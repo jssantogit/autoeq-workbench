@@ -19,3 +19,13 @@ export interface Normalization {
   anchorHz: number
   targetDb: number
 }
+
+export interface PreparedCurve {
+  curveId: string
+  name: string
+  role: CurveRole
+  frequencies: number[]
+  db: number[]
+  normalization: Normalization
+  offsetDb: number
+}
