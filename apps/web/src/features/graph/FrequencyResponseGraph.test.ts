@@ -1,7 +1,7 @@
 import type { Curve, Filter } from '@autoeq-workbench/core'
 import { describe, expect, it } from 'vitest'
 import { createWorkspaceStore, deriveWorkspace } from '../../state/workspaceStore'
-import { buildGraphSeries } from './graphSeries'
+import { buildGraphSeries, formatGraphInspector } from './graphSeries'
 
 const source: Curve = {
   id: 'source',
@@ -117,5 +117,37 @@ describe('buildGraphSeries', () => {
     expect(derived.status).toBe('coverage-error')
     expect(derived.message).toMatch(/20 Hz.*20 kHz/i)
     expect(series.map(({ name }) => name)).toEqual(['Source', 'Target'])
+  })
+})
+
+describe('formatGraphInspector', () => {
+  it('log-interpolates values at the pointer and lists only present visible series', () => {
+    const text = formatGraphInspector(
+      1_000,
+      [
+        {
+          name: 'Source',
+          data: [
+            [100, 0],
+            [10_000, 20],
+          ],
+          defaultVisible: true,
+        },
+        {
+          name: 'Target',
+          data: [
+            [100, 5],
+            [10_000, 5],
+          ],
+          defaultVisible: true,
+        },
+      ],
+      { Source: true, Target: false, PEQ: true },
+    )
+
+    expect(text).toContain('1.00 kHz')
+    expect(text).toContain('Source: 10.00 dB')
+    expect(text).not.toContain('Target')
+    expect(text).not.toContain('PEQ')
   })
 })

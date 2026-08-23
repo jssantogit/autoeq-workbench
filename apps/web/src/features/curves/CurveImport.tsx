@@ -1,5 +1,5 @@
 import { CoreError, parseCurveText } from '@autoeq-workbench/core'
-import { useState, type ChangeEvent } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 
 interface CurveImportProps {
@@ -12,23 +12,28 @@ export function CurveImport({ role }: CurveImportProps) {
     role === 'source' ? state.setSource : state.setTarget,
   )
   const [error, setError] = useState<string | null>(null)
+  const requestRef = useRef(0)
   const label = role === 'source' ? 'Source' : 'Target'
 
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     if (file === undefined) return
+    const input = event.currentTarget
+    const request = ++requestRef.current
 
     try {
       const text = await file.text()
       const parsed = parseCurveText(text, { name: file.name, role })
+      if (request !== requestRef.current) return
       setCurve(parsed)
       setError(null)
     } catch (cause) {
+      if (request !== requestRef.current) return
       const category = cause instanceof CoreError ? cause.category : 'parse'
       const message = cause instanceof Error ? cause.message : 'Unable to read curve file'
       setError(`[${category}] ${message}`)
     } finally {
-      event.target.value = ''
+      if (request === requestRef.current) input.value = ''
     }
   }
 

@@ -1,3 +1,4 @@
+import { interpolateLogFrequency } from '@autoeq-workbench/core'
 import type { DerivedCurve, WorkspaceDerived } from '../../state/workspaceStore'
 
 export type GraphSeriesName =
@@ -13,6 +14,29 @@ export interface GraphSeries {
   data: [number, number][]
   defaultVisible: boolean
   markerFrequencyHz?: number
+}
+
+export function formatGraphInspector(
+  frequencyHz: number,
+  series: readonly GraphSeries[],
+  selected: Readonly<Partial<Record<GraphSeriesName, boolean>>>,
+): string {
+  const frequency =
+    frequencyHz >= 1_000 ? `${(frequencyHz / 1_000).toFixed(2)} kHz` : `${frequencyHz.toFixed(0)} Hz`
+  const values = series.flatMap((item) => {
+    if (selected[item.name] === false || item.data.length < 2) return []
+    const firstFrequency = item.data[0]![0]
+    const lastFrequency = item.data[item.data.length - 1]![0]
+    if (frequencyHz < firstFrequency || frequencyHz > lastFrequency) return []
+    const points = item.data.map(([pointFrequencyHz, db]) => ({
+      frequencyHz: pointFrequencyHz,
+      db,
+    }))
+    const db = interpolateLogFrequency(points, [frequencyHz])[0]!
+    return [`${item.name}: ${db.toFixed(2)} dB`]
+  })
+
+  return [frequency, ...values].join('<br/>')
 }
 
 function graphSeries(

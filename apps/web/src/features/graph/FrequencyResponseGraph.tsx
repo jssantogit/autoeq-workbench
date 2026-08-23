@@ -12,7 +12,7 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { useEffect, useRef } from 'react'
 import { Button } from '../../components/ui/Button'
 import type { WorkspaceDerived } from '../../state/workspaceStore'
-import { buildGraphSeries, type GraphSeriesName } from './graphSeries'
+import { buildGraphSeries, formatGraphInspector, type GraphSeriesName } from './graphSeries'
 
 registerEChartsModules([
   LineChart,
@@ -47,9 +47,41 @@ const seriesColors: Record<GraphSeriesName, string> = {
   'Selected Filter': '#ffffff',
 }
 
+interface EChartsInteractionOption {
+  legend?: { selected?: Partial<Record<GraphSeriesName, boolean>> }[]
+  dataZoom?: {
+    start?: number
+    end?: number
+    startValue?: number
+    endValue?: number
+  }[]
+}
+
+function dataZoomInteraction(
+  option: EChartsInteractionOption,
+  index: number,
+): NonNullable<EChartsInteractionOption['dataZoom']>[number] {
+  const zoom = option.dataZoom?.[index]
+  if (zoom === undefined) return {}
+  return {
+    ...(zoom.start === undefined ? {} : { start: zoom.start }),
+    ...(zoom.end === undefined ? {} : { end: zoom.end }),
+    ...(zoom.startValue === undefined ? {} : { startValue: zoom.startValue }),
+    ...(zoom.endValue === undefined ? {} : { endValue: zoom.endValue }),
+  }
+}
+
+function tooltipFrequency(params: unknown): number | null {
+  const first = Array.isArray(params) ? params[0] : params
+  if (typeof first !== 'object' || first === null || !('axisValue' in first)) return null
+  const frequencyHz = Number(first.axisValue)
+  return Number.isFinite(frequencyHz) && frequencyHz > 0 ? frequencyHz : null
+}
+
 export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<EChartsType | null>(null)
+  const renderedSeriesRef = useRef<Set<GraphSeriesName>>(new Set())
 
   useEffect(() => {
     if (containerRef.current === null) return
@@ -69,12 +101,18 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
     const chart = chartRef.current
     if (chart === null) return
     const graphSeries = buildGraphSeries(derived)
+    const interactionOption = chart.getOption() as EChartsInteractionOption
+    const previousSelected = interactionOption.legend?.[0]?.selected ?? {}
     const selected = Object.fromEntries(
       legendNames.map((name) => [
         name,
-        graphSeries.find((series) => series.name === name)?.defaultVisible ?? false,
+        renderedSeriesRef.current.has(name) && previousSelected[name] !== undefined
+          ? previousSelected[name]
+          : (graphSeries.find((series) => series.name === name)?.defaultVisible ?? false),
       ]),
-    )
+    ) as Record<GraphSeriesName, boolean>
+    const insideZoom = dataZoomInteraction(interactionOption, 0)
+    const sliderZoom = dataZoomInteraction(interactionOption, 1)
 
     chart.setOption(
       {
@@ -89,7 +127,14 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
         },
         tooltip: {
           trigger: 'axis',
-          axisPointer: { type: 'cross', snap: true },
+          axisPointer: { type: 'cross', snap: false },
+          formatter: (params: unknown) => {
+            const frequencyHz = tooltipFrequency(params)
+            if (frequencyHz === null) return ''
+            const currentSelected =
+              (chart.getOption() as EChartsInteractionOption).legend?.[0]?.selected ?? selected
+            return formatGraphInspector(frequencyHz, graphSeries, currentSelected)
+          },
         },
         xAxis: {
           type: 'log',
@@ -109,7 +154,7 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
           splitLine: { lineStyle: { color: '#26333e' } },
         },
         dataZoom: [
-          { type: 'inside', xAxisIndex: 0, filterMode: 'none' },
+          { type: 'inside', xAxisIndex: 0, filterMode: 'none', ...insideZoom },
           {
             type: 'slider',
             xAxisIndex: 0,
@@ -118,6 +163,7 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
             bottom: 12,
             borderColor: '#344450',
             fillerColor: 'rgba(80, 213, 183, 0.12)',
+            ...sliderZoom,
           },
         ],
         series: graphSeries.map((series) => ({
@@ -142,6 +188,7 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
       },
       { notMerge: true },
     )
+    renderedSeriesRef.current = new Set(graphSeries.map(({ name }) => name))
   }, [derived])
 
   function resetView() {
