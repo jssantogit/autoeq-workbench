@@ -31,7 +31,7 @@ export function FilterEditor() {
         </div>
       </div>
       <div className="filter-table-wrap">
-        <table className="filter-table" aria-label="Manual filters">
+        <table className="filter-table" aria-label="Equalizer filters">
           <thead className="filter-table__head">
             <tr><th>ON</th><th>Type</th><th>Fc</th><th>Gain</th><th>Q</th><th aria-label="Actions" /></tr>
           </thead>
@@ -47,7 +47,7 @@ export function FilterEditor() {
             ))}
           </tbody>
         </table>
-        {filters.length === 0 && <p className="filter-editor__empty">Add a filter to begin manual EQ.</p>}
+        {filters.length === 0 && <p className="filter-editor__empty">Add a filter to begin EQ.</p>}
       </div>
       <p className="filter-editor__count">{filters.length} / 64 filters</p>
     </div>

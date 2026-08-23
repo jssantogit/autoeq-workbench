@@ -48,7 +48,7 @@ export function CurveAppearanceControls({ entry }: CurveAppearanceControlsProps)
         />
       </label>
       <details className="curve-menu">
-        <summary aria-label={`Actions for ${curve.name}`}>Actions</summary>
+        <summary aria-label={`Actions for ${curve.name}`}>...</summary>
         <div className="curve-menu__panel">
           <button type="button" onClick={() => setCurveRole(curve.id, 'source')}>Set as Source</button>
           <button type="button" onClick={() => setCurveRole(curve.id, 'target')}>Set as Target</button>

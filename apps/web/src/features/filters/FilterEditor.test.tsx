@@ -94,7 +94,7 @@ describe('FilterEditor', () => {
     workspaceStore.setState({ filters: [filter] })
     render(<FilterEditor />)
 
-    expect(screen.getByRole('table', { name: 'Manual filters' })).toBeInTheDocument()
+    expect(screen.getByRole('table', { name: 'Equalizer filters' })).toBeInTheDocument()
     expect(screen.getAllByRole('columnheader')).toHaveLength(6)
     expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
       'ON',

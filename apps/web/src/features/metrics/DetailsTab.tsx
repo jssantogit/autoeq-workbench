@@ -1,4 +1,3 @@
-import { MVP_NUMERIC_POLICY } from '@autoeq-workbench/core'
 import {
   useWorkspaceStore,
   type WorkspaceDerived,
@@ -12,7 +11,7 @@ interface DetailsTabProps {
 const titleCase = (value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`
 
 const displayProvenance = (value: 'manual' | 'autoeq' | null) =>
-  value === 'autoeq' ? 'AutoEQ' : 'Manual'
+  value === 'autoeq' ? 'AutoEQ' : 'User edited'
 
 export function DetailsTab({ derived }: DetailsTabProps) {
   const activeFilterCount = useWorkspaceStore(
@@ -21,15 +20,8 @@ export function DetailsTab({ derived }: DetailsTabProps) {
   const totalFilterCount = useWorkspaceStore((state) => state.filters.length)
   const solutionState = useWorkspaceStore((state) => state.solutionState)
   const filterProvenance = useWorkspaceStore((state) => state.filterProvenance)
-  const policy = MVP_NUMERIC_POLICY
-
   return (
-    <section className="details-tab" aria-labelledby="details-heading">
-      <header className="details-tab__heading">
-        <h2 id="details-heading">Details</h2>
-        <p>Current comparison, equalizer, and evaluation information.</p>
-      </header>
-
+    <section className="details-tab" aria-label="Details workspace">
       <div className="details-tab__sections">
         <MetricsSummary derived={derived} />
 
@@ -41,23 +33,6 @@ export function DetailsTab({ derived }: DetailsTabProps) {
               { label: 'Total filters', value: String(totalFilterCount) },
               { label: 'Solution state', value: titleCase(solutionState) },
               { label: 'Provenance', value: displayProvenance(filterProvenance) },
-            ]}
-          />
-        </section>
-
-        <section className="details-section" aria-labelledby="policy-details-heading">
-          <h3 id="policy-details-heading">Evaluation policy</h3>
-          <MetricList
-            values={[
-              { label: 'Sample rate', value: `${policy.sampleRateHz / 1_000} kHz` },
-              {
-                label: 'Evaluation range',
-                value: `${policy.minFrequencyHz} Hz-${policy.maxFrequencyHz / 1_000} kHz`,
-              },
-              {
-                label: 'Evaluation density',
-                value: `${policy.evaluationPointsPerOctave} ppo evaluation`,
-              },
             ]}
           />
         </section>

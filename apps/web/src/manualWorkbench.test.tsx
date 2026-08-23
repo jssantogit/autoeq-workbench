@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { seriesAppearance } from './features/graph/graphAppearance'
@@ -54,7 +54,8 @@ describe('manual workbench integration', () => {
     fireEvent.change(screen.getByLabelText('+ Curve'), {
       target: { files: [sourceFile] },
     })
-    await waitFor(() => expect(screen.getByText('Synthetic Source.txt')).toBeInTheDocument())
+    const curveManager = screen.getByRole('list', { name: 'Workspace curves' })
+    await waitFor(() => expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument())
     const sourceId = workspaceStore.getState().curves[0]!.curve.id
     const importedSourceColor = uiStore.getState().curveAppearance[sourceId]!.color
     expect(MEASUREMENT_CURVE_PALETTE).toContain(importedSourceColor)
@@ -70,8 +71,8 @@ describe('manual workbench integration', () => {
       target: { files: [targetFile] },
     })
     await waitFor(() => {
-      expect(screen.getByText('Synthetic Source.txt')).toBeInTheDocument()
-      expect(screen.getByText('Synthetic Target.csv')).toBeInTheDocument()
+      expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument()
+      expect(within(curveManager).getByText('Synthetic Target.csv')).toBeInTheDocument()
     })
     await user.click(screen.getByRole('button', { name: 'Apply normalization' }))
     expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 500, targetDb: 0 })

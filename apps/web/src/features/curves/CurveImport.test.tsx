@@ -114,12 +114,16 @@ describe('CurvesTab', () => {
     render(<CurvesTab />)
     const rows = within(screen.getByRole('list', { name: 'Workspace curves' })).getAllByRole('listitem')
 
+    expect(screen.queryByRole('heading', { name: 'Curves' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/import, identify, and align/i)).not.toBeInTheDocument()
     expect(rows).toHaveLength(3)
     expect(within(rows[0]!).getByText('Source')).toBeInTheDocument()
     expect(within(rows[1]!).getByText('Target')).toBeInTheDocument()
     expect(within(rows[2]!).getByText('Comparison')).toBeInTheDocument()
     expect(screen.queryByLabelText('+ Curve')).not.toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Workspace normalization' })).toBeInTheDocument()
+    expect(within(rows[0]!).getByLabelText('Actions for Source.csv')).toHaveTextContent('...')
+    expect(within(rows[0]!).queryByText('Actions')).not.toBeInTheDocument()
   })
 
   it('performs role, visibility, color, inline rename, and remove operations from a compact row menu', async () => {

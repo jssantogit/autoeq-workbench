@@ -5,7 +5,7 @@ export function AppHeader() {
     <header className="app-header">
       <div className="app-header__identity">
         <h1>AutoEQ Workbench</h1>
-        <p>Manual frequency response workspace</p>
+        <p>Frequency response workspace</p>
       </div>
       <ThemeToggle />
     </header>

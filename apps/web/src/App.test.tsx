@@ -1,5 +1,5 @@
 import type { Curve } from '@autoeq-workbench/core'
-import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
@@ -19,6 +19,8 @@ describe('App', () => {
   it('renders the workbench title', () => {
     render(<App />)
     expect(screen.getByRole('heading', { name: /autoeq workbench/i })).toBeInTheDocument()
+    expect(screen.getByText('Frequency response workspace')).toBeVisible()
+    expect(screen.queryByText('Manual frequency response workspace')).not.toBeInTheDocument()
   })
 
   it('assembles the graph before the shared workbench dock', async () => {
@@ -37,7 +39,7 @@ describe('App', () => {
     expect(within(utilityRail).getByText('Normalize: 500 Hz / 0 dB')).toBeVisible()
     expect(utilityRail).toHaveTextContent('Source: None')
     expect(utilityRail).toHaveTextContent('Target: None')
-    expect(screen.getByRole('heading', { name: 'Curves' })).toBeVisible()
+    expect(screen.queryByRole('heading', { name: 'Curves' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     const equalizer = screen.getByRole('region', { name: 'Equalizer workspace' })
     expect(equalizer).toBeVisible()
@@ -50,19 +52,33 @@ describe('App', () => {
     expect(screen.queryByRole('button', { name: /run autoeq/i })).not.toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'Details' }))
     expect(screen.getByRole('heading', { name: 'Metrics' })).toBeVisible()
+    expect(screen.queryByRole('heading', { name: 'Details' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Evaluation policy')).not.toBeInTheDocument()
+    expect(screen.queryByText('48 kHz')).not.toBeInTheDocument()
     expect(screen.getByText(/assign source and target/i)).toBeInTheDocument()
   })
 
-  it('switches to Curves and focuses normalization from the utility rail', async () => {
-    const user = userEvent.setup()
-    uiStore.setState({ activeDockTab: 'details' })
-    render(<App />)
+  it.each(['equalizer', 'details'] as const)(
+    'switches from %s to Curves and focuses normalization after rendering',
+    async (activeDockTab) => {
+      const user = userEvent.setup()
+      uiStore.setState({ activeDockTab })
+      render(<App />)
+      let panelWasVisibleWhenFocused = false
+      const normalization = screen.getByRole('region', { name: 'Workspace normalization', hidden: true })
+      const originalFocus = normalization.focus.bind(normalization)
+      vi.spyOn(normalization, 'focus').mockImplementation(() => {
+        panelWasVisibleWhenFocused = !normalization.closest('[role="tabpanel"]')?.hasAttribute('hidden')
+        originalFocus()
+      })
 
-    await user.click(screen.getByRole('button', { name: 'Normalize: 500 Hz / 0 dB' }))
+      await user.click(screen.getByRole('button', { name: 'Normalize: 500 Hz / 0 dB' }))
 
-    expect(uiStore.getState().activeDockTab).toBe('curves')
-    expect(screen.getByRole('region', { name: 'Workspace normalization' })).toHaveFocus()
-  })
+      expect(uiStore.getState().activeDockTab).toBe('curves')
+      await waitFor(() => expect(normalization).toHaveFocus())
+      expect(panelWasVisibleWhenFocused).toBe(true)
+    },
+  )
 
   it('reacts to Source and Target role assignments in the utility rail', () => {
     const curves: Curve[] = ['Measurement A', 'Measurement B'].map((name, index) => ({

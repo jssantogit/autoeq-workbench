@@ -12,7 +12,10 @@ export function UtilityRail() {
 
   function showNormalization() {
     setActiveDockTab('curves')
-    document.getElementById('workspace-normalization')?.focus()
+    const scheduleFocus = window.requestAnimationFrame ?? ((callback: FrameRequestCallback) => {
+      window.setTimeout(callback, 0)
+    })
+    scheduleFocus(() => document.getElementById('workspace-normalization')?.focus())
   }
 
   return (

@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { MVP_NUMERIC_POLICY } from '@autoeq-workbench/core'
 import {
   defaultNormalization,
   deriveWorkspace,
@@ -67,7 +66,7 @@ describe('DetailsTab', () => {
     expect(metricValue('Provenance')).toHaveTextContent('AutoEQ')
   })
 
-  it('keeps derivable zero preamp and manual state legible without comparison curves', () => {
+  it('keeps derivable zero preamp and user-edited state legible without comparison curves', () => {
     render(<DetailsTab derived={currentDerived()} />)
 
     expect(metricValue('MAE')).toHaveTextContent('--')
@@ -77,22 +76,19 @@ describe('DetailsTab', () => {
     expect(metricValue('Preamp')).toHaveTextContent('0.00 dB')
     expect(metricValue('Active filters')).toHaveTextContent('0')
     expect(metricValue('Solution state')).toHaveTextContent('Clean')
-    expect(metricValue('Provenance')).toHaveTextContent('Manual')
+    expect(metricValue('Provenance')).toHaveTextContent('User edited')
     expect(screen.getByText(/comparison metrics require source and target/i)).toBeVisible()
     expect(screen.queryByText(/peq.*unavailable/i)).not.toBeInTheDocument()
   })
 
-  it('shows the core-owned fixed numeric policy', () => {
+  it('omits redundant headings and internal evaluation policy metadata', () => {
     render(<DetailsTab derived={currentDerived()} />)
 
-    expect(MVP_NUMERIC_POLICY).toEqual({
-      sampleRateHz: 48_000,
-      minFrequencyHz: 20,
-      maxFrequencyHz: 20_000,
-      evaluationPointsPerOctave: 96,
-    })
-    expect(metricValue('Sample rate')).toHaveTextContent('48 kHz')
-    expect(metricValue('Evaluation range')).toHaveTextContent('20 Hz-20 kHz')
-    expect(metricValue('Evaluation density')).toHaveTextContent('96 ppo')
+    expect(screen.queryByRole('heading', { name: 'Details' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Evaluation policy')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sample rate')).not.toBeInTheDocument()
+    expect(screen.queryByText('Evaluation range')).not.toBeInTheDocument()
+    expect(screen.queryByText('Evaluation density')).not.toBeInTheDocument()
+    expect(screen.queryByText('48 kHz')).not.toBeInTheDocument()
   })
 })
