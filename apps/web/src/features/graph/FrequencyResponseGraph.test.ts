@@ -6,7 +6,7 @@ import { buildGraphSeries, formatGraphInspector } from './graphSeries'
 const source: Curve = {
   id: 'source',
   name: 'Source',
-  role: 'source',
+  kind: 'fr',
   rawPoints: [
     { frequencyHz: 20, db: -2 },
     { frequencyHz: 500, db: 1 },
@@ -18,7 +18,7 @@ const source: Curve = {
 const target: Curve = {
   id: 'target',
   name: 'Target',
-  role: 'target',
+  kind: 'target',
   rawPoints: [
     { frequencyHz: 20, db: 1 },
     { frequencyHz: 500, db: 0 },
@@ -39,7 +39,7 @@ const filter: Filter = {
 const overlay: Curve = {
   id: 'overlay',
   name: 'Room overlay',
-  role: 'comparison',
+  kind: 'fr',
   rawPoints: [
     { frequencyHz: 20, db: 2 },
     { frequencyHz: 500, db: 1 },

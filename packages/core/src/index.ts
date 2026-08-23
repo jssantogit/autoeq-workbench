@@ -23,9 +23,9 @@ export type { CoreErrorCategory } from './types/error.js'
 export type { Filter, FilterType } from './types/filter.js'
 export type {
   Curve,
+  CurveKind,
   CurveMetadata,
   CurvePoint,
-  CurveRole,
   Normalization,
   PreparedCurve,
 } from './types/curve.js'

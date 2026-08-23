@@ -15,7 +15,7 @@ vi.mock('@autoeq-workbench/core', async (importOriginal) => {
 const curves: Curve[] = ['Source.csv', 'Target.csv', 'Overlay.csv'].map((name, index) => ({
   id: `curve-${index}`,
   name,
-  role: 'comparison',
+  kind: 'fr',
   rawPoints: [
     { frequencyHz: 20, db: index },
     { frequencyHz: 20_000, db: index + 1 },
@@ -54,7 +54,7 @@ describe('CurveImport', () => {
 
     await waitFor(() => expect(workspaceStore.getState().curves).toHaveLength(1))
     const entry = workspaceStore.getState().curves[0]!
-    expect(entry).toMatchObject({ curve: { name: 'Measurement.txt', role: 'comparison' }, role: 'source' })
+    expect(entry).toMatchObject({ curve: { name: 'Measurement.txt', kind: 'fr' }, role: 'source' })
     expect(uiStore.getState().curveAppearance[entry.curve.id]).toMatchObject({ visible: true })
   })
 

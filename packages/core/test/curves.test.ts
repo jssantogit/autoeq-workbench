@@ -148,7 +148,7 @@ describe('prepareCurve', () => {
   const curve: Curve = {
     id: 'source-1',
     name: 'Synthetic source',
-    role: 'source',
+    kind: 'fr',
     rawPoints: [
       { frequencyHz: 100, db: 80 },
       { frequencyHz: 1000, db: 90 },
@@ -161,7 +161,7 @@ describe('prepareCurve', () => {
     expectTypeOf<PreparedCurve>().toEqualTypeOf<{
       curveId: string
       name: string
-      role: 'source' | 'target' | 'comparison' | 'derived'
+      kind: 'fr' | 'target'
       frequencies: number[]
       db: number[]
       normalization: { anchorHz: number; targetDb: number }
@@ -178,7 +178,7 @@ describe('prepareCurve', () => {
     expect(prepared).toEqual({
       curveId: 'source-1',
       name: 'Synthetic source',
-      role: 'source',
+      kind: 'fr',
       frequencies: [100, 1000, 10_000],
       db: [-10, 0, 10],
       normalization: { anchorHz: 1000, targetDb: 0 },

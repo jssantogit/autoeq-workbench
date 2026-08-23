@@ -84,7 +84,7 @@ describe('App', () => {
     const curves: Curve[] = ['Measurement A', 'Measurement B'].map((name, index) => ({
       id: `curve-${index}`,
       name,
-      role: 'comparison',
+      kind: 'fr',
       rawPoints: [{ frequencyHz: 20, db: 0 }, { frequencyHz: 20_000, db: 0 }],
       metadata: {},
     }))

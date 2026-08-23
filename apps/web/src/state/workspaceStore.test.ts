@@ -5,7 +5,7 @@ import { createWorkspaceStore, defaultNormalization, deriveWorkspace } from './w
 const source: Curve = {
   id: 'source-1',
   name: 'Source A',
-  role: 'comparison',
+  kind: 'fr',
   rawPoints: [
     { frequencyHz: 20, db: -2 },
     { frequencyHz: 500, db: 0 },
@@ -17,7 +17,7 @@ const source: Curve = {
 const target: Curve = {
   id: 'target-1',
   name: 'Target A',
-  role: 'comparison',
+  kind: 'target',
   rawPoints: [
     { frequencyHz: 20, db: 2 },
     { frequencyHz: 500, db: 8 },

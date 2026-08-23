@@ -3,14 +3,14 @@ export interface CurvePoint {
   db: number
 }
 
-export type CurveRole = 'source' | 'target' | 'comparison' | 'derived'
+export type CurveKind = 'fr' | 'target'
 
 export type CurveMetadata = Record<string, string | number | boolean>
 
 export interface Curve {
   id: string
   name: string
-  role: CurveRole
+  kind: CurveKind
   rawPoints: CurvePoint[]
   metadata: CurveMetadata
 }
@@ -23,7 +23,7 @@ export interface Normalization {
 export interface PreparedCurve {
   curveId: string
   name: string
-  role: CurveRole
+  kind: CurveKind
   frequencies: number[]
   db: number[]
   normalization: Normalization

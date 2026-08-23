@@ -4,11 +4,12 @@ import {
   CoreError,
   parseCurveText,
   type Curve,
+  type CurveKind,
   type CurvePoint,
-  type CurveRole,
   type Filter,
   type FilterType,
   type Normalization,
+  type ParseCurveOptions,
 } from '../src/index.js'
 import {
   commentFixture,
@@ -16,7 +17,7 @@ import {
   expectedThreePointCurve,
 } from './fixtures/curves.js'
 
-const sourceOptions = { name: 'Source', role: 'source' as const }
+const frOptions = { name: 'Source', kind: 'fr' as const }
 
 function expectCoreError(
   operation: () => unknown,
@@ -39,7 +40,11 @@ describe('core domain types', () => {
       frequencyHz: number
       db: number
     }>()
-    expectTypeOf<CurveRole>().toEqualTypeOf<'source' | 'target' | 'comparison' | 'derived'>()
+    expectTypeOf<CurveKind>().toEqualTypeOf<'fr' | 'target'>()
+    expectTypeOf<ParseCurveOptions>().toEqualTypeOf<{
+      name: string
+      kind: CurveKind
+    }>()
     expectTypeOf<Normalization>().toEqualTypeOf<{
       anchorHz: number
       targetDb: number
@@ -56,7 +61,7 @@ describe('core domain types', () => {
     expectTypeOf<Curve>().toMatchTypeOf<{
       id: string
       name: string
-      role: CurveRole
+      kind: CurveKind
       rawPoints: CurvePoint[]
     }>()
 
@@ -70,36 +75,36 @@ describe('core domain types', () => {
 })
 
 describe('parseCurveText', () => {
-  it('imports a generic comparison curve without assigning an AutoEQ role', () => {
-    const curve = parseCurveText('20 1\n20000 2', { name: 'Overlay', role: 'comparison' })
+  it('classifies an imported frequency-response curve by kind', () => {
+    const curve = parseCurveText('20 1\n20000 2', { name: 'Overlay', kind: 'fr' })
 
-    expect(curve).toMatchObject({ name: 'Overlay', role: 'comparison' })
+    expect(curve).toMatchObject({ name: 'Overlay', kind: 'fr' })
   })
 
   it.each(delimiterFixtures)('parses $name-delimited data with a header', ({ text }) => {
-    const curve = parseCurveText(text, sourceOptions)
+    const curve = parseCurveText(text, frOptions)
 
-    expect(curve).toMatchObject({ name: 'Source', role: 'source' })
+    expect(curve).toMatchObject({ name: 'Source', kind: 'fr' })
     expect(curve.id).toEqual(expect.any(String))
     expect(curve.id).not.toHaveLength(0)
     expect(curve.rawPoints).toEqual(expectedThreePointCurve)
   })
 
   it('normalizes a BOM and CRLF newlines and removes every supported comment prefix', () => {
-    expect(parseCurveText(commentFixture, sourceOptions).rawPoints).toEqual(
+    expect(parseCurveText(commentFixture, frOptions).rawPoints).toEqual(
       expectedThreePointCurve,
     )
   })
 
   it('normalizes bare carriage-return newlines and accepts files without a header', () => {
-    const curve = parseCurveText('20 81.2\r1000 90\r20000 82.1', sourceOptions)
+    const curve = parseCurveText('20 81.2\r1000 90\r20000 82.1', frOptions)
 
     expect(curve.rawPoints).toEqual(expectedThreePointCurve)
   })
 
   it('only treats semicolon followed by whitespace as a comment prefix', () => {
     expectCoreError(
-      () => parseCurveText(';not a comment\n20;81.2\n1000;90', sourceOptions),
+      () => parseCurveText(';not a comment\n20;81.2\n1000;90', frOptions),
       'parse',
       /header|malformed|columns/i,
     )
@@ -108,11 +113,11 @@ describe('parseCurveText', () => {
   it('allows comments and blank lines between data rows', () => {
     const text = '20 81.2\n# note\n\n// note\n; note\n1000 90\n20000 82.1'
 
-    expect(parseCurveText(text, sourceOptions).rawPoints).toEqual(expectedThreePointCurve)
+    expect(parseCurveText(text, frOptions).rawPoints).toEqual(expectedThreePointCurve)
   })
 
   it('allows exactly one fully non-numeric leading header', () => {
-    expect(parseCurveText('Hz dB\n20 1\n1000 2', sourceOptions).rawPoints).toEqual([
+    expect(parseCurveText('Hz dB\n20 1\n1000 2', frOptions).rawPoints).toEqual([
       { frequencyHz: 20, db: 1 },
       { frequencyHz: 1000, db: 2 },
     ])
@@ -120,7 +125,7 @@ describe('parseCurveText', () => {
 
   it('rejects a header that matches more than one delimiter strategy', () => {
     expectCoreError(
-      () => parseCurveText('Frequency\tLevel;SPL', sourceOptions),
+      () => parseCurveText('Frequency\tLevel;SPL', frOptions),
       'parse',
       /ambiguous.*delimiter/i,
     )
@@ -137,7 +142,7 @@ describe('parseCurveText', () => {
     ['partially numeric header', '20 SPL\n1000 1\n20000 2'],
   ])('rejects malformed or ambiguous input: %s', (_name, text) => {
     expectCoreError(
-      () => parseCurveText(text, sourceOptions),
+      () => parseCurveText(text, frOptions),
       'parse',
       /ambiguous|column|delimiter|header|malformed/i,
     )
@@ -148,7 +153,7 @@ describe('parseCurveText', () => {
     ['negative', '20 1\n-1000 2'],
   ])('rejects %s frequencies', (_name, text) => {
     expectCoreError(
-      () => parseCurveText(text, sourceOptions),
+      () => parseCurveText(text, frOptions),
       'validation',
       /frequency.*positive/i,
     )
@@ -161,7 +166,7 @@ describe('parseCurveText', () => {
     ['NaN magnitude', '20 1\n1000 NaN'],
   ])('rejects a non-finite number: %s', (_name, text) => {
     expectCoreError(
-      () => parseCurveText(text, sourceOptions),
+      () => parseCurveText(text, frOptions),
       'validation',
       /finite/i,
     )
@@ -169,21 +174,21 @@ describe('parseCurveText', () => {
 
   it('rejects duplicate frequencies with conflicting dB values', () => {
     expectCoreError(
-      () => parseCurveText('20 1\n1000 2\n20 1.1', sourceOptions),
+      () => parseCurveText('20 1\n1000 2\n20 1.1', frOptions),
       'validation',
       /duplicate.*conflict/i,
     )
   })
 
   it('collapses exact duplicate points', () => {
-    expect(parseCurveText('20 1\n20 1\n1000 2\n1000 2', sourceOptions).rawPoints).toEqual([
+    expect(parseCurveText('20 1\n20 1\n1000 2\n1000 2', frOptions).rawPoints).toEqual([
       { frequencyHz: 20, db: 1 },
       { frequencyHz: 1000, db: 2 },
     ])
   })
 
   it('sorts non-increasing input by frequency', () => {
-    expect(parseCurveText('1000 2\n20 1\n20000 3', sourceOptions).rawPoints).toEqual([
+    expect(parseCurveText('1000 2\n20 1\n20000 3', frOptions).rawPoints).toEqual([
       { frequencyHz: 20, db: 1 },
       { frequencyHz: 1000, db: 2 },
       { frequencyHz: 20000, db: 3 },
@@ -193,10 +198,10 @@ describe('parseCurveText', () => {
   it('preserves raw numeric values without normalization, interpolation, or rounding', () => {
     const curve = parseCurveText(
       '2.0123456789e1 -81.23456789\n1e3 +9.0000000001e1',
-      { name: 'Target', role: 'target' },
+      { name: 'Target', kind: 'target' },
     )
 
-    expect(curve).toMatchObject({ name: 'Target', role: 'target' })
+    expect(curve).toMatchObject({ name: 'Target', kind: 'target' })
     expect(curve.rawPoints).toEqual([
       { frequencyHz: 20.123456789, db: -81.23456789 },
       { frequencyHz: 1000, db: 90.000000001 },
@@ -211,7 +216,7 @@ describe('parseCurveText', () => {
     ['one unique point', '20 1\n20 1'],
   ])('requires at least two unique points: %s', (_name, text) => {
     expectCoreError(
-      () => parseCurveText(text, sourceOptions),
+      () => parseCurveText(text, frOptions),
       'validation',
       /at least two unique points|empty|numeric data/i,
     )

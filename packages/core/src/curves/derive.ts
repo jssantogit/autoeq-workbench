@@ -14,7 +14,7 @@ export function prepareCurve(
   return {
     curveId: curve.id,
     name: curve.name,
-    role: curve.role,
+    kind: curve.kind,
     frequencies: [...frequencies],
     db: applyOffset(interpolatedDb, offsetDb),
     normalization: { ...normalization },

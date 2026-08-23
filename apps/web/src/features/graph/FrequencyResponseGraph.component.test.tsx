@@ -22,11 +22,11 @@ vi.mock('echarts/renderers', () => ({ CanvasRenderer: { name: 'canvas' } }))
 
 import { FrequencyResponseGraph } from './FrequencyResponseGraph'
 
-function curve(id: string, name: string, role: Curve['role'], offset = 0): Curve {
+function curve(id: string, name: string, kind: Curve['kind'], offset = 0): Curve {
   return {
     id,
     name,
-    role,
+    kind,
     rawPoints: [
       { frequencyHz: 20, db: offset - 1 },
       { frequencyHz: 500, db: offset },
@@ -82,12 +82,12 @@ describe('FrequencyResponseGraph', () => {
 
   it('plots every visible measurement by actual name and labels it with its effective color', () => {
     const store = createWorkspaceStore()
-    store.getState().addCurve(curve('source', 'Studio left', 'source'))
+    store.getState().addCurve(curve('source', 'Studio left', 'fr'))
     store.getState().addCurve(curve('target', 'Harman target', 'target', 1))
-    store.getState().addCurve(curve('reference', 'Archive reference', 'comparison', 2))
+    store.getState().addCurve(curve('reference', 'Archive reference', 'target', 2))
     store.getState().setCurveRole('reference', 'reference')
-    store.getState().addCurve(curve('comparison', 'Room comparison', 'comparison', 3))
-    store.getState().addCurve(curve('hidden', 'Hidden comparison', 'comparison', 4))
+    store.getState().addCurve(curve('comparison', 'Room comparison', 'fr', 3))
+    store.getState().addCurve(curve('hidden', 'Hidden comparison', 'fr', 4))
     store.getState().setFilters([filter], 'manual')
     uiStore.setState({
       curveAppearance: {
@@ -120,7 +120,7 @@ describe('FrequencyResponseGraph', () => {
 
   it('updates theme colors without changing canonical series data', () => {
     const store = createWorkspaceStore()
-    store.getState().addCurve(curve('source', 'Source measurement', 'source'))
+    store.getState().addCurve(curve('source', 'Source measurement', 'fr'))
     uiStore.setState({ curveAppearance: { source: { color: '#00796b', visible: true } } })
     render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     const initialData = mocks.chart.setOption.mock.calls.at(-1)?.[0].series[0].data

@@ -17,7 +17,7 @@ export function CurveImport() {
 
     try {
       const text = await file.text()
-      const parsed = parseCurveText(text, { name: file.name, role: 'comparison' })
+      const parsed = parseCurveText(text, { name: file.name, kind: 'fr' })
       if (request !== requestRef.current) return
       if (addCurve(parsed)) registerCurve(parsed.id)
       setError(null)
