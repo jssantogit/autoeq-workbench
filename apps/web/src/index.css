@@ -120,6 +120,7 @@ input:focus-visible { outline: 2px solid #78a9ff; outline-offset: 1px; }
 .number-field input[aria-invalid="true"] { border-color: #f08b88; background: #251416; }
 
 .workspace-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 7px; margin-top: 7px; }
+.workspace-grid > .panel { min-width: 0; }
 .panel__header { min-height: 36px; padding: 7px 10px; border-bottom: 1px solid #26343e; }
 .panel__body { padding: 9px; }
 .curve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
