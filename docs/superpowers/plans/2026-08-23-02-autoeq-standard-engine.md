@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Complete Plan 1 before starting this plan.
+- Complete the mandatory Plan 1.5 Visual Foundation Closeout gate before starting this plan.
 - Standard profile uses fixed 48,000 Hz sample rate and 20 Hz–20 kHz optimization range.
 - Standard allows PK/LS/HS, filter gain -15..+15 dB, PK Q 0.1..12, shelf Q 0.7.
 - `maxFilters` default 10, hard ceiling 64, and is never a fill target.
@@ -74,10 +74,15 @@ apps/web/src/features/autoeq/
 - [ ] **Step 1: Write config invariant tests**
 
 ```ts
+import { MVP_NUMERIC_POLICY, STANDARD_V1_CONFIG } from '../../src/index.js'
+
 it('exposes Standard v1 product bounds', () => {
-  expect(STANDARD_V1_CONFIG.sampleRateHz).toBe(48000)
-  expect(STANDARD_V1_CONFIG.minFrequencyHz).toBe(20)
-  expect(STANDARD_V1_CONFIG.maxFrequencyHz).toBe(20000)
+  expect(STANDARD_V1_CONFIG).toMatchObject({
+    sampleRateHz: MVP_NUMERIC_POLICY.sampleRateHz,
+    minFrequencyHz: MVP_NUMERIC_POLICY.minFrequencyHz,
+    maxFrequencyHz: MVP_NUMERIC_POLICY.maxFrequencyHz,
+    fitPointsPerOctave: MVP_NUMERIC_POLICY.evaluationPointsPerOctave,
+  })
   expect(STANDARD_V1_CONFIG.defaultMaxFilters).toBe(10)
   expect(STANDARD_V1_CONFIG.hardMaxFilters).toBe(64)
   expect(STANDARD_V1_CONFIG.minGainDb).toBe(-15)
@@ -92,13 +97,15 @@ it('exposes Standard v1 product bounds', () => {
 Use a separate `algorithm` block so Plan 3 can tune it without changing product bounds:
 
 ```ts
+import { MVP_NUMERIC_POLICY } from '../config/numericPolicy.js'
+
 export const STANDARD_V1_CONFIG = {
   profile: 'Standard',
   algorithmVersion: 'standard-v1',
-  sampleRateHz: 48000,
-  minFrequencyHz: 20,
-  maxFrequencyHz: 20000,
-  fitPointsPerOctave: 96,
+  sampleRateHz: MVP_NUMERIC_POLICY.sampleRateHz,
+  minFrequencyHz: MVP_NUMERIC_POLICY.minFrequencyHz,
+  maxFrequencyHz: MVP_NUMERIC_POLICY.maxFrequencyHz,
+  fitPointsPerOctave: MVP_NUMERIC_POLICY.evaluationPointsPerOctave,
   defaultMaxFilters: 10,
   hardMaxFilters: 64,
   minGainDb: -15,
@@ -120,7 +127,7 @@ export const STANDARD_V1_CONFIG = {
 } as const
 ```
 
-These values are engineering starting points, not scientific claims.
+The sample rate, optimization range, and fit density are sourced from the frozen MVP numeric policy rather than duplicated in the AutoEQ module. The remaining Standard-specific values are engineering starting points, not scientific claims.
 
 - [ ] **Step 3: Write objective tests**
 

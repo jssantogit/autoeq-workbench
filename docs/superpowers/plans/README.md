@@ -10,6 +10,8 @@ The approved MVP design is implemented through sequential plans. Do not skip a c
 
 ## Execution order
 
+Plan 1.5 is a mandatory gate between the manual workbench and Standard AutoEQ work. It freezes the graph, shared dock, and Light/Dark theme foundation while establishing the shared numeric policy and closing partial-derivation gaps so Plan 2 does not repeat visual restructuring or numeric constants.
+
 1. `2026-08-23-01-foundations-manual-workbench.md`
    - pnpm monorepo bootstrap
    - React/Vite/Tailwind/ECharts/Zustand shell
