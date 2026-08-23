@@ -5,52 +5,51 @@ import { defaultNormalization, useWorkspaceStore } from '../../state/workspaceSt
 
 const positive = (value: number) => value > 0
 
-export function NormalizationControls() {
-  const source = useWorkspaceStore((state) => state.sourceNormalization)
-  const target = useWorkspaceStore((state) => state.targetNormalization)
-  const setSource = useWorkspaceStore((state) => state.setSourceNormalization)
-  const setTarget = useWorkspaceStore((state) => state.setTargetNormalization)
+interface NormalizationControlsProps {
+  role: 'source' | 'target' | 'together'
+}
+
+function CurveNormalizationControls({ role }: { role: 'source' | 'target' }) {
+  const normalization = useWorkspaceStore((state) => state[`${role}Normalization`])
+  const setNormalization = useWorkspaceStore((state) =>
+    role === 'source' ? state.setSourceNormalization : state.setTargetNormalization,
+  )
+  const label = role === 'source' ? 'Source' : 'Target'
+
+  return (
+    <section className="curve-normalization" aria-labelledby={`${role}-normalization-heading`}>
+      <h4 id={`${role}-normalization-heading`}>Normalization</h4>
+      <div className="normalization-fields">
+        <NumberField
+          label={`${label} anchor Hz`}
+          value={normalization.anchorHz}
+          min={1}
+          validate={positive}
+          onValueChange={(anchorHz) => setNormalization({ ...normalization, anchorHz })}
+        />
+        <NumberField
+          label={`${label} target dB`}
+          value={normalization.targetDb}
+          step="0.1"
+          onValueChange={(targetDb) => setNormalization({ ...normalization, targetDb })}
+        />
+      </div>
+    </section>
+  )
+}
+
+function TogetherNormalizationControls() {
   const normalizeTogether = useWorkspaceStore((state) => state.normalizeTogether)
   const [togetherAnchorHz, setTogetherAnchorHz] = useState(defaultNormalization.anchorHz)
   const [togetherTargetDb, setTogetherTargetDb] = useState(defaultNormalization.targetDb)
 
   return (
-    <section className="normalization" aria-labelledby="normalization-heading">
-      <h2 id="normalization-heading">Normalization</h2>
-      <div className="normalization__group">
-        <strong>Source</strong>
-        <NumberField
-          label="Source anchor Hz"
-          value={source.anchorHz}
-          min={1}
-          validate={positive}
-          onValueChange={(anchorHz) => setSource({ ...source, anchorHz })}
-        />
-        <NumberField
-          label="Source target dB"
-          value={source.targetDb}
-          step="0.1"
-          onValueChange={(targetDb) => setSource({ ...source, targetDb })}
-        />
+    <section className="normalize-together" aria-labelledby="normalize-together-heading">
+      <div className="normalize-together__heading">
+        <h3 id="normalize-together-heading">Normalize Together</h3>
+        <p>Apply one non-destructive anchor and level to both curves.</p>
       </div>
-      <div className="normalization__group">
-        <strong>Target</strong>
-        <NumberField
-          label="Target anchor Hz"
-          value={target.anchorHz}
-          min={1}
-          validate={positive}
-          onValueChange={(anchorHz) => setTarget({ ...target, anchorHz })}
-        />
-        <NumberField
-          label="Target target dB"
-          value={target.targetDb}
-          step="0.1"
-          onValueChange={(targetDb) => setTarget({ ...target, targetDb })}
-        />
-      </div>
-      <div className="normalization__group normalization__group--together">
-        <strong>Together</strong>
+      <div className="normalize-together__controls">
         <NumberField
           label="Together anchor Hz"
           value={togetherAnchorHz}
@@ -73,5 +72,13 @@ export function NormalizationControls() {
         </Button>
       </div>
     </section>
+  )
+}
+
+export function NormalizationControls({ role }: NormalizationControlsProps) {
+  return role === 'together' ? (
+    <TogetherNormalizationControls />
+  ) : (
+    <CurveNormalizationControls role={role} />
   )
 }

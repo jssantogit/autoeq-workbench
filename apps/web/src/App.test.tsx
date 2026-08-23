@@ -27,7 +27,7 @@ describe('App', () => {
     expect(graphActions.compareDocumentPosition(graph)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(graph.compareDocumentPosition(dock)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(screen.getByRole('button', { name: 'Reset View' })).toBeVisible()
-    expect(screen.getByRole('heading', { name: 'Source / Target' })).toBeVisible()
+    expect(screen.getByRole('heading', { name: 'Curves' })).toBeVisible()
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     expect(screen.getByRole('heading', { name: 'Filter Editor' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Add PK' })).toBeInTheDocument()

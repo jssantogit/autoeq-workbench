@@ -217,21 +217,61 @@ select:focus-visible,
 .panel__header { min-height: 42px; padding: 8px 12px 0; }
 .panel__body { min-width: 0; padding: 10px 12px 14px; }
 
-.curve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.curve-import { min-width: 0; border: 1px solid var(--color-border); border-radius: 11px; padding: 10px; background: var(--color-bg-subtle); }
-.curve-import h3 { margin: 0; font-size: 0.82rem; }
-.curve-import__name { overflow: hidden; margin: 8px 0; color: var(--color-text-muted); font-size: 0.75rem; text-overflow: ellipsis; white-space: nowrap; }
-.status { color: var(--color-text-faint); font-size: 0.68rem; font-weight: 650; }
-.status--loaded { color: var(--color-success); }
-.file-control { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--color-text-muted); font-size: 0.72rem; }
-.file-control input { width: min(100%, 210px); color: var(--color-text-muted); font-size: 0.7rem; }
-.field-error { margin: 7px 0 0; color: var(--color-danger); font-size: 0.72rem; }
+.curves-tab { min-width: 0; padding: 14px; }
+.curves-tab__heading { margin-bottom: 12px; }
+.curves-tab__heading h2 { margin: 0; font-size: 0.95rem; }
+.curves-tab__heading p,
+.normalize-together__heading p { margin: 3px 0 0; color: var(--color-text-muted); font-size: 0.72rem; }
+.curve-work-areas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.curve-work-area { min-width: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-bg-subtle); }
+.curve-import { min-width: 0; padding: 12px; }
+.curve-import h3 { margin: 0; font-size: 0.86rem; }
+.curve-import__name { overflow: hidden; margin: 7px 0 11px; color: var(--color-text-muted); font-size: 0.75rem; text-overflow: ellipsis; white-space: nowrap; }
+.curve-status { color: var(--color-text-faint); font-size: 0.7rem; font-weight: 650; }
+.curve-status--loaded { color: var(--color-success); }
+.file-control {
+  position: relative;
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 9px;
+  padding: 7px 12px;
+  color: var(--color-text);
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+.file-control:hover { border-color: var(--color-accent-hover); color: var(--color-accent-active); }
+.file-control:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.file-control input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.field-error { margin: 8px 0 0; color: var(--color-danger); font-size: 0.72rem; }
 
-.normalization { display: grid; grid-template-columns: auto repeat(3, minmax(200px, 1fr)); gap: 9px; align-items: end; margin-top: 12px; }
-.normalization > h2 { align-self: center; color: var(--color-text-muted); }
-.normalization__group { display: grid; grid-template-columns: auto 1fr 1fr; gap: 7px; align-items: end; }
-.normalization__group strong { align-self: center; color: var(--color-text-muted); font-size: 0.7rem; }
-.normalization__group--together { grid-template-columns: auto 1fr 1fr auto; padding-left: 9px; border-left: 1px solid var(--color-border); }
+.curve-appearance { border-top: 1px solid var(--color-border); padding: 11px 12px; background: var(--color-bg-elevated); }
+.curve-appearance__row { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 12px; }
+.visibility-control,
+.color-control { display: inline-flex; min-height: 40px; align-items: center; gap: 8px; color: var(--color-text-muted); font-size: 0.73rem; }
+.visibility-control { cursor: pointer; }
+.visibility-control input { width: 18px; height: 18px; accent-color: var(--color-accent-active); }
+.color-control input { width: 42px; height: 32px; border: 1px solid var(--color-border); border-radius: 8px; padding: 3px; background: var(--color-input); cursor: pointer; }
+.curve-presentation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin: 0 0 9px; border: 0; padding: 0; }
+.curve-presentation legend { margin-bottom: 4px; color: var(--color-text-muted); font-size: 0.68rem; }
+.curve-presentation label { position: relative; min-width: 0; cursor: pointer; }
+.curve-presentation input { position: absolute; opacity: 0; }
+.curve-presentation span { display: flex; min-height: 40px; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 8px; color: var(--color-text-muted); background: var(--color-input); font-size: 0.72rem; text-align: center; }
+.curve-presentation input:checked + span { border-color: var(--color-accent); color: var(--color-text); background: var(--color-accent-soft); }
+.curve-presentation input:focus-visible + span { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+.curve-normalization { border-top: 1px solid var(--color-border); padding: 11px 12px 12px; }
+.curve-normalization h4 { margin: 0 0 8px; color: var(--color-text-muted); font-size: 0.72rem; }
+.normalization-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.normalize-together { display: flex; min-width: 0; align-items: end; justify-content: space-between; gap: 18px; margin-top: 12px; border: 1px solid var(--color-border); border-radius: 12px; padding: 12px; background: var(--color-bg-subtle); }
+.normalize-together__heading { min-width: 180px; }
+.normalize-together__heading h3 { margin: 0; font-size: 0.82rem; }
+.normalize-together__controls { display: grid; width: min(100%, 560px); grid-template-columns: repeat(2, minmax(110px, 1fr)) auto; gap: 8px; align-items: end; }
+.normalize-together__controls .button { min-height: 40px; border-color: var(--color-accent-active); color: #24170a; background: var(--color-accent); }
+.normalize-together__controls .button:hover { color: #24170a; background: var(--color-accent-hover); }
 .number-field { display: grid; gap: 3px; color: var(--color-text-muted); font-size: 0.68rem; }
 .number-field input {
   width: 100%;
@@ -245,7 +285,6 @@ select:focus-visible,
   font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
 }
 .number-field input[aria-invalid='true'] { border-color: var(--color-danger); }
-.config-strip { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--color-border); color: var(--color-text-muted); font-size: 0.7rem; }
 
 .filter-editor__toolbar { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .filter-editor__add,
@@ -284,9 +323,8 @@ select:focus-visible,
 .metrics dd { margin: 4px 0 0; color: var(--color-text); font: 0.82rem ui-monospace, "SFMono-Regular", Consolas, monospace; }
 
 @media (max-width: 1050px) {
-  .normalization { grid-template-columns: 1fr; align-items: stretch; }
-  .normalization__group,
-  .normalization__group--together { grid-template-columns: 70px 1fr 1fr auto; padding-left: 0; border-left: 0; }
+  .normalize-together { align-items: stretch; flex-direction: column; gap: 10px; }
+  .normalize-together__controls { width: 100%; }
 }
 
 @media (max-width: 650px) {
@@ -300,15 +338,19 @@ select:focus-visible,
   .fr-graph { height: 368px; }
   .workbench-dock { border-radius: 11px; }
   .dock-tabs { margin: 5px; }
-  .curve-grid { grid-template-columns: 1fr; }
-  .normalization__group,
-  .normalization__group--together { grid-template-columns: 1fr 1fr; }
-  .normalization__group strong { grid-column: 1 / -1; }
-  .normalization__group--together .button { grid-column: 1 / -1; }
+  .curves-tab { padding: 10px; }
+  .curve-work-areas { grid-template-columns: 1fr; }
+  .normalize-together__controls { grid-template-columns: 1fr 1fr; }
+  .normalize-together__controls .button { grid-column: 1 / -1; }
   .metrics dl { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 380px) {
   .app-header p { display: none; }
+  .curve-appearance__row { align-items: stretch; flex-direction: column; gap: 0; }
+  .color-control { justify-content: space-between; }
+  .normalization-fields,
+  .normalize-together__controls { grid-template-columns: 1fr; }
+  .normalize-together__controls .button { grid-column: auto; }
   .metrics dl { grid-template-columns: 1fr; }
 }

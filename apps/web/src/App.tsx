@@ -2,8 +2,7 @@ import { useRef } from 'react'
 import { Panel } from './components/ui/Panel'
 import { AppHeader } from './components/layout/AppHeader'
 import { WorkbenchDock } from './components/layout/WorkbenchDock'
-import { CurveImport } from './features/curves/CurveImport'
-import { NormalizationControls } from './features/curves/NormalizationControls'
+import { CurvesTab } from './features/curves/CurvesTab'
 import {
   FrequencyResponseGraph,
   type FrequencyResponseGraphHandle,
@@ -26,20 +25,7 @@ function App() {
       <FrequencyResponseGraph ref={graphRef} derived={derived} />
 
       <WorkbenchDock
-        curves={
-          <Panel title="Source / Target">
-            <div className="curve-grid">
-              <CurveImport role="source" />
-              <CurveImport role="target" />
-            </div>
-            <NormalizationControls />
-            <div className="config-strip" aria-label="Workbench configuration">
-              <span>Profile: Manual</span>
-              <span>48 kHz</span>
-              <span>20 Hz-20 kHz</span>
-            </div>
-          </Panel>
-        }
+        curves={<CurvesTab />}
         equalizer={
           <Panel title="Filter Editor">
             <FilterEditor />

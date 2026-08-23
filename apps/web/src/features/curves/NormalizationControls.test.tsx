@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { defaultNormalization, workspaceStore } from '../../state/workspaceStore'
-import { NormalizationControls } from './NormalizationControls'
+import { CurvesTab } from './CurvesTab'
 
 describe('NormalizationControls', () => {
   beforeEach(() => {
@@ -13,7 +13,7 @@ describe('NormalizationControls', () => {
   })
 
   it('shows 500 Hz and 0 dB defaults for both curves and shared controls', () => {
-    render(<NormalizationControls />)
+    render(<CurvesTab />)
 
     expect(screen.getByLabelText('Source anchor Hz')).toHaveValue(500)
     expect(screen.getByLabelText('Source target dB')).toHaveValue(0)
@@ -25,7 +25,7 @@ describe('NormalizationControls', () => {
 
   it('updates Source and Target normalization independently', async () => {
     const user = userEvent.setup()
-    render(<NormalizationControls />)
+    render(<CurvesTab />)
 
     const sourceAnchor = screen.getByLabelText('Source anchor Hz')
     await user.clear(sourceAnchor)
@@ -45,7 +45,7 @@ describe('NormalizationControls', () => {
 
   it('applies one anchor and level to both curves', async () => {
     const user = userEvent.setup()
-    render(<NormalizationControls />)
+    render(<CurvesTab />)
 
     const togetherAnchor = screen.getByLabelText('Together anchor Hz')
     const togetherDb = screen.getByLabelText('Together target dB')

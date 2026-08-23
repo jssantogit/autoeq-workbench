@@ -1,8 +1,12 @@
 import type { Curve } from '@autoeq-workbench/core'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { uiStore } from '../../state/uiStore'
 import { workspaceStore } from '../../state/workspaceStore'
+import { CurveAppearanceControls } from './CurveAppearanceControls'
 import { CurveImport } from './CurveImport'
+import { CurvesTab } from './CurvesTab'
 
 const previousSource: Curve = {
   id: 'source-existing',
@@ -34,14 +38,36 @@ function fileWithText(name: string, text: () => Promise<string>) {
 describe('CurveImport', () => {
   beforeEach(() => {
     workspaceStore.setState({ source: previousSource })
+    uiStore.setState({
+      sourceColor: '#1565c0',
+      targetColor: '#c62828',
+      sourceVisible: true,
+      targetVisible: true,
+      targetPresentation: 'measurement',
+    })
+  })
+
+  it('assigns a fresh graph color only after a successful latest Source import', async () => {
+    const initialColor = uiStore.getState().sourceColor
+    render(<CurveImport role="source" />)
+    const file = fileWithText('Source.txt', async () => '20 1\n20000 2')
+
+    fireEvent.change(screen.getByLabelText('Replace Source curve'), {
+      target: { files: [file] },
+    })
+
+    await screen.findByText('Source.txt')
+    expect(uiStore.getState().sourceColor).not.toBe(initialColor)
+    expect(workspaceStore.getState().source?.name).toBe('Source.txt')
   })
 
   it('reports a structured parse failure without replacing the previous curve', async () => {
+    const initialColor = uiStore.getState().sourceColor
     render(<CurveImport role="source" />)
     const file = new File(['not curve data'], 'broken.csv', { type: 'text/csv' })
     Object.defineProperty(file, 'text', { value: async () => 'not curve data' })
 
-    fireEvent.change(screen.getByLabelText('Import Source curve'), {
+    fireEvent.change(screen.getByLabelText('Replace Source curve'), {
       target: { files: [file] },
     })
 
@@ -50,14 +76,16 @@ describe('CurveImport', () => {
     })
     expect(screen.getByText('Previous Source.csv')).toBeInTheDocument()
     expect(workspaceStore.getState().source).toBe(previousSource)
+    expect(uiStore.getState().sourceColor).toBe(initialColor)
   })
 
   it('ignores an older slow success after a newer selection fails', async () => {
+    const initialColor = uiStore.getState().sourceColor
     const olderRead = deferred<string>()
     const older = fileWithText('older.csv', () => olderRead.promise)
     const newer = fileWithText('newer.csv', async () => 'not curve data')
     render(<CurveImport role="source" />)
-    const input = screen.getByLabelText('Import Source curve')
+    const input = screen.getByLabelText('Replace Source curve')
 
     fireEvent.change(input, { target: { files: [older] } })
     fireEvent.change(input, { target: { files: [newer] } })
@@ -68,6 +96,7 @@ describe('CurveImport', () => {
       await olderRead.promise
     })
     expect(workspaceStore.getState().source).toBe(previousSource)
+    expect(uiStore.getState().sourceColor).toBe(initialColor)
     expect(screen.getByRole('alert')).toHaveTextContent('[parse]')
   })
 
@@ -76,11 +105,13 @@ describe('CurveImport', () => {
     const older = fileWithText('older.csv', () => olderRead.promise)
     const newer = fileWithText('newer.csv', async () => '20 2\n20000 4')
     render(<CurveImport role="source" />)
-    const input = screen.getByLabelText('Import Source curve')
+    const input = screen.getByLabelText('Replace Source curve')
 
     fireEvent.change(input, { target: { files: [older] } })
     fireEvent.change(input, { target: { files: [newer] } })
     await screen.findByText('newer.csv')
+    const latestColor = uiStore.getState().sourceColor
+    expect(latestColor).not.toBe('#1565c0')
 
     await act(async () => {
       olderRead.reject(new Error('slow read failed'))
@@ -88,5 +119,67 @@ describe('CurveImport', () => {
     })
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(workspaceStore.getState().source?.name).toBe('newer.csv')
+    expect(uiStore.getState().sourceColor).toBe(latestColor)
+  })
+})
+
+describe('CurveAppearanceControls', () => {
+  beforeEach(() => {
+    workspaceStore.setState({ source: previousSource })
+    uiStore.setState({
+      sourceColor: '#1565c0',
+      targetColor: '#c62828',
+      sourceVisible: true,
+      targetVisible: true,
+      targetPresentation: 'measurement',
+    })
+  })
+
+  it('exposes accessible Source visibility and six-digit color controls', async () => {
+    const user = userEvent.setup()
+    const rawPoints = workspaceStore.getState().source?.rawPoints
+    render(<CurveAppearanceControls role="source" />)
+
+    await user.click(screen.getByRole('checkbox', { name: 'Show Source curve' }))
+    expect(uiStore.getState().sourceVisible).toBe(false)
+
+    fireEvent.change(screen.getByLabelText('Source curve color'), {
+      target: { value: '#123456' },
+    })
+    expect(uiStore.getState().sourceColor).toBe('#123456')
+    expect(workspaceStore.getState().source?.rawPoints).toBe(rawPoints)
+  })
+
+  it('retains the custom Target color while switching accessible presentation modes', async () => {
+    const user = userEvent.setup()
+    render(<CurveAppearanceControls role="target" />)
+
+    expect(screen.getByRole('radio', { name: 'Measurement FR' })).toBeChecked()
+    await user.click(screen.getByRole('radio', { name: 'Reference target' }))
+
+    expect(uiStore.getState().targetPresentation).toBe('reference')
+    expect(uiStore.getState().targetColor).toBe('#c62828')
+    expect(screen.getByRole('checkbox', { name: 'Show Target curve' })).toBeChecked()
+  })
+})
+
+describe('CurvesTab', () => {
+  it('groups import, appearance, and normalization into cohesive Source and Target work areas', () => {
+    workspaceStore.setState({ source: null, target: null })
+    render(<CurvesTab />)
+
+    const source = screen.getByRole('region', { name: 'Source curve' })
+    expect(within(source).getByLabelText('Import Source curve')).toBeInTheDocument()
+    expect(within(source).getByLabelText('Source curve color')).toBeInTheDocument()
+    expect(within(source).getByLabelText('Source anchor Hz')).toBeInTheDocument()
+
+    const target = screen.getByRole('region', { name: 'Target curve' })
+    expect(within(target).getByLabelText('Import Target curve')).toBeInTheDocument()
+    expect(within(target).getByRole('radio', { name: 'Reference target' })).toBeInTheDocument()
+    expect(within(target).getByLabelText('Target target dB')).toBeInTheDocument()
+
+    expect(screen.getByRole('heading', { name: 'Normalize Together' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Together anchor Hz')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Normalize Together' })).toBeInTheDocument()
   })
 })
