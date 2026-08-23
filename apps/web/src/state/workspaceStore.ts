@@ -4,8 +4,9 @@ import {
   calculateErrorMetrics,
   calculatePreampDb,
   cascadeMagnitudeDb,
-  createLogGrid,
+  createEvaluationGrid,
   desiredCorrection,
+  MVP_NUMERIC_POLICY,
   prepareCurve,
   residualError,
   type Curve,
@@ -109,8 +110,8 @@ function validFilter(filter: Filter): boolean {
     typeof filter.enabled === 'boolean' &&
     ['PK', 'LS', 'HS'].includes(filter.type) &&
     Number.isFinite(filter.frequencyHz) &&
-    filter.frequencyHz >= 20 &&
-    filter.frequencyHz <= 20_000 &&
+    filter.frequencyHz >= MVP_NUMERIC_POLICY.minFrequencyHz &&
+    filter.frequencyHz <= MVP_NUMERIC_POLICY.maxFrequencyHz &&
     Number.isFinite(filter.gainDb) &&
     filter.gainDb >= -15 &&
     filter.gainDb <= 15 &&
@@ -364,108 +365,106 @@ function prepareImportedCurve(
 }
 
 export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
+  const frequencies = createEvaluationGrid()
+  const peqDb = cascadeMagnitudeDb(
+    state.filters,
+    frequencies,
+    MVP_NUMERIC_POLICY.sampleRateHz,
+  )
+  const peq = { frequencies, db: peqDb }
+  const preamp = calculatePreampDb(state.filters, MVP_NUMERIC_POLICY.sampleRateHz)
   let source: DerivedCurve | null = null
   let target: DerivedCurve | null = null
+  let preparedSource: DerivedCurve | null = null
+  let preparedTarget: DerivedCurve | null = null
+  const errors: string[] = []
   const selected = state.filters.find(({ id }) => id === state.selectedFilterId)
-  const selectedFrequencies = createLogGrid(20, 20_000, 24)
   const selectedFilter = selected
     ? {
-        frequencies: selectedFrequencies,
-        db: biquadMagnitudeDb(selected, selectedFrequencies, 48_000),
+        frequencies,
+        db: biquadMagnitudeDb(selected, frequencies, MVP_NUMERIC_POLICY.sampleRateHz),
         frequencyHz: selected.frequencyHz,
         enabled: selected.enabled,
       }
     : null
 
-  try {
-    source = prepareImportedCurve(state.source, state.sourceNormalization)
-    target = prepareImportedCurve(state.target, state.targetNormalization)
-  } catch (cause) {
-    return {
-      status: 'coverage-error',
-      message: cause instanceof Error ? cause.message : 'Unable to prepare imported curves',
-      source,
-      target,
-      peq: null,
-      desired: null,
-      sourceEq: null,
-      metrics: null,
-      preamp: null,
-      selectedFilter,
-      hasFilters: state.filters.length > 0,
+  const coversWorkbenchRange = (curve: Curve) => {
+    const firstFrequencyHz = curve.rawPoints[0]?.frequencyHz
+    const lastFrequencyHz = curve.rawPoints.at(-1)?.frequencyHz
+    return (
+      firstFrequencyHz !== undefined &&
+      lastFrequencyHz !== undefined &&
+      firstFrequencyHz <= MVP_NUMERIC_POLICY.minFrequencyHz &&
+      lastFrequencyHz >= MVP_NUMERIC_POLICY.maxFrequencyHz
+    )
+  }
+
+  for (const role of ['source', 'target'] as const) {
+    const curve = state[role]
+    if (curve === null) continue
+    const normalization = state[`${role}Normalization`]
+    try {
+      const imported = prepareImportedCurve(curve, normalization)
+      if (role === 'source') source = imported
+      else target = imported
+
+      if (!coversWorkbenchRange(curve)) {
+        errors.push(`${role === 'source' ? 'Source' : 'Target'} must cover the 20 Hz to 20 kHz graph range.`)
+        continue
+      }
+
+      const prepared = prepareCurve(curve, normalization, frequencies)
+      const evaluationCurve = { frequencies: prepared.frequencies, db: prepared.db }
+      if (role === 'source') preparedSource = evaluationCurve
+      else preparedTarget = evaluationCurve
+    } catch (cause) {
+      errors.push(cause instanceof Error ? cause.message : `Unable to prepare ${role} curve`)
     }
   }
 
-  if (state.source === null || state.target === null) {
-    return {
-      status: 'incomplete',
-      message: 'Import Source and Target to compare responses.',
-      source,
-      target,
-      peq: null,
-      desired: null,
-      sourceEq: null,
-      metrics: null,
-      preamp: null,
-      selectedFilter,
-      hasFilters: state.filters.length > 0,
-    }
+  const sourceEq = preparedSource === null
+    ? null
+    : { frequencies, db: applyEqToSource(preparedSource.db, peqDb) }
+  const desired = preparedSource === null || preparedTarget === null
+    ? null
+    : { frequencies, db: desiredCorrection(preparedSource.db, preparedTarget.db) }
+  const metrics = sourceEq === null || preparedTarget === null
+    ? null
+    : calculateErrorMetrics(residualError(preparedTarget.db, sourceEq.db), frequencies)
+  const comparable = preparedSource !== null && preparedTarget !== null
+  if (comparable) {
+    source = preparedSource
+    target = preparedTarget
   }
 
-  const coversWorkbenchRange = (curve: Curve) =>
-    curve.rawPoints[0]!.frequencyHz <= 20 && curve.rawPoints.at(-1)!.frequencyHz >= 20_000
-  if (!coversWorkbenchRange(state.source) || !coversWorkbenchRange(state.target)) {
-    return {
-      status: 'coverage-error',
-      message: 'Source and Target must both cover the 20 Hz to 20 kHz graph range.',
-      source,
-      target,
-      peq: null,
-      desired: null,
-      sourceEq: null,
-      metrics: null,
-      preamp: null,
-      selectedFilter,
-      hasFilters: state.filters.length > 0,
-    }
-  }
+  const status = errors.length > 0
+    ? 'coverage-error'
+    : comparable
+      ? 'ready'
+      : 'incomplete'
+  const incompleteMessage = state.source === null && state.target === null
+    ? 'Import Source and Target to compare responses.'
+    : state.source === null
+      ? 'Import Source to compare responses.'
+      : 'Import Target to compare responses.'
 
-  try {
-    const frequencies = createLogGrid(20, 20_000, 24)
-    const preparedSource = prepareCurve(state.source, state.sourceNormalization, frequencies)
-    const preparedTarget = prepareCurve(state.target, state.targetNormalization, frequencies)
-    const peqDb = cascadeMagnitudeDb(state.filters, frequencies, 48_000)
-    const sourceEqDb = applyEqToSource(preparedSource.db, peqDb)
-    const desiredDb = desiredCorrection(preparedSource.db, preparedTarget.db)
-    const residual = residualError(preparedTarget.db, sourceEqDb)
-
-    return {
-      status: 'ready',
-      message: 'Source and Target ready.',
-      source: { frequencies, db: preparedSource.db },
-      target: { frequencies, db: preparedTarget.db },
-      peq: { frequencies, db: peqDb },
-      desired: { frequencies, db: desiredDb },
-      sourceEq: { frequencies, db: sourceEqDb },
-      metrics: calculateErrorMetrics(residual, frequencies),
-      preamp: calculatePreampDb(state.filters, 48_000),
-      selectedFilter,
-      hasFilters: state.filters.length > 0,
-    }
-  } catch (cause) {
-    return {
-      status: 'coverage-error',
-      message: cause instanceof Error ? cause.message : 'Unable to derive workspace responses',
-      source,
-      target,
-      peq: null,
-      desired: null,
-      sourceEq: null,
-      metrics: null,
-      preamp: null,
-      selectedFilter,
-      hasFilters: state.filters.length > 0,
-    }
+  return {
+    status,
+    message:
+      status === 'coverage-error'
+        ? errors.join(' ')
+        : status === 'ready'
+          ? 'Source and Target ready.'
+          : incompleteMessage,
+    source,
+    target,
+    peq,
+    desired,
+    sourceEq,
+    metrics,
+    preamp,
+    selectedFilter,
+    hasFilters: state.filters.length > 0,
   }
 }
 

@@ -45,7 +45,7 @@ describe('buildGraphSeries', () => {
     const series = buildGraphSeries(derived)
 
     expect(derived.status).toBe('incomplete')
-    expect(series.map(({ name }) => name)).toEqual(['Source'])
+    expect(series.map(({ name }) => name)).toEqual(['Source', 'PEQ'])
     expect(series[0]?.data).toEqual([
       [20, -3],
       [500, 0],
@@ -116,7 +116,7 @@ describe('buildGraphSeries', () => {
 
     expect(derived.status).toBe('coverage-error')
     expect(derived.message).toMatch(/20 Hz.*20 kHz/i)
-    expect(series.map(({ name }) => name)).toEqual(['Source', 'Target'])
+    expect(series.map(({ name }) => name)).toEqual(['Source', 'Target', 'PEQ'])
   })
 })
 

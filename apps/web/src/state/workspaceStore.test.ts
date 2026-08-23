@@ -1,6 +1,6 @@
-import type { Curve, Filter, FilterType } from '@autoeq-workbench/core'
+import { createEvaluationGrid, type Curve, type Filter, type FilterType } from '@autoeq-workbench/core'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { createWorkspaceStore, defaultNormalization } from './workspaceStore'
+import { createWorkspaceStore, defaultNormalization, deriveWorkspace } from './workspaceStore'
 
 const source: Curve = {
   id: 'source-1',
@@ -31,6 +31,19 @@ const filter: Filter = {
   frequencyHz: 1_000,
   gainDb: 3,
   q: 1,
+}
+
+function makeFlatCurve(role: 'source' | 'target'): Curve {
+  return {
+    id: `${role}-flat`,
+    name: `${role} flat`,
+    role,
+    rawPoints: [
+      { frequencyHz: 20, db: 0 },
+      { frequencyHz: 20_000, db: 0 },
+    ],
+    metadata: {},
+  }
 }
 
 describe('workspace store', () => {
@@ -291,5 +304,104 @@ describe('workspace store', () => {
     expect(store.getState().sourceNormalization).toEqual(defaultNormalization)
     expect(store.getState().targetNormalization).toEqual(defaultNormalization)
     expect(store.getState().canUndo).toBe(false)
+  })
+
+  it('derives PEQ and preamp without Source or Target', () => {
+    store.getState().addFilter('PK')
+    const addedFilter = store.getState().filters[0]!
+    store.getState().updateFilter(addedFilter.id, { gainDb: 6 })
+
+    const derived = deriveWorkspace(store.getState())
+
+    expect(derived.status).toBe('incomplete')
+    expect(derived.peq?.frequencies).toEqual(createEvaluationGrid())
+    expect(derived.preamp?.preampDb).toBeLessThanOrEqual(-6)
+    expect(derived.sourceEq).toBeNull()
+    expect(derived.desired).toBeNull()
+    expect(derived.metrics).toBeNull()
+  })
+
+  it('derives Source + EQ with Source alone and waits for Target before comparison outputs', () => {
+    store.getState().setSource(makeFlatCurve('source'))
+    store.getState().addFilter('PK')
+    const addedFilter = store.getState().filters[0]!
+    store.getState().updateFilter(addedFilter.id, { gainDb: 3 })
+
+    const derived = deriveWorkspace(store.getState())
+
+    expect(derived.status).toBe('incomplete')
+    expect(derived.source).not.toBeNull()
+    expect(derived.sourceEq?.frequencies).toEqual(createEvaluationGrid())
+    expect(derived.peq).not.toBeNull()
+    expect(derived.preamp).not.toBeNull()
+    expect(derived.desired).toBeNull()
+    expect(derived.metrics).toBeNull()
+  })
+
+  it('prepares Target alone while leaving Source-dependent and comparison outputs unavailable', () => {
+    store.getState().setTarget(makeFlatCurve('target'))
+
+    const derived = deriveWorkspace(store.getState())
+
+    expect(derived.status).toBe('incomplete')
+    expect(derived.source).toBeNull()
+    expect(derived.target).not.toBeNull()
+    expect(derived.peq?.db.every((value) => value === 0)).toBe(true)
+    expect(derived.preamp?.preampDb).toBe(0)
+    expect(derived.sourceEq).toBeNull()
+    expect(derived.desired).toBeNull()
+    expect(derived.metrics).toBeNull()
+  })
+
+  it('uses the canonical evaluation grid for full Source and Target comparison', () => {
+    store.getState().setSource(makeFlatCurve('source'))
+    store.getState().setTarget(makeFlatCurve('target'))
+
+    const derived = deriveWorkspace(store.getState())
+    const frequencies = createEvaluationGrid()
+
+    expect(derived.status).toBe('ready')
+    expect(derived.source?.frequencies).toEqual(frequencies)
+    expect(derived.target?.frequencies).toEqual(frequencies)
+    expect(derived.peq?.frequencies).toEqual(frequencies)
+    expect(derived.sourceEq?.frequencies).toEqual(frequencies)
+    expect(derived.desired?.frequencies).toEqual(frequencies)
+    expect(derived.metrics).not.toBeNull()
+  })
+
+  it('isolates a present curve coverage error from PEQ, preamp, and valid Source derivation', () => {
+    store.getState().setSource(makeFlatCurve('source'))
+    store.getState().setTarget({
+      ...makeFlatCurve('target'),
+      rawPoints: [
+        { frequencyHz: 100, db: 0 },
+        { frequencyHz: 10_000, db: 0 },
+      ],
+    })
+    store.getState().setFilters([filter], 'manual')
+
+    const derived = deriveWorkspace(store.getState())
+
+    expect(derived.status).toBe('coverage-error')
+    expect(derived.peq).not.toBeNull()
+    expect(derived.preamp).not.toBeNull()
+    expect(derived.sourceEq).not.toBeNull()
+    expect(derived.desired).toBeNull()
+    expect(derived.metrics).toBeNull()
+  })
+
+  it('does not mutate raw curve inputs while deriving normalized responses', () => {
+    const sourceCurve = makeFlatCurve('source')
+    const targetCurve = makeFlatCurve('target')
+    const sourceRawPoints = structuredClone(sourceCurve.rawPoints)
+    const targetRawPoints = structuredClone(targetCurve.rawPoints)
+    store.getState().setSource(sourceCurve)
+    store.getState().setTarget(targetCurve)
+    store.getState().normalizeTogether({ anchorHz: 500, targetDb: 4 })
+
+    deriveWorkspace(store.getState())
+
+    expect(sourceCurve.rawPoints).toEqual(sourceRawPoints)
+    expect(targetCurve.rawPoints).toEqual(targetRawPoints)
   })
 })
