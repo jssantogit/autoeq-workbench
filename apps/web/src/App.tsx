@@ -1,14 +1,13 @@
 import { useRef } from 'react'
-import { Panel } from './components/ui/Panel'
 import { AppHeader } from './components/layout/AppHeader'
 import { WorkbenchDock } from './components/layout/WorkbenchDock'
 import { CurvesTab } from './features/curves/CurvesTab'
+import { EqualizerTab } from './features/filters/EqualizerTab'
 import {
   FrequencyResponseGraph,
   type FrequencyResponseGraphHandle,
 } from './features/graph/FrequencyResponseGraph'
 import { GraphToolbar } from './features/graph/GraphToolbar'
-import { FilterEditor } from './features/filters/FilterEditor'
 import { MetricsSummary } from './features/metrics/MetricsSummary'
 import { deriveWorkspace, useWorkspaceStore } from './state/workspaceStore'
 
@@ -26,11 +25,7 @@ function App() {
 
       <WorkbenchDock
         curves={<CurvesTab />}
-        equalizer={
-          <Panel title="Filter Editor">
-            <FilterEditor />
-          </Panel>
-        }
+        equalizer={<EqualizerTab />}
         details={<MetricsSummary derived={derived} />}
       />
     </main>

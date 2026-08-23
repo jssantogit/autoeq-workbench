@@ -35,12 +35,22 @@ describe('FilterEditor', () => {
     await user.click(screen.getByRole('button', { name: 'Add HS' }))
     expect(workspaceStore.getState().filters.map(({ type }) => type)).toEqual(['PK', 'LS', 'HS'])
 
+    await user.click(screen.getByRole('checkbox', { name: 'Enable filter 1' }))
+    expect(workspaceStore.getState().filters[0]?.enabled).toBe(false)
+    await user.click(screen.getByRole('checkbox', { name: 'Enable filter 1' }))
+    expect(workspaceStore.getState().filters[0]?.enabled).toBe(true)
     await user.click(screen.getByRole('button', { name: 'Select filter 1' }))
     expect(workspaceStore.getState().selectedFilterId).toBe(workspaceStore.getState().filters[0]?.id)
     await user.click(screen.getByRole('button', { name: 'Duplicate filter 1' }))
     expect(workspaceStore.getState().filters).toHaveLength(4)
+    const duplicateId = workspaceStore.getState().filters[1]?.id
     await user.click(screen.getByRole('button', { name: 'Move filter 2 down' }))
+    expect(workspaceStore.getState().filters[2]?.id).toBe(duplicateId)
     await user.click(screen.getByRole('button', { name: 'Remove filter 3' }))
+    expect(workspaceStore.getState().filters).toHaveLength(3)
+    await user.click(screen.getByRole('button', { name: 'Undo' }))
+    expect(workspaceStore.getState().filters).toHaveLength(4)
+    await user.click(screen.getByRole('button', { name: 'Redo' }))
     expect(workspaceStore.getState().filters).toHaveLength(3)
   })
 
@@ -76,6 +86,49 @@ describe('FilterEditor', () => {
     expect(gain).toHaveAttribute('aria-invalid', 'true')
     expect(gain).toHaveValue(16)
     expect(workspaceStore.getState().filters[0]?.gainDb).toBe(0)
+  })
+
+  it('exposes one responsive semantic row with every field and action', () => {
+    workspaceStore.setState({ filters: [filter] })
+    render(<FilterEditor />)
+
+    expect(screen.getByRole('table', { name: 'Manual filters' })).toBeInTheDocument()
+    expect(screen.getAllByRole('columnheader')).toHaveLength(7)
+    const row = screen.getByRole('row', { name: /filter 1/i })
+    expect(row).toContainElement(screen.getByRole('checkbox', { name: 'Enable filter 1' }))
+    expect(row).toContainElement(screen.getByRole('button', { name: 'Select filter 1' }))
+    expect(row).toContainElement(screen.getByRole('combobox', { name: 'Filter 1 type' }))
+    expect(row).toContainElement(screen.getByRole('spinbutton', { name: 'Filter 1 frequency Hz' }))
+    expect(row).toContainElement(screen.getByRole('spinbutton', { name: 'Filter 1 gain dB' }))
+    expect(row).toContainElement(screen.getByRole('spinbutton', { name: 'Filter 1 Q' }))
+    expect(row).toContainElement(screen.getByRole('button', { name: 'Move filter 1 up' }))
+    expect(row).toContainElement(screen.getByRole('button', { name: 'Move filter 1 down' }))
+    expect(row).toContainElement(screen.getByRole('button', { name: 'Duplicate filter 1' }))
+    expect(row).toContainElement(screen.getByRole('button', { name: 'Remove filter 1' }))
+    expect(Array.from(row.querySelectorAll('td')).map((cell) => cell.dataset.label)).toEqual([
+      'ON',
+      '#',
+      'Type',
+      'Fc',
+      'Gain',
+      'Q',
+      'Actions',
+    ])
+  })
+
+  it('marks selected and disabled filters without relying on color alone', () => {
+    workspaceStore.setState({
+      filters: [{ ...filter, enabled: false }],
+      selectedFilterId: filter.id,
+    })
+    render(<FilterEditor />)
+
+    const row = screen.getByRole('row', { name: /filter 1/i })
+    expect(row).toHaveClass('filter-row--selected', 'filter-row--disabled')
+    expect(row).toHaveAttribute('data-selected', 'true')
+    expect(row).toHaveAttribute('data-enabled', 'false')
+    expect(screen.getByRole('button', { name: 'Select filter 1' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('checkbox', { name: 'Enable filter 1' })).not.toBeChecked()
   })
 
   it('disables all Add choices at 64 filters', () => {

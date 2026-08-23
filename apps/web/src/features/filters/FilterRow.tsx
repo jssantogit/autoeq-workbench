@@ -17,10 +17,15 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
   const reorderFilter = useWorkspaceStore((state) => state.reorderFilter)
   const selectFilter = useWorkspaceStore((state) => state.selectFilter)
   const rowNumber = index + 1
+  const className = [
+    'filter-row',
+    selected && 'filter-row--selected',
+    !filter.enabled && 'filter-row--disabled',
+  ].filter(Boolean).join(' ')
 
   return (
-    <tr className={selected ? 'filter-row filter-row--selected' : 'filter-row'}>
-      <td>
+    <tr className={className} data-selected={selected} data-enabled={filter.enabled}>
+      <td data-label="ON">
         <input
           type="checkbox"
           checked={filter.enabled}
@@ -28,7 +33,7 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
           onChange={() => toggleFilter(filter.id)}
         />
       </td>
-      <td>
+      <td data-label="#">
         <button
           type="button"
           className="filter-row__select"
@@ -39,7 +44,7 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
           {rowNumber}
         </button>
       </td>
-      <td>
+      <td data-label="Type">
         <select
           value={filter.type}
           aria-label={`Filter ${rowNumber} type`}
@@ -50,7 +55,7 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
           <option value="HS">HS</option>
         </select>
       </td>
-      <td>
+      <td data-label="Fc">
         <NumberField
           label={`Filter ${rowNumber} frequency Hz`}
           value={filter.frequencyHz}
@@ -60,7 +65,7 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
           onValueChange={(frequencyHz) => updateFilter(filter.id, { frequencyHz })}
         />
       </td>
-      <td>
+      <td data-label="Gain">
         <NumberField
           label={`Filter ${rowNumber} gain dB`}
           value={filter.gainDb}
@@ -71,7 +76,7 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
           onValueChange={(gainDb) => updateFilter(filter.id, { gainDb })}
         />
       </td>
-      <td>
+      <td data-label="Q">
         <NumberField
           label={`Filter ${rowNumber} Q`}
           value={filter.q}
@@ -82,7 +87,7 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
           onValueChange={(q) => updateFilter(filter.id, { q })}
         />
       </td>
-      <td className="filter-row__actions">
+      <td className="filter-row__actions" data-label="Actions">
         <button
           type="button"
           aria-label={`Move filter ${rowNumber} up`}
