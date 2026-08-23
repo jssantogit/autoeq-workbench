@@ -1,4 +1,5 @@
 import type { Filter, FilterType } from '@autoeq-workbench/core'
+import { useState } from 'react'
 import { NumberField } from '../../components/ui/NumberField'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 
@@ -10,6 +11,7 @@ interface FilterRowProps {
 }
 
 export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
+  const [menuOpen, setMenuOpen] = useState(false)
   const updateFilter = useWorkspaceStore((state) => state.updateFilter)
   const toggleFilter = useWorkspaceStore((state) => state.toggleFilter)
   const duplicateFilter = useWorkspaceStore((state) => state.duplicateFilter)
@@ -23,8 +25,23 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
     !filter.enabled && 'filter-row--disabled',
   ].filter(Boolean).join(' ')
 
+  const handleRowKeyDown = (event: React.KeyboardEvent<HTMLTableRowElement>) => {
+    if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return
+    event.preventDefault()
+    selectFilter(filter.id)
+  }
+
   return (
-    <tr className={className} data-selected={selected} data-enabled={filter.enabled}>
+    <tr
+      className={className}
+      aria-label={`Filter ${rowNumber}`}
+      aria-selected={selected}
+      data-selected={selected}
+      data-enabled={filter.enabled}
+      tabIndex={0}
+      onClick={() => selectFilter(filter.id)}
+      onKeyDown={handleRowKeyDown}
+    >
       <td data-label="ON">
         <input
           type="checkbox"
@@ -32,17 +49,6 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
           aria-label={`Enable filter ${rowNumber}`}
           onChange={() => toggleFilter(filter.id)}
         />
-      </td>
-      <td data-label="#">
-        <button
-          type="button"
-          className="filter-row__select"
-          aria-label={`Select filter ${rowNumber}`}
-          aria-pressed={selected}
-          onClick={() => selectFilter(filter.id)}
-        >
-          {rowNumber}
-        </button>
       </td>
       <td data-label="Type">
         <select
@@ -87,29 +93,48 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
           onValueChange={(q) => updateFilter(filter.id, { q })}
         />
       </td>
-      <td className="filter-row__actions" data-label="Actions">
-        <button
-          type="button"
-          aria-label={`Move filter ${rowNumber} up`}
-          disabled={index === 0}
-          onClick={() => reorderFilter(filter.id, 'up')}
+      <td className="filter-row__actions">
+        <details
+          className="filter-row__menu"
+          open={menuOpen}
+          onToggle={(event) => setMenuOpen(event.currentTarget.open)}
         >
-          Up
-        </button>
-        <button
-          type="button"
-          aria-label={`Move filter ${rowNumber} down`}
-          disabled={index === count - 1}
-          onClick={() => reorderFilter(filter.id, 'down')}
-        >
-          Down
-        </button>
-        <button type="button" aria-label={`Duplicate filter ${rowNumber}`} onClick={() => duplicateFilter(filter.id)}>
-          Copy
-        </button>
-        <button type="button" aria-label={`Remove filter ${rowNumber}`} onClick={() => removeFilter(filter.id)}>
-          Remove
-        </button>
+          <summary role="button" aria-label={`Actions for filter ${rowNumber}`}>...</summary>
+          {menuOpen && <div className="filter-row__menu-panel">
+            <button
+              type="button"
+              aria-label={`Move filter ${rowNumber} up`}
+              disabled={index === 0}
+              onClick={() => reorderFilter(filter.id, 'up')}
+            >
+              Move up
+            </button>
+            <button
+              type="button"
+              aria-label={`Move filter ${rowNumber} down`}
+              disabled={index === count - 1}
+              onClick={() => reorderFilter(filter.id, 'down')}
+            >
+              Move down
+            </button>
+            <button
+              type="button"
+              aria-label={`Duplicate filter ${rowNumber}`}
+              disabled={count >= 64}
+              onClick={() => duplicateFilter(filter.id)}
+            >
+              Duplicate
+            </button>
+            <button
+              type="button"
+              className="filter-row__remove"
+              aria-label={`Remove filter ${rowNumber}`}
+              onClick={() => removeFilter(filter.id)}
+            >
+              Remove
+            </button>
+          </div>}
+        </details>
       </td>
     </tr>
   )

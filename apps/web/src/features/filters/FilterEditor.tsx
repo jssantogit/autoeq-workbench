@@ -33,7 +33,7 @@ export function FilterEditor() {
       <div className="filter-table-wrap">
         <table className="filter-table" aria-label="Manual filters">
           <thead className="filter-table__head">
-            <tr><th>ON</th><th>#</th><th>Type</th><th>Fc</th><th>Gain</th><th>Q</th><th>Actions</th></tr>
+            <tr><th>ON</th><th>Type</th><th>Fc</th><th>Gain</th><th>Q</th><th aria-label="Actions" /></tr>
           </thead>
           <tbody>
             {filters.map((filter, index) => (
