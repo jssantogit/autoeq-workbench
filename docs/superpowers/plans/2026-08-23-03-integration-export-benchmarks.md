@@ -14,6 +14,7 @@
 
 - Complete Plans 1 and 2 before starting this plan.
 - Poweramp output in MVP is a **Poweramp-style manual-entry text preset**, not an undocumented claim of compatibility with Poweramp's native backup schema.
+- Poweramp text contains the final **enabled** solution only; disabled filters remain reproducible through the session JSON, not the active preset export.
 - Exported filters and metrics must use exactly the same final quantized filters shown in the workspace.
 - Preamp comes from dense combined-cascade maximum boost and rounds outward to 0.1 dB.
 - Session JSON is explicit user export/import, not automatic persistence.
@@ -74,7 +75,7 @@ docs/research/
 
 - [ ] **Step 1: Write Poweramp text golden test**
 
-Use final quantized filters only:
+Use final quantized filters only and emit enabled filters only:
 
 ```ts
 const text = formatPowerampText({
@@ -90,26 +91,27 @@ expect(text).toBe([
   '# AutoEQ Workbench — Demo',
   '# Poweramp-style manual-entry preset',
   'Preamp: -6.1 dB',
-  'Filter 1: ON PK Fc 1000 Hz Gain 6.0 dB Q 1.41',
-  'Filter 2: OFF HS Fc 10000 Hz Gain -1.2 dB Q 0.70'
+  'Filter 1: ON PK Fc 1000 Hz Gain 6.0 dB Q 1.41'
 ].join('\n'))
 ```
 
-Disabled filters are preserved as `OFF` in the text for reproducibility; Poweramp application of the preset should use enabled filters only.
+The disabled HS remains in Workbench/session state but is absent from the active preset export.
 
 - [ ] **Step 2: Implement stable numeric formatting**
 
 Rules:
 
+- include enabled filters only;
 - frequency: integer Hz;
 - gain: one decimal dB;
 - Q: two decimals;
 - preamp: one decimal dB;
 - normalize `-0.0` to `0.0`;
-- preserve filter list order;
+- preserve relative order of enabled filters;
+- renumber exported filters densely from 1;
 - type map exactly `PK | LS | HS`.
 
-The formatter does not re-quantize. It rejects filters that are off the `POWERAMP_MANUAL_ENTRY_POLICY` grid to prevent export/validation drift.
+The formatter does not re-quantize. It rejects enabled filters that are off the `POWERAMP_MANUAL_ENTRY_POLICY` grid to prevent export/validation drift.
 
 - [ ] **Step 3: Write and implement curve export tests**
 
@@ -247,7 +249,7 @@ Buttons after a valid workspace result:
 - `Export Residual (.txt)`;
 - optional CSV choice via compact menu/select, not separate giant cards.
 
-`Export Poweramp` is disabled if final current filters are not on the policy grid or if preamp/derived result is invalid.
+`Export Poweramp` is disabled if final current enabled filters are not on the policy grid or if preamp/derived result is invalid.
 
 - [ ] **Step 3: Write non-destructive session-import test**
 
@@ -561,10 +563,11 @@ The Chromium flow must:
 8. verify filter count <=10;
 9. edit one final Gain and verify `Modified` state;
 10. disable a filter and verify row remains;
-11. export Poweramp and assert downloaded text contains `Preamp:` and `Filter 1:`;
-12. export session;
-13. reload page;
-14. import exported session and verify filter count/state are restored.
+11. export Poweramp and assert downloaded text contains `Preamp:` and at least one `Filter 1:` when an enabled filter remains;
+12. verify the disabled row is not serialized as an active Poweramp filter;
+13. export session;
+14. reload page;
+15. import exported session and verify filter count/enabled state/solution state are restored.
 
 - [ ] **Step 4: Run E2E plus regular verification**
 
@@ -661,7 +664,7 @@ Every command must exit 0 before claiming completion.
 
 - [ ] **Step 2: Verify acceptance criteria directly**
 
-Check all 20 criteria from section 21 of the spec, including import, normalization, non-blocking/cancellable AutoEQ, 0..maxFilters behavior, manual PK/LS/HS editing, enable/disable, selected filter inspection, post-quantization validation, dense preamp, exact export, curve/session export, non-destructive failure, benchmark evidence, and graph-centered interaction language.
+Check all 20 criteria from section 21 of the spec, including import, normalization, non-blocking/cancellable AutoEQ, 0..maxFilters behavior, manual PK/LS/HS editing, enable/disable, selected filter inspection, post-quantization validation, dense preamp, exact enabled-solution export, curve/session export, non-destructive failure, benchmark evidence, and graph-centered interaction language.
 
 - [ ] **Step 3: Review repository diff/history for scope and hygiene**
 
@@ -692,7 +695,8 @@ The MVP is ready for user review only when:
 - every automated command in Task 9 passes;
 - the browser E2E flow passes in Chromium;
 - Standard-v1 benchmark baseline is committed and validation report explains retained/rejected tuning choices;
-- Poweramp-style text is generated from exactly the final quantized displayed filters;
+- Poweramp-style text is generated from exactly the final enabled quantized displayed filters;
+- disabled filters survive session round-trip but are absent from active Poweramp export;
 - session JSON round-trips authoritative state and invalid session import is non-destructive;
 - final UI directly observed at desktop/narrow viewport remains graph-centered and technically dense;
 - repository review finds no private data, local paths, secrets, accidental generated artifacts, or unrelated scope drift.
