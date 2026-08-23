@@ -25,7 +25,7 @@ describe('App', () => {
     expect(normalization.compareDocumentPosition(curves)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(curves.compareDocumentPosition(filters)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(filters.compareDocumentPosition(metrics)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-    expect(screen.getByText(/manual filter controls arrive in task 7/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add PK' })).toBeInTheDocument()
     expect(screen.getByText(/import source and target/i)).toBeInTheDocument()
   })
 })

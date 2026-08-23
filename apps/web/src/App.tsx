@@ -2,6 +2,7 @@ import { Panel } from './components/ui/Panel'
 import { CurveImport } from './features/curves/CurveImport'
 import { NormalizationControls } from './features/curves/NormalizationControls'
 import { FrequencyResponseGraph } from './features/graph/FrequencyResponseGraph'
+import { FilterEditor } from './features/filters/FilterEditor'
 import { MetricsSummary } from './features/metrics/MetricsSummary'
 import { deriveWorkspace, useWorkspaceStore } from './state/workspaceStore'
 
@@ -45,11 +46,8 @@ function App() {
           </div>
         </Panel>
 
-        <Panel title="Filter Editor" className="filter-placeholder">
-          <div className="filter-columns" aria-hidden="true">
-            <span>ON</span><span>#</span><span>TYPE</span><span>FC</span><span>GAIN</span><span>Q</span>
-          </div>
-          <p>Manual filter controls arrive in Task 7.</p>
+        <Panel title="Filter Editor">
+          <FilterEditor />
         </Panel>
       </div>
 

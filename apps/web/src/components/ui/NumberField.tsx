@@ -1,4 +1,4 @@
-import { useState, type InputHTMLAttributes } from 'react'
+import { useState, type InputHTMLAttributes, type KeyboardEvent } from 'react'
 
 interface NumberFieldProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange'> {
@@ -17,13 +17,24 @@ export function NumberField({
   ...props
 }: NumberFieldProps) {
   const [editText, setEditText] = useState<string | null>(null)
+  const [invalid, setInvalid] = useState(false)
 
   function commit(candidate: string) {
-    setEditText(candidate)
     const numeric = Number(candidate)
     if (candidate.trim() !== '' && Number.isFinite(numeric) && validate(numeric)) {
       onValueChange(numeric)
+      setEditText(null)
+      setInvalid(false)
+    } else {
+      setEditText(candidate)
+      setInvalid(true)
     }
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== 'Enter') return
+    event.preventDefault()
+    commit(event.currentTarget.value)
   }
 
   return (
@@ -33,8 +44,13 @@ export function NumberField({
         {...props}
         type="number"
         value={editText ?? String(value)}
-        onChange={(event) => commit(event.target.value)}
-        onBlur={() => setEditText(null)}
+        aria-invalid={invalid}
+        onChange={(event) => {
+          setEditText(event.target.value)
+          setInvalid(false)
+        }}
+        onBlur={(event) => commit(event.currentTarget.value)}
+        onKeyDown={handleKeyDown}
       />
     </label>
   )

@@ -3,6 +3,7 @@ import {
   DataZoomComponent,
   GridComponent,
   LegendComponent,
+  MarkLineComponent,
   ToolboxComponent,
   TooltipComponent,
 } from 'echarts/components'
@@ -18,6 +19,7 @@ registerEChartsModules([
   DataZoomComponent,
   GridComponent,
   LegendComponent,
+  MarkLineComponent,
   ToolboxComponent,
   TooltipComponent,
   CanvasRenderer,
@@ -33,6 +35,7 @@ const legendNames: GraphSeriesName[] = [
   'Source + EQ',
   'PEQ',
   'Desired',
+  'Selected Filter',
 ]
 
 const seriesColors: Record<GraphSeriesName, string> = {
@@ -41,6 +44,7 @@ const seriesColors: Record<GraphSeriesName, string> = {
   'Source + EQ': '#78a9ff',
   PEQ: '#c69cff',
   Desired: '#ef769f',
+  'Selected Filter': '#ffffff',
 }
 
 export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps) {
@@ -125,6 +129,15 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
           lineStyle: { width: series.name === 'PEQ' || series.name === 'Desired' ? 1.4 : 2 },
           itemStyle: { color: seriesColors[series.name] },
           emphasis: { focus: 'series' },
+          markLine:
+            series.markerFrequencyHz === undefined
+              ? undefined
+              : {
+                  symbol: 'none',
+                  label: { formatter: `${series.markerFrequencyHz} Hz`, color: '#dce6ed' },
+                  lineStyle: { color: seriesColors[series.name], type: 'dashed', width: 1 },
+                  data: [{ xAxis: series.markerFrequencyHz }],
+                },
         })),
       },
       { notMerge: true },

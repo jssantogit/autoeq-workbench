@@ -86,6 +86,23 @@ describe('buildGraphSeries', () => {
     )
   })
 
+  it('keeps a disabled selected filter response inspectable with its Fc marker', () => {
+    const store = createWorkspaceStore()
+    store.getState().setSource(source)
+    store.getState().setTarget(target)
+    store.getState().setFilters([{ ...filter, enabled: false }], 'manual')
+    store.getState().selectFilter(filter.id)
+
+    const derived = deriveWorkspace(store.getState())
+    const series = buildGraphSeries(derived)
+    const selected = series.find(({ name }) => name === 'Selected Filter')
+
+    expect(derived.peq?.db.every((db) => Math.abs(db) < 1e-10)).toBe(true)
+    expect(selected?.defaultVisible).toBe(true)
+    expect(selected?.markerFrequencyHz).toBe(1_000)
+    expect(Math.max(...selected!.data.map(([, db]) => db))).toBeGreaterThan(2.9)
+  })
+
   it('reports fixed-range coverage failures without dropping imported curve data', () => {
     const store = createWorkspaceStore()
     store.getState().setSource({

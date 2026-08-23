@@ -20,6 +20,7 @@ vi.mock('echarts/components', () => ({
   DataZoomComponent: {},
   GridComponent: {},
   LegendComponent: {},
+  MarkLineComponent: {},
   ToolboxComponent: {},
   TooltipComponent: {},
 }))
@@ -55,7 +56,7 @@ describe('FrequencyResponseGraph', () => {
         yAxis: expect.objectContaining({ type: 'value', name: 'dB' }),
         tooltip: expect.objectContaining({ trigger: 'axis' }),
         legend: expect.objectContaining({
-          data: ['Source', 'Target', 'Source + EQ', 'PEQ', 'Desired'],
+          data: ['Source', 'Target', 'Source + EQ', 'PEQ', 'Desired', 'Selected Filter'],
         }),
         dataZoom: [expect.objectContaining({ type: 'inside' }), expect.objectContaining({ type: 'slider' })],
       }),

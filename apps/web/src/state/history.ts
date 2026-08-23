@@ -1,7 +1,6 @@
 import type { Filter, Normalization } from '@autoeq-workbench/core'
 import type { FilterProvenance, SolutionState } from './workspaceStore'
 
-// Task 7 will add history operations; Task 6 only establishes the authoritative snapshot boundary.
 export interface WorkspaceHistorySnapshot {
   sourceNormalization: Normalization
   targetNormalization: Normalization
@@ -9,4 +8,15 @@ export interface WorkspaceHistorySnapshot {
   selectedFilterId: string | null
   solutionState: SolutionState
   filterProvenance: FilterProvenance | null
+}
+
+export function createHistorySnapshot(state: WorkspaceHistorySnapshot): WorkspaceHistorySnapshot {
+  return {
+    sourceNormalization: { ...state.sourceNormalization },
+    targetNormalization: { ...state.targetNormalization },
+    filters: state.filters.map((filter) => ({ ...filter })),
+    selectedFilterId: state.selectedFilterId,
+    solutionState: state.solutionState,
+    filterProvenance: state.filterProvenance,
+  }
 }

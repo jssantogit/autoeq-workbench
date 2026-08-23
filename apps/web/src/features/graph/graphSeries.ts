@@ -1,11 +1,18 @@
 import type { DerivedCurve, WorkspaceDerived } from '../../state/workspaceStore'
 
-export type GraphSeriesName = 'Source' | 'Target' | 'Source + EQ' | 'PEQ' | 'Desired'
+export type GraphSeriesName =
+  | 'Source'
+  | 'Target'
+  | 'Source + EQ'
+  | 'PEQ'
+  | 'Desired'
+  | 'Selected Filter'
 
 export interface GraphSeries {
   name: GraphSeriesName
   data: [number, number][]
   defaultVisible: boolean
+  markerFrequencyHz?: number
 }
 
 function graphSeries(
@@ -32,5 +39,11 @@ export function buildGraphSeries(workspaceDerived: WorkspaceDerived): GraphSerie
     ),
     graphSeries('PEQ', workspaceDerived.peq, false),
     graphSeries('Desired', workspaceDerived.desired, false),
+    workspaceDerived.selectedFilter === null
+      ? null
+      : {
+          ...graphSeries('Selected Filter', workspaceDerived.selectedFilter, true)!,
+          markerFrequencyHz: workspaceDerived.selectedFilter.frequencyHz,
+        },
   ].filter((series): series is GraphSeries => series !== null)
 }
