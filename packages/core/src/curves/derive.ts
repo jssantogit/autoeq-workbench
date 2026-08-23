@@ -41,3 +41,44 @@ export function desiredCorrection(
     return correction
   })
 }
+
+export function applyEqToSource(
+  sourceDb: readonly number[],
+  peqDb: readonly number[],
+): number[] {
+  return combineDbArrays(sourceDb, peqDb, 'Source and PEQ', (source, peq) => source + peq)
+}
+
+export function residualError(
+  targetDb: readonly number[],
+  sourceEqDb: readonly number[],
+): number[] {
+  return combineDbArrays(
+    targetDb,
+    sourceEqDb,
+    'Target and Source + EQ',
+    (target, sourceEq) => target - sourceEq,
+  )
+}
+
+function combineDbArrays(
+  left: readonly number[],
+  right: readonly number[],
+  names: string,
+  operation: (leftValue: number, rightValue: number) => number,
+): number[] {
+  if (left.length !== right.length) {
+    throw new CoreError('validation', `${names} arrays must have equal length`)
+  }
+  if ([...left, ...right].some((value) => !Number.isFinite(value))) {
+    throw new CoreError('validation', `${names} dB values must be finite`)
+  }
+
+  return left.map((leftValue, index) => {
+    const result = operation(leftValue, right[index]!)
+    if (!Number.isFinite(result)) {
+      throw new CoreError('numeric', `${names} operation produced a non-finite value`)
+    }
+    return result
+  })
+}
