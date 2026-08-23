@@ -10,6 +10,7 @@ import {
   prepareCurve,
   residualError,
   type Curve,
+  type CurveKind,
   type ErrorMetrics,
   type Filter,
   type FilterType,
@@ -26,22 +27,19 @@ import {
 
 export type SolutionState = 'clean' | 'modified' | 'stale'
 export type FilterProvenance = 'manual' | 'autoeq'
-export type WorkspaceCurveRole = 'source' | 'target' | 'reference' | null
-
-export interface WorkspaceCurveEntry {
-  curve: Curve
-  role: WorkspaceCurveRole
-}
 
 export interface WorkspaceState {
-  curves: WorkspaceCurveEntry[]
+  curves: Curve[]
+  activeFrId: string | null
+  activeTargetId: string | null
   normalization: Normalization
   filters: Filter[]
   selectedFilterId: string | null
   solutionState: SolutionState
   filterProvenance: FilterProvenance | null
   addCurve: (curve: Curve) => boolean
-  setCurveRole: (curveId: string, role: WorkspaceCurveRole) => void
+  setActiveFr: (id: string | null) => void
+  setActiveTarget: (id: string | null) => void
   renameCurve: (curveId: string, name: string) => void
   removeCurve: (curveId: string) => void
   setNormalization: (value: Normalization) => void
@@ -67,22 +65,24 @@ export interface DerivedCurve {
 export interface DerivedMeasurementCurve extends DerivedCurve {
   id: string
   name: string
-  role: WorkspaceCurveRole
+  kind: CurveKind
 }
 
 export interface WorkspaceDerived {
   status: 'incomplete' | 'ready' | 'coverage-error'
   message: string
   measurementCurves: DerivedMeasurementCurve[]
-  source: DerivedCurve | null
+  fr: DerivedCurve | null
   target: DerivedCurve | null
   peq: DerivedCurve | null
   desired: DerivedCurve | null
-  sourceEq: DerivedCurve | null
+  frEq: DerivedCurve | null
   metrics: ErrorMetrics | null
   preamp: PreampResult | null
   selectedFilter: (DerivedCurve & { frequencyHz: number; enabled: boolean }) | null
   hasFilters: boolean
+  activeFrId: string | null
+  activeTargetId: string | null
 }
 
 export const defaultNormalization: Readonly<Normalization> = {
@@ -92,6 +92,8 @@ export const defaultNormalization: Readonly<Normalization> = {
 
 const initialState = {
   curves: [],
+  activeFrId: null,
+  activeTargetId: null,
   normalization: { ...defaultNormalization },
   filters: [],
   selectedFilterId: null,
@@ -149,24 +151,16 @@ function afterNormalizationChange(state: WorkspaceState): SolutionState {
     : state.solutionState
 }
 
-function selectedInputIds(curves: WorkspaceCurveEntry[]): [string | null, string | null] {
-  return [
-    curves.find(({ role }) => role === 'source')?.curve.id ?? null,
-    curves.find(({ role }) => role === 'target')?.curve.id ?? null,
-  ]
-}
-
 function curveCollectionUpdate(
   state: WorkspaceState,
   future: WorkspaceHistorySnapshot[],
-  curves: WorkspaceCurveEntry[],
+  update: Pick<WorkspaceState, 'curves' | 'activeFrId' | 'activeTargetId'>,
 ): Partial<WorkspaceState> {
   future.length = 0
-  const before = selectedInputIds(state.curves)
-  const after = selectedInputIds(curves)
-  const selectedInputsChanged = before[0] !== after[0] || before[1] !== after[1]
+  const selectedInputsChanged =
+    state.activeFrId !== update.activeFrId || state.activeTargetId !== update.activeTargetId
   return {
-    curves,
+    ...update,
     solutionState:
       state.filters.length > 0 &&
       state.filterProvenance === 'autoeq' &&
@@ -182,7 +176,7 @@ export function createWorkspaceStore() {
   const future: WorkspaceHistorySnapshot[] = []
 
   function record(state: WorkspaceState, update: Partial<WorkspaceState>): Partial<WorkspaceState> {
-    past.push(createHistorySnapshot(state, selectedInputIds(state.curves)))
+    past.push(createHistorySnapshot(state))
     future.length = 0
     return { ...update, canUndo: true, canRedo: false }
   }
@@ -190,47 +184,73 @@ export function createWorkspaceStore() {
   return createStore<WorkspaceState>()((set, get) => ({
     ...initialState,
     addCurve: (curve) => {
-      if (get().curves.some(({ curve: existing }) => existing.id === curve.id)) return false
+      if (get().curves.some((existing) => existing.id === curve.id)) return false
       set((state) => {
-        const role: WorkspaceCurveRole =
-          state.curves.length === 0 ? 'source' : state.curves.length === 1 ? 'target' : null
-        return curveCollectionUpdate(state, future, [...state.curves, { curve, role }])
+        return curveCollectionUpdate(state, future, {
+          curves: [...state.curves, curve],
+          activeFrId: curve.kind === 'fr' && state.activeFrId === null ? curve.id : state.activeFrId,
+          activeTargetId:
+            curve.kind === 'target' && state.activeTargetId === null
+              ? curve.id
+              : state.activeTargetId,
+        })
       })
       return true
     },
-    setCurveRole: (curveId, role) =>
+    setActiveFr: (id) =>
       set((state) => {
-        const entry = state.curves.find(({ curve }) => curve.id === curveId)
-        if (entry === undefined || entry.role === role) return state
-        const curves = state.curves.map((item) => ({
-          ...item,
-          role:
-            item.curve.id === curveId
-              ? role
-              : (role === 'source' || role === 'target') && item.role === role
-                ? null
-                : item.role,
-        }))
-        return curveCollectionUpdate(state, future, curves)
+        if (
+          id === state.activeFrId ||
+          (id !== null && !state.curves.some((curve) => curve.id === id && curve.kind === 'fr'))
+        ) return state
+        return curveCollectionUpdate(state, future, {
+          curves: state.curves,
+          activeFrId: id,
+          activeTargetId: state.activeTargetId,
+        })
+      }),
+    setActiveTarget: (id) =>
+      set((state) => {
+        if (
+          id === state.activeTargetId ||
+          (id !== null && !state.curves.some((curve) => curve.id === id && curve.kind === 'target'))
+        ) return state
+        return curveCollectionUpdate(state, future, {
+          curves: state.curves,
+          activeFrId: state.activeFrId,
+          activeTargetId: id,
+        })
       }),
     renameCurve: (curveId, name) =>
       set((state) => {
         const trimmed = name.trim()
-        const entry = state.curves.find(({ curve }) => curve.id === curveId)
-        if (entry === undefined || trimmed.length === 0 || entry.curve.name === trimmed) return state
+        const curve = state.curves.find((item) => item.id === curveId)
+        if (curve === undefined || trimmed.length === 0 || curve.name === trimmed) return state
         const curves = state.curves.map((item) =>
-          item.curve.id === curveId ? { ...item, curve: { ...item.curve, name: trimmed } } : item,
+          item.id === curveId ? { ...item, name: trimmed } : item,
         )
-        return curveCollectionUpdate(state, future, curves)
+        return curveCollectionUpdate(state, future, {
+          curves,
+          activeFrId: state.activeFrId,
+          activeTargetId: state.activeTargetId,
+        })
       }),
     removeCurve: (curveId) =>
       set((state) => {
-        if (!state.curves.some(({ curve }) => curve.id === curveId)) return state
-        return curveCollectionUpdate(
-          state,
-          future,
-          state.curves.filter(({ curve }) => curve.id !== curveId),
-        )
+        const removed = state.curves.find((curve) => curve.id === curveId)
+        if (removed === undefined) return state
+        const curves = state.curves.filter((curve) => curve.id !== curveId)
+        return curveCollectionUpdate(state, future, {
+          curves,
+          activeFrId:
+            state.activeFrId === curveId
+              ? (curves.find((curve) => curve.kind === 'fr')?.id ?? null)
+              : state.activeFrId,
+          activeTargetId:
+            state.activeTargetId === curveId
+              ? (curves.find((curve) => curve.kind === 'target')?.id ?? null)
+              : state.activeTargetId,
+        })
       }),
     setNormalization: (value) =>
       set((state) => {
@@ -367,9 +387,9 @@ export function createWorkspaceStore() {
       set((state) => {
         const snapshot = past.pop()
         if (snapshot === undefined) return state
-        future.push(createHistorySnapshot(state, selectedInputIds(state.curves)))
+        future.push(createHistorySnapshot(state))
         return {
-          ...restoreHistorySnapshot(snapshot, selectedInputIds(state.curves)),
+          ...restoreHistorySnapshot(snapshot, state),
           canUndo: past.length > 0,
           canRedo: true,
         }
@@ -378,9 +398,9 @@ export function createWorkspaceStore() {
       set((state) => {
         const snapshot = future.pop()
         if (snapshot === undefined) return state
-        past.push(createHistorySnapshot(state, selectedInputIds(state.curves)))
+        past.push(createHistorySnapshot(state))
         return {
-          ...restoreHistorySnapshot(snapshot, selectedInputIds(state.curves)),
+          ...restoreHistorySnapshot(snapshot, state),
           canUndo: true,
           canRedo: future.length > 0,
         }
@@ -403,14 +423,15 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
   )
   const peq = { frequencies, db: peqDb }
   const preamp = calculatePreampDb(state.filters, MVP_NUMERIC_POLICY.sampleRateHz)
-  let source: DerivedCurve | null = null
+  let fr: DerivedCurve | null = null
   let target: DerivedCurve | null = null
-  let preparedSource: DerivedCurve | null = null
+  let preparedFr: DerivedCurve | null = null
   let preparedTarget: DerivedCurve | null = null
   const errors: string[] = []
   const warnings: string[] = []
-  const sourceEntry = state.curves.find(({ role }) => role === 'source') ?? null
-  const targetEntry = state.curves.find(({ role }) => role === 'target') ?? null
+  const activeFr = state.curves.find((curve) => curve.id === state.activeFrId && curve.kind === 'fr') ?? null
+  const activeTarget =
+    state.curves.find((curve) => curve.id === state.activeTargetId && curve.kind === 'target') ?? null
   const measurementCurves: DerivedMeasurementCurve[] = []
   const selected = state.filters.find(({ id }) => id === state.selectedFilterId)
   const selectedFilter = selected
@@ -433,57 +454,53 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
     )
   }
 
-  for (const entry of state.curves) {
+  for (const curve of state.curves) {
+    const isActiveFr = curve.id === activeFr?.id
+    const isActiveTarget = curve.id === activeTarget?.id
     try {
-      const imported = prepareImportedCurve(entry.curve, state.normalization)
+      const imported = prepareImportedCurve(curve, state.normalization)
       measurementCurves.push({
-        id: entry.curve.id,
-        name: entry.curve.name,
-        role: entry.role,
+        id: curve.id,
+        name: curve.name,
+        kind: curve.kind,
         ...imported,
       })
 
-      if (entry.role !== 'source' && entry.role !== 'target') continue
-      if (entry.role === 'source') source = imported
+      if (!isActiveFr && !isActiveTarget) continue
+      if (isActiveFr) fr = imported
       else target = imported
 
-      if (!coversWorkbenchRange(entry.curve)) {
-        const roleLabel = entry.role === 'source' ? 'Source' : 'Target'
-        errors.push(`${roleLabel} "${entry.curve.name}" must cover the 20 Hz to 20 kHz graph range.`)
+      if (!coversWorkbenchRange(curve)) {
+        const kindLabel = isActiveFr ? 'FR' : 'Target'
+        errors.push(`${kindLabel} "${curve.name}" must cover the 20 Hz to 20 kHz graph range.`)
         continue
       }
 
-      const prepared = prepareCurve(entry.curve, state.normalization, frequencies)
+      const prepared = prepareCurve(curve, state.normalization, frequencies)
       const evaluationCurve = { frequencies: prepared.frequencies, db: prepared.db }
-      if (entry.role === 'source') preparedSource = evaluationCurve
+      if (isActiveFr) preparedFr = evaluationCurve
       else preparedTarget = evaluationCurve
     } catch (cause) {
-      const roleLabel = entry.role === 'source'
-        ? 'Source'
-        : entry.role === 'target'
-          ? 'Target'
-          : entry.role === 'reference'
-            ? 'Reference Target'
-            : 'Comparison'
+      const kindLabel = curve.kind === 'fr' ? 'FR' : 'Target'
       const message =
-        `${roleLabel} "${entry.curve.name}": ${cause instanceof Error ? cause.message : 'unable to prepare curve'}`
-      if (entry.role === 'source' || entry.role === 'target') errors.push(message)
+        `${kindLabel} "${curve.name}": ${cause instanceof Error ? cause.message : 'unable to prepare curve'}`
+      if (isActiveFr || isActiveTarget) errors.push(message)
       else warnings.push(message)
     }
   }
 
-  const sourceEq = preparedSource === null
+  const frEq = preparedFr === null
     ? null
-    : { frequencies, db: applyEqToSource(preparedSource.db, peqDb) }
-  const desired = preparedSource === null || preparedTarget === null
+    : { frequencies, db: applyEqToSource(preparedFr.db, peqDb) }
+  const desired = preparedFr === null || preparedTarget === null
     ? null
-    : { frequencies, db: desiredCorrection(preparedSource.db, preparedTarget.db) }
-  const metrics = sourceEq === null || preparedTarget === null
+    : { frequencies, db: desiredCorrection(preparedFr.db, preparedTarget.db) }
+  const metrics = frEq === null || preparedTarget === null
     ? null
-    : calculateErrorMetrics(residualError(preparedTarget.db, sourceEq.db), frequencies)
-  const comparable = preparedSource !== null && preparedTarget !== null
+    : calculateErrorMetrics(residualError(preparedTarget.db, frEq.db), frequencies)
+  const comparable = preparedFr !== null && preparedTarget !== null
   if (comparable) {
-    source = preparedSource
+    fr = preparedFr
     target = preparedTarget
   }
 
@@ -492,31 +509,33 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
     : comparable
       ? 'ready'
       : 'incomplete'
-  const incompleteMessage = sourceEntry === null && targetEntry === null
-    ? 'Assign Source and Target to compare responses.'
-    : sourceEntry === null
-      ? 'Assign Source to compare responses.'
-      : 'Assign Target to compare responses.'
+  const incompleteMessage = activeFr === null && activeTarget === null
+    ? 'Select an active FR and Target to compare responses.'
+    : activeFr === null
+      ? 'Select an active FR to compare responses.'
+      : 'Select an active Target to compare responses.'
 
   const message = status === 'coverage-error'
     ? errors.join(' ')
     : status === 'ready'
-      ? 'Source and Target ready.'
+      ? 'FR and Target ready.'
       : incompleteMessage
 
   return {
     status,
     message: [message, ...warnings].join(' '),
     measurementCurves,
-    source,
+    fr,
     target,
     peq,
     desired,
-    sourceEq,
+    frEq,
     metrics,
     preamp,
     selectedFilter,
     hasFilters: state.filters.length > 0,
+    activeFrId: activeFr?.id ?? null,
+    activeTargetId: activeTarget?.id ?? null,
   }
 }
 

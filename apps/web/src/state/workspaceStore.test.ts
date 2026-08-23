@@ -49,36 +49,47 @@ describe('workspace curve collection', () => {
     store = createWorkspaceStore()
   })
 
-  it('starts with one authoritative normalization and no curves', () => {
-    expect(store.getState()).toMatchObject({ curves: [], normalization: defaultNormalization })
+  it('starts with one authoritative normalization, no curves, and no active pair', () => {
+    expect(store.getState()).toMatchObject({
+      curves: [],
+      activeFrId: null,
+      activeTargetId: null,
+      normalization: defaultNormalization,
+    })
   })
 
-  it('stores N curves and auto-assigns only the first Source and second Target', () => {
+  it('stores core Curves and activates only the first curve of each kind', () => {
     store.getState().addCurve(source)
     store.getState().addCurve(target)
     store.getState().addCurve(extra)
 
-    expect(store.getState().curves).toEqual([
-      { curve: source, role: 'source' },
-      { curve: target, role: 'target' },
-      { curve: extra, role: null },
-    ])
+    expect(store.getState()).toMatchObject({
+      curves: [source, target, extra],
+      activeFrId: source.id,
+      activeTargetId: target.id,
+    })
   })
 
-  it('keeps Source and Target unique while allowing multiple references', () => {
+  it('rejects a duplicate curve ID without changing active selection', () => {
+    expect(store.getState().addCurve(source)).toBe(true)
+    expect(store.getState().addCurve({ ...source, name: 'Duplicate' })).toBe(false)
+    expect(store.getState()).toMatchObject({ curves: [source], activeFrId: source.id })
+  })
+
+  it('accepts null or existing matching-kind active IDs and ignores invalid requests', () => {
     store.getState().addCurve(source)
     store.getState().addCurve(target)
     store.getState().addCurve(extra)
 
-    store.getState().setCurveRole(extra.id, 'source')
-    store.getState().setCurveRole(target.id, 'reference')
-    store.getState().setCurveRole(source.id, 'reference')
+    store.getState().setActiveFr(extra.id)
+    store.getState().setActiveTarget(source.id)
+    store.getState().setActiveFr(target.id)
+    store.getState().setActiveTarget('missing')
+    expect(store.getState()).toMatchObject({ activeFrId: extra.id, activeTargetId: target.id })
 
-    expect(store.getState().curves.map(({ curve, role }) => [curve.id, role])).toEqual([
-      [source.id, 'reference'],
-      [target.id, 'reference'],
-      [extra.id, 'source'],
-    ])
+    store.getState().setActiveFr(null)
+    store.getState().setActiveTarget(null)
+    expect(store.getState()).toMatchObject({ activeFrId: null, activeTargetId: null })
   })
 
   it('renames and removes curves without mutating the imported curve object', () => {
@@ -87,10 +98,24 @@ describe('workspace curve collection', () => {
     store.getState().renameCurve(source.id, '  Renamed source  ')
     store.getState().removeCurve(target.id)
 
-    expect(store.getState().curves).toEqual([
-      { curve: { ...source, name: 'Renamed source' }, role: 'source' },
-    ])
+    expect(store.getState().curves).toEqual([{ ...source, name: 'Renamed source' }])
+    expect(store.getState()).toMatchObject({ activeFrId: source.id, activeTargetId: null })
     expect(source.name).toBe('Source A')
+  })
+
+  it('falls back to the first remaining same-kind curve only when removing an active curve', () => {
+    const otherTarget = { ...target, id: 'target-2' }
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
+    store.getState().addCurve(extra)
+    store.getState().addCurve(otherTarget)
+
+    store.getState().removeCurve(otherTarget.id)
+    expect(store.getState()).toMatchObject({ activeFrId: source.id, activeTargetId: target.id })
+    store.getState().removeCurve(source.id)
+    expect(store.getState()).toMatchObject({ activeFrId: extra.id, activeTargetId: target.id })
+    store.getState().removeCurve(target.id)
+    expect(store.getState()).toMatchObject({ activeFrId: extra.id, activeTargetId: null })
   })
 
   it('stales preserved AutoEQ filters only when selected input IDs change', () => {
@@ -99,15 +124,14 @@ describe('workspace curve collection', () => {
     store.getState().addCurve(extra)
     store.getState().setFilters([filter], 'autoeq')
 
-    store.getState().renameCurve(extra.id, 'Comparison renamed')
-    store.getState().setCurveRole(extra.id, 'reference')
+    store.getState().renameCurve(extra.id, 'FR renamed')
     expect(store.getState().solutionState).toBe('clean')
 
     store.getState().renameCurve(source.id, 'Source renamed')
     store.getState().renameCurve(target.id, 'Target renamed')
     expect(store.getState().solutionState).toBe('clean')
 
-    store.getState().setCurveRole(extra.id, 'source')
+    store.getState().setActiveFr(extra.id)
     expect(store.getState().solutionState).toBe('stale')
     expect(store.getState().filters).toEqual([filter])
   })
@@ -123,7 +147,7 @@ describe('workspace curve collection', () => {
     store.getState().renameCurve(source.id, 'Renamed')
     expect(store.getState()).toMatchObject({ canRedo: false, solutionState: 'clean' })
     store.getState().undo()
-    expect(store.getState().curves[0]?.curve.name).toBe('Renamed')
+    expect(store.getState().curves[0]?.name).toBe('Renamed')
     expect(store.getState().filters).toEqual([])
 
     store.getState().setFilters([filter], 'autoeq')
@@ -138,7 +162,7 @@ describe('workspace curve collection', () => {
     store.getState().addCurve(extra)
     store.getState().setFilters([filter], 'manual')
 
-    store.getState().setCurveRole(extra.id, 'source')
+    store.getState().setActiveFr(extra.id)
     expect(store.getState().solutionState).toBe('clean')
     store.getState().removeCurve(target.id)
     expect(store.getState().solutionState).toBe('clean')
@@ -152,7 +176,7 @@ describe('workspace curve collection', () => {
     store.getState().updateFilter(filter.id, { gainDb: 4 })
     expect(store.getState()).toMatchObject({ filterProvenance: 'autoeq', solutionState: 'modified' })
 
-    store.getState().setCurveRole(extra.id, 'source')
+    store.getState().setActiveFr(extra.id)
     expect(store.getState().solutionState).toBe('stale')
   })
 })
@@ -204,7 +228,7 @@ describe('workspace history and filters', () => {
     store.getState().addCurve(extra)
     store.getState().setFilters([filter], 'autoeq')
     store.getState().updateFilter(filter.id, { gainDb: 4 })
-    store.getState().setCurveRole(extra.id, 'source')
+    store.getState().setActiveFr(extra.id)
 
     store.getState().undo()
     expect(store.getState()).toMatchObject({ solutionState: 'stale', filters: [filter] })
@@ -228,7 +252,7 @@ describe('workspace history and filters', () => {
     changedStore.getState().addCurve(extra)
     changedStore.getState().setFilters([filter], 'autoeq')
     changedStore.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
-    changedStore.getState().setCurveRole(extra.id, 'source')
+    changedStore.getState().setActiveFr(extra.id)
     changedStore.getState().undo()
     expect(changedStore.getState()).toMatchObject({
       normalization: defaultNormalization,
@@ -247,7 +271,7 @@ describe('deriveWorkspace', () => {
     expect(derived.status).toBe('incomplete')
     expect(derived.peq?.frequencies).toEqual(createEvaluationGrid())
     expect(derived.preamp?.preampDb).toBeLessThanOrEqual(-3)
-    expect(derived.sourceEq).toBeNull()
+    expect(derived.frEq).toBeNull()
     expect(derived.desired).toBeNull()
     expect(derived.metrics).toBeNull()
   })
@@ -267,7 +291,7 @@ describe('deriveWorkspace', () => {
     expect([source, target, extra].map(({ rawPoints }) => rawPoints)).toEqual(snapshots)
   })
 
-  it('uses only assigned Source and Target for canonical comparison outputs', () => {
+  it('uses only active FR and Target for canonical comparison outputs', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(source)
     store.getState().addCurve(target)
@@ -278,26 +302,25 @@ describe('deriveWorkspace', () => {
     const after = deriveWorkspace(store.getState())
 
     expect(after.status).toBe('ready')
-    expect(after.source?.frequencies).toEqual(createEvaluationGrid())
+    expect(after.fr?.frequencies).toEqual(createEvaluationGrid())
     expect(after.target?.frequencies).toEqual(createEvaluationGrid())
     expect(after.desired?.db).toEqual(before)
     expect(after.metrics).not.toBeNull()
   })
 
-  it('supports partial derivation from Source or Target alone', () => {
+  it('supports partial derivation from FR or Target alone', () => {
     const sourceStore = createWorkspaceStore()
     sourceStore.getState().addCurve(source)
     sourceStore.getState().setFilters([filter], 'manual')
     const sourceOnly = deriveWorkspace(sourceStore.getState())
-    expect(sourceOnly.sourceEq).not.toBeNull()
+    expect(sourceOnly.frEq).not.toBeNull()
     expect(sourceOnly.desired).toBeNull()
 
     const targetStore = createWorkspaceStore()
     targetStore.getState().addCurve(target)
-    targetStore.getState().setCurveRole(target.id, 'target')
     const targetOnly = deriveWorkspace(targetStore.getState())
     expect(targetOnly.target).not.toBeNull()
-    expect(targetOnly.sourceEq).toBeNull()
+    expect(targetOnly.frEq).toBeNull()
   })
 
   it('names the failing role and curve while preserving independent PEQ/preamp', () => {
@@ -315,7 +338,7 @@ describe('deriveWorkspace', () => {
 
     expect(derived.status).toBe('coverage-error')
     expect(derived.message).toMatch(/Target.*Short target.*20 Hz.*20 kHz/i)
-    expect(derived.sourceEq).not.toBeNull()
+    expect(derived.frEq).not.toBeNull()
     expect(derived.peq).not.toBeNull()
     expect(derived.preamp).not.toBeNull()
     expect(derived.desired).toBeNull()
@@ -332,13 +355,33 @@ describe('deriveWorkspace', () => {
     store.getState().addCurve(source)
     store.getState().addCurve(target)
     store.getState().addCurve(invalidReference)
-    store.getState().setCurveRole(invalidReference.id, 'reference')
-
     const derived = deriveWorkspace(store.getState())
 
     expect(derived.status).toBe('ready')
     expect(derived.metrics).not.toBeNull()
     expect(derived.measurementCurves.map(({ id }) => id)).toEqual([source.id, target.id])
-    expect(derived.message).toMatch(/Reference Target.*High-frequency reference/i)
+    expect(derived.message).toMatch(/FR.*High-frequency reference/i)
+  })
+
+  it('warns for an invalid inactive Target while deriving only the active pair', () => {
+    const store = createWorkspaceStore()
+    const invalidTarget: Curve = {
+      ...target,
+      id: 'target-invalid',
+      name: 'Narrow target',
+      rawPoints: target.rawPoints.filter(({ frequencyHz }) => frequencyHz >= 1_000),
+    }
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
+    store.getState().addCurve(invalidTarget)
+
+    const derived = deriveWorkspace(store.getState())
+
+    expect(derived.status).toBe('ready')
+    expect(derived.measurementCurves.map(({ id, kind }) => [id, kind])).toEqual([
+      [source.id, 'fr'],
+      [target.id, 'target'],
+    ])
+    expect(derived.message).toMatch(/Target.*Narrow target/i)
   })
 })

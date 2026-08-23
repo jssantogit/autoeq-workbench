@@ -1,25 +1,23 @@
 import { useState, type FormEvent } from 'react'
-import type { WorkspaceCurveEntry, WorkspaceCurveRole } from '../../state/workspaceStore'
+import type { Curve } from '@autoeq-workbench/core'
 import { useUiStore } from '../../state/uiStore'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 
 interface CurveAppearanceControlsProps {
-  entry: WorkspaceCurveEntry
+  curve: Curve
 }
 
-const roleLabels: Record<Exclude<WorkspaceCurveRole, null>, string> = {
-  source: 'Source',
-  target: 'Target',
-  reference: 'Reference Target',
-}
-
-export function CurveAppearanceControls({ entry }: CurveAppearanceControlsProps) {
-  const { curve, role } = entry
+export function CurveAppearanceControls({ curve }: CurveAppearanceControlsProps) {
   const appearance = useUiStore((state) => state.curveAppearance[curve.id])
   const setCurveColor = useUiStore((state) => state.setCurveColor)
   const setCurveVisible = useUiStore((state) => state.setCurveVisible)
   const unregisterCurve = useUiStore((state) => state.unregisterCurve)
-  const setCurveRole = useWorkspaceStore((state) => state.setCurveRole)
+  const activeId = useWorkspaceStore((state) =>
+    curve.kind === 'fr' ? state.activeFrId : state.activeTargetId,
+  )
+  const setActive = useWorkspaceStore((state) =>
+    curve.kind === 'fr' ? state.setActiveFr : state.setActiveTarget,
+  )
   const renameCurve = useWorkspaceStore((state) => state.renameCurve)
   const removeCurve = useWorkspaceStore((state) => state.removeCurve)
   const [name, setName] = useState(curve.name)
@@ -38,7 +36,9 @@ export function CurveAppearanceControls({ entry }: CurveAppearanceControlsProps)
     <>
       <span className="curve-manager__swatch" style={{ background: appearance?.color }} aria-hidden="true" />
       <span className="curve-manager__name" title={curve.name}>{curve.name}</span>
-      <span className="curve-status curve-status--loaded">{role === null ? 'Comparison' : roleLabels[role]}</span>
+      <span className="curve-status curve-status--loaded">
+        {activeId === curve.id ? `Active ${curve.kind === 'fr' ? 'FR' : 'Target'}` : curve.kind === 'fr' ? 'FR' : 'Target'}
+      </span>
       <label className="visibility-control">
         <input
           type="checkbox"
@@ -50,10 +50,9 @@ export function CurveAppearanceControls({ entry }: CurveAppearanceControlsProps)
       <details className="curve-menu">
         <summary aria-label={`Actions for ${curve.name}`}>...</summary>
         <div className="curve-menu__panel">
-          <button type="button" onClick={() => setCurveRole(curve.id, 'source')}>Set as Source</button>
-          <button type="button" onClick={() => setCurveRole(curve.id, 'target')}>Set as Target</button>
-          <button type="button" onClick={() => setCurveRole(curve.id, 'reference')}>Set as Reference Target</button>
-          <button type="button" onClick={() => setCurveRole(curve.id, null)}>Set as Comparison</button>
+          {activeId === curve.id
+            ? <button type="button" onClick={() => setActive(null)}>Clear active {curve.kind === 'fr' ? 'FR' : 'Target'}</button>
+            : <button type="button" onClick={() => setActive(curve.id)}>Set active {curve.kind === 'fr' ? 'FR' : 'Target'}</button>}
           <label className="color-control">
             <span>Change color</span>
             <input

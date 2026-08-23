@@ -4,10 +4,12 @@ import { useWorkspaceStore } from '../../state/workspaceStore'
 
 export function UtilityRail() {
   const curves = useWorkspaceStore((state) => state.curves)
+  const activeFrId = useWorkspaceStore((state) => state.activeFrId)
+  const activeTargetId = useWorkspaceStore((state) => state.activeTargetId)
   const normalization = useWorkspaceStore((state) => state.normalization)
   const setActiveDockTab = useUiStore((state) => state.setActiveDockTab)
-  const source = curves.find(({ role }) => role === 'source')?.curve.name ?? 'None'
-  const target = curves.find(({ role }) => role === 'target')?.curve.name ?? 'None'
+  const fr = curves.find(({ id }) => id === activeFrId)?.name ?? 'None'
+  const target = curves.find(({ id }) => id === activeTargetId)?.name ?? 'None'
   const normalizationLabel = `Normalize: ${normalization.anchorHz} Hz / ${normalization.targetDb} dB`
 
   function showNormalization() {
@@ -23,7 +25,7 @@ export function UtilityRail() {
       <button className="utility-rail__action" type="button" onClick={showNormalization}>
         {normalizationLabel}
       </button>
-      <span className="utility-rail__summary">Source: <strong>{source}</strong></span>
+      <span className="utility-rail__summary">FR: <strong>{fr}</strong></span>
       <span className="utility-rail__summary">Target: <strong>{target}</strong></span>
     </div>
   )

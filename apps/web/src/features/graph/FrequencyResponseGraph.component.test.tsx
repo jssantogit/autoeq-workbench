@@ -85,7 +85,6 @@ describe('FrequencyResponseGraph', () => {
     store.getState().addCurve(curve('source', 'Studio left', 'fr'))
     store.getState().addCurve(curve('target', 'Harman target', 'target', 1))
     store.getState().addCurve(curve('reference', 'Archive reference', 'target', 2))
-    store.getState().setCurveRole('reference', 'reference')
     store.getState().addCurve(curve('comparison', 'Room comparison', 'fr', 3))
     store.getState().addCurve(curve('hidden', 'Hidden comparison', 'fr', 4))
     store.getState().setFilters([filter], 'manual')
@@ -102,7 +101,7 @@ describe('FrequencyResponseGraph', () => {
     render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     const option = mocks.chart.setOption.mock.calls.at(-1)?.[0]
     expect(option.series.map(({ name }: { name: string }) => name)).toEqual([
-      'Studio left', 'Harman target', 'Archive reference', 'Room comparison', 'Source + EQ',
+      'Studio left', 'Harman target', 'Archive reference', 'Room comparison', 'FR + EQ',
     ])
     expect(option.series.find(({ name }: { name: string }) => name === 'Archive reference').lineStyle)
       .toMatchObject({ color: '#989894', type: 'dashed' })

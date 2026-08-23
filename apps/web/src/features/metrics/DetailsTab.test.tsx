@@ -22,6 +22,8 @@ describe('DetailsTab', () => {
   beforeEach(() => {
     workspaceStore.setState({
       curves: [],
+      activeFrId: null,
+      activeTargetId: null,
       normalization: { ...defaultNormalization },
       filters: [],
       selectedFilterId: null,
@@ -43,7 +45,7 @@ describe('DetailsTab', () => {
     })
     const derived = currentDerived({
       status: 'ready',
-      message: 'Source and Target ready.',
+      message: 'FR and Target ready.',
       metrics: {
         maeDb: 1.234,
         rmseDb: 2.345,
@@ -77,7 +79,7 @@ describe('DetailsTab', () => {
     expect(metricValue('Active filters')).toHaveTextContent('0')
     expect(metricValue('Solution state')).toHaveTextContent('Clean')
     expect(metricValue('Provenance')).toHaveTextContent('User edited')
-    expect(screen.getByText(/comparison metrics require source and target/i)).toBeVisible()
+    expect(screen.getByText(/metrics require an active FR and Target/i)).toBeVisible()
     expect(screen.queryByText(/peq.*unavailable/i)).not.toBeInTheDocument()
   })
 

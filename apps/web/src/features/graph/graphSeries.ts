@@ -1,7 +1,6 @@
-import { interpolateLogFrequency } from '@autoeq-workbench/core'
+import { interpolateLogFrequency, type CurveKind } from '@autoeq-workbench/core'
 import type {
   DerivedCurve,
-  WorkspaceCurveRole,
   WorkspaceDerived,
 } from '../../state/workspaceStore'
 
@@ -16,13 +15,15 @@ interface GraphSeriesBase {
 export interface MeasurementGraphSeries extends GraphSeriesBase {
   kind: 'measurement'
   curveId: string
-  measurementRole: WorkspaceCurveRole
+  measurementKind: CurveKind
+  active: boolean
 }
 
 export interface DerivedGraphSeries extends GraphSeriesBase {
   kind: 'derived'
   curveId?: never
-  measurementRole?: never
+  measurementKind?: never
+  active?: never
 }
 
 export type GraphSeries = MeasurementGraphSeries | DerivedGraphSeries
@@ -74,12 +75,16 @@ export function buildGraphSeries(workspaceDerived: WorkspaceDerived): GraphSerie
       data: curve.frequencies.map((frequency, index) => [frequency, curve.db[index]!] as [number, number]),
       defaultVisible: true,
       curveId: curve.id,
-      measurementRole: curve.role,
+      measurementKind: curve.kind,
+      active:
+        curve.kind === 'fr'
+          ? curve.id === workspaceDerived.activeFrId
+          : curve.id === workspaceDerived.activeTargetId,
     })),
     graphSeries(
-      'source-eq',
-      'Source + EQ',
-      workspaceDerived.hasFilters ? workspaceDerived.sourceEq : null,
+      'fr-eq',
+      'FR + EQ',
+      workspaceDerived.hasFilters ? workspaceDerived.frEq : null,
       true,
     ),
     graphSeries('peq', 'PEQ', workspaceDerived.peq, false),

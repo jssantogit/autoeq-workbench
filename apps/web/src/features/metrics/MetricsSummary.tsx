@@ -54,7 +54,7 @@ export function MetricsSummary({ derived }: MetricsSummaryProps) {
       </div>
       <p className={`metrics__status metrics__status--${derived.status}`}>
         {derived.metrics === null
-          ? `${derived.message} Comparison metrics require Source and Target with valid 20 Hz-20 kHz coverage.`
+          ? `${derived.message} Metrics require an active FR and Target with valid 20 Hz-20 kHz coverage.`
           : 'Compared on the canonical evaluation grid.'}
       </p>
       <MetricList values={values} />

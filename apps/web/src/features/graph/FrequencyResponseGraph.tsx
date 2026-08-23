@@ -32,8 +32,7 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
   const chartRef = useRef<EChartsType | null>(null)
   const theme = useUiStore((state) => state.theme)
   const curveAppearance = useUiStore((state) => state.curveAppearance)
-  const sourceCurveId = derived.measurementCurves.find(({ role }) => role === 'source')?.id
-  const appearanceInput = { theme, curveAppearance, sourceCurveId }
+  const appearanceInput = { theme, curveAppearance, frCurveId: derived.activeFrId ?? undefined }
   const visibleSeries = buildGraphSeries(derived).filter((series) =>
     series.kind === 'measurement'
       ? (curveAppearance[series.curveId]?.visible ?? true)

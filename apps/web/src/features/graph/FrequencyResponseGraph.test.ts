@@ -65,21 +65,20 @@ describe('buildGraphSeries', () => {
     ])
   })
 
-  it('builds one actual-name series for every imported measurement and keeps its identity and role', () => {
+  it('builds one actual-name series for every imported curve and keeps its kind and active state', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve({ ...source, name: 'Left channel' })
     store.getState().addCurve({ ...target, name: 'House target' })
     store.getState().addCurve(overlay)
-    store.getState().setCurveRole(overlay.id, 'reference')
 
     const measurements = buildGraphSeries(deriveWorkspace(store.getState())).filter(
       ({ kind }) => kind === 'measurement',
     )
 
     expect(measurements).toMatchObject([
-      { id: 'source', name: 'Left channel', curveId: 'source', measurementRole: 'source' },
-      { id: 'target', name: 'House target', curveId: 'target', measurementRole: 'target' },
-      { id: 'overlay', name: 'Room overlay', curveId: 'overlay', measurementRole: 'reference' },
+      { id: 'source', name: 'Left channel', curveId: 'source', measurementKind: 'fr', active: true },
+      { id: 'target', name: 'House target', curveId: 'target', measurementKind: 'target', active: true },
+      { id: 'overlay', name: 'Room overlay', curveId: 'overlay', measurementKind: 'fr', active: false },
     ])
   })
 
@@ -98,7 +97,7 @@ describe('buildGraphSeries', () => {
     expect(series.every(({ data }) => data.every(([frequency, db]) => frequency > 0 && Number.isFinite(db)))).toBe(true)
   })
 
-  it('adds Source + EQ to the default series only when filters exist', () => {
+  it('adds FR + EQ to the default series only when filters exist', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(source)
     store.getState().addCurve(target)
@@ -109,9 +108,9 @@ describe('buildGraphSeries', () => {
     expect(series.filter(({ defaultVisible }) => defaultVisible).map(({ name }) => name)).toEqual([
       'Source',
       'Target',
-      'Source + EQ',
+      'FR + EQ',
     ])
-    expect(series.find(({ name }) => name === 'Source + EQ')?.data).not.toEqual(
+    expect(series.find(({ name }) => name === 'FR + EQ')?.data).not.toEqual(
       series.find(({ name }) => name === 'Source')?.data,
     )
   })
@@ -126,7 +125,8 @@ describe('buildGraphSeries', () => {
         data: [[20, 1], [20_000, 2]],
         defaultVisible: true,
         curveId: 'room',
-        measurementRole: null,
+        measurementKind: 'fr',
+        active: false,
       }],
     )
 
@@ -182,7 +182,8 @@ describe('formatGraphInspector', () => {
           ],
           defaultVisible: true,
           curveId: 'source',
-          measurementRole: 'source',
+          measurementKind: 'fr',
+          active: true,
         },
         {
           name: 'Target',
@@ -194,7 +195,8 @@ describe('formatGraphInspector', () => {
           ],
           defaultVisible: true,
           curveId: 'target',
-          measurementRole: 'target',
+          measurementKind: 'target',
+          active: true,
         },
       ],
     )

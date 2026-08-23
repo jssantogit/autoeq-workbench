@@ -8,9 +8,9 @@ export function CurvesTab() {
   return (
     <section className="curves-tab" aria-label="Curves workspace">
       <ul className="curve-manager" aria-label="Workspace curves">
-        {curves.map((entry) => (
-          <li className="curve-manager__row" key={entry.curve.id}>
-            <CurveAppearanceControls entry={entry} />
+        {curves.map((curve) => (
+          <li className="curve-manager__row" key={curve.id}>
+            <CurveAppearanceControls curve={curve} />
           </li>
         ))}
       </ul>

@@ -13,7 +13,7 @@ vi.mock('./features/graph/FrequencyResponseGraph', () => ({
 describe('App', () => {
   beforeEach(() => {
     uiStore.setState({ activeDockTab: 'curves', curveAppearance: {} })
-    workspaceStore.setState({ curves: [] })
+    workspaceStore.setState({ curves: [], activeFrId: null, activeTargetId: null })
   })
 
   it('renders the workbench title', () => {
@@ -37,7 +37,7 @@ describe('App', () => {
     expect(screen.getAllByLabelText('+ Curve')).toHaveLength(1)
     expect(utilityRail).toHaveClass('utility-rail', 'utility-rail--nowrap')
     expect(within(utilityRail).getByText('Normalize: 500 Hz / 0 dB')).toBeVisible()
-    expect(utilityRail).toHaveTextContent('Source: None')
+    expect(utilityRail).toHaveTextContent('FR: None')
     expect(utilityRail).toHaveTextContent('Target: None')
     expect(screen.queryByRole('heading', { name: 'Curves' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
@@ -55,7 +55,7 @@ describe('App', () => {
     expect(screen.queryByRole('heading', { name: 'Details' })).not.toBeInTheDocument()
     expect(screen.queryByText('Evaluation policy')).not.toBeInTheDocument()
     expect(screen.queryByText('48 kHz')).not.toBeInTheDocument()
-    expect(screen.getByText(/assign source and target/i)).toBeInTheDocument()
+    expect(screen.getByText(/active FR and Target/i)).toBeInTheDocument()
   })
 
   it.each(['equalizer', 'details'] as const)(
@@ -80,26 +80,28 @@ describe('App', () => {
     },
   )
 
-  it('reacts to Source and Target role assignments in the utility rail', () => {
+  it('reacts to active FR and Target selection in the utility rail', () => {
     const curves: Curve[] = ['Measurement A', 'Measurement B'].map((name, index) => ({
       id: `curve-${index}`,
       name,
-      kind: 'fr',
+      kind: index === 0 ? 'fr' : 'target',
       rawPoints: [{ frequencyHz: 20, db: 0 }, { frequencyHz: 20_000, db: 0 }],
       metadata: {},
     }))
     workspaceStore.setState({
-      curves: curves.map((curve) => ({ curve, role: null })),
+      curves,
+      activeFrId: null,
+      activeTargetId: null,
     })
     render(<App />)
     const utilityRail = screen.getByRole('toolbar', { name: 'Workspace utilities' })
 
     act(() => {
-      workspaceStore.getState().setCurveRole('curve-0', 'source')
-      workspaceStore.getState().setCurveRole('curve-1', 'target')
+      workspaceStore.getState().setActiveFr('curve-0')
+      workspaceStore.getState().setActiveTarget('curve-1')
     })
 
-    expect(utilityRail).toHaveTextContent('Source: Measurement A')
+    expect(utilityRail).toHaveTextContent('FR: Measurement A')
     expect(utilityRail).toHaveTextContent('Target: Measurement B')
   })
 

@@ -7,15 +7,15 @@ export interface WorkspaceHistorySnapshot {
   selectedFilterId: string | null
   solutionState: SolutionState
   filterProvenance: FilterProvenance | null
-  sourceCurveId: string | null
-  targetCurveId: string | null
+  activeFrId: string | null
+  activeTargetId: string | null
 }
 
-export type WorkspaceHistoryState = Omit<WorkspaceHistorySnapshot, 'sourceCurveId' | 'targetCurveId'>
+export type WorkspaceHistoryState = Omit<WorkspaceHistorySnapshot, 'activeFrId' | 'activeTargetId'>
+type ActiveCurveIds = Pick<WorkspaceHistorySnapshot, 'activeFrId' | 'activeTargetId'>
 
 export function createHistorySnapshot(
-  state: WorkspaceHistoryState,
-  [sourceCurveId, targetCurveId]: [string | null, string | null],
+  state: WorkspaceHistoryState & ActiveCurveIds,
 ): WorkspaceHistorySnapshot {
   return {
     normalization: { ...state.normalization },
@@ -23,19 +23,20 @@ export function createHistorySnapshot(
     selectedFilterId: state.selectedFilterId,
     solutionState: state.solutionState,
     filterProvenance: state.filterProvenance,
-    sourceCurveId,
-    targetCurveId,
+    activeFrId: state.activeFrId,
+    activeTargetId: state.activeTargetId,
   }
 }
 
 export function restoreHistorySnapshot(
   snapshot: WorkspaceHistorySnapshot,
-  [sourceCurveId, targetCurveId]: [string | null, string | null],
+  activeIds: ActiveCurveIds,
 ): WorkspaceHistoryState {
   const solutionState =
     snapshot.filters.length > 0 &&
     snapshot.filterProvenance === 'autoeq' &&
-    (snapshot.sourceCurveId !== sourceCurveId || snapshot.targetCurveId !== targetCurveId)
+    (snapshot.activeFrId !== activeIds.activeFrId ||
+      snapshot.activeTargetId !== activeIds.activeTargetId)
       ? 'stale'
       : snapshot.solutionState
 

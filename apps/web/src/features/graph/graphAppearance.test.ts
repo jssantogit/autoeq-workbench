@@ -7,46 +7,48 @@ const input: GraphAppearanceInput = {
     source: { color: '#1565c0', visible: true },
     target: { color: '#c62828', visible: true },
   },
-  sourceCurveId: 'source',
+  frCurveId: 'source',
 }
 
 describe('seriesAppearance', () => {
-  it('renders a reference Target as the exact theme neutral gray dashed instead of the UI accent', () => {
-    const style = seriesAppearance('Reference', input, {
+  it('renders an inactive Target as the exact theme neutral gray dashed instead of the UI accent', () => {
+    const style = seriesAppearance('Target B', input, {
       curveId: 'target',
-      measurementRole: 'reference',
+      measurementKind: 'target',
+      active: false,
     })
 
     expect(style.color).toBe('#989894')
     expect(style.lineType).toBe('dashed')
     expect(style.opacity).toBeLessThan(1)
-    expect(seriesAppearance('Reference', { ...input, theme: 'dark' }, {
+    expect(seriesAppearance('Target B', { ...input, theme: 'dark' }, {
       curveId: 'target',
-      measurementRole: 'reference',
+      measurementKind: 'target',
+      active: false,
     }).color).toBe('#8f8e8a')
   })
 
   it('renders a measurement Target with its assigned graph color', () => {
-    const style = seriesAppearance('Target', input, { curveId: 'target', measurementRole: 'target' })
+    const style = seriesAppearance('Target', input, { curveId: 'target', measurementKind: 'target', active: true })
 
     expect(style.color).toBe('#c62828')
     expect(style.lineType).toBe('solid')
   })
 
-  it('keeps Source independent from the amber UI accent', () => {
-    const style = seriesAppearance('Source', input, { curveId: 'source', measurementRole: 'source' })
+  it('keeps FR independent from the amber UI accent', () => {
+    const style = seriesAppearance('FR', input, { curveId: 'source', measurementKind: 'fr', active: true })
 
     expect(style.color).toBe('#1565c0')
     expect(style.color.toLowerCase()).not.toBe('#f39a3b')
   })
 
-  it('relates Source + EQ to Source while distinguishing its stroke', () => {
-    const source = seriesAppearance('Source', input, { curveId: 'source', measurementRole: 'source' })
-    const sourceEq = seriesAppearance('Source + EQ', input)
+  it('relates FR + EQ to FR while distinguishing its stroke', () => {
+    const source = seriesAppearance('FR', input, { curveId: 'source', measurementKind: 'fr', active: true })
+    const frEq = seriesAppearance('FR + EQ', input)
 
-    expect(sourceEq.color).toBe(source.color)
-    expect(sourceEq).not.toEqual(source)
-    expect([sourceEq.lineWidth, sourceEq.opacity, sourceEq.lineType]).not.toEqual([
+    expect(frEq.color).toBe(source.color)
+    expect(frEq).not.toEqual(source)
+    expect([frEq.lineWidth, frEq.opacity, frEq.lineType]).not.toEqual([
       source.lineWidth,
       source.opacity,
       source.lineType,
@@ -73,7 +75,7 @@ describe('graphTheme', () => {
       majorGrid: '#d8d8d3',
       minorGrid: '#ecece7',
       marker: '#2f3437',
-      referenceTarget: '#989894',
+      inactiveTarget: '#989894',
     })
     expect(graphTheme('dark')).toEqual({
       background: '#0b1012',
@@ -81,7 +83,7 @@ describe('graphTheme', () => {
       majorGrid: '#2a3032',
       minorGrid: '#1b2123',
       marker: '#f3efe8',
-      referenceTarget: '#8f8e8a',
+      inactiveTarget: '#8f8e8a',
     })
   })
 })

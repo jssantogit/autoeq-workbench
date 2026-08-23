@@ -4,7 +4,7 @@ import type { MeasurementGraphSeries } from './graphSeries'
 export interface GraphAppearanceInput {
   theme: ThemeMode
   curveAppearance: Record<string, CurveAppearance>
-  sourceCurveId?: string
+  frCurveId?: string
 }
 
 const GRAPH_THEMES = {
@@ -14,7 +14,7 @@ const GRAPH_THEMES = {
     majorGrid: '#d8d8d3',
     minorGrid: '#ecece7',
     marker: '#2f3437',
-    referenceTarget: '#989894',
+    inactiveTarget: '#989894',
   },
   dark: {
     background: '#0b1012',
@@ -22,7 +22,7 @@ const GRAPH_THEMES = {
     majorGrid: '#2a3032',
     minorGrid: '#1b2123',
     marker: '#f3efe8',
-    referenceTarget: '#8f8e8a',
+    inactiveTarget: '#8f8e8a',
   },
 } as const
 
@@ -38,7 +38,7 @@ export function graphTheme(theme: ThemeMode) {
 export function seriesAppearance(
   name: string,
   input: GraphAppearanceInput,
-  series?: Partial<Pick<MeasurementGraphSeries, 'curveId' | 'measurementRole'>>,
+  series?: Partial<Pick<MeasurementGraphSeries, 'curveId' | 'measurementKind' | 'active'>>,
 ) {
   const derived = DERIVED_COLORS[input.theme]
   const base = { lineType: 'solid' as const, lineWidth: 2, opacity: 1 }
@@ -46,10 +46,10 @@ export function seriesAppearance(
     ? undefined
     : input.curveAppearance[series.curveId]?.color
 
-  if (series?.measurementRole !== undefined) {
-    return series.measurementRole === 'reference'
+  if (series?.measurementKind !== undefined) {
+    return series.measurementKind === 'target' && series.active === false
       ? {
-          color: graphTheme(input.theme).referenceTarget,
+          color: graphTheme(input.theme).inactiveTarget,
           lineType: 'dashed' as const,
           lineWidth: 1.6,
           opacity: 0.82,
@@ -58,11 +58,11 @@ export function seriesAppearance(
   }
 
   switch (name) {
-    case 'Source + EQ':
+    case 'FR + EQ':
       return {
-        color: input.sourceCurveId === undefined
+        color: input.frCurveId === undefined
           ? '#1565c0'
-          : (input.curveAppearance[input.sourceCurveId]?.color ?? '#1565c0'),
+          : (input.curveAppearance[input.frCurveId]?.color ?? '#1565c0'),
         lineType: 'solid' as const,
         lineWidth: 2.5,
         opacity: 0.72,

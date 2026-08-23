@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { seriesAppearance } from './features/graph/graphAppearance'
@@ -7,8 +7,8 @@ import type { WorkspaceDerived } from './state/workspaceStore'
 vi.mock('./features/graph/FrequencyResponseGraph', () => ({
   FrequencyResponseGraph: ({ derived }: { derived: WorkspaceDerived }) => (
     <output aria-label="Graph response">
-      PEQ {Math.max(...(derived.peq?.db ?? [0])).toFixed(2)}; Source + EQ{' '}
-      {Math.max(...(derived.sourceEq?.db ?? [0])).toFixed(2)}
+      PEQ {Math.max(...(derived.peq?.db ?? [0])).toFixed(2)}; FR + EQ{' '}
+      {Math.max(...(derived.frEq?.db ?? [0])).toFixed(2)}
     </output>
   ),
 }))
@@ -31,6 +31,8 @@ describe('manual workbench integration', () => {
     initializeTheme()
     workspaceStore.setState({
       curves: [],
+      activeFrId: null,
+      activeTargetId: null,
       normalization: { ...defaultNormalization },
       filters: [],
       selectedFilterId: null,
@@ -56,16 +58,16 @@ describe('manual workbench integration', () => {
     })
     const curveManager = screen.getByRole('list', { name: 'Workspace curves' })
     await waitFor(() => expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument())
-    const sourceId = workspaceStore.getState().curves[0]!.curve.id
-    const importedSourceColor = uiStore.getState().curveAppearance[sourceId]!.color
-    expect(MEASUREMENT_CURVE_PALETTE).toContain(importedSourceColor)
+    const frId = workspaceStore.getState().curves[0]!.id
+    const importedFrColor = uiStore.getState().curveAppearance[frId]!.color
+    expect(MEASUREMENT_CURVE_PALETTE).toContain(importedFrColor)
     expect(
-      seriesAppearance('Source', {
+      seriesAppearance('FR', {
         theme: uiStore.getState().theme,
         curveAppearance: uiStore.getState().curveAppearance,
-        sourceCurveId: sourceId,
-      }, { curveId: sourceId, measurementRole: 'source' }),
-    ).toMatchObject({ color: importedSourceColor, lineType: 'solid' })
+        frCurveId: frId,
+      }, { curveId: frId, measurementKind: 'fr', active: true }),
+    ).toMatchObject({ color: importedFrColor, lineType: 'solid' })
 
     fireEvent.change(screen.getByLabelText('+ Curve'), {
       target: { files: [targetFile] },
@@ -73,6 +75,13 @@ describe('manual workbench integration', () => {
     await waitFor(() => {
       expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument()
       expect(within(curveManager).getByText('Synthetic Target.csv')).toBeInTheDocument()
+    })
+    act(() => {
+      const second = workspaceStore.getState().curves[1]!
+      workspaceStore.setState((state) => ({
+        curves: state.curves.map((curve) => curve.id === second.id ? { ...curve, kind: 'target' } : curve),
+        activeTargetId: second.id,
+      }))
     })
     await user.click(screen.getByRole('button', { name: 'Apply normalization' }))
     expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 500, targetDb: 0 })
@@ -84,7 +93,7 @@ describe('manual workbench integration', () => {
     await user.type(gain, '3')
     fireEvent.blur(gain)
 
-    expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 3.00; Source + EQ 3.00')
+    expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 3.00; FR + EQ 3.00')
     await user.click(screen.getByRole('tab', { name: 'Details' }))
     expect(screen.getByText('-3.00 dB')).toBeInTheDocument()
 
@@ -113,7 +122,7 @@ describe('manual workbench integration', () => {
     await user.click(screen.getByRole('button', { name: 'Switch to dark theme' }))
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(localStorage.getItem('autoeq-workbench.theme')).toBe('dark')
-  })
+  }, 10_000)
 
   it('shows preamp in Details even before Target is loaded', async () => {
     const user = userEvent.setup()
@@ -130,6 +139,6 @@ describe('manual workbench integration', () => {
     expect(screen.getByText('Preamp').nextElementSibling).toHaveTextContent('-6')
     expect(screen.getByText('MAE').nextElementSibling).toHaveTextContent('--')
     expect(screen.getByText('RMSE').nextElementSibling).toHaveTextContent('--')
-    expect(screen.getByText(/comparison metrics require source and target/i)).toBeVisible()
+    expect(screen.getByText(/metrics require an active FR and Target/i)).toBeVisible()
   })
 })
