@@ -8,7 +8,7 @@ import {
   type FrequencyResponseGraphHandle,
 } from './features/graph/FrequencyResponseGraph'
 import { GraphToolbar } from './features/graph/GraphToolbar'
-import { MetricsSummary } from './features/metrics/MetricsSummary'
+import { DetailsTab } from './features/metrics/DetailsTab'
 import { deriveWorkspace, useWorkspaceStore } from './state/workspaceStore'
 
 function App() {
@@ -26,7 +26,7 @@ function App() {
       <WorkbenchDock
         curves={<CurvesTab />}
         equalizer={<EqualizerTab />}
-        details={<MetricsSummary derived={derived} />}
+        details={<DetailsTab derived={derived} />}
       />
     </main>
   )

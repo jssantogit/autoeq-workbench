@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
@@ -30,10 +30,11 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'Curves' })).toBeVisible()
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     expect(screen.getByRole('region', { name: 'Equalizer workspace' })).toBeVisible()
-    expect(screen.getByRole('group', { name: 'Equalizer profile' })).toBeVisible()
-    expect(screen.getByText('Manual')).toBeVisible()
-    expect(screen.getByText('48 kHz')).toBeVisible()
-    expect(screen.getByText('20 Hz-20 kHz')).toBeVisible()
+    const profile = screen.getByRole('group', { name: 'Equalizer profile' })
+    expect(profile).toBeVisible()
+    expect(within(profile).getByText('Manual')).toBeVisible()
+    expect(within(profile).getByText('48 kHz')).toBeVisible()
+    expect(within(profile).getByText('20 Hz-20 kHz')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Add PK' })).toBeInTheDocument()
     expect(screen.getByText('0 / 64 filters')).toBeVisible()
     expect(screen.queryByRole('button', { name: /run autoeq/i })).not.toBeInTheDocument()

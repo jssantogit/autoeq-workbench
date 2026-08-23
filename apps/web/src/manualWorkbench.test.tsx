@@ -79,4 +79,22 @@ describe('manual workbench integration', () => {
     expect(screen.getByRole('checkbox', { name: 'Enable filter 1' })).toBeChecked()
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 3.00')
   })
+
+  it('shows preamp in Details even before Target is loaded', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
+    await user.click(screen.getByRole('button', { name: 'Add PK' }))
+    const gain = screen.getByRole('spinbutton', { name: 'Filter 1 gain dB' })
+    await user.clear(gain)
+    await user.type(gain, '6')
+    fireEvent.blur(gain)
+
+    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    expect(screen.getByText('Preamp').nextElementSibling).toHaveTextContent('-6')
+    expect(screen.getByText('MAE').nextElementSibling).toHaveTextContent('--')
+    expect(screen.getByText('RMSE').nextElementSibling).toHaveTextContent('--')
+    expect(screen.getByText(/comparison metrics require source and target/i)).toBeVisible()
+  })
 })
