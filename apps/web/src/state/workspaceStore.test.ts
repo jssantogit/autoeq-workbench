@@ -70,6 +70,33 @@ describe('workspace store', () => {
     expect(store.getState().filters).toEqual([filter])
   })
 
+  it.each(['Source', 'Target'] as const)(
+    'clears redo and keeps the replacement %s curve outside history snapshots',
+    (role) => {
+      const setter = role === 'Source' ? store.getState().setSource : store.getState().setTarget
+      const curve = role === 'Source' ? source : target
+      setter(curve)
+      store.getState().setFilters([filter], 'autoeq')
+      store.getState().updateFilter(filter.id, { gainDb: 4 })
+      store.getState().undo()
+      expect(store.getState().solutionState).toBe('clean')
+      expect(store.getState().canRedo).toBe(true)
+
+      const replacement = { ...curve, id: `${curve.id}-replacement` }
+      setter(replacement)
+
+      expect(role === 'Source' ? store.getState().source : store.getState().target).toBe(replacement)
+      expect(store.getState().solutionState).toBe('stale')
+      expect(store.getState().canRedo).toBe(false)
+      store.getState().redo()
+      expect(store.getState().solutionState).toBe('stale')
+      expect(role === 'Source' ? store.getState().source : store.getState().target).toBe(replacement)
+
+      store.getState().undo()
+      expect(role === 'Source' ? store.getState().source : store.getState().target).toBe(replacement)
+    },
+  )
+
   it('applies normalization independently or together', () => {
     store.getState().setSourceNormalization({ anchorHz: 1_000, targetDb: -1 })
     expect(store.getState().targetNormalization).toEqual(defaultNormalization)
@@ -85,6 +112,24 @@ describe('workspace store', () => {
     )
   })
 
+  it.each([
+    ['source', (value: { anchorHz: number; targetDb: number }) => store.getState().setSourceNormalization(value)],
+    ['target', (value: { anchorHz: number; targetDb: number }) => store.getState().setTargetNormalization(value)],
+    ['together', (value: { anchorHz: number; targetDb: number }) => store.getState().normalizeTogether(value)],
+  ] as const)('marks AutoEQ filters stale after %s normalization and restores state on undo', (_, update) => {
+    store.getState().setFilters([filter], 'autoeq')
+
+    update({ anchorHz: 800, targetDb: 1 })
+    expect(store.getState().solutionState).toBe('stale')
+    expect(store.getState().filterProvenance).toBe('autoeq')
+
+    store.getState().undo()
+    expect(store.getState().sourceNormalization).toEqual(defaultNormalization)
+    expect(store.getState().targetNormalization).toEqual(defaultNormalization)
+    expect(store.getState().solutionState).toBe('clean')
+    expect(store.getState().filterProvenance).toBe('autoeq')
+  })
+
   it('treats an initial manual filter set as a clean manual workspace', () => {
     store.getState().setFilters([filter], 'manual')
     store.getState().selectFilter(filter.id)
@@ -92,6 +137,27 @@ describe('workspace store', () => {
     expect(store.getState().filterProvenance).toBe('manual')
     expect(store.getState().solutionState).toBe('clean')
     expect(store.getState().selectedFilterId).toBe(filter.id)
+  })
+
+  it('preserves AutoEQ provenance and solution state across manual filter replacements', () => {
+    const replacement = [{ ...filter, gainDb: 4 }]
+
+    store.getState().setFilters([filter], 'autoeq')
+    store.getState().setFilters(replacement, 'manual')
+    expect(store.getState().filters).toEqual(replacement)
+    expect(store.getState().filterProvenance).toBe('autoeq')
+    expect(store.getState().solutionState).toBe('modified')
+
+    store.getState().setSource(source)
+    store.getState().setSource({ ...source, id: 'source-2' })
+    expect(store.getState().solutionState).toBe('stale')
+    store.getState().setFilters([filter], 'manual')
+    expect(store.getState().filterProvenance).toBe('autoeq')
+    expect(store.getState().solutionState).toBe('stale')
+
+    store.getState().setFilters(replacement, 'autoeq')
+    expect(store.getState().filterProvenance).toBe('autoeq')
+    expect(store.getState().solutionState).toBe('clean')
   })
 
   it.each([
@@ -180,7 +246,7 @@ describe('workspace store', () => {
     expect(store.getState().canUndo).toBe(true)
     store.getState().undo()
     expect(store.getState().filters[0]?.gainDb).toBe(3)
-    expect(store.getState().solutionState).toBe('clean')
+    expect(store.getState().solutionState).toBe('stale')
     expect(store.getState().filterProvenance).toBe('autoeq')
     expect(store.getState().selectedFilterId).toBe(filter.id)
 
@@ -191,7 +257,7 @@ describe('workspace store', () => {
     store.getState().redo()
     expect(store.getState().sourceNormalization).toEqual({ anchorHz: 1_000, targetDb: -2 })
     expect(store.getState().filters[0]?.gainDb).toBe(6)
-    expect(store.getState().solutionState).toBe('modified')
+    expect(store.getState().solutionState).toBe('stale')
     expect(store.getState().canRedo).toBe(false)
   })
 

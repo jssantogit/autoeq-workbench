@@ -129,6 +129,12 @@ function manualProvenance(state: WorkspaceState): FilterProvenance {
   return state.filterProvenance ?? 'manual'
 }
 
+function afterNormalizationChange(state: WorkspaceState): SolutionState {
+  return state.filters.length > 0 && state.filterProvenance === 'autoeq'
+    ? 'stale'
+    : state.solutionState
+}
+
 export function createWorkspaceStore() {
   const past: WorkspaceHistorySnapshot[] = []
   const future: WorkspaceHistorySnapshot[] = []
@@ -142,17 +148,25 @@ export function createWorkspaceStore() {
   return createStore<WorkspaceState>()((set) => ({
     ...initialState,
     setSource: (curve) =>
-      set((state) => ({
-        source: curve,
-        solutionState:
-          state.source !== null && state.filters.length > 0 ? 'stale' : state.solutionState,
-      })),
+      set((state) => {
+        if (state.source === null) return { source: curve }
+        future.length = 0
+        return {
+          source: curve,
+          solutionState: state.filters.length > 0 ? 'stale' : state.solutionState,
+          canRedo: false,
+        }
+      }),
     setTarget: (curve) =>
-      set((state) => ({
-        target: curve,
-        solutionState:
-          state.target !== null && state.filters.length > 0 ? 'stale' : state.solutionState,
-      })),
+      set((state) => {
+        if (state.target === null) return { target: curve }
+        future.length = 0
+        return {
+          target: curve,
+          solutionState: state.filters.length > 0 ? 'stale' : state.solutionState,
+          canRedo: false,
+        }
+      }),
     setSourceNormalization: (value) =>
       set((state) => {
         if (
@@ -162,7 +176,10 @@ export function createWorkspaceStore() {
           (value.anchorHz === state.sourceNormalization.anchorHz &&
             value.targetDb === state.sourceNormalization.targetDb)
         ) return state
-        return record(state, { sourceNormalization: { ...value } })
+        return record(state, {
+          sourceNormalization: { ...value },
+          solutionState: afterNormalizationChange(state),
+        })
       }),
     setTargetNormalization: (value) =>
       set((state) => {
@@ -173,7 +190,10 @@ export function createWorkspaceStore() {
           (value.anchorHz === state.targetNormalization.anchorHz &&
             value.targetDb === state.targetNormalization.targetDb)
         ) return state
-        return record(state, { targetNormalization: { ...value } })
+        return record(state, {
+          targetNormalization: { ...value },
+          solutionState: afterNormalizationChange(state),
+        })
       }),
     normalizeTogether: (value) =>
       set((state) => {
@@ -188,6 +208,7 @@ export function createWorkspaceStore() {
         return record(state, {
           sourceNormalization: { ...value },
           targetNormalization: { ...value },
+          solutionState: afterNormalizationChange(state),
         })
       }),
     setFilters: (filters, provenance) =>
@@ -200,11 +221,19 @@ export function createWorkspaceStore() {
         const selectedFilterId = filters.some(({ id }) => id === state.selectedFilterId)
           ? state.selectedFilterId
           : null
+        const replacesAutoEq = provenance === 'manual' && state.filterProvenance === 'autoeq'
         return record(state, {
           filters: filters.map((filter) => ({ ...filter })),
           selectedFilterId,
-          filterProvenance: provenance,
-          solutionState: 'clean',
+          filterProvenance: replacesAutoEq ? 'autoeq' : provenance,
+          solutionState:
+            provenance === 'autoeq'
+              ? 'clean'
+              : state.solutionState === 'stale'
+                ? 'stale'
+                : replacesAutoEq
+                  ? 'modified'
+                  : 'clean',
         })
       }),
     selectFilter: (id) =>

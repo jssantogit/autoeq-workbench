@@ -18,6 +18,13 @@ export function NumberField({
 }: NumberFieldProps) {
   const [editText, setEditText] = useState<string | null>(null)
   const [invalid, setInvalid] = useState(false)
+  const [lastValue, setLastValue] = useState(value)
+
+  if (!Object.is(value, lastValue)) {
+    setLastValue(value)
+    setEditText(null)
+    setInvalid(false)
+  }
 
   function commit(candidate: string) {
     const numeric = Number(candidate)
