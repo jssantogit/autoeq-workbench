@@ -19,7 +19,12 @@ export function NormalizationControls() {
   }
 
   return (
-    <section className="workspace-normalization" aria-label="Workspace normalization">
+    <section
+      id="workspace-normalization"
+      className="workspace-normalization"
+      aria-label="Workspace normalization"
+      tabIndex={-1}
+    >
       <div className="workspace-normalization__heading">
         <h3>Workspace normalization</h3>
         <p>Applied non-destructively to every imported curve.</p>

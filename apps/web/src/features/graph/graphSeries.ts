@@ -5,35 +5,36 @@ import type {
   WorkspaceDerived,
 } from '../../state/workspaceStore'
 
-export const GRAPH_SERIES_NAMES = [
-  'Source',
-  'Target',
-  'Source + EQ',
-  'PEQ',
-  'Desired',
-  'Selected Filter',
-] as const
-
-export type GraphSeriesName = (typeof GRAPH_SERIES_NAMES)[number]
-
-export interface GraphSeries {
+interface GraphSeriesBase {
+  id: string
   name: string
   data: [number, number][]
   defaultVisible: boolean
-  curveId?: string
-  measurementRole?: WorkspaceCurveRole
   markerFrequencyHz?: number
 }
+
+export interface MeasurementGraphSeries extends GraphSeriesBase {
+  kind: 'measurement'
+  curveId: string
+  measurementRole: WorkspaceCurveRole
+}
+
+export interface DerivedGraphSeries extends GraphSeriesBase {
+  kind: 'derived'
+  curveId?: never
+  measurementRole?: never
+}
+
+export type GraphSeries = MeasurementGraphSeries | DerivedGraphSeries
 
 export function formatGraphInspector(
   frequencyHz: number,
   series: readonly GraphSeries[],
-  selected: Readonly<Record<string, boolean | undefined>>,
 ): string {
   const frequency =
     frequencyHz >= 1_000 ? `${(frequencyHz / 1_000).toFixed(2)} kHz` : `${frequencyHz.toFixed(0)} Hz`
   const values = series.flatMap((item) => {
-    if (selected[item.name] === false || item.data.length < 2) return []
+    if (item.data.length < 2) return []
     const firstFrequency = item.data[0]![0]
     const lastFrequency = item.data[item.data.length - 1]![0]
     if (frequencyHz < firstFrequency || frequencyHz > lastFrequency) return []
@@ -49,48 +50,44 @@ export function formatGraphInspector(
 }
 
 function graphSeries(
+  id: string,
   name: string,
   curve: DerivedCurve | null,
   defaultVisible: boolean,
-): GraphSeries | null {
+): DerivedGraphSeries | null {
   if (curve === null) return null
   return {
+    id,
     name,
+    kind: 'derived',
     data: curve.frequencies.map((frequency, index) => [frequency, curve.db[index]!] as const),
     defaultVisible,
   }
 }
 
 export function buildGraphSeries(workspaceDerived: WorkspaceDerived): GraphSeries[] {
-  const source = workspaceDerived.measurementCurves.find(({ role }) => role === 'source')
-  const target = workspaceDerived.measurementCurves.find(({ role }) => role === 'target')
-
   return [
-    workspaceDerived.source === null
-      ? null
-      : {
-          ...graphSeries('Source', workspaceDerived.source, true)!,
-          curveId: source?.id,
-          measurementRole: 'source' as const,
-        },
-    workspaceDerived.target === null
-      ? null
-      : {
-          ...graphSeries('Target', workspaceDerived.target, true)!,
-          curveId: target?.id,
-          measurementRole: 'target' as const,
-        },
+    ...workspaceDerived.measurementCurves.map((curve) => ({
+      id: curve.id,
+      name: curve.name,
+      kind: 'measurement' as const,
+      data: curve.frequencies.map((frequency, index) => [frequency, curve.db[index]!] as [number, number]),
+      defaultVisible: true,
+      curveId: curve.id,
+      measurementRole: curve.role,
+    })),
     graphSeries(
+      'source-eq',
       'Source + EQ',
       workspaceDerived.hasFilters ? workspaceDerived.sourceEq : null,
       true,
     ),
-    graphSeries('PEQ', workspaceDerived.peq, false),
-    graphSeries('Desired', workspaceDerived.desired, false),
+    graphSeries('peq', 'PEQ', workspaceDerived.peq, false),
+    graphSeries('desired', 'Desired', workspaceDerived.desired, false),
     workspaceDerived.selectedFilter === null
       ? null
       : {
-          ...graphSeries('Selected Filter', workspaceDerived.selectedFilter, true)!,
+          ...graphSeries('selected-filter', 'Selected Filter', workspaceDerived.selectedFilter, true)!,
           markerFrequencyHz: workspaceDerived.selectedFilter.frequencyHz,
         },
   ].filter((series): series is GraphSeries => series !== null)

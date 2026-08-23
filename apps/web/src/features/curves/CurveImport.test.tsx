@@ -118,7 +118,7 @@ describe('CurvesTab', () => {
     expect(within(rows[0]!).getByText('Source')).toBeInTheDocument()
     expect(within(rows[1]!).getByText('Target')).toBeInTheDocument()
     expect(within(rows[2]!).getByText('Comparison')).toBeInTheDocument()
-    expect(screen.getByLabelText('+ Curve')).toBeInTheDocument()
+    expect(screen.queryByLabelText('+ Curve')).not.toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Workspace normalization' })).toBeInTheDocument()
   })
 

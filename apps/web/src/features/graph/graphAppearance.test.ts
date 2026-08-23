@@ -20,6 +20,10 @@ describe('seriesAppearance', () => {
     expect(style.color).toBe('#989894')
     expect(style.lineType).toBe('dashed')
     expect(style.opacity).toBeLessThan(1)
+    expect(seriesAppearance('Reference', { ...input, theme: 'dark' }, {
+      curveId: 'target',
+      measurementRole: 'reference',
+    }).color).toBe('#8f8e8a')
   })
 
   it('renders a measurement Target with its assigned graph color', () => {
@@ -62,15 +66,12 @@ describe('seriesAppearance', () => {
 })
 
 describe('graphTheme', () => {
-  it('centralizes background, axes, grids, legend, zoom, and marker colors by theme', () => {
+  it('centralizes only plotting and marker colors by theme', () => {
     expect(graphTheme('light')).toEqual({
       background: '#fffefa',
       axis: '#7b7b76',
       majorGrid: '#d8d8d3',
       minorGrid: '#ecece7',
-      legend: '#756e67',
-      zoomBorder: '#b9afa2',
-      zoomFill: 'rgba(152, 152, 148, 0.12)',
       marker: '#2f3437',
       referenceTarget: '#989894',
     })
@@ -79,9 +80,6 @@ describe('graphTheme', () => {
       axis: '#96918c',
       majorGrid: '#2a3032',
       minorGrid: '#1b2123',
-      legend: '#aaa29a',
-      zoomBorder: '#465055',
-      zoomFill: 'rgba(143, 142, 138, 0.12)',
       marker: '#f3efe8',
       referenceTarget: '#8f8e8a',
     })

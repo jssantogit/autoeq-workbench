@@ -36,6 +36,18 @@ const filter: Filter = {
   q: 1,
 }
 
+const overlay: Curve = {
+  id: 'overlay',
+  name: 'Room overlay',
+  role: 'comparison',
+  rawPoints: [
+    { frequencyHz: 20, db: 2 },
+    { frequencyHz: 500, db: 1 },
+    { frequencyHz: 20_000, db: 0 },
+  ],
+  metadata: {},
+}
+
 describe('buildGraphSeries', () => {
   it('builds normalized Source data while the workspace is incomplete', () => {
     const store = createWorkspaceStore()
@@ -50,6 +62,24 @@ describe('buildGraphSeries', () => {
       [20, -3],
       [500, 0],
       [20_000, 1],
+    ])
+  })
+
+  it('builds one actual-name series for every imported measurement and keeps its identity and role', () => {
+    const store = createWorkspaceStore()
+    store.getState().addCurve({ ...source, name: 'Left channel' })
+    store.getState().addCurve({ ...target, name: 'House target' })
+    store.getState().addCurve(overlay)
+    store.getState().setCurveRole(overlay.id, 'reference')
+
+    const measurements = buildGraphSeries(deriveWorkspace(store.getState())).filter(
+      ({ kind }) => kind === 'measurement',
+    )
+
+    expect(measurements).toMatchObject([
+      { id: 'source', name: 'Left channel', curveId: 'source', measurementRole: 'source' },
+      { id: 'target', name: 'House target', curveId: 'target', measurementRole: 'target' },
+      { id: 'overlay', name: 'Room overlay', curveId: 'overlay', measurementRole: 'reference' },
     ])
   })
 
@@ -89,8 +119,15 @@ describe('buildGraphSeries', () => {
   it('allows future imported-curve series names without a brittle fixed-name contract', () => {
     const text = formatGraphInspector(
       1_000,
-      [{ name: 'Room overlay', data: [[20, 1], [20_000, 2]], defaultVisible: true }],
-      { 'Room overlay': true },
+      [{
+        id: 'room',
+        name: 'Room overlay',
+        kind: 'measurement',
+        data: [[20, 1], [20_000, 2]],
+        defaultVisible: true,
+        curveId: 'room',
+        measurementRole: null,
+      }],
     )
 
     expect(text).toContain('Room overlay:')
@@ -137,27 +174,34 @@ describe('formatGraphInspector', () => {
       [
         {
           name: 'Source',
+          id: 'source',
+          kind: 'measurement',
           data: [
             [100, 0],
             [10_000, 20],
           ],
           defaultVisible: true,
+          curveId: 'source',
+          measurementRole: 'source',
         },
         {
           name: 'Target',
+          id: 'target',
+          kind: 'measurement',
           data: [
             [100, 5],
             [10_000, 5],
           ],
           defaultVisible: true,
+          curveId: 'target',
+          measurementRole: 'target',
         },
       ],
-      { Source: true, Target: false, PEQ: true },
     )
 
     expect(text).toContain('1.00 kHz')
     expect(text).toContain('Source: 10.00 dB')
-    expect(text).not.toContain('Target')
+    expect(text).toContain('Target: 5.00 dB')
     expect(text).not.toContain('PEQ')
   })
 })

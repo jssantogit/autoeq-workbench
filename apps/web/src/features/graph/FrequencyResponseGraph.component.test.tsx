@@ -1,249 +1,134 @@
 import type { Curve, Filter } from '@autoeq-workbench/core'
-import { act, fireEvent, render, screen } from '@testing-library/react'
-import { createRef } from 'react'
+import { act, render, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { uiStore } from '../../state/uiStore'
 import { createWorkspaceStore, deriveWorkspace } from '../../state/workspaceStore'
 
+const modules = vi.hoisted(() => ({
+  GridComponent: { name: 'grid' },
+  MarkLineComponent: { name: 'mark-line' },
+  TooltipComponent: { name: 'tooltip' },
+}))
 const mocks = vi.hoisted(() => ({
-  chart: {
-    setOption: vi.fn(),
-    resize: vi.fn(),
-    dispose: vi.fn(),
-    dispatchAction: vi.fn(),
-    getOption: vi.fn(),
-  },
+  chart: { setOption: vi.fn(), resize: vi.fn(), dispose: vi.fn(), getOption: vi.fn() },
   init: vi.fn(),
   use: vi.fn(),
 }))
 
 vi.mock('echarts/core', () => ({ init: mocks.init, use: mocks.use }))
-vi.mock('echarts/charts', () => ({ LineChart: {} }))
-vi.mock('echarts/components', () => ({
-  DataZoomComponent: {},
-  GridComponent: {},
-  LegendComponent: {},
-  MarkLineComponent: {},
-  ToolboxComponent: {},
-  TooltipComponent: {},
-}))
-vi.mock('echarts/renderers', () => ({ CanvasRenderer: {} }))
+vi.mock('echarts/charts', () => ({ LineChart: { name: 'line' } }))
+vi.mock('echarts/components', () => modules)
+vi.mock('echarts/renderers', () => ({ CanvasRenderer: { name: 'canvas' } }))
 
-import {
-  FrequencyResponseGraph,
-  type FrequencyResponseGraphHandle,
-} from './FrequencyResponseGraph'
-import { GraphToolbar } from './GraphToolbar'
+import { FrequencyResponseGraph } from './FrequencyResponseGraph'
 
-const curve = (role: 'source' | 'target'): Curve => ({
-  id: role,
-  name: role,
-  role,
-  rawPoints: [
-    { frequencyHz: 20, db: role === 'source' ? -1 : 0 },
-    { frequencyHz: 500, db: 0 },
-    { frequencyHz: 20_000, db: role === 'source' ? 1 : 0 },
-  ],
-  metadata: {},
-})
+function curve(id: string, name: string, role: Curve['role'], offset = 0): Curve {
+  return {
+    id,
+    name,
+    role,
+    rawPoints: [
+      { frequencyHz: 20, db: offset - 1 },
+      { frequencyHz: 500, db: offset },
+      { frequencyHz: 20_000, db: offset + 1 },
+    ],
+    metadata: {},
+  }
+}
 
 const filter: Filter = {
-  id: 'filter',
-  enabled: true,
-  type: 'PK',
-  frequencyHz: 1_000,
-  gainDb: 3,
-  q: 1,
+  id: 'filter', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 3, q: 1,
 }
 
 describe('FrequencyResponseGraph', () => {
   beforeEach(() => {
-    mocks.chart.setOption.mockClear()
-    mocks.chart.resize.mockClear()
-    mocks.chart.dispose.mockClear()
-    mocks.chart.dispatchAction.mockClear()
+    for (const mock of [mocks.chart.setOption, mocks.chart.resize, mocks.chart.dispose, mocks.init]) {
+      mock.mockClear()
+    }
     mocks.chart.getOption.mockReset()
-    mocks.init.mockClear()
-    mocks.init.mockReturnValue(mocks.chart)
     mocks.chart.getOption.mockReturnValue({})
-    uiStore.setState({
-      theme: 'light',
-      curveAppearance: {
-        source: { color: '#1565c0', visible: true },
-        target: { color: '#c62828', visible: true },
-      },
-    })
+    mocks.init.mockReturnValue(mocks.chart)
+    uiStore.setState({ theme: 'light', curveAppearance: {} })
   })
 
-  it('initializes ECharts once and disposes it on unmount', () => {
+  it('initializes once, safely handles an absent initial option, resizes, and disposes', () => {
+    mocks.chart.getOption.mockReturnValue(undefined)
     const store = createWorkspaceStore()
     const { rerender, unmount } = render(
       <FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />,
     )
-
     rerender(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-    expect(mocks.init).toHaveBeenCalledOnce()
 
+    expect(mocks.init).toHaveBeenCalledOnce()
+    expect(mocks.chart.setOption).toHaveBeenCalled()
+    act(() => window.dispatchEvent(new Event('resize')))
+    expect(mocks.chart.resize).toHaveBeenCalledOnce()
     unmount()
     expect(mocks.chart.dispose).toHaveBeenCalledOnce()
   })
 
-  it('configures a newly initialized chart before ECharts has an option', () => {
-    mocks.chart.getOption.mockReturnValue(undefined)
-    const store = createWorkspaceStore()
-
-    render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-
-    expect(mocks.chart.setOption).toHaveBeenCalledOnce()
-  })
-
-  it('configures the FR inspector and wires toolbar Reset View through the graph ref', () => {
-    const store = createWorkspaceStore()
-    store.getState().addCurve(curve('source'))
-    store.getState().addCurve(curve('target'))
-    const graphRef = createRef<FrequencyResponseGraphHandle>()
-
-    render(
-      <>
-        <GraphToolbar onResetView={() => graphRef.current?.resetView()} />
-        <FrequencyResponseGraph ref={graphRef} derived={deriveWorkspace(store.getState())} />
-      </>,
-    )
-
-    expect(mocks.use).toHaveBeenCalled()
-    expect(mocks.chart.setOption).toHaveBeenCalledWith(
-      expect.objectContaining({
-        xAxis: expect.objectContaining({ type: 'log', min: 20, max: 20_000 }),
-        yAxis: expect.objectContaining({ type: 'value', name: 'dB' }),
-        tooltip: expect.objectContaining({
-          trigger: 'axis',
-          axisPointer: expect.objectContaining({ snap: false }),
-          formatter: expect.any(Function),
-        }),
-        legend: expect.objectContaining({
-          data: ['Source', 'Target', 'Source + EQ', 'PEQ', 'Desired', 'Selected Filter'],
-        }),
-        dataZoom: [expect.objectContaining({ type: 'inside' }), expect.objectContaining({ type: 'slider' })],
-      }),
-      { notMerge: true },
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Reset View' }))
-    expect(mocks.chart.dispatchAction).toHaveBeenCalledWith({ type: 'restore' })
-    expect(mocks.chart.dispatchAction).toHaveBeenCalledWith({
-      type: 'dataZoom',
-      start: 0,
-      end: 100,
-    })
-  })
-
-  it('updates theme and assigned colors without changing graph data or interaction state', () => {
-    const store = createWorkspaceStore()
-    store.getState().addCurve(curve('source'))
-    store.getState().addCurve(curve('target'))
-    render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-    const initialOption = mocks.chart.setOption.mock.calls.at(-1)?.[0]
-    const initialData = initialOption.series.map(
-      (series: { name: string; data: [number, number][] }) => [series.name, series.data],
-    )
-
-    mocks.chart.getOption.mockReturnValue({
-      legend: [{ selected: { Source: false, Target: true } }],
-      dataZoom: [{ start: 12, end: 82 }, { start: 12, end: 82 }],
-    })
-    act(() => {
-      uiStore.setState({
-        theme: 'dark',
-        curveAppearance: {
-          source: { color: '#00796b', visible: true },
-          target: { color: '#ad1457', visible: true },
-        },
-      })
-    })
-
+  it('registers and configures no zoom, toolbox, or standard legend', () => {
+    render(<FrequencyResponseGraph derived={deriveWorkspace(createWorkspaceStore().getState())} />)
+    const registered = mocks.use.mock.calls[0]?.[0] as { name: string }[]
     const option = mocks.chart.setOption.mock.calls.at(-1)?.[0]
-    const source = option.series.find((series: { name: string }) => series.name === 'Source')
-    const target = option.series.find((series: { name: string }) => series.name === 'Target')
-    expect(option.backgroundColor).toBe('#0b1012')
-    expect(option.xAxis.axisLabel.color).toBe('#96918c')
-    expect(source.itemStyle.color).toBe('#00796b')
-    expect(target.itemStyle.color).toBe('#ad1457')
-    expect(option.series.map((series: { name: string; data: [number, number][] }) => [series.name, series.data])).toEqual(
-      initialData,
-    )
-    expect(option.legend.selected).toMatchObject({ Source: false, Target: true })
-    expect(option.dataZoom).toEqual([
-      expect.objectContaining({ start: 12, end: 82 }),
-      expect.objectContaining({ start: 12, end: 82 }),
-    ])
-    expect(mocks.init).toHaveBeenCalledOnce()
+
+    expect(registered.map(({ name }) => name)).toEqual(['line', 'grid', 'mark-line', 'tooltip', 'canvas'])
+    expect(option).not.toHaveProperty('dataZoom')
+    expect(option).not.toHaveProperty('legend')
+    expect(option).not.toHaveProperty('toolbox')
+    expect(screen.queryByText('Reset View')).not.toBeInTheDocument()
+    expect(screen.queryByRole('toolbar', { name: /graph/i })).not.toBeInTheDocument()
   })
 
-  it('applies explicit UI visibility changes but preserves legend toggles on unrelated edits', () => {
+  it('plots every visible measurement by actual name and labels it with its effective color', () => {
     const store = createWorkspaceStore()
-    store.getState().addCurve(curve('source'))
-    store.getState().addCurve(curve('target'))
+    store.getState().addCurve(curve('source', 'Studio left', 'source'))
+    store.getState().addCurve(curve('target', 'Harman target', 'target', 1))
+    store.getState().addCurve(curve('reference', 'Archive reference', 'comparison', 2))
+    store.getState().setCurveRole('reference', 'reference')
+    store.getState().addCurve(curve('comparison', 'Room comparison', 'comparison', 3))
+    store.getState().addCurve(curve('hidden', 'Hidden comparison', 'comparison', 4))
+    store.getState().setFilters([filter], 'manual')
     uiStore.setState({
       curveAppearance: {
-        source: { color: '#1565c0', visible: false },
+        source: { color: '#1565c0', visible: true },
         target: { color: '#c62828', visible: true },
+        reference: { color: '#2e7d32', visible: true },
+        comparison: { color: '#6a1b9a', visible: true },
+        hidden: { color: '#00838f', visible: false },
       },
     })
+
     render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+    const option = mocks.chart.setOption.mock.calls.at(-1)?.[0]
+    expect(option.series.map(({ name }: { name: string }) => name)).toEqual([
+      'Studio left', 'Harman target', 'Archive reference', 'Room comparison', 'Source + EQ',
+    ])
+    expect(option.series.find(({ name }: { name: string }) => name === 'Archive reference').lineStyle)
+      .toMatchObject({ color: '#989894', type: 'dashed' })
+    expect(option.series.some(({ name }: { name: string }) => name === 'Hidden comparison')).toBe(false)
+    expect(option.series.some(({ name }: { name: string }) => name === 'PEQ')).toBe(false)
+    expect(option.series.some(({ name }: { name: string }) => name === 'Desired')).toBe(false)
 
-    expect(mocks.chart.setOption.mock.calls.at(-1)?.[0].legend.selected).toMatchObject({
-      Source: false,
-      Target: true,
-    })
-
-    mocks.chart.getOption.mockReturnValue({
-      legend: [{ selected: { Source: false, Target: false } }],
-      dataZoom: [],
-    })
-    act(() => uiStore.setState({ theme: 'dark' }))
-    expect(mocks.chart.setOption.mock.calls.at(-1)?.[0].legend.selected).toMatchObject({
-      Source: false,
-      Target: false,
-    })
-
-    act(() => uiStore.getState().setCurveVisible('source', true))
-    expect(mocks.chart.setOption.mock.calls.at(-1)?.[0].legend.selected).toMatchObject({
-      Source: true,
-      Target: false,
-    })
+    const labels = screen.getByRole('list', { name: 'Visible graph series' })
+    expect(within(labels).getByText('Studio left')).toHaveStyle({ color: '#1565c0' })
+    expect(within(labels).getByText('Harman target')).toHaveStyle({ color: '#c62828' })
+    expect(within(labels).getByText('Archive reference')).toHaveStyle({ color: '#989894' })
+    expect(within(labels).getByText('Room comparison')).toHaveStyle({ color: '#6a1b9a' })
+    expect(within(labels).queryByText('Hidden comparison')).not.toBeInTheDocument()
   })
 
-  it('preserves user legend visibility and x zoom across derived workspace updates', () => {
+  it('updates theme colors without changing canonical series data', () => {
     const store = createWorkspaceStore()
-    store.getState().addCurve(curve('source'))
-    store.getState().addCurve(curve('target'))
-    store.getState().setFilters([filter], 'manual')
-    const { rerender } = render(
-      <FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />,
-    )
+    store.getState().addCurve(curve('source', 'Source measurement', 'source'))
+    uiStore.setState({ curveAppearance: { source: { color: '#00796b', visible: true } } })
+    render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+    const initialData = mocks.chart.setOption.mock.calls.at(-1)?.[0].series[0].data
 
-    mocks.chart.getOption.mockReturnValue({
-      legend: [{ selected: { Source: false, Target: true, 'Source + EQ': false, PEQ: true } }],
-      dataZoom: [
-        { start: 18, end: 73, startValue: 70, endValue: 8_000 },
-        { start: 18, end: 73, startValue: 70, endValue: 8_000 },
-      ],
-    })
-    store.getState().updateFilter(filter.id, { gainDb: 4 })
-    rerender(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-
-    const updatedOption = mocks.chart.setOption.mock.calls.at(-1)?.[0]
-    expect(updatedOption.legend.selected).toMatchObject({
-      Source: false,
-      Target: true,
-      'Source + EQ': false,
-      PEQ: true,
-      Desired: false,
-    })
-    expect(updatedOption.dataZoom).toEqual([
-      expect.objectContaining({ start: 18, end: 73, startValue: 70, endValue: 8_000 }),
-      expect.objectContaining({ start: 18, end: 73, startValue: 70, endValue: 8_000 }),
-    ])
-    expect(mocks.chart.dispatchAction).not.toHaveBeenCalled()
+    act(() => uiStore.setState({ theme: 'dark' }))
+    const option = mocks.chart.setOption.mock.calls.at(-1)?.[0]
+    expect(option.backgroundColor).toBe('#0b1012')
+    expect(option.series[0].data).toEqual(initialData)
+    expect(option.series[0].itemStyle.color).toBe('#00796b')
   })
 })
