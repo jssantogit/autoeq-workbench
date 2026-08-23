@@ -1,4 +1,4 @@
-import type { Curve } from '@autoeq-workbench/core'
+import { parseCurveText, type Curve } from '@autoeq-workbench/core'
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -6,6 +6,11 @@ import { uiStore } from '../../state/uiStore'
 import { workspaceStore } from '../../state/workspaceStore'
 import { CurveImport } from './CurveImport'
 import { CurvesTab } from './CurvesTab'
+
+vi.mock('@autoeq-workbench/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@autoeq-workbench/core')>()
+  return { ...actual, parseCurveText: vi.fn(actual.parseCurveText) }
+})
 
 const curves: Curve[] = ['Source.csv', 'Target.csv', 'Overlay.csv'].map((name, index) => ({
   id: `curve-${index}`,
@@ -36,6 +41,7 @@ function fileWithText(name: string, text: () => Promise<string>) {
 
 describe('CurveImport', () => {
   beforeEach(() => {
+    vi.mocked(parseCurveText).mockClear()
     workspaceStore.setState({ curves: [] })
     uiStore.setState({ curveAppearance: {} })
   })
@@ -60,6 +66,20 @@ describe('CurveImport', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('[parse]')
     expect(workspaceStore.getState().curves).toEqual([])
+    expect(uiStore.getState().curveAppearance).toEqual({})
+  })
+
+  it('does not register appearance when the parsed curve ID is rejected as a duplicate', async () => {
+    const duplicate = curves[0]!
+    workspaceStore.setState({ curves: [{ curve: duplicate, role: 'source' }] })
+    vi.mocked(parseCurveText).mockReturnValueOnce(duplicate)
+    render(<CurveImport />)
+    fireEvent.change(screen.getByLabelText('+ Curve'), {
+      target: { files: [fileWithText('duplicate.csv', async () => '20 1\n20000 2')] },
+    })
+
+    await waitFor(() => expect(parseCurveText).toHaveBeenCalled())
+    expect(workspaceStore.getState().curves).toEqual([{ curve: duplicate, role: 'source' }])
     expect(uiStore.getState().curveAppearance).toEqual({})
   })
 

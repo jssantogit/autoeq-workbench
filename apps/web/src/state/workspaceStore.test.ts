@@ -93,7 +93,7 @@ describe('workspace curve collection', () => {
     expect(source.name).toBe('Source A')
   })
 
-  it('stales preserved AutoEQ filters only when selected inputs change', () => {
+  it('stales preserved AutoEQ filters only when selected input IDs change', () => {
     store.getState().addCurve(source)
     store.getState().addCurve(target)
     store.getState().addCurve(extra)
@@ -103,12 +103,16 @@ describe('workspace curve collection', () => {
     store.getState().setCurveRole(extra.id, 'reference')
     expect(store.getState().solutionState).toBe('clean')
 
+    store.getState().renameCurve(source.id, 'Source renamed')
+    store.getState().renameCurve(target.id, 'Target renamed')
+    expect(store.getState().solutionState).toBe('clean')
+
     store.getState().setCurveRole(extra.id, 'source')
     expect(store.getState().solutionState).toBe('stale')
     expect(store.getState().filters).toEqual([filter])
   })
 
-  it('stales on selected rename/removal and leaves curve changes outside undo history', () => {
+  it('stales AutoEQ filters on selected removal and leaves curve changes outside undo history', () => {
     store.getState().addCurve(source)
     store.getState().addCurve(target)
     store.getState().setFilters([filter], 'autoeq')
@@ -117,7 +121,7 @@ describe('workspace curve collection', () => {
     expect(store.getState().canRedo).toBe(true)
 
     store.getState().renameCurve(source.id, 'Renamed')
-    expect(store.getState()).toMatchObject({ canRedo: false, solutionState: 'stale' })
+    expect(store.getState()).toMatchObject({ canRedo: false, solutionState: 'clean' })
     store.getState().undo()
     expect(store.getState().curves[0]?.curve.name).toBe('Renamed')
     expect(store.getState().filters).toEqual([])
@@ -125,6 +129,30 @@ describe('workspace curve collection', () => {
     store.getState().setFilters([filter], 'autoeq')
     store.getState().removeCurve(target.id)
     expect(store.getState().filters).toEqual([filter])
+    expect(store.getState().solutionState).toBe('stale')
+  })
+
+  it('does not stale wholly manual filters when selected inputs change or are removed', () => {
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
+    store.getState().addCurve(extra)
+    store.getState().setFilters([filter], 'manual')
+
+    store.getState().setCurveRole(extra.id, 'source')
+    expect(store.getState().solutionState).toBe('clean')
+    store.getState().removeCurve(target.id)
+    expect(store.getState().solutionState).toBe('clean')
+  })
+
+  it('stales modified AutoEQ filters when selected inputs change', () => {
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
+    store.getState().addCurve(extra)
+    store.getState().setFilters([filter], 'autoeq')
+    store.getState().updateFilter(filter.id, { gainDb: 4 })
+    expect(store.getState()).toMatchObject({ filterProvenance: 'autoeq', solutionState: 'modified' })
+
+    store.getState().setCurveRole(extra.id, 'source')
     expect(store.getState().solutionState).toBe('stale')
   })
 })
@@ -167,6 +195,45 @@ describe('workspace history and filters', () => {
 
     expect(store.getState().normalization).toEqual(defaultNormalization)
     expect(store.getState().filters).toEqual([filter])
+  })
+
+  it('keeps restored AutoEQ state stale when selected input IDs changed outside history', () => {
+    const store = createWorkspaceStore()
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
+    store.getState().addCurve(extra)
+    store.getState().setFilters([filter], 'autoeq')
+    store.getState().updateFilter(filter.id, { gainDb: 4 })
+    store.getState().setCurveRole(extra.id, 'source')
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({ solutionState: 'stale', filters: [filter] })
+  })
+
+  it('validates selected input IDs when undoing normalization-only history', () => {
+    const matchingStore = createWorkspaceStore()
+    matchingStore.getState().addCurve(source)
+    matchingStore.getState().addCurve(target)
+    matchingStore.getState().setFilters([filter], 'autoeq')
+    matchingStore.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
+    matchingStore.getState().undo()
+    expect(matchingStore.getState()).toMatchObject({
+      normalization: defaultNormalization,
+      solutionState: 'clean',
+    })
+
+    const changedStore = createWorkspaceStore()
+    changedStore.getState().addCurve(source)
+    changedStore.getState().addCurve(target)
+    changedStore.getState().addCurve(extra)
+    changedStore.getState().setFilters([filter], 'autoeq')
+    changedStore.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
+    changedStore.getState().setCurveRole(extra.id, 'source')
+    changedStore.getState().undo()
+    expect(changedStore.getState()).toMatchObject({
+      normalization: defaultNormalization,
+      solutionState: 'stale',
+    })
   })
 })
 
@@ -252,5 +319,26 @@ describe('deriveWorkspace', () => {
     expect(derived.peq).not.toBeNull()
     expect(derived.preamp).not.toBeNull()
     expect(derived.desired).toBeNull()
+  })
+
+  it('omits an unnormalizable auxiliary curve without blocking Source/Target metrics', () => {
+    const store = createWorkspaceStore()
+    const invalidReference: Curve = {
+      ...extra,
+      id: 'reference-invalid',
+      name: 'High-frequency reference',
+      rawPoints: extra.rawPoints.filter(({ frequencyHz }) => frequencyHz >= 1_000),
+    }
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
+    store.getState().addCurve(invalidReference)
+    store.getState().setCurveRole(invalidReference.id, 'reference')
+
+    const derived = deriveWorkspace(store.getState())
+
+    expect(derived.status).toBe('ready')
+    expect(derived.metrics).not.toBeNull()
+    expect(derived.measurementCurves.map(({ id }) => id)).toEqual([source.id, target.id])
+    expect(derived.message).toMatch(/Reference Target.*High-frequency reference/i)
   })
 })

@@ -138,6 +138,24 @@ describe('FilterEditor', () => {
     expect(workspaceStore.getState().filters.map(({ id }) => id)).toEqual(['filter-2'])
   })
 
+  it('does not let interactive row descendants override their own selection behavior', async () => {
+    const user = userEvent.setup()
+    const second = { ...filter, id: 'filter-2' }
+    workspaceStore.setState({ filters: [filter, second], selectedFilterId: second.id })
+    render(<FilterEditor />)
+
+    await user.click(screen.getByRole('checkbox', { name: 'Enable filter 1' }))
+    expect(workspaceStore.getState().selectedFilterId).toBe(second.id)
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Filter 1 type' }), 'LS')
+    expect(workspaceStore.getState().selectedFilterId).toBe(second.id)
+    await user.click(screen.getByRole('spinbutton', { name: 'Filter 1 gain dB' }))
+    expect(workspaceStore.getState().selectedFilterId).toBe(second.id)
+    await user.click(screen.getByRole('button', { name: 'Actions for filter 1' }))
+    expect(workspaceStore.getState().selectedFilterId).toBe(second.id)
+    await user.click(screen.getByRole('button', { name: 'Duplicate filter 1' }))
+    expect(workspaceStore.getState().selectedFilterId).toBe(workspaceStore.getState().filters[1]?.id)
+  })
+
   it('marks selected and disabled filters without relying on color alone', () => {
     workspaceStore.setState({
       filters: [{ ...filter, enabled: false }],

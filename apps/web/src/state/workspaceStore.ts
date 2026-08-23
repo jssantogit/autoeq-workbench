@@ -18,7 +18,11 @@ import {
 } from '@autoeq-workbench/core'
 import { createStore } from 'zustand/vanilla'
 import { useStore } from 'zustand'
-import { createHistorySnapshot, type WorkspaceHistorySnapshot } from './history'
+import {
+  createHistorySnapshot,
+  restoreHistorySnapshot,
+  type WorkspaceHistorySnapshot,
+} from './history'
 
 export type SolutionState = 'clean' | 'modified' | 'stale'
 export type FilterProvenance = 'manual' | 'autoeq'
@@ -36,7 +40,7 @@ export interface WorkspaceState {
   selectedFilterId: string | null
   solutionState: SolutionState
   filterProvenance: FilterProvenance | null
-  addCurve: (curve: Curve) => void
+  addCurve: (curve: Curve) => boolean
   setCurveRole: (curveId: string, role: WorkspaceCurveRole) => void
   renameCurve: (curveId: string, name: string) => void
   removeCurve: (curveId: string) => void
@@ -156,16 +160,19 @@ function curveCollectionUpdate(
   state: WorkspaceState,
   future: WorkspaceHistorySnapshot[],
   curves: WorkspaceCurveEntry[],
-  forceStale = false,
 ): Partial<WorkspaceState> {
   future.length = 0
   const before = selectedInputIds(state.curves)
   const after = selectedInputIds(curves)
-  const selectedInputsChanged = forceStale || before[0] !== after[0] || before[1] !== after[1]
+  const selectedInputsChanged = before[0] !== after[0] || before[1] !== after[1]
   return {
     curves,
     solutionState:
-      state.filters.length > 0 && selectedInputsChanged ? 'stale' : state.solutionState,
+      state.filters.length > 0 &&
+      state.filterProvenance === 'autoeq' &&
+      selectedInputsChanged
+        ? 'stale'
+        : state.solutionState,
     canRedo: false,
   }
 }
@@ -175,20 +182,22 @@ export function createWorkspaceStore() {
   const future: WorkspaceHistorySnapshot[] = []
 
   function record(state: WorkspaceState, update: Partial<WorkspaceState>): Partial<WorkspaceState> {
-    past.push(createHistorySnapshot(state))
+    past.push(createHistorySnapshot(state, selectedInputIds(state.curves)))
     future.length = 0
     return { ...update, canUndo: true, canRedo: false }
   }
 
-  return createStore<WorkspaceState>()((set) => ({
+  return createStore<WorkspaceState>()((set, get) => ({
     ...initialState,
-    addCurve: (curve) =>
+    addCurve: (curve) => {
+      if (get().curves.some(({ curve: existing }) => existing.id === curve.id)) return false
       set((state) => {
-        if (state.curves.some(({ curve: existing }) => existing.id === curve.id)) return state
         const role: WorkspaceCurveRole =
           state.curves.length === 0 ? 'source' : state.curves.length === 1 ? 'target' : null
         return curveCollectionUpdate(state, future, [...state.curves, { curve, role }])
-      }),
+      })
+      return true
+    },
     setCurveRole: (curveId, role) =>
       set((state) => {
         const entry = state.curves.find(({ curve }) => curve.id === curveId)
@@ -212,12 +221,7 @@ export function createWorkspaceStore() {
         const curves = state.curves.map((item) =>
           item.curve.id === curveId ? { ...item, curve: { ...item.curve, name: trimmed } } : item,
         )
-        return curveCollectionUpdate(
-          state,
-          future,
-          curves,
-          entry.role === 'source' || entry.role === 'target',
-        )
+        return curveCollectionUpdate(state, future, curves)
       }),
     removeCurve: (curveId) =>
       set((state) => {
@@ -363,9 +367,9 @@ export function createWorkspaceStore() {
       set((state) => {
         const snapshot = past.pop()
         if (snapshot === undefined) return state
-        future.push(createHistorySnapshot(state))
+        future.push(createHistorySnapshot(state, selectedInputIds(state.curves)))
         return {
-          ...createHistorySnapshot(snapshot),
+          ...restoreHistorySnapshot(snapshot, selectedInputIds(state.curves)),
           canUndo: past.length > 0,
           canRedo: true,
         }
@@ -374,9 +378,9 @@ export function createWorkspaceStore() {
       set((state) => {
         const snapshot = future.pop()
         if (snapshot === undefined) return state
-        past.push(createHistorySnapshot(state))
+        past.push(createHistorySnapshot(state, selectedInputIds(state.curves)))
         return {
-          ...createHistorySnapshot(snapshot),
+          ...restoreHistorySnapshot(snapshot, selectedInputIds(state.curves)),
           canUndo: true,
           canRedo: future.length > 0,
         }
@@ -404,6 +408,7 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
   let preparedSource: DerivedCurve | null = null
   let preparedTarget: DerivedCurve | null = null
   const errors: string[] = []
+  const warnings: string[] = []
   const sourceEntry = state.curves.find(({ role }) => role === 'source') ?? null
   const targetEntry = state.curves.find(({ role }) => role === 'target') ?? null
   const measurementCurves: DerivedMeasurementCurve[] = []
@@ -460,9 +465,10 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
           : entry.role === 'reference'
             ? 'Reference Target'
             : 'Comparison'
-      errors.push(
-        `${roleLabel} "${entry.curve.name}": ${cause instanceof Error ? cause.message : 'unable to prepare curve'}`,
-      )
+      const message =
+        `${roleLabel} "${entry.curve.name}": ${cause instanceof Error ? cause.message : 'unable to prepare curve'}`
+      if (entry.role === 'source' || entry.role === 'target') errors.push(message)
+      else warnings.push(message)
     }
   }
 
@@ -492,14 +498,15 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
       ? 'Assign Source to compare responses.'
       : 'Assign Target to compare responses.'
 
+  const message = status === 'coverage-error'
+    ? errors.join(' ')
+    : status === 'ready'
+      ? 'Source and Target ready.'
+      : incompleteMessage
+
   return {
     status,
-    message:
-      status === 'coverage-error'
-        ? errors.join(' ')
-        : status === 'ready'
-          ? 'Source and Target ready.'
-          : incompleteMessage,
+    message: [message, ...warnings].join(' '),
     measurementCurves,
     source,
     target,

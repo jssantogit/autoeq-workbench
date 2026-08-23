@@ -31,6 +31,15 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
     selectFilter(filter.id)
   }
 
+  const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
+    const target = event.target
+    if (
+      target instanceof Element &&
+      target.closest('button, input, select, textarea, summary, [role="button"]') !== null
+    ) return
+    selectFilter(filter.id)
+  }
+
   return (
     <tr
       className={className}
@@ -39,7 +48,7 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
       data-selected={selected}
       data-enabled={filter.enabled}
       tabIndex={0}
-      onClick={() => selectFilter(filter.id)}
+      onClick={handleRowClick}
       onKeyDown={handleRowKeyDown}
     >
       <td data-label="ON">
