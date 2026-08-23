@@ -26,16 +26,11 @@ describe('manual workbench integration', () => {
     uiStore.setState({
       theme: 'light',
       activeDockTab: 'curves',
-      sourceColor: MEASUREMENT_CURVE_PALETTE[0],
-      targetColor: MEASUREMENT_CURVE_PALETTE[1],
-      sourceVisible: true,
-      targetVisible: true,
-      targetPresentation: 'measurement',
+      curveAppearance: {},
     })
     initializeTheme()
     workspaceStore.setState({
-      source: null,
-      target: null,
+      curves: [],
       normalization: { ...defaultNormalization },
       filters: [],
       selectedFilterId: null,
@@ -52,38 +47,32 @@ describe('manual workbench integration', () => {
     expect(document.documentElement.dataset.theme).toBe('light')
     expect(screen.getByRole('button', { name: 'Switch to dark theme' })).toHaveTextContent('Light')
 
-    const initialSourceColor = uiStore.getState().sourceColor
     const sourceFile = new File([curveText], 'Synthetic Source.txt', { type: 'text/plain' })
     const targetFile = new File([curveText], 'Synthetic Target.csv', { type: 'text/csv' })
     Object.defineProperty(sourceFile, 'text', { value: async () => curveText })
     Object.defineProperty(targetFile, 'text', { value: async () => curveText })
-    fireEvent.change(screen.getByLabelText('Import Source curve'), {
+    fireEvent.change(screen.getByLabelText('+ Curve'), {
       target: { files: [sourceFile] },
     })
     await waitFor(() => expect(screen.getByText('Synthetic Source.txt')).toBeInTheDocument())
-    const importedSourceColor = uiStore.getState().sourceColor
-    expect(importedSourceColor).not.toBe(initialSourceColor)
+    const sourceId = workspaceStore.getState().curves[0]!.curve.id
+    const importedSourceColor = uiStore.getState().curveAppearance[sourceId]!.color
     expect(MEASUREMENT_CURVE_PALETTE).toContain(importedSourceColor)
     expect(
       seriesAppearance('Source', {
-        ...uiStore.getState(),
-      }),
+        theme: uiStore.getState().theme,
+        curveAppearance: uiStore.getState().curveAppearance,
+        sourceCurveId: sourceId,
+      }, { curveId: sourceId, measurementRole: 'source' }),
     ).toMatchObject({ color: importedSourceColor, lineType: 'solid' })
 
-    await user.click(screen.getByRole('radio', { name: 'Reference target' }))
-    expect(uiStore.getState().targetPresentation).toBe('reference')
-    fireEvent.change(screen.getByLabelText('Import Target curve'), {
+    fireEvent.change(screen.getByLabelText('+ Curve'), {
       target: { files: [targetFile] },
     })
     await waitFor(() => {
       expect(screen.getByText('Synthetic Source.txt')).toBeInTheDocument()
       expect(screen.getByText('Synthetic Target.csv')).toBeInTheDocument()
     })
-    expect(
-      seriesAppearance('Target', {
-        ...uiStore.getState(),
-      }),
-    ).toMatchObject({ color: '#989894', lineType: 'dashed' })
     await user.click(screen.getByRole('button', { name: 'Apply normalization' }))
     expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 500, targetDb: 0 })
 
@@ -123,11 +112,6 @@ describe('manual workbench integration', () => {
     await user.click(screen.getByRole('button', { name: 'Switch to dark theme' }))
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(localStorage.getItem('autoeq-workbench.theme')).toBe('dark')
-    expect(
-      seriesAppearance('Target', {
-        ...uiStore.getState(),
-      }),
-    ).toMatchObject({ color: '#8f8e8a', lineType: 'dashed' })
   })
 
   it('shows preamp in Details even before Target is loaded', async () => {

@@ -1,11 +1,10 @@
-import type { TargetPresentation, ThemeMode } from '../../state/uiStore'
-import type { GraphSeriesName } from './graphSeries'
+import type { CurveAppearance, ThemeMode } from '../../state/uiStore'
+import type { GraphSeries } from './graphSeries'
 
 export interface GraphAppearanceInput {
   theme: ThemeMode
-  sourceColor: string
-  targetColor: string
-  targetPresentation: TargetPresentation
+  curveAppearance: Record<string, CurveAppearance>
+  sourceCurveId?: string
 }
 
 const GRAPH_THEMES = {
@@ -42,25 +41,34 @@ export function graphTheme(theme: ThemeMode) {
   return GRAPH_THEMES[theme]
 }
 
-export function seriesAppearance(name: GraphSeriesName, input: GraphAppearanceInput) {
+export function seriesAppearance(
+  name: string,
+  input: GraphAppearanceInput,
+  series?: Pick<GraphSeries, 'curveId' | 'measurementRole'>,
+) {
   const derived = DERIVED_COLORS[input.theme]
   const base = { lineType: 'solid' as const, lineWidth: 2, opacity: 1 }
+  const measurementColor = series?.curveId === undefined
+    ? undefined
+    : input.curveAppearance[series.curveId]?.color
+
+  if (series?.measurementRole !== undefined) {
+    return series.measurementRole === 'reference'
+      ? {
+          color: graphTheme(input.theme).referenceTarget,
+          lineType: 'dashed' as const,
+          lineWidth: 1.6,
+          opacity: 0.82,
+        }
+      : { ...base, color: measurementColor ?? '#1565c0' }
+  }
 
   switch (name) {
-    case 'Source':
-      return { ...base, color: input.sourceColor }
-    case 'Target':
-      return input.targetPresentation === 'reference'
-        ? {
-            color: graphTheme(input.theme).referenceTarget,
-            lineType: 'dashed' as const,
-            lineWidth: 1.6,
-            opacity: 0.82,
-          }
-        : { ...base, color: input.targetColor }
     case 'Source + EQ':
       return {
-        color: input.sourceColor,
+        color: input.sourceCurveId === undefined
+          ? '#1565c0'
+          : (input.curveAppearance[input.sourceCurveId]?.color ?? '#1565c0'),
         lineType: 'solid' as const,
         lineWidth: 2.5,
         opacity: 0.72,
@@ -71,5 +79,7 @@ export function seriesAppearance(name: GraphSeriesName, input: GraphAppearanceIn
       return { color: derived.desired, lineType: 'dotted' as const, lineWidth: 1.4, opacity: 0.9 }
     case 'Selected Filter':
       return { ...base, color: derived.selectedFilter, lineWidth: 1.6 }
+    default:
+      return { ...base, color: measurementColor ?? '#1565c0' }
   }
 }

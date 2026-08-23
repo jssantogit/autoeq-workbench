@@ -3,7 +3,7 @@ export interface CurvePoint {
   db: number
 }
 
-export type CurveRole = 'source' | 'target' | 'derived'
+export type CurveRole = 'source' | 'target' | 'comparison' | 'derived'
 
 export type CurveMetadata = Record<string, string | number | boolean>
 

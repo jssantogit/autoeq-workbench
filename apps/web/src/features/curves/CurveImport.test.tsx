@@ -4,20 +4,19 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { uiStore } from '../../state/uiStore'
 import { workspaceStore } from '../../state/workspaceStore'
-import { CurveAppearanceControls } from './CurveAppearanceControls'
 import { CurveImport } from './CurveImport'
 import { CurvesTab } from './CurvesTab'
 
-const previousSource: Curve = {
-  id: 'source-existing',
-  name: 'Previous Source.csv',
-  role: 'source',
+const curves: Curve[] = ['Source.csv', 'Target.csv', 'Overlay.csv'].map((name, index) => ({
+  id: `curve-${index}`,
+  name,
+  role: 'comparison',
   rawPoints: [
-    { frequencyHz: 20, db: -1 },
-    { frequencyHz: 20_000, db: 1 },
+    { frequencyHz: 20, db: index },
+    { frequencyHz: 20_000, db: index + 1 },
   ],
   metadata: {},
-}
+}))
 
 function deferred<T>() {
   let resolve!: (value: T) => void
@@ -37,150 +36,115 @@ function fileWithText(name: string, text: () => Promise<string>) {
 
 describe('CurveImport', () => {
   beforeEach(() => {
-    workspaceStore.setState({ source: previousSource })
-    uiStore.setState({
-      sourceColor: '#1565c0',
-      targetColor: '#c62828',
-      sourceVisible: true,
-      targetVisible: true,
-      targetPresentation: 'measurement',
-    })
+    workspaceStore.setState({ curves: [] })
+    uiStore.setState({ curveAppearance: {} })
   })
 
-  it('assigns a fresh graph color only after a successful latest Source import', async () => {
-    const initialColor = uiStore.getState().sourceColor
-    render(<CurveImport role="source" />)
-    const file = fileWithText('Source.txt', async () => '20 1\n20000 2')
-
-    fireEvent.change(screen.getByLabelText('Replace Source curve'), {
-      target: { files: [file] },
+  it('adds a generic curve and registers appearance only after a successful parse', async () => {
+    render(<CurveImport />)
+    fireEvent.change(screen.getByLabelText('+ Curve'), {
+      target: { files: [fileWithText('Measurement.txt', async () => '20 1\n20000 2')] },
     })
 
-    await screen.findByText('Source.txt')
-    expect(uiStore.getState().sourceColor).not.toBe(initialColor)
-    expect(workspaceStore.getState().source?.name).toBe('Source.txt')
+    await waitFor(() => expect(workspaceStore.getState().curves).toHaveLength(1))
+    const entry = workspaceStore.getState().curves[0]!
+    expect(entry).toMatchObject({ curve: { name: 'Measurement.txt', role: 'comparison' }, role: 'source' })
+    expect(uiStore.getState().curveAppearance[entry.curve.id]).toMatchObject({ visible: true })
   })
 
-  it('reports a structured parse failure without replacing the previous curve', async () => {
-    const initialColor = uiStore.getState().sourceColor
-    render(<CurveImport role="source" />)
-    const file = new File(['not curve data'], 'broken.csv', { type: 'text/csv' })
-    Object.defineProperty(file, 'text', { value: async () => 'not curve data' })
-
-    fireEvent.change(screen.getByLabelText('Replace Source curve'), {
-      target: { files: [file] },
+  it('reports structured errors without adding or registering a curve', async () => {
+    render(<CurveImport />)
+    fireEvent.change(screen.getByLabelText('+ Curve'), {
+      target: { files: [fileWithText('broken.csv', async () => 'not curve data')] },
     })
 
-    await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('[parse]')
-    })
-    expect(screen.getByText('Previous Source.csv')).toBeInTheDocument()
-    expect(workspaceStore.getState().source).toBe(previousSource)
-    expect(uiStore.getState().sourceColor).toBe(initialColor)
+    expect(await screen.findByRole('alert')).toHaveTextContent('[parse]')
+    expect(workspaceStore.getState().curves).toEqual([])
+    expect(uiStore.getState().curveAppearance).toEqual({})
   })
 
   it('ignores an older slow success after a newer selection fails', async () => {
-    const initialColor = uiStore.getState().sourceColor
     const olderRead = deferred<string>()
-    const older = fileWithText('older.csv', () => olderRead.promise)
-    const newer = fileWithText('newer.csv', async () => 'not curve data')
-    render(<CurveImport role="source" />)
-    const input = screen.getByLabelText('Replace Source curve')
-
-    fireEvent.change(input, { target: { files: [older] } })
-    fireEvent.change(input, { target: { files: [newer] } })
+    render(<CurveImport />)
+    const input = screen.getByLabelText('+ Curve')
+    fireEvent.change(input, { target: { files: [fileWithText('older.csv', () => olderRead.promise)] } })
+    fireEvent.change(input, { target: { files: [fileWithText('newer.csv', async () => 'bad')] } })
     expect(await screen.findByRole('alert')).toHaveTextContent('[parse]')
 
     await act(async () => {
-      olderRead.resolve('20 10\n20000 12')
+      olderRead.resolve('20 1\n20000 2')
       await olderRead.promise
     })
-    expect(workspaceStore.getState().source).toBe(previousSource)
-    expect(uiStore.getState().sourceColor).toBe(initialColor)
-    expect(screen.getByRole('alert')).toHaveTextContent('[parse]')
+    expect(workspaceStore.getState().curves).toEqual([])
+    expect(uiStore.getState().curveAppearance).toEqual({})
   })
 
   it('ignores an older slow error after a newer selection succeeds', async () => {
     const olderRead = deferred<string>()
-    const older = fileWithText('older.csv', () => olderRead.promise)
-    const newer = fileWithText('newer.csv', async () => '20 2\n20000 4')
-    render(<CurveImport role="source" />)
-    const input = screen.getByLabelText('Replace Source curve')
-
-    fireEvent.change(input, { target: { files: [older] } })
-    fireEvent.change(input, { target: { files: [newer] } })
-    await screen.findByText('newer.csv')
-    const latestColor = uiStore.getState().sourceColor
-    expect(latestColor).not.toBe('#1565c0')
+    render(<CurveImport />)
+    const input = screen.getByLabelText('+ Curve')
+    fireEvent.change(input, { target: { files: [fileWithText('older.csv', () => olderRead.promise)] } })
+    fireEvent.change(input, {
+      target: { files: [fileWithText('newer.csv', async () => '20 2\n20000 4')] },
+    })
+    await waitFor(() => expect(workspaceStore.getState().curves[0]?.curve.name).toBe('newer.csv'))
 
     await act(async () => {
       olderRead.reject(new Error('slow read failed'))
       await olderRead.promise.catch(() => undefined)
     })
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-    expect(workspaceStore.getState().source?.name).toBe('newer.csv')
-    expect(uiStore.getState().sourceColor).toBe(latestColor)
-  })
-})
-
-describe('CurveAppearanceControls', () => {
-  beforeEach(() => {
-    workspaceStore.setState({ source: previousSource })
-    uiStore.setState({
-      sourceColor: '#1565c0',
-      targetColor: '#c62828',
-      sourceVisible: true,
-      targetVisible: true,
-      targetPresentation: 'measurement',
-    })
-  })
-
-  it('exposes accessible Source visibility and six-digit color controls', async () => {
-    const user = userEvent.setup()
-    const rawPoints = workspaceStore.getState().source?.rawPoints
-    render(<CurveAppearanceControls role="source" />)
-
-    await user.click(screen.getByRole('checkbox', { name: 'Show Source curve' }))
-    expect(uiStore.getState().sourceVisible).toBe(false)
-
-    fireEvent.change(screen.getByLabelText('Source curve color'), {
-      target: { value: '#123456' },
-    })
-    expect(uiStore.getState().sourceColor).toBe('#123456')
-    expect(workspaceStore.getState().source?.rawPoints).toBe(rawPoints)
-  })
-
-  it('retains the custom Target color while switching accessible presentation modes', async () => {
-    const user = userEvent.setup()
-    render(<CurveAppearanceControls role="target" />)
-
-    expect(screen.getByRole('radio', { name: 'Measurement FR' })).toBeChecked()
-    await user.click(screen.getByRole('radio', { name: 'Reference target' }))
-
-    expect(uiStore.getState().targetPresentation).toBe('reference')
-    expect(uiStore.getState().targetColor).toBe('#c62828')
-    expect(screen.getByRole('checkbox', { name: 'Show Target curve' })).toBeChecked()
+    expect(workspaceStore.getState().curves).toHaveLength(1)
   })
 })
 
 describe('CurvesTab', () => {
-  it('presents a compact two-row curve manager with inline controls', () => {
-    workspaceStore.setState({ source: null, target: null })
+  beforeEach(() => {
+    workspaceStore.setState({
+      curves: curves.map((curve, index) => ({
+        curve,
+        role: index === 0 ? 'source' : index === 1 ? 'target' : null,
+      })),
+    })
+    uiStore.setState({ curveAppearance: {} })
+    for (const curve of curves) uiStore.getState().registerCurve(curve.id)
+  })
+
+  it('renders a dense N-row list including an extra Comparison row and one global normalization', () => {
     render(<CurvesTab />)
+    const rows = within(screen.getByRole('list', { name: 'Workspace curves' })).getAllByRole('listitem')
 
-    const manager = screen.getByRole('list', { name: 'Workspace curves' })
-    const rows = within(manager).getAllByRole('listitem')
-    expect(rows).toHaveLength(2)
-
-    const source = rows[0]!
-    expect(within(source).getByText('Source')).toBeInTheDocument()
-    expect(within(source).getByLabelText('Import Source curve')).toBeInTheDocument()
-    expect(within(source).getByLabelText('Source curve color')).toBeInTheDocument()
-
-    const target = rows[1]!
-    expect(within(target).getByText('Target')).toBeInTheDocument()
-    expect(within(target).getByLabelText('Import Target curve')).toBeInTheDocument()
-    expect(within(target).getByRole('radio', { name: 'Reference target' })).toBeInTheDocument()
+    expect(rows).toHaveLength(3)
+    expect(within(rows[0]!).getByText('Source')).toBeInTheDocument()
+    expect(within(rows[1]!).getByText('Target')).toBeInTheDocument()
+    expect(within(rows[2]!).getByText('Comparison')).toBeInTheDocument()
+    expect(screen.getByLabelText('+ Curve')).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Workspace normalization' })).toBeInTheDocument()
+  })
+
+  it('performs role, visibility, color, inline rename, and remove operations from a compact row menu', async () => {
+    const user = userEvent.setup()
+    render(<CurvesTab />)
+    const overlayRow = screen.getByText('Overlay.csv').closest('li')!
+    await user.click(within(overlayRow).getByLabelText('Actions for Overlay.csv'))
+    await user.click(within(overlayRow).getByRole('button', { name: 'Set as Reference Target' }))
+    expect(workspaceStore.getState().curves[2]?.role).toBe('reference')
+
+    await user.click(within(overlayRow).getByLabelText('Show Overlay.csv'))
+    expect(uiStore.getState().curveAppearance['curve-2']?.visible).toBe(false)
+    fireEvent.change(within(overlayRow).getByLabelText('Overlay.csv color'), {
+      target: { value: '#123456' },
+    })
+    expect(uiStore.getState().curveAppearance['curve-2']?.color).toBe('#123456')
+
+    const rename = within(overlayRow).getByLabelText('Rename Overlay.csv')
+    await user.clear(rename)
+    await user.type(rename, 'Room reference')
+    await user.click(within(overlayRow).getByRole('button', { name: 'Save name' }))
+    expect(workspaceStore.getState().curves[2]?.curve.name).toBe('Room reference')
+
+    await user.click(within(overlayRow).getByRole('button', { name: 'Remove' }))
+    expect(workspaceStore.getState().curves).toHaveLength(2)
+    expect(uiStore.getState().curveAppearance['curve-2']).toBeUndefined()
   })
 })

@@ -161,7 +161,7 @@ describe('prepareCurve', () => {
     expectTypeOf<PreparedCurve>().toEqualTypeOf<{
       curveId: string
       name: string
-      role: 'source' | 'target' | 'derived'
+      role: 'source' | 'target' | 'comparison' | 'derived'
       frequencies: number[]
       db: number[]
       normalization: { anchorHz: number; targetDb: number }

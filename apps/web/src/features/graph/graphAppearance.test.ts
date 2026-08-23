@@ -3,14 +3,19 @@ import { graphTheme, seriesAppearance, type GraphAppearanceInput } from './graph
 
 const input: GraphAppearanceInput = {
   theme: 'light',
-  sourceColor: '#1565c0',
-  targetColor: '#c62828',
-  targetPresentation: 'measurement',
+  curveAppearance: {
+    source: { color: '#1565c0', visible: true },
+    target: { color: '#c62828', visible: true },
+  },
+  sourceCurveId: 'source',
 }
 
 describe('seriesAppearance', () => {
   it('renders a reference Target as the exact theme neutral gray dashed instead of the UI accent', () => {
-    const style = seriesAppearance('Target', { ...input, targetPresentation: 'reference' })
+    const style = seriesAppearance('Reference', input, {
+      curveId: 'target',
+      measurementRole: 'reference',
+    })
 
     expect(style.color).toBe('#989894')
     expect(style.lineType).toBe('dashed')
@@ -18,21 +23,21 @@ describe('seriesAppearance', () => {
   })
 
   it('renders a measurement Target with its assigned graph color', () => {
-    const style = seriesAppearance('Target', input)
+    const style = seriesAppearance('Target', input, { curveId: 'target', measurementRole: 'target' })
 
     expect(style.color).toBe('#c62828')
     expect(style.lineType).toBe('solid')
   })
 
   it('keeps Source independent from the amber UI accent', () => {
-    const style = seriesAppearance('Source', input)
+    const style = seriesAppearance('Source', input, { curveId: 'source', measurementRole: 'source' })
 
     expect(style.color).toBe('#1565c0')
     expect(style.color.toLowerCase()).not.toBe('#f39a3b')
   })
 
   it('relates Source + EQ to Source while distinguishing its stroke', () => {
-    const source = seriesAppearance('Source', input)
+    const source = seriesAppearance('Source', input, { curveId: 'source', measurementRole: 'source' })
     const sourceEq = seriesAppearance('Source + EQ', input)
 
     expect(sourceEq.color).toBe(source.color)

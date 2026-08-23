@@ -17,7 +17,6 @@ import {
   buildGraphSeries,
   formatGraphInspector,
   GRAPH_SERIES_NAMES,
-  type GraphSeriesName,
 } from './graphSeries'
 
 registerEChartsModules([
@@ -40,7 +39,7 @@ export interface FrequencyResponseGraphHandle {
 }
 
 interface EChartsInteractionOption {
-  legend?: { selected?: Partial<Record<GraphSeriesName, boolean>> }[]
+  legend?: { selected?: Record<string, boolean> }[]
   dataZoom?: {
     start?: number
     end?: number
@@ -76,14 +75,10 @@ export const FrequencyResponseGraph = forwardRef<
 >(function FrequencyResponseGraph({ derived }, ref) {
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<EChartsType | null>(null)
-  const renderedSeriesRef = useRef<Set<GraphSeriesName>>(new Set())
+  const renderedSeriesRef = useRef<Set<string>>(new Set())
   const theme = useUiStore((state) => state.theme)
-  const sourceColor = useUiStore((state) => state.sourceColor)
-  const targetColor = useUiStore((state) => state.targetColor)
-  const sourceVisible = useUiStore((state) => state.sourceVisible)
-  const targetVisible = useUiStore((state) => state.targetVisible)
-  const targetPresentation = useUiStore((state) => state.targetPresentation)
-  const uiVisibilityRef = useRef({ source: sourceVisible, target: targetVisible })
+  const curveAppearance = useUiStore((state) => state.curveAppearance)
+  const uiVisibilityRef = useRef<Record<string, boolean>>({})
 
   useImperativeHandle(ref, () => ({
     resetView: () => {
@@ -110,20 +105,20 @@ export const FrequencyResponseGraph = forwardRef<
     const chart = chartRef.current
     if (chart === null) return
     const graphSeries = buildGraphSeries(derived)
-    const appearanceInput = { theme, sourceColor, targetColor, targetPresentation }
+    const sourceCurveId = derived.measurementCurves.find(({ role }) => role === 'source')?.id
+    const appearanceInput = { theme, curveAppearance, sourceCurveId }
     const colors = graphTheme(theme)
     const interactionOption = (chart.getOption() ?? {}) as EChartsInteractionOption
     const previousSelected = interactionOption.legend?.[0]?.selected ?? {}
     const previousUiVisibility = uiVisibilityRef.current
     const selected = Object.fromEntries(
       GRAPH_SERIES_NAMES.map((name) => {
-        const uiVisible = name === 'Source' ? sourceVisible : name === 'Target' ? targetVisible : undefined
-        const uiVisibilityChanged =
-          name === 'Source'
-            ? sourceVisible !== previousUiVisibility.source
-            : name === 'Target'
-              ? targetVisible !== previousUiVisibility.target
-              : false
+        const series = graphSeries.find((item) => item.name === name)
+        const curveId = series?.curveId
+        const uiVisible = curveId === undefined ? undefined : curveAppearance[curveId]?.visible
+        const uiVisibilityChanged = curveId !== undefined &&
+          previousUiVisibility[curveId] !== undefined &&
+          uiVisible !== previousUiVisibility[curveId]
         const visible =
           uiVisible !== undefined && uiVisibilityChanged
             ? uiVisible
@@ -132,7 +127,7 @@ export const FrequencyResponseGraph = forwardRef<
               : (uiVisible ?? graphSeries.find((series) => series.name === name)?.defaultVisible ?? false)
         return [name, visible]
       }),
-    ) as Record<GraphSeriesName, boolean>
+    ) as Record<string, boolean>
     const insideZoom = dataZoomInteraction(interactionOption, 0)
     const sliderZoom = dataZoomInteraction(interactionOption, 1)
 
@@ -195,7 +190,7 @@ export const FrequencyResponseGraph = forwardRef<
           },
         ],
         series: graphSeries.map((series) => {
-          const appearance = seriesAppearance(series.name, appearanceInput)
+          const appearance = seriesAppearance(series.name, appearanceInput, series)
           return {
             name: series.name,
             type: 'line',
@@ -225,8 +220,10 @@ export const FrequencyResponseGraph = forwardRef<
       { notMerge: true },
     )
     renderedSeriesRef.current = new Set(graphSeries.map(({ name }) => name))
-    uiVisibilityRef.current = { source: sourceVisible, target: targetVisible }
-  }, [derived, sourceColor, sourceVisible, targetColor, targetPresentation, targetVisible, theme])
+    uiVisibilityRef.current = Object.fromEntries(
+      Object.entries(curveAppearance).map(([id, { visible }]) => [id, visible]),
+    )
+  }, [curveAppearance, derived, theme])
 
   return (
     <section className="graph-panel" aria-labelledby="fr-graph-heading">

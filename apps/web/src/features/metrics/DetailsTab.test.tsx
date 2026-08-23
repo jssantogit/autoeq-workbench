@@ -22,8 +22,7 @@ function currentDerived(overrides: Partial<WorkspaceDerived> = {}): WorkspaceDer
 describe('DetailsTab', () => {
   beforeEach(() => {
     workspaceStore.setState({
-      source: null,
-      target: null,
+      curves: [],
       normalization: { ...defaultNormalization },
       filters: [],
       selectedFilterId: null,

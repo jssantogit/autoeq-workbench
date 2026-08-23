@@ -39,7 +39,7 @@ describe('core domain types', () => {
       frequencyHz: number
       db: number
     }>()
-    expectTypeOf<CurveRole>().toEqualTypeOf<'source' | 'target' | 'derived'>()
+    expectTypeOf<CurveRole>().toEqualTypeOf<'source' | 'target' | 'comparison' | 'derived'>()
     expectTypeOf<Normalization>().toEqualTypeOf<{
       anchorHz: number
       targetDb: number
@@ -70,6 +70,12 @@ describe('core domain types', () => {
 })
 
 describe('parseCurveText', () => {
+  it('imports a generic comparison curve without assigning an AutoEQ role', () => {
+    const curve = parseCurveText('20 1\n20000 2', { name: 'Overlay', role: 'comparison' })
+
+    expect(curve).toMatchObject({ name: 'Overlay', role: 'comparison' })
+  })
+
   it.each(delimiterFixtures)('parses $name-delimited data with a header', ({ text }) => {
     const curve = parseCurveText(text, sourceOptions)
 

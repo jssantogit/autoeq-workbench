@@ -1,5 +1,9 @@
 import { interpolateLogFrequency } from '@autoeq-workbench/core'
-import type { DerivedCurve, WorkspaceDerived } from '../../state/workspaceStore'
+import type {
+  DerivedCurve,
+  WorkspaceCurveRole,
+  WorkspaceDerived,
+} from '../../state/workspaceStore'
 
 export const GRAPH_SERIES_NAMES = [
   'Source',
@@ -13,16 +17,18 @@ export const GRAPH_SERIES_NAMES = [
 export type GraphSeriesName = (typeof GRAPH_SERIES_NAMES)[number]
 
 export interface GraphSeries {
-  name: GraphSeriesName
+  name: string
   data: [number, number][]
   defaultVisible: boolean
+  curveId?: string
+  measurementRole?: WorkspaceCurveRole
   markerFrequencyHz?: number
 }
 
 export function formatGraphInspector(
   frequencyHz: number,
   series: readonly GraphSeries[],
-  selected: Readonly<Partial<Record<GraphSeriesName, boolean>>>,
+  selected: Readonly<Record<string, boolean | undefined>>,
 ): string {
   const frequency =
     frequencyHz >= 1_000 ? `${(frequencyHz / 1_000).toFixed(2)} kHz` : `${frequencyHz.toFixed(0)} Hz`
@@ -43,7 +49,7 @@ export function formatGraphInspector(
 }
 
 function graphSeries(
-  name: GraphSeriesName,
+  name: string,
   curve: DerivedCurve | null,
   defaultVisible: boolean,
 ): GraphSeries | null {
@@ -56,9 +62,24 @@ function graphSeries(
 }
 
 export function buildGraphSeries(workspaceDerived: WorkspaceDerived): GraphSeries[] {
+  const source = workspaceDerived.measurementCurves.find(({ role }) => role === 'source')
+  const target = workspaceDerived.measurementCurves.find(({ role }) => role === 'target')
+
   return [
-    graphSeries('Source', workspaceDerived.source, true),
-    graphSeries('Target', workspaceDerived.target, true),
+    workspaceDerived.source === null
+      ? null
+      : {
+          ...graphSeries('Source', workspaceDerived.source, true)!,
+          curveId: source?.id,
+          measurementRole: 'source' as const,
+        },
+    workspaceDerived.target === null
+      ? null
+      : {
+          ...graphSeries('Target', workspaceDerived.target, true)!,
+          curveId: target?.id,
+          measurementRole: 'target' as const,
+        },
     graphSeries(
       'Source + EQ',
       workspaceDerived.hasFilters ? workspaceDerived.sourceEq : null,

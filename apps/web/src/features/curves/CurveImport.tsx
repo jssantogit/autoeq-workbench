@@ -3,19 +3,11 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { useUiStore } from '../../state/uiStore'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 
-interface CurveImportProps {
-  role: 'source' | 'target'
-}
-
-export function CurveImport({ role }: CurveImportProps) {
-  const curve = useWorkspaceStore((state) => state[role])
-  const setCurve = useWorkspaceStore((state) =>
-    role === 'source' ? state.setSource : state.setTarget,
-  )
-  const assignFreshCurveColor = useUiStore((state) => state.assignFreshCurveColor)
+export function CurveImport() {
+  const addCurve = useWorkspaceStore((state) => state.addCurve)
+  const registerCurve = useUiStore((state) => state.registerCurve)
   const [error, setError] = useState<string | null>(null)
   const requestRef = useRef(0)
-  const label = role === 'source' ? 'Source' : 'Target'
 
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -25,10 +17,10 @@ export function CurveImport({ role }: CurveImportProps) {
 
     try {
       const text = await file.text()
-      const parsed = parseCurveText(text, { name: file.name, role })
+      const parsed = parseCurveText(text, { name: file.name, role: 'comparison' })
       if (request !== requestRef.current) return
-      setCurve(parsed)
-      assignFreshCurveColor(role)
+      addCurve(parsed)
+      registerCurve(parsed.id)
       setError(null)
     } catch (cause) {
       if (request !== requestRef.current) return
@@ -42,17 +34,8 @@ export function CurveImport({ role }: CurveImportProps) {
 
   return (
     <div className="curve-import">
-      <div className="curve-import__heading">
-        <h3 id={`${role}-import-heading`}>{label}</h3>
-        <span className={curve === null ? 'curve-status' : 'curve-status curve-status--loaded'}>
-          {curve === null ? 'Not loaded' : 'Loaded'}
-        </span>
-      </div>
-      <p className="curve-import__name">{curve?.name ?? `No ${label.toLowerCase()} curve`}</p>
       <label className="file-control">
-        <span>
-          {curve === null ? 'Import' : 'Replace'} {label} curve
-        </span>
+        <span>+ Curve</span>
         <input type="file" accept=".txt,.csv,text/plain,text/csv" onChange={handleFile} />
       </label>
       {error !== null && (

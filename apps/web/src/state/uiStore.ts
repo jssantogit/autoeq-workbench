@@ -3,24 +3,22 @@ import { createStore, type StoreApi } from 'zustand/vanilla'
 
 export type ThemeMode = 'light' | 'dark'
 export type DockTab = 'curves' | 'equalizer' | 'details'
-export type TargetPresentation = 'measurement' | 'reference'
 
-type CurveRole = 'source' | 'target'
+export interface CurveAppearance {
+  color: string
+  visible: boolean
+}
 
 export interface UiState {
   theme: ThemeMode
   activeDockTab: DockTab
-  sourceColor: string
-  targetColor: string
-  sourceVisible: boolean
-  targetVisible: boolean
-  targetPresentation: TargetPresentation
+  curveAppearance: Record<string, CurveAppearance>
   setTheme: (theme: ThemeMode) => void
   setActiveDockTab: (tab: DockTab) => void
-  setCurveColor: (role: CurveRole, color: string) => void
-  assignFreshCurveColor: (role: CurveRole) => void
-  setCurveVisible: (role: CurveRole, visible: boolean) => void
-  setTargetPresentation: (value: TargetPresentation) => void
+  registerCurve: (id: string) => void
+  unregisterCurve: (id: string) => void
+  setCurveColor: (id: string, color: string) => void
+  setCurveVisible: (id: string, visible: boolean) => void
 }
 
 export const MEASUREMENT_CURVE_PALETTE = [
@@ -83,39 +81,52 @@ export function pickMeasurementColor(
 }
 
 export function createUiStore(random: () => number = Math.random) {
-  const sourceColor = pickMeasurementColor([], random)
-  const targetColor = pickMeasurementColor([sourceColor], random)
-
   return createStore<UiState>()((set) => ({
     theme: readTheme(),
     activeDockTab: 'curves',
-    sourceColor,
-    targetColor,
-    sourceVisible: true,
-    targetVisible: true,
-    targetPresentation: 'measurement',
+    curveAppearance: {},
     setTheme: (theme) => {
       set({ theme })
       applyDocumentTheme(theme)
       persistTheme(theme)
     },
     setActiveDockTab: (activeDockTab) => set({ activeDockTab }),
-    setCurveColor: (role, color) => {
-      if (!CSS_HEX_COLOR.test(color)) return
-      set({ [`${role}Color`]: color } as Pick<UiState, `${CurveRole}Color`>)
-    },
-    assignFreshCurveColor: (role) =>
+    registerCurve: (id) =>
       set((state) => {
-        const otherRole = role === 'source' ? 'target' : 'source'
-        const color = pickMeasurementColor(
-          [state[`${role}Color`], state[`${otherRole}Color`]],
-          random,
-        )
-        return { [`${role}Color`]: color } as Pick<UiState, `${CurveRole}Color`>
+        if (id.length === 0 || state.curveAppearance[id] !== undefined) return state
+        const excluded = Object.values(state.curveAppearance)
+          .filter(({ visible }) => visible)
+          .map(({ color }) => color)
+        return {
+          curveAppearance: {
+            ...state.curveAppearance,
+            [id]: { color: pickMeasurementColor(excluded, random), visible: true },
+          },
+        }
       }),
-    setCurveVisible: (role, visible) =>
-      set({ [`${role}Visible`]: visible } as Pick<UiState, `${CurveRole}Visible`>),
-    setTargetPresentation: (targetPresentation) => set({ targetPresentation }),
+    unregisterCurve: (id) =>
+      set((state) => {
+        if (state.curveAppearance[id] === undefined) return state
+        const curveAppearance = { ...state.curveAppearance }
+        delete curveAppearance[id]
+        return { curveAppearance }
+      }),
+    setCurveColor: (id, color) => {
+      if (!CSS_HEX_COLOR.test(color)) return
+      set((state) => {
+        const appearance = state.curveAppearance[id]
+        return appearance === undefined
+          ? state
+          : { curveAppearance: { ...state.curveAppearance, [id]: { ...appearance, color } } }
+      })
+    },
+    setCurveVisible: (id, visible) =>
+      set((state) => {
+        const appearance = state.curveAppearance[id]
+        return appearance === undefined || appearance.visible === visible
+          ? state
+          : { curveAppearance: { ...state.curveAppearance, [id]: { ...appearance, visible } } }
+      }),
   }))
 }
 

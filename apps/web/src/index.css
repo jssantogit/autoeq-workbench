@@ -218,15 +218,15 @@ select:focus-visible,
 .panel__body { min-width: 0; padding: 10px 12px 14px; }
 
 .curves-tab { min-width: 0; padding: 14px; }
-.curves-tab__heading { margin-bottom: 12px; }
+.curves-tab__heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .curves-tab__heading h2 { margin: 0; font-size: 0.95rem; }
 .curves-tab__heading p,
 .workspace-normalization__heading p { margin: 3px 0 0; color: var(--color-text-muted); font-size: 0.72rem; }
 .curve-manager { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
-.curve-manager__row { display: grid; min-width: 0; grid-template-columns: minmax(320px, 1fr) auto; align-items: center; gap: 14px; padding: 8px 10px; background: var(--color-bg-subtle); }
-.curve-import { display: grid; min-width: 0; grid-template-columns: minmax(112px, auto) minmax(120px, 1fr) auto; align-items: center; gap: 10px; }
-.curve-import h3 { margin: 0; font-size: 0.86rem; }
-.curve-import__name { overflow: hidden; margin: 0; color: var(--color-text-muted); font-size: 0.75rem; text-overflow: ellipsis; white-space: nowrap; }
+.curve-manager__row { position: relative; display: grid; min-width: 0; grid-template-columns: 12px minmax(100px, 1fr) minmax(88px, auto) 24px auto; align-items: center; gap: 10px; padding: 7px 10px; background: var(--color-bg-subtle); }
+.curve-manager__swatch { width: 10px; height: 10px; border: 1px solid rgb(0 0 0 / 15%); border-radius: 50%; }
+.curve-manager__name { overflow: hidden; font-size: 0.78rem; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.curve-import { display: grid; justify-items: end; }
 .curve-status { color: var(--color-text-faint); font-size: 0.7rem; font-weight: 650; }
 .curve-status--loaded { color: var(--color-success); }
 .file-control {
@@ -248,20 +248,19 @@ select:focus-visible,
 .file-control input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .field-error { margin: 8px 0 0; color: var(--color-danger); font-size: 0.72rem; }
 
-.curve-appearance { display: flex; min-width: 0; align-items: end; gap: 12px; }
-.curve-appearance__row { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 12px; }
 .visibility-control,
 .color-control { display: inline-flex; min-height: 34px; align-items: center; gap: 8px; color: var(--color-text-muted); font-size: 0.73rem; }
 .visibility-control { cursor: pointer; }
 .visibility-control input { width: 18px; height: 18px; accent-color: var(--color-accent-active); }
 .color-control input { width: 42px; height: 32px; border: 1px solid var(--color-border); border-radius: 8px; padding: 3px; background: var(--color-input); cursor: pointer; }
-.curve-presentation { display: grid; grid-template-columns: repeat(2, minmax(88px, 1fr)); gap: 4px; margin: 0; border: 0; padding: 0; }
-.curve-presentation legend { margin-bottom: 4px; color: var(--color-text-muted); font-size: 0.68rem; }
-.curve-presentation label { position: relative; min-width: 0; cursor: pointer; }
-.curve-presentation input { position: absolute; opacity: 0; }
-.curve-presentation span { display: flex; min-height: 34px; align-items: center; justify-content: center; border: 1px solid var(--color-border); border-radius: 8px; padding: 5px 8px; color: var(--color-text-muted); background: var(--color-input); font-size: 0.72rem; text-align: center; }
-.curve-presentation input:checked + span { border-color: var(--color-accent); color: var(--color-text); background: var(--color-accent-soft); }
-.curve-presentation input:focus-visible + span { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.curve-menu summary { cursor: pointer; color: var(--color-text-muted); font-size: 0.72rem; font-weight: 650; }
+.curve-menu__panel { position: absolute; z-index: 5; right: 8px; display: grid; width: min(260px, calc(100vw - 40px)); gap: 4px; margin-top: 5px; border: 1px solid var(--color-border); border-radius: 9px; padding: 8px; background: var(--color-bg-elevated); box-shadow: var(--shadow-panel); }
+.curve-menu__panel button { min-height: 30px; border: 0; border-radius: 6px; padding: 5px 8px; color: var(--color-text); background: transparent; text-align: left; cursor: pointer; }
+.curve-menu__panel button:hover { background: var(--color-bg-subtle); }
+.curve-menu__rename { display: grid; grid-template-columns: 1fr auto; gap: 5px; border-top: 1px solid var(--color-border); padding-top: 6px; }
+.curve-menu__rename label { display: grid; gap: 3px; color: var(--color-text-muted); font-size: 0.68rem; }
+.curve-menu__rename input { min-width: 0; border: 1px solid var(--color-border); border-radius: 6px; padding: 6px; color: var(--color-text); background: var(--color-input); }
+.curve-menu__remove { color: var(--color-danger) !important; }
 
 .workspace-normalization { display: flex; min-width: 0; align-items: end; justify-content: space-between; gap: 18px; margin-top: 8px; padding: 8px 10px; background: var(--color-bg-subtle); }
 .workspace-normalization__heading { min-width: 180px; }
@@ -336,8 +335,6 @@ select:focus-visible,
 .metric-list dd { overflow-wrap: anywhere; margin: 3px 0 0; color: var(--color-text); font: 0.8rem ui-monospace, "SFMono-Regular", Consolas, monospace; font-variant-numeric: tabular-nums; }
 
 @media (max-width: 1050px) {
-  .curve-manager__row { grid-template-columns: minmax(280px, 1fr) auto; }
-  .curve-appearance { align-items: stretch; flex-direction: column; gap: 2px; }
   .workspace-normalization { align-items: stretch; flex-direction: column; gap: 10px; }
   .workspace-normalization__controls { width: 100%; }
   .details-tab__sections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -406,9 +403,7 @@ select:focus-visible,
   .workbench-dock { border-radius: 11px; }
   .dock-tabs { margin: 5px; }
   .curves-tab { padding: 10px; }
-  .curve-manager__row { grid-template-columns: 1fr; gap: 6px; }
-  .curve-import { grid-template-columns: minmax(108px, auto) minmax(0, 1fr) auto; }
-  .curve-appearance { align-items: end; flex-direction: row; }
+  .curve-manager__row { grid-template-columns: 12px minmax(80px, 1fr) minmax(76px, auto) 24px auto; gap: 7px; }
   .workspace-normalization__controls { grid-template-columns: 1fr 1fr; }
   .workspace-normalization__controls .button { grid-column: 1 / -1; }
   .details-tab { padding: 10px; }
@@ -418,10 +413,6 @@ select:focus-visible,
 
 @media (max-width: 380px) {
   .app-header p { display: none; }
-  .curve-import { grid-template-columns: 1fr auto; }
-  .curve-import__name { grid-column: 1 / -1; grid-row: 2; }
-  .curve-appearance { align-items: stretch; flex-direction: column; }
-  .curve-appearance__row { align-items: stretch; flex-direction: column; gap: 0; }
   .color-control { justify-content: space-between; }
   .workspace-normalization__controls { grid-template-columns: 1fr; }
   .workspace-normalization__controls .button { grid-column: auto; }

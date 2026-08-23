@@ -1,9 +1,9 @@
 import { CoreError } from '../types/error.js'
-import type { Curve, CurvePoint } from '../types/curve.js'
+import type { Curve, CurvePoint, CurveRole } from '../types/curve.js'
 
 export interface ParseCurveOptions {
   name: string
-  role: 'source' | 'target'
+  role: Exclude<CurveRole, 'derived'>
 }
 
 type Delimiter = {

@@ -68,11 +68,10 @@ describe('FrequencyResponseGraph', () => {
     mocks.chart.getOption.mockReturnValue({})
     uiStore.setState({
       theme: 'light',
-      sourceColor: '#1565c0',
-      targetColor: '#c62828',
-      sourceVisible: true,
-      targetVisible: true,
-      targetPresentation: 'measurement',
+      curveAppearance: {
+        source: { color: '#1565c0', visible: true },
+        target: { color: '#c62828', visible: true },
+      },
     })
   })
 
@@ -100,8 +99,8 @@ describe('FrequencyResponseGraph', () => {
 
   it('configures the FR inspector and wires toolbar Reset View through the graph ref', () => {
     const store = createWorkspaceStore()
-    store.getState().setSource(curve('source'))
-    store.getState().setTarget(curve('target'))
+    store.getState().addCurve(curve('source'))
+    store.getState().addCurve(curve('target'))
     const graphRef = createRef<FrequencyResponseGraphHandle>()
 
     render(
@@ -138,23 +137,10 @@ describe('FrequencyResponseGraph', () => {
     })
   })
 
-  it('uses neutral dashed Target styling in reference mode', () => {
-    const store = createWorkspaceStore()
-    store.getState().setTarget(curve('target'))
-    uiStore.setState({ targetPresentation: 'reference', targetColor: '#c62828' })
-
-    render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-
-    const option = mocks.chart.setOption.mock.calls.at(-1)?.[0]
-    const target = option.series.find((series: { name: string }) => series.name === 'Target')
-    expect(target.itemStyle.color).toBe('#989894')
-    expect(target.lineStyle).toMatchObject({ color: '#989894', type: 'dashed' })
-  })
-
   it('updates theme and assigned colors without changing graph data or interaction state', () => {
     const store = createWorkspaceStore()
-    store.getState().setSource(curve('source'))
-    store.getState().setTarget(curve('target'))
+    store.getState().addCurve(curve('source'))
+    store.getState().addCurve(curve('target'))
     render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     const initialOption = mocks.chart.setOption.mock.calls.at(-1)?.[0]
     const initialData = initialOption.series.map(
@@ -166,7 +152,13 @@ describe('FrequencyResponseGraph', () => {
       dataZoom: [{ start: 12, end: 82 }, { start: 12, end: 82 }],
     })
     act(() => {
-      uiStore.setState({ theme: 'dark', sourceColor: '#00796b', targetColor: '#ad1457' })
+      uiStore.setState({
+        theme: 'dark',
+        curveAppearance: {
+          source: { color: '#00796b', visible: true },
+          target: { color: '#ad1457', visible: true },
+        },
+      })
     })
 
     const option = mocks.chart.setOption.mock.calls.at(-1)?.[0]
@@ -189,9 +181,14 @@ describe('FrequencyResponseGraph', () => {
 
   it('applies explicit UI visibility changes but preserves legend toggles on unrelated edits', () => {
     const store = createWorkspaceStore()
-    store.getState().setSource(curve('source'))
-    store.getState().setTarget(curve('target'))
-    uiStore.setState({ sourceVisible: false, targetVisible: true })
+    store.getState().addCurve(curve('source'))
+    store.getState().addCurve(curve('target'))
+    uiStore.setState({
+      curveAppearance: {
+        source: { color: '#1565c0', visible: false },
+        target: { color: '#c62828', visible: true },
+      },
+    })
     render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
 
     expect(mocks.chart.setOption.mock.calls.at(-1)?.[0].legend.selected).toMatchObject({
@@ -209,7 +206,7 @@ describe('FrequencyResponseGraph', () => {
       Target: false,
     })
 
-    act(() => uiStore.setState({ sourceVisible: true }))
+    act(() => uiStore.getState().setCurveVisible('source', true))
     expect(mocks.chart.setOption.mock.calls.at(-1)?.[0].legend.selected).toMatchObject({
       Source: true,
       Target: false,
@@ -218,8 +215,8 @@ describe('FrequencyResponseGraph', () => {
 
   it('preserves user legend visibility and x zoom across derived workspace updates', () => {
     const store = createWorkspaceStore()
-    store.getState().setSource(curve('source'))
-    store.getState().setTarget(curve('target'))
+    store.getState().addCurve(curve('source'))
+    store.getState().addCurve(curve('target'))
     store.getState().setFilters([filter], 'manual')
     const { rerender } = render(
       <FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />,

@@ -39,7 +39,7 @@ const filter: Filter = {
 describe('buildGraphSeries', () => {
   it('builds normalized Source data while the workspace is incomplete', () => {
     const store = createWorkspaceStore()
-    store.getState().setSource(source)
+    store.getState().addCurve(source)
 
     const derived = deriveWorkspace(store.getState())
     const series = buildGraphSeries(derived)
@@ -55,8 +55,8 @@ describe('buildGraphSeries', () => {
 
   it('keeps auxiliary PEQ and Desired series toggleable but hidden by default', () => {
     const store = createWorkspaceStore()
-    store.getState().setSource(source)
-    store.getState().setTarget(target)
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
 
     const series = buildGraphSeries(deriveWorkspace(store.getState()))
 
@@ -70,8 +70,8 @@ describe('buildGraphSeries', () => {
 
   it('adds Source + EQ to the default series only when filters exist', () => {
     const store = createWorkspaceStore()
-    store.getState().setSource(source)
-    store.getState().setTarget(target)
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
     store.getState().setFilters([filter], 'manual')
 
     const series = buildGraphSeries(deriveWorkspace(store.getState()))
@@ -86,10 +86,20 @@ describe('buildGraphSeries', () => {
     )
   })
 
+  it('allows future imported-curve series names without a brittle fixed-name contract', () => {
+    const text = formatGraphInspector(
+      1_000,
+      [{ name: 'Room overlay', data: [[20, 1], [20_000, 2]], defaultVisible: true }],
+      { 'Room overlay': true },
+    )
+
+    expect(text).toContain('Room overlay:')
+  })
+
   it('keeps a disabled selected filter response inspectable with its Fc marker', () => {
     const store = createWorkspaceStore()
-    store.getState().setSource(source)
-    store.getState().setTarget(target)
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
     store.getState().setFilters([{ ...filter, enabled: false }], 'manual')
     store.getState().selectFilter(filter.id)
 
@@ -105,11 +115,11 @@ describe('buildGraphSeries', () => {
 
   it('reports fixed-range coverage failures without dropping imported curve data', () => {
     const store = createWorkspaceStore()
-    store.getState().setSource({
+    store.getState().addCurve({
       ...source,
       rawPoints: source.rawPoints.filter(({ frequencyHz }) => frequencyHz >= 500),
     })
-    store.getState().setTarget(target)
+    store.getState().addCurve(target)
 
     const derived = deriveWorkspace(store.getState())
     const series = buildGraphSeries(derived)
