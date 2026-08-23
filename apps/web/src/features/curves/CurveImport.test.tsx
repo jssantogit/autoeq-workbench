@@ -164,22 +164,23 @@ describe('CurveAppearanceControls', () => {
 })
 
 describe('CurvesTab', () => {
-  it('groups import, appearance, and normalization into cohesive Source and Target work areas', () => {
+  it('presents a compact two-row curve manager with inline controls', () => {
     workspaceStore.setState({ source: null, target: null })
     render(<CurvesTab />)
 
-    const source = screen.getByRole('region', { name: 'Source curve' })
+    const manager = screen.getByRole('list', { name: 'Workspace curves' })
+    const rows = within(manager).getAllByRole('listitem')
+    expect(rows).toHaveLength(2)
+
+    const source = rows[0]!
+    expect(within(source).getByText('Source')).toBeInTheDocument()
     expect(within(source).getByLabelText('Import Source curve')).toBeInTheDocument()
     expect(within(source).getByLabelText('Source curve color')).toBeInTheDocument()
-    expect(within(source).getByLabelText('Source anchor Hz')).toBeInTheDocument()
 
-    const target = screen.getByRole('region', { name: 'Target curve' })
+    const target = rows[1]!
+    expect(within(target).getByText('Target')).toBeInTheDocument()
     expect(within(target).getByLabelText('Import Target curve')).toBeInTheDocument()
     expect(within(target).getByRole('radio', { name: 'Reference target' })).toBeInTheDocument()
-    expect(within(target).getByLabelText('Target target dB')).toBeInTheDocument()
-
-    expect(screen.getByRole('heading', { name: 'Normalize Together' })).toBeInTheDocument()
-    expect(screen.getByLabelText('Together anchor Hz')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Normalize Together' })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Workspace normalization' })).toBeInTheDocument()
   })
 })

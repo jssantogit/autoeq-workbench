@@ -36,8 +36,7 @@ describe('manual workbench integration', () => {
     workspaceStore.setState({
       source: null,
       target: null,
-      sourceNormalization: { ...defaultNormalization },
-      targetNormalization: { ...defaultNormalization },
+      normalization: { ...defaultNormalization },
       filters: [],
       selectedFilterId: null,
       solutionState: 'clean',
@@ -85,9 +84,8 @@ describe('manual workbench integration', () => {
         ...uiStore.getState(),
       }),
     ).toMatchObject({ color: '#989894', lineType: 'dashed' })
-    await user.click(screen.getByRole('button', { name: 'Normalize Together' }))
-    expect(workspaceStore.getState().sourceNormalization).toEqual({ anchorHz: 500, targetDb: 0 })
-    expect(workspaceStore.getState().targetNormalization).toEqual({ anchorHz: 500, targetDb: 0 })
+    await user.click(screen.getByRole('button', { name: 'Apply normalization' }))
+    expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 500, targetDb: 0 })
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     await user.click(screen.getByRole('button', { name: 'Add PK' }))

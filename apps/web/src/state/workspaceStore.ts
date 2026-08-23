@@ -26,17 +26,14 @@ export type FilterProvenance = 'manual' | 'autoeq'
 export interface WorkspaceState {
   source: Curve | null
   target: Curve | null
-  sourceNormalization: Normalization
-  targetNormalization: Normalization
+  normalization: Normalization
   filters: Filter[]
   selectedFilterId: string | null
   solutionState: SolutionState
   filterProvenance: FilterProvenance | null
   setSource: (curve: Curve) => void
   setTarget: (curve: Curve) => void
-  setSourceNormalization: (value: Normalization) => void
-  setTargetNormalization: (value: Normalization) => void
-  normalizeTogether: (value: Normalization) => void
+  setNormalization: (value: Normalization) => void
   setFilters: (filters: Filter[], provenance: FilterProvenance) => void
   selectFilter: (id: string | null) => void
   addFilter: (type: FilterType) => void
@@ -78,8 +75,7 @@ export const defaultNormalization: Readonly<Normalization> = {
 const initialState = {
   source: null,
   target: null,
-  sourceNormalization: { ...defaultNormalization },
-  targetNormalization: { ...defaultNormalization },
+  normalization: { ...defaultNormalization },
   filters: [],
   selectedFilterId: null,
   solutionState: 'clean' as const,
@@ -168,47 +164,17 @@ export function createWorkspaceStore() {
           canRedo: false,
         }
       }),
-    setSourceNormalization: (value) =>
+    setNormalization: (value) =>
       set((state) => {
         if (
           !Number.isFinite(value.anchorHz) ||
           value.anchorHz <= 0 ||
           !Number.isFinite(value.targetDb) ||
-          (value.anchorHz === state.sourceNormalization.anchorHz &&
-            value.targetDb === state.sourceNormalization.targetDb)
+          (value.anchorHz === state.normalization.anchorHz &&
+            value.targetDb === state.normalization.targetDb)
         ) return state
         return record(state, {
-          sourceNormalization: { ...value },
-          solutionState: afterNormalizationChange(state),
-        })
-      }),
-    setTargetNormalization: (value) =>
-      set((state) => {
-        if (
-          !Number.isFinite(value.anchorHz) ||
-          value.anchorHz <= 0 ||
-          !Number.isFinite(value.targetDb) ||
-          (value.anchorHz === state.targetNormalization.anchorHz &&
-            value.targetDb === state.targetNormalization.targetDb)
-        ) return state
-        return record(state, {
-          targetNormalization: { ...value },
-          solutionState: afterNormalizationChange(state),
-        })
-      }),
-    normalizeTogether: (value) =>
-      set((state) => {
-        if (!Number.isFinite(value.anchorHz) || value.anchorHz <= 0 || !Number.isFinite(value.targetDb)) {
-          return state
-        }
-        const unchanged = [state.sourceNormalization, state.targetNormalization].every(
-          (normalization) =>
-            normalization.anchorHz === value.anchorHz && normalization.targetDb === value.targetDb,
-        )
-        if (unchanged) return state
-        return record(state, {
-          sourceNormalization: { ...value },
-          targetNormalization: { ...value },
+          normalization: { ...value },
           solutionState: afterNormalizationChange(state),
         })
       }),
@@ -402,9 +368,8 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
   for (const role of ['source', 'target'] as const) {
     const curve = state[role]
     if (curve === null) continue
-    const normalization = state[`${role}Normalization`]
     try {
-      const imported = prepareImportedCurve(curve, normalization)
+      const imported = prepareImportedCurve(curve, state.normalization)
       if (role === 'source') source = imported
       else target = imported
 
@@ -413,7 +378,7 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
         continue
       }
 
-      const prepared = prepareCurve(curve, normalization, frequencies)
+      const prepared = prepareCurve(curve, state.normalization, frequencies)
       const evaluationCurve = { frequencies: prepared.frequencies, db: prepared.db }
       if (role === 'source') preparedSource = evaluationCurve
       else preparedTarget = evaluationCurve

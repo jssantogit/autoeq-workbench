@@ -2,8 +2,7 @@ import type { Filter, Normalization } from '@autoeq-workbench/core'
 import type { FilterProvenance, SolutionState } from './workspaceStore'
 
 export interface WorkspaceHistorySnapshot {
-  sourceNormalization: Normalization
-  targetNormalization: Normalization
+  normalization: Normalization
   filters: Filter[]
   selectedFilterId: string | null
   solutionState: SolutionState
@@ -12,8 +11,7 @@ export interface WorkspaceHistorySnapshot {
 
 export function createHistorySnapshot(state: WorkspaceHistorySnapshot): WorkspaceHistorySnapshot {
   return {
-    sourceNormalization: { ...state.sourceNormalization },
-    targetNormalization: { ...state.targetNormalization },
+    normalization: { ...state.normalization },
     filters: state.filters.map((filter) => ({ ...filter })),
     selectedFilterId: state.selectedFilterId,
     solutionState: state.solutionState,

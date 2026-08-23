@@ -22,19 +22,21 @@ export function CurveAppearanceControls({ role }: CurveAppearanceControlsProps) 
             <input
               type="radio"
               name="target-presentation"
+              aria-label="Measurement FR"
               checked={targetPresentation === 'measurement'}
               onChange={() => setTargetPresentation('measurement')}
             />
-            <span>Measurement FR</span>
+            <span>Measurement</span>
           </label>
           <label>
             <input
               type="radio"
               name="target-presentation"
+              aria-label="Reference target"
               checked={targetPresentation === 'reference'}
               onChange={() => setTargetPresentation('reference')}
             />
-            <span>Reference target</span>
+            <span>Reference</span>
           </label>
         </fieldset>
       )}

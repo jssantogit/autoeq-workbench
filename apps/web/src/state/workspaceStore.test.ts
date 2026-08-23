@@ -53,12 +53,8 @@ describe('workspace store', () => {
     store = createWorkspaceStore()
   })
 
-  it('starts with independent 500 Hz / 0 dB normalization defaults', () => {
-    expect(store.getState().sourceNormalization).toEqual(defaultNormalization)
-    expect(store.getState().targetNormalization).toEqual(defaultNormalization)
-    expect(store.getState().sourceNormalization).not.toBe(
-      store.getState().targetNormalization,
-    )
+  it('starts with one authoritative 500 Hz / 0 dB workspace normalization', () => {
+    expect(store.getState().normalization).toEqual(defaultNormalization)
   })
 
   it('sets Source without replacing Target and vice versa', () => {
@@ -110,35 +106,24 @@ describe('workspace store', () => {
     },
   )
 
-  it('applies normalization independently or together', () => {
-    store.getState().setSourceNormalization({ anchorHz: 1_000, targetDb: -1 })
-    expect(store.getState().targetNormalization).toEqual(defaultNormalization)
+  it('commits one global normalization and rejects invalid or unchanged edits', () => {
+    store.getState().setNormalization({ anchorHz: 800, targetDb: 0.5 })
+    expect(store.getState().normalization).toEqual({ anchorHz: 800, targetDb: 0.5 })
 
-    store.getState().setTargetNormalization({ anchorHz: 2_000, targetDb: 2 })
-    expect(store.getState().sourceNormalization).toEqual({ anchorHz: 1_000, targetDb: -1 })
-
-    store.getState().normalizeTogether({ anchorHz: 800, targetDb: 0.5 })
-    expect(store.getState().sourceNormalization).toEqual({ anchorHz: 800, targetDb: 0.5 })
-    expect(store.getState().targetNormalization).toEqual({ anchorHz: 800, targetDb: 0.5 })
-    expect(store.getState().sourceNormalization).not.toBe(
-      store.getState().targetNormalization,
-    )
+    store.getState().setNormalization({ anchorHz: 0, targetDb: 2 })
+    store.getState().setNormalization({ anchorHz: 800, targetDb: 0.5 })
+    expect(store.getState().normalization).toEqual({ anchorHz: 800, targetDb: 0.5 })
   })
 
-  it.each([
-    ['source', (value: { anchorHz: number; targetDb: number }) => store.getState().setSourceNormalization(value)],
-    ['target', (value: { anchorHz: number; targetDb: number }) => store.getState().setTargetNormalization(value)],
-    ['together', (value: { anchorHz: number; targetDb: number }) => store.getState().normalizeTogether(value)],
-  ] as const)('marks AutoEQ filters stale after %s normalization and restores state on undo', (_, update) => {
+  it('marks AutoEQ filters stale after normalization and restores state on undo', () => {
     store.getState().setFilters([filter], 'autoeq')
 
-    update({ anchorHz: 800, targetDb: 1 })
+    store.getState().setNormalization({ anchorHz: 800, targetDb: 1 })
     expect(store.getState().solutionState).toBe('stale')
     expect(store.getState().filterProvenance).toBe('autoeq')
 
     store.getState().undo()
-    expect(store.getState().sourceNormalization).toEqual(defaultNormalization)
-    expect(store.getState().targetNormalization).toEqual(defaultNormalization)
+    expect(store.getState().normalization).toEqual(defaultNormalization)
     expect(store.getState().solutionState).toBe('clean')
     expect(store.getState().filterProvenance).toBe('autoeq')
   })
@@ -253,7 +238,7 @@ describe('workspace store', () => {
   it('undoes and redoes normalization and filter snapshots', () => {
     store.getState().setFilters([filter], 'autoeq')
     store.getState().selectFilter(filter.id)
-    store.getState().setSourceNormalization({ anchorHz: 1_000, targetDb: -2 })
+    store.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
     store.getState().updateFilter(filter.id, { gainDb: 6 })
 
     expect(store.getState().canUndo).toBe(true)
@@ -264,11 +249,11 @@ describe('workspace store', () => {
     expect(store.getState().selectedFilterId).toBe(filter.id)
 
     store.getState().undo()
-    expect(store.getState().sourceNormalization).toEqual(defaultNormalization)
+    expect(store.getState().normalization).toEqual(defaultNormalization)
     expect(store.getState().canRedo).toBe(true)
     store.getState().redo()
     store.getState().redo()
-    expect(store.getState().sourceNormalization).toEqual({ anchorHz: 1_000, targetDb: -2 })
+    expect(store.getState().normalization).toEqual({ anchorHz: 1_000, targetDb: -2 })
     expect(store.getState().filters[0]?.gainDb).toBe(6)
     expect(store.getState().solutionState).toBe('stale')
     expect(store.getState().canRedo).toBe(false)
@@ -298,12 +283,27 @@ describe('workspace store', () => {
     expect(store.getState().canRedo).toBe(false)
   })
 
-  it('records normalize-together as one meaningful history item', () => {
-    store.getState().normalizeTogether({ anchorHz: 800, targetDb: 1 })
+  it('records a global normalization commit as one meaningful history item', () => {
+    store.getState().setNormalization({ anchorHz: 800, targetDb: 1 })
     store.getState().undo()
-    expect(store.getState().sourceNormalization).toEqual(defaultNormalization)
-    expect(store.getState().targetNormalization).toEqual(defaultNormalization)
+    expect(store.getState().normalization).toEqual(defaultNormalization)
     expect(store.getState().canUndo).toBe(false)
+  })
+
+  it('preserves normalization redo branching and source replacement semantics', () => {
+    store.getState().setSource(source)
+    store.getState().setNormalization({ anchorHz: 800, targetDb: 1 })
+    store.getState().undo()
+    expect(store.getState().canRedo).toBe(true)
+
+    const replacement = { ...source, id: 'source-replacement' }
+    store.getState().setSource(replacement)
+
+    expect(store.getState().source).toBe(replacement)
+    expect(store.getState().canRedo).toBe(false)
+    store.getState().redo()
+    expect(store.getState().normalization).toEqual(defaultNormalization)
+    expect(store.getState().source).toBe(replacement)
   })
 
   it('derives PEQ and preamp without Source or Target', () => {
@@ -369,6 +369,23 @@ describe('workspace store', () => {
     expect(derived.metrics).not.toBeNull()
   })
 
+  it('prepares Source and Target with the same global normalization', () => {
+    store.getState().setSource(makeFlatCurve('source'))
+    store.getState().setTarget({
+      ...makeFlatCurve('target'),
+      rawPoints: [
+        { frequencyHz: 20, db: 8 },
+        { frequencyHz: 20_000, db: 8 },
+      ],
+    })
+    store.getState().setNormalization({ anchorHz: 1_000, targetDb: 3 })
+
+    const derived = deriveWorkspace(store.getState())
+
+    expect(derived.source?.db.every((db) => Math.abs(db - 3) < 1e-10)).toBe(true)
+    expect(derived.target?.db.every((db) => Math.abs(db - 3) < 1e-10)).toBe(true)
+  })
+
   it('isolates a present curve coverage error from PEQ, preamp, and valid Source derivation', () => {
     store.getState().setSource(makeFlatCurve('source'))
     store.getState().setTarget({
@@ -397,7 +414,7 @@ describe('workspace store', () => {
     const targetRawPoints = structuredClone(targetCurve.rawPoints)
     store.getState().setSource(sourceCurve)
     store.getState().setTarget(targetCurve)
-    store.getState().normalizeTogether({ anchorHz: 500, targetDb: 4 })
+    store.getState().setNormalization({ anchorHz: 500, targetDb: 4 })
 
     deriveWorkspace(store.getState())
 

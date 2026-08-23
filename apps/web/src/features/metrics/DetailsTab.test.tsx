@@ -24,8 +24,7 @@ describe('DetailsTab', () => {
     workspaceStore.setState({
       source: null,
       target: null,
-      sourceNormalization: { ...defaultNormalization },
-      targetNormalization: { ...defaultNormalization },
+      normalization: { ...defaultNormalization },
       filters: [],
       selectedFilterId: null,
       solutionState: 'clean',

@@ -11,19 +11,17 @@ export function CurvesTab() {
           <p>Import, identify, and align your frequency responses.</p>
         </div>
       </header>
-      <div className="curve-work-areas">
-        <section className="curve-work-area" aria-label="Source curve">
+      <ul className="curve-manager" aria-label="Workspace curves">
+        <li className="curve-manager__row">
           <CurveImport role="source" />
           <CurveAppearanceControls role="source" />
-          <NormalizationControls role="source" />
-        </section>
-        <section className="curve-work-area" aria-label="Target curve">
+        </li>
+        <li className="curve-manager__row">
           <CurveImport role="target" />
           <CurveAppearanceControls role="target" />
-          <NormalizationControls role="target" />
-        </section>
-      </div>
-      <NormalizationControls role="together" />
+        </li>
+      </ul>
+      <NormalizationControls />
     </section>
   )
 }
