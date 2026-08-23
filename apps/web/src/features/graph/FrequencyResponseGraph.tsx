@@ -101,7 +101,7 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
     const chart = chartRef.current
     if (chart === null) return
     const graphSeries = buildGraphSeries(derived)
-    const interactionOption = chart.getOption() as EChartsInteractionOption
+    const interactionOption = (chart.getOption() ?? {}) as EChartsInteractionOption
     const previousSelected = interactionOption.legend?.[0]?.selected ?? {}
     const selected = Object.fromEntries(
       legendNames.map((name) => [
@@ -131,8 +131,8 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
           formatter: (params: unknown) => {
             const frequencyHz = tooltipFrequency(params)
             if (frequencyHz === null) return ''
-            const currentSelected =
-              (chart.getOption() as EChartsInteractionOption).legend?.[0]?.selected ?? selected
+            const currentOption = (chart.getOption() ?? {}) as EChartsInteractionOption
+            const currentSelected = currentOption.legend?.[0]?.selected ?? selected
             return formatGraphInspector(frequencyHz, graphSeries, currentSelected)
           },
         },

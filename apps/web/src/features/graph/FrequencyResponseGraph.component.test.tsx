@@ -62,6 +62,15 @@ describe('FrequencyResponseGraph', () => {
     mocks.chart.getOption.mockReturnValue({})
   })
 
+  it('configures a newly initialized chart before ECharts has an option', () => {
+    mocks.chart.getOption.mockReturnValue(undefined)
+    const store = createWorkspaceStore()
+
+    render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+
+    expect(mocks.chart.setOption).toHaveBeenCalledOnce()
+  })
+
   it('configures the FR inspector and resets visual zoom through ECharts', () => {
     const store = createWorkspaceStore()
     store.getState().setSource(curve('source'))
