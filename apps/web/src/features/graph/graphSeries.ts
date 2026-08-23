@@ -1,13 +1,16 @@
 import { interpolateLogFrequency } from '@autoeq-workbench/core'
 import type { DerivedCurve, WorkspaceDerived } from '../../state/workspaceStore'
 
-export type GraphSeriesName =
-  | 'Source'
-  | 'Target'
-  | 'Source + EQ'
-  | 'PEQ'
-  | 'Desired'
-  | 'Selected Filter'
+export const GRAPH_SERIES_NAMES = [
+  'Source',
+  'Target',
+  'Source + EQ',
+  'PEQ',
+  'Desired',
+  'Selected Filter',
+] as const
+
+export type GraphSeriesName = (typeof GRAPH_SERIES_NAMES)[number]
 
 export interface GraphSeries {
   name: GraphSeriesName

@@ -21,9 +21,12 @@ describe('App', () => {
     render(<App />)
 
     const graph = screen.getByLabelText('Frequency Response graph')
+    const graphActions = screen.getByRole('toolbar', { name: 'Graph actions' })
     const dock = screen.getByRole('region', { name: 'Workbench dock' })
 
+    expect(graphActions.compareDocumentPosition(graph)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(graph.compareDocumentPosition(dock)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(screen.getByRole('button', { name: 'Reset View' })).toBeVisible()
     expect(screen.getByRole('heading', { name: 'Source / Target' })).toBeVisible()
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     expect(screen.getByRole('heading', { name: 'Filter Editor' })).toBeVisible()

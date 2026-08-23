@@ -9,10 +9,16 @@ import {
 } from 'echarts/components'
 import { init, use as registerEChartsModules, type EChartsType } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { useEffect, useRef } from 'react'
-import { Button } from '../../components/ui/Button'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { useUiStore } from '../../state/uiStore'
 import type { WorkspaceDerived } from '../../state/workspaceStore'
-import { buildGraphSeries, formatGraphInspector, type GraphSeriesName } from './graphSeries'
+import { graphTheme, seriesAppearance } from './graphAppearance'
+import {
+  buildGraphSeries,
+  formatGraphInspector,
+  GRAPH_SERIES_NAMES,
+  type GraphSeriesName,
+} from './graphSeries'
 
 registerEChartsModules([
   LineChart,
@@ -29,22 +35,8 @@ interface FrequencyResponseGraphProps {
   derived: WorkspaceDerived
 }
 
-const legendNames: GraphSeriesName[] = [
-  'Source',
-  'Target',
-  'Source + EQ',
-  'PEQ',
-  'Desired',
-  'Selected Filter',
-]
-
-const seriesColors: Record<GraphSeriesName, string> = {
-  Source: '#50d5b7',
-  Target: '#f3b95f',
-  'Source + EQ': '#78a9ff',
-  PEQ: '#c69cff',
-  Desired: '#ef769f',
-  'Selected Filter': '#ffffff',
+export interface FrequencyResponseGraphHandle {
+  resetView: () => void
 }
 
 interface EChartsInteractionOption {
@@ -78,10 +70,27 @@ function tooltipFrequency(params: unknown): number | null {
   return Number.isFinite(frequencyHz) && frequencyHz > 0 ? frequencyHz : null
 }
 
-export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps) {
+export const FrequencyResponseGraph = forwardRef<
+  FrequencyResponseGraphHandle,
+  FrequencyResponseGraphProps
+>(function FrequencyResponseGraph({ derived }, ref) {
   const containerRef = useRef<HTMLDivElement>(null)
   const chartRef = useRef<EChartsType | null>(null)
   const renderedSeriesRef = useRef<Set<GraphSeriesName>>(new Set())
+  const theme = useUiStore((state) => state.theme)
+  const sourceColor = useUiStore((state) => state.sourceColor)
+  const targetColor = useUiStore((state) => state.targetColor)
+  const sourceVisible = useUiStore((state) => state.sourceVisible)
+  const targetVisible = useUiStore((state) => state.targetVisible)
+  const targetPresentation = useUiStore((state) => state.targetPresentation)
+  const uiVisibilityRef = useRef({ source: sourceVisible, target: targetVisible })
+
+  useImperativeHandle(ref, () => ({
+    resetView: () => {
+      chartRef.current?.dispatchAction({ type: 'restore' })
+      chartRef.current?.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
+    },
+  }), [])
 
   useEffect(() => {
     if (containerRef.current === null) return
@@ -101,15 +110,28 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
     const chart = chartRef.current
     if (chart === null) return
     const graphSeries = buildGraphSeries(derived)
+    const appearanceInput = { theme, sourceColor, targetColor, targetPresentation }
+    const colors = graphTheme(theme)
     const interactionOption = (chart.getOption() ?? {}) as EChartsInteractionOption
     const previousSelected = interactionOption.legend?.[0]?.selected ?? {}
+    const previousUiVisibility = uiVisibilityRef.current
     const selected = Object.fromEntries(
-      legendNames.map((name) => [
-        name,
-        renderedSeriesRef.current.has(name) && previousSelected[name] !== undefined
-          ? previousSelected[name]
-          : (graphSeries.find((series) => series.name === name)?.defaultVisible ?? false),
-      ]),
+      GRAPH_SERIES_NAMES.map((name) => {
+        const uiVisible = name === 'Source' ? sourceVisible : name === 'Target' ? targetVisible : undefined
+        const uiVisibilityChanged =
+          name === 'Source'
+            ? sourceVisible !== previousUiVisibility.source
+            : name === 'Target'
+              ? targetVisible !== previousUiVisibility.target
+              : false
+        const visible =
+          uiVisible !== undefined && uiVisibilityChanged
+            ? uiVisible
+            : renderedSeriesRef.current.has(name) && previousSelected[name] !== undefined
+              ? previousSelected[name]
+              : (uiVisible ?? graphSeries.find((series) => series.name === name)?.defaultVisible ?? false)
+        return [name, visible]
+      }),
     ) as Record<GraphSeriesName, boolean>
     const insideZoom = dataZoomInteraction(interactionOption, 0)
     const sliderZoom = dataZoomInteraction(interactionOption, 1)
@@ -117,13 +139,13 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
     chart.setOption(
       {
         animation: false,
-        backgroundColor: 'transparent',
+        backgroundColor: colors.background,
         grid: { left: 58, right: 22, top: 48, bottom: 58 },
         legend: {
-          data: legendNames,
+          data: GRAPH_SERIES_NAMES,
           selected,
           top: 10,
-          textStyle: { color: '#aab7c4', fontSize: 11 },
+          textStyle: { color: colors.legend, fontSize: 11 },
         },
         tooltip: {
           trigger: 'axis',
@@ -141,17 +163,21 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
           min: 20,
           max: 20_000,
           name: 'Hz',
+          nameTextStyle: { color: colors.axis },
           minorTick: { show: true },
-          minorSplitLine: { show: true },
-          axisLabel: { color: '#82909f' },
-          splitLine: { lineStyle: { color: '#26333e' } },
+          minorSplitLine: { show: true, lineStyle: { color: colors.minorGrid } },
+          axisLine: { lineStyle: { color: colors.axis } },
+          axisLabel: { color: colors.axis },
+          splitLine: { lineStyle: { color: colors.majorGrid } },
         },
         yAxis: {
           type: 'value',
           name: 'dB',
           scale: true,
-          axisLabel: { color: '#82909f', formatter: '{value} dB' },
-          splitLine: { lineStyle: { color: '#26333e' } },
+          nameTextStyle: { color: colors.axis },
+          axisLine: { lineStyle: { color: colors.axis } },
+          axisLabel: { color: colors.axis, formatter: '{value} dB' },
+          splitLine: { lineStyle: { color: colors.majorGrid } },
         },
         dataZoom: [
           { type: 'inside', xAxisIndex: 0, filterMode: 'none', ...insideZoom },
@@ -161,40 +187,46 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
             filterMode: 'none',
             height: 16,
             bottom: 12,
-            borderColor: '#344450',
-            fillerColor: 'rgba(80, 213, 183, 0.12)',
+            borderColor: colors.zoomBorder,
+            fillerColor: colors.zoomFill,
+            textStyle: { color: colors.axis },
+            dataBackground: { lineStyle: { color: colors.axis, opacity: 0.25 } },
             ...sliderZoom,
           },
         ],
-        series: graphSeries.map((series) => ({
-          name: series.name,
-          type: 'line',
-          data: series.data,
-          showSymbol: false,
-          sampling: 'lttb',
-          lineStyle: { width: series.name === 'PEQ' || series.name === 'Desired' ? 1.4 : 2 },
-          itemStyle: { color: seriesColors[series.name] },
-          emphasis: { focus: 'series' },
-          markLine:
-            series.markerFrequencyHz === undefined
-              ? undefined
-              : {
-                  symbol: 'none',
-                  label: { formatter: `${series.markerFrequencyHz} Hz`, color: '#dce6ed' },
-                  lineStyle: { color: seriesColors[series.name], type: 'dashed', width: 1 },
-                  data: [{ xAxis: series.markerFrequencyHz }],
-                },
-        })),
+        series: graphSeries.map((series) => {
+          const appearance = seriesAppearance(series.name, appearanceInput)
+          return {
+            name: series.name,
+            type: 'line',
+            data: series.data,
+            showSymbol: false,
+            sampling: 'lttb',
+            lineStyle: {
+              color: appearance.color,
+              width: appearance.lineWidth,
+              type: appearance.lineType,
+              opacity: appearance.opacity,
+            },
+            itemStyle: { color: appearance.color, opacity: appearance.opacity },
+            emphasis: { focus: 'series' },
+            markLine:
+              series.markerFrequencyHz === undefined
+                ? undefined
+                : {
+                    symbol: 'none',
+                    label: { formatter: `${series.markerFrequencyHz} Hz`, color: colors.marker },
+                    lineStyle: { color: colors.marker, type: 'dashed', width: 1 },
+                    data: [{ xAxis: series.markerFrequencyHz }],
+                  },
+          }
+        }),
       },
       { notMerge: true },
     )
     renderedSeriesRef.current = new Set(graphSeries.map(({ name }) => name))
-  }, [derived])
-
-  function resetView() {
-    chartRef.current?.dispatchAction({ type: 'restore' })
-    chartRef.current?.dispatchAction({ type: 'dataZoom', start: 0, end: 100 })
-  }
+    uiVisibilityRef.current = { source: sourceVisible, target: targetVisible }
+  }, [derived, sourceColor, sourceVisible, targetColor, targetPresentation, targetVisible, theme])
 
   return (
     <section className="graph-panel" aria-labelledby="fr-graph-heading">
@@ -205,7 +237,6 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
             {derived.message}
           </p>
         </div>
-        <Button onClick={resetView}>Reset View</Button>
       </div>
       <div
         ref={containerRef}
@@ -215,4 +246,4 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
       />
     </section>
   )
-}
+})

@@ -124,10 +124,20 @@ select:focus-visible,
   min-width: 0;
   min-height: 500px;
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
+  border-radius: 8px;
   background: var(--color-graph-bg);
-  box-shadow: var(--shadow-surface);
+}
+
+.graph-toolbar {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 4px 2px;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 650;
 }
 
 .graph-panel__header,
@@ -140,7 +150,7 @@ select:focus-visible,
   gap: 12px;
 }
 
-.graph-panel__header { min-height: 50px; padding: 8px 12px; border-bottom: 1px solid var(--color-border); }
+.graph-panel__header { min-height: 46px; padding: 7px 12px; }
 .graph-panel h2,
 .panel h2,
 .normalization h2,
