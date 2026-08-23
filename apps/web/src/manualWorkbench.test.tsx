@@ -13,12 +13,14 @@ vi.mock('./features/graph/FrequencyResponseGraph', () => ({
 }))
 
 import App from './App'
+import { uiStore } from './state/uiStore'
 import { defaultNormalization, workspaceStore } from './state/workspaceStore'
 
 const curveText = '20 0\n500 0\n1000 0\n20000 0'
 
 describe('manual workbench integration', () => {
   beforeEach(() => {
+    uiStore.setState({ activeDockTab: 'curves' })
     workspaceStore.setState({
       source: null,
       target: null,
@@ -55,6 +57,7 @@ describe('manual workbench integration', () => {
     expect(workspaceStore.getState().sourceNormalization).toEqual({ anchorHz: 500, targetDb: 0 })
     expect(workspaceStore.getState().targetNormalization).toEqual({ anchorHz: 500, targetDb: 0 })
 
+    await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     await user.click(screen.getByRole('button', { name: 'Add PK' }))
     const gain = screen.getByRole('spinbutton', { name: 'Filter 1 gain dB' })
     await user.clear(gain)
@@ -62,12 +65,16 @@ describe('manual workbench integration', () => {
     fireEvent.blur(gain)
 
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 3.00; Source + EQ 3.00')
+    await user.click(screen.getByRole('tab', { name: 'Details' }))
     expect(screen.getByText('-3.00 dB')).toBeInTheDocument()
 
+    await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     await user.click(screen.getByRole('checkbox', { name: 'Enable filter 1' }))
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 0.00')
+    await user.click(screen.getByRole('tab', { name: 'Details' }))
     expect(screen.getByText('Preamp').nextElementSibling).toHaveTextContent('0.00 dB')
 
+    await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     await user.click(screen.getByRole('button', { name: 'Undo' }))
     expect(screen.getByRole('checkbox', { name: 'Enable filter 1' })).toBeChecked()
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 3.00')
