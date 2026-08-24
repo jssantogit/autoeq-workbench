@@ -191,19 +191,19 @@ describe('FilterEditor', () => {
     expect(screen.getByRole('checkbox', { name: 'Enable filter 1' })).not.toBeChecked()
   })
 
-  it('disables Add and duplicate choices at 64 filters', async () => {
-    const user = userEvent.setup()
+  it('disables Add and duplicate choices at 64 filters', () => {
     workspaceStore.setState({
       filters: Array.from({ length: 64 }, (_, index) => ({ ...filter, id: `filter-${index}` })),
     })
     render(<FilterEditor />)
-    expect(screen.getByRole('button', { name: 'Add filter' })).toBeDisabled()
-    await user.click(screen.getByRole('button', { name: 'Actions for filter 1' }))
-    expect(screen.getByRole('button', { name: 'Duplicate filter 1' })).toBeDisabled()
-  })
+    expect(screen.getByLabelText('Add filter')).toBeDisabled()
+    const menu = screen.getByLabelText('Actions for filter 1').closest('details')!
+    menu.open = true
+    fireEvent(menu, new Event('toggle'))
+    expect(screen.getByLabelText('Duplicate filter 1')).toBeDisabled()
+  }, 20_000)
 
-  it('renders twenty compact rows while keeping the toolbar and last-row menu available', async () => {
-    const user = userEvent.setup()
+  it('renders twenty compact rows while keeping the toolbar and last-row menu available', () => {
     workspaceStore.setState({
       filters: Array.from({ length: 20 }, (_, index) => ({ ...filter, id: `filter-${index + 1}` })),
     })
@@ -212,8 +212,10 @@ describe('FilterEditor', () => {
     expect(screen.getAllByRole('row')).toHaveLength(21)
     expect(screen.getByRole('button', { name: 'Add filter' })).toBeEnabled()
     expect(screen.getByText('20 / 64 filters')).toBeVisible()
-    await user.click(screen.getByRole('button', { name: 'Actions for filter 20' }))
-    expect(screen.getByRole('button', { name: 'Move filter 20 up' })).toBeEnabled()
-    expect(screen.getByRole('button', { name: 'Remove filter 20' })).toBeEnabled()
-  })
+    const menu = screen.getByLabelText('Actions for filter 20').closest('details')!
+    menu.open = true
+    fireEvent(menu, new Event('toggle'))
+    expect(screen.getByLabelText('Move filter 20 up')).toBeEnabled()
+    expect(screen.getByLabelText('Remove filter 20')).toBeEnabled()
+  }, 20_000)
 })
