@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { seriesAppearance } from './features/graph/graphAppearance'
@@ -53,10 +53,10 @@ describe('manual workbench integration', () => {
     const targetFile = new File([curveText], 'Synthetic Target.csv', { type: 'text/csv' })
     Object.defineProperty(sourceFile, 'text', { value: async () => curveText })
     Object.defineProperty(targetFile, 'text', { value: async () => curveText })
-    fireEvent.change(screen.getByLabelText('+ Curve'), {
+    fireEvent.change(screen.getByLabelText('+ FR'), {
       target: { files: [sourceFile] },
     })
-    const curveManager = screen.getByRole('list', { name: 'Workspace curves' })
+    const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
     await waitFor(() => expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument())
     const frId = workspaceStore.getState().curves[0]!.id
     const importedFrColor = uiStore.getState().curveAppearance[frId]!.color
@@ -69,21 +69,21 @@ describe('manual workbench integration', () => {
       }, { curveId: frId, measurementKind: 'fr', active: true }),
     ).toMatchObject({ color: importedFrColor, lineType: 'solid' })
 
-    fireEvent.change(screen.getByLabelText('+ Curve'), {
+    fireEvent.change(screen.getByLabelText('+ Target'), {
       target: { files: [targetFile] },
     })
     await waitFor(() => {
       expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument()
       expect(within(curveManager).getByText('Synthetic Target.csv')).toBeInTheDocument()
     })
-    act(() => {
-      const second = workspaceStore.getState().curves[1]!
-      workspaceStore.setState((state) => ({
-        curves: state.curves.map((curve) => curve.id === second.id ? { ...curve, kind: 'target' } : curve),
-        activeTargetId: second.id,
-      }))
-    })
-    await user.click(screen.getByRole('button', { name: 'Apply normalization' }))
+    const targetDb = screen.getByLabelText('Target dB')
+    await user.clear(targetDb)
+    await user.type(targetDb, '1')
+    fireEvent.blur(targetDb)
+    expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 500, targetDb: 1 })
+    await user.clear(targetDb)
+    await user.type(targetDb, '0')
+    fireEvent.blur(targetDb)
     expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 500, targetDb: 0 })
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))

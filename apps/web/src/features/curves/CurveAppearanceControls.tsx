@@ -12,12 +12,6 @@ export function CurveAppearanceControls({ curve }: CurveAppearanceControlsProps)
   const setCurveColor = useUiStore((state) => state.setCurveColor)
   const setCurveVisible = useUiStore((state) => state.setCurveVisible)
   const unregisterCurve = useUiStore((state) => state.unregisterCurve)
-  const activeId = useWorkspaceStore((state) =>
-    curve.kind === 'fr' ? state.activeFrId : state.activeTargetId,
-  )
-  const setActive = useWorkspaceStore((state) =>
-    curve.kind === 'fr' ? state.setActiveFr : state.setActiveTarget,
-  )
   const renameCurve = useWorkspaceStore((state) => state.renameCurve)
   const removeCurve = useWorkspaceStore((state) => state.removeCurve)
   const [name, setName] = useState(curve.name)
@@ -34,11 +28,12 @@ export function CurveAppearanceControls({ curve }: CurveAppearanceControlsProps)
 
   return (
     <>
-      <span className="curve-manager__swatch" style={{ background: appearance?.color }} aria-hidden="true" />
+      <span
+        className={`curve-manager__indicator curve-manager__indicator--${curve.kind}`}
+        style={curve.kind === 'fr' ? { background: appearance?.color } : undefined}
+        aria-hidden="true"
+      />
       <span className="curve-manager__name" title={curve.name}>{curve.name}</span>
-      <span className="curve-status curve-status--loaded">
-        {activeId === curve.id ? `Active ${curve.kind === 'fr' ? 'FR' : 'Target'}` : curve.kind === 'fr' ? 'FR' : 'Target'}
-      </span>
       <label className="visibility-control">
         <input
           type="checkbox"
@@ -50,18 +45,17 @@ export function CurveAppearanceControls({ curve }: CurveAppearanceControlsProps)
       <details className="curve-menu">
         <summary aria-label={`Actions for ${curve.name}`}>...</summary>
         <div className="curve-menu__panel">
-          {activeId === curve.id
-            ? <button type="button" onClick={() => setActive(null)}>Clear active {curve.kind === 'fr' ? 'FR' : 'Target'}</button>
-            : <button type="button" onClick={() => setActive(curve.id)}>Set active {curve.kind === 'fr' ? 'FR' : 'Target'}</button>}
-          <label className="color-control">
-            <span>Change color</span>
-            <input
-              type="color"
-              aria-label={`${curve.name} color`}
-              value={appearance?.color ?? '#1565c0'}
-              onChange={(event) => setCurveColor(curve.id, event.target.value)}
-            />
-          </label>
+          {curve.kind === 'fr' && (
+            <label className="color-control">
+              <span>Change color</span>
+              <input
+                type="color"
+                aria-label={`${curve.name} color`}
+                value={appearance?.color ?? '#1565c0'}
+                onChange={(event) => setCurveColor(curve.id, event.target.value)}
+              />
+            </label>
+          )}
           <form onSubmit={handleRename} className="curve-menu__rename">
             <label>
               <span>Rename</span>

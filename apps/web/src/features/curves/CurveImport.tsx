@@ -1,9 +1,13 @@
-import { CoreError, parseCurveText } from '@autoeq-workbench/core'
+import { CoreError, parseCurveText, type CurveKind } from '@autoeq-workbench/core'
 import { useRef, useState, type ChangeEvent } from 'react'
 import { useUiStore } from '../../state/uiStore'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 
-export function CurveImport() {
+interface CurveImportProps {
+  kind: CurveKind
+}
+
+export function CurveImport({ kind }: CurveImportProps) {
   const addCurve = useWorkspaceStore((state) => state.addCurve)
   const registerCurve = useUiStore((state) => state.registerCurve)
   const [error, setError] = useState<string | null>(null)
@@ -17,7 +21,7 @@ export function CurveImport() {
 
     try {
       const text = await file.text()
-      const parsed = parseCurveText(text, { name: file.name, kind: 'fr' })
+      const parsed = parseCurveText(text, { name: file.name, kind })
       if (request !== requestRef.current) return
       if (addCurve(parsed)) registerCurve(parsed.id)
       setError(null)
@@ -34,7 +38,7 @@ export function CurveImport() {
   return (
     <div className="curve-import">
       <label className="file-control">
-        <span>+ Curve</span>
+        <span>{kind === 'fr' ? '+ FR' : '+ Target'}</span>
         <input type="file" accept=".txt,.csv,text/plain,text/csv" onChange={handleFile} />
       </label>
       {error !== null && (

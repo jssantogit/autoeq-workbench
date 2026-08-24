@@ -1,32 +1,52 @@
 import { CurveImport } from '../../features/curves/CurveImport'
+import { NumberField } from '../ui/NumberField'
 import { useUiStore } from '../../state/uiStore'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 
-export function UtilityRail() {
-  const curves = useWorkspaceStore((state) => state.curves)
-  const activeFrId = useWorkspaceStore((state) => state.activeFrId)
-  const activeTargetId = useWorkspaceStore((state) => state.activeTargetId)
-  const normalization = useWorkspaceStore((state) => state.normalization)
-  const setActiveDockTab = useUiStore((state) => state.setActiveDockTab)
-  const fr = curves.find(({ id }) => id === activeFrId)?.name ?? 'None'
-  const target = curves.find(({ id }) => id === activeTargetId)?.name ?? 'None'
-  const normalizationLabel = `Normalize: ${normalization.anchorHz} Hz / ${normalization.targetDb} dB`
+const positive = (value: number) => value > 0
 
-  function showNormalization() {
-    setActiveDockTab('curves')
-    const focusNormalization = () => document.getElementById('workspace-normalization')?.focus()
-    if (window.requestAnimationFrame === undefined) window.setTimeout(focusNormalization, 0)
-    else window.requestAnimationFrame(focusNormalization)
-  }
+export function UtilityRail() {
+  const normalization = useWorkspaceStore((state) => state.normalization)
+  const setNormalization = useWorkspaceStore((state) => state.setNormalization)
+  const inspectorEnabled = useUiStore((state) => state.inspectorEnabled)
+  const toggleInspector = useUiStore((state) => state.toggleInspector)
 
   return (
     <div className="utility-rail utility-rail--nowrap" role="toolbar" aria-label="Workspace utilities">
-      <CurveImport />
-      <button className="utility-rail__action" type="button" onClick={showNormalization}>
-        {normalizationLabel}
+      <div className="utility-rail__imports">
+        <CurveImport kind="fr" />
+        <CurveImport kind="target" />
+      </div>
+      <div className="rail-normalization" role="group" aria-label="NORMALIZE">
+        <span className="rail-normalization__label" aria-hidden="true">NORMALIZE</span>
+        <div className="rail-number-field">
+          <NumberField
+            label="Target dB"
+            value={normalization.targetDb}
+            step="0.1"
+            onValueChange={(targetDb) => setNormalization({ ...normalization, targetDb })}
+          />
+          <span className="rail-number-field__unit" aria-hidden="true">dB</span>
+        </div>
+        <div className="rail-number-field">
+          <NumberField
+            label="Anchor Hz"
+            value={normalization.anchorHz}
+            min={1}
+            validate={positive}
+            onValueChange={(anchorHz) => setNormalization({ ...normalization, anchorHz })}
+          />
+          <span className="rail-number-field__unit" aria-hidden="true">Hz</span>
+        </div>
+      </div>
+      <button
+        className="utility-rail__action"
+        type="button"
+        aria-pressed={inspectorEnabled}
+        onClick={toggleInspector}
+      >
+        Inspect
       </button>
-      <span className="utility-rail__summary">FR: <strong>{fr}</strong></span>
-      <span className="utility-rail__summary">Target: <strong>{target}</strong></span>
     </div>
   )
 }
