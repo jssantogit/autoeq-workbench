@@ -14,6 +14,9 @@ describe('workspace numeric policy', () => {
 
     store.getState().setNormalization({ anchorHz: 20, targetDb: 1 })
     expect(store.getState().normalization).toEqual({ anchorHz: 20, targetDb: 1 })
+
+    store.getState().setNormalization({ anchorHz: 20_000, targetDb: 2 })
+    expect(store.getState().normalization).toEqual({ anchorHz: 20_000, targetDb: 2 })
   })
 
   it('stores only AutoEQ effective settings that stay inside hard product limits', () => {

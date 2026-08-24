@@ -42,6 +42,11 @@ describe('AutoEQ settings', () => {
       maxQ: 8,
       maxFilters: 6,
     })).toBe(true)
+    expect(isValidAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 0 })).toBe(true)
+    expect(isValidAutoEqSettings({
+      ...DEFAULT_AUTOEQ_SETTINGS,
+      maxFilters: AUTOEQ_PRODUCT_LIMITS.hardMaxFilters,
+    })).toBe(true)
   })
 
   it.each([
