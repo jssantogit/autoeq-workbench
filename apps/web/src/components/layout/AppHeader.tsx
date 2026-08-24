@@ -1,6 +1,6 @@
 export function AppHeader() {
   return (
-    <header className="app-header">
+    <header className="header app-header">
       <h1>AutoEQ Workbench</h1>
     </header>
   )

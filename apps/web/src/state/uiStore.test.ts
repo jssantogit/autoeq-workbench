@@ -59,7 +59,7 @@ describe('UI preferences', () => {
     first.getState().registerCurve('curve-1')
     first.getState().setCurveColor('curve-1', '#123456')
     first.getState().setCurveVisible('curve-1', false)
-    first.getState().setActiveDockTab('details')
+    first.getState().setActiveDockTab('tools')
 
     expect(createUiStore().getState()).toMatchObject({
       activeDockTab: 'curves',

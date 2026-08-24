@@ -5,13 +5,13 @@ import { DockTabs } from './DockTabs'
 interface WorkbenchDockProps {
   curves: ReactNode
   equalizer: ReactNode
-  details: ReactNode
+  tools: ReactNode
 }
 
-export function WorkbenchDock({ curves, equalizer, details }: WorkbenchDockProps) {
+export function WorkbenchDock({ curves, equalizer, tools }: WorkbenchDockProps) {
   const activeTab = useUiStore((state) => state.activeDockTab)
   const setActiveDockTab = useUiStore((state) => state.setActiveDockTab)
-  const panels: Record<DockTab, ReactNode> = { curves, equalizer, details }
+  const panels: Record<DockTab, ReactNode> = { curves, equalizer, tools }
 
   return (
     <section className="workbench-dock" aria-label="Workbench dock">

@@ -107,13 +107,13 @@ describe('manual workbench integration', () => {
     fireEvent.blur(gain)
 
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 3.00; FR + EQ 3.00')
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
     expect(screen.getByText('-3.00 dB')).toBeInTheDocument()
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     await user.click(screen.getByRole('checkbox', { name: 'Enable filter 1' }))
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 0.00')
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
     expect(screen.getByText('Preamp').nextElementSibling).toHaveTextContent('0.00 dB')
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
@@ -121,7 +121,7 @@ describe('manual workbench integration', () => {
     expect(screen.getByRole('checkbox', { name: 'Enable filter 1' })).toBeChecked()
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 3.00')
 
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
     const metrics = deriveWorkspace(workspaceStore.getState()).metrics
     expect(metrics).not.toBeNull()
     expect(screen.getByText('MAE').nextElementSibling).toHaveTextContent(
@@ -137,7 +137,7 @@ describe('manual workbench integration', () => {
     expect(localStorage.getItem('autoeq-workbench.theme')).toBe('dark')
   }, 10_000)
 
-  it('shows preamp in Details even before Target is loaded', async () => {
+  it('shows preamp in Tools even before Target is loaded', async () => {
     const user = userEvent.setup()
     render(<App />)
 
@@ -148,7 +148,7 @@ describe('manual workbench integration', () => {
     await user.type(gain, '6')
     fireEvent.blur(gain)
 
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
     expect(screen.getByText('Preamp').nextElementSibling).toHaveTextContent('-6')
     expect(screen.getByText('MAE').nextElementSibling).toHaveTextContent('--')
     expect(screen.getByText('RMSE').nextElementSibling).toHaveTextContent('--')

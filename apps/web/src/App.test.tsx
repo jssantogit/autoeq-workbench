@@ -61,12 +61,18 @@ describe('App', () => {
 
   it('assembles the graph before the shared workbench dock', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    const { container } = render(<App />)
 
     const graph = screen.getByLabelText('Frequency Response graph')
     const utilityRail = screen.getByRole('toolbar', { name: 'Workspace utilities' })
     const dock = screen.getByRole('region', { name: 'Workbench dock' })
+    const shell = container.querySelector('.graphtool')
+    const main = shell?.querySelector(':scope > main.main')
 
+    expect(shell?.querySelector(':scope > header.header')).toBe(screen.getByRole('banner'))
+    expect(main).toBeInTheDocument()
+    expect(main?.querySelector(':scope > .parts-primary')).toContainElement(graph)
+    expect(main?.querySelector(':scope > .parts-secondary')).toContainElement(dock)
     expect(utilityRail.compareDocumentPosition(graph)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(graph.compareDocumentPosition(dock)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(screen.queryByRole('button', { name: 'Reset View' })).not.toBeInTheDocument()
@@ -90,7 +96,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Add filter' })).toBeInTheDocument()
     expect(screen.getByText('0 / 64 filters')).toBeVisible()
     expect(within(equalizer).getByRole('button', { name: 'Auto EQ' })).toBeDisabled()
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
     expect(screen.getByRole('heading', { name: 'Metrics' })).toBeVisible()
     expect(screen.queryByRole('heading', { name: 'Details' })).not.toBeInTheDocument()
     expect(screen.queryByText('Evaluation policy')).not.toBeInTheDocument()
@@ -100,7 +106,7 @@ describe('App', () => {
 
   it('commits valid normalization edits directly and toggles inspector without navigation', async () => {
     const user = userEvent.setup()
-    uiStore.setState({ activeDockTab: 'details' })
+    uiStore.setState({ activeDockTab: 'tools' })
     render(<App />)
     const utilityRail = screen.getByRole('toolbar', { name: 'Workspace utilities' })
     const target = within(utilityRail).getByLabelText('Target dB')
@@ -130,7 +136,7 @@ describe('App', () => {
     await user.type(anchor, '800')
     fireEvent.keyDown(anchor, { key: 'Enter' })
     expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 800, targetDb: 1.5 })
-    expect(uiStore.getState().activeDockTab).toBe('details')
+    expect(uiStore.getState().activeDockTab).toBe('tools')
 
     await user.clear(anchor)
     fireEvent.blur(anchor)

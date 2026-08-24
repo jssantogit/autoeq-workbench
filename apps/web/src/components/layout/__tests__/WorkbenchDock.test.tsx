@@ -15,14 +15,14 @@ describe('workbench shell', () => {
     initializeTheme()
   })
 
-  it('uses one Curves / Equalizer / Details dock and switches content without changing pages', async () => {
+  it('uses one Curves / Equalizer / Tools dock and switches content without changing pages', async () => {
     const user = userEvent.setup()
     render(<App />)
 
     const tabs = screen.getAllByRole('tab')
-    expect(tabs.map((tab) => tab.textContent)).toEqual(['Curves', 'Equalizer', 'Details'])
+    expect(tabs.map((tab) => tab.textContent)).toEqual(['Curves', 'Equalizer', 'Tools'])
     const tablist = screen.getByRole('tablist', { name: 'Workbench tools' })
-    const shell = document.querySelector('main.workbench')
+    const shell = document.querySelector('.graphtool > main.main')
     const dock = screen.getByRole('region', { name: 'Workbench dock' })
     const dockContent = dock.querySelector('.workbench-dock__content')
     expect(tablist).toBeVisible()
@@ -53,8 +53,8 @@ describe('workbench shell', () => {
     )
     expect(screen.getByRole('tabpanel', { name: 'Equalizer' })).toBeVisible()
 
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
-    expect(screen.getByRole('tabpanel', { name: 'Details' })).toBeVisible()
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
+    expect(screen.getByRole('tabpanel', { name: 'Tools' })).toBeVisible()
   })
 
   it('supports arrow, Home, and End keyboard navigation with focus', async () => {
@@ -68,7 +68,7 @@ describe('workbench shell', () => {
     expect(screen.getByRole('tabpanel', { name: 'Equalizer' })).toBeVisible()
 
     await user.keyboard('{End}')
-    expect(screen.getByRole('tab', { name: 'Details' })).toHaveFocus()
+    expect(screen.getByRole('tab', { name: 'Tools' })).toHaveFocus()
     await user.keyboard('{Home}')
     expect(curves).toHaveFocus()
     expect(screen.getByRole('tabpanel', { name: 'Curves' })).toBeVisible()

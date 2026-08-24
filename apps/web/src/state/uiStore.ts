@@ -2,7 +2,7 @@ import { useStore } from 'zustand'
 import { createStore, type StoreApi } from 'zustand/vanilla'
 
 export type ThemeMode = 'light' | 'dark'
-export type DockTab = 'curves' | 'equalizer' | 'details'
+export type DockTab = 'curves' | 'equalizer' | 'tools'
 export type GraphZoomPreset = 'full' | 'bass' | 'midrange' | 'treble'
 
 export interface CurveAppearance {
