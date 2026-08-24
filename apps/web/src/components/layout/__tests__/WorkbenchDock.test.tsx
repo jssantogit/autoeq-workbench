@@ -21,7 +21,13 @@ describe('workbench shell', () => {
 
     const tabs = screen.getAllByRole('tab')
     expect(tabs.map((tab) => tab.textContent)).toEqual(['Curves', 'Equalizer', 'Details'])
-    expect(screen.getByRole('tablist', { name: 'Workbench tools' })).toBeVisible()
+    const tablist = screen.getByRole('tablist', { name: 'Workbench tools' })
+    expect(tablist).toBeVisible()
+    expect(tablist).toHaveClass('dock-tabs', 'dock-tabs--segmented')
+    expect(tablist.children).toHaveLength(3)
+    const handle = document.querySelector('.workbench-dock__handle')
+    expect(handle).toBeInTheDocument()
+    expect(handle).toHaveAttribute('aria-hidden', 'true')
     expect(screen.getByRole('tab', { name: 'Curves' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('tab', { name: 'Curves' })).toHaveAttribute(
       'aria-controls',

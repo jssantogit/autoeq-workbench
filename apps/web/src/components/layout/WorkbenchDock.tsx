@@ -15,6 +15,7 @@ export function WorkbenchDock({ curves, equalizer, details }: WorkbenchDockProps
 
   return (
     <section className="workbench-dock" aria-label="Workbench dock">
+      <div className="workbench-dock__handle" aria-hidden="true" />
       <DockTabs activeTab={activeTab} onChange={setActiveDockTab} />
       <div className="workbench-dock__content">
         {(Object.keys(panels) as DockTab[]).map((tab) => (

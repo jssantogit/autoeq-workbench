@@ -30,7 +30,7 @@ export function DockTabs({ activeTab, onChange }: DockTabsProps) {
   }
 
   return (
-    <div className="dock-tabs" role="tablist" aria-label="Workbench tools">
+    <div className="dock-tabs dock-tabs--segmented" role="tablist" aria-label="Workbench tools">
       {tabs.map((tab, index) => (
         <button
           key={tab.id}

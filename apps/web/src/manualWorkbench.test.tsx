@@ -47,7 +47,10 @@ describe('manual workbench integration', () => {
     const user = userEvent.setup()
     render(<App />)
     expect(document.documentElement.dataset.theme).toBe('light')
-    expect(screen.getByRole('button', { name: 'Switch to dark theme' })).toHaveTextContent('Light')
+    expect(screen.getByRole('button', { name: 'Switch to dark theme' })).toHaveAttribute(
+      'title',
+      'Switch to dark theme',
+    )
 
     const sourceFile = new File([curveText], 'Synthetic Source.txt', { type: 'text/plain' })
     const targetFile = new File([curveText], 'Synthetic Target.csv', { type: 'text/csv' })

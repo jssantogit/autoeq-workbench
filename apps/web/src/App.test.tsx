@@ -20,11 +20,15 @@ describe('App', () => {
     })
   })
 
-  it('renders the workbench title', () => {
+  it('renders a compact title and accessible icon-only theme control', () => {
     render(<App />)
     expect(screen.getByRole('heading', { name: /autoeq workbench/i })).toBeInTheDocument()
-    expect(screen.getByText('Frequency response workspace')).toBeVisible()
+    expect(screen.queryByText('Frequency response workspace')).not.toBeInTheDocument()
     expect(screen.queryByText('Manual frequency response workspace')).not.toBeInTheDocument()
+    const themeToggle = screen.getByRole('button', { name: 'Switch to dark theme' })
+    expect(themeToggle).toHaveAttribute('title', 'Switch to dark theme')
+    expect(themeToggle.textContent).toBe('')
+    expect(themeToggle.querySelector('span')).not.toBeInTheDocument()
   })
 
   it('assembles the graph before the shared workbench dock', async () => {
