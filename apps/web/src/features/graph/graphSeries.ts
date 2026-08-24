@@ -3,12 +3,6 @@ import type {
   DerivedCurve,
   WorkspaceDerived,
 } from '../../state/workspaceStore'
-import {
-  evaluateNaturalSpline,
-  evaluateNaturalSplineSegments,
-  type NaturalSplineSegment,
-} from './graphGeometry'
-
 interface GraphSeriesBase {
   id: string
   name: string
@@ -32,32 +26,6 @@ export interface EqualizedFrGraphSeries extends GraphSeriesBase {
 }
 
 export type GraphSeries = MeasurementGraphSeries | EqualizedFrGraphSeries
-
-export interface GraphInspector {
-  frequencyHz: number
-  frequencyLabel: string
-  values: { id: string; name: string; db: number }[]
-}
-
-export function formatGraphInspector(
-  frequencyHz: number,
-  series: readonly GraphSeries[],
-  preparedSegments?: ReadonlyMap<string, readonly NaturalSplineSegment[]>,
-): GraphInspector {
-  const frequency =
-    frequencyHz >= 1_000 ? `${(frequencyHz / 1_000).toFixed(2)} kHz` : `${frequencyHz.toFixed(0)} Hz`
-  const values = series.flatMap((item) => {
-    if (item.data.length < 2) return []
-    const segments = preparedSegments?.get(item.id)
-    const db = segments === undefined
-      ? evaluateNaturalSpline(item.data, frequencyHz)
-      : evaluateNaturalSplineSegments(segments, frequencyHz)
-    if (db === null) return []
-    return [{ id: item.id, name: item.name, db }]
-  })
-
-  return { frequencyHz, frequencyLabel: frequency, values }
-}
 
 export function formatEqualizedFrName(name: string): string {
   return `${name.replace(/\.(txt|csv)$/i, '')} EQ`

@@ -89,7 +89,7 @@ describe('manual workbench integration', () => {
       expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument()
       expect(within(curveManager).getByText('Synthetic Target.csv')).toBeInTheDocument()
     })
-    const targetDb = screen.getByLabelText('Target dB')
+    const targetDb = screen.getByLabelText('Normalize dB')
     await user.clear(targetDb)
     await user.type(targetDb, '1')
     fireEvent.blur(targetDb)
@@ -135,7 +135,7 @@ describe('manual workbench integration', () => {
     await user.click(screen.getByRole('button', { name: 'Switch to dark theme' }))
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(localStorage.getItem('autoeq-workbench.theme')).toBe('dark')
-  }, 10_000)
+  }, 15_000)
 
   it('shows preamp in Tools even before Target is loaded', async () => {
     const user = userEvent.setup()

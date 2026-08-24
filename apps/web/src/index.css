@@ -98,7 +98,6 @@ select:focus-visible,
 }
 
 .app-header,
-.utility-rail,
 .graph-panel { flex: none; }
 
 .app-header {
@@ -128,49 +127,12 @@ select:focus-visible,
 
 .theme-toggle:hover { border-color: var(--color-border-strong); color: var(--color-text); }
 .theme-toggle svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
-.utility-rail > .theme-toggle { position: sticky; left: 0; z-index: 2; width: 32px; height: 32px; border-block: 0; border-left: 0; border-radius: 0; background: var(--color-bg); }
 
 .graph-panel {
   min-width: 0;
   overflow: hidden;
   background: var(--color-graph-bg);
 }
-
-.utility-rail {
-  display: flex;
-  min-width: 0;
-  min-height: 40px;
-  align-items: center;
-  gap: 0;
-  overflow-x: auto;
-  border-block: 1px solid var(--color-border);
-  padding: 3px 0;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
-}
-.utility-rail--nowrap { white-space: nowrap; }
-.utility-rail > * { flex: 0 0 auto; }
-.utility-rail__action {
-  border: 0;
-  border-left: 1px solid var(--color-border);
-  border-radius: 0;
-  padding: 5px 10px;
-  color: var(--color-text-muted);
-  background: transparent;
-  font-size: 0.75rem;
-  font-weight: 650;
-}
-.utility-rail__action { cursor: pointer; }
-.utility-rail__action:hover { color: var(--color-accent-active); }
-.utility-rail__action[aria-pressed='true'] { color: var(--color-text); background: var(--color-accent-soft); }
-.rail-normalization { display: flex; align-items: center; gap: 6px; padding: 0 10px; }
-.rail-normalization__label { color: var(--color-text-faint); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; }
-.rail-normalization .number-field > span:first-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.rail-normalization .number-field input { width: 58px; min-width: 0; height: 28px; padding: 3px 5px; }
-.rail-normalization__compound { border-radius: 6px; cursor: text; }
-.rail-normalization__compound[data-selected='true'] .number-field__control { border-color: var(--color-accent-active); background: var(--color-accent-soft); }
-.rail-normalization__compound[data-selected='true'] .number-field input { background: var(--color-accent-soft); }
-.rail-normalization__compound[data-selected='true'] .number-field__unit { color: var(--color-bg-elevated); background: var(--color-accent-active); }
 
 .panel__header,
 .metrics__heading {

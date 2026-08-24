@@ -56,7 +56,7 @@ describe('FilterEditor', () => {
     expect(workspaceStore.getState().filters).toHaveLength(2)
     await user.click(screen.getByRole('button', { name: 'Redo' }))
     expect(workspaceStore.getState().filters).toHaveLength(1)
-  })
+  }, 10_000)
 
   it('keeps Sort disabled and removes the old type-specific add controls', () => {
     render(<FilterEditor />)

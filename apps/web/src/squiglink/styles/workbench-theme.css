@@ -31,6 +31,17 @@
 .graphBox { border-color: var(--wb-border); }
 .tools-panel { color: var(--wb-text); background: var(--wb-surface); }
 .tools-section > h3 { color: var(--wb-text-muted); }
+.graph-toolbar { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-bg); }
+.graph-toolbar .zoom,
+.graph-toolbar .normalize,
+.graph-toolbar .smooth,
+.graph-toolbar .miscTools { border-color: var(--wb-border); }
+.graph-toolbar .zoom > span,
+.graph-toolbar .normalize > span,
+.graph-toolbar .smooth .number-field { color: var(--wb-text-muted); }
+.graph-toolbar button:not(.theme-toggle) { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
+.graph-toolbar button:not(.theme-toggle):hover { border-color: var(--wb-accent-hover); color: var(--wb-text); }
+.graph-toolbar button[aria-pressed='true'] { border-color: var(--wb-accent-hover); color: var(--wb-text); background: var(--wb-surface-muted); box-shadow: inset 0 -2px var(--wb-accent); }
 
 @media (max-width: 1000px) {
   .parts-secondary { border-color: var(--wb-border); }

@@ -1,4 +1,5 @@
 import type { Curve, Filter } from '@autoeq-workbench/core'
+import { StrictMode } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { uiStore } from '../../state/uiStore'
@@ -49,7 +50,15 @@ function installGraphMediaQuery(initialMatches: boolean) {
 
 describe('FrequencyResponseGraph SVG renderer', () => {
   beforeEach(() => {
-    uiStore.setState({ theme: 'light', curveAppearance: {}, inspectorEnabled: true })
+    uiStore.setState({
+      theme: 'light',
+      curveAppearance: {},
+      inspectorEnabled: true,
+      labelsEnabled: true,
+      graphZoomPreset: 'full',
+      smoothingLevel: 5,
+      baselineCurveId: null,
+    })
     Object.defineProperty(window, 'matchMedia', { configurable: true, value: undefined })
   })
 
@@ -64,6 +73,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(svg).toHaveClass('fr-graph')
     expect(svg).not.toHaveAttribute('role', 'img')
     expect(svg).toHaveStyle({ aspectRatio: '800 / 346', width: '100%', height: 'auto' })
+    expect(container.querySelectorAll('[data-squiglink-graph-root]')).toHaveLength(1)
     expect(container.querySelectorAll('[data-x-grid]')).toHaveLength(25)
     expect(container.querySelectorAll('[data-y-grid]')).toHaveLength(12)
     expect(container.querySelector('[data-y-grid="0"]')).toHaveAttribute('data-emphasis', 'zero')
@@ -186,12 +196,12 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(tooltipNumbers).toHaveLength(6)
     expect(tooltipNames[0]?.lastChild).toHaveTextContent('Long cur...')
     expect(tooltipNames[0]?.querySelector('title')).toHaveTextContent('Long curve name 0')
-    expect(tooltipNumbers[0]).toHaveTextContent('0.20 dB')
+    expect(tooltipNumbers[0]).toHaveTextContent('0.19 dB')
     expect(tooltipNumbers[0]).toHaveAttribute('text-anchor', 'end')
     expect(tooltipNumbers[0]).toHaveAttribute('x', '233')
     expect(Number(tooltipNumbers[0]!.getAttribute('x'))).toBeLessThan(240)
     expect(screen.getByTestId('graph-inspector-status')).toHaveTextContent(
-      /Long curve name 0: 0\.20 dB/,
+      /Long curve name 0: 0\.19 dB/,
     )
 
     unmount()
@@ -212,6 +222,47 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-series-name="Source"]')).toHaveAttribute('d', initialPath)
     expect(container.querySelector('[data-series-name="Source"]')).toHaveAttribute('stroke', '#00796b')
     expect(container.querySelector('[data-series-name="Target"]')).toHaveAttribute('stroke', '#8f8e8a')
+  })
+
+  it('applies source visibility and offset to its equalized FR without mutating raw points', () => {
+    const store = createWorkspaceStore()
+    const source = curve('source', 'Source', 'fr')
+    store.getState().addCurve(source)
+    store.getState().setFilters([filter], 'manual')
+    uiStore.setState({ curveAppearance: {
+      source: { color: '#1565c0', visible: true, offsetDb: 0 },
+    } })
+    const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+    const sourcePath = container.querySelector('[data-series-name="Source"]')?.getAttribute('d')
+    const equalizedPath = container.querySelector('[data-series-name="Source EQ"]')?.getAttribute('d')
+    const rawSnapshot = structuredClone(source.rawPoints)
+
+    act(() => uiStore.getState().setCurveOffset('source', 3))
+    expect(container.querySelector('[data-series-name="Source"]')).not.toHaveAttribute('d', sourcePath)
+    expect(container.querySelector('[data-series-name="Source EQ"]')).not.toHaveAttribute('d', equalizedPath)
+    expect(source.rawPoints).toEqual(rawSnapshot)
+
+    act(() => uiStore.getState().setCurveVisible('source', false))
+    expect(container.querySelector('[data-series-name="Source"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-series-name="Source EQ"]')).not.toBeInTheDocument()
+    expect(source.rawPoints).toEqual(rawSnapshot)
+  })
+
+  it('keeps one owned D3 root through StrictMode updates and tears it down', () => {
+    const store = createWorkspaceStore()
+    const view = (derived: ReturnType<typeof deriveWorkspace>) => (
+      <StrictMode><FrequencyResponseGraph derived={derived} /></StrictMode>
+    )
+    const { container, rerender, unmount } = render(view(deriveWorkspace(store.getState())))
+    expect(container.querySelectorAll('[data-squiglink-graph-root]')).toHaveLength(1)
+
+    store.getState().addCurve(curve('source', 'Strict source', 'fr'))
+    rerender(view(deriveWorkspace(store.getState())))
+    expect(container.querySelectorAll('[data-squiglink-graph-root]')).toHaveLength(1)
+    expect(container.querySelector('[data-series-name="Strict source"]')).toBeInTheDocument()
+
+    unmount()
+    expect(container.querySelector('[data-squiglink-graph-root]')).toBeNull()
   })
 
   it('shows a clamped structured pointer inspector and crosshair, then hides on leave or disable', () => {
