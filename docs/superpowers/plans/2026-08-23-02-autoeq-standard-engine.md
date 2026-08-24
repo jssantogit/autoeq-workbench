@@ -10,12 +10,15 @@
 
 **Spec:** `docs/superpowers/specs/2026-08-23-autoeq-workbench-design.md`
 
+**Current foundation contract:** This plan consumes `AUTOEQ_PRODUCT_LIMITS`, `AutoEqSettings`, `DEFAULT_AUTOEQ_SETTINGS`, and `MVP_NUMERIC_POLICY` from the completed Plan 1.5 foundation. The current contract in `docs/superpowers/specs/2026-08-24-plan-1-5-final-closeout.md` and its Plan 2 amendment supersede conflicting Source/Target, normalization, graph, and settings language below.
+
 ## Global Constraints
 
 - Complete the mandatory Plan 1.5 Visual Foundation Closeout gate before starting this plan.
-- Standard profile uses fixed 48,000 Hz sample rate and 20 Hz–20 kHz optimization range.
-- Standard allows PK/LS/HS, filter gain -15..+15 dB, PK Q 0.1..12, shelf Q 0.7.
-- `maxFilters` default 10, hard ceiling 64, and is never a fill target.
+- Hard product bounds come from `AUTOEQ_PRODUCT_LIMITS` and `MVP_NUMERIC_POLICY`: 48 kHz, a 20 Hz–20 kHz Workbench band, gain -15..+15 dB, PK Q 0.1..12, default `maxFilters` 10, and hard maximum 64.
+- Effective run bounds come from validated `AutoEqSettings`; frequency, gain, Q, and `maxFilters` may narrow but never exceed the hard product bounds.
+- The optimizer fits only `settings.minFrequencyHz..settings.maxFrequencyHz`; the canonical graph/evaluation domain remains 20 Hz–20 kHz and final preamp validation covers the complete supported band.
+- Standard allows PK/LS/HS and keeps shelf Q 0.7. `maxFilters` is a ceiling, never a fill target.
 - Optimizer must start from zero filters for each run.
 - Same Source, Target, effective config, and algorithm version must produce the same result.
 - Optimization evaluates the complete enabled cascade, not isolated filter gain heuristics.
@@ -73,46 +76,15 @@ apps/web/src/features/autoeq/
 
 - [ ] **Step 1: Write config invariant tests**
 
-```ts
-import { MVP_NUMERIC_POLICY, STANDARD_V1_CONFIG } from '../../src/index.js'
-
-it('exposes Standard v1 product bounds', () => {
-  expect(STANDARD_V1_CONFIG).toMatchObject({
-    sampleRateHz: MVP_NUMERIC_POLICY.sampleRateHz,
-    minFrequencyHz: MVP_NUMERIC_POLICY.minFrequencyHz,
-    maxFrequencyHz: MVP_NUMERIC_POLICY.maxFrequencyHz,
-    fitPointsPerOctave: MVP_NUMERIC_POLICY.evaluationPointsPerOctave,
-  })
-  expect(STANDARD_V1_CONFIG.defaultMaxFilters).toBe(10)
-  expect(STANDARD_V1_CONFIG.hardMaxFilters).toBe(64)
-  expect(STANDARD_V1_CONFIG.minGainDb).toBe(-15)
-  expect(STANDARD_V1_CONFIG.maxGainDb).toBe(15)
-  expect(STANDARD_V1_CONFIG.minPkQ).toBe(0.1)
-  expect(STANDARD_V1_CONFIG.maxPkQ).toBe(12)
-})
-```
+Write separate tests proving that existing product bounds remain authoritative, that effective settings are validated within them, and that `STANDARD_V1_CONFIG` contains no duplicate product bounds.
 
 - [ ] **Step 2: Define explicit initial algorithm constants**
 
 Use a separate `algorithm` block so Plan 3 can tune it without changing product bounds:
 
 ```ts
-import { MVP_NUMERIC_POLICY } from '../config/numericPolicy.js'
-
 export const STANDARD_V1_CONFIG = {
-  profile: 'Standard',
   algorithmVersion: 'standard-v1',
-  sampleRateHz: MVP_NUMERIC_POLICY.sampleRateHz,
-  minFrequencyHz: MVP_NUMERIC_POLICY.minFrequencyHz,
-  maxFrequencyHz: MVP_NUMERIC_POLICY.maxFrequencyHz,
-  fitPointsPerOctave: MVP_NUMERIC_POLICY.evaluationPointsPerOctave,
-  defaultMaxFilters: 10,
-  hardMaxFilters: 64,
-  minGainDb: -15,
-  maxGainDb: 15,
-  minPkQ: 0.1,
-  maxPkQ: 12,
-  shelfQ: 0.7,
   algorithm: {
     deadbandDb: 0.1,
     huberDeltaDb: 1.0,
@@ -127,7 +99,7 @@ export const STANDARD_V1_CONFIG = {
 } as const
 ```
 
-The sample rate, optimization range, and fit density are sourced from the frozen MVP numeric policy rather than duplicated in the AutoEQ module. The remaining Standard-specific values are engineering starting points, not scientific claims.
+Resolve each run from validated `AutoEqSettings`, `AUTOEQ_PRODUCT_LIMITS`, and `MVP_NUMERIC_POLICY`. `STANDARD_V1_CONFIG` owns only versioned algorithm constants such as deadband, Huber behavior, candidate thresholds, objective weights, pruning tolerance, quantization, and refinement settings. It must not duplicate sample rate, Workbench band, gain/Q hard bounds, or filter-count limits.
 
 - [ ] **Step 3: Write objective tests**
 
@@ -492,13 +464,12 @@ Manifest includes:
   schemaVersion: 1,
   algorithmVersion: 'standard-v1',
   profile: 'Standard',
-  sampleRateHz: 48000,
-  optimizationRangeHz: [20, 20000],
-  maxFilters,
+  sampleRateHz: MVP_NUMERIC_POLICY.sampleRateHz,
+  optimizationRangeHz: [settings.minFrequencyHz, settings.maxFrequencyHz],
+  autoeqSettings: settings,
   sourceName,
   targetName,
-  sourceNormalization,
-  targetNormalization,
+  normalization,
   algorithmParameters: STANDARD_V1_CONFIG.algorithm,
   finalFilters,
   metrics,
@@ -590,21 +561,16 @@ git commit -m "feat(web): run AutoEQ in cancellable worker"
 - Modify: `apps/web/src/features/metrics/MetricsSummary.tsx`
 
 **Interfaces:**
-- UI exposes only Standard profile and `maxFilters` in MVP.
+- Reuse the existing Equalizer FR/Target selectors, Auto EQ action, and Frequency/Gain/Q/maxFilters settings surface.
 - Successful run sets quantized filters with provenance `autoeq` and state `clean`.
 
 - [ ] **Step 1: Write controls tests**
 
-Assert Run is disabled without both Source and Target, maxFilters accepts integer 0..64 and defaults to 10, Running shows Cancel, and success displays active filter count/preamp.
+Assert Auto EQ is disabled without both active FR and Target, every effective setting stays within its shared hard bound, maxFilters accepts integer 0..64 and defaults to 10, Running shows Cancel, and success displays active filter count/preamp.
 
 - [ ] **Step 2: Implement controls**
 
-Visible controls:
-
-- Profile: `Standard` read-only label/select with one option;
-- Max Filters numeric input 0..64;
-- `Run AutoEQ` primary button;
-- `Cancel` only while running.
+Wire the controls already present in `EqualizerTab`; do not add a parallel Standard settings panel or duplicate FR/Target selectors. Add only run/cancel/status behavior required by worker execution.
 
 Keep algorithm penalty constants out of normal UI.
 

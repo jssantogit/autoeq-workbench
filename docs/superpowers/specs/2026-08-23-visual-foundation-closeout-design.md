@@ -4,6 +4,8 @@
 **Date:** 2026-08-23  
 **Repository:** `jssantogit/autoeq-workbench`
 
+> **Current-contract note:** The implemented Plan 1.5 closeout in `2026-08-24-plan-1-5-final-closeout.md` supersedes this earlier direction where they conflict, including ECharts, zoom/reset, curve roles, per-curve normalization, and placeholder-control guidance.
+
 ## 1. Purpose
 
 This design closes the visual and numerical foundation of Plan 1 before implementation of the Standard AutoEQ engine in Plan 2.
@@ -274,6 +276,14 @@ Status such as Source/Target loaded, modified/stale state, and filter count may 
 ## 10. Graph presentation
 
 The graph is the strongest visual reference to Squiglink.
+
+Current semantic series contract:
+
+- the main FR plot renders imported FR curves, imported Target curves, and the active FR after the complete enabled EQ cascade when filters exist;
+- PEQ transfer response, Desired correction, and individual filter responses are not graph series;
+- filter selection affects only the filter editor and never creates a graph curve or frequency marker;
+- the equalized FR is named from the active FR, for example `Juzear Nimbus EQ`, and uses a deterministic solid graph-palette color distinct from the source FR;
+- the inspector and Screenshot action consume the same visible graph-series contract.
 
 ### 10.1 General appearance
 

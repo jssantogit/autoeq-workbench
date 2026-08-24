@@ -76,12 +76,7 @@ Recommended shape:
 
 ```ts
 export const STANDARD_V1_CONFIG = {
-  profile: 'Standard',
   algorithmVersion: 'standard-v1',
-  sampleRateHz: MVP_NUMERIC_POLICY.sampleRateHz,
-  fitPointsPerOctave: MVP_NUMERIC_POLICY.evaluationPointsPerOctave,
-  shelfQ: 0.7,
-  productLimits: AUTOEQ_PRODUCT_LIMITS,
   algorithm: {
     deadbandDb: 0.1,
     huberDeltaDb: 1.0,
@@ -95,6 +90,8 @@ export const STANDARD_V1_CONFIG = {
   },
 } as const
 ```
+
+`STANDARD_V1_CONFIG` contains only algorithm-version constants. The resolver consumes `MVP_NUMERIC_POLICY`, `AUTOEQ_PRODUCT_LIMITS`, and validated `AutoEqSettings`; it must not copy hard product bounds, sample rate, or the Workbench band into a second source of truth.
 
 Add an explicit resolver:
 
@@ -166,6 +163,8 @@ config.minFrequencyHz <= f <= config.maxFrequencyHz
 Do not change the global Workbench graph/evaluation policy merely because a narrower AutoEQ run was selected.
 
 Final full-cascade preamp remains dense-grid and must cover the complete audible Workbench domain required by the existing preamp policy, not only the narrowed optimization interval.
+
+Final delivered metrics must be calculated from the final quantized solution using the documented effective run configuration; the manifest records that configuration explicitly.
 
 ## 7. Amend maxFilters behavior
 

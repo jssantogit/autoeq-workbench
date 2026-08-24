@@ -40,6 +40,10 @@ Current graph contract:
 - Target curves render neutral gray and dashed;
 - FR colors remain independent and user-changeable.
 
+The main plot renders only imported FRs, imported Targets, and the active FR after the complete enabled EQ cascade when filters exist. PEQ transfer response, Desired correction, and individual filter responses are not graph series. Filter selection remains an editor concern and never creates a graph curve or frequency marker.
+
+The equalized response is named from its active FR (for example, `Juzear Nimbus EQ`) and receives a deterministic, solid graph-palette color distinct from the source FR. Inspector values and screenshots follow the same visible-series contract.
+
 ECharts must not be reintroduced for the FR graph during Plan 2.
 
 ## 3. Curve model

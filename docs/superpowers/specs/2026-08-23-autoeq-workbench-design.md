@@ -4,6 +4,8 @@
 **Date:** 2026-08-23  
 **Repository:** `jssantogit/autoeq-workbench`
 
+> **Current-contract note:** The implemented Plan 1.5 closeout in `2026-08-24-plan-1-5-final-closeout.md` supersedes this document where they conflict. In particular, the current product uses `CurveKind = 'fr' | 'target'`, one global normalization, a specialized SVG graph without ECharts/zoom/reset, and validated effective AutoEQ settings inside shared hard product bounds.
+
 ## 1. Purpose
 
 AutoEQ Workbench is a focused browser application for importing a measured frequency response and a target, visualizing both, generating a parametric AutoEQ with our own algorithm, inspecting and manually editing the resulting filters, and exporting the final result for Poweramp.
@@ -363,6 +365,8 @@ The UI should remain technical and relatively dense. Avoid oversized dashboard c
 Tailwind is used for consistent layout, spacing, typography, interaction states, and component primitives rather than to make the product visually generic.
 
 ## 8. Graph behavior
+
+Current graph amendment: the main FR plot renders only semantic response curves: imported FRs, imported Targets, and the active FR after the complete enabled EQ cascade when filters exist. PEQ transfer response, Desired correction, and individual filter responses remain internal derived data and are not graph series. Filter selection is an editor concern and never creates a graph curve or frequency marker. The equalized FR is named from the active FR, for example `Juzear Nimbus EQ`, and receives a deterministic solid graph-palette color distinct from its source FR.
 
 Apache ECharts is the graph engine.
 
