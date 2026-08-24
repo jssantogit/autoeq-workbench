@@ -1,4 +1,9 @@
-import { DEFAULT_AUTOEQ_SETTINGS, type Curve, type Filter } from '@autoeq-workbench/core'
+import {
+  AUTOEQ_PRODUCT_LIMITS,
+  DEFAULT_AUTOEQ_SETTINGS,
+  type Curve,
+  type Filter,
+} from '@autoeq-workbench/core'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -123,7 +128,7 @@ describe('EqualizerTab', () => {
     expect(targetRow).toContainElement(within(profile).getByRole('button', { name: 'Auto EQ' }))
   })
 
-  it('expands compact settings with accessible values and commits valid full updates', async () => {
+  it('expands compact settings with accessible defaults and commits valid effective run settings', async () => {
     const user = userEvent.setup()
     render(<EqualizerTab />)
 
@@ -143,14 +148,31 @@ describe('EqualizerTab', () => {
     expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })).toHaveValue(15)
     expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum Q' })).toHaveValue(0.1)
     expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum Q' })).toHaveValue(12)
+    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ max filters' })).toHaveValue(10)
     expect(within(settings).getAllByText('Hz')).toHaveLength(2)
     expect(within(settings).getAllByText('dB')).toHaveLength(2)
 
     const minimumFrequency = within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })
-    await user.clear(minimumFrequency)
-    await user.type(minimumFrequency, '30')
-    fireEvent.blur(minimumFrequency)
-    expect(workspaceStore.getState().autoeqSettings.minFrequencyHz).toBe(30)
+    const maximumGain = within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })
+    const maximumQ = within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum Q' })
+    const maxFilters = within(settings).getByRole('spinbutton', { name: 'AutoEQ max filters' })
+
+    for (const [input, value] of [
+      [minimumFrequency, '30'],
+      [maximumGain, '12'],
+      [maximumQ, '10'],
+      [maxFilters, '12'],
+    ] as const) {
+      await user.clear(input)
+      await user.type(input, value)
+      fireEvent.blur(input)
+    }
+    expect(workspaceStore.getState().autoeqSettings).toMatchObject({
+      minFrequencyHz: 30,
+      maxGainDb: 12,
+      maxQ: 10,
+      maxFilters: 12,
+    })
 
     await user.click(toggle)
     expect(screen.queryByRole('region', { name: 'AutoEQ Settings' })).not.toBeInTheDocument()
@@ -169,32 +191,36 @@ describe('EqualizerTab', () => {
     expect(workspaceStore.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
   })
 
-  it('commits validator-valid gain and Q ranges beyond defaults without native contradictions', async () => {
+  it('enforces product hard bounds for gain, Q, and filter count', async () => {
     const user = userEvent.setup()
     render(<EqualizerTab />)
     await user.click(screen.getByRole('button', { name: 'AutoEQ settings' }))
     const minimumGain = screen.getByRole('spinbutton', { name: 'AutoEQ minimum gain dB' })
     const maximumGain = screen.getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })
+    const minimumQ = screen.getByRole('spinbutton', { name: 'AutoEQ minimum Q' })
     const maximumQ = screen.getByRole('spinbutton', { name: 'AutoEQ maximum Q' })
+    const maxFilters = screen.getByRole('spinbutton', { name: 'AutoEQ max filters' })
 
-    expect(minimumGain).not.toHaveAttribute('min')
-    expect(minimumGain).not.toHaveAttribute('max')
-    expect(maximumQ).not.toHaveAttribute('min')
-    expect(maximumQ).not.toHaveAttribute('max')
-    for (const [input, value] of [[minimumGain, '-20'], [maximumGain, '25'], [maximumQ, '20']] as const) {
+    expect(minimumGain).toHaveAttribute('min', String(AUTOEQ_PRODUCT_LIMITS.minGainDb))
+    expect(maximumGain).toHaveAttribute('max', String(AUTOEQ_PRODUCT_LIMITS.maxGainDb))
+    expect(minimumQ).toHaveAttribute('min', String(AUTOEQ_PRODUCT_LIMITS.minQ))
+    expect(maximumQ).toHaveAttribute('max', String(AUTOEQ_PRODUCT_LIMITS.maxQ))
+    expect(maxFilters).toHaveAttribute('min', '0')
+    expect(maxFilters).toHaveAttribute('max', String(AUTOEQ_PRODUCT_LIMITS.hardMaxFilters))
+    expect(maxFilters).toHaveAttribute('step', '1')
+
+    for (const [input, value] of [
+      [minimumGain, '-20'],
+      [maximumGain, '25'],
+      [minimumQ, '0.01'],
+      [maximumQ, '20'],
+      [maxFilters, '65'],
+    ] as const) {
       await user.clear(input)
       await user.type(input, value)
       fireEvent.blur(input)
-      expect(input).toBeValid()
+      expect(input).toHaveAttribute('aria-invalid', 'true')
     }
-    expect(workspaceStore.getState().autoeqSettings).toMatchObject({
-      minGainDb: -20, maxGainDb: 25, maxQ: 20,
-    })
-
-    await user.clear(minimumGain)
-    await user.type(minimumGain, '30')
-    fireEvent.blur(minimumGain)
-    expect(minimumGain).toHaveAttribute('aria-invalid', 'true')
-    expect(workspaceStore.getState().autoeqSettings.minGainDb).toBe(-20)
+    expect(workspaceStore.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
   })
 })
