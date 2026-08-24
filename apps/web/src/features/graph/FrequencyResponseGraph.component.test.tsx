@@ -167,15 +167,32 @@ describe('FrequencyResponseGraph SVG renderer', () => {
 
     fireEvent.focus(screen.getByRole('slider', { name: 'Inspect graph frequency' }))
     const tooltip = container.querySelector('[data-inspector-tooltip-box]')
-    const tooltipRows = [...container.querySelectorAll('.graph-tooltip-value')]
+    const tooltipRows = [...container.querySelectorAll('[data-inspector-value-row]')]
     expect(tooltip).toHaveAttribute('width', '240')
     expect(tooltip).toHaveAttribute('height', '202')
     expect(Number(tooltip?.getAttribute('width'))).toBeLessThan((785 - 15) / 3)
     expect(container.querySelector('.graph-tooltip-label')).toHaveAttribute('font-size', '19')
-    expect(tooltipRows).toHaveLength(7)
+    expect(tooltipRows).toHaveLength(6)
     expect(tooltipRows.every((row) => row.getAttribute('font-size') === '18')).toBe(true)
-    expect(Number(tooltipRows[1]!.getAttribute('y')) - Number(tooltipRows[0]!.getAttribute('y'))).toBe(22)
-    expect(tooltipRows.at(-1)).toHaveTextContent('+1 more')
+    const tooltipRowYs = tooltipRows.map((row) =>
+      Number(row.querySelector('[data-inspector-value-name]')?.getAttribute('y')))
+    expect(tooltipRowYs[1]! - tooltipRowYs[0]!).toBe(22)
+    expect(container.querySelector('.graph-tooltip-value:not([data-inspector-value-row])'))
+      .toHaveTextContent('+1 more')
+
+    const tooltipNames = [...container.querySelectorAll('[data-inspector-value-name]')]
+    const tooltipNumbers = [...container.querySelectorAll('[data-inspector-value-number]')]
+    expect(tooltipNames).toHaveLength(6)
+    expect(tooltipNumbers).toHaveLength(6)
+    expect(tooltipNames[0]?.lastChild).toHaveTextContent('Long cur...')
+    expect(tooltipNames[0]?.querySelector('title')).toHaveTextContent('Long curve name 0')
+    expect(tooltipNumbers[0]).toHaveTextContent('0.20 dB')
+    expect(tooltipNumbers[0]).toHaveAttribute('text-anchor', 'end')
+    expect(tooltipNumbers[0]).toHaveAttribute('x', '233')
+    expect(Number(tooltipNumbers[0]!.getAttribute('x'))).toBeLessThan(240)
+    expect(screen.getByTestId('graph-inspector-status')).toHaveTextContent(
+      /Long curve name 0: 0\.20 dB/,
+    )
 
     unmount()
     expect(media.listeners.size).toBe(0)

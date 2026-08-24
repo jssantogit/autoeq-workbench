@@ -31,6 +31,7 @@ interface PointerInspector {
 
 const MAX_INTERNAL_LABELS = 8
 const MAX_INSPECTOR_VALUES = 6
+const COMPACT_INSPECTOR_NAME_LENGTH = 11
 const COMPACT_GRAPH_QUERY = '(max-width: 430px)'
 const CURVE_LABEL_BASE_X = PLOT_LEFT + 52
 
@@ -95,6 +96,12 @@ function dashArray(lineType: 'solid' | 'dashed' | 'dotted'): string | undefined 
 
 function markerLabel(frequencyHz: number): string {
   return frequencyHz >= 1_000 ? `${frequencyHz / 1_000}kHz` : `${frequencyHz}Hz`
+}
+
+function truncateByCharacters(value: string, maxLength: number): string {
+  if (value.length <= maxLength) return value
+  if (maxLength <= 3) return '.'.repeat(Math.max(0, maxLength))
+  return `${value.slice(0, maxLength - 3)}...`
 }
 
 export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps) {
@@ -324,8 +331,33 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
               </text>
               {tooltipValues.map((value, index) => {
                 const appearance = presentedSeries.find(({ series }) => series.id === value.id)?.appearance
+                const y = presentation.tooltipValueY + index * presentation.tooltipLineHeight
+                if (compact) {
+                  return (
+                    <g
+                      className="graph-tooltip-value"
+                      data-inspector-value-row
+                      key={value.id}
+                      fill={appearance?.color ?? colors.axis}
+                      fontSize={presentation.tooltipValueFontSize}
+                    >
+                      <text data-inspector-value-name x={7} y={y}>
+                        <title>{value.name}</title>
+                        {truncateByCharacters(value.name, COMPACT_INSPECTOR_NAME_LENGTH)}
+                      </text>
+                      <text
+                        data-inspector-value-number
+                        x={tooltipWidth - 7}
+                        y={y}
+                        textAnchor="end"
+                      >
+                        {value.db.toFixed(2)} dB
+                      </text>
+                    </g>
+                  )
+                }
                 return (
-                  <text className="graph-tooltip-value" key={value.id} x={7} y={presentation.tooltipValueY + index * presentation.tooltipLineHeight} fill={appearance?.color ?? colors.axis} fontSize={presentation.tooltipValueFontSize}>
+                  <text className="graph-tooltip-value" key={value.id} x={7} y={y} fill={appearance?.color ?? colors.axis} fontSize={presentation.tooltipValueFontSize}>
                     {value.name}: {value.db.toFixed(2)} dB
                   </text>
                 )
