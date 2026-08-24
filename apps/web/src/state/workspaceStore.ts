@@ -1,5 +1,6 @@
 import {
   applyEqToSource,
+  AUTOEQ_PRODUCT_LIMITS,
   biquadMagnitudeDb,
   calculateErrorMetrics,
   calculatePreampDb,
@@ -133,11 +134,11 @@ function validFilter(filter: Filter): boolean {
     filter.frequencyHz >= MVP_NUMERIC_POLICY.minFrequencyHz &&
     filter.frequencyHz <= MVP_NUMERIC_POLICY.maxFrequencyHz &&
     Number.isFinite(filter.gainDb) &&
-    filter.gainDb >= -15 &&
-    filter.gainDb <= 15 &&
+    filter.gainDb >= AUTOEQ_PRODUCT_LIMITS.minGainDb &&
+    filter.gainDb <= AUTOEQ_PRODUCT_LIMITS.maxGainDb &&
     Number.isFinite(filter.q) &&
-    filter.q >= 0.1 &&
-    filter.q <= 12
+    filter.q >= AUTOEQ_PRODUCT_LIMITS.minQ &&
+    filter.q <= AUTOEQ_PRODUCT_LIMITS.maxQ
   )
 }
 
@@ -262,7 +263,8 @@ export function createWorkspaceStore() {
       set((state) => {
         if (
           !Number.isFinite(value.anchorHz) ||
-          value.anchorHz <= 0 ||
+          value.anchorHz < MVP_NUMERIC_POLICY.minFrequencyHz ||
+          value.anchorHz > MVP_NUMERIC_POLICY.maxFrequencyHz ||
           !Number.isFinite(value.targetDb) ||
           (value.anchorHz === state.normalization.anchorHz &&
             value.targetDb === state.normalization.targetDb)
@@ -288,7 +290,7 @@ export function createWorkspaceStore() {
     setFilters: (filters, provenance) =>
       set((state) => {
         if (
-          filters.length > 64 ||
+          filters.length > AUTOEQ_PRODUCT_LIMITS.hardMaxFilters ||
           !filters.every(validFilter) ||
           new Set(filters.map(({ id }) => id)).size !== filters.length
         ) return state
@@ -317,7 +319,7 @@ export function createWorkspaceStore() {
       })),
     addFilter: (type) =>
       set((state) => {
-        if (state.filters.length >= 64) return state
+        if (state.filters.length >= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters) return state
         const filter = { id: uniqueFilterId(state.filters), ...filterDefaults[type] }
         return record(state, {
           filters: [...state.filters, filter],
@@ -344,7 +346,7 @@ export function createWorkspaceStore() {
       }),
     duplicateFilter: (id) =>
       set((state) => {
-        if (state.filters.length >= 64) return state
+        if (state.filters.length >= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters) return state
         const index = state.filters.findIndex((filter) => filter.id === id)
         if (index < 0) return state
         const duplicate = { ...state.filters[index]!, id: uniqueFilterId(state.filters) }
@@ -556,10 +558,4 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
     activeFrId: activeFr?.id ?? null,
     activeTargetId: activeTarget?.id ?? null,
   }
-}
-
-export const workspaceStore = createWorkspaceStore()
-
-export function useWorkspaceStore<T>(selector: (state: WorkspaceState) => T): T {
-  return useStore(workspaceStore, selector)
 }
