@@ -1,8 +1,9 @@
-import { interpolateLogFrequency, type CurveKind } from '@autoeq-workbench/core'
+import type { CurveKind } from '@autoeq-workbench/core'
 import type {
   DerivedCurve,
   WorkspaceDerived,
 } from '../../state/workspaceStore'
+import { evaluateNaturalSpline } from './graphGeometry'
 
 interface GraphSeriesBase {
   id: string
@@ -45,11 +46,8 @@ export function formatGraphInspector(
     const firstFrequency = item.data[0]![0]
     const lastFrequency = item.data[item.data.length - 1]![0]
     if (frequencyHz < firstFrequency || frequencyHz > lastFrequency) return []
-    const points = item.data.map(([pointFrequencyHz, db]) => ({
-      frequencyHz: pointFrequencyHz,
-      db,
-    }))
-    const db = interpolateLogFrequency(points, [frequencyHz])[0]!
+    const db = evaluateNaturalSpline(item.data, frequencyHz)
+    if (db === null) return []
     return [{ id: item.id, name: item.name, db }]
   })
 

@@ -151,11 +151,7 @@ select:focus-visible,
 .utility-rail__action { cursor: pointer; }
 .utility-rail__action:hover { color: var(--color-accent-active); }
 .utility-rail__action[aria-pressed='true'] { color: var(--color-text); background: var(--color-accent-soft); }
-.utility-rail__imports { display: flex; gap: 4px; padding-right: 8px; }
-.utility-rail .curve-import { display: block; }
-.utility-rail .file-control { min-height: 30px; border-color: transparent; border-radius: 5px; padding: 5px 9px; color: var(--color-accent-active); background: var(--color-accent-soft); }
-.utility-rail .field-error { display: inline; margin: 0 0 0 8px; }
-.rail-normalization { display: flex; align-items: center; gap: 6px; border-left: 1px solid var(--color-border); padding: 0 10px; }
+.rail-normalization { display: flex; align-items: center; gap: 6px; padding: 0 10px; }
 .rail-normalization__label { color: var(--color-text-faint); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; }
 .rail-normalization .number-field > span:first-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .rail-normalization .number-field input { width: 58px; min-width: 0; height: 28px; padding: 3px 5px; }
@@ -170,7 +166,7 @@ select:focus-visible,
 
 .panel h2,
 .metrics h3 { margin: 0; font-size: 0.84rem; letter-spacing: -0.01em; }
-.fr-graph { display: block; width: 100%; height: auto; aspect-ratio: 800 / 346; touch-action: none; }
+.fr-graph { display: block; width: 100%; height: auto; aspect-ratio: 800 / 346; touch-action: pan-y; }
 
 .button {
   min-height: 34px;
@@ -233,7 +229,11 @@ select:focus-visible,
 
 .curves-tab { min-width: 0; padding: 8px 10px 10px; }
 .curve-manager__section + .curve-manager__section { margin-top: 8px; }
-.curve-manager__section h3 { margin: 0; padding: 3px 8px; color: var(--color-text-faint); font-size: 0.68rem; letter-spacing: 0.06em; }
+.curve-manager__heading { display: flex; min-height: 32px; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 8px; }
+.curve-manager__section h3 { margin: 0; color: var(--color-text-faint); font-size: 0.68rem; letter-spacing: 0.06em; }
+.curve-manager__heading .curve-import { display: flex; min-width: 0; align-items: center; gap: 6px; }
+.curve-manager__heading .file-control { min-height: 26px; border-color: transparent; border-radius: 5px; padding: 3px 7px; color: var(--color-accent-active); background: var(--color-accent-soft); }
+.curve-manager__heading .field-error { margin: 0; }
 .curve-manager { display: grid; margin: 0; border-block: 1px solid var(--color-border); padding: 0; list-style: none; }
 .curve-manager:empty { min-height: 24px; background: var(--color-bg-subtle); }
 .curve-manager__row { position: relative; display: grid; min-width: 0; grid-template-columns: 12px minmax(100px, 1fr) 24px 28px; align-items: center; gap: 10px; border-top: 1px solid var(--color-border); padding: 5px 8px; }
@@ -260,6 +260,7 @@ select:focus-visible,
 .file-control:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .file-control input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .field-error { margin: 8px 0 0; color: var(--color-danger); font-size: 0.72rem; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 
 .visibility-control,
 .color-control { display: inline-flex; min-height: 34px; align-items: center; gap: 8px; color: var(--color-text-muted); font-size: 0.73rem; }

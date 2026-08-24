@@ -169,7 +169,7 @@ describe('buildGraphSeries', () => {
 })
 
 describe('formatGraphInspector', () => {
-  it('log-interpolates values at the pointer and lists only present visible series', () => {
+  it('evaluates the rendered natural spline and lists only present visible series', () => {
     const inspector = formatGraphInspector(
       1_000,
       [
@@ -202,13 +202,11 @@ describe('formatGraphInspector', () => {
       ],
     )
 
-    expect(inspector).toEqual({
+    expect(inspector).toMatchObject({
       frequencyHz: 1_000,
       frequencyLabel: '1.00 kHz',
-      values: [
-        { id: 'source', name: 'Source', db: 10 },
-        { id: 'target', name: 'Target', db: 5 },
-      ],
+      values: [{ id: 'source', name: 'Source' }, { id: 'target', name: 'Target', db: 5 }],
     })
+    expect(inspector.values[0]!.db).toBeCloseTo(10, 8)
   })
 })

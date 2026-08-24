@@ -143,6 +143,10 @@ describe('CurvesTab', () => {
 
     expect(screen.getByRole('heading', { name: 'FR' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'TARGETS' })).toBeInTheDocument()
+    expect(within(screen.getByRole('heading', { name: 'FR' }).closest('section')!).getByLabelText('+ FR')).toBeInTheDocument()
+    expect(within(screen.getByRole('heading', { name: 'TARGETS' }).closest('section')!).getByLabelText('+ Target')).toBeInTheDocument()
+    expect(screen.getAllByLabelText('+ FR')).toHaveLength(1)
+    expect(screen.getAllByLabelText('+ Target')).toHaveLength(1)
     expect(within(frList).getAllByRole('listitem')).toHaveLength(2)
     expect(within(frList).getByText('Source.csv')).toBeInTheDocument()
     expect(within(frList).getByText('Overlay.csv')).toBeInTheDocument()

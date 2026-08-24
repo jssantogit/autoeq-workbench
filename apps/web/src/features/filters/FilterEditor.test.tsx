@@ -200,4 +200,19 @@ describe('FilterEditor', () => {
     await user.click(screen.getByRole('button', { name: 'Actions for filter 1' }))
     expect(screen.getByRole('button', { name: 'Duplicate filter 1' })).toBeDisabled()
   })
+
+  it('renders twenty compact rows while keeping the toolbar and last-row menu available', async () => {
+    const user = userEvent.setup()
+    workspaceStore.setState({
+      filters: Array.from({ length: 20 }, (_, index) => ({ ...filter, id: `filter-${index + 1}` })),
+    })
+    render(<FilterEditor />)
+
+    expect(screen.getAllByRole('row')).toHaveLength(21)
+    expect(screen.getByRole('button', { name: 'Add filter' })).toBeEnabled()
+    expect(screen.getByText('20 / 64 filters')).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Actions for filter 20' }))
+    expect(screen.getByRole('button', { name: 'Move filter 20 up' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Remove filter 20' })).toBeEnabled()
+  })
 })

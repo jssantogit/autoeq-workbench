@@ -42,9 +42,10 @@ describe('App', () => {
     expect(utilityRail.compareDocumentPosition(graph)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(graph.compareDocumentPosition(dock)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(screen.queryByRole('button', { name: 'Reset View' })).not.toBeInTheDocument()
-    expect(within(utilityRail).getAllByLabelText(/^\+ (FR|Target)$/)).toHaveLength(2)
-    expect(within(utilityRail).getByLabelText('+ FR')).toBeInTheDocument()
-    expect(within(utilityRail).getByLabelText('+ Target')).toBeInTheDocument()
+    expect(within(utilityRail).queryByLabelText('+ FR')).not.toBeInTheDocument()
+    expect(within(utilityRail).queryByLabelText('+ Target')).not.toBeInTheDocument()
+    const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
+    expect(within(curveManager).getAllByLabelText(/^\+ (FR|Target)$/)).toHaveLength(2)
     expect(utilityRail).toHaveClass('utility-rail', 'utility-rail--nowrap')
     expect(within(utilityRail).getByRole('group', { name: 'NORMALIZE' })).toBeVisible()
     expect(within(utilityRail).getByLabelText('Target dB')).toHaveValue(0)
@@ -101,33 +102,35 @@ describe('App', () => {
     expect(screen.queryByRole('button', { name: 'Apply normalization' })).not.toBeInTheDocument()
   })
 
-  it('imports FR and Target files side by side with their requested kinds', async () => {
+  it('imports FR and Target files from their curve-manager sections', async () => {
     render(<App />)
-    const utilityRail = screen.getByRole('toolbar', { name: 'Workspace utilities' })
+    const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
     const text = '20 0\n20000 0'
     const fr = new File([], 'Measurement.txt', { type: 'text/plain' })
     const target = new File([], 'Target.csv', { type: 'text/csv' })
     Object.defineProperty(fr, 'text', { value: async () => text })
     Object.defineProperty(target, 'text', { value: async () => text })
 
-    fireEvent.change(within(utilityRail).getByLabelText('+ FR'), { target: { files: [fr] } })
-    fireEvent.change(within(utilityRail).getByLabelText('+ Target'), { target: { files: [target] } })
+    fireEvent.change(within(curveManager).getByLabelText('+ FR'), { target: { files: [fr] } })
+    fireEvent.change(within(curveManager).getByLabelText('+ Target'), { target: { files: [target] } })
 
     await waitFor(() => expect(workspaceStore.getState().curves).toHaveLength(2))
     expect(workspaceStore.getState().curves.map(({ kind }) => kind)).toEqual(['fr', 'target'])
     expect(Object.keys(uiStore.getState().curveAppearance)).toHaveLength(2)
   })
 
-  it('keeps import errors accessibly associated with the utility rail', async () => {
+  it('keeps import errors accessibly associated with the relevant curve section', async () => {
     render(<App />)
-    const utilityRail = screen.getByRole('toolbar', { name: 'Workspace utilities' })
+    const frSection = screen.getByRole('heading', { name: 'FR' }).closest('section')!
     const file = new File([], 'broken.csv', { type: 'text/csv' })
     Object.defineProperty(file, 'text', { value: async () => 'not curve data' })
 
-    fireEvent.change(within(utilityRail).getByLabelText('+ FR'), {
+    fireEvent.change(within(frSection).getByLabelText('+ FR'), {
       target: { files: [file] },
     })
 
-    expect(await within(utilityRail).findByRole('alert')).toHaveTextContent('[parse]')
+    expect(await within(frSection).findByRole('alert')).toHaveTextContent('[parse]')
+    const targetsSection = screen.getByRole('heading', { name: 'TARGETS' }).closest('section')!
+    expect(within(targetsSection).queryByRole('alert')).not.toBeInTheDocument()
   })
 })

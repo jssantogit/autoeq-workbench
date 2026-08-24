@@ -56,10 +56,10 @@ describe('manual workbench integration', () => {
     const targetFile = new File([curveText], 'Synthetic Target.csv', { type: 'text/csv' })
     Object.defineProperty(sourceFile, 'text', { value: async () => curveText })
     Object.defineProperty(targetFile, 'text', { value: async () => curveText })
-    fireEvent.change(screen.getByLabelText('+ FR'), {
+    const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
+    fireEvent.change(within(curveManager).getByLabelText('+ FR'), {
       target: { files: [sourceFile] },
     })
-    const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
     await waitFor(() => expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument())
     const frId = workspaceStore.getState().curves[0]!.id
     const importedFrColor = uiStore.getState().curveAppearance[frId]!.color
@@ -72,7 +72,7 @@ describe('manual workbench integration', () => {
       }, { curveId: frId, measurementKind: 'fr', active: true }),
     ).toMatchObject({ color: importedFrColor, lineType: 'solid' })
 
-    fireEvent.change(screen.getByLabelText('+ Target'), {
+    fireEvent.change(within(curveManager).getByLabelText('+ Target'), {
       target: { files: [targetFile] },
     })
     await waitFor(() => {

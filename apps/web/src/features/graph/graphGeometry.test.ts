@@ -11,6 +11,8 @@ import {
   Y_MAX_DB,
   Y_MIN_DB,
   createNaturalSplinePath,
+  createNaturalSplineSegments,
+  evaluateNaturalSpline,
   frequencyToX,
   generateXTicks,
   generateYTicks,
@@ -78,5 +80,25 @@ describe('natural spline path', () => {
     ])
     expect(path.match(/C/g)).toHaveLength(2)
     expect(path).not.toMatch(/NaN|Infinity/)
+  })
+
+  it('evaluates the same cubic controls used by the rendered path', () => {
+    const points: [number, number][] = [[20, 0], [200, 8], [2_000, -4], [20_000, 2]]
+    const segment = createNaturalSplineSegments(points)[1]!
+    const cubic = (start: number, first: number, second: number, end: number, t: number) =>
+      (1 - t) ** 3 * start + 3 * (1 - t) ** 2 * t * first + 3 * (1 - t) * t ** 2 * second + t ** 3 * end
+    const midpointX = cubic(segment.start.x, segment.control1.x, segment.control2.x, segment.end.x, 0.5)
+    const midpointY = cubic(segment.start.y, segment.control1.y, segment.control2.y, segment.end.y, 0.5)
+    const midpointFrequency = xToFrequency(midpointX)
+
+    expect(createNaturalSplinePath(points)).toContain(
+      `C${Number(segment.control1.x.toFixed(3))},${Number(segment.control1.y.toFixed(3))}`,
+    )
+    expect(yDbToY(evaluateNaturalSpline(points, midpointFrequency)!)).toBeCloseTo(midpointY, 8)
+    expect(evaluateNaturalSpline(points, 20)).toBe(0)
+    expect(evaluateNaturalSpline(points, 20_000)).toBe(2)
+    expect(evaluateNaturalSpline(points, 10)).toBeNull()
+    expect(createNaturalSplineSegments([[20, 0], [200, Number.NaN]])).toEqual([])
+    expect(evaluateNaturalSpline(points, 632)).toSatisfy(Number.isFinite)
   })
 })

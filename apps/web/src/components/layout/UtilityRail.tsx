@@ -1,4 +1,3 @@
-import { CurveImport } from '../../features/curves/CurveImport'
 import { NumberField } from '../ui/NumberField'
 import { useUiStore } from '../../state/uiStore'
 import { useWorkspaceStore } from '../../state/workspaceStore'
@@ -13,10 +12,6 @@ export function UtilityRail() {
 
   return (
     <div className="utility-rail utility-rail--nowrap" role="toolbar" aria-label="Workspace utilities">
-      <div className="utility-rail__imports">
-        <CurveImport kind="fr" />
-        <CurveImport kind="target" />
-      </div>
       <div className="rail-normalization" role="group" aria-label="NORMALIZE">
         <span className="rail-normalization__label" aria-hidden="true">NORMALIZE</span>
         <NumberField

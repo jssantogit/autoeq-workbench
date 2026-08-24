@@ -1,4 +1,4 @@
-import { useId, useState, type PointerEvent } from 'react'
+import { useId, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { useUiStore } from '../../state/uiStore'
 import type { WorkspaceDerived } from '../../state/workspaceStore'
 import { graphTheme, seriesAppearance } from './graphAppearance'
@@ -9,6 +9,8 @@ import {
   PLOT_LEFT,
   PLOT_RIGHT,
   PLOT_TOP,
+  X_MAX_HZ,
+  X_MIN_HZ,
   createNaturalSplinePath,
   frequencyToX,
   generateXTicks,
@@ -64,13 +66,38 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
   const internalLabels = presentedSeries.slice(0, MAX_INTERNAL_LABELS)
   const overflowCount = presentedSeries.length - internalLabels.length
 
+  function inspectAtX(nextX: number): void {
+    const x = Math.min(PLOT_RIGHT, Math.max(PLOT_LEFT, nextX))
+    setInspector({ x, details: formatGraphInspector(xToFrequency(x), visibleSeries) })
+  }
+
+  function inspectAtFrequency(frequencyHz: number): void {
+    setInspector({
+      x: frequencyToX(frequencyHz),
+      details: formatGraphInspector(frequencyHz, visibleSeries),
+    })
+  }
+
   function inspectPointer(event: PointerEvent<SVGRectElement>): void {
     if (!inspectorEnabled) return
     const bounds = event.currentTarget.ownerSVGElement?.getBoundingClientRect()
     if (bounds === undefined || bounds.width <= 0) return
     const viewBoxX = (event.clientX - bounds.left) / bounds.width * GRAPH_WIDTH
-    const x = Math.min(PLOT_RIGHT, Math.max(PLOT_LEFT, viewBoxX))
-    setInspector({ x, details: formatGraphInspector(xToFrequency(x), visibleSeries) })
+    inspectAtX(viewBoxX)
+  }
+
+  function inspectKeyboard(event: KeyboardEvent<SVGRectElement>): void {
+    if (!inspectorEnabled) return
+    const step = (PLOT_RIGHT - PLOT_LEFT) / 100
+    const currentX = inspector?.x ?? frequencyToX(1_000)
+    let nextX: number | null = null
+    if (event.key === 'ArrowLeft') nextX = currentX - step
+    if (event.key === 'ArrowRight') nextX = currentX + step
+    if (event.key === 'Home') nextX = PLOT_LEFT
+    if (event.key === 'End') nextX = PLOT_RIGHT
+    if (nextX === null) return
+    event.preventDefault()
+    inspectAtX(nextX)
   }
 
   const tooltipWidth = 170
@@ -80,14 +107,18 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
   const tooltipX = inspector === null
     ? PLOT_LEFT
     : Math.min(PLOT_RIGHT - tooltipWidth - 4, Math.max(PLOT_LEFT + 4, inspector.x + 8))
+  const inspectorAnnouncement = !inspectorEnabled || inspector === null
+    ? ''
+    : [
+        inspector.details.frequencyLabel,
+        ...inspector.details.values.map(({ name, db }) => `${name}: ${db.toFixed(2)} dB`),
+      ].join('. ')
 
   return (
     <section className="graph-panel" aria-label="Frequency response graph">
       <svg
         className="fr-graph"
         viewBox={`0 0 ${GRAPH_WIDTH} ${GRAPH_HEIGHT}`}
-        role="img"
-        aria-label="Frequency response graph from 20 Hz to 20 kHz"
         style={{ aspectRatio: `${GRAPH_WIDTH} / ${GRAPH_HEIGHT}`, width: '100%', height: 'auto' }}
       >
         <defs>
@@ -177,7 +208,6 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
         </g>
         <text
           data-graph-status
-          role="status"
           x={PLOT_LEFT + 7} y={PLOT_TOP + 12}
           fill={derived.status === 'coverage-error' ? '#b42318' : colors.axis}
           fontSize={9}
@@ -213,12 +243,34 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
         )}
         <rect
           data-inspector-hit-area
+          role="slider"
+          aria-label="Inspect graph frequency"
+          aria-valuemin={X_MIN_HZ}
+          aria-valuemax={X_MAX_HZ}
+          aria-valuenow={Math.round(inspector?.details.frequencyHz ?? 1_000)}
+          aria-valuetext={inspector?.details.frequencyLabel ?? '1.00 kHz'}
+          aria-disabled={!inspectorEnabled}
+          tabIndex={inspectorEnabled ? 0 : -1}
           x={PLOT_LEFT} y={PLOT_TOP} width={PLOT_RIGHT - PLOT_LEFT} height={PLOT_BOTTOM - PLOT_TOP}
           fill="transparent"
           onPointerMove={inspectPointer}
           onPointerLeave={() => setInspector(null)}
+          onFocus={() => inspectorEnabled && inspector === null && inspectAtFrequency(1_000)}
+          onKeyDown={inspectKeyboard}
         />
       </svg>
+      <p className="visually-hidden" role="status" data-testid="graph-derived-status">
+        {derived.message}
+      </p>
+      <p
+        className="visually-hidden"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        data-testid="graph-inspector-status"
+      >
+        {inspectorAnnouncement}
+      </p>
     </section>
   )
 }

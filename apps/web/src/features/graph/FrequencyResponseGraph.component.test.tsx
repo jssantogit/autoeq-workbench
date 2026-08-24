@@ -32,9 +32,10 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     const { container } = render(
       <FrequencyResponseGraph derived={deriveWorkspace(createWorkspaceStore().getState())} />,
     )
-    const svg = screen.getByRole('img', { name: /20 hz to 20 khz/i })
+    const svg = container.querySelector('svg')!
     expect(svg).toHaveAttribute('viewBox', '0 0 800 346')
     expect(svg).toHaveClass('fr-graph')
+    expect(svg).not.toHaveAttribute('role', 'img')
     expect(svg).toHaveStyle({ aspectRatio: '800 / 346', width: '100%', height: 'auto' })
     expect(container.querySelectorAll('[data-x-grid]')).toHaveLength(25)
     expect(container.querySelectorAll('[data-y-grid]')).toHaveLength(12)
@@ -98,14 +99,14 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(curve('source', 'Source', 'fr'))
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-    const svg = screen.getByRole('img')
+    const svg = container.querySelector('svg')!
     Object.defineProperty(svg, 'getBoundingClientRect', {
       value: () => ({ left: 100, top: 0, width: 400, height: 173, right: 500, bottom: 173, x: 100, y: 0, toJSON: () => ({}) }),
     })
     fireEvent.pointerMove(container.querySelector('[data-inspector-hit-area]')!, { clientX: 300 })
     expect(container.querySelector('[data-inspector-crosshair]')).toBeInTheDocument()
     expect(screen.getByText('632 Hz')).toBeInTheDocument()
-    expect(screen.getByText(/Source:/)).toBeInTheDocument()
+    expect(container.querySelector('[data-inspector-tooltip]')).toHaveTextContent(/Source:/)
     fireEvent.pointerMove(container.querySelector('[data-inspector-hit-area]')!, { clientX: 499 })
     expect(container.querySelector('[data-inspector-tooltip]')).toHaveAttribute('transform', 'translate(611 30)')
     fireEvent.pointerLeave(container.querySelector('[data-inspector-hit-area]')!)
@@ -113,6 +114,40 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     act(() => uiStore.getState().toggleInspector())
     fireEvent.pointerMove(container.querySelector('[data-inspector-hit-area]')!, { clientX: 300 })
     expect(container.querySelector('[data-inspector-crosshair]')).not.toBeInTheDocument()
+  })
+
+  it('operates the inspector by keyboard and announces status and details outside the SVG', () => {
+    const store = createWorkspaceStore()
+    store.getState().addCurve(curve('source', 'Source', 'fr'))
+    const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+    const control = screen.getByRole('slider', { name: 'Inspect graph frequency' })
+
+    expect(control).toHaveAttribute('tabindex', '0')
+    fireEvent.focus(control)
+    expect(container.querySelector('[data-inspector-crosshair]')).toBeInTheDocument()
+    expect(screen.getByTestId('graph-inspector-status')).toHaveTextContent(/1\.00 kHz.*Source:.*dB/i)
+    expect(screen.getByTestId('graph-derived-status')).toHaveTextContent(/target/i)
+    expect(screen.getByTestId('graph-inspector-status').closest('svg')).toBeNull()
+
+    fireEvent.keyDown(control, { key: 'ArrowRight' })
+    expect(control).toHaveAttribute('aria-valuenow', '1072')
+    fireEvent.keyDown(control, { key: 'ArrowLeft' })
+    expect(control).toHaveAttribute('aria-valuenow', '1000')
+    fireEvent.keyDown(control, { key: 'Home' })
+    expect(control).toHaveAttribute('aria-valuenow', '20')
+    fireEvent.keyDown(control, { key: 'End' })
+    expect(control).toHaveAttribute('aria-valuenow', '20000')
+  })
+
+  it('caps internal labels and reports overflow beyond eight visible series', () => {
+    const store = createWorkspaceStore()
+    for (let index = 0; index < 10; index += 1) {
+      store.getState().addCurve(curve(`curve-${index}`, `Curve ${index}`, 'fr', index))
+    }
+    const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+
+    expect(container.querySelectorAll('[aria-label="Visible graph series"] > text')).toHaveLength(9)
+    expect(screen.getByText('+2 more')).toBeInTheDocument()
   })
 
   it('keeps the status message and selected-filter Fc marker inside the graph', () => {
