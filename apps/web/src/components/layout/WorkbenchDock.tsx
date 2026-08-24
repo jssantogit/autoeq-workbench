@@ -20,6 +20,7 @@ export function WorkbenchDock({ curves, equalizer, details }: WorkbenchDockProps
       <div className="workbench-dock__content">
         {(Object.keys(panels) as DockTab[]).map((tab) => (
           <div
+            className="workbench-dock__panel"
             key={tab}
             id={`dock-panel-${tab}`}
             role="tabpanel"

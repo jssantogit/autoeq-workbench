@@ -66,11 +66,13 @@ html { min-width: 320px; background: var(--color-bg); }
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   color: var(--color-text);
   background: var(--color-bg);
 }
+
+#root { min-height: 100dvh; }
 
 button, input, select { font: inherit; }
 
@@ -84,11 +86,18 @@ select:focus-visible,
 }
 
 .workbench {
+  display: flex;
   width: min(1440px, 100%);
   min-width: 0;
+  min-height: 100dvh;
+  flex-direction: column;
   margin: 0 auto;
   padding: 8px clamp(10px, 2vw, 24px) 20px;
 }
+
+.app-header,
+.utility-rail,
+.graph-panel { flex: none; }
 
 .app-header {
   display: flex;
@@ -184,7 +193,10 @@ select:focus-visible,
 .button:disabled { opacity: 0.42; cursor: not-allowed; }
 
 .workbench-dock {
+  display: flex;
   min-width: 0;
+  flex: 1 0 auto;
+  flex-direction: column;
   margin-top: 8px;
 }
 
@@ -221,21 +233,23 @@ select:focus-visible,
   box-shadow: inset 0 0 0 1px var(--color-accent-active);
 }
 
-.workbench-dock__content { min-width: 0; }
-.workbench-dock__content > [role='tabpanel'] { min-width: 0; }
+.workbench-dock__content { display: flex; min-width: 0; flex: 1 0 auto; flex-direction: column; }
+.workbench-dock__panel { min-width: 0; }
+.workbench-dock__panel:not([hidden]) { display: flex; flex: 1 0 auto; flex-direction: column; }
+.workbench-dock__panel:not([hidden]) > * { flex: 1 0 auto; }
 .panel { min-width: 0; }
 .panel__header { min-height: 42px; padding: 8px 12px 0; }
 .panel__body { min-width: 0; padding: 10px 12px 14px; }
 
 .curves-tab { min-width: 0; padding: 8px 10px 10px; }
+.curve-upload-toolbar { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; padding: 2px 8px 6px; }
+.curve-upload-toolbar .curve-import { min-width: 0; }
+.curve-upload-toolbar .file-control { min-height: 28px; border-radius: 6px; padding: 4px 8px; }
+.curve-upload-toolbar .field-error { margin-top: 4px; }
 .curve-manager__section + .curve-manager__section { margin-top: 8px; }
-.curve-manager__heading { display: flex; min-height: 32px; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 8px; }
-.curve-manager__section h3 { margin: 0; color: var(--color-text-faint); font-size: 0.68rem; letter-spacing: 0.06em; }
-.curve-manager__heading .curve-import { display: flex; min-width: 0; align-items: center; gap: 6px; }
-.curve-manager__heading .file-control { min-height: 26px; border-color: transparent; border-radius: 5px; padding: 3px 7px; color: var(--color-accent-active); background: var(--color-accent-soft); }
-.curve-manager__heading .field-error { margin: 0; }
+.curve-manager__heading { min-height: 24px; margin: 0; padding: 4px 8px; color: var(--color-text-faint); font-size: 0.68rem; letter-spacing: 0.06em; }
 .curve-manager { display: grid; margin: 0; border-block: 1px solid var(--color-border); padding: 0; list-style: none; }
-.curve-manager:empty { min-height: 24px; background: var(--color-bg-subtle); }
+.curve-manager__empty { margin: 0; padding: 2px 8px 4px; color: var(--color-text-faint); font-size: 0.72rem; }
 .curve-manager__row { position: relative; display: grid; min-width: 0; grid-template-columns: 12px minmax(100px, 1fr) 24px 28px; align-items: center; gap: 10px; border-top: 1px solid var(--color-border); padding: 5px 8px; }
 .curve-manager__row:first-child { border-top: 0; }
 .curve-manager__indicator--fr { width: 10px; height: 10px; border: 1px solid rgb(0 0 0 / 15%); border-radius: 50%; }
@@ -368,7 +382,7 @@ select:focus-visible,
 }
 
 @media (max-width: 650px) {
-  .workbench { padding: 5px 7px 14px; }
+  .workbench { padding: 5px 7px 0; }
   .app-header { min-height: 38px; padding-bottom: 3px; }
   .theme-toggle { width: 32px; height: 32px; }
   .workbench-dock { margin-top: 7px; border-top: 1px solid var(--color-border-strong); border-radius: 14px 14px 0 0; padding-top: 8px; background: var(--color-bg-elevated); }

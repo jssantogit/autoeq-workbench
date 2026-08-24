@@ -22,7 +22,13 @@ describe('workbench shell', () => {
     const tabs = screen.getAllByRole('tab')
     expect(tabs.map((tab) => tab.textContent)).toEqual(['Curves', 'Equalizer', 'Details'])
     const tablist = screen.getByRole('tablist', { name: 'Workbench tools' })
+    const shell = document.querySelector('main.workbench')
+    const dock = screen.getByRole('region', { name: 'Workbench dock' })
+    const dockContent = dock.querySelector('.workbench-dock__content')
     expect(tablist).toBeVisible()
+    expect(shell).toBeInTheDocument()
+    expect(dock).toHaveClass('workbench-dock')
+    expect(dockContent).toBeInTheDocument()
     expect(tablist).toHaveClass('dock-tabs', 'dock-tabs--segmented')
     expect(tablist.children).toHaveLength(3)
     const handle = document.querySelector('.workbench-dock__handle')
@@ -33,7 +39,9 @@ describe('workbench shell', () => {
       'aria-controls',
       'dock-panel-curves',
     )
-    expect(screen.getByRole('tabpanel', { name: 'Curves' })).toHaveAttribute(
+    const curvesPanel = screen.getByRole('tabpanel', { name: 'Curves' })
+    expect(curvesPanel).toHaveClass('workbench-dock__panel')
+    expect(curvesPanel).toHaveAttribute(
       'aria-labelledby',
       'dock-tab-curves',
     )
