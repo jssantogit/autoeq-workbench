@@ -559,3 +559,9 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
     activeTargetId: activeTarget?.id ?? null,
   }
 }
+
+export const workspaceStore = createWorkspaceStore()
+
+export function useWorkspaceStore<T>(selector: (state: WorkspaceState) => T): T {
+  return useStore(workspaceStore, selector)
+}
