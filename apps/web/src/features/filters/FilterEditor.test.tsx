@@ -1,5 +1,5 @@
 import type { Filter } from '@autoeq-workbench/core'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { workspaceStore } from '../../state/workspaceStore'
@@ -26,14 +26,15 @@ describe('FilterEditor', () => {
     })
   })
 
-  it('offers PK, LS, and HS defaults and dense row operations', async () => {
+  it('adds a default PK and supports selected removal and dense row operations', async () => {
     const user = userEvent.setup()
     render(<FilterEditor />)
 
-    await user.click(screen.getByRole('button', { name: 'Add PK' }))
-    await user.click(screen.getByRole('button', { name: 'Add LS' }))
-    await user.click(screen.getByRole('button', { name: 'Add HS' }))
-    expect(workspaceStore.getState().filters.map(({ type }) => type)).toEqual(['PK', 'LS', 'HS'])
+    const removeSelected = screen.getByRole('button', { name: 'Remove selected filter' })
+    expect(removeSelected).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: 'Add filter' }))
+    expect(workspaceStore.getState().filters.map(({ type }) => type)).toEqual(['PK'])
+    expect(removeSelected).toBeEnabled()
 
     await user.click(screen.getByRole('checkbox', { name: 'Enable filter 1' }))
     expect(workspaceStore.getState().filters[0]?.enabled).toBe(false)
@@ -43,17 +44,30 @@ describe('FilterEditor', () => {
     expect(workspaceStore.getState().selectedFilterId).toBe(workspaceStore.getState().filters[0]?.id)
     await user.click(screen.getByRole('button', { name: 'Actions for filter 1' }))
     await user.click(screen.getByRole('button', { name: 'Duplicate filter 1' }))
-    expect(workspaceStore.getState().filters).toHaveLength(4)
+    expect(workspaceStore.getState().filters).toHaveLength(2)
     const duplicateId = workspaceStore.getState().filters[1]?.id
     await user.click(screen.getByRole('button', { name: 'Actions for filter 2' }))
-    await user.click(screen.getByRole('button', { name: 'Move filter 2 down' }))
-    expect(workspaceStore.getState().filters[2]?.id).toBe(duplicateId)
-    await user.click(screen.getByRole('button', { name: 'Remove filter 3' }))
-    expect(workspaceStore.getState().filters).toHaveLength(3)
+    await user.click(screen.getByRole('button', { name: 'Move filter 2 up' }))
+    expect(workspaceStore.getState().filters[0]?.id).toBe(duplicateId)
+    await user.click(removeSelected)
+    expect(workspaceStore.getState().filters).toHaveLength(1)
     await user.click(screen.getByRole('button', { name: 'Undo' }))
-    expect(workspaceStore.getState().filters).toHaveLength(4)
+    expect(workspaceStore.getState().filters).toHaveLength(2)
     await user.click(screen.getByRole('button', { name: 'Redo' }))
-    expect(workspaceStore.getState().filters).toHaveLength(3)
+    expect(workspaceStore.getState().filters).toHaveLength(1)
+  })
+
+  it('keeps Sort disabled and removes the old type-specific add controls', () => {
+    render(<FilterEditor />)
+
+    expect(screen.getByRole('button', { name: 'Sort filters' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Sort filters' })).toHaveAttribute(
+      'title',
+      'Sorting is unavailable until a deterministic rule is defined',
+    )
+    expect(screen.queryByRole('button', { name: 'Add PK' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add LS' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add HS' })).not.toBeInTheDocument()
   })
 
   it('keeps temporary numeric text local and commits once on blur or Enter', async () => {
@@ -99,7 +113,7 @@ describe('FilterEditor', () => {
     expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
       'ON',
       'Type',
-      'Fc',
+      'Frequency',
       'Gain',
       'Q',
       '',
@@ -117,12 +131,16 @@ describe('FilterEditor', () => {
     expect(Array.from(row.querySelectorAll('td')).map((cell) => cell.dataset.label)).toEqual([
       'ON',
       'Type',
-      'Fc',
+      'Frequency',
       'Gain',
       'Q',
       undefined,
     ])
     expect(row).toHaveAttribute('tabindex', '0')
+    expect(within(row).getByText('Hz')).toHaveAttribute('aria-hidden', 'true')
+    expect(within(row).getByText('dB')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByRole('spinbutton', { name: 'Filter 1 frequency Hz' })).toHaveValue(1_000)
+    expect(screen.getByRole('spinbutton', { name: 'Filter 1 gain dB' })).toHaveValue(0)
   })
 
   it('reveals compact overflow actions with movement boundaries and removal', async () => {
@@ -147,6 +165,7 @@ describe('FilterEditor', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Enable filter 1' }))
     expect(workspaceStore.getState().selectedFilterId).toBe(second.id)
     await user.selectOptions(screen.getByRole('combobox', { name: 'Filter 1 type' }), 'LS')
+    expect(workspaceStore.getState().filters[0]?.type).toBe('LS')
     expect(workspaceStore.getState().selectedFilterId).toBe(second.id)
     await user.click(screen.getByRole('spinbutton', { name: 'Filter 1 gain dB' }))
     expect(workspaceStore.getState().selectedFilterId).toBe(second.id)
@@ -177,9 +196,7 @@ describe('FilterEditor', () => {
       filters: Array.from({ length: 64 }, (_, index) => ({ ...filter, id: `filter-${index}` })),
     })
     render(<FilterEditor />)
-    expect(screen.getByRole('button', { name: 'Add PK' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Add LS' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Add HS' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Add filter' })).toBeDisabled()
     await user.click(screen.getByRole('button', { name: 'Actions for filter 1' }))
     expect(screen.getByRole('button', { name: 'Duplicate filter 1' })).toBeDisabled()
   })

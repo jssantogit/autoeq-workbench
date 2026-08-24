@@ -87,7 +87,7 @@ describe('manual workbench integration', () => {
     expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 500, targetDb: 0 })
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
-    await user.click(screen.getByRole('button', { name: 'Add PK' }))
+    await user.click(screen.getByRole('button', { name: 'Add filter' }))
     const gain = screen.getByRole('spinbutton', { name: 'Filter 1 gain dB' })
     await user.clear(gain)
     await user.type(gain, '3')
@@ -129,7 +129,7 @@ describe('manual workbench integration', () => {
     render(<App />)
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
-    await user.click(screen.getByRole('button', { name: 'Add PK' }))
+    await user.click(screen.getByRole('button', { name: 'Add filter' }))
     const gain = screen.getByRole('spinbutton', { name: 'Filter 1 gain dB' })
     await user.clear(gain)
     await user.type(gain, '6')

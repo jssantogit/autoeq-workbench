@@ -70,9 +70,10 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
           <option value="HS">HS</option>
         </select>
       </td>
-      <td data-label="Fc">
+      <td data-label="Frequency">
         <NumberField
           label={`Filter ${rowNumber} frequency Hz`}
+          unit="Hz"
           value={filter.frequencyHz}
           min={20}
           max={20_000}
@@ -83,6 +84,7 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
       <td data-label="Gain">
         <NumberField
           label={`Filter ${rowNumber} gain dB`}
+          unit="dB"
           value={filter.gainDb}
           min={-15}
           max={15}

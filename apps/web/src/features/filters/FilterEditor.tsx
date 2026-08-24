@@ -1,14 +1,12 @@
-import type { FilterType } from '@autoeq-workbench/core'
 import { Button } from '../../components/ui/Button'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 import { FilterRow } from './FilterRow'
-
-const filterTypes: FilterType[] = ['PK', 'LS', 'HS']
 
 export function FilterEditor() {
   const filters = useWorkspaceStore((state) => state.filters)
   const selectedFilterId = useWorkspaceStore((state) => state.selectedFilterId)
   const addFilter = useWorkspaceStore((state) => state.addFilter)
+  const removeFilter = useWorkspaceStore((state) => state.removeFilter)
   const undo = useWorkspaceStore((state) => state.undo)
   const redo = useWorkspaceStore((state) => state.redo)
   const canUndo = useWorkspaceStore((state) => state.canUndo)
@@ -18,12 +16,25 @@ export function FilterEditor() {
   return (
     <div className="filter-editor">
       <div className="filter-editor__toolbar">
-        <div className="filter-editor__add" aria-label="Add filter">
-          {filterTypes.map((type) => (
-            <Button key={type} disabled={atLimit} onClick={() => addFilter(type)}>
-              Add {type}
-            </Button>
-          ))}
+        <div className="filter-editor__actions">
+          <Button aria-label="Add filter" disabled={atLimit} title="Add PK filter" onClick={() => addFilter('PK')}>
+            +
+          </Button>
+          <Button
+            aria-label="Remove selected filter"
+            disabled={selectedFilterId === null}
+            title={selectedFilterId === null ? 'Select a filter to remove it' : 'Remove selected filter'}
+            onClick={() => selectedFilterId !== null && removeFilter(selectedFilterId)}
+          >
+            -
+          </Button>
+          <Button
+            aria-label="Sort filters"
+            disabled
+            title="Sorting is unavailable until a deterministic rule is defined"
+          >
+            Sort
+          </Button>
         </div>
         <div className="filter-editor__history">
           <Button disabled={!canUndo} onClick={undo}>Undo</Button>
@@ -33,7 +44,7 @@ export function FilterEditor() {
       <div className="filter-table-wrap">
         <table className="filter-table" aria-label="Equalizer filters">
           <thead className="filter-table__head">
-            <tr><th>ON</th><th>Type</th><th>Fc</th><th>Gain</th><th>Q</th><th aria-label="Actions" /></tr>
+            <tr><th>ON</th><th>Type</th><th>Frequency</th><th>Gain</th><th>Q</th><th aria-label="Actions" /></tr>
           </thead>
           <tbody>
             {filters.map((filter, index) => (

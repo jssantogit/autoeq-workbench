@@ -19,25 +19,21 @@ export function UtilityRail() {
       </div>
       <div className="rail-normalization" role="group" aria-label="NORMALIZE">
         <span className="rail-normalization__label" aria-hidden="true">NORMALIZE</span>
-        <div className="rail-number-field">
-          <NumberField
-            label="Target dB"
-            value={normalization.targetDb}
-            step="0.1"
-            onValueChange={(targetDb) => setNormalization({ ...normalization, targetDb })}
-          />
-          <span className="rail-number-field__unit" aria-hidden="true">dB</span>
-        </div>
-        <div className="rail-number-field">
-          <NumberField
-            label="Anchor Hz"
-            value={normalization.anchorHz}
-            min={1}
-            validate={positive}
-            onValueChange={(anchorHz) => setNormalization({ ...normalization, anchorHz })}
-          />
-          <span className="rail-number-field__unit" aria-hidden="true">Hz</span>
-        </div>
+        <NumberField
+          label="Target dB"
+          unit="dB"
+          value={normalization.targetDb}
+          step="0.1"
+          onValueChange={(targetDb) => setNormalization({ ...normalization, targetDb })}
+        />
+        <NumberField
+          label="Anchor Hz"
+          unit="Hz"
+          value={normalization.anchorHz}
+          min={1}
+          validate={positive}
+          onValueChange={(anchorHz) => setNormalization({ ...normalization, anchorHz })}
+        />
       </div>
       <button
         className="utility-rail__action"

@@ -6,6 +6,7 @@ interface NumberFieldProps
   value: number
   onValueChange: (value: number) => void
   validate?: (value: number) => boolean
+  unit?: string
 }
 
 export function NumberField({
@@ -13,6 +14,7 @@ export function NumberField({
   value,
   onValueChange,
   validate = Number.isFinite,
+  unit,
   className = '',
   ...props
 }: NumberFieldProps) {
@@ -45,20 +47,24 @@ export function NumberField({
   }
 
   return (
-    <label className={`number-field ${className}`.trim()}>
+    <label className={`number-field${unit === undefined ? '' : ' number-field--with-unit'} ${className}`.trim()}>
       <span>{label}</span>
-      <input
-        {...props}
-        type="number"
-        value={editText ?? String(value)}
-        aria-invalid={invalid}
-        onChange={(event) => {
-          setEditText(event.target.value)
-          setInvalid(false)
-        }}
-        onBlur={(event) => commit(event.currentTarget.value)}
-        onKeyDown={handleKeyDown}
-      />
+      <span className="number-field__control">
+        <input
+          {...props}
+          type="number"
+          value={editText ?? String(value)}
+          aria-label={label}
+          aria-invalid={invalid}
+          onChange={(event) => {
+            setEditText(event.target.value)
+            setInvalid(false)
+          }}
+          onBlur={(event) => commit(event.currentTarget.value)}
+          onKeyDown={handleKeyDown}
+        />
+        {unit !== undefined && <span className="number-field__unit" aria-hidden="true">{unit}</span>}
+      </span>
     </label>
   )
 }
