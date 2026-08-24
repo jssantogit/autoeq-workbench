@@ -1,6 +1,6 @@
 import type { Curve, Filter } from '@autoeq-workbench/core'
 import { act, fireEvent, render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { uiStore } from '../../state/uiStore'
 import { createWorkspaceStore, deriveWorkspace } from '../../state/workspaceStore'
 import { FrequencyResponseGraph } from './FrequencyResponseGraph'
@@ -23,9 +23,34 @@ const filter: Filter = {
   id: 'filter', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 3, q: 1,
 }
 
+function installGraphMediaQuery(initialMatches: boolean) {
+  let matches = initialMatches
+  const listeners = new Set<(event: MediaQueryListEvent) => void>()
+  const mediaQuery = {
+    get matches() { return matches },
+    media: '(max-width: 430px)',
+    onchange: null,
+    addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => listeners.add(listener),
+    removeEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => listeners.delete(listener),
+  } as unknown as MediaQueryList
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: vi.fn(() => mediaQuery),
+  })
+  return {
+    listeners,
+    setMatches(nextMatches: boolean) {
+      matches = nextMatches
+      const event = { matches, media: mediaQuery.media } as MediaQueryListEvent
+      for (const listener of listeners) listener(event)
+    },
+  }
+}
+
 describe('FrequencyResponseGraph SVG renderer', () => {
   beforeEach(() => {
     uiStore.setState({ theme: 'light', curveAppearance: {}, inspectorEnabled: true })
+    Object.defineProperty(window, 'matchMedia', { configurable: true, value: undefined })
   })
 
   it('renders a responsive fixed-viewBox SVG with explicit grids and no external graph chrome', () => {
@@ -35,6 +60,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     const svg = container.querySelector('svg')!
     expect(svg).toHaveAttribute('viewBox', '0 0 800 346')
     expect(svg).toHaveAttribute('data-fr-graph')
+    expect(svg).toHaveAttribute('data-graph-presentation', 'desktop')
     expect(svg).toHaveClass('fr-graph')
     expect(svg).not.toHaveAttribute('role', 'img')
     expect(svg).toHaveStyle({ aspectRatio: '800 / 346', width: '100%', height: 'auto' })
@@ -88,10 +114,71 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-series-name="Hidden comparison"]')).not.toBeInTheDocument()
     expect(screen.getByText('Studio left')).toHaveAttribute('fill', '#1565c0')
     expect(screen.getByText('Harman target')).toHaveAttribute('fill', '#989894')
-    expect(screen.getByText('Harman target')).toHaveAttribute('x', '64')
+    expect(screen.getByText('Studio left')).toHaveAttribute('x', '67')
+    expect(screen.getByText('Harman target')).toHaveAttribute('x', '102')
+    expect(container.querySelector('[data-target-label-sample="target"]')).toHaveAttribute('x1', '67')
     expect(container.querySelector('[data-target-label-sample="target"]')).toHaveAttribute('stroke-dasharray', '7 5')
     expect(container.querySelector('[data-target-label-sample="reference"]')).toBeInTheDocument()
     expect(screen.queryByText('Hidden comparison')).not.toBeInTheDocument()
+
+    const yLabelX = Number(container.querySelector('[data-y-label="-30"]')?.getAttribute('x'))
+    const annotations = [
+      ...container.querySelectorAll('[data-curve-label]'),
+      ...container.querySelectorAll('[data-target-label-sample]'),
+    ]
+    const annotationXs = annotations
+      .map((label) => Number(label.getAttribute(label.tagName === 'line' ? 'x1' : 'x')))
+    expect(annotationXs.every((x) => x > yLabelX + 20)).toBe(true)
+    expect(annotations.every((label) =>
+      Number(label.getAttribute(label.tagName === 'line' ? 'y1' : 'y')) < 322,
+    )).toBe(true)
+  })
+
+  it('uses compact SVG units without changing graph geometry and cleans up its media listener', () => {
+    const media = installGraphMediaQuery(false)
+    const store = createWorkspaceStore()
+    for (let index = 0; index < 7; index += 1) {
+      store.getState().addCurve(curve(`curve-${index}`, `Long curve name ${index}`, 'fr', index))
+    }
+    const { container, unmount } = render(
+      <FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />,
+    )
+    const svg = container.querySelector('svg')!
+    const initialPaths = [...container.querySelectorAll('[data-series-name]')]
+      .map((path) => path.getAttribute('d'))
+
+    expect(media.listeners.size).toBe(1)
+    expect(svg).toHaveAttribute('data-graph-presentation', 'desktop')
+    act(() => media.setMatches(true))
+
+    expect(svg).toHaveAttribute('data-graph-presentation', 'compact')
+    expect(svg).toHaveAttribute('viewBox', '0 0 800 346')
+    expect(container.querySelectorAll('[data-x-grid]')).toHaveLength(25)
+    expect(container.querySelectorAll('[data-y-grid]')).toHaveLength(12)
+    expect([...container.querySelectorAll('[data-series-name]')].map((path) => path.getAttribute('d')))
+      .toEqual(initialPaths)
+    expect(container.querySelector('.graph-axis-label--x')).toHaveAttribute('font-size', '13')
+    expect(container.querySelector('[data-y-label]')).toHaveAttribute('font-size', '12')
+
+    const labels = [...container.querySelectorAll('[data-curve-label]')]
+    expect(labels[0]).toHaveAttribute('font-size', '19')
+    expect(Number(labels[0]!.getAttribute('y')) - Number(labels[1]!.getAttribute('y'))).toBe(21)
+    expect(labels.every((label) => Number(label.getAttribute('y')) < 322)).toBe(true)
+
+    fireEvent.focus(screen.getByRole('slider', { name: 'Inspect graph frequency' }))
+    const tooltip = container.querySelector('[data-inspector-tooltip-box]')
+    const tooltipRows = [...container.querySelectorAll('.graph-tooltip-value')]
+    expect(tooltip).toHaveAttribute('width', '240')
+    expect(tooltip).toHaveAttribute('height', '202')
+    expect(Number(tooltip?.getAttribute('width'))).toBeLessThan((785 - 15) / 3)
+    expect(container.querySelector('.graph-tooltip-label')).toHaveAttribute('font-size', '19')
+    expect(tooltipRows).toHaveLength(7)
+    expect(tooltipRows.every((row) => row.getAttribute('font-size') === '18')).toBe(true)
+    expect(Number(tooltipRows[1]!.getAttribute('y')) - Number(tooltipRows[0]!.getAttribute('y'))).toBe(22)
+    expect(tooltipRows.at(-1)).toHaveTextContent('+1 more')
+
+    unmount()
+    expect(media.listeners.size).toBe(0)
   })
 
   it('keeps path data stable through theme changes and updates theme-neutral colors', () => {
@@ -162,7 +249,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
 
     expect(container.querySelectorAll('[aria-label="Visible graph series"] text')).toHaveLength(9)
     expect(screen.getByText('+2 more')).toBeInTheDocument()
-    expect(screen.getByText('Curve 0')).toHaveAttribute('x', '29')
+    expect(screen.getByText('Curve 0')).toHaveAttribute('x', '67')
     expect(screen.getByText('Curve 0')).toHaveAttribute('y', '302')
     expect(screen.getByText('Curve 7')).toHaveAttribute('y', '197')
     expect(screen.getByText('+2 more')).toHaveAttribute('y', '182')
