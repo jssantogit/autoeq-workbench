@@ -16,12 +16,20 @@ describe('UI preferences', () => {
     document.documentElement.removeAttribute('data-theme')
   })
 
-  it('defaults to light theme, Curves dock, and no registered curve appearance', () => {
+  it('defaults to light theme, Curves dock, inspector enabled, and no registered curve appearance', () => {
     expect(createUiStore().getState()).toMatchObject({
       theme: 'light',
       activeDockTab: 'curves',
+      inspectorEnabled: true,
       curveAppearance: {},
     })
+  })
+
+  it('toggles the graph inspector without persisting it', () => {
+    const store = createUiStore()
+    store.getState().toggleInspector()
+    expect(store.getState().inspectorEnabled).toBe(false)
+    expect(localStorage.length).toBe(0)
   })
 
   it('restores and persists only valid theme state', () => {

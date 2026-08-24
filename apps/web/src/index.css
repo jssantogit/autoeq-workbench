@@ -123,7 +123,6 @@ select:focus-visible,
 
 .graph-panel {
   min-width: 0;
-  min-height: 480px;
   overflow: hidden;
   background: var(--color-graph-bg);
 }
@@ -170,12 +169,7 @@ select:focus-visible,
 
 .panel h2,
 .metrics h3 { margin: 0; font-size: 0.84rem; letter-spacing: -0.01em; }
-.graph-meta { display: flex; min-width: 0; min-height: 30px; align-items: center; gap: 14px; padding: 2px 8px 0 54px; }
-.graph-status { flex: 0 0 auto; margin: 0; color: var(--color-text-muted); font-size: 0.68rem; }
-.graph-status--coverage-error { color: var(--color-danger); }
-.graph-labels { display: flex; min-width: 0; gap: 12px; overflow-x: auto; margin: 0; padding: 4px 0; list-style: none; scrollbar-width: thin; white-space: nowrap; }
-.graph-labels li { flex: 0 0 auto; font-size: 0.7rem; font-weight: 700; }
-.fr-graph { width: 100%; height: 450px; }
+.fr-graph { display: block; width: 100%; height: auto; aspect-ratio: 800 / 346; touch-action: none; }
 
 .button {
   min-height: 34px;
@@ -367,9 +361,6 @@ select:focus-visible,
   .app-header p { margin-top: 1px; font-size: 0.7rem; }
   .theme-toggle { min-width: 42px; padding: 8px 10px; }
   .theme-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-  .graph-panel { min-height: 410px; }
-  .graph-meta { align-items: flex-start; flex-direction: column; gap: 0; padding: 3px 7px 0; }
-  .fr-graph { height: 368px; }
   .dock-tabs { padding: 0; }
   .dock-tabs button { flex: 1 1 0; min-width: 0; min-height: 34px; padding-inline: 4px; }
   .curves-tab { padding: 6px 0 8px; }

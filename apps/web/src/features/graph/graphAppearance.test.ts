@@ -11,7 +11,7 @@ const input: GraphAppearanceInput = {
 }
 
 describe('seriesAppearance', () => {
-  it('renders an inactive Target as the exact theme neutral gray dashed instead of the UI accent', () => {
+  it('renders every Target as theme neutral gray dashed instead of the UI accent', () => {
     const style = seriesAppearance('Target B', input, {
       curveId: 'target',
       measurementKind: 'target',
@@ -26,13 +26,9 @@ describe('seriesAppearance', () => {
       measurementKind: 'target',
       active: false,
     }).color).toBe('#8f8e8a')
-  })
-
-  it('renders a measurement Target with its assigned graph color', () => {
-    const style = seriesAppearance('Target', input, { curveId: 'target', measurementKind: 'target', active: true })
-
-    expect(style.color).toBe('#c62828')
-    expect(style.lineType).toBe('solid')
+    expect(seriesAppearance('Target', input, {
+      curveId: 'target', measurementKind: 'target', active: true,
+    })).toMatchObject({ color: '#989894', lineType: 'dashed' })
   })
 
   it('keeps FR independent from the amber UI accent', () => {

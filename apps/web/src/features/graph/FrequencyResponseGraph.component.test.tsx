@@ -1,25 +1,8 @@
 import type { Curve, Filter } from '@autoeq-workbench/core'
-import { act, render, screen, within } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { uiStore } from '../../state/uiStore'
 import { createWorkspaceStore, deriveWorkspace } from '../../state/workspaceStore'
-
-const modules = vi.hoisted(() => ({
-  GridComponent: { name: 'grid' },
-  MarkLineComponent: { name: 'mark-line' },
-  TooltipComponent: { name: 'tooltip' },
-}))
-const mocks = vi.hoisted(() => ({
-  chart: { setOption: vi.fn(), resize: vi.fn(), dispose: vi.fn(), getOption: vi.fn() },
-  init: vi.fn(),
-  use: vi.fn(),
-}))
-
-vi.mock('echarts/core', () => ({ init: mocks.init, use: mocks.use }))
-vi.mock('echarts/charts', () => ({ LineChart: { name: 'line' } }))
-vi.mock('echarts/components', () => modules)
-vi.mock('echarts/renderers', () => ({ CanvasRenderer: { name: 'canvas' } }))
-
 import { FrequencyResponseGraph } from './FrequencyResponseGraph'
 
 function curve(id: string, name: string, kind: Curve['kind'], offset = 0): Curve {
@@ -40,51 +23,32 @@ const filter: Filter = {
   id: 'filter', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 3, q: 1,
 }
 
-describe('FrequencyResponseGraph', () => {
+describe('FrequencyResponseGraph SVG renderer', () => {
   beforeEach(() => {
-    for (const mock of [mocks.chart.setOption, mocks.chart.resize, mocks.chart.dispose, mocks.init]) {
-      mock.mockClear()
-    }
-    mocks.chart.getOption.mockReset()
-    mocks.chart.getOption.mockReturnValue({})
-    mocks.init.mockReturnValue(mocks.chart)
-    uiStore.setState({ theme: 'light', curveAppearance: {} })
+    uiStore.setState({ theme: 'light', curveAppearance: {}, inspectorEnabled: true })
   })
 
-  it('initializes once, safely handles an absent initial option, resizes, and disposes', () => {
-    mocks.chart.getOption.mockReturnValue(undefined)
-    const store = createWorkspaceStore()
-    const { rerender, unmount } = render(
-      <FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />,
+  it('renders a responsive fixed-viewBox SVG with explicit grids and no external graph chrome', () => {
+    const { container } = render(
+      <FrequencyResponseGraph derived={deriveWorkspace(createWorkspaceStore().getState())} />,
     )
-    rerender(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-
-    expect(mocks.init).toHaveBeenCalledOnce()
-    expect(mocks.chart.setOption).toHaveBeenCalled()
-    act(() => window.dispatchEvent(new Event('resize')))
-    expect(mocks.chart.resize).toHaveBeenCalledOnce()
-    unmount()
-    expect(mocks.chart.dispose).toHaveBeenCalledOnce()
+    const svg = screen.getByRole('img', { name: /20 hz to 20 khz/i })
+    expect(svg).toHaveAttribute('viewBox', '0 0 800 346')
+    expect(svg).toHaveClass('fr-graph')
+    expect(svg).toHaveStyle({ aspectRatio: '800 / 346', width: '100%', height: 'auto' })
+    expect(container.querySelectorAll('[data-x-grid]')).toHaveLength(25)
+    expect(container.querySelectorAll('[data-y-grid]')).toHaveLength(12)
+    expect(container.querySelector('[data-y-grid="0"]')).toHaveAttribute('data-emphasis', 'zero')
+    expect(container.querySelector('.graph-meta')).not.toBeInTheDocument()
+    expect(container.querySelector('[class*="legend"]')).not.toBeInTheDocument()
+    expect(container.innerHTML).not.toMatch(/sampling|dataZoom|toolbox|Reset View/)
   })
 
-  it('registers and configures no zoom, toolbox, or standard legend', () => {
-    render(<FrequencyResponseGraph derived={deriveWorkspace(createWorkspaceStore().getState())} />)
-    const registered = mocks.use.mock.calls[0]?.[0] as { name: string }[]
-    const option = mocks.chart.setOption.mock.calls.at(-1)?.[0]
-
-    expect(registered.map(({ name }) => name)).toEqual(['line', 'grid', 'mark-line', 'tooltip', 'canvas'])
-    expect(option).not.toHaveProperty('dataZoom')
-    expect(option).not.toHaveProperty('legend')
-    expect(option).not.toHaveProperty('toolbox')
-    expect(screen.queryByText('Reset View')).not.toBeInTheDocument()
-    expect(screen.queryByRole('toolbar', { name: /graph/i })).not.toBeInTheDocument()
-  })
-
-  it('plots every visible measurement by actual name and labels it with its effective color', () => {
+  it('renders visible series and internal names with effective styles while omitting hidden curves', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(curve('source', 'Studio left', 'fr'))
     store.getState().addCurve(curve('target', 'Harman target', 'target', 1))
-    store.getState().addCurve(curve('reference', 'Archive reference', 'target', 2))
+    store.getState().addCurve(curve('reference', 'Archive target', 'target', 2))
     store.getState().addCurve(curve('comparison', 'Room comparison', 'fr', 3))
     store.getState().addCurve(curve('hidden', 'Hidden comparison', 'fr', 4))
     store.getState().setFilters([filter], 'manual')
@@ -98,36 +62,67 @@ describe('FrequencyResponseGraph', () => {
       },
     })
 
-    render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-    const option = mocks.chart.setOption.mock.calls.at(-1)?.[0]
-    expect(option.series.map(({ name }: { name: string }) => name)).toEqual([
-      'Studio left', 'Harman target', 'Archive reference', 'Room comparison', 'FR + EQ',
+    const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+    const paths = [...container.querySelectorAll<SVGPathElement>('[data-series-name]')]
+    expect(paths.map((path) => path.dataset.seriesName)).toEqual([
+      'Studio left', 'Harman target', 'Archive target', 'Room comparison', 'FR + EQ',
     ])
-    expect(option.series.find(({ name }: { name: string }) => name === 'Archive reference').lineStyle)
-      .toMatchObject({ color: '#989894', type: 'dashed' })
-    expect(option.series.some(({ name }: { name: string }) => name === 'Hidden comparison')).toBe(false)
-    expect(option.series.some(({ name }: { name: string }) => name === 'PEQ')).toBe(false)
-    expect(option.series.some(({ name }: { name: string }) => name === 'Desired')).toBe(false)
-
-    const labels = screen.getByRole('list', { name: 'Visible graph series' })
-    expect(within(labels).getByText('Studio left')).toHaveStyle({ color: '#1565c0' })
-    expect(within(labels).getByText('Harman target')).toHaveStyle({ color: '#c62828' })
-    expect(within(labels).getByText('Archive reference')).toHaveStyle({ color: '#989894' })
-    expect(within(labels).getByText('Room comparison')).toHaveStyle({ color: '#6a1b9a' })
-    expect(within(labels).queryByText('Hidden comparison')).not.toBeInTheDocument()
+    for (const name of ['Harman target', 'Archive target']) {
+      const target = container.querySelector(`[data-series-name="${name}"]`)
+      expect(target).toHaveAttribute('stroke', '#989894')
+      expect(target).toHaveAttribute('stroke-dasharray')
+    }
+    expect(container.querySelector('[data-series-name="FR + EQ"]')).toHaveAttribute('stroke', '#1565c0')
+    expect(container.querySelector('[data-series-name="Hidden comparison"]')).not.toBeInTheDocument()
+    expect(screen.getByText('Studio left')).toHaveAttribute('fill', '#1565c0')
+    expect(screen.getByText('Harman target')).toHaveAttribute('fill', '#989894')
+    expect(screen.queryByText('Hidden comparison')).not.toBeInTheDocument()
   })
 
-  it('updates theme colors without changing canonical series data', () => {
+  it('keeps path data stable through theme changes and updates theme-neutral colors', () => {
     const store = createWorkspaceStore()
-    store.getState().addCurve(curve('source', 'Source measurement', 'fr'))
-    uiStore.setState({ curveAppearance: { source: { color: '#00796b', visible: true } } })
-    render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-    const initialData = mocks.chart.setOption.mock.calls.at(-1)?.[0].series[0].data
-
+    store.getState().addCurve(curve('source', 'Source', 'fr'))
+    store.getState().addCurve(curve('target', 'Target', 'target'))
+    uiStore.setState({ curveAppearance: {
+      source: { color: '#00796b', visible: true }, target: { color: '#ff0000', visible: true },
+    } })
+    const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+    const initialPath = container.querySelector('[data-series-name="Source"]')?.getAttribute('d')
     act(() => uiStore.setState({ theme: 'dark' }))
-    const option = mocks.chart.setOption.mock.calls.at(-1)?.[0]
-    expect(option.backgroundColor).toBe('#0b1012')
-    expect(option.series[0].data).toEqual(initialData)
-    expect(option.series[0].itemStyle.color).toBe('#00796b')
+    expect(container.querySelector('[data-series-name="Source"]')).toHaveAttribute('d', initialPath)
+    expect(container.querySelector('[data-series-name="Source"]')).toHaveAttribute('stroke', '#00796b')
+    expect(container.querySelector('[data-series-name="Target"]')).toHaveAttribute('stroke', '#8f8e8a')
+  })
+
+  it('shows a clamped structured pointer inspector and crosshair, then hides on leave or disable', () => {
+    const store = createWorkspaceStore()
+    store.getState().addCurve(curve('source', 'Source', 'fr'))
+    const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+    const svg = screen.getByRole('img')
+    Object.defineProperty(svg, 'getBoundingClientRect', {
+      value: () => ({ left: 100, top: 0, width: 400, height: 173, right: 500, bottom: 173, x: 100, y: 0, toJSON: () => ({}) }),
+    })
+    fireEvent.pointerMove(container.querySelector('[data-inspector-hit-area]')!, { clientX: 300 })
+    expect(container.querySelector('[data-inspector-crosshair]')).toBeInTheDocument()
+    expect(screen.getByText('632 Hz')).toBeInTheDocument()
+    expect(screen.getByText(/Source:/)).toBeInTheDocument()
+    fireEvent.pointerMove(container.querySelector('[data-inspector-hit-area]')!, { clientX: 499 })
+    expect(container.querySelector('[data-inspector-tooltip]')).toHaveAttribute('transform', 'translate(611 30)')
+    fireEvent.pointerLeave(container.querySelector('[data-inspector-hit-area]')!)
+    expect(container.querySelector('[data-inspector-crosshair]')).not.toBeInTheDocument()
+    act(() => uiStore.getState().toggleInspector())
+    fireEvent.pointerMove(container.querySelector('[data-inspector-hit-area]')!, { clientX: 300 })
+    expect(container.querySelector('[data-inspector-crosshair]')).not.toBeInTheDocument()
+  })
+
+  it('keeps the status message and selected-filter Fc marker inside the graph', () => {
+    const store = createWorkspaceStore()
+    store.getState().addCurve(curve('source', 'Source', 'fr'))
+    store.getState().setFilters([filter], 'manual')
+    store.getState().selectFilter('filter')
+    const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+    expect(container.querySelector('[data-graph-status]')).toHaveTextContent(/target/i)
+    expect(container.querySelector('[data-selected-frequency="1000"]')).toBeInTheDocument()
+    expect(screen.getByText('1kHz')).toBeInTheDocument()
   })
 })

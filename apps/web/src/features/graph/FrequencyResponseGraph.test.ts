@@ -116,7 +116,7 @@ describe('buildGraphSeries', () => {
   })
 
   it('allows future imported-curve series names without a brittle fixed-name contract', () => {
-    const text = formatGraphInspector(
+    const inspector = formatGraphInspector(
       1_000,
       [{
         id: 'room',
@@ -130,7 +130,8 @@ describe('buildGraphSeries', () => {
       }],
     )
 
-    expect(text).toContain('Room overlay:')
+    expect(inspector.values[0]?.name).toBe('Room overlay')
+    expect(inspector.values[0]?.db).toBeTypeOf('number')
   })
 
   it('keeps a disabled selected filter response inspectable with its Fc marker', () => {
@@ -169,7 +170,7 @@ describe('buildGraphSeries', () => {
 
 describe('formatGraphInspector', () => {
   it('log-interpolates values at the pointer and lists only present visible series', () => {
-    const text = formatGraphInspector(
+    const inspector = formatGraphInspector(
       1_000,
       [
         {
@@ -201,9 +202,13 @@ describe('formatGraphInspector', () => {
       ],
     )
 
-    expect(text).toContain('1.00 kHz')
-    expect(text).toContain('Source: 10.00 dB')
-    expect(text).toContain('Target: 5.00 dB')
-    expect(text).not.toContain('PEQ')
+    expect(inspector).toEqual({
+      frequencyHz: 1_000,
+      frequencyLabel: '1.00 kHz',
+      values: [
+        { id: 'source', name: 'Source', db: 10 },
+        { id: 'target', name: 'Target', db: 5 },
+      ],
+    })
   })
 })

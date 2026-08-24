@@ -28,10 +28,16 @@ export interface DerivedGraphSeries extends GraphSeriesBase {
 
 export type GraphSeries = MeasurementGraphSeries | DerivedGraphSeries
 
+export interface GraphInspector {
+  frequencyHz: number
+  frequencyLabel: string
+  values: { id: string; name: string; db: number }[]
+}
+
 export function formatGraphInspector(
   frequencyHz: number,
   series: readonly GraphSeries[],
-): string {
+): GraphInspector {
   const frequency =
     frequencyHz >= 1_000 ? `${(frequencyHz / 1_000).toFixed(2)} kHz` : `${frequencyHz.toFixed(0)} Hz`
   const values = series.flatMap((item) => {
@@ -44,10 +50,10 @@ export function formatGraphInspector(
       db,
     }))
     const db = interpolateLogFrequency(points, [frequencyHz])[0]!
-    return [`${item.name}: ${db.toFixed(2)} dB`]
+    return [{ id: item.id, name: item.name, db }]
   })
 
-  return [frequency, ...values].join('<br/>')
+  return { frequencyHz, frequencyLabel: frequency, values }
 }
 
 function graphSeries(

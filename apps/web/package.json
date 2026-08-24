@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@autoeq-workbench/core": "workspace:*",
-    "echarts": "^6.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "zustand": "^5.0.11"

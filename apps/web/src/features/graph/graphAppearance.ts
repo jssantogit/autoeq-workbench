@@ -47,7 +47,7 @@ export function seriesAppearance(
     : input.curveAppearance[series.curveId]?.color
 
   if (series?.measurementKind !== undefined) {
-    return series.measurementKind === 'target' && series.active === false
+    return series.measurementKind === 'target'
       ? {
           color: graphTheme(input.theme).inactiveTarget,
           lineType: 'dashed' as const,

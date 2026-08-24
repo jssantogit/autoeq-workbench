@@ -12,9 +12,11 @@ export interface CurveAppearance {
 export interface UiState {
   theme: ThemeMode
   activeDockTab: DockTab
+  inspectorEnabled: boolean
   curveAppearance: Record<string, CurveAppearance>
   setTheme: (theme: ThemeMode) => void
   setActiveDockTab: (tab: DockTab) => void
+  toggleInspector: () => void
   registerCurve: (id: string) => void
   unregisterCurve: (id: string) => void
   setCurveColor: (id: string, color: string) => void
@@ -84,6 +86,7 @@ export function createUiStore(random: () => number = Math.random) {
   return createStore<UiState>()((set) => ({
     theme: readTheme(),
     activeDockTab: 'curves',
+    inspectorEnabled: true,
     curveAppearance: {},
     setTheme: (theme) => {
       set({ theme })
@@ -91,6 +94,7 @@ export function createUiStore(random: () => number = Math.random) {
       persistTheme(theme)
     },
     setActiveDockTab: (activeDockTab) => set({ activeDockTab }),
+    toggleInspector: () => set((state) => ({ inspectorEnabled: !state.inspectorEnabled })),
     registerCurve: (id) =>
       set((state) => {
         if (id.length === 0 || state.curveAppearance[id] !== undefined) return state
