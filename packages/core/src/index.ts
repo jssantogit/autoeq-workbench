@@ -5,6 +5,8 @@ export {
   residualError,
 } from './curves/derive.js'
 export { MVP_NUMERIC_POLICY, createEvaluationGrid } from './config/numericPolicy.js'
+export { DEFAULT_AUTOEQ_SETTINGS, isValidAutoEqSettings } from './config/autoeqSettings.js'
+export type { AutoEqSettings } from './config/autoeqSettings.js'
 export { createLogGrid } from './curves/grid.js'
 export { interpolateLogFrequency } from './curves/interpolate.js'
 export { applyOffset, normalizationOffset } from './curves/normalize.js'

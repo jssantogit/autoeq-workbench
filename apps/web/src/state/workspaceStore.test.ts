@@ -1,4 +1,10 @@
-import { createEvaluationGrid, type Curve, type Filter } from '@autoeq-workbench/core'
+import {
+  createEvaluationGrid,
+  DEFAULT_AUTOEQ_SETTINGS,
+  type AutoEqSettings,
+  type Curve,
+  type Filter,
+} from '@autoeq-workbench/core'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createWorkspaceStore, defaultNormalization, deriveWorkspace } from './workspaceStore'
 
@@ -182,6 +188,46 @@ describe('workspace curve collection', () => {
 })
 
 describe('workspace history and filters', () => {
+  it('stores valid AutoEQ settings as copied undoable snapshots and rejects invalid updates', () => {
+    const store = createWorkspaceStore()
+    const settings: AutoEqSettings = { ...DEFAULT_AUTOEQ_SETTINGS, minFrequencyHz: 30, maxQ: 10 }
+
+    expect(store.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
+    expect(store.getState().autoeqSettings).not.toBe(DEFAULT_AUTOEQ_SETTINGS)
+    store.getState().setAutoEqSettings(settings)
+    expect(store.getState().autoeqSettings).toEqual(settings)
+    expect(store.getState().autoeqSettings).not.toBe(settings)
+
+    settings.minFrequencyHz = 40
+    expect(store.getState().autoeqSettings.minFrequencyHz).toBe(30)
+    store.getState().undo()
+    expect(store.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
+    expect(store.getState().autoeqSettings).not.toBe(DEFAULT_AUTOEQ_SETTINGS)
+    store.getState().redo()
+    expect(store.getState().autoeqSettings).toMatchObject({ minFrequencyHz: 30, maxQ: 10 })
+    expect(store.getState().autoeqSettings).not.toBe(settings)
+
+    const before = store.getState()
+    store.getState().setAutoEqSettings({ ...before.autoeqSettings, minQ: before.autoeqSettings.maxQ })
+    expect(store.getState()).toBe(before)
+  })
+
+  it('stales nonempty AutoEQ-provenance filters on settings changes but leaves manual filters clean', () => {
+    const autoEqStore = createWorkspaceStore()
+    autoEqStore.getState().setFilters([filter], 'autoeq')
+    autoEqStore.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxGainDb: 12 })
+    expect(autoEqStore.getState()).toMatchObject({ solutionState: 'stale', filters: [filter] })
+
+    const manualStore = createWorkspaceStore()
+    manualStore.getState().setFilters([filter], 'manual')
+    manualStore.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxGainDb: 12 })
+    expect(manualStore.getState()).toMatchObject({ solutionState: 'clean', filters: [filter] })
+
+    const emptyStore = createWorkspaceStore()
+    emptyStore.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxGainDb: 12 })
+    expect(emptyStore.getState().solutionState).toBe('clean')
+  })
+
   it('keeps normalization and filter undo/redo independent from curve collection', () => {
     const store = createWorkspaceStore()
     store.getState().setFilters([filter], 'autoeq')

@@ -1,3 +1,4 @@
+import { DEFAULT_AUTOEQ_SETTINGS } from '@autoeq-workbench/core'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -27,6 +28,7 @@ describe('App', () => {
       activeFrId: null,
       activeTargetId: null,
       normalization: { anchorHz: 500, targetDb: 0 },
+      autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
     })
   })
 

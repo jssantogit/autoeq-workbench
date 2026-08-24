@@ -5,11 +5,14 @@ import {
   calculatePreampDb,
   cascadeMagnitudeDb,
   createEvaluationGrid,
+  DEFAULT_AUTOEQ_SETTINGS,
   desiredCorrection,
   MVP_NUMERIC_POLICY,
+  isValidAutoEqSettings,
   prepareCurve,
   residualError,
   type Curve,
+  type AutoEqSettings,
   type CurveKind,
   type ErrorMetrics,
   type Filter,
@@ -33,6 +36,7 @@ export interface WorkspaceState {
   activeFrId: string | null
   activeTargetId: string | null
   normalization: Normalization
+  autoeqSettings: AutoEqSettings
   filters: Filter[]
   selectedFilterId: string | null
   solutionState: SolutionState
@@ -43,6 +47,7 @@ export interface WorkspaceState {
   renameCurve: (curveId: string, name: string) => void
   removeCurve: (curveId: string) => void
   setNormalization: (value: Normalization) => void
+  setAutoEqSettings: (settings: AutoEqSettings) => void
   setFilters: (filters: Filter[], provenance: FilterProvenance) => void
   selectFilter: (id: string | null) => void
   addFilter: (type: FilterType) => void
@@ -183,6 +188,7 @@ export function createWorkspaceStore() {
 
   return createStore<WorkspaceState>()((set, get) => ({
     ...initialState,
+    autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
     addCurve: (curve) => {
       if (get().curves.some((existing) => existing.id === curve.id)) return false
       set((state) => {
@@ -263,6 +269,19 @@ export function createWorkspaceStore() {
         ) return state
         return record(state, {
           normalization: { ...value },
+          solutionState: afterNormalizationChange(state),
+        })
+      }),
+    setAutoEqSettings: (settings) =>
+      set((state) => {
+        if (
+          !isValidAutoEqSettings(settings) ||
+          Object.entries(settings).every(
+            ([key, value]) => state.autoeqSettings[key as keyof AutoEqSettings] === value,
+          )
+        ) return state
+        return record(state, {
+          autoeqSettings: { ...settings },
           solutionState: afterNormalizationChange(state),
         })
       }),

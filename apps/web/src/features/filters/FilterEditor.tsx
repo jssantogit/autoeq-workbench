@@ -15,32 +15,6 @@ export function FilterEditor() {
 
   return (
     <div className="filter-editor">
-      <div className="filter-editor__toolbar">
-        <div className="filter-editor__actions">
-          <Button aria-label="Add filter" disabled={atLimit} title="Add PK filter" onClick={() => addFilter('PK')}>
-            +
-          </Button>
-          <Button
-            aria-label="Remove selected filter"
-            disabled={selectedFilterId === null}
-            title={selectedFilterId === null ? 'Select a filter to remove it' : 'Remove selected filter'}
-            onClick={() => selectedFilterId !== null && removeFilter(selectedFilterId)}
-          >
-            -
-          </Button>
-          <Button
-            aria-label="Sort filters"
-            disabled
-            title="Sorting is unavailable until a deterministic rule is defined"
-          >
-            Sort
-          </Button>
-        </div>
-        <div className="filter-editor__history">
-          <Button disabled={!canUndo} onClick={undo}>Undo</Button>
-          <Button disabled={!canRedo} onClick={redo}>Redo</Button>
-        </div>
-      </div>
       <div className="filter-table-wrap">
         <table className="filter-table" aria-label="Equalizer filters">
           <thead className="filter-table__head">
@@ -59,6 +33,31 @@ export function FilterEditor() {
           </tbody>
         </table>
         {filters.length === 0 && <p className="filter-editor__empty">Add a filter to begin EQ.</p>}
+      </div>
+      <div className="filter-editor__toolbar">
+        <div className="filter-editor__actions">
+          <Button
+            aria-label="Add filter"
+            disabled={atLimit}
+            title="Add PK filter"
+            onClick={() => addFilter('PK')}
+          >+</Button>
+          <Button
+            aria-label="Remove selected filter"
+            disabled={selectedFilterId === null}
+            title={selectedFilterId === null ? 'Select a filter to remove it' : 'Remove selected filter'}
+            onClick={() => selectedFilterId !== null && removeFilter(selectedFilterId)}
+          >-</Button>
+          <Button
+            aria-label="Sort filters"
+            disabled
+            title="Sorting is unavailable until a deterministic rule is defined"
+          >Sort</Button>
+        </div>
+        <div className="filter-editor__history">
+          <Button disabled={!canUndo} onClick={undo}>Undo</Button>
+          <Button disabled={!canRedo} onClick={redo}>Redo</Button>
+        </div>
       </div>
       <p className="filter-editor__count">{filters.length} / 64 filters</p>
     </div>

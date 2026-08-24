@@ -1,5 +1,5 @@
-import type { Curve, Filter } from '@autoeq-workbench/core'
-import { render, screen, within } from '@testing-library/react'
+import { DEFAULT_AUTOEQ_SETTINGS, type Curve, type Filter } from '@autoeq-workbench/core'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { workspaceStore } from '../../state/workspaceStore'
@@ -31,6 +31,7 @@ describe('EqualizerTab', () => {
       curves: [],
       activeFrId: null,
       activeTargetId: null,
+      autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
       filters: [],
       selectedFilterId: null,
       filterProvenance: null,
@@ -108,5 +109,63 @@ describe('EqualizerTab', () => {
     expect(autoEq).toHaveAttribute('title', 'Auto EQ engine arrives in Plan 2')
     await user.click(autoEq)
     expect(workspaceStore.getState()).toEqual(before)
+  })
+
+  it('uses separate FR and Target action rows so the mobile hierarchy cannot collapse to one row', () => {
+    render(<EqualizerTab />)
+
+    const profile = screen.getByRole('group', { name: 'Equalizer profile' })
+    const frRow = within(profile).getByRole('combobox', { name: 'FR' }).closest('.equalizer-profile__fr-row')
+    const targetRow = within(profile).getByRole('combobox', { name: 'Target' }).closest('.equalizer-profile__target-row')
+    expect(frRow).toBeInTheDocument()
+    expect(targetRow).toBeInTheDocument()
+    expect(frRow).not.toBe(targetRow)
+    expect(targetRow).toContainElement(within(profile).getByRole('button', { name: 'Auto EQ' }))
+  })
+
+  it('expands compact settings with accessible values and commits valid full updates', async () => {
+    const user = userEvent.setup()
+    render(<EqualizerTab />)
+
+    expect(screen.getByRole('heading', { name: 'Parametric Equalizer' })).toBeVisible()
+    const toggle = screen.getByRole('button', { name: 'AutoEQ settings' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(toggle).toHaveAttribute('aria-controls', 'autoeq-settings')
+    expect(screen.queryByRole('region', { name: 'AutoEQ Settings' })).not.toBeInTheDocument()
+
+    await user.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    const settings = screen.getByRole('region', { name: 'AutoEQ Settings' })
+    expect(settings).toHaveAttribute('id', 'autoeq-settings')
+    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })).toHaveValue(20)
+    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum frequency Hz' })).toHaveValue(20_000)
+    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum gain dB' })).toHaveValue(-15)
+    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })).toHaveValue(15)
+    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum Q' })).toHaveValue(0.1)
+    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum Q' })).toHaveValue(12)
+    expect(within(settings).getAllByText('Hz')).toHaveLength(2)
+    expect(within(settings).getAllByText('dB')).toHaveLength(2)
+
+    const minimumFrequency = within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })
+    await user.clear(minimumFrequency)
+    await user.type(minimumFrequency, '30')
+    fireEvent.blur(minimumFrequency)
+    expect(workspaceStore.getState().autoeqSettings.minFrequencyHz).toBe(30)
+
+    await user.click(toggle)
+    expect(screen.queryByRole('region', { name: 'AutoEQ Settings' })).not.toBeInTheDocument()
+  })
+
+  it('keeps invalid cross-bound setting edits local', async () => {
+    const user = userEvent.setup()
+    render(<EqualizerTab />)
+    await user.click(screen.getByRole('button', { name: 'AutoEQ settings' }))
+    const minimumFrequency = screen.getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })
+
+    await user.clear(minimumFrequency)
+    await user.type(minimumFrequency, '20000')
+    fireEvent.blur(minimumFrequency)
+    expect(minimumFrequency).toHaveAttribute('aria-invalid', 'true')
+    expect(workspaceStore.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
   })
 })

@@ -1,3 +1,4 @@
+import { DEFAULT_AUTOEQ_SETTINGS } from '@autoeq-workbench/core'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -34,6 +35,7 @@ describe('manual workbench integration', () => {
       activeFrId: null,
       activeTargetId: null,
       normalization: { ...defaultNormalization },
+      autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
       filters: [],
       selectedFilterId: null,
       solutionState: 'clean',

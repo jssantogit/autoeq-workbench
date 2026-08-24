@@ -1,3 +1,4 @@
+import { DEFAULT_AUTOEQ_SETTINGS } from '@autoeq-workbench/core'
 import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
@@ -25,6 +26,7 @@ describe('DetailsTab', () => {
       activeFrId: null,
       activeTargetId: null,
       normalization: { ...defaultNormalization },
+      autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
       filters: [],
       selectedFilterId: null,
       solutionState: 'clean',

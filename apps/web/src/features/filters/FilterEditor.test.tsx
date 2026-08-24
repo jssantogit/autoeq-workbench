@@ -1,4 +1,4 @@
-import type { Filter } from '@autoeq-workbench/core'
+import { DEFAULT_AUTOEQ_SETTINGS, type Filter } from '@autoeq-workbench/core'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -17,6 +17,7 @@ const filter: Filter = {
 describe('FilterEditor', () => {
   beforeEach(() => {
     workspaceStore.setState({
+      autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
       filters: [],
       selectedFilterId: null,
       filterProvenance: null,

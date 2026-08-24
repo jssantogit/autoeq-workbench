@@ -54,7 +54,7 @@ export function NumberField({
           {...props}
           type="number"
           value={editText ?? String(value)}
-          aria-label={label}
+          aria-label={props['aria-label'] ?? label}
           aria-invalid={invalid}
           onChange={(event) => {
             setEditText(event.target.value)
