@@ -2,6 +2,7 @@ import type { Curve, Filter } from '@autoeq-workbench/core'
 import { describe, expect, it } from 'vitest'
 import { createWorkspaceStore, deriveWorkspace } from '../../state/workspaceStore'
 import { buildGraphSeries, formatGraphInspector } from './graphSeries'
+import { createNaturalSplineSegments } from './graphGeometry'
 
 const source: Curve = {
   id: 'source',
@@ -208,5 +209,20 @@ describe('formatGraphInspector', () => {
       values: [{ id: 'source', name: 'Source' }, { id: 'target', name: 'Target', db: 5 }],
     })
     expect(inspector.values[0]!.db).toBeCloseTo(10, 8)
+  })
+
+  it('uses caller-precomputed spline segments when supplied', () => {
+    const series = [{
+      name: 'Source', id: 'source', kind: 'measurement' as const,
+      data: [[20, 99], [20_000, 99]] as [number, number][],
+      defaultVisible: true, curveId: 'source', measurementKind: 'fr' as const, active: true,
+    }]
+    const prepared = new Map([[
+      'source',
+      createNaturalSplineSegments([[10, 0], [200, 4], [30_000, 0]]),
+    ]])
+
+    expect(formatGraphInspector(20, series, prepared).values[0]!.db).not.toBe(99)
+    expect(formatGraphInspector(20_000, series, prepared).values[0]!.db).not.toBe(99)
   })
 })

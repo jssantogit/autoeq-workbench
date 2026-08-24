@@ -13,6 +13,7 @@ import {
   createNaturalSplinePath,
   createNaturalSplineSegments,
   evaluateNaturalSpline,
+  evaluateNaturalSplineSegments,
   frequencyToX,
   generateXTicks,
   generateYTicks,
@@ -74,11 +75,52 @@ describe('natural spline path', () => {
     expect(first).not.toMatch(/NaN|Infinity/)
   })
 
-  it('clips invalid and out-of-domain points before constructing the path', () => {
+  it('retains finite positive bracketing points for the SVG clip path', () => {
     const path = createNaturalSplinePath([
       [10, 0], [20, 0], [200, Number.NaN], [2_000, 2], [20_000, 0], [30_000, 0],
     ])
-    expect(path.match(/C/g)).toHaveLength(2)
+    expect(path.match(/C/g)).toHaveLength(4)
+    expect(path.startsWith('M-')).toBe(true)
+    expect(path).not.toMatch(/NaN|Infinity/)
+  })
+
+  it('sorts unsorted points and resolves duplicate frequencies deterministically', () => {
+    const segments = createNaturalSplineSegments([
+      [2_000, 2], [20, 0], [200, 1], [200, 3], [20_000, 4],
+    ])
+
+    expect(segments.map(({ start }) => start.x)).toEqual(
+      [...segments.map(({ start }) => start.x)].sort((left, right) => left - right),
+    )
+    expect(segments).toHaveLength(3)
+    expect(evaluateNaturalSplineSegments(segments, 200)).toBe(3)
+  })
+
+  it('uses log frequency as the monotonic independent coordinate on irregular spacing', () => {
+    const segments = createNaturalSplineSegments([
+      [10, -2], [23, 4], [900, -7], [1_100, 8], [30_000, 1],
+    ])
+
+    for (const segment of segments) {
+      expect(segment.control1.x).toBeGreaterThan(segment.start.x)
+      expect(segment.control1.x).toBeLessThan(segment.control2.x)
+      expect(segment.control2.x).toBeLessThan(segment.end.x)
+      expect([
+        segment.start.x, segment.control1.x, segment.control2.x, segment.end.x,
+        segment.start.y, segment.control1.y, segment.control2.y, segment.end.y,
+      ].every(Number.isFinite)).toBe(true)
+    }
+  })
+
+  it('crosses the visible domain from bracketing points and evaluates both plot edges', () => {
+    const points: [number, number][] = [[10, -3], [100, 5], [10_000, -2], [30_000, 4]]
+    const segments = createNaturalSplineSegments(points)
+    const path = createNaturalSplinePath(points)
+
+    expect(segments[0]!.start.x).toBeLessThan(PLOT_LEFT)
+    expect(segments.at(-1)!.end.x).toBeGreaterThan(PLOT_RIGHT)
+    expect(evaluateNaturalSplineSegments(segments, 20)).toSatisfy(Number.isFinite)
+    expect(evaluateNaturalSplineSegments(segments, 20_000)).toSatisfy(Number.isFinite)
     expect(path).not.toMatch(/NaN|Infinity/)
   })
 
@@ -95,6 +137,8 @@ describe('natural spline path', () => {
       `C${Number(segment.control1.x.toFixed(3))},${Number(segment.control1.y.toFixed(3))}`,
     )
     expect(yDbToY(evaluateNaturalSpline(points, midpointFrequency)!)).toBeCloseTo(midpointY, 8)
+    expect(evaluateNaturalSplineSegments(createNaturalSplineSegments(points), midpointFrequency))
+      .toBeCloseTo(evaluateNaturalSpline(points, midpointFrequency)!, 10)
     expect(evaluateNaturalSpline(points, 20)).toBe(0)
     expect(evaluateNaturalSpline(points, 20_000)).toBe(2)
     expect(evaluateNaturalSpline(points, 10)).toBeNull()

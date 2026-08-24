@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { useEffect, useId, useMemo, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { useUiStore } from '../../state/uiStore'
 import type { WorkspaceDerived } from '../../state/workspaceStore'
 import { graphTheme, seriesAppearance } from './graphAppearance'
@@ -11,10 +11,10 @@ import {
   PLOT_TOP,
   X_MAX_HZ,
   X_MIN_HZ,
-  createNaturalSplinePath,
   frequencyToX,
   generateXTicks,
   generateYTicks,
+  prepareNaturalSpline,
   xToFrequency,
   yDbToY,
 } from './graphGeometry'
@@ -112,16 +112,22 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
   const theme = useUiStore((state) => state.theme)
   const curveAppearance = useUiStore((state) => state.curveAppearance)
   const inspectorEnabled = useUiStore((state) => state.inspectorEnabled)
-  const appearanceInput = { theme, curveAppearance, frCurveId: derived.activeFrId ?? undefined }
-  const visibleSeries = buildGraphSeries(derived).filter((series) =>
+  const visibleSeries = useMemo(() => buildGraphSeries(derived).filter((series) =>
     series.kind === 'measurement'
       ? (curveAppearance[series.curveId]?.visible ?? true)
       : series.defaultVisible,
-  )
-  const presentedSeries = visibleSeries.map((series) => ({
-    series,
-    appearance: seriesAppearance(series.name, appearanceInput, series),
-  }))
+  ), [curveAppearance, derived])
+  const presentedSeries = useMemo(() => {
+    const appearanceInput = { theme, curveAppearance, frCurveId: derived.activeFrId ?? undefined }
+    return visibleSeries.map((series) => ({
+      series,
+      appearance: seriesAppearance(series.name, appearanceInput, series),
+      spline: prepareNaturalSpline(series.data),
+    }))
+  }, [curveAppearance, derived.activeFrId, theme, visibleSeries])
+  const preparedSegments = useMemo(() => new Map(
+    presentedSeries.map(({ series, spline }) => [series.id, spline.segments] as const),
+  ), [presentedSeries])
   const colors = graphTheme(theme)
   const xTicks = generateXTicks()
   const yTicks = generateYTicks()
@@ -132,13 +138,13 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
 
   function inspectAtX(nextX: number): void {
     const x = Math.min(PLOT_RIGHT, Math.max(PLOT_LEFT, nextX))
-    setInspector({ x, details: formatGraphInspector(xToFrequency(x), visibleSeries) })
+    setInspector({ x, details: formatGraphInspector(xToFrequency(x), visibleSeries, preparedSegments) })
   }
 
   function inspectAtFrequency(frequencyHz: number): void {
     setInspector({
       x: frequencyToX(frequencyHz),
-      details: formatGraphInspector(frequencyHz, visibleSeries),
+      details: formatGraphInspector(frequencyHz, visibleSeries, preparedSegments),
     })
   }
 
@@ -248,11 +254,11 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
           >dB</text>
         </g>
         <g clipPath={`url(#${clipId})`}>
-          {presentedSeries.map(({ series, appearance }) => (
+          {presentedSeries.map(({ series, appearance, spline }) => (
             <path
               key={series.id}
               data-series-name={series.name}
-              d={createNaturalSplinePath(series.data)}
+              d={spline.path}
               fill="none"
               stroke={appearance.color}
               strokeWidth={appearance.lineWidth}

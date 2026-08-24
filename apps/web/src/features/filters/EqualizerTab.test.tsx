@@ -168,4 +168,33 @@ describe('EqualizerTab', () => {
     expect(minimumFrequency).toHaveAttribute('aria-invalid', 'true')
     expect(workspaceStore.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
   })
+
+  it('commits validator-valid gain and Q ranges beyond defaults without native contradictions', async () => {
+    const user = userEvent.setup()
+    render(<EqualizerTab />)
+    await user.click(screen.getByRole('button', { name: 'AutoEQ settings' }))
+    const minimumGain = screen.getByRole('spinbutton', { name: 'AutoEQ minimum gain dB' })
+    const maximumGain = screen.getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })
+    const maximumQ = screen.getByRole('spinbutton', { name: 'AutoEQ maximum Q' })
+
+    expect(minimumGain).not.toHaveAttribute('min')
+    expect(minimumGain).not.toHaveAttribute('max')
+    expect(maximumQ).not.toHaveAttribute('min')
+    expect(maximumQ).not.toHaveAttribute('max')
+    for (const [input, value] of [[minimumGain, '-20'], [maximumGain, '25'], [maximumQ, '20']] as const) {
+      await user.clear(input)
+      await user.type(input, value)
+      fireEvent.blur(input)
+      expect(input).toBeValid()
+    }
+    expect(workspaceStore.getState().autoeqSettings).toMatchObject({
+      minGainDb: -20, maxGainDb: 25, maxQ: 20,
+    })
+
+    await user.clear(minimumGain)
+    await user.type(minimumGain, '30')
+    fireEvent.blur(minimumGain)
+    expect(minimumGain).toHaveAttribute('aria-invalid', 'true')
+    expect(workspaceStore.getState().autoeqSettings.minGainDb).toBe(-20)
+  })
 })

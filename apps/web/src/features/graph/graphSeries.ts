@@ -3,7 +3,11 @@ import type {
   DerivedCurve,
   WorkspaceDerived,
 } from '../../state/workspaceStore'
-import { evaluateNaturalSpline } from './graphGeometry'
+import {
+  evaluateNaturalSpline,
+  evaluateNaturalSplineSegments,
+  type NaturalSplineSegment,
+} from './graphGeometry'
 
 interface GraphSeriesBase {
   id: string
@@ -38,15 +42,16 @@ export interface GraphInspector {
 export function formatGraphInspector(
   frequencyHz: number,
   series: readonly GraphSeries[],
+  preparedSegments?: ReadonlyMap<string, readonly NaturalSplineSegment[]>,
 ): GraphInspector {
   const frequency =
     frequencyHz >= 1_000 ? `${(frequencyHz / 1_000).toFixed(2)} kHz` : `${frequencyHz.toFixed(0)} Hz`
   const values = series.flatMap((item) => {
     if (item.data.length < 2) return []
-    const firstFrequency = item.data[0]![0]
-    const lastFrequency = item.data[item.data.length - 1]![0]
-    if (frequencyHz < firstFrequency || frequencyHz > lastFrequency) return []
-    const db = evaluateNaturalSpline(item.data, frequencyHz)
+    const segments = preparedSegments?.get(item.id)
+    const db = segments === undefined
+      ? evaluateNaturalSpline(item.data, frequencyHz)
+      : evaluateNaturalSplineSegments(segments, frequencyHz)
     if (db === null) return []
     return [{ id: item.id, name: item.name, db }]
   })

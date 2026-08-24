@@ -37,6 +37,11 @@ export interface NaturalSplineSegment {
   end: GraphPoint
 }
 
+export interface PreparedNaturalSpline {
+  segments: NaturalSplineSegment[]
+  path: string
+}
+
 export function frequencyToX(frequencyHz: number): number {
   const position = Math.log10(frequencyHz / X_MIN_HZ) / Math.log10(X_MAX_HZ / X_MIN_HZ)
   return PLOT_LEFT + position * (PLOT_RIGHT - PLOT_LEFT)
@@ -90,62 +95,70 @@ function formatCoordinate(value: number): string {
   return Number(value.toFixed(3)).toString()
 }
 
-function firstControlPoints(values: readonly number[]): number[] {
-  const segmentCount = values.length - 1
-  if (segmentCount === 1) return [(2 * values[0]! + values[1]!) / 3]
-
-  const diagonal = new Array<number>(segmentCount)
-  const rhs = new Array<number>(segmentCount)
-  diagonal[0] = 2
-  rhs[0] = values[0]! + 2 * values[1]!
-  for (let index = 1; index < segmentCount - 1; index += 1) {
-    diagonal[index] = 4 - 1 / diagonal[index - 1]!
-    rhs[index] = 4 * values[index]! + 2 * values[index + 1]! - rhs[index - 1]! / diagonal[index - 1]!
+function graphPoints(data: readonly (readonly [number, number])[]): GraphPoint[] {
+  const sorted = data
+    .map(([frequencyHz, db], index) => ({ frequencyHz, db, index }))
+    .filter(({ frequencyHz, db }) =>
+      Number.isFinite(frequencyHz) && frequencyHz > 0 && Number.isFinite(db),
+    )
+    .sort((left, right) => left.frequencyHz - right.frequencyHz || left.index - right.index)
+  const unique: GraphPoint[] = []
+  for (const { frequencyHz, db } of sorted) {
+    const point = { x: frequencyToX(frequencyHz), y: yDbToY(db) }
+    if (unique.at(-1)?.x === point.x) unique[unique.length - 1] = point
+    else unique.push(point)
   }
-  diagonal[segmentCount - 1] = 3.5 - 1 / diagonal[segmentCount - 2]!
-  rhs[segmentCount - 1] = (
-    8 * values[segmentCount - 1]! + values[segmentCount]! -
-    2 * rhs[segmentCount - 2]! / diagonal[segmentCount - 2]!
-  ) / 2
-
-  const controls = new Array<number>(segmentCount)
-  controls[segmentCount - 1] = rhs[segmentCount - 1]! / diagonal[segmentCount - 1]!
-  for (let index = segmentCount - 2; index >= 0; index -= 1) {
-    controls[index] = (rhs[index]! - controls[index + 1]!) / diagonal[index]!
-  }
-  return controls
+  return unique
 }
 
-function graphPoints(data: readonly (readonly [number, number])[]): GraphPoint[] {
-  return data
-    .filter(([frequencyHz, db]) =>
-      Number.isFinite(frequencyHz) && Number.isFinite(db) &&
-      frequencyHz >= X_MIN_HZ && frequencyHz <= X_MAX_HZ,
-    )
-    .map(([frequencyHz, db]) => ({ x: frequencyToX(frequencyHz), y: yDbToY(db) }))
+function splineSecondDerivatives(points: readonly GraphPoint[]): number[] {
+  const last = points.length - 1
+  const second = new Array<number>(points.length).fill(0)
+  if (last < 2) return second
+
+  const diagonal = new Array<number>(last - 1)
+  const rhs = new Array<number>(last - 1)
+  for (let index = 1; index < last; index += 1) {
+    const previousWidth = points[index]!.x - points[index - 1]!.x
+    const nextWidth = points[index + 1]!.x - points[index]!.x
+    const lower = index === 1 ? 0 : previousWidth
+    const previousDiagonal = diagonal[index - 2]
+    const factor = previousDiagonal === undefined ? 0 : lower / previousDiagonal
+    diagonal[index - 1] = 2 * (previousWidth + nextWidth) - factor * previousWidth
+    rhs[index - 1] = 6 * (
+      (points[index + 1]!.y - points[index]!.y) / nextWidth -
+      (points[index]!.y - points[index - 1]!.y) / previousWidth
+    ) - factor * (rhs[index - 2] ?? 0)
+  }
+  for (let index = last - 1; index >= 1; index -= 1) {
+    second[index] = (rhs[index - 1]! - (index === last - 1 ? 0 :
+      (points[index + 1]!.x - points[index]!.x) * second[index + 1]!)) / diagonal[index - 1]!
+  }
+  return second
+}
+
+function naturalSplineSegments(points: readonly GraphPoint[]): NaturalSplineSegment[] {
+  if (points.length < 2) return []
+  const second = splineSecondDerivatives(points)
+  return points.slice(0, -1).map((start, index) => {
+    const end = points[index + 1]!
+    const width = end.x - start.x
+    const slope = (end.y - start.y) / width
+    const startSlope = slope - width * (2 * second[index]! + second[index + 1]!) / 6
+    const endSlope = slope + width * (second[index]! + 2 * second[index + 1]!) / 6
+    return {
+      start,
+      control1: { x: start.x + width / 3, y: start.y + startSlope * width / 3 },
+      control2: { x: start.x + 2 * width / 3, y: end.y - endSlope * width / 3 },
+      end,
+    }
+  })
 }
 
 export function createNaturalSplineSegments(
   data: readonly (readonly [number, number])[],
 ): NaturalSplineSegment[] {
-  const points = graphPoints(data)
-  if (points.length < 2) return []
-
-  const firstX = firstControlPoints(points.map(({ x }) => x))
-  const firstY = firstControlPoints(points.map(({ y }) => y))
-  const lastSegment = points.length - 2
-  return points.slice(0, -1).map((start, index) => {
-    const next = points[index + 1]!
-    return {
-      start,
-      control1: { x: firstX[index]!, y: firstY[index]! },
-      control2: {
-        x: index === lastSegment ? (next.x + firstX[index]!) / 2 : 2 * next.x - firstX[index + 1]!,
-        y: index === lastSegment ? (next.y + firstY[index]!) / 2 : 2 * next.y - firstY[index + 1]!,
-      },
-      end: next,
-    }
-  })
+  return naturalSplineSegments(graphPoints(data))
 }
 
 function cubic(start: number, control1: number, control2: number, end: number, t: number): number {
@@ -157,37 +170,42 @@ export function evaluateNaturalSpline(
   data: readonly (readonly [number, number])[],
   frequencyHz: number,
 ): number | null {
+  return evaluateNaturalSplineSegments(createNaturalSplineSegments(data), frequencyHz)
+}
+
+export function evaluateNaturalSplineSegments(
+  segments: readonly NaturalSplineSegment[],
+  frequencyHz: number,
+): number | null {
   if (!Number.isFinite(frequencyHz)) return null
   const x = frequencyToX(frequencyHz)
-  const segment = createNaturalSplineSegments(data).find(({ start, end }) => x >= start.x && x <= end.x)
+  const segment = segments.find(({ start, end }) => x >= start.x && x <= end.x)
   if (segment === undefined) return null
   if (x === segment.start.x) return yToDb(segment.start.y)
   if (x === segment.end.x) return yToDb(segment.end.y)
-
-  let low = 0
-  let high = 1
-  for (let iteration = 0; iteration < 48; iteration += 1) {
-    const midpoint = (low + high) / 2
-    const midpointX = cubic(
-      segment.start.x, segment.control1.x, segment.control2.x, segment.end.x, midpoint,
-    )
-    if (midpointX < x) low = midpoint
-    else high = midpoint
-  }
-  const t = (low + high) / 2
+  const t = (x - segment.start.x) / (segment.end.x - segment.start.x)
   return yToDb(cubic(
     segment.start.y, segment.control1.y, segment.control2.y, segment.end.y, t,
   ))
 }
 
 export function createNaturalSplinePath(data: readonly (readonly [number, number])[]): string {
+  return prepareNaturalSpline(data).path
+}
+
+export function prepareNaturalSpline(
+  data: readonly (readonly [number, number])[],
+): PreparedNaturalSpline {
   const points = graphPoints(data)
-  if (points.length === 0) return ''
-  if (points.length === 1) return `M${formatCoordinate(points[0]!.x)},${formatCoordinate(points[0]!.y)}`
-  const commands = createNaturalSplineSegments(data).map(({ control1, control2, end }) =>
+  const segments = naturalSplineSegments(points)
+  if (points.length === 0) return { segments, path: '' }
+  if (points.length === 1) {
+    return { segments, path: `M${formatCoordinate(points[0]!.x)},${formatCoordinate(points[0]!.y)}` }
+  }
+  const commands = segments.map(({ control1, control2, end }) =>
     `C${formatCoordinate(control1.x)},${formatCoordinate(control1.y)}` +
     ` ${formatCoordinate(control2.x)},${formatCoordinate(control2.y)}` +
     ` ${formatCoordinate(end.x)},${formatCoordinate(end.y)}`,
   )
-  return `M${formatCoordinate(points[0]!.x)},${formatCoordinate(points[0]!.y)} ${commands.join(' ')}`
+  return { segments, path: `M${formatCoordinate(points[0]!.x)},${formatCoordinate(points[0]!.y)} ${commands.join(' ')}` }
 }

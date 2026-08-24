@@ -85,13 +85,13 @@ export function EqualizerTab() {
         </div>
         <div className="autoeq-settings__row" role="group" aria-label="AutoEQ gain range">
           <span>Gain</span>
-          <NumberField label="Min" aria-label="AutoEQ minimum gain dB" unit="dB" value={autoeqSettings.minGainDb} min={-15} max={15} step="0.1" validate={validates('minGainDb')} onValueChange={(minGainDb) => updateSetting({ minGainDb })} />
-          <NumberField label="Max" aria-label="AutoEQ maximum gain dB" unit="dB" value={autoeqSettings.maxGainDb} min={-15} max={15} step="0.1" validate={validates('maxGainDb')} onValueChange={(maxGainDb) => updateSetting({ maxGainDb })} />
+          <NumberField label="Min" aria-label="AutoEQ minimum gain dB" unit="dB" value={autoeqSettings.minGainDb} step="0.1" validate={validates('minGainDb')} onValueChange={(minGainDb) => updateSetting({ minGainDb })} />
+          <NumberField label="Max" aria-label="AutoEQ maximum gain dB" unit="dB" value={autoeqSettings.maxGainDb} step="0.1" validate={validates('maxGainDb')} onValueChange={(maxGainDb) => updateSetting({ maxGainDb })} />
         </div>
         <div className="autoeq-settings__row" role="group" aria-label="AutoEQ Q range">
           <span>Q</span>
-          <NumberField label="Min" aria-label="AutoEQ minimum Q" value={autoeqSettings.minQ} min={0.1} max={12} step="0.1" validate={validates('minQ')} onValueChange={(minQ) => updateSetting({ minQ })} />
-          <NumberField label="Max" aria-label="AutoEQ maximum Q" value={autoeqSettings.maxQ} min={0.1} max={12} step="0.1" validate={validates('maxQ')} onValueChange={(maxQ) => updateSetting({ maxQ })} />
+          <NumberField label="Min" aria-label="AutoEQ minimum Q" value={autoeqSettings.minQ} step="0.1" validate={validates('minQ')} onValueChange={(minQ) => updateSetting({ minQ })} />
+          <NumberField label="Max" aria-label="AutoEQ maximum Q" value={autoeqSettings.maxQ} step="0.1" validate={validates('maxQ')} onValueChange={(maxQ) => updateSetting({ maxQ })} />
         </div>
       </section>}
       <FilterEditor />

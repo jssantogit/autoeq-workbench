@@ -1,6 +1,7 @@
 const GRAPH_SELECTOR = '[data-fr-graph]'
 const EXPORT_WIDTH = 1_600
 const EXPORT_HEIGHT = 692
+const GRAPH_FONT_FAMILY = 'Open Sans, Segoe UI, system-ui, sans-serif'
 
 export const GRAPH_SCREENSHOT_FILENAME = 'autoeq-workbench-fr.png'
 
@@ -77,6 +78,7 @@ export async function exportFrequencyResponseGraph(
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
     clone.setAttribute('width', String(EXPORT_WIDTH))
     clone.setAttribute('height', String(EXPORT_HEIGHT))
+    clone.setAttribute('font-family', GRAPH_FONT_FAMILY)
     const source = browser.serialize(clone)
     const sourceUrl = browser.createObjectURL(browser.createBlob([source], { type: 'image/svg+xml;charset=utf-8' }))
     let image: HTMLImageElement | null = null

@@ -75,6 +75,9 @@ describe('exportFrequencyResponseGraph', () => {
     expect(await sourceBlobs[0]!.text()).toContain('height="692"')
     expect(await sourceBlobs[0]!.text()).toContain('background: rgb(17, 18, 19)')
     expect(await sourceBlobs[0]!.text()).toContain('fill="#111213"')
+    expect(await sourceBlobs[0]!.text()).toContain(
+      'font-family="Open Sans, Segoe UI, system-ui, sans-serif"',
+    )
     expect(context.drawImage).toHaveBeenCalledWith(expect.anything(), 0, 0, 1_600, 692)
     expect(dependencies.triggerDownload).toHaveBeenCalledWith('blob:test-1', GRAPH_SCREENSHOT_FILENAME)
     expect(dependencies.revokeObjectURL).toHaveBeenCalledTimes(2)
