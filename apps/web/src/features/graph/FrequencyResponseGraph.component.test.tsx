@@ -34,6 +34,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     )
     const svg = container.querySelector('svg')!
     expect(svg).toHaveAttribute('viewBox', '0 0 800 346')
+    expect(svg).toHaveAttribute('data-fr-graph')
     expect(svg).toHaveClass('fr-graph')
     expect(svg).not.toHaveAttribute('role', 'img')
     expect(svg).toHaveStyle({ aspectRatio: '800 / 346', width: '100%', height: 'auto' })

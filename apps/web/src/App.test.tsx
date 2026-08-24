@@ -5,12 +5,22 @@ import App from './App'
 import { uiStore } from './state/uiStore'
 import { workspaceStore } from './state/workspaceStore'
 
+const { exportFrequencyResponseGraphMock } = vi.hoisted(() => ({
+  exportFrequencyResponseGraphMock: vi.fn(),
+}))
+
+vi.mock('./features/graph/graphScreenshot', () => ({
+  exportFrequencyResponseGraph: exportFrequencyResponseGraphMock,
+}))
+
 vi.mock('./features/graph/FrequencyResponseGraph', () => ({
   FrequencyResponseGraph: () => <section aria-label="Frequency Response graph" />,
 }))
 
 describe('App', () => {
   beforeEach(() => {
+    exportFrequencyResponseGraphMock.mockReset()
+    exportFrequencyResponseGraphMock.mockResolvedValue({ ok: true, message: 'Graph screenshot downloaded.' })
     uiStore.setState({ activeDockTab: 'curves', curveAppearance: {}, inspectorEnabled: true })
     workspaceStore.setState({
       curves: [],
@@ -18,6 +28,19 @@ describe('App', () => {
       activeTargetId: null,
       normalization: { anchorHz: 500, targetDb: 0 },
     })
+  })
+
+  it('exports the graph from the utility rail Screenshot control', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    const utilityRail = screen.getByRole('toolbar', { name: 'Workspace utilities' })
+    const screenshot = within(utilityRail).getByRole('button', { name: 'Screenshot' })
+    expect(screenshot).toHaveAttribute('title', 'Download graph screenshot')
+    await user.click(screenshot)
+
+    expect(exportFrequencyResponseGraphMock).toHaveBeenCalledOnce()
+    expect(within(utilityRail).getByRole('status')).toHaveTextContent('Graph screenshot downloaded.')
   })
 
   it('renders a compact title and accessible icon-only theme control', () => {

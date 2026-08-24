@@ -118,6 +118,7 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
     <section className="graph-panel" aria-label="Frequency response graph">
       <svg
         className="fr-graph"
+        data-fr-graph
         viewBox={`0 0 ${GRAPH_WIDTH} ${GRAPH_HEIGHT}`}
         style={{ aspectRatio: `${GRAPH_WIDTH} / ${GRAPH_HEIGHT}`, width: '100%', height: 'auto' }}
       >
