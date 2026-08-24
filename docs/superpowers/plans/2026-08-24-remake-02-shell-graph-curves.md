@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the current visual shell and custom React/SVG graph with a source-derived Squiglink shell, toolbar, D3 renderer, and curve manager while preserving all current FR/Target/filter functionality and publishing a usable site after every coherent step.
+**Goal:** Replace the current visual shell and custom React/SVG graph with a source-derived Squiglink shell, toolbar, D3 renderer, and curve manager while preserving current FR/Target/manual-EQ behavior after every publishable checkpoint.
 
-**Architecture:** React remains the application/lifecycle owner, Zustand remains canonical state, and `packages/core` remains the DSP/domain authority. A TypeScript adapter encapsulates a real D3 port of Squiglink's graph; D3 owns the SVG interior while React supplies semantic graph series and view state. Squiglink CSS/layout is copied into runtime source and parameterized with Workbench Light/Dark tokens rather than imported from `vendor/`.
+**Architecture:** React owns composition/lifecycle, Zustand owns canonical workspace/UI state, and `packages/core` remains the domain/DSP authority. A TypeScript adapter owns a real D3 port of the Squiglink graph; D3 mutates only the SVG subtree it owns. Squiglink CSS is copied into runtime source and recolored through Workbench Light/Dark variables rather than imported from `vendor/`.
 
 **Tech Stack:** React 19, TypeScript 6, Vite 8, Zustand 5, D3 v7, Tailwind 4 where already used, Vitest, Testing Library, jsdom.
 
@@ -12,26 +12,26 @@
 
 ## Global Constraints
 
-- Remake 01 must be complete: public Pages preview comes from successful `remake/squiglink-base` CI and `vendor/squiglink/` is present as reference-only source.
+- Remake 01 must be complete and publicly green first.
 - Keep Vite + React + TypeScript; do not replace the app with legacy global HTML/JS.
-- `packages/core` remains authoritative for parsing, normalization, filter DSP, preamp, and metrics.
-- Zustand remains canonical application state; the D3 port must not create a second global workspace state.
-- Do not import runtime code from `vendor/squiglink/`; adapted code lives under `apps/web/src/squiglink/`.
-- Add D3 as a normal pnpm/Vite dependency; do not add `<script>` tags or CDN dependencies.
-- Preserve the main graph semantic contract: imported FR(s), imported Target(s), and one full-cascade equalized FR for the active FR when filters exist; no isolated filter response and no selected-filter marker.
-- Use Squiglink's graph `viewBox="0 0 800 346"`, log-frequency x axis, source-derived grid/ticks/zoom/interactions, but keep Workbench relative-dB semantics rather than Squiglink's absolute-SPL y-domain.
-- Source zoom ranges are fixed as: Bass 20-400 Hz, Mids 100-4000 Hz, Treble 1000-20000 Hz, Full 20-20000 Hz.
-- Light and Dark both remain; Light remains default. Workbench palette/tokens replace Squiglink colors.
-- New information architecture is exactly `Curves | Equalizer | Tools`.
-- `UtilityRail` must disappear once the source-derived toolbar owns its functions; do not leave duplicate user-facing controls.
-- Normalization remains non-destructive and bounded to 20-20000 Hz.
-- Baseline, offset, smoothing, visibility, and labels are display-state only and must not mutate imported raw curve samples.
-- Keep the public site usable at each pushed migration checkpoint.
+- Keep `packages/core` authoritative for parsing, normalization, filters, preamp, metrics, and future AutoEQ.
+- Do not import or execute runtime code from `vendor/squiglink/`.
+- Bundle D3 through pnpm/Vite; no D3 CDN/script tag.
+- Preserve graph semantics: imported FR(s), imported Target(s), and one full-cascade equalized FR for the active FR only.
+- Never render an isolated filter response or selected-filter graph marker.
+- Port `viewBox="0 0 800 346"`, source log-frequency behavior, tick/grid hierarchy, zoom interaction, inspector, labels, screenshot, recolor, and smoothing interaction.
+- Keep Workbench relative-dB y semantics; use fixed initial domain -30..+25 dB rather than Squiglink absolute SPL.
+- Source zoom ranges are exact: Full 20-20000, Bass 20-400, Mids 100-4000, Treble 1000-20000 Hz.
+- Light and Dark remain; Light is default; graph-series colors remain independent from amber/copper UI accent.
+- Tabs are exactly `Curves | Equalizer | Tools`.
+- The source-derived graph toolbar replaces `UtilityRail`; no duplicate controls remain after cutover.
+- Normalization remains non-destructive and frequency-bounded to 20-20000 Hz.
+- Offset, baseline, smoothing, visibility, and labels are display state and never mutate imported raw samples.
 - No legacy Squiglink AutoEQ code may enter runtime.
 
 ---
 
-### Task 1: Add D3 and define source-derived graph view state
+### Task 1: Add D3 and lock graph-view UI state
 
 **Files:**
 - Modify: `apps/web/package.json`
@@ -76,9 +76,7 @@ export interface UiState {
 }
 ```
 
-- [ ] **Step 1: Write failing state tests for the new dock and graph-view contract**
-
-Add tests that assert:
+- [ ] **Step 1: Write failing state tests**
 
 ```ts
 const store = createUiStore(() => 0)
@@ -88,51 +86,78 @@ expect(store.getState().smoothingLevel).toBe(5)
 expect(store.getState().labelsEnabled).toBe(true)
 expect(store.getState().baselineCurveId).toBeNull()
 
-store.getState().setActiveDockTab('tools')
-store.getState().setGraphZoomPreset('bass')
-store.getState().setSmoothingLevel(0)
-store.getState().toggleLabels()
-expect(store.getState().activeDockTab).toBe('tools')
-expect(store.getState().graphZoomPreset).toBe('bass')
-expect(store.getState().smoothingLevel).toBe(0)
-expect(store.getState().labelsEnabled).toBe(false)
+store.getState().registerCurve('fr-1')
+expect(store.getState().curveAppearance['fr-1']).toEqual({
+  color: '#1565c0',
+  visible: true,
+  offsetDb: 0,
+})
+store.getState().setCurveOffset('fr-1', 3.5)
+expect(store.getState().curveAppearance['fr-1']?.offsetDb).toBe(3.5)
+
+store.getState().setBaselineCurve('fr-1')
+store.getState().unregisterCurve('fr-1')
+expect(store.getState().baselineCurveId).toBeNull()
 ```
 
-Also register a curve and assert its appearance is `{ color: <palette color>, visible: true, offsetDb: 0 }`, then assert `setCurveOffset(id, 3.5)` stores `3.5`, non-finite values are ignored, and removing the baseline curve clears `baselineCurveId`.
+Also test that negative/non-finite smoothing values and non-finite offsets are ignored.
 
-- [ ] **Step 2: Run the targeted store tests and confirm they fail**
+- [ ] **Step 2: Run the test and verify failure**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/state/uiStore.test.ts
 ```
 
-Expected: failures because `tools`, zoom/smoothing/labels/baseline, and offsets are not implemented.
+Expected: FAIL because the new state fields/actions do not exist.
 
-- [ ] **Step 3: Install D3 and type declarations**
+- [ ] **Step 3: Install bundled D3 dependencies**
 
 ```bash
 pnpm --filter @autoeq-workbench/web add d3
 pnpm --filter @autoeq-workbench/web add -D @types/d3
 ```
 
-Expected: `apps/web/package.json` gains `d3` under dependencies and `@types/d3` under devDependencies; lockfile updates once.
-
-- [ ] **Step 4: Implement the UI state contract minimally**
-
-Use these exact defaults and validation rules:
+- [ ] **Step 4: Implement the minimal UI state changes**
 
 ```ts
-activeDockTab: 'curves'
-inspectorEnabled: true
-labelsEnabled: true
-graphZoomPreset: 'full'
-smoothingLevel: 5
-baselineCurveId: null
+export const DEFAULT_GRAPH_VIEW = Object.freeze({
+  inspectorEnabled: true,
+  labelsEnabled: true,
+  graphZoomPreset: 'full' as const,
+  smoothingLevel: 5,
+  baselineCurveId: null as string | null,
+})
+
+// inside createUiStore
+setSmoothingLevel: (smoothingLevel) => {
+  if (!Number.isFinite(smoothingLevel) || smoothingLevel < 0) return
+  set({ smoothingLevel })
+},
+setBaselineCurve: (baselineCurveId) =>
+  set((state) =>
+    baselineCurveId === null || state.curveAppearance[baselineCurveId] !== undefined
+      ? { baselineCurveId }
+      : state,
+  ),
+setCurveOffset: (id, offsetDb) => {
+  if (!Number.isFinite(offsetDb)) return
+  set((state) => {
+    const appearance = state.curveAppearance[id]
+    return appearance === undefined
+      ? state
+      : {
+          curveAppearance: {
+            ...state.curveAppearance,
+            [id]: { ...appearance, offsetDb },
+          },
+        }
+  })
+},
 ```
 
-`setSmoothingLevel` accepts finite values `>= 0` and ignores negative/non-finite values. `setCurveOffset` accepts finite values only. `setBaselineCurve(id)` accepts `null` or an already-registered curve id. `unregisterCurve(id)` must clear `baselineCurveId` if the removed curve was the baseline.
+Extend `registerCurve()` to initialize `offsetDb: 0`, and extend `unregisterCurve()` to clear `baselineCurveId` when removing the active baseline.
 
-- [ ] **Step 5: Run targeted tests and typecheck**
+- [ ] **Step 5: Run targeted verification**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/state/uiStore.test.ts
@@ -141,14 +166,14 @@ pnpm --filter @autoeq-workbench/web typecheck
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit the state/dependency boundary**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add apps/web/package.json pnpm-lock.yaml apps/web/src/state/uiStore.ts apps/web/src/state/uiStore.test.ts
 git commit -m "feat(web): add Squiglink graph view state"
 ```
 
-### Task 2: Port the Squiglink shell and shared style language without replacing the working graph yet
+### Task 2: Port the shell/style language around the still-working old graph
 
 **Files:**
 - Create: `apps/web/src/squiglink/styles/squiglink-base.css`
@@ -161,29 +186,30 @@ git commit -m "feat(web): add Squiglink graph view state"
 - Modify: `apps/web/src/App.tsx`
 - Modify: `apps/web/src/App.test.tsx`
 - Modify: `apps/web/src/index.css`
-- Modify: `apps/web/src/main.tsx` only if explicit CSS imports are cleaner there
 
 **Interfaces:**
-- Consumes: existing `FrequencyResponseGraph`, `CurvesTab`, `EqualizerTab`, `MetricsSummary`, theme store.
-- Produces: source-derived primary/secondary shell with `Curves | Equalizer | Tools`; existing graph and functionality remain mounted during this task.
+- Consumes: current `FrequencyResponseGraph`, `CurvesTab`, `EqualizerTab`, `MetricsSummary`, `uiStore.theme`.
+- Produces: source-derived shell with final `Curves | Equalizer | Tools` IA while the old graph remains functional for this checkpoint.
 
-- [ ] **Step 1: Copy the upstream stylesheet into runtime source as an adapted baseline**
+- [ ] **Step 1: Copy the upstream runtime stylesheet into an editable source-derived runtime file**
 
-Copy `vendor/squiglink/style-alt.css` to `apps/web/src/squiglink/styles/squiglink-base.css` and add a header comment:
+```bash
+cp vendor/squiglink/style-alt.css apps/web/src/squiglink/styles/squiglink-base.css
+```
+
+Prepend this provenance comment:
 
 ```css
 /*
  * Adapted from squiglink/lab style-alt.css at
  * 9ff842c539b058cc726207b689c904c9efff75fd (0BSD).
- * Runtime copy: edit here; vendor/squiglink remains immutable.
+ * Runtime copy: vendor/squiglink remains immutable.
  */
 ```
 
-Do not import from `vendor/`. Remove only selectors that directly depend on ads, Patreon/premium elements, hosted Brands/Models database UI, or remote branding assets when those selectors conflict with the new shell. Preserve source layout/responsive/control rules rather than rewriting them from memory.
+Remove only selectors that directly require ads, Patreon/premium content, hosted Brands/Models database UI, or Squiglink branding assets.
 
-- [ ] **Step 2: Add Workbench theme tokens as an override layer**
-
-Create `workbench-theme.css` with shared semantic variables and Light default:
+- [ ] **Step 2: Add exact Workbench Light/Dark variables**
 
 ```css
 :root,
@@ -212,32 +238,33 @@ Create `workbench-theme.css` with shared semantic variables and Light default:
 }
 ```
 
-Map source background/surface/text/border/accent declarations to these variables in the override layer. Do not recolor semantic graph-series lines with `--wb-accent`.
+Use these variables in `workbench-theme.css` to override source background/surface/text/border/accent declarations. Do not map semantic graph line colors to `--wb-accent`.
 
-- [ ] **Step 3: Write failing shell tests before changing App composition**
+- [ ] **Step 3: Write failing shell/IA tests**
 
-Assert that the rendered app has:
+```tsx
+render(<App />)
+expect(screen.getByText('AutoEQ Workbench')).toBeInTheDocument()
+expect(screen.getByRole('tab', { name: 'Curves' })).toBeInTheDocument()
+expect(screen.getByRole('tab', { name: 'Equalizer' })).toBeInTheDocument()
+expect(screen.getByRole('tab', { name: 'Tools' })).toBeInTheDocument()
+expect(screen.queryByRole('tab', { name: 'Details' })).not.toBeInTheDocument()
 
-```text
-AutoEQ Workbench
-Curves
-Equalizer
-Tools
+await user.click(screen.getByRole('tab', { name: 'Tools' }))
+expect(screen.getByText('MAE')).toBeInTheDocument()
+expect(screen.getByText('RMSE')).toBeInTheDocument()
+expect(screen.getByText('Preamp')).toBeInTheDocument()
 ```
 
-and no `Details` tab label. Switch to `Tools` and assert interim analysis includes `MAE`, `RMSE`, and `Preamp` so the new tab is useful before Remake 04.
-
-- [ ] **Step 4: Run shell tests and confirm failure**
+- [ ] **Step 4: Run the shell tests and verify failure**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/App.test.tsx src/features/tools/ToolsInterim.test.tsx
 ```
 
-Expected: FAIL because current IA is `Curves | Equalizer | Details` and `ToolsInterim` does not exist.
+Expected: FAIL because `Tools`/`ToolsInterim` do not exist.
 
-- [ ] **Step 5: Implement the source-derived shell around the existing functional graph**
-
-`ToolsInterim` should be deliberately small:
+- [ ] **Step 5: Implement interim Tools and source-derived App composition**
 
 ```tsx
 export function ToolsInterim({ derived }: { derived: WorkspaceDerived }) {
@@ -252,48 +279,68 @@ export function ToolsInterim({ derived }: { derived: WorkspaceDerived }) {
 }
 ```
 
-Update the dock to use exactly `Curves | Equalizer | Tools`. Recompose `App.tsx` using source-derived `.main`, `.parts-primary`, `.parts-secondary`, `.graphBox`, `.controls`, and tab/panel relationships, but leave the current `FrequencyResponseGraph` mounted in the graph region for this task.
+Recompose `App` with source-derived structural class names while leaving the existing graph component mounted:
 
-`AppHeader` displays the textual wordmark `AutoEQ Workbench` in the position/role occupied by Squiglink branding; no generated logo or Squiglink logo asset.
+```tsx
+<main className="main workbench">
+  <AppHeader />
+  <section className="parts-primary">
+    <div className="graphBox">
+      <FrequencyResponseGraph derived={derived} />
+    </div>
+  </section>
+  <section className="parts-secondary">
+    <WorkbenchDock
+      curves={<CurvesTab />}
+      equalizer={<EqualizerTab />}
+      tools={<ToolsInterim derived={derived} />}
+    />
+  </section>
+</main>
+```
 
-- [ ] **Step 6: Import the runtime CSS and run targeted tests**
+`AppHeader` renders only the textual wordmark `AutoEQ Workbench` in the source branding role.
+
+- [ ] **Step 6: Import the source/theme styles from the existing CSS entry point**
+
+At the top of `apps/web/src/index.css`, keep Tailwind and add the runtime styles in this order:
+
+```css
+@import "tailwindcss";
+@import "./squiglink/styles/squiglink-base.css";
+@import "./squiglink/styles/workbench-theme.css";
+```
+
+Remove a duplicated `@import "tailwindcss";` if the current file already has it elsewhere.
+
+- [ ] **Step 7: Run tests/build and inspect both themes**
 
 ```bash
-pnpm --filter @autoeq-workbench/web test -- src/App.test.tsx src/features/tools/ToolsInterim.test.tsx src/components/layout/__tests__
+pnpm --filter @autoeq-workbench/web test -- src/App.test.tsx src/features/tools/ToolsInterim.test.tsx
 pnpm --filter @autoeq-workbench/web typecheck
-```
-
-Expected: PASS.
-
-- [ ] **Step 7: Run the full web build and manually inspect both themes at desktop/mobile widths**
-
-```bash
 pnpm --filter @autoeq-workbench/web build
-pnpm --filter @autoeq-workbench/web dev --host 0.0.0.0
 ```
 
-Inspect at approximately 390 px and 1280 px viewport widths. Verify graph remains prominent, panel layout follows source proportions, controls do not overlap, and Light/Dark use Workbench colors.
+Inspect at ~390 px and ~1280 px widths in Light and Dark before committing.
 
-- [ ] **Step 8: Commit and publish this functional shell checkpoint**
+- [ ] **Step 8: Commit, push, and smoke the public functional checkpoint**
 
 ```bash
-git add apps/web/src apps/web/package.json pnpm-lock.yaml
+git add apps/web/src
 git commit -m "feat(web): port Squiglink shell"
 git push origin remake/squiglink-base
 ```
 
-Wait for CI/Pages and smoke-test public FR/Target import plus manual EQ before continuing.
+Wait for green CI/Pages; verify FR/Target import and manual EQ still work publicly.
 
-### Task 3: Extract pure display transforms for offset and baseline
+### Task 3: Add pure display transforms for offset/baseline
 
 **Files:**
 - Create: `apps/web/src/squiglink/graph/displayTransform.ts`
 - Create: `apps/web/src/squiglink/graph/displayTransform.test.ts`
-- Modify: `apps/web/src/features/graph/graphSeries.ts` only if readonly typing needs tightening
+- Modify: `apps/web/src/features/graph/graphSeries.ts`
 
 **Interfaces:**
-- Consumes: existing semantic `GraphSeries[]`, `curveAppearance`, `baselineCurveId`.
-- Produces:
 
 ```ts
 export interface DisplaySeries extends GraphSeries {
@@ -307,68 +354,65 @@ export function buildDisplaySeries(
 ): DisplaySeries[]
 ```
 
-- [ ] **Step 1: Write tests proving view transforms do not mutate semantic data**
-
-Use synthetic curves and assert:
+- [ ] **Step 1: Write failing transform tests**
 
 ```ts
 const sourceData = [[100, 1], [1000, 2], [10000, 3]] as const
-const result = buildDisplaySeries(series, appearance, null)
-expect(result[0]!.displayData).toEqual([[100, 4], [1000, 5], [10000, 6]]) // +3 dB offset
+const result = buildDisplaySeries(series, {
+  'fr-1': { color: '#1565c0', visible: true, offsetDb: 3 },
+}, null)
+expect(result[0]!.displayData).toEqual([[100, 4], [1000, 5], [10000, 6]])
 expect(series[0]!.data).toEqual(sourceData)
 ```
 
-Also assert that an equalized-FR series inherits the offset of its `sourceCurveId`.
+Add a second test where the baseline is `[100,1], [1000,2], [10000,3]` and another curve is exactly +4 dB at the same frequencies; expect `[100,4], [1000,4], [10000,4]`. Assert an `equalized-fr` series inherits its `sourceCurveId` offset.
 
-For a selected baseline, assert the baseline renders at 0 dB at its own points and another series renders as `series - interpolatedBaseline`; raw `GraphSeries.data` remains byte-equal before/after.
-
-- [ ] **Step 2: Run the test and confirm failure**
+- [ ] **Step 2: Run and verify failure**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/squiglink/graph/displayTransform.test.ts
 ```
 
-Expected: FAIL because the module does not exist.
-
-- [ ] **Step 3: Implement deterministic log-frequency interpolation for display-only baseline subtraction**
-
-Use a private helper with this contract:
+- [ ] **Step 3: Implement deterministic log-frequency interpolation and display transforms**
 
 ```ts
 function interpolateLogFrequency(
   data: readonly [number, number][],
   frequencyHz: number,
-): number | null
+): number | null {
+  if (data.length === 0 || !Number.isFinite(frequencyHz) || frequencyHz <= 0) return null
+  const first = data[0]!
+  const last = data[data.length - 1]!
+  if (frequencyHz === first[0]) return first[1]
+  if (frequencyHz === last[0]) return last[1]
+  if (frequencyHz < first[0] || frequencyHz > last[0]) return null
+
+  for (let i = 1; i < data.length; i += 1) {
+    const left = data[i - 1]!
+    const right = data[i]!
+    if (frequencyHz > right[0]) continue
+    const x = Math.log10(frequencyHz)
+    const x0 = Math.log10(left[0])
+    const x1 = Math.log10(right[0])
+    const t = (x - x0) / (x1 - x0)
+    return left[1] + t * (right[1] - left[1])
+  }
+  return null
+}
 ```
 
-Rules:
+Apply offset first. For equalized FR, resolve appearance using `sourceCurveId`. If a baseline exists, build its offset-adjusted points once, subtract interpolated baseline values from every display series, and omit points outside baseline coverage. Never mutate `GraphSeries.data`.
 
-```text
-frequency <= first point -> first value only when equal, otherwise null
-frequency >= last point  -> last value only when equal, otherwise null
-interior                  -> linear interpolation in log10(frequency)
-invalid/non-positive f    -> null
-```
-
-`buildDisplaySeries` first applies each series' visual offset, then subtracts the selected baseline's offset-adjusted value at matching/interpolated frequencies. If a baseline value is unavailable for a point, omit that display point rather than extrapolating.
-
-- [ ] **Step 4: Run tests and typecheck**
+- [ ] **Step 4: Run tests/typecheck and commit**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/squiglink/graph/displayTransform.test.ts
 pnpm --filter @autoeq-workbench/web typecheck
-```
-
-Expected: PASS.
-
-- [ ] **Step 5: Commit the display-only transform boundary**
-
-```bash
 git add apps/web/src/squiglink/graph/displayTransform.ts apps/web/src/squiglink/graph/displayTransform.test.ts apps/web/src/features/graph/graphSeries.ts
 git commit -m "feat(web): add graph display transforms"
 ```
 
-### Task 4: Port the D3 graph behind a lifecycle-safe TypeScript adapter
+### Task 4: Port the D3 graph behind a lifecycle adapter
 
 **Files:**
 - Create: `apps/web/src/squiglink/graph/types.ts`
@@ -378,11 +422,8 @@ git commit -m "feat(web): add graph display transforms"
 - Create: `apps/web/src/squiglink/graph/createSquiglinkGraph.test.ts`
 
 **Interfaces:**
-- Produces:
 
 ```ts
-export type GraphZoomPreset = 'full' | 'bass' | 'mids' | 'treble'
-
 export interface SquiglinkGraphSeries {
   id: string
   name: string
@@ -409,10 +450,6 @@ export interface SquiglinkGraphState {
   view: SquiglinkGraphView
 }
 
-export interface SquiglinkGraphCallbacks {
-  onInspector(reading: SquiglinkInspectorReading | null): void
-}
-
 export interface SquiglinkGraphController {
   update(next: SquiglinkGraphState): void
   destroy(): void
@@ -421,112 +458,138 @@ export interface SquiglinkGraphController {
 export function createSquiglinkGraph(
   svg: SVGSVGElement,
   initial: SquiglinkGraphState,
-  callbacks: SquiglinkGraphCallbacks,
+  callbacks: { onInspector(reading: SquiglinkInspectorReading | null): void },
 ): SquiglinkGraphController
 ```
 
-- [ ] **Step 1: Port and test the source smoothing functions as a pure module**
-
-Extract the algebra from `vendor/squiglink/graphtool.js` functions `pair`, `smooth_prep`, `smooth_eval`, and `smooth`, replacing global `smooth_level`, `smooth_scale`, and cached `smooth_param` with explicit arguments/cache local to the module.
-
-Expose:
+- [ ] **Step 1: Write failing smoothing invariants**
 
 ```ts
-export function smoothGraphSeries(
-  data: readonly [number, number][],
-  level: number,
-  scale?: number,
-): [number, number][]
+expect(smoothGraphSeries(points, 0)).toEqual(points)
+expect(smoothGraphSeries([[100, 2], [1000, 2], [10000, 2]], 5))
+  .toEqual(expect.arrayContaining([[100, 2], [1000, 2], [10000, 2]]))
+expect(smoothGraphSeries(points, 5).map(([f]) => f)).toEqual(points.map(([f]) => f))
 ```
 
-Tests must assert:
+Also assert output length equals input length and input arrays are not mutated.
 
-```text
-level 0 returns numerically identical points
-frequencies never change
-constant dB input remains constant within 1e-9
-output length equals input length
-input arrays are not mutated
-```
-
-- [ ] **Step 2: Write adapter tests before implementation**
-
-In jsdom, create an SVG and assert after mount:
+- [ ] **Step 2: Write failing adapter lifecycle tests**
 
 ```ts
+const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+const controller = createSquiglinkGraph(svg, initialState, { onInspector: vi.fn() })
 expect(svg.getAttribute('viewBox')).toBe('0 0 800 346')
 expect(svg.querySelectorAll('[data-graph-axis="x"]')).toHaveLength(1)
 expect(svg.querySelectorAll('[data-graph-axis="y"]')).toHaveLength(1)
-expect(svg.querySelectorAll('[data-series-id="fr-1"]')).toHaveLength(1)
+controller.update(initialState)
+controller.update(initialState)
+expect(svg.querySelectorAll('[data-graph-axis="x"]')).toHaveLength(1)
+controller.destroy()
+expect(svg.querySelector('[data-squiglink-graph-root]')).toBeNull()
 ```
 
-Call `update()` twice and assert axes/series are not duplicated. Call `destroy()` and assert adapter-created nodes/listeners are removed.
-
-- [ ] **Step 3: Run targeted graph tests and confirm failure**
+- [ ] **Step 3: Run and verify failure**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/squiglink/graph/smoothing.test.ts src/squiglink/graph/createSquiglinkGraph.test.ts
 ```
 
-Expected: FAIL because the modules are not implemented.
+- [ ] **Step 4: Port the source smoothing implementation with explicit parameters**
 
-- [ ] **Step 4: Port the source graph structure and axes into the adapter**
-
-Use the upstream source as the line-by-line reference for SVG structure, tick hierarchy, log x scale, natural curve rendering, fades/labels/inspector behavior. Keep these exact source contracts:
+Use `vendor/squiglink/graphtool.js` functions `pair`, `smooth_prep`, `smooth_eval`, and `smooth` as the exact algebra source. Replace globals with arguments and expose only:
 
 ```ts
-const GRAPH_VIEWBOX = '0 0 800 346'
-const X_FULL: [number, number] = [20, 20_000]
+export function smoothGraphSeries(
+  data: readonly [number, number][],
+  level: number,
+  scale = 0.01,
+): [number, number][] {
+  if (level === 0 || data.length < 3) return data.map(([f, db]) => [f, db])
+  const frequencies = data.map(([f]) => f)
+  const gains = data.map(([, db]) => db)
+  const x = frequencies.map(Math.log)
+  const h = x.slice(1).map((value, index) => value - x[index]!)
+  const s = level * scale
+  const d = (index: number) => s * Math.pow(1 / 80, Math.pow(index / x.length, 2))
+  const prepared = smoothPrep(h, d)
+  const smoothed = smoothEval(prepared, gains)
+  return frequencies.map((frequencyHz, index) => [frequencyHz, smoothed[index]!])
+}
+```
+
+Port `smoothPrep` and `smoothEval` line-for-line into typed local helpers from the pinned source; do not change constants/formulae and do not add another smoothing library.
+
+- [ ] **Step 5: Implement fixed graph constants and the owned SVG root**
+
+```ts
+const VIEW_BOX = '0 0 800 346'
+const X_TICKS = [
+  20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 400, 500, 600, 800,
+  1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 15000, 20000,
+] as const
 const ZOOM_RANGES = {
   full: [20, 20_000],
   bass: [20, 400],
   mids: [100, 4_000],
   treble: [1_000, 20_000],
 } as const
-```
-
-Keep the Squiglink x tick family:
-
-```ts
-[20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 400, 500, 600, 800,
- 1000, 1500, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 15000, 20000]
-```
-
-Adapt only the y-domain to Workbench relative dB. Use a fixed initial domain:
-
-```ts
 const Y_DOMAIN: [number, number] = [-30, 25]
+
+const root = select(svg)
+  .attr('viewBox', VIEW_BOX)
+  .append('g')
+  .attr('data-squiglink-graph-root', '')
 ```
 
-and render +25 at the top / -30 at the bottom. Do not add an SPL offset or reinterpret Workbench 0 dB as Squiglink absolute SPL.
+Build x with `scaleLog()`, y with `scaleLinear().domain(Y_DOMAIN)` and reversed screen range, then port Squiglink's axis/grid styling into groups marked `data-graph-axis="x"` and `data-graph-axis="y"`.
 
-- [ ] **Step 5: Implement data joins and update semantics**
+- [ ] **Step 6: Implement keyed series updates**
 
-Use D3 keyed joins by `series.id`. `update()` must update domain, paths, dash pattern, color, visibility, smoothing, labels, and inspector state without recreating the whole SVG. Use `d3.curveNatural` for smoothed rendering and the source's unsmoothed cardinal behavior when smoothing level is zero.
+```ts
+function renderSeries(next: SquiglinkGraphState) {
+  const line = d3Line<[number, number]>()
+    .x(([frequencyHz]) => x(frequencyHz))
+    .y(([, db]) => y(db))
+    .curve(next.view.smoothingLevel > 0 ? curveNatural : curveCardinal.tension(0.5))
 
-Targets are passed in with `dashed: true`; measurements/equalized FR use `dashed: false`.
+  root.select<SVGGElement>('[data-series-layer]')
+    .selectAll<SVGPathElement, SquiglinkGraphSeries>('path[data-series-id]')
+    .data(next.series.filter((item) => item.visible), (item) => item.id)
+    .join('path')
+    .attr('data-series-id', (item) => item.id)
+    .attr('fill', 'none')
+    .attr('stroke', (item) => item.color)
+    .attr('stroke-dasharray', (item) => item.dashed ? '7 5' : null)
+    .attr('d', (item) => line(smoothGraphSeries(item.data, next.view.smoothingLevel)))
+}
+```
 
-- [ ] **Step 6: Implement cleanup explicitly**
+Update zoom domain, axes, paths, labels, inspector overlay, and visibility in `update()`; do not append duplicate roots/axes on updates.
 
-Track namespaced D3/DOM handlers and remove them in `destroy()`. Cancel active transitions and remove adapter-created groups/defs/overlays. The controller must be safe to destroy once even if React unmounts during an update.
+- [ ] **Step 7: Implement explicit destroy cleanup**
 
-- [ ] **Step 7: Run targeted tests and typecheck**
+```ts
+destroy() {
+  select(svg).interrupt()
+  select(svg).on('.squiglink', null)
+  root.selectAll('*').interrupt()
+  root.remove()
+  callbacks.onInspector(null)
+}
+```
+
+Namespace pointer/mouse handlers as `.squiglink` so cleanup is deterministic.
+
+- [ ] **Step 8: Run targeted tests/typecheck and commit**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/squiglink/graph/smoothing.test.ts src/squiglink/graph/createSquiglinkGraph.test.ts
 pnpm --filter @autoeq-workbench/web typecheck
-```
-
-Expected: PASS.
-
-- [ ] **Step 8: Commit the D3 adapter in isolation**
-
-```bash
 git add apps/web/src/squiglink/graph
 git commit -m "feat(web): port Squiglink D3 graph"
 ```
 
-### Task 5: Replace the old graph component and UtilityRail with the ported graph + source toolbar
+### Task 5: Cut React over to D3 and replace UtilityRail with the source toolbar
 
 **Files:**
 - Create: `apps/web/src/features/graph/GraphToolbar.tsx`
@@ -537,62 +600,62 @@ git commit -m "feat(web): port Squiglink D3 graph"
 - Modify: `apps/web/src/features/graph/graphAppearance.ts`
 - Modify: `apps/web/src/features/graph/graphAppearance.test.ts`
 - Modify: `apps/web/src/App.tsx`
-- Delete after replacement tests pass: `apps/web/src/components/layout/UtilityRail.tsx`
-- Delete after replacement tests pass if no longer imported: `apps/web/src/features/graph/graphGeometry.ts`
-- Delete after replacement tests pass if no longer needed: `apps/web/src/features/graph/graphGeometry.test.ts`
+- Delete after successful replacement: `apps/web/src/components/layout/UtilityRail.tsx`
+- Delete after successful replacement: `apps/web/src/features/graph/graphGeometry.ts`
+- Delete after successful replacement: `apps/web/src/features/graph/graphGeometry.test.ts`
 
 **Interfaces:**
-- Consumes: `buildGraphSeries(derived)`, `buildDisplaySeries(...)`, uiStore graph view state, workspace normalization.
-- Produces: React wrapper around `createSquiglinkGraph`; source-derived toolbar is the only graph toolbar.
+- Consumes: `buildGraphSeries`, `buildDisplaySeries`, `createSquiglinkGraph`, workspace normalization, graph UI state.
+- Produces: adapter-backed graph + only graph toolbar.
 
-- [ ] **Step 1: Rewrite component tests around semantic behavior instead of old SVG internals**
+- [ ] **Step 1: Write failing toolbar/state tests**
 
-Tests must assert that with two FRs, one Target, active FR, and enabled filters, the adapter input contains exactly:
-
-```text
-FR 1
-FR 1 EQ
-FR 2
-Target 1
+```tsx
+expect(screen.getByRole('button', { name: 'Bass' })).toBeInTheDocument()
+expect(screen.getByRole('button', { name: 'Mids' })).toBeInTheDocument()
+expect(screen.getByRole('button', { name: 'Treble' })).toBeInTheDocument()
+expect(screen.getByLabelText('Normalize dB')).toBeInTheDocument()
+expect(screen.getByLabelText('Normalize Hz')).toBeInTheDocument()
+expect(screen.getByLabelText('Smooth')).toBeInTheDocument()
+expect(screen.getByRole('button', { name: /inspect/i })).toBeInTheDocument()
+expect(screen.getByRole('button', { name: /label/i })).toBeInTheDocument()
+expect(screen.getByRole('button', { name: /screenshot/i })).toBeInTheDocument()
+expect(screen.getByRole('button', { name: /recolor/i })).toBeInTheDocument()
 ```
 
-and never contains `PEQ`, `Desired`, or selected-filter series. Preserve existing tests for equalized-FR naming and target styling.
+Click Bass twice and assert `full -> bass -> full`; set normalization Hz to 500 and verify workspace state; attempt 25000 and verify state is unchanged.
 
-- [ ] **Step 2: Write toolbar tests**
+- [ ] **Step 2: Rewrite graph component tests around adapter input semantics**
 
-Render `GraphToolbar` and assert controls named:
+For two FRs, one Target, active FR, and enabled filters:
 
-```text
-Bass
-Mids
-Treble
-Normalize dB
-Normalize Hz
-Smooth
-inspect
-label
-screenshot
-recolor
+```ts
+expect(series.map((item) => item.name)).toEqual([
+  'FR 1',
+  'FR 1 EQ',
+  'FR 2',
+  'Target 1',
+])
+expect(series.some((item) => /PEQ|Desired|Selected Filter/.test(item.name))).toBe(false)
 ```
 
-Click Bass twice and assert `graphZoomPreset` goes `full -> bass -> full`. Enter normalization frequency `500` and target `0` and assert workspace normalization updates through `setNormalization`. Enter `25000` Hz and assert state remains unchanged. Toggle inspect/label and assert uiStore state changes.
-
-- [ ] **Step 3: Run graph/toolbar tests and confirm failure**
+- [ ] **Step 3: Run and verify failure**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/features/graph/GraphToolbar.test.tsx src/features/graph/FrequencyResponseGraph.component.test.tsx src/features/graph/FrequencyResponseGraph.test.ts
 ```
 
-Expected: FAIL until the new wrapper/toolbar is implemented.
-
-- [ ] **Step 4: Implement the React lifecycle wrapper**
-
-`FrequencyResponseGraph` must create the controller only when its SVG node mounts:
+- [ ] **Step 4: Implement the React adapter lifecycle**
 
 ```tsx
+const svgRef = useRef<SVGSVGElement | null>(null)
+const controllerRef = useRef<SquiglinkGraphController | null>(null)
+
 useEffect(() => {
   if (svgRef.current === null) return
-  const controller = createSquiglinkGraph(svgRef.current, graphState, callbacks)
+  const controller = createSquiglinkGraph(svgRef.current, graphState, {
+    onInspector: setInspectorReading,
+  })
   controllerRef.current = controller
   return () => {
     controller.destroy()
@@ -605,151 +668,165 @@ useEffect(() => {
 }, [graphState])
 ```
 
-Do not make D3 mutate React-owned siblings.
+D3 must mutate only `<svg ref={svgRef}>` descendants.
 
-- [ ] **Step 5: Build adapter input from canonical Workbench state**
+- [ ] **Step 5: Build graph state from semantic series + display transforms**
 
-For each semantic series:
-
-```text
-measurement FR -> appearance color, solid, appearance.visible
-measurement Target -> neutral gray, dashed, appearance.visible
-equalized FR -> deterministic distinct FR-EQ color, solid, inherits source FR visibility/offset
+```ts
+const semantic = buildGraphSeries(derived)
+const display = buildDisplaySeries(semantic, curveAppearance, baselineCurveId)
+const graphState: SquiglinkGraphState = {
+  series: display.map((item) => {
+    const appearance = resolveGraphSeriesAppearance(item, theme)
+    return {
+      id: item.id,
+      name: item.name,
+      data: item.displayData,
+      color: appearance.color,
+      dashed: appearance.lineStyle === 'dashed',
+      visible: resolveSeriesVisibility(item, curveAppearance),
+    }
+  }),
+  view: {
+    zoom: graphZoomPreset,
+    smoothingLevel,
+    inspectorEnabled,
+    labelsEnabled,
+  },
+}
 ```
 
-Run `buildDisplaySeries` before passing points to D3. Baseline/offset remain view-only.
+Equalized FR visibility/offset follows its `sourceCurveId`; Targets stay neutral gray dashed.
 
-- [ ] **Step 6: Port toolbar behavior and reuse the existing screenshot helper where it remains valid**
+- [ ] **Step 6: Implement the source-derived toolbar with canonical actions**
 
-Use source toolbar composition. Keep normalization in workspace state. Keep source zoom ranges. Keep smoothing level in uiStore. Reuse `graphScreenshot.ts` only if it works against the new SVG; otherwise adapt it behind the same local-only screenshot behavior and retain its existing unit tests.
+```tsx
+const toggleZoom = (preset: Exclude<GraphZoomPreset, 'full'>) =>
+  setGraphZoomPreset(graphZoomPreset === preset ? 'full' : preset)
 
-`recolor` cycles/reassigns visible FR colors through the existing measurement palette; it must not recolor Target gray or use the amber UI accent as a graph-series color.
+const updateNormalizationHz = (value: number) => {
+  if (value < MVP_NUMERIC_POLICY.minFrequencyHz || value > MVP_NUMERIC_POLICY.maxFrequencyHz) return
+  setNormalization({ ...normalization, anchorHz: value })
+}
+```
 
-- [ ] **Step 7: Remove the duplicate old UtilityRail and obsolete geometry only after imports are gone**
+Use the existing screenshot helper against the new SVG if its tests still pass; otherwise adapt that helper, not a second screenshot implementation. `recolor` changes visible FR measurement colors through existing palette selection; never recolor Targets or use UI amber as a semantic curve color.
 
-Run before deleting:
+- [ ] **Step 7: Remove old toolbar/geometry after grep proves no imports**
 
 ```bash
-git grep -n "UtilityRail\|graphGeometry" -- apps/web/src
+git grep -n "UtilityRail\|graphGeometry" -- apps/web/src || true
+rm apps/web/src/components/layout/UtilityRail.tsx
+rm apps/web/src/features/graph/graphGeometry.ts apps/web/src/features/graph/graphGeometry.test.ts
 ```
 
-Delete each file only when no runtime/test import still requires it.
+If grep shows a legitimate remaining import, migrate that import to the new graph/toolbar modules before running the `rm` commands; do not keep two graph implementations.
 
-- [ ] **Step 8: Run targeted and broad web tests**
+- [ ] **Step 8: Verify, commit, push, and smoke public graph behavior**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/features/graph src/state/uiStore.test.ts src/App.test.tsx
 pnpm --filter @autoeq-workbench/web typecheck
 pnpm --filter @autoeq-workbench/web build
-```
-
-Expected: PASS.
-
-- [ ] **Step 9: Commit and publish the graph replacement checkpoint**
-
-```bash
-git add apps/web/src apps/web/package.json pnpm-lock.yaml
+git add -A apps/web/src
 git commit -m "feat(web): switch to Squiglink graph renderer"
 git push origin remake/squiglink-base
 ```
 
-On the public URL verify graph render, Bass/Mids/Treble toggle, normalization, smoothing, inspect, labels, screenshot, recolor, Light/Dark, FR import, Target import, and manual filter EQ.
+After CI/Pages, verify graph render, zoom, normalization, smoothing, inspect, labels, screenshot, recolor, Light/Dark, imports, and manual EQ on the public URL.
 
-### Task 6: Replace the Curves panel with a Squiglink-derived manager
+### Task 6: Replace Curves with the source-derived curve manager
 
 **Files:**
 - Create: `apps/web/src/features/curves/CurveManagerRow.tsx`
 - Create: `apps/web/src/features/curves/CurveManagerRow.test.tsx`
 - Modify: `apps/web/src/features/curves/CurvesTab.tsx`
-- Modify: `apps/web/src/features/curves/CurveAppearanceControls.tsx` or delete it after migration
 - Modify: `apps/web/src/features/curves/CurveImport.tsx`
 - Modify: `apps/web/src/features/curves/CurveImport.test.tsx`
+- Delete after migration: `apps/web/src/features/curves/CurveAppearanceControls.tsx`
 - Modify: `apps/web/src/App.test.tsx`
 
 **Interfaces:**
-- Consumes: workspace curve CRUD/active pair, uiStore appearance/baseline/offset state.
-- Produces: source-derived curve rows with active state, visibility, recolor, baseline, offset, rename/remove, and local FR/Target import.
+- Consumes: workspace curve CRUD/active pair plus uiStore appearance/baseline/offset.
+- Produces: source-derived rows with local import, active selection, visibility, recolor, baseline, offset, rename/remove.
 
-- [ ] **Step 1: Write manager-row tests for every approved state mutation**
+- [ ] **Step 1: Write failing row/empty-state tests**
 
-For an FR row, assert controls can:
-
-```text
-make FR active
-hide/show
-set baseline / clear baseline
-change display offset
-rename
-remove
+```tsx
+expect(screen.getByRole('button', { name: /set .* active fr/i })).toBeInTheDocument()
+expect(screen.getByRole('checkbox', { name: /visible/i })).toBeChecked()
+expect(screen.getByRole('button', { name: /baseline/i })).toBeInTheDocument()
+expect(screen.getByLabelText(/offset/i)).toHaveValue(0)
+expect(screen.getByRole('button', { name: /rename/i })).toBeInTheDocument()
+expect(screen.getByRole('button', { name: /remove/i })).toBeInTheDocument()
 ```
 
-For a Target row, assert it can become active Target and retains neutral graph styling despite row controls. Assert setting offset or baseline does not change `workspaceStore.curves[*].rawPoints`.
+For empty Curves, assert both local `Upload FR` and `Upload Target` actions are reachable. For Target row, assert it can become active Target. After offset/baseline actions, assert `workspaceStore.curves[0].rawPoints` is unchanged.
 
-- [ ] **Step 2: Write Curves empty/populated-state tests**
-
-Empty state must present a prominent source-derived import action rather than two disconnected empty lists. The import affordance may expose `Upload FR` and `Upload Target` directly or from one compact chooser, but both must remain local file inputs using current parser behavior.
-
-Populated state must show all FR and Target curves in one manager composition with a visible semantic marker/label distinguishing FR from Target.
-
-- [ ] **Step 3: Run the tests and confirm failure**
+- [ ] **Step 2: Run and verify failure**
 
 ```bash
 pnpm --filter @autoeq-workbench/web test -- src/features/curves src/App.test.tsx
 ```
 
-Expected: FAIL until the source-derived manager exists.
+- [ ] **Step 3: Implement row actions directly against existing stores**
 
-- [ ] **Step 4: Implement `CurveManagerRow` using existing stores rather than local duplicate curve state**
-
-Do not store a second copy of curve name/color/visibility/offset. Read/write directly through:
-
-```ts
-workspaceStore: setActiveFr, setActiveTarget, renameCurve, removeCurve
-uiStore: setCurveVisible, setCurveColor, setCurveOffset, setBaselineCurve
+```tsx
+const activate = () => {
+  if (curve.kind === 'fr') setActiveFr(curve.id)
+  else setActiveTarget(curve.id)
+}
+const remove = () => {
+  removeCurve(curve.id)
+  unregisterCurve(curve.id)
+}
+const toggleBaseline = () =>
+  setBaselineCurve(baselineCurveId === curve.id ? null : curve.id)
 ```
 
-On remove, call both workspace removal and `unregisterCurve(curve.id)` so appearance/baseline state is cleaned.
+Offset writes only `uiStore.setCurveOffset`; visibility/color write only appearance state; rename/remove/active selection write workspace state.
 
-- [ ] **Step 5: Recompose `CurvesTab` with source manager density and controls**
+- [ ] **Step 4: Recompose Curves using source manager density and existing parser**
 
-Use the Squiglink manager row/inline-icon proportions and responsive behavior as the source reference. Preserve local `.txt/.csv` parsing by continuing to call `parseCurveText` through `CurveImport`; do not port Squiglink's hosted measurement selection/database behavior.
+```tsx
+<section className="manage" aria-label="Curves workspace">
+  <div className="curve-upload-actions">
+    <CurveImport kind="fr" />
+    <CurveImport kind="target" />
+  </div>
+  <div className="manageTable" role="list">
+    {curves.map((curve) => (
+      <CurveManagerRow key={curve.id} curve={curve} />
+    ))}
+  </div>
+</section>
+```
 
-- [ ] **Step 6: Run curve + graph integration tests**
+Keep `CurveImport` calling `parseCurveText` from core; do not add hosted Brands/Models selection.
+
+- [ ] **Step 5: Delete superseded appearance component, verify, commit, push**
 
 ```bash
+git grep -n "CurveAppearanceControls" -- apps/web/src || true
+rm apps/web/src/features/curves/CurveAppearanceControls.tsx
 pnpm --filter @autoeq-workbench/web test -- src/features/curves src/features/graph src/state/uiStore.test.ts src/state/workspaceStore.test.ts
 pnpm --filter @autoeq-workbench/web typecheck
-```
-
-Expected: PASS.
-
-- [ ] **Step 7: Delete the old curve appearance component if fully superseded**
-
-```bash
-git grep -n "CurveAppearanceControls" -- apps/web/src
-```
-
-If only its own file remains, delete it and rerun the targeted tests.
-
-- [ ] **Step 8: Commit and publish Curves migration**
-
-```bash
-git add apps/web/src
+git add -A apps/web/src
 git commit -m "feat(web): port Squiglink curve manager"
 git push origin remake/squiglink-base
 ```
 
-Public smoke: import multiple FRs/Targets, switch active pair, hide/show, offset, baseline, recolor, rename/remove, verify active FR EQ follows active FR, and refresh root.
+After CI/Pages, publicly test multiple FR/Targets, active pair switching, visibility, color, offset, baseline, rename/remove, and active FR EQ tracking.
 
-### Task 7: Close Remake 02 with full regression and source/runtime audit
+### Task 7: Remake 02 completion gate
 
 **Files:**
-- Modify only if failures expose defects in Remake 02 files.
+- Verification/fixes only in files changed above.
 
 **Interfaces:**
-- Produces: stable published shell/graph/curves gate for Remake 03.
+- Produces: stable shell/graph/Curves baseline for Remake 03.
 
-- [ ] **Step 1: Run the complete repository gate**
+- [ ] **Step 1: Run the full repository gate**
 
 ```bash
 pnpm install --frozen-lockfile
@@ -761,73 +838,38 @@ pnpm --filter @autoeq-workbench/web build:pages
 git diff --check
 ```
 
-Expected: all exit 0.
-
-- [ ] **Step 2: Audit forbidden runtime references**
+- [ ] **Step 2: Audit forbidden runtime references and graph-series regressions**
 
 ```bash
-if git grep -n "vendor/squiglink" -- apps packages ':!docs/**'; then
-  echo "Runtime import/reference to vendor is forbidden" >&2
-  exit 1
-fi
-if grep -R "d3js.org\|cdnjs.cloudflare.com.*d3" apps/web/dist; then
-  echo "CDN D3 reference found" >&2
-  exit 1
-fi
+if git grep -n "vendor/squiglink" -- apps packages ':!docs/**'; then exit 1; fi
+if grep -R "d3js.org\|cdnjs.cloudflare.com.*d3" apps/web/dist; then exit 1; fi
+git grep -n "selectedFilter\|Desired\|PEQ" -- apps/web/src/features/graph apps/web/src/squiglink/graph || true
 ```
 
-Expected: no matches.
+Review the final grep: any match must be a negative test/comment, not a rendered graph series.
 
-- [ ] **Step 3: Audit graph semantics**
-
-Search the new graph runtime and tests:
-
-```bash
-git grep -n "selectedFilter\|Desired\|PEQ" -- apps/web/src/features/graph apps/web/src/squiglink/graph
-```
-
-Any match must be a negative test/assertion/documentation comment, not a rendered series path.
-
-- [ ] **Step 4: Public visual/functional acceptance**
-
-Verify at mobile and desktop widths in both Light and Dark:
+- [ ] **Step 3: Verify public viewport/theme/function matrix**
 
 ```text
-source-derived header/shell proportions
-Curves | Equalizer | Tools tabs
-800x346 D3 graph responsive inside its container
-20 Hz-20 kHz log axis and source-like ticks/grid
-Bass/Mids/Treble zoom toggle and return to Full
-normalization fields bounded 20-20000 Hz
-smoothing 0 and 5 visibly work
-inspect/label/screenshot/recolor work
-multiple FR/Target rows manage correctly
-baseline/offset are display-only
-active FR EQ moves with active FR
-manual filters still alter only the active FR EQ curve
-no isolated filter curve/marker
-Light/Dark preserve Workbench palette
+390x844 Light + Dark
+1280x800 Light + Dark
+Curves | Equalizer | Tools
+D3 graph no overflow
+20-20000 Hz source-like ticks/grid
+Bass/Mids/Treble toggle and return Full
+Normalize 20-20000 bound
+Smooth 0 vs 5
+Inspect/Label/Screenshot/Recolor
+multiple FR/Target management
+baseline/offset display-only
+active FR EQ follows active FR
+manual filters affect full-cascade FR EQ only
 ```
 
-- [ ] **Step 5: Push the final fixes, wait for CI/Pages, and record evidence**
+- [ ] **Step 4: Record final green/deployed SHA and stop**
 
-Do not start Remake 03 until the public SHA matches the final green Remake 02 SHA.
+Do not start Remake 03 until CI and Pages both point to the final Remake 02 SHA.
 
 ## Completion Gate
 
-Remake 02 is complete only when:
-
-1. the whole shell/header/panel relationship is source-derived from Squiglink and branded only as `AutoEQ Workbench`;
-2. tabs are exactly `Curves | Equalizer | Tools` and interim Tools still exposes useful Analysis;
-3. Light/Dark both work with Light default and Workbench palette;
-4. D3 is bundled through pnpm/Vite, with no CDN or runtime vendor dependency;
-5. the old custom React/SVG graph is replaced by a lifecycle-safe D3 adapter using `viewBox 0 0 800 346`;
-6. graph x-axis/zoom/tick behavior follows Squiglink while y values remain Workbench relative dB;
-7. graph displays only FR(s), Target(s), and active full-cascade FR EQ;
-8. toolbar replaces UtilityRail and all approved controls work;
-9. Curves uses source-derived manager composition and supports local FR/Target import, active selection, visibility, recolor, baseline, offset, rename, and remove without mutating raw samples for view-only actions;
-10. manual PEQ functionality remains intact even though Equalizer visual migration is deferred to Remake 03;
-11. full repository verification and public mobile/desktop Light/Dark smoke checks pass;
-12. no legacy Squiglink AutoEQ runtime has been introduced.
-
-Stop and record final commit SHA, CI/Pages evidence, public URL, screenshots/observations from mobile and desktop, and any source-derived behavior intentionally adapted before starting Remake 03.
+Remake 02 is complete only when shell/header/panels are source-derived, tabs are `Curves | Equalizer | Tools`, both themes work with the Workbench palette, D3 is bundled and lifecycle-contained, graph semantics remain FR/Target/active full-cascade FR EQ only, UtilityRail/old geometry are removed, source toolbar works, Curves uses source manager composition, view-only transforms do not mutate raw data, manual EQ still works, all repository checks pass, and the public site serves the same final green SHA. No legacy Squiglink AutoEQ runtime may exist.
