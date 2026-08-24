@@ -7,15 +7,28 @@ export interface AutoEqSettings {
   maxGainDb: number
   minQ: number
   maxQ: number
+  maxFilters: number
 }
 
-export const DEFAULT_AUTOEQ_SETTINGS: Readonly<AutoEqSettings> = Object.freeze({
+export const AUTOEQ_PRODUCT_LIMITS = Object.freeze({
   minFrequencyHz: MVP_NUMERIC_POLICY.minFrequencyHz,
   maxFrequencyHz: MVP_NUMERIC_POLICY.maxFrequencyHz,
   minGainDb: -15,
   maxGainDb: 15,
   minQ: 0.1,
   maxQ: 12,
+  defaultMaxFilters: 10,
+  hardMaxFilters: 64,
+})
+
+export const DEFAULT_AUTOEQ_SETTINGS: Readonly<AutoEqSettings> = Object.freeze({
+  minFrequencyHz: AUTOEQ_PRODUCT_LIMITS.minFrequencyHz,
+  maxFrequencyHz: AUTOEQ_PRODUCT_LIMITS.maxFrequencyHz,
+  minGainDb: AUTOEQ_PRODUCT_LIMITS.minGainDb,
+  maxGainDb: AUTOEQ_PRODUCT_LIMITS.maxGainDb,
+  minQ: AUTOEQ_PRODUCT_LIMITS.minQ,
+  maxQ: AUTOEQ_PRODUCT_LIMITS.maxQ,
+  maxFilters: AUTOEQ_PRODUCT_LIMITS.defaultMaxFilters,
 })
 
 export function isValidAutoEqSettings(settings: AutoEqSettings): boolean {
@@ -26,11 +39,17 @@ export function isValidAutoEqSettings(settings: AutoEqSettings): boolean {
     Number.isFinite(settings.maxGainDb) &&
     Number.isFinite(settings.minQ) &&
     Number.isFinite(settings.maxQ) &&
-    settings.minFrequencyHz >= MVP_NUMERIC_POLICY.minFrequencyHz &&
-    settings.maxFrequencyHz <= MVP_NUMERIC_POLICY.maxFrequencyHz &&
+    Number.isInteger(settings.maxFilters) &&
+    settings.minFrequencyHz >= AUTOEQ_PRODUCT_LIMITS.minFrequencyHz &&
+    settings.maxFrequencyHz <= AUTOEQ_PRODUCT_LIMITS.maxFrequencyHz &&
     settings.minFrequencyHz < settings.maxFrequencyHz &&
+    settings.minGainDb >= AUTOEQ_PRODUCT_LIMITS.minGainDb &&
+    settings.maxGainDb <= AUTOEQ_PRODUCT_LIMITS.maxGainDb &&
     settings.minGainDb < settings.maxGainDb &&
-    settings.minQ > 0 &&
-    settings.minQ < settings.maxQ
+    settings.minQ >= AUTOEQ_PRODUCT_LIMITS.minQ &&
+    settings.maxQ <= AUTOEQ_PRODUCT_LIMITS.maxQ &&
+    settings.minQ < settings.maxQ &&
+    settings.maxFilters >= 0 &&
+    settings.maxFilters <= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters
   )
 }
