@@ -1,10 +1,10 @@
 import type { CurveAppearance, ThemeMode } from '../../state/uiStore'
-import type { MeasurementGraphSeries } from './graphSeries'
+import { MEASUREMENT_CURVE_PALETTE } from '../../state/uiStore'
+import type { GraphSeries } from './graphSeries'
 
 export interface GraphAppearanceInput {
   theme: ThemeMode
   curveAppearance: Record<string, CurveAppearance>
-  frCurveId?: string
 }
 
 const GRAPH_THEMES = {
@@ -26,27 +26,23 @@ const GRAPH_THEMES = {
   },
 } as const
 
-const DERIVED_COLORS = {
-  light: { peq: '#7257a6', desired: '#b54f67', selectedFilter: '#2f3437' },
-  dark: { peq: '#aa8ddd', desired: '#e07a91', selectedFilter: '#f3efe8' },
-} as const
-
 export function graphTheme(theme: ThemeMode) {
   return GRAPH_THEMES[theme]
 }
 
-export function seriesAppearance(
-  name: string,
-  input: GraphAppearanceInput,
-  series?: Partial<Pick<MeasurementGraphSeries, 'curveId' | 'measurementKind' | 'active'>>,
-) {
-  const derived = DERIVED_COLORS[input.theme]
-  const base = { lineType: 'solid' as const, lineWidth: 1.35, opacity: 1 }
-  const measurementColor = series?.curveId === undefined
-    ? undefined
-    : input.curveAppearance[series.curveId]?.color
+export function pickEqualizedFrColor(sourceColor: string): string {
+  const normalizedSource = sourceColor.toLowerCase()
+  return MEASUREMENT_CURVE_PALETTE.find((color) => color.toLowerCase() !== normalizedSource)!
+}
 
-  if (series?.measurementKind !== undefined) {
+export function seriesAppearance(
+  series: GraphSeries,
+  input: GraphAppearanceInput,
+) {
+  const base = { lineType: 'solid' as const, lineWidth: 1.35, opacity: 1 }
+
+  if (series.kind === 'measurement') {
+    const measurementColor = input.curveAppearance[series.curveId]?.color
     return series.measurementKind === 'target'
       ? {
           color: graphTheme(input.theme).inactiveTarget,
@@ -57,23 +53,11 @@ export function seriesAppearance(
       : { ...base, color: measurementColor ?? '#1565c0' }
   }
 
-  switch (name) {
-    case 'FR + EQ':
-      return {
-        color: input.frCurveId === undefined
-          ? '#1565c0'
-          : (input.curveAppearance[input.frCurveId]?.color ?? '#1565c0'),
-        lineType: 'solid' as const,
-        lineWidth: 1.6,
-        opacity: 0.72,
-      }
-    case 'PEQ':
-      return { color: derived.peq, lineType: 'dashed' as const, lineWidth: 1.4, opacity: 0.9 }
-    case 'Desired':
-      return { color: derived.desired, lineType: 'dotted' as const, lineWidth: 1.4, opacity: 0.9 }
-    case 'Selected Filter':
-      return { ...base, color: derived.selectedFilter, lineWidth: 1.6 }
-    default:
-      return { ...base, color: measurementColor ?? '#1565c0' }
+  const sourceColor = input.curveAppearance[series.sourceCurveId]?.color ?? '#1565c0'
+  return {
+    color: pickEqualizedFrColor(sourceColor),
+    lineType: 'solid' as const,
+    lineWidth: 1.6,
+    opacity: 0.96,
   }
 }

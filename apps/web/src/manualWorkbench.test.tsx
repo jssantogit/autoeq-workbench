@@ -67,11 +67,19 @@ describe('manual workbench integration', () => {
     const importedFrColor = uiStore.getState().curveAppearance[frId]!.color
     expect(MEASUREMENT_CURVE_PALETTE).toContain(importedFrColor)
     expect(
-      seriesAppearance('FR', {
+      seriesAppearance({
+        id: frId,
+        name: 'Synthetic Source.txt',
+        kind: 'measurement',
+        data: [],
+        defaultVisible: true,
+        curveId: frId,
+        measurementKind: 'fr',
+        active: true,
+      }, {
         theme: uiStore.getState().theme,
         curveAppearance: uiStore.getState().curveAppearance,
-        frCurveId: frId,
-      }, { curveId: frId, measurementKind: 'fr', active: true }),
+      }),
     ).toMatchObject({ color: importedFrColor, lineType: 'solid' })
 
     fireEvent.change(within(curveManager).getByLabelText('+ Target'), {

@@ -94,10 +94,6 @@ function dashArray(lineType: 'solid' | 'dashed' | 'dotted'): string | undefined 
   return undefined
 }
 
-function markerLabel(frequencyHz: number): string {
-  return frequencyHz >= 1_000 ? `${frequencyHz / 1_000}kHz` : `${frequencyHz}Hz`
-}
-
 function truncateByCharacters(value: string, maxLength: number): string {
   if (value.length <= maxLength) return value
   if (maxLength <= 3) return '.'.repeat(Math.max(0, maxLength))
@@ -118,21 +114,19 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
       : series.defaultVisible,
   ), [curveAppearance, derived])
   const presentedSeries = useMemo(() => {
-    const appearanceInput = { theme, curveAppearance, frCurveId: derived.activeFrId ?? undefined }
+    const appearanceInput = { theme, curveAppearance }
     return visibleSeries.map((series) => ({
       series,
-      appearance: seriesAppearance(series.name, appearanceInput, series),
+      appearance: seriesAppearance(series, appearanceInput),
       spline: prepareNaturalSpline(series.data),
     }))
-  }, [curveAppearance, derived.activeFrId, theme, visibleSeries])
+  }, [curveAppearance, theme, visibleSeries])
   const preparedSegments = useMemo(() => new Map(
     presentedSeries.map(({ series, spline }) => [series.id, spline.segments] as const),
   ), [presentedSeries])
   const colors = graphTheme(theme)
   const xTicks = generateXTicks()
   const yTicks = generateYTicks()
-  const selectedFrequency = visibleSeries.find(({ markerFrequencyHz }) => markerFrequencyHz !== undefined)
-    ?.markerFrequencyHz
   const internalLabels = presentedSeries.slice(0, MAX_INTERNAL_LABELS)
   const overflowCount = presentedSeries.length - internalLabels.length
 
@@ -267,23 +261,7 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
               vectorEffect="non-scaling-stroke"
             />
           ))}
-          {selectedFrequency !== undefined && (
-            <line
-              data-selected-frequency={selectedFrequency}
-              x1={frequencyToX(selectedFrequency)} x2={frequencyToX(selectedFrequency)}
-              y1={PLOT_TOP} y2={PLOT_BOTTOM}
-              stroke={colors.marker} strokeWidth={1} strokeDasharray="5 4"
-              vectorEffect="non-scaling-stroke"
-            />
-          )}
         </g>
-        {selectedFrequency !== undefined && (
-          <text
-            className="graph-marker-label"
-            x={frequencyToX(selectedFrequency) + 4} y={PLOT_TOP + 12}
-            fill={colors.marker} fontSize={presentation.markerFontSize}
-          >{markerLabel(selectedFrequency)}</text>
-        )}
         <g aria-label="Visible graph series" pointerEvents="none">
           {internalLabels.map(({ series, appearance }, index) => {
             const y = PLOT_BOTTOM - presentation.curveBottomPadding -

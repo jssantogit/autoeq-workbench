@@ -103,14 +103,14 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     const paths = [...container.querySelectorAll<SVGPathElement>('[data-series-name]')]
     expect(paths.map((path) => path.dataset.seriesName)).toEqual([
-      'Studio left', 'Harman target', 'Archive target', 'Room comparison', 'FR + EQ',
+      'Studio left', 'Studio left EQ', 'Harman target', 'Archive target', 'Room comparison',
     ])
     for (const name of ['Harman target', 'Archive target']) {
       const target = container.querySelector(`[data-series-name="${name}"]`)
       expect(target).toHaveAttribute('stroke', '#989894')
       expect(target).toHaveAttribute('stroke-dasharray')
     }
-    expect(container.querySelector('[data-series-name="FR + EQ"]')).toHaveAttribute('stroke', '#1565c0')
+    expect(container.querySelector('[data-series-name="Studio left EQ"]')).toHaveAttribute('stroke', '#c62828')
     expect(container.querySelector('[data-series-name="Hidden comparison"]')).not.toBeInTheDocument()
     expect(screen.getByText('Studio left')).toHaveAttribute('fill', '#1565c0')
     expect(screen.getByText('Harman target')).toHaveAttribute('fill', '#989894')
@@ -272,7 +272,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(screen.getByText('+2 more')).toHaveAttribute('y', '182')
   })
 
-  it('keeps graph narration out of the SVG while retaining the selected-filter Fc marker', () => {
+  it('keeps graph narration and selected-filter overlays out of the SVG', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(curve('source', 'Source', 'fr'))
     store.getState().setFilters([filter], 'manual')
@@ -280,7 +280,8 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     expect(container.querySelector('[data-graph-status]')).not.toBeInTheDocument()
     expect(container.querySelector('svg')).not.toHaveTextContent(/FR and Target ready|select active/i)
-    expect(container.querySelector('[data-selected-frequency="1000"]')).toBeInTheDocument()
-    expect(screen.getByText('1kHz')).toBeInTheDocument()
+    expect(container.querySelector('[data-selected-frequency]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-series-name="Selected Filter"]')).not.toBeInTheDocument()
+    expect(screen.queryByText('1kHz')).not.toBeInTheDocument()
   })
 })

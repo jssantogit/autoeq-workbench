@@ -14,7 +14,6 @@ interface GraphSeriesBase {
   name: string
   data: [number, number][]
   defaultVisible: boolean
-  markerFrequencyHz?: number
 }
 
 export interface MeasurementGraphSeries extends GraphSeriesBase {
@@ -24,14 +23,15 @@ export interface MeasurementGraphSeries extends GraphSeriesBase {
   active: boolean
 }
 
-export interface DerivedGraphSeries extends GraphSeriesBase {
-  kind: 'derived'
+export interface EqualizedFrGraphSeries extends GraphSeriesBase {
+  kind: 'equalized-fr'
+  sourceCurveId: string
   curveId?: never
   measurementKind?: never
   active?: never
 }
 
-export type GraphSeries = MeasurementGraphSeries | DerivedGraphSeries
+export type GraphSeries = MeasurementGraphSeries | EqualizedFrGraphSeries
 
 export interface GraphInspector {
   frequencyHz: number
@@ -59,25 +59,28 @@ export function formatGraphInspector(
   return { frequencyHz, frequencyLabel: frequency, values }
 }
 
-function graphSeries(
-  id: string,
-  name: string,
-  curve: DerivedCurve | null,
-  defaultVisible: boolean,
-): DerivedGraphSeries | null {
-  if (curve === null) return null
+export function formatEqualizedFrName(name: string): string {
+  return `${name.replace(/\.(txt|csv)$/i, '')} EQ`
+}
+
+function equalizedFrSeries(
+  source: WorkspaceDerived['measurementCurves'][number],
+  curve: DerivedCurve,
+): EqualizedFrGraphSeries {
   return {
-    id,
-    name,
-    kind: 'derived',
+    id: 'fr-eq',
+    name: formatEqualizedFrName(source.name),
+    kind: 'equalized-fr',
     data: curve.frequencies.map((frequency, index) => [frequency, curve.db[index]!] as const),
-    defaultVisible,
+    defaultVisible: true,
+    sourceCurveId: source.id,
   }
 }
 
 export function buildGraphSeries(workspaceDerived: WorkspaceDerived): GraphSeries[] {
-  return [
-    ...workspaceDerived.measurementCurves.map((curve) => ({
+  const series: GraphSeries[] = []
+  for (const curve of workspaceDerived.measurementCurves) {
+    series.push({
       id: curve.id,
       name: curve.name,
       kind: 'measurement' as const,
@@ -89,20 +92,14 @@ export function buildGraphSeries(workspaceDerived: WorkspaceDerived): GraphSerie
         curve.kind === 'fr'
           ? curve.id === workspaceDerived.activeFrId
           : curve.id === workspaceDerived.activeTargetId,
-    })),
-    graphSeries(
-      'fr-eq',
-      'FR + EQ',
-      workspaceDerived.hasFilters ? workspaceDerived.frEq : null,
-      true,
-    ),
-    graphSeries('peq', 'PEQ', workspaceDerived.peq, false),
-    graphSeries('desired', 'Desired', workspaceDerived.desired, false),
-    workspaceDerived.selectedFilter === null
-      ? null
-      : {
-          ...graphSeries('selected-filter', 'Selected Filter', workspaceDerived.selectedFilter, true)!,
-          markerFrequencyHz: workspaceDerived.selectedFilter.frequencyHz,
-        },
-  ].filter((series): series is GraphSeries => series !== null)
+    })
+    if (
+      curve.id === workspaceDerived.activeFrId &&
+      workspaceDerived.hasFilters &&
+      workspaceDerived.frEq !== null
+    ) {
+      series.push(equalizedFrSeries(curve, workspaceDerived.frEq))
+    }
+  }
+  return series
 }

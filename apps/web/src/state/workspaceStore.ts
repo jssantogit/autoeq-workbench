@@ -1,7 +1,6 @@
 import {
   applyEqToSource,
   AUTOEQ_PRODUCT_LIMITS,
-  biquadMagnitudeDb,
   calculateErrorMetrics,
   calculatePreampDb,
   cascadeMagnitudeDb,
@@ -85,7 +84,6 @@ export interface WorkspaceDerived {
   frEq: DerivedCurve | null
   metrics: ErrorMetrics | null
   preamp: PreampResult | null
-  selectedFilter: (DerivedCurve & { frequencyHz: number; enabled: boolean }) | null
   hasFilters: boolean
   activeFrId: string | null
   activeTargetId: string | null
@@ -454,16 +452,6 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
   const activeTarget =
     state.curves.find((curve) => curve.id === state.activeTargetId && curve.kind === 'target') ?? null
   const measurementCurves: DerivedMeasurementCurve[] = []
-  const selected = state.filters.find(({ id }) => id === state.selectedFilterId)
-  const selectedFilter = selected
-    ? {
-        frequencies,
-        db: biquadMagnitudeDb(selected, frequencies, MVP_NUMERIC_POLICY.sampleRateHz),
-        frequencyHz: selected.frequencyHz,
-        enabled: selected.enabled,
-      }
-    : null
-
   const coversWorkbenchRange = (curve: Curve) => {
     const firstFrequencyHz = curve.rawPoints[0]?.frequencyHz
     const lastFrequencyHz = curve.rawPoints.at(-1)?.frequencyHz
@@ -553,7 +541,6 @@ export function deriveWorkspace(state: WorkspaceState): WorkspaceDerived {
     frEq,
     metrics,
     preamp,
-    selectedFilter,
     hasFilters: state.filters.length > 0,
     activeFrId: activeFr?.id ?? null,
     activeTargetId: activeTarget?.id ?? null,

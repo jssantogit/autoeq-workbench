@@ -1,12 +1,12 @@
 import type { Curve, Filter } from '@autoeq-workbench/core'
 import { describe, expect, it } from 'vitest'
 import { createWorkspaceStore, deriveWorkspace } from '../../state/workspaceStore'
-import { buildGraphSeries, formatGraphInspector } from './graphSeries'
+import { buildGraphSeries, formatEqualizedFrName, formatGraphInspector } from './graphSeries'
 import { createNaturalSplineSegments } from './graphGeometry'
 
 const source: Curve = {
   id: 'source',
-  name: 'Source',
+  name: 'Juzear Nimbus [1].txt',
   kind: 'fr',
   rawPoints: [
     { frequencyHz: 20, db: -2 },
@@ -18,7 +18,7 @@ const source: Curve = {
 
 const target: Curve = {
   id: 'target',
-  name: 'Target',
+  name: 'JM-1 Target',
   kind: 'target',
   rawPoints: [
     { frequencyHz: 20, db: 1 },
@@ -50,7 +50,7 @@ const overlay: Curve = {
 }
 
 describe('buildGraphSeries', () => {
-  it('builds normalized Source data while the workspace is incomplete', () => {
+  it('builds only the imported FR while the workspace is incomplete and has no filters', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(source)
 
@@ -58,7 +58,7 @@ describe('buildGraphSeries', () => {
     const series = buildGraphSeries(derived)
 
     expect(derived.status).toBe('incomplete')
-    expect(series.map(({ name }) => name)).toEqual(['Source', 'PEQ'])
+    expect(series.map(({ name }) => name)).toEqual(['Juzear Nimbus [1].txt'])
     expect(series[0]?.data).toEqual([
       [20, -3],
       [500, 0],
@@ -83,22 +83,18 @@ describe('buildGraphSeries', () => {
     ])
   })
 
-  it('keeps auxiliary PEQ and Desired series toggleable but hidden by default', () => {
+  it('renders only imported FR and Target responses when there are no filters', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(source)
     store.getState().addCurve(target)
 
     const series = buildGraphSeries(deriveWorkspace(store.getState()))
 
-    expect(series.map(({ name }) => name)).toEqual(['Source', 'Target', 'PEQ', 'Desired'])
-    expect(series.filter(({ defaultVisible }) => defaultVisible).map(({ name }) => name)).toEqual([
-      'Source',
-      'Target',
-    ])
+    expect(series.map(({ name }) => name)).toEqual(['Juzear Nimbus [1].txt', 'JM-1 Target'])
     expect(series.every(({ data }) => data.every(([frequency, db]) => frequency > 0 && Number.isFinite(db)))).toBe(true)
   })
 
-  it('adds FR + EQ to the default series only when filters exist', () => {
+  it('adds the active FR equalized response without graphing internal correction curves', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(source)
     store.getState().addCurve(target)
@@ -106,14 +102,52 @@ describe('buildGraphSeries', () => {
 
     const series = buildGraphSeries(deriveWorkspace(store.getState()))
 
-    expect(series.filter(({ defaultVisible }) => defaultVisible).map(({ name }) => name)).toEqual([
-      'Source',
-      'Target',
-      'FR + EQ',
+    expect(series.map(({ name }) => name)).toEqual([
+      'Juzear Nimbus [1].txt',
+      'Juzear Nimbus [1] EQ',
+      'JM-1 Target',
     ])
-    expect(series.find(({ name }) => name === 'FR + EQ')?.data).not.toEqual(
-      series.find(({ name }) => name === 'Source')?.data,
+    expect(series.map(({ kind }) => kind)).toEqual(['measurement', 'equalized-fr', 'measurement'])
+    expect(series.find(({ kind }) => kind === 'equalized-fr')).toMatchObject({
+      id: 'fr-eq',
+      sourceCurveId: 'source',
+    })
+    expect(series.find(({ kind }) => kind === 'equalized-fr')?.data).not.toEqual(
+      series.find(({ id }) => id === 'source')?.data,
     )
+    expect(series.map(({ name }) => name)).not.toEqual(expect.arrayContaining([
+      'FR + EQ', 'Selected Filter', 'PEQ', 'Desired',
+    ]))
+  })
+
+  it('derives the equalized FR without an active Target', () => {
+    const store = createWorkspaceStore()
+    store.getState().addCurve(source)
+    store.getState().setFilters([filter], 'manual')
+
+    expect(buildGraphSeries(deriveWorkspace(store.getState())).map(({ name }) => name)).toEqual([
+      'Juzear Nimbus [1].txt',
+      'Juzear Nimbus [1] EQ',
+    ])
+  })
+
+  it('keeps exactly one equalized response and follows the active FR immediately', () => {
+    const store = createWorkspaceStore()
+    store.getState().addCurve(source)
+    store.getState().addCurve(overlay)
+    store.getState().addCurve(target)
+    store.getState().setFilters([filter], 'manual')
+
+    expect(buildGraphSeries(deriveWorkspace(store.getState())).map(({ name }) => name)).toEqual([
+      'Juzear Nimbus [1].txt', 'Juzear Nimbus [1] EQ', 'Room overlay', 'JM-1 Target',
+    ])
+
+    store.getState().setActiveFr('overlay')
+    const switched = buildGraphSeries(deriveWorkspace(store.getState()))
+    expect(switched.map(({ name }) => name)).toEqual([
+      'Juzear Nimbus [1].txt', 'Room overlay', 'Room overlay EQ', 'JM-1 Target',
+    ])
+    expect(switched.filter(({ kind }) => kind === 'equalized-fr')).toHaveLength(1)
   })
 
   it('allows future imported-curve series names without a brittle fixed-name contract', () => {
@@ -135,7 +169,7 @@ describe('buildGraphSeries', () => {
     expect(inspector.values[0]?.db).toBeTypeOf('number')
   })
 
-  it('keeps a disabled selected filter response inspectable with its Fc marker', () => {
+  it('does not turn filter selection into a graph response or marker', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(source)
     store.getState().addCurve(target)
@@ -144,12 +178,14 @@ describe('buildGraphSeries', () => {
 
     const derived = deriveWorkspace(store.getState())
     const series = buildGraphSeries(derived)
-    const selected = series.find(({ name }) => name === 'Selected Filter')
 
     expect(derived.peq?.db.every((db) => Math.abs(db) < 1e-10)).toBe(true)
-    expect(selected?.defaultVisible).toBe(true)
-    expect(selected?.markerFrequencyHz).toBe(1_000)
-    expect(Math.max(...selected!.data.map(([, db]) => db))).toBeGreaterThan(2.9)
+    expect(series.map(({ name }) => name)).toEqual([
+      'Juzear Nimbus [1].txt',
+      'Juzear Nimbus [1] EQ',
+      'JM-1 Target',
+    ])
+    expect(series.every((item) => !('markerFrequencyHz' in item))).toBe(true)
   })
 
   it('reports fixed-range coverage failures without dropping imported curve data', () => {
@@ -165,7 +201,17 @@ describe('buildGraphSeries', () => {
 
     expect(derived.status).toBe('coverage-error')
     expect(derived.message).toMatch(/20 Hz.*20 kHz/i)
-    expect(series.map(({ name }) => name)).toEqual(['Source', 'Target', 'PEQ'])
+    expect(series.map(({ name }) => name)).toEqual(['Juzear Nimbus [1].txt', 'JM-1 Target'])
+  })
+})
+
+describe('formatEqualizedFrName', () => {
+  it.each([
+    ['Juzear Nimbus [1].txt', 'Juzear Nimbus [1] EQ'],
+    ['Truthear Nova.CSV', 'Truthear Nova EQ'],
+    ['DUNU Titan S2', 'DUNU Titan S2 EQ'],
+  ])('formats %s as %s', (name, expected) => {
+    expect(formatEqualizedFrName(name)).toBe(expected)
   })
 })
 
