@@ -1,0 +1,37 @@
+:root,
+:root[data-theme='light'] {
+  --wb-bg: #f6f3ed;
+  --wb-surface: #fffdf8;
+  --wb-surface-muted: #eee9df;
+  --wb-text: #232323;
+  --wb-text-muted: #6f6b63;
+  --wb-border: #d7d0c4;
+  --wb-accent: #ffa03a;
+  --wb-accent-hover: #e98a27;
+  --wb-copper: #9a642b;
+}
+
+:root[data-theme='dark'] {
+  --wb-bg: #080c0e;
+  --wb-surface: #0e1417;
+  --wb-surface-muted: #151d21;
+  --wb-text: #eceae4;
+  --wb-text-muted: #a6a39c;
+  --wb-border: #293237;
+  --wb-accent: #ffa03a;
+  --wb-accent-hover: #e98a27;
+  --wb-copper: #9a642b;
+}
+
+.graphtool,
+.parts-primary { color: var(--wb-text); background: var(--wb-bg); }
+.header,
+.parts-secondary { color: var(--wb-text); background: var(--wb-surface); }
+.parts-secondary,
+.graphBox { border-color: var(--wb-border); }
+.tools-panel { color: var(--wb-text); background: var(--wb-surface); }
+.tools-section > h3 { color: var(--wb-text-muted); }
+
+@media (max-width: 1000px) {
+  .parts-secondary { border-color: var(--wb-border); }
+}

@@ -97,6 +97,7 @@ describe('App', () => {
     expect(screen.getByText('0 / 64 filters')).toBeVisible()
     expect(within(equalizer).getByRole('button', { name: 'Auto EQ' })).toBeDisabled()
     await user.click(screen.getByRole('tab', { name: 'Tools' }))
+    expect(screen.getByRole('heading', { name: 'Analysis' })).toBeVisible()
     expect(screen.getByRole('heading', { name: 'Metrics' })).toBeVisible()
     expect(screen.queryByRole('heading', { name: 'Details' })).not.toBeInTheDocument()
     expect(screen.queryByText('Evaluation policy')).not.toBeInTheDocument()

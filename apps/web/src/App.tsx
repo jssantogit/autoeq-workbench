@@ -4,7 +4,7 @@ import { WorkbenchDock } from './components/layout/WorkbenchDock'
 import { CurvesTab } from './features/curves/CurvesTab'
 import { EqualizerTab } from './features/filters/EqualizerTab'
 import { FrequencyResponseGraph } from './features/graph/FrequencyResponseGraph'
-import { DetailsTab } from './features/metrics/DetailsTab'
+import { ToolsInterim } from './features/tools/ToolsInterim'
 import { SquiglinkShell } from './squiglink/SquiglinkShell'
 import { deriveWorkspace, useWorkspaceStore } from './state/workspaceStore'
 
@@ -27,7 +27,7 @@ function App() {
         <WorkbenchDock
           curves={<CurvesTab />}
           equalizer={<EqualizerTab />}
-          tools={<DetailsTab derived={derived} />}
+          tools={<ToolsInterim derived={derived} />}
         />
       )}
     />

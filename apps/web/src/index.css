@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./squiglink/styles/squiglink-base.css";
+@import "./squiglink/styles/workbench-theme.css";
 
 :root,
 :root[data-theme='light'] {

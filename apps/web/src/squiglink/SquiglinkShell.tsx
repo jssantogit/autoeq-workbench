@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import './shell.css'
 
 interface SquiglinkShellProps {
   header: ReactNode
