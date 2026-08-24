@@ -1,3 +1,4 @@
+import { MVP_NUMERIC_POLICY } from '@autoeq-workbench/core'
 import { useState } from 'react'
 import { NumberField } from '../ui/NumberField'
 import { exportFrequencyResponseGraph } from '../../features/graph/graphScreenshot'
@@ -5,7 +6,10 @@ import { useUiStore } from '../../state/uiStore'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 import { ThemeToggle } from './ThemeToggle'
 
-const positive = (value: number) => value > 0
+const validAnchor = (value: number) =>
+  Number.isFinite(value) &&
+  value >= MVP_NUMERIC_POLICY.minFrequencyHz &&
+  value <= MVP_NUMERIC_POLICY.maxFrequencyHz
 
 export function UtilityRail() {
   const [selectedNormalizationField, setSelectedNormalizationField] = useState<'db' | 'hz'>('hz')
@@ -60,8 +64,9 @@ export function UtilityRail() {
             label="Anchor Hz"
             unit="Hz"
             value={normalization.anchorHz}
-            min={1}
-            validate={positive}
+            min={MVP_NUMERIC_POLICY.minFrequencyHz}
+            max={MVP_NUMERIC_POLICY.maxFrequencyHz}
+            validate={validAnchor}
             onValueChange={(anchorHz) => setNormalization({ ...normalization, anchorHz })}
           />
         </div>
