@@ -29,6 +29,19 @@
 - Offset, baseline, smoothing, visibility, and labels are display state and never mutate imported raw samples.
 - No legacy Squiglink AutoEQ code may enter runtime.
 
+## Authorized Execution Corrections
+
+These corrections resolve conflicts found between the original task sequence, the current typed React application, and the pinned Squiglink source. They are authoritative where the task text below differs.
+
+1. Task 1 keeps `DockTab = 'curves' | 'equalizer' | 'details'` so its required typecheck remains coherent. Task 2 migrates `details` to `tools` atomically across App composition, dock components, state, and affected tests.
+2. Task 1 makes `CurveAppearance.offsetDb` required and updates every affected fixture or helper with neutral `offsetDb: 0`, including files omitted from the original Task 1 file list when required for a green typecheck.
+3. Task 2 keeps `UtilityRail` functional. Task 5 removes it only after the source-derived graph toolbar is implemented and tested with theme access, normalization, inspector, screenshot, and the remaining migrated controls.
+4. The shell follows the actual upstream hierarchy: `.graphtool > header.header + main.main`. `AppHeader` is not placed inside `main.main`.
+5. The curve manager preserves the upstream table structure: `table.manageTable > tbody > tr > td`, with React accessibility semantics layered onto that structure.
+6. Smoothing is display-only. The graph adapter deterministically resamples each series onto an approximately 1/48-octave common logarithmic grid within valid source coverage, applies the ported Squiglink smoothing algebra to that representation, and passes only display output to the renderer. Raw imported samples remain unchanged.
+
+Additional files may change only when necessary to keep an amended task's contract compilable and tested. These corrections do not authorize unrelated refactors, runtime imports from `vendor/`, legacy Squiglink AutoEQ, or Remake 03 work.
+
 ---
 
 ### Task 1: Add D3 and lock graph-view UI state
