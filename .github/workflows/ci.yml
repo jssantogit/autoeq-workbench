@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, remake/squiglink-base]
   pull_request:
 
 permissions:
