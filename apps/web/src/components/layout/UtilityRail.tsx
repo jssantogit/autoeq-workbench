@@ -3,10 +3,12 @@ import { NumberField } from '../ui/NumberField'
 import { exportFrequencyResponseGraph } from '../../features/graph/graphScreenshot'
 import { useUiStore } from '../../state/uiStore'
 import { useWorkspaceStore } from '../../state/workspaceStore'
+import { ThemeToggle } from './ThemeToggle'
 
 const positive = (value: number) => value > 0
 
 export function UtilityRail() {
+  const [selectedNormalizationField, setSelectedNormalizationField] = useState<'db' | 'hz'>('hz')
   const [screenshotStatus, setScreenshotStatus] = useState('')
   const [screenshotPending, setScreenshotPending] = useState(false)
   const normalization = useWorkspaceStore((state) => state.normalization)
@@ -29,23 +31,40 @@ export function UtilityRail() {
 
   return (
     <div className="utility-rail utility-rail--nowrap" role="toolbar" aria-label="Workspace utilities">
+      <ThemeToggle />
       <div className="rail-normalization" role="group" aria-label="NORMALIZE">
         <span className="rail-normalization__label" aria-hidden="true">NORMALIZE</span>
-        <NumberField
-          label="Target dB"
-          unit="dB"
-          value={normalization.targetDb}
-          step="0.1"
-          onValueChange={(targetDb) => setNormalization({ ...normalization, targetDb })}
-        />
-        <NumberField
-          label="Anchor Hz"
-          unit="Hz"
-          value={normalization.anchorHz}
-          min={1}
-          validate={positive}
-          onValueChange={(anchorHz) => setNormalization({ ...normalization, anchorHz })}
-        />
+        <div
+          className="rail-normalization__compound"
+          data-normalization-field="db"
+          data-selected={selectedNormalizationField === 'db'}
+          onClick={() => setSelectedNormalizationField('db')}
+          onFocusCapture={() => setSelectedNormalizationField('db')}
+        >
+          <NumberField
+            label="Target dB"
+            unit="dB"
+            value={normalization.targetDb}
+            step="0.1"
+            onValueChange={(targetDb) => setNormalization({ ...normalization, targetDb })}
+          />
+        </div>
+        <div
+          className="rail-normalization__compound"
+          data-normalization-field="hz"
+          data-selected={selectedNormalizationField === 'hz'}
+          onClick={() => setSelectedNormalizationField('hz')}
+          onFocusCapture={() => setSelectedNormalizationField('hz')}
+        >
+          <NumberField
+            label="Anchor Hz"
+            unit="Hz"
+            value={normalization.anchorHz}
+            min={1}
+            validate={positive}
+            onValueChange={(anchorHz) => setNormalization({ ...normalization, anchorHz })}
+          />
+        </div>
       </div>
       <button
         className="utility-rail__action"

@@ -20,6 +20,7 @@ describe('seriesAppearance', () => {
 
     expect(style.color).toBe('#989894')
     expect(style.lineType).toBe('dashed')
+    expect(style.lineWidth).toBe(1.1)
     expect(style.opacity).toBeLessThan(1)
     expect(seriesAppearance('Target B', { ...input, theme: 'dark' }, {
       curveId: 'target',
@@ -35,6 +36,7 @@ describe('seriesAppearance', () => {
     const style = seriesAppearance('FR', input, { curveId: 'source', measurementKind: 'fr', active: true })
 
     expect(style.color).toBe('#1565c0')
+    expect(style.lineWidth).toBe(1.35)
     expect(style.color.toLowerCase()).not.toBe('#f39a3b')
   })
 
@@ -43,6 +45,7 @@ describe('seriesAppearance', () => {
     const frEq = seriesAppearance('FR + EQ', input)
 
     expect(frEq.color).toBe(source.color)
+    expect(frEq.lineWidth).toBe(1.6)
     expect(frEq).not.toEqual(source)
     expect([frEq.lineWidth, frEq.opacity, frEq.lineType]).not.toEqual([
       source.lineWidth,

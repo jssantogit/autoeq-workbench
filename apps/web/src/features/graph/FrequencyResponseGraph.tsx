@@ -141,6 +141,7 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
                 />
                 {tick.label !== null && (
                   <text
+                    className="graph-axis-label graph-axis-label--x"
                     x={x} y={339} fill={colors.axis} fontSize={10}
                     textAnchor={tick.frequencyHz === 20 ? 'start' : tick.frequencyHz === 20_000 ? 'end' : 'middle'}
                   >{tick.label}</text>
@@ -159,10 +160,24 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
                   stroke={tick.emphasis === 'zero' ? colors.axis : colors.majorGrid}
                   strokeWidth={tick.emphasis === 'zero' ? 1.2 : 0.55}
                 />
-                <text x={PLOT_LEFT + 4} y={y - 3} fill={colors.axis} fontSize={9}>{tick.db}</text>
+                <text
+                  className="graph-axis-label graph-axis-label--y"
+                  data-y-label={tick.db}
+                  x={PLOT_LEFT + 24} y={y} fill={colors.axis} fontSize={9}
+                  dominantBaseline={tick.db === 25 ? 'hanging' : tick.db === -30 ? 'auto' : 'middle'}
+                >{tick.db}</text>
               </g>
             )
           })}
+          <text
+            className="graph-axis-label graph-db-label"
+            data-db-label
+            x={PLOT_LEFT + 4}
+            y={PLOT_TOP + 4}
+            fill={colors.axis}
+            fontSize={9}
+            dominantBaseline="hanging"
+          >dB</text>
         </g>
         <g clipPath={`url(#${clipId})`}>
           {presentedSeries.map(({ series, appearance }) => (
@@ -190,29 +205,45 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
         </g>
         {selectedFrequency !== undefined && (
           <text
+            className="graph-marker-label"
             x={frequencyToX(selectedFrequency) + 4} y={PLOT_TOP + 12}
             fill={colors.marker} fontSize={9}
           >{markerLabel(selectedFrequency)}</text>
         )}
         <g aria-label="Visible graph series" pointerEvents="none">
-          {internalLabels.map(({ series, appearance }, index) => (
-            <text
-              key={series.id} x={PLOT_LEFT + 7} y={PLOT_BOTTOM - 8 - index * 12}
-              fill={appearance.color} fontSize={10} fontWeight={650}
-            >{series.name}</text>
-          ))}
+          {internalLabels.map(({ series, appearance }, index) => {
+            const y = PLOT_BOTTOM - 20 - index * 15
+            const target = series.kind === 'measurement' && series.measurementKind === 'target'
+            return (
+              <g key={series.id}>
+                {target && (
+                  <line
+                    data-target-label-sample={series.curveId}
+                    x1={PLOT_LEFT + 14} x2={PLOT_LEFT + 44} y1={y - 3} y2={y - 3}
+                    stroke={appearance.color} strokeWidth={appearance.lineWidth}
+                    strokeDasharray={dashArray(appearance.lineType)}
+                    strokeOpacity={appearance.opacity}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                )}
+                <text
+                  className="graph-curve-label"
+                  x={target ? PLOT_LEFT + 49 : PLOT_LEFT + 14} y={y}
+                  fill={appearance.color} fontSize={10} fontWeight={650}
+                >{series.name}</text>
+              </g>
+            )
+          })}
           {overflowCount > 0 && (
-            <text x={PLOT_LEFT + 7} y={PLOT_BOTTOM - 8 - internalLabels.length * 12} fill={colors.axis} fontSize={9}>
+            <text
+              className="graph-curve-label graph-curve-label--overflow"
+              x={PLOT_LEFT + 14} y={PLOT_BOTTOM - 20 - internalLabels.length * 15}
+              fill={colors.axis} fontSize={9}
+            >
               +{overflowCount} more
             </text>
           )}
         </g>
-        <text
-          data-graph-status
-          x={PLOT_LEFT + 7} y={PLOT_TOP + 12}
-          fill={derived.status === 'coverage-error' ? '#b42318' : colors.axis}
-          fontSize={9}
-        >{derived.message}</text>
         {inspectorEnabled && inspector !== null && (
           <g pointerEvents="none">
             <line
@@ -223,19 +254,19 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
             />
             <g data-inspector-tooltip transform={`translate(${tooltipX} ${PLOT_TOP + 18})`}>
               <rect width={tooltipWidth} height={tooltipHeight} rx={3} fill={colors.background} fillOpacity={0.94} stroke={colors.majorGrid} />
-              <text x={7} y={13} fill={colors.marker} fontSize={10} fontWeight={700}>
+              <text className="graph-tooltip-label" x={7} y={13} fill={colors.marker} fontSize={10} fontWeight={700}>
                 {inspector.details.frequencyLabel}
               </text>
               {tooltipValues.map((value, index) => {
                 const appearance = presentedSeries.find(({ series }) => series.id === value.id)?.appearance
                 return (
-                  <text key={value.id} x={7} y={27 + index * 13} fill={appearance?.color ?? colors.axis} fontSize={9}>
+                  <text className="graph-tooltip-value" key={value.id} x={7} y={27 + index * 13} fill={appearance?.color ?? colors.axis} fontSize={9}>
                     {value.name}: {value.db.toFixed(2)} dB
                   </text>
                 )
               })}
               {inspector.details.values.length > MAX_INSPECTOR_VALUES && (
-                <text x={7} y={27 + tooltipValues.length * 13} fill={colors.axis} fontSize={9}>
+                <text className="graph-tooltip-value" x={7} y={27 + tooltipValues.length * 13} fill={colors.axis} fontSize={9}>
                   +{inspector.details.values.length - MAX_INSPECTOR_VALUES} more
                 </text>
               )}
@@ -260,9 +291,6 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
           onKeyDown={inspectKeyboard}
         />
       </svg>
-      <p className="visually-hidden" role="status" data-testid="graph-derived-status">
-        {derived.message}
-      </p>
       <p
         className="visually-hidden"
         role="status"

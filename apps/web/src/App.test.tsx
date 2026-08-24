@@ -45,10 +45,13 @@ describe('App', () => {
 
   it('renders a compact title and accessible icon-only theme control', () => {
     render(<App />)
-    expect(screen.getByRole('heading', { name: /autoeq workbench/i })).toBeInTheDocument()
+    const header = screen.getByRole('banner')
+    const utilityRail = screen.getByRole('toolbar', { name: 'Workspace utilities' })
+    expect(within(header).getByRole('heading', { name: /autoeq workbench/i })).toBeInTheDocument()
     expect(screen.queryByText('Frequency response workspace')).not.toBeInTheDocument()
     expect(screen.queryByText('Manual frequency response workspace')).not.toBeInTheDocument()
-    const themeToggle = screen.getByRole('button', { name: 'Switch to dark theme' })
+    expect(within(header).queryByRole('button')).not.toBeInTheDocument()
+    const themeToggle = within(utilityRail).getByRole('button', { name: 'Switch to dark theme' })
     expect(themeToggle).toHaveAttribute('title', 'Switch to dark theme')
     expect(themeToggle.textContent).toBe('')
     expect(themeToggle.querySelector('span')).not.toBeInTheDocument()
@@ -101,6 +104,17 @@ describe('App', () => {
     const target = within(utilityRail).getByLabelText('Target dB')
     const anchor = within(utilityRail).getByLabelText('Anchor Hz')
     const inspector = within(utilityRail).getByRole('button', { name: 'Inspect' })
+    const targetCompound = target.closest('[data-normalization-field]')!
+    const anchorCompound = anchor.closest('[data-normalization-field]')!
+
+    expect(anchorCompound).toHaveAttribute('data-selected', 'true')
+    expect(targetCompound).toHaveAttribute('data-selected', 'false')
+    fireEvent.focus(target)
+    expect(targetCompound).toHaveAttribute('data-selected', 'true')
+    expect(anchorCompound).toHaveAttribute('data-selected', 'false')
+    await user.click(within(anchorCompound as HTMLElement).getByText('Hz'))
+    expect(anchorCompound).toHaveAttribute('data-selected', 'true')
+    expect(targetCompound).toHaveAttribute('data-selected', 'false')
 
     expect(inspector).toHaveAttribute('aria-pressed', 'true')
     await user.click(inspector)

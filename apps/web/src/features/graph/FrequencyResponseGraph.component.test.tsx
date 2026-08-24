@@ -41,6 +41,16 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelectorAll('[data-x-grid]')).toHaveLength(25)
     expect(container.querySelectorAll('[data-y-grid]')).toHaveLength(12)
     expect(container.querySelector('[data-y-grid="0"]')).toHaveAttribute('data-emphasis', 'zero')
+    const dbLabel = container.querySelector('[data-db-label]')
+    expect(dbLabel).toHaveTextContent('dB')
+    expect(dbLabel).toHaveAttribute('x', '19')
+    expect(dbLabel).toHaveAttribute('y', '16')
+    expect(container.querySelectorAll('.graph-axis-label')).toHaveLength(23)
+    expect([...container.querySelectorAll('[data-y-label]')].map((label) => label.textContent)).toEqual([
+      '25', '20', '15', '10', '5', '0', '-5', '-10', '-15', '-20', '-25', '-30',
+    ])
+    expect(container.querySelector('[data-y-label="25"]')).toHaveAttribute('dominant-baseline', 'hanging')
+    expect(container.querySelector('[data-y-label="-30"]')).toHaveAttribute('dominant-baseline', 'auto')
     expect(container.querySelector('.graph-meta')).not.toBeInTheDocument()
     expect(container.querySelector('[class*="legend"]')).not.toBeInTheDocument()
     expect(container.innerHTML).not.toMatch(/sampling|dataZoom|toolbox|Reset View/)
@@ -78,6 +88,9 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-series-name="Hidden comparison"]')).not.toBeInTheDocument()
     expect(screen.getByText('Studio left')).toHaveAttribute('fill', '#1565c0')
     expect(screen.getByText('Harman target')).toHaveAttribute('fill', '#989894')
+    expect(screen.getByText('Harman target')).toHaveAttribute('x', '64')
+    expect(container.querySelector('[data-target-label-sample="target"]')).toHaveAttribute('stroke-dasharray', '7 5')
+    expect(container.querySelector('[data-target-label-sample="reference"]')).toBeInTheDocument()
     expect(screen.queryByText('Hidden comparison')).not.toBeInTheDocument()
   })
 
@@ -117,7 +130,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-inspector-crosshair]')).not.toBeInTheDocument()
   })
 
-  it('operates the inspector by keyboard and announces status and details outside the SVG', () => {
+  it('operates the inspector by keyboard and announces details outside the SVG', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(curve('source', 'Source', 'fr'))
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
@@ -127,8 +140,8 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     fireEvent.focus(control)
     expect(container.querySelector('[data-inspector-crosshair]')).toBeInTheDocument()
     expect(screen.getByTestId('graph-inspector-status')).toHaveTextContent(/1\.00 kHz.*Source:.*dB/i)
-    expect(screen.getByTestId('graph-derived-status')).toHaveTextContent(/target/i)
     expect(screen.getByTestId('graph-inspector-status').closest('svg')).toBeNull()
+    expect(screen.queryByTestId('graph-derived-status')).not.toBeInTheDocument()
 
     fireEvent.keyDown(control, { key: 'ArrowRight' })
     expect(control).toHaveAttribute('aria-valuenow', '1072')
@@ -147,17 +160,22 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     }
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
 
-    expect(container.querySelectorAll('[aria-label="Visible graph series"] > text')).toHaveLength(9)
+    expect(container.querySelectorAll('[aria-label="Visible graph series"] text')).toHaveLength(9)
     expect(screen.getByText('+2 more')).toBeInTheDocument()
+    expect(screen.getByText('Curve 0')).toHaveAttribute('x', '29')
+    expect(screen.getByText('Curve 0')).toHaveAttribute('y', '302')
+    expect(screen.getByText('Curve 7')).toHaveAttribute('y', '197')
+    expect(screen.getByText('+2 more')).toHaveAttribute('y', '182')
   })
 
-  it('keeps the status message and selected-filter Fc marker inside the graph', () => {
+  it('keeps graph narration out of the SVG while retaining the selected-filter Fc marker', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(curve('source', 'Source', 'fr'))
     store.getState().setFilters([filter], 'manual')
     store.getState().selectFilter('filter')
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
-    expect(container.querySelector('[data-graph-status]')).toHaveTextContent(/target/i)
+    expect(container.querySelector('[data-graph-status]')).not.toBeInTheDocument()
+    expect(container.querySelector('svg')).not.toHaveTextContent(/FR and Target ready|select active/i)
     expect(container.querySelector('[data-selected-frequency="1000"]')).toBeInTheDocument()
     expect(screen.getByText('1kHz')).toBeInTheDocument()
   })

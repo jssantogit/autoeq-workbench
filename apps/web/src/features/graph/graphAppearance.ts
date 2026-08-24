@@ -41,7 +41,7 @@ export function seriesAppearance(
   series?: Partial<Pick<MeasurementGraphSeries, 'curveId' | 'measurementKind' | 'active'>>,
 ) {
   const derived = DERIVED_COLORS[input.theme]
-  const base = { lineType: 'solid' as const, lineWidth: 2, opacity: 1 }
+  const base = { lineType: 'solid' as const, lineWidth: 1.35, opacity: 1 }
   const measurementColor = series?.curveId === undefined
     ? undefined
     : input.curveAppearance[series.curveId]?.color
@@ -51,7 +51,7 @@ export function seriesAppearance(
       ? {
           color: graphTheme(input.theme).inactiveTarget,
           lineType: 'dashed' as const,
-          lineWidth: 1.6,
+          lineWidth: 1.1,
           opacity: 0.82,
         }
       : { ...base, color: measurementColor ?? '#1565c0' }
@@ -64,7 +64,7 @@ export function seriesAppearance(
           ? '#1565c0'
           : (input.curveAppearance[input.frCurveId]?.color ?? '#1565c0'),
         lineType: 'solid' as const,
-        lineWidth: 2.5,
+        lineWidth: 1.6,
         opacity: 0.72,
       }
     case 'PEQ':
