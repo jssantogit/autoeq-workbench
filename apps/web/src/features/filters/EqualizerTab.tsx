@@ -1,4 +1,8 @@
-import { isValidAutoEqSettings, type AutoEqSettings } from '@autoeq-workbench/core'
+import {
+  AUTOEQ_PRODUCT_LIMITS,
+  isValidAutoEqSettings,
+  type AutoEqSettings,
+} from '@autoeq-workbench/core'
 import { useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { NumberField } from '../../components/ui/NumberField'
@@ -80,18 +84,87 @@ export function EqualizerTab() {
       >
         <div className="autoeq-settings__row" role="group" aria-label="AutoEQ frequency range">
           <span>Frequency</span>
-          <NumberField label="From" aria-label="AutoEQ minimum frequency Hz" unit="Hz" value={autoeqSettings.minFrequencyHz} min={20} max={20_000} validate={validates('minFrequencyHz')} onValueChange={(minFrequencyHz) => updateSetting({ minFrequencyHz })} />
-          <NumberField label="To" aria-label="AutoEQ maximum frequency Hz" unit="Hz" value={autoeqSettings.maxFrequencyHz} min={20} max={20_000} validate={validates('maxFrequencyHz')} onValueChange={(maxFrequencyHz) => updateSetting({ maxFrequencyHz })} />
+          <NumberField
+            label="From"
+            aria-label="AutoEQ minimum frequency Hz"
+            unit="Hz"
+            value={autoeqSettings.minFrequencyHz}
+            min={AUTOEQ_PRODUCT_LIMITS.minFrequencyHz}
+            max={AUTOEQ_PRODUCT_LIMITS.maxFrequencyHz}
+            validate={validates('minFrequencyHz')}
+            onValueChange={(minFrequencyHz) => updateSetting({ minFrequencyHz })}
+          />
+          <NumberField
+            label="To"
+            aria-label="AutoEQ maximum frequency Hz"
+            unit="Hz"
+            value={autoeqSettings.maxFrequencyHz}
+            min={AUTOEQ_PRODUCT_LIMITS.minFrequencyHz}
+            max={AUTOEQ_PRODUCT_LIMITS.maxFrequencyHz}
+            validate={validates('maxFrequencyHz')}
+            onValueChange={(maxFrequencyHz) => updateSetting({ maxFrequencyHz })}
+          />
         </div>
         <div className="autoeq-settings__row" role="group" aria-label="AutoEQ gain range">
           <span>Gain</span>
-          <NumberField label="Min" aria-label="AutoEQ minimum gain dB" unit="dB" value={autoeqSettings.minGainDb} step="0.1" validate={validates('minGainDb')} onValueChange={(minGainDb) => updateSetting({ minGainDb })} />
-          <NumberField label="Max" aria-label="AutoEQ maximum gain dB" unit="dB" value={autoeqSettings.maxGainDb} step="0.1" validate={validates('maxGainDb')} onValueChange={(maxGainDb) => updateSetting({ maxGainDb })} />
+          <NumberField
+            label="Min"
+            aria-label="AutoEQ minimum gain dB"
+            unit="dB"
+            value={autoeqSettings.minGainDb}
+            min={AUTOEQ_PRODUCT_LIMITS.minGainDb}
+            max={AUTOEQ_PRODUCT_LIMITS.maxGainDb}
+            step="0.1"
+            validate={validates('minGainDb')}
+            onValueChange={(minGainDb) => updateSetting({ minGainDb })}
+          />
+          <NumberField
+            label="Max"
+            aria-label="AutoEQ maximum gain dB"
+            unit="dB"
+            value={autoeqSettings.maxGainDb}
+            min={AUTOEQ_PRODUCT_LIMITS.minGainDb}
+            max={AUTOEQ_PRODUCT_LIMITS.maxGainDb}
+            step="0.1"
+            validate={validates('maxGainDb')}
+            onValueChange={(maxGainDb) => updateSetting({ maxGainDb })}
+          />
         </div>
         <div className="autoeq-settings__row" role="group" aria-label="AutoEQ Q range">
           <span>Q</span>
-          <NumberField label="Min" aria-label="AutoEQ minimum Q" value={autoeqSettings.minQ} step="0.1" validate={validates('minQ')} onValueChange={(minQ) => updateSetting({ minQ })} />
-          <NumberField label="Max" aria-label="AutoEQ maximum Q" value={autoeqSettings.maxQ} step="0.1" validate={validates('maxQ')} onValueChange={(maxQ) => updateSetting({ maxQ })} />
+          <NumberField
+            label="Min"
+            aria-label="AutoEQ minimum Q"
+            value={autoeqSettings.minQ}
+            min={AUTOEQ_PRODUCT_LIMITS.minQ}
+            max={AUTOEQ_PRODUCT_LIMITS.maxQ}
+            step="0.1"
+            validate={validates('minQ')}
+            onValueChange={(minQ) => updateSetting({ minQ })}
+          />
+          <NumberField
+            label="Max"
+            aria-label="AutoEQ maximum Q"
+            value={autoeqSettings.maxQ}
+            min={AUTOEQ_PRODUCT_LIMITS.minQ}
+            max={AUTOEQ_PRODUCT_LIMITS.maxQ}
+            step="0.1"
+            validate={validates('maxQ')}
+            onValueChange={(maxQ) => updateSetting({ maxQ })}
+          />
+        </div>
+        <div className="autoeq-settings__row" role="group" aria-label="AutoEQ filter limit">
+          <span>Filters</span>
+          <NumberField
+            label="Max"
+            aria-label="AutoEQ max filters"
+            value={autoeqSettings.maxFilters}
+            min={0}
+            max={AUTOEQ_PRODUCT_LIMITS.hardMaxFilters}
+            step="1"
+            validate={validates('maxFilters')}
+            onValueChange={(maxFilters) => updateSetting({ maxFilters })}
+          />
         </div>
       </section>}
       <FilterEditor />
