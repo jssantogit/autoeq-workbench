@@ -11,8 +11,8 @@ import { MEASUREMENT_CURVE_PALETTE } from '../../state/uiStore'
 const input: GraphAppearanceInput = {
   theme: 'light',
   curveAppearance: {
-    source: { color: '#1565c0', visible: true },
-    target: { color: '#c62828', visible: true },
+    source: { color: '#1565c0', visible: true, offsetDb: 0 },
+    target: { color: '#c62828', visible: true, offsetDb: 0 },
   },
 }
 

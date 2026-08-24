@@ -3,24 +3,35 @@ import { createStore, type StoreApi } from 'zustand/vanilla'
 
 export type ThemeMode = 'light' | 'dark'
 export type DockTab = 'curves' | 'equalizer' | 'details'
+export type GraphZoomPreset = 'full' | 'bass' | 'midrange' | 'treble'
 
 export interface CurveAppearance {
   color: string
   visible: boolean
+  offsetDb: number
 }
 
 export interface UiState {
   theme: ThemeMode
   activeDockTab: DockTab
   inspectorEnabled: boolean
+  labelsEnabled: boolean
+  graphZoomPreset: GraphZoomPreset
+  smoothingLevel: number
+  baselineCurveId: string | null
   curveAppearance: Record<string, CurveAppearance>
   setTheme: (theme: ThemeMode) => void
   setActiveDockTab: (tab: DockTab) => void
   toggleInspector: () => void
+  toggleLabels: () => void
+  setGraphZoomPreset: (preset: GraphZoomPreset) => void
+  setSmoothingLevel: (level: number) => void
+  setBaselineCurve: (id: string | null) => void
   registerCurve: (id: string) => void
   unregisterCurve: (id: string) => void
   setCurveColor: (id: string, color: string) => void
   setCurveVisible: (id: string, visible: boolean) => void
+  setCurveOffset: (id: string, offsetDb: number) => void
 }
 
 export const MEASUREMENT_CURVE_PALETTE = [
@@ -87,6 +98,10 @@ export function createUiStore(random: () => number = Math.random) {
     theme: readTheme(),
     activeDockTab: 'curves',
     inspectorEnabled: true,
+    labelsEnabled: true,
+    graphZoomPreset: 'full',
+    smoothingLevel: 5,
+    baselineCurveId: null,
     curveAppearance: {},
     setTheme: (theme) => {
       set({ theme })
@@ -95,6 +110,18 @@ export function createUiStore(random: () => number = Math.random) {
     },
     setActiveDockTab: (activeDockTab) => set({ activeDockTab }),
     toggleInspector: () => set((state) => ({ inspectorEnabled: !state.inspectorEnabled })),
+    toggleLabels: () => set((state) => ({ labelsEnabled: !state.labelsEnabled })),
+    setGraphZoomPreset: (graphZoomPreset) => set({ graphZoomPreset }),
+    setSmoothingLevel: (smoothingLevel) => {
+      if (!Number.isFinite(smoothingLevel) || smoothingLevel < 0) return
+      set({ smoothingLevel })
+    },
+    setBaselineCurve: (baselineCurveId) =>
+      set((state) => (
+        baselineCurveId === null || state.curveAppearance[baselineCurveId] !== undefined
+          ? { baselineCurveId }
+          : state
+      )),
     registerCurve: (id) =>
       set((state) => {
         if (id.length === 0 || state.curveAppearance[id] !== undefined) return state
@@ -104,7 +131,7 @@ export function createUiStore(random: () => number = Math.random) {
         return {
           curveAppearance: {
             ...state.curveAppearance,
-            [id]: { color: pickMeasurementColor(excluded, random), visible: true },
+            [id]: { color: pickMeasurementColor(excluded, random), visible: true, offsetDb: 0 },
           },
         }
       }),
@@ -113,7 +140,10 @@ export function createUiStore(random: () => number = Math.random) {
         if (state.curveAppearance[id] === undefined) return state
         const curveAppearance = { ...state.curveAppearance }
         delete curveAppearance[id]
-        return { curveAppearance }
+        return {
+          curveAppearance,
+          baselineCurveId: state.baselineCurveId === id ? null : state.baselineCurveId,
+        }
       }),
     setCurveColor: (id, color) => {
       if (!CSS_HEX_COLOR.test(color)) return
@@ -131,6 +161,15 @@ export function createUiStore(random: () => number = Math.random) {
           ? state
           : { curveAppearance: { ...state.curveAppearance, [id]: { ...appearance, visible } } }
       }),
+    setCurveOffset: (id, offsetDb) => {
+      if (!Number.isFinite(offsetDb)) return
+      set((state) => {
+        const appearance = state.curveAppearance[id]
+        return appearance === undefined || appearance.offsetDb === offsetDb
+          ? state
+          : { curveAppearance: { ...state.curveAppearance, [id]: { ...appearance, offsetDb } } }
+      })
+    },
   }))
 }
 

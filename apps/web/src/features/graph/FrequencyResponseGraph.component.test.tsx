@@ -92,11 +92,11 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     store.getState().setFilters([filter], 'manual')
     uiStore.setState({
       curveAppearance: {
-        source: { color: '#1565c0', visible: true },
-        target: { color: '#c62828', visible: true },
-        reference: { color: '#2e7d32', visible: true },
-        comparison: { color: '#6a1b9a', visible: true },
-        hidden: { color: '#00838f', visible: false },
+        source: { color: '#1565c0', visible: true, offsetDb: 0 },
+        target: { color: '#c62828', visible: true, offsetDb: 0 },
+        reference: { color: '#2e7d32', visible: true, offsetDb: 0 },
+        comparison: { color: '#6a1b9a', visible: true, offsetDb: 0 },
+        hidden: { color: '#00838f', visible: false, offsetDb: 0 },
       },
     })
 
@@ -203,7 +203,8 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     store.getState().addCurve(curve('source', 'Source', 'fr'))
     store.getState().addCurve(curve('target', 'Target', 'target'))
     uiStore.setState({ curveAppearance: {
-      source: { color: '#00796b', visible: true }, target: { color: '#ff0000', visible: true },
+      source: { color: '#00796b', visible: true, offsetDb: 0 },
+      target: { color: '#ff0000', visible: true, offsetDb: 0 },
     } })
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     const initialPath = container.querySelector('[data-series-name="Source"]')?.getAttribute('d')

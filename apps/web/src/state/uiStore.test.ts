@@ -21,6 +21,10 @@ describe('UI preferences', () => {
       theme: 'light',
       activeDockTab: 'curves',
       inspectorEnabled: true,
+      labelsEnabled: true,
+      graphZoomPreset: 'full',
+      smoothingLevel: 5,
+      baselineCurveId: null,
       curveAppearance: {},
     })
   })
@@ -66,6 +70,40 @@ describe('UI preferences', () => {
 })
 
 describe('scalable curve appearance', () => {
+  it('keeps graph view state and display-only curve controls bounded', () => {
+    const store = createUiStore(() => 0)
+    store.getState().registerCurve('fr-1')
+    expect(store.getState().curveAppearance['fr-1']).toEqual({
+      color: '#1565c0',
+      visible: true,
+      offsetDb: 0,
+    })
+
+    store.getState().setCurveOffset('fr-1', 3.5)
+    store.getState().setBaselineCurve('fr-1')
+    store.getState().setGraphZoomPreset('bass')
+    store.getState().setSmoothingLevel(0)
+    store.getState().toggleLabels()
+    expect(store.getState()).toMatchObject({
+      graphZoomPreset: 'bass',
+      smoothingLevel: 0,
+      labelsEnabled: false,
+      baselineCurveId: 'fr-1',
+    })
+    expect(store.getState().curveAppearance['fr-1']?.offsetDb).toBe(3.5)
+
+    store.getState().setSmoothingLevel(-1)
+    store.getState().setSmoothingLevel(Number.NaN)
+    store.getState().setCurveOffset('fr-1', Number.POSITIVE_INFINITY)
+    store.getState().setBaselineCurve('missing')
+    expect(store.getState().smoothingLevel).toBe(0)
+    expect(store.getState().curveAppearance['fr-1']?.offsetDb).toBe(3.5)
+    expect(store.getState().baselineCurveId).toBe('fr-1')
+
+    store.getState().unregisterCurve('fr-1')
+    expect(store.getState().baselineCurveId).toBeNull()
+  })
+
   it('registers stable visible colors while excluding active colors where possible', () => {
     const store = createUiStore(() => 0)
     store.getState().registerCurve('a')
@@ -73,9 +111,9 @@ describe('scalable curve appearance', () => {
     store.getState().registerCurve('c')
 
     expect(store.getState().curveAppearance).toEqual({
-      a: { color: MEASUREMENT_CURVE_PALETTE[0], visible: true },
-      b: { color: MEASUREMENT_CURVE_PALETTE[1], visible: true },
-      c: { color: MEASUREMENT_CURVE_PALETTE[2], visible: true },
+      a: { color: MEASUREMENT_CURVE_PALETTE[0], visible: true, offsetDb: 0 },
+      b: { color: MEASUREMENT_CURVE_PALETTE[1], visible: true, offsetDb: 0 },
+      c: { color: MEASUREMENT_CURVE_PALETTE[2], visible: true, offsetDb: 0 },
     })
     const stable = store.getState().curveAppearance.a
     store.getState().setActiveDockTab('equalizer')
@@ -88,7 +126,9 @@ describe('scalable curve appearance', () => {
     store.getState().registerCurve('curve')
     store.getState().setCurveColor('curve', '#123456')
     store.getState().setCurveVisible('curve', false)
-    expect(store.getState().curveAppearance.curve).toEqual({ color: '#123456', visible: false })
+    expect(store.getState().curveAppearance.curve).toEqual({
+      color: '#123456', visible: false, offsetDb: 0,
+    })
 
     store.getState().setCurveColor('curve', 'red')
     expect(store.getState().curveAppearance.curve?.color).toBe('#123456')
