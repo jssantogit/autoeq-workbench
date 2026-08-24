@@ -12,7 +12,7 @@ import {
 interface GraphSeriesBase {
   id: string
   name: string
-  data: [number, number][]
+  data: readonly [number, number][]
   defaultVisible: boolean
 }
 
