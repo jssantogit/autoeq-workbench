@@ -18,6 +18,16 @@ vi.mock('./features/graph/FrequencyResponseGraph', () => ({
   FrequencyResponseGraph: () => <section aria-label="Frequency Response graph" />,
 }))
 
+async function chooseCurveKind(
+  user: ReturnType<typeof userEvent.setup>,
+  curveManager: HTMLElement,
+  kind: 'FR' | 'Target',
+) {
+  await user.click(within(curveManager).getByRole('button', { name: 'Import FR / Target' }))
+  const chooser = within(curveManager).getByRole('group', { name: 'Curve type' })
+  await user.click(within(chooser).getByRole('button', { name: kind }))
+}
+
 describe('App', () => {
   beforeEach(() => {
     exportFrequencyResponseGraphMock.mockReset()
@@ -76,10 +86,11 @@ describe('App', () => {
     expect(graphToolbar.compareDocumentPosition(graph)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(graph.compareDocumentPosition(dock)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(screen.queryByRole('button', { name: 'Reset View' })).not.toBeInTheDocument()
-    expect(within(graphToolbar).queryByLabelText('Upload FR')).not.toBeInTheDocument()
-    expect(within(graphToolbar).queryByLabelText('Upload Target')).not.toBeInTheDocument()
+    expect(within(graphToolbar).queryByText('Import FR / Target')).not.toBeInTheDocument()
     const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
-    expect(within(curveManager).getAllByLabelText(/^Upload (FR|Target)$/)).toHaveLength(2)
+    expect(within(curveManager).getAllByRole('button', { name: 'Import FR / Target' })).toHaveLength(1)
+    expect(within(curveManager).queryByText('Upload FR')).not.toBeInTheDocument()
+    expect(within(curveManager).queryByText('Upload Target')).not.toBeInTheDocument()
     expect(graphToolbar).toHaveClass('tools', 'graph-toolbar')
     expect(within(graphToolbar).getByRole('group', { name: 'Normalize' })).toBeVisible()
     expect(within(graphToolbar).getByLabelText('Normalize dB')).toHaveValue(0)
@@ -136,41 +147,44 @@ describe('App', () => {
     expect(screen.queryByRole('button', { name: 'Apply normalization' })).not.toBeInTheDocument()
   })
 
-  it('imports FR and Target files from the shared curve upload toolbar', async () => {
+  it('imports FR and Target files through one explicit curve import flow', async () => {
+    const user = userEvent.setup()
     render(<App />)
     const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
-    const uploadToolbar = within(curveManager).getByRole('toolbar', { name: 'Curve uploads' })
     const text = '20 0\n20000 0'
     const fr = new File([], 'Measurement.txt', { type: 'text/plain' })
     const target = new File([], 'Target.csv', { type: 'text/csv' })
     Object.defineProperty(fr, 'text', { value: async () => text })
     Object.defineProperty(target, 'text', { value: async () => text })
 
-    fireEvent.change(within(uploadToolbar).getByLabelText('Upload FR'), { target: { files: [fr] } })
-    fireEvent.change(within(uploadToolbar).getByLabelText('Upload Target'), { target: { files: [target] } })
+    await chooseCurveKind(user, curveManager, 'FR')
+    fireEvent.change(within(curveManager).getByLabelText('Curve file'), { target: { files: [fr] } })
+    await waitFor(() => expect(workspaceStore.getState().curves).toHaveLength(1))
+
+    await chooseCurveKind(user, curveManager, 'Target')
+    fireEvent.change(within(curveManager).getByLabelText('Curve file'), { target: { files: [target] } })
 
     await waitFor(() => expect(workspaceStore.getState().curves).toHaveLength(2))
     expect(workspaceStore.getState().curves.map(({ kind }) => kind)).toEqual(['fr', 'target'])
     expect(Object.keys(uiStore.getState().curveAppearance)).toHaveLength(2)
   })
 
-  it('keeps import errors beside the relevant upload control', async () => {
+  it('keeps import errors beside the unified curve import control', async () => {
+    const user = userEvent.setup()
     render(<App />)
-    const uploadToolbar = screen.getByRole('toolbar', { name: 'Curve uploads' })
-    const frImport = within(uploadToolbar)
-      .getByLabelText('Upload FR')
+    const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
+    const curveImport = within(curveManager)
+      .getByRole('button', { name: 'Import FR / Target' })
       .closest<HTMLElement>('.curve-import')!
     const file = new File([], 'broken.csv', { type: 'text/csv' })
     Object.defineProperty(file, 'text', { value: async () => 'not curve data' })
 
-    fireEvent.change(within(frImport).getByLabelText('Upload FR'), {
+    await chooseCurveKind(user, curveManager, 'FR')
+    fireEvent.change(within(curveImport).getByLabelText('Curve file'), {
       target: { files: [file] },
     })
 
-    expect(await within(frImport).findByRole('alert')).toHaveTextContent('[parse]')
-    const targetImport = within(uploadToolbar)
-      .getByLabelText('Upload Target')
-      .closest<HTMLElement>('.curve-import')!
-    expect(within(targetImport).queryByRole('alert')).not.toBeInTheDocument()
+    expect(await within(curveImport).findByRole('alert')).toHaveTextContent('[parse]')
+    expect(within(curveManager).getAllByRole('alert')).toHaveLength(1)
   })
 })
