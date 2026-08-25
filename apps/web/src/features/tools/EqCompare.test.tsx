@@ -54,8 +54,12 @@ describe('EqCompare', () => {
     ])
 
     const rows = within(history).getAllByRole('listitem')
-    fireEvent.click(within(rows[0]!).getByRole('button', { name: 'Set A' }))
-    fireEvent.click(within(rows[1]!).getByRole('button', { name: 'Set B' }))
+    const setAButton = within(rows[0]!).getByRole('button', { name: 'Set A: PK 1k Hz +4.0 dB, preamp -4.0 dB' })
+    const setBButton = within(rows[1]!).getByRole('button', { name: 'Set B: PK 1k Hz +1.0 dB, preamp -1.0 dB' })
+    expect(setAButton).toHaveTextContent('Set A')
+    expect(setBButton).toHaveTextContent('Set B')
+    fireEvent.click(setAButton)
+    fireEvent.click(setBButton)
 
     expect(within(rows[0]!).getByText('Assigned A')).toBeVisible()
     expect(within(rows[1]!).getByText('Assigned B')).toBeVisible()

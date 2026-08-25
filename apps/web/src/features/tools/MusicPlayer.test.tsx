@@ -93,4 +93,28 @@ describe('MusicPlayer', () => {
     )
     expect(await screen.findByRole('alert')).toHaveTextContent('Unable to decode local audio file: unsupported format')
   })
+
+  it('exposes accessible aria-valuetext and output association for seek position and volume', () => {
+    const engine = mockEngine()
+    render(
+      <MusicPlayer
+        engine={engine}
+        state={{ ...fileState, fileLoaded: true, duration: 125, currentTime: 45, volume: 0.8 }}
+      />,
+    )
+
+    const seekSlider = screen.getByRole('slider', { name: 'Playback position' })
+    expect(seekSlider).toHaveAttribute('aria-valuetext', '0:45 / 2:05')
+    expect(seekSlider).toHaveAttribute('id', 'music-playback-position')
+    const seekOutput = screen.getByText('0:45 / 2:05')
+    expect(seekOutput.tagName.toLowerCase()).toBe('output')
+    expect(seekOutput).toHaveAttribute('for', 'music-playback-position')
+
+    const volumeSlider = screen.getByRole('slider', { name: 'Music volume' })
+    expect(volumeSlider).toHaveAttribute('aria-valuetext', '80%')
+    expect(volumeSlider).toHaveAttribute('id', 'music-volume')
+    const volumeOutput = screen.getByText('80%')
+    expect(volumeOutput.tagName.toLowerCase()).toBe('output')
+    expect(volumeOutput).toHaveAttribute('for', 'music-volume')
+  })
 })

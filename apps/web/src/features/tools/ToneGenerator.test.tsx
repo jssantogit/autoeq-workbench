@@ -79,4 +79,23 @@ describe('ToneGenerator', () => {
     expect(engine.setToneFrequency).toHaveBeenCalledWith(expect.closeTo(112.468, 3))
     expect(engine.play).not.toHaveBeenCalled()
   })
+
+  it('exposes accessible aria-valuetext and programmatic output association for frequency and volume', () => {
+    const engine = mockEngine()
+    render(<ToneGenerator engine={engine} state={{ ...toneState, toneFrequencyHz: 1000, volume: 0.75 }} />)
+
+    const frequencySlider = screen.getByRole('slider', { name: 'Tone frequency' })
+    expect(frequencySlider).toHaveAttribute('aria-valuetext', '1000 Hz')
+    expect(frequencySlider).toHaveAttribute('id', 'tone-frequency')
+    const frequencyOutput = screen.getByText('1000 Hz')
+    expect(frequencyOutput.tagName.toLowerCase()).toBe('output')
+    expect(frequencyOutput).toHaveAttribute('for', 'tone-frequency')
+
+    const volumeSlider = screen.getByRole('slider', { name: 'Tone volume' })
+    expect(volumeSlider).toHaveAttribute('aria-valuetext', '75%')
+    expect(volumeSlider).toHaveAttribute('id', 'tone-volume')
+    const volumeOutput = screen.getByText('75%')
+    expect(volumeOutput.tagName.toLowerCase()).toBe('output')
+    expect(volumeOutput).toHaveAttribute('for', 'tone-volume')
+  })
 })

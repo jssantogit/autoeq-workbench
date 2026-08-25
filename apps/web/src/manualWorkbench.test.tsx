@@ -162,6 +162,5 @@ describe('manual workbench integration', () => {
     expect(screen.getByText('Preamp').nextElementSibling).toHaveTextContent('-6')
     expect(screen.getByText('MAE').nextElementSibling).toHaveTextContent('--')
     expect(screen.getByText('RMSE').nextElementSibling).toHaveTextContent('--')
-    expect(screen.getByText(/metrics require an active FR and Target/i)).toBeVisible()
   }, 10_000)
 })

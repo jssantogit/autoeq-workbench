@@ -107,6 +107,7 @@ export function EqCompare({
                     <button
                       type="button"
                       className="button"
+                      aria-label={`Set A: ${snapshot.summary}`}
                       aria-pressed={assignedA}
                       style={buttonStyle}
                       onClick={() => compareStore.getState().setA(snapshot.id)}
@@ -116,6 +117,7 @@ export function EqCompare({
                     <button
                       type="button"
                       className="button"
+                      aria-label={`Set B: ${snapshot.summary}`}
                       aria-pressed={assignedB}
                       style={buttonStyle}
                       onClick={() => compareStore.getState().setB(snapshot.id)}

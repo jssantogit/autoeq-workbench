@@ -43,7 +43,9 @@ export function ToneGenerator({ engine, state }: ToneGeneratorProps) {
             Tone frequency
           </span>
           <input
+            id="tone-frequency"
             aria-label="Tone frequency"
+            aria-valuetext={`${Math.round(state.toneFrequencyHz)} Hz`}
             type="range"
             min="0"
             max="1"
@@ -52,7 +54,11 @@ export function ToneGenerator({ engine, state }: ToneGeneratorProps) {
             onChange={(event) => engine.setToneFrequency(sliderToFrequency(Number(event.currentTarget.value)))}
             style={{ width: '100%', minWidth: 0, accentColor: 'var(--wb-accent)' }}
           />
-          <output style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontSize: '0.74rem' }}>
+          <output
+            htmlFor="tone-frequency"
+            id="tone-frequency-output"
+            style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontSize: '0.74rem' }}
+          >
             {Math.round(state.toneFrequencyHz)} Hz
           </output>
         </label>
@@ -60,7 +66,9 @@ export function ToneGenerator({ engine, state }: ToneGeneratorProps) {
         <label style={{ display: 'grid', gridTemplateColumns: '3.2rem minmax(0, 1fr) 2.8rem', alignItems: 'center', gap: 8, color: 'var(--wb-text-muted)', fontSize: '0.68rem' }}>
           <span>Volume</span>
           <input
+            id="tone-volume"
             aria-label="Tone volume"
+            aria-valuetext={`${Math.round(state.volume * 100)}%`}
             type="range"
             min="0"
             max="1"
@@ -69,7 +77,13 @@ export function ToneGenerator({ engine, state }: ToneGeneratorProps) {
             onChange={(event) => engine.setVolume(Number(event.currentTarget.value))}
             style={{ width: '100%', minWidth: 0, accentColor: 'var(--wb-accent)' }}
           />
-          <output style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{Math.round(state.volume * 100)}%</output>
+          <output
+            htmlFor="tone-volume"
+            id="tone-volume-output"
+            style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}
+          >
+            {Math.round(state.volume * 100)}%
+          </output>
         </label>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>

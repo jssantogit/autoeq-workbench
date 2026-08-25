@@ -69,7 +69,9 @@ export function MusicPlayer({ engine, state }: MusicPlayerProps) {
             Playback position
           </span>
           <input
+            id="music-playback-position"
             aria-label="Playback position"
+            aria-valuetext={`${formatTime(state.currentTime)} / ${formatTime(state.duration)}`}
             type="range"
             min="0"
             max={hasDuration ? state.duration : 0}
@@ -79,7 +81,11 @@ export function MusicPlayer({ engine, state }: MusicPlayerProps) {
             onChange={(event) => engine.seek(Number(event.currentTarget.value))}
             style={{ width: '100%', minWidth: 0, accentColor: 'var(--wb-accent)' }}
           />
-          <output style={{ minWidth: '5.6rem', textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontSize: '0.7rem' }}>
+          <output
+            htmlFor="music-playback-position"
+            id="music-playback-position-output"
+            style={{ minWidth: '5.6rem', textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontSize: '0.7rem' }}
+          >
             {formatTime(state.currentTime)} / {formatTime(state.duration)}
           </output>
         </label>
@@ -87,7 +93,9 @@ export function MusicPlayer({ engine, state }: MusicPlayerProps) {
         <label style={{ display: 'grid', gridTemplateColumns: '3.2rem minmax(0, 1fr) 2.8rem', alignItems: 'center', gap: 8, color: 'var(--wb-text-muted)', fontSize: '0.68rem' }}>
           <span>Volume</span>
           <input
+            id="music-volume"
             aria-label="Music volume"
+            aria-valuetext={`${Math.round(state.volume * 100)}%`}
             type="range"
             min="0"
             max="1"
@@ -96,7 +104,13 @@ export function MusicPlayer({ engine, state }: MusicPlayerProps) {
             onChange={(event) => engine.setVolume(Number(event.currentTarget.value))}
             style={{ width: '100%', minWidth: 0, accentColor: 'var(--wb-accent)' }}
           />
-          <output style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{Math.round(state.volume * 100)}%</output>
+          <output
+            htmlFor="music-volume"
+            id="music-volume-output"
+            style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}
+          >
+            {Math.round(state.volume * 100)}%
+          </output>
         </label>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 4 }}>
