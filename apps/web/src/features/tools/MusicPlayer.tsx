@@ -16,6 +16,8 @@ export function MusicPlayer({ engine, state }: MusicPlayerProps) {
   const [fileName, setFileName] = useState('No local file selected')
   const [localError, setLocalError] = useState<string | null>(null)
   const hasDuration = state.fileLoaded && Number.isFinite(state.duration) && state.duration > 0
+  const canStopFile =
+    state.fileLoaded && state.source === 'file' && (state.isPlaying || state.currentTime > 0)
 
   function selectFileSource(): void {
     if (state.source === 'tone' && state.isPlaying) engine.stop()
@@ -26,10 +28,10 @@ export function MusicPlayer({ engine, state }: MusicPlayerProps) {
     const file = event.currentTarget.files?.[0]
     if (!file) return
     setLocalError(null)
-    setFileName(file.name)
     selectFileSource()
     try {
       await engine.loadFile(file)
+      setFileName(file.name)
     } catch (error) {
       setLocalError(error instanceof Error ? error.message : 'Unable to decode the local audio file')
     }
@@ -43,6 +45,10 @@ export function MusicPlayer({ engine, state }: MusicPlayerProps) {
     } catch (error) {
       setLocalError(error instanceof Error ? error.message : 'Unable to play the local audio file')
     }
+  }
+
+  function stopFile(): void {
+    if (canStopFile) engine.stop()
   }
 
   return (
@@ -120,7 +126,7 @@ export function MusicPlayer({ engine, state }: MusicPlayerProps) {
           <button className="button" type="button" aria-label="Pause file" disabled={state.source !== 'file' || !state.isPlaying} onClick={() => engine.pause()}>
             Pause
           </button>
-          <button className="button" type="button" aria-label="Stop file" disabled={!state.fileLoaded} onClick={() => engine.stop()}>
+          <button className="button" type="button" aria-label="Stop file" disabled={!canStopFile} onClick={stopFile}>
             Stop
           </button>
           <label style={{ display: 'inline-flex', minHeight: 30, alignItems: 'center', gap: 5, marginLeft: 'auto', fontSize: '0.7rem' }}>
