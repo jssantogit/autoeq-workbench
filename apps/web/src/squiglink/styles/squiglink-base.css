@@ -170,7 +170,7 @@
 .select-eq-phone select { width: 100%; min-width: 0; height: 32px; border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 8px; color: var(--color-text); background: var(--color-input); }
 .select-eq-phone select:disabled { color: var(--color-text-faint); }
 .filters-header,
-.filter { display: grid; grid-template-columns: 25% 29% 25% 21%; }
+.filter { display: grid; grid-template-columns: 25fr 29fr 25fr 21fr; }
 .filters-header { gap: 4px; margin: 8px 0; color: var(--color-text-faint); font-size: 0.7rem; line-height: 1; }
 .filters { border-block: 1px solid var(--color-border); }
 .filter { min-width: 0; gap: 4px; border-top: 1px solid var(--color-border); padding: 3px 0; cursor: pointer; font: 0.69rem ui-monospace, "SFMono-Regular", Consolas, monospace; }
