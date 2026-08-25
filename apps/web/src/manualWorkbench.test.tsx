@@ -20,6 +20,20 @@ import { defaultNormalization, deriveWorkspace, workspaceStore } from './state/w
 
 const curveText = '20 0\n500 0\n1000 0\n20000 0'
 
+async function importCurve(
+  user: ReturnType<typeof userEvent.setup>,
+  curveManager: HTMLElement,
+  kind: 'FR' | 'Target',
+  file: File,
+) {
+  await user.click(within(curveManager).getByRole('button', { name: 'Import FR / Target' }))
+  const chooser = within(curveManager).getByRole('group', { name: 'Curve type' })
+  await user.click(within(chooser).getByRole('button', { name: kind }))
+  fireEvent.change(within(curveManager).getByLabelText('Curve file'), {
+    target: { files: [file] },
+  })
+}
+
 describe('manual workbench integration', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -59,9 +73,7 @@ describe('manual workbench integration', () => {
     Object.defineProperty(sourceFile, 'text', { value: async () => curveText })
     Object.defineProperty(targetFile, 'text', { value: async () => curveText })
     const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
-    fireEvent.change(within(curveManager).getByLabelText('Upload FR'), {
-      target: { files: [sourceFile] },
-    })
+    await importCurve(user, curveManager, 'FR', sourceFile)
     await waitFor(() => expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument())
     const frId = workspaceStore.getState().curves[0]!.id
     const importedFrColor = uiStore.getState().curveAppearance[frId]!.color
@@ -82,9 +94,7 @@ describe('manual workbench integration', () => {
       }),
     ).toMatchObject({ color: importedFrColor, lineType: 'solid' })
 
-    fireEvent.change(within(curveManager).getByLabelText('Upload Target'), {
-      target: { files: [targetFile] },
-    })
+    await importCurve(user, curveManager, 'Target', targetFile)
     await waitFor(() => {
       expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument()
       expect(within(curveManager).getByText('Synthetic Target.csv')).toBeInTheDocument()
