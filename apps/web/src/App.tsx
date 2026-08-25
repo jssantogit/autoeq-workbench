@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { AppHeader } from './components/layout/AppHeader'
 import { WorkbenchDock } from './components/layout/WorkbenchDock'
 import { CurvesTab } from './features/curves/CurvesTab'
@@ -6,9 +7,11 @@ import { FrequencyResponseGraph } from './features/graph/FrequencyResponseGraph'
 import { GraphToolbar } from './features/graph/GraphToolbar'
 import { ToolsInterim } from './features/tools/ToolsInterim'
 import { SquiglinkShell } from './squiglink/SquiglinkShell'
+import { initializeEqCompareRecorder } from './state/initializeEqCompareRecorder'
 import { deriveWorkspace, useWorkspaceStore } from './state/workspaceStore'
 
 function App() {
+  useEffect(() => initializeEqCompareRecorder(), [])
   const workspace = useWorkspaceStore((state) => state)
   const derived = deriveWorkspace(workspace)
 
