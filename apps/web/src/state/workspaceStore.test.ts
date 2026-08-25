@@ -1,4 +1,5 @@
 import {
+  AUTOEQ_PRODUCT_LIMITS,
   createEvaluationGrid,
   DEFAULT_AUTOEQ_SETTINGS,
   type AutoEqSettings,
@@ -7,7 +8,12 @@ import {
   type FilterDefinition,
 } from '@autoeq-workbench/core'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { createWorkspaceStore, defaultNormalization, deriveWorkspace } from './workspaceStore'
+import {
+  createWorkspaceStore,
+  defaultNormalization,
+  deriveWorkspace,
+  type FilterSnapshotState,
+} from './workspaceStore'
 
 const source: Curve = {
   id: 'source-1',
@@ -361,6 +367,91 @@ describe('workspace history and filters', () => {
       solutionState: 'clean',
       selectedFilterId: null,
     })
+  })
+
+  it('applies a copied filter snapshot in one undoable history step and redoes it deterministically', () => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'autoeq')
+    store.getState().updateFilter(filter.id, { gainDb: 4 })
+    store.getState().selectFilter(filter.id)
+    const beforeApply = store.getState()
+    const snapshot: FilterSnapshotState = {
+      filters: [
+        { ...filter, id: 'high', type: 'HS', frequencyHz: 8_000, gainDb: -2, q: 0.7 },
+        { ...filter, id: 'low', type: 'LS', frequencyHz: 120, gainDb: 1.5, q: 0.8 },
+      ],
+      filterProvenance: 'manual',
+      solutionState: 'stale',
+    }
+    const expectedFilters = snapshot.filters.map((item) => ({ ...item }))
+
+    store.getState().applyFilterSnapshot(snapshot)
+
+    expect(store.getState()).toMatchObject({
+      filters: expectedFilters,
+      filterProvenance: 'manual',
+      solutionState: 'stale',
+      selectedFilterId: null,
+    })
+    expect(store.getState().filters).not.toBe(snapshot.filters)
+    expect(store.getState().filters[0]).not.toBe(snapshot.filters[0])
+
+    snapshot.filters.reverse()
+    snapshot.filters[0]!.gainDb = 9
+    expect(store.getState().filters).toEqual(expectedFilters)
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      filters: beforeApply.filters,
+      filterProvenance: beforeApply.filterProvenance,
+      solutionState: beforeApply.solutionState,
+      selectedFilterId: beforeApply.selectedFilterId,
+    })
+
+    store.getState().redo()
+    expect(store.getState()).toMatchObject({
+      filters: expectedFilters,
+      filterProvenance: 'manual',
+      solutionState: 'stale',
+      selectedFilterId: null,
+    })
+
+    store.getState().undo()
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([filter])
+  })
+
+  it.each([
+    [
+      'invalid filter data',
+      [{ ...filter, frequencyHz: 0 }],
+    ],
+    [
+      'duplicate filter IDs',
+      [filter, { ...filter }],
+    ],
+    [
+      'an over-limit filter count',
+      Array.from({ length: AUTOEQ_PRODUCT_LIMITS.hardMaxFilters + 1 }, (_, index) => ({
+        ...filter,
+        id: `snapshot-${index}`,
+      })),
+    ],
+  ] satisfies [string, Filter[]][])('rejects a snapshot with %s atomically', (_label, filters) => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'manual')
+    store.getState().selectFilter(filter.id)
+    const beforeApply = store.getState()
+
+    store.getState().applyFilterSnapshot({
+      filters,
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+    })
+
+    expect(store.getState()).toBe(beforeApply)
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([])
   })
 
   it.each([

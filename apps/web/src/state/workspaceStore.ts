@@ -32,6 +32,12 @@ import {
 export type SolutionState = 'clean' | 'modified' | 'stale'
 export type FilterProvenance = 'manual' | 'autoeq'
 
+export interface FilterSnapshotState {
+  filters: Filter[]
+  filterProvenance: FilterProvenance | null
+  solutionState: SolutionState
+}
+
 export interface WorkspaceState {
   curves: Curve[]
   activeFrId: string | null
@@ -50,6 +56,7 @@ export interface WorkspaceState {
   setNormalization: (value: Normalization) => void
   setAutoEqSettings: (settings: AutoEqSettings) => void
   setFilters: (filters: Filter[], provenance: FilterProvenance) => void
+  applyFilterSnapshot: (snapshot: FilterSnapshotState) => void
   selectFilter: (id: string | null) => void
   addFilter: (type: FilterType) => void
   removeFilter: (id: string) => void
@@ -311,6 +318,22 @@ export function createWorkspaceStore() {
                 : replacesAutoEq
                   ? 'modified'
                   : 'clean',
+        })
+      }),
+    applyFilterSnapshot: (snapshot) =>
+      set((state) => {
+        if (
+          snapshot.filters.length > AUTOEQ_PRODUCT_LIMITS.hardMaxFilters ||
+          !snapshot.filters.every(validFilter) ||
+          new Set(snapshot.filters.map(({ id }) => id)).size !== snapshot.filters.length ||
+          ![null, 'manual', 'autoeq'].includes(snapshot.filterProvenance) ||
+          !['clean', 'modified', 'stale'].includes(snapshot.solutionState)
+        ) return state
+        return record(state, {
+          filters: snapshot.filters.map((filter) => ({ ...filter })),
+          filterProvenance: snapshot.filterProvenance,
+          solutionState: snapshot.solutionState,
+          selectedFilterId: null,
         })
       }),
     selectFilter: (id) =>
