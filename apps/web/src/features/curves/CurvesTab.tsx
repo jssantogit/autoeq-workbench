@@ -7,19 +7,27 @@ export function CurvesTab() {
 
   return (
     <section className="manage curves-tab" aria-label="Curves workspace">
-      <div className="curve-upload-actions" role="toolbar" aria-label="Curve uploads">
-        <CurveImport kind="fr" />
-        <CurveImport kind="target" />
-      </div>
       <table className="manageTable" aria-label="Curve manager">
-        <tbody>
+        <colgroup>
+          <col className="remove" />
+          <col className="phoneId" />
+          <col className="key" />
+          <col className="calibrate" />
+          <col className="baselineButton" />
+          <col className="hideButton" />
+          <col className="lastColumn" />
+        </colgroup>
+        <tbody className="curves">
           {curves.length === 0 ? (
             <tr className="curve-manager-empty">
-              <td colSpan={6}>No curves loaded</td>
+              <td colSpan={7}>No curves loaded</td>
             </tr>
           ) : curves.map((curve) => <CurveManagerRow key={curve.id} curve={curve} />)}
         </tbody>
       </table>
+      <div className="curve-upload-actions">
+        <CurveImport />
+      </div>
     </section>
   )
 }
