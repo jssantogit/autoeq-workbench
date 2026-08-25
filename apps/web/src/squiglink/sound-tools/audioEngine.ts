@@ -207,6 +207,12 @@ export function createAudioEngine(
       return true
     } catch (error) {
       if (destroyed || generation !== fileGeneration) return false
+      pendingFile = null
+      state.fileLoaded = audioBuffer !== null
+      if (audioBuffer === null) {
+        state.duration = 0
+        state.currentTime = 0
+      }
       const failure = decodeError(error)
       state.error = failure.message
       notify()
