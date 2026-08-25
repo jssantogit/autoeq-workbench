@@ -99,7 +99,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
   it('renders visible series and internal names with effective styles while omitting hidden curves', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(curve('source', 'Studio left', 'fr'))
-    store.getState().addCurve(curve('target', 'Harman target', 'target', 1))
+    store.getState().addCurve(curve('target', 'Harman  target', 'target', 1))
     store.getState().addCurve(curve('reference', 'Archive target', 'target', 2))
     store.getState().addCurve(curve('comparison', 'Room comparison', 'fr', 3))
     store.getState().addCurve(curve('hidden', 'Hidden comparison', 'fr', 4))
@@ -117,9 +117,9 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     const paths = [...container.querySelectorAll<SVGPathElement>('[data-series-name]')]
     expect(paths.map((path) => path.dataset.seriesName)).toEqual([
-      'Studio left', 'Studio left EQ', 'Harman target', 'Archive target', 'Room comparison',
+      'Studio left', 'Studio left EQ', 'Harman  target', 'Archive target', 'Room comparison',
     ])
-    for (const name of ['Harman target', 'Archive target']) {
+    for (const name of ['Harman  target', 'Archive target']) {
       const target = container.querySelector(`[data-series-name="${name}"]`)
       expect(target).toHaveAttribute('stroke', '#989894')
       expect(target).toHaveAttribute('stroke-dasharray')
@@ -127,24 +127,25 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-series-name="Studio left EQ"]')).toHaveAttribute('stroke', '#c62828')
     expect(container.querySelector('[data-series-name="Hidden comparison"]')).not.toBeInTheDocument()
     expect(screen.getByText('Studio left')).toHaveAttribute('fill', '#1565c0')
-    expect(screen.getByText('Harman target')).toHaveAttribute('fill', '#989894')
-    expect(screen.getByText('Studio left')).toHaveAttribute('x', '67')
-    expect(screen.getByText('Harman target')).toHaveAttribute('x', '102')
-    expect(container.querySelector('[data-target-label-sample="target"]')).toHaveAttribute('x1', '67')
-    expect(container.querySelector('[data-target-label-sample="target"]')).toHaveAttribute('stroke-dasharray', '7 5')
-    expect(container.querySelector('[data-target-label-sample="reference"]')).toBeInTheDocument()
+    const targetLabel = container.querySelector('[data-curve-label="target"]')
+    expect(targetLabel).toHaveTextContent('Harman target')
+    expect(targetLabel?.textContent).toBe('Harman  target')
+    expect(targetLabel).toHaveStyle({ whiteSpace: 'pre' })
+    expect(targetLabel).toHaveAttribute('fill', '#989894')
+    expect(container.querySelector('[data-target-label-sample]')).not.toBeInTheDocument()
+    expect([...container.querySelectorAll('[data-curve-label]')]
+      .every((label) => label.getAttribute('x') === '67')).toBe(true)
     expect(screen.queryByText('Hidden comparison')).not.toBeInTheDocument()
 
     const yLabelX = Number(container.querySelector('[data-y-label="-30"]')?.getAttribute('x'))
     const annotations = [
       ...container.querySelectorAll('[data-curve-label]'),
-      ...container.querySelectorAll('[data-target-label-sample]'),
     ]
     const annotationXs = annotations
-      .map((label) => Number(label.getAttribute(label.tagName === 'line' ? 'x1' : 'x')))
+      .map((label) => Number(label.getAttribute('x')))
     expect(annotationXs.every((x) => x > yLabelX + 20)).toBe(true)
     expect(annotations.every((label) =>
-      Number(label.getAttribute(label.tagName === 'line' ? 'y1' : 'y')) < 322,
+      Number(label.getAttribute('y')) < 322,
     )).toBe(true)
   })
 
@@ -228,13 +229,14 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-series-name="Target"]')).toHaveAttribute('stroke', '#8f8e8a')
   })
 
-  it('applies source visibility and offset to its equalized FR without mutating raw points', () => {
+  it('shares display offset but keeps source and equalized FR visibility independent', () => {
     const store = createWorkspaceStore()
     const source = curve('source', 'Source', 'fr')
     store.getState().addCurve(source)
     store.getState().setFilters([filter], 'manual')
     uiStore.setState({ curveAppearance: {
       source: { color: '#1565c0', visible: true, offsetDb: 0 },
+      'derived:fr-eq': { color: '#c62828', visible: true, offsetDb: 0 },
     } })
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     const sourcePath = container.querySelector('[data-series-name="Source"]')?.getAttribute('d')
@@ -248,6 +250,8 @@ describe('FrequencyResponseGraph SVG renderer', () => {
 
     act(() => uiStore.getState().setCurveVisible('source', false))
     expect(container.querySelector('[data-series-name="Source"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-series-name="Source EQ"]')).toBeInTheDocument()
+    act(() => uiStore.getState().setCurveVisible('derived:fr-eq', false))
     expect(container.querySelector('[data-series-name="Source EQ"]')).not.toBeInTheDocument()
     expect(source.rawPoints).toEqual(rawSnapshot)
   })

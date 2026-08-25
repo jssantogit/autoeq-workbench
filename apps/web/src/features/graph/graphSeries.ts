@@ -26,9 +26,10 @@ export interface EqualizedFrGraphSeries extends GraphSeriesBase {
 }
 
 export type GraphSeries = MeasurementGraphSeries | EqualizedFrGraphSeries
+export const EQUALIZED_FR_APPEARANCE_ID = 'derived:fr-eq'
 
 export function formatEqualizedFrName(name: string): string {
-  return `${name.replace(/\.(txt|csv)$/i, '')} EQ`
+  return `${name} EQ`
 }
 
 function equalizedFrSeries(

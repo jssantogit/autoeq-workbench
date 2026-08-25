@@ -25,7 +25,7 @@ function App() {
       )}
       secondary={(
         <WorkbenchDock
-          curves={<CurvesTab />}
+          curves={<CurvesTab derived={derived} />}
           equalizer={<EqualizerTab />}
           tools={<ToolsInterim derived={derived} />}
         />

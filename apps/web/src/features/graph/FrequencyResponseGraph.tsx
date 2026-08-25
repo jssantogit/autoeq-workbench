@@ -9,7 +9,7 @@ import type {
 import { useUiStore } from '../../state/uiStore'
 import type { WorkspaceDerived } from '../../state/workspaceStore'
 import { graphTheme, seriesAppearance } from './graphAppearance'
-import { buildGraphSeries } from './graphSeries'
+import { buildGraphSeries, EQUALIZED_FR_APPEARANCE_ID } from './graphSeries'
 
 interface FrequencyResponseGraphProps {
   derived: WorkspaceDerived
@@ -67,7 +67,7 @@ export function FrequencyResponseGraph({ derived }: FrequencyResponseGraphProps)
     return {
       series: display.map((item) => {
         const appearance = seriesAppearance(item, { theme, curveAppearance })
-        const appearanceId = item.kind === 'equalized-fr' ? item.sourceCurveId : item.curveId
+        const appearanceId = item.kind === 'equalized-fr' ? EQUALIZED_FR_APPEARANCE_ID : item.curveId
         return {
           id: item.id,
           name: item.name,

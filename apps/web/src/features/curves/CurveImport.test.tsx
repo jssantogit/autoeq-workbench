@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { uiStore } from '../../state/uiStore'
-import { workspaceStore } from '../../state/workspaceStore'
+import { deriveWorkspace, workspaceStore } from '../../state/workspaceStore'
 import { CurveImport } from './CurveImport'
 import { CurvesTab } from './CurvesTab'
 
@@ -180,7 +180,7 @@ describe('CurvesTab', () => {
   })
 
   it('renders the source manager table skeleton and one import action', () => {
-    render(<CurvesTab />)
+    render(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
     const workspace = screen.getByRole('region', { name: 'Curves workspace' })
     const table = within(workspace).getByRole('table', { name: 'Curve manager' })
 
@@ -202,15 +202,15 @@ describe('CurvesTab', () => {
     expect(within(table).getByText('Source.csv')).toBeInTheDocument()
     expect(within(table).getByText('Target.csv')).toBeInTheDocument()
     expect(within(table).getByText('Overlay.csv')).toBeInTheDocument()
-    expect(within(table).getByRole('button', { name: /set source.csv as active fr/i })).toHaveAttribute('aria-pressed', 'true')
-    expect(within(table).getByRole('button', { name: /set target.csv as active target/i })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(table).queryByRole('button', { name: /set .* active/i })).not.toBeInTheDocument()
+    expect(within(table).queryByText(/^FR$|^Target$/)).not.toBeInTheDocument()
   })
 
   it('offers color only for FR rows and keeps visibility, removal, and active fallback functional', async () => {
     const user = userEvent.setup()
-    render(<CurvesTab />)
+    render(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
     const overlayRow = screen.getByText('Overlay.csv').closest('tr')!
-    await user.click(within(overlayRow).getByLabelText('Overlay.csv visible'))
+    await user.click(within(overlayRow).getByRole('button', { name: 'Hide Overlay.csv' }))
     expect(uiStore.getState().curveAppearance['curve-2']?.visible).toBe(false)
     fireEvent.change(within(overlayRow).getByLabelText('Overlay.csv color'), {
       target: { value: '#123456' },
@@ -218,7 +218,7 @@ describe('CurvesTab', () => {
     expect(uiStore.getState().curveAppearance['curve-2']?.color).toBe('#123456')
 
     const targetRow = screen.getByText('Target.csv').closest('tr')!
-    expect(within(targetRow).queryByLabelText('Target.csv color')).not.toBeInTheDocument()
+    expect(within(targetRow).getByRole('img', { name: 'Target.csv fixed gray color' })).toBeInTheDocument()
     expect(within(targetRow).getByRole('button', { name: 'Rename Target.csv' })).toBeInTheDocument()
     expect(within(targetRow).getByRole('button', { name: 'Remove Target.csv' })).toBeInTheDocument()
 
@@ -237,16 +237,44 @@ describe('CurvesTab', () => {
       kind: index < 6 ? 'fr' : 'target',
     }))
     workspaceStore.setState({ curves: manyCurves, activeFrId: null, activeTargetId: null })
-    const { rerender } = render(<CurvesTab />)
+    const { rerender } = render(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
 
     expect(within(screen.getByRole('table', { name: 'Curve manager' })).getAllByRole('row')).toHaveLength(8)
 
     workspaceStore.setState({ curves: [], activeFrId: null, activeTargetId: null })
-    rerender(<CurvesTab />)
-    expect(screen.queryByText('No curves loaded')).not.toBeInTheDocument()
+    rerender(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
     expect(screen.getByRole('button', { name: 'Import FR / Target' })).toBeVisible()
     const emptyTable = screen.getByRole('table', { name: 'Curve manager' })
     expect(within(emptyTable).queryAllByRole('row')).toHaveLength(0)
-    expect(emptyTable.querySelector('tbody.curves')).toBeEmptyDOMElement()
+    const emptyBody = emptyTable.querySelector('tbody.curves')
+    expect(emptyBody).toBeEmptyDOMElement()
+    expect(emptyBody).toHaveAttribute('aria-label', 'No curves loaded')
+    expect(emptyTable.nextElementSibling).toHaveClass('curve-upload-actions')
+  })
+
+  it('shows exactly one derived FR EQ after the active source without persisting it', () => {
+    workspaceStore.setState({
+      curves,
+      activeFrId: curves[0]!.id,
+      activeTargetId: curves[1]!.id,
+      filters: [{ id: 'filter', enabled: true, type: 'PK', frequencyHz: 1000, gainDb: 3, q: 1 }],
+    })
+    const { rerender } = render(
+      <CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />,
+    )
+    const rowNames = () => within(screen.getByRole('table', { name: 'Curve manager' }))
+      .getAllByRole('row').map((row) => row.getAttribute('aria-label'))
+
+    expect(rowNames()).toEqual(['Source.csv', 'Source.csv EQ', 'Target.csv', 'Overlay.csv'])
+    expect(workspaceStore.getState().curves).toEqual(curves)
+    workspaceStore.getState().setActiveFr('curve-2')
+    rerender(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
+    expect(rowNames()).toEqual(['Source.csv', 'Target.csv', 'Overlay.csv', 'Overlay.csv EQ'])
+    workspaceStore.getState().renameCurve('curve-2', 'Renamed overlay')
+    rerender(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
+    expect(rowNames()).toEqual(['Source.csv', 'Target.csv', 'Renamed overlay', 'Renamed overlay EQ'])
+    workspaceStore.getState().setFilters([], 'manual')
+    rerender(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
+    expect(rowNames()).toEqual(['Source.csv', 'Target.csv', 'Renamed overlay'])
   })
 })

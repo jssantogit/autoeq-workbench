@@ -13,6 +13,7 @@ const input: GraphAppearanceInput = {
   curveAppearance: {
     source: { color: '#1565c0', visible: true, offsetDb: 0 },
     target: { color: '#c62828', visible: true, offsetDb: 0 },
+    'derived:fr-eq': { color: '#123456', visible: true, offsetDb: 0 },
   },
 }
 
@@ -47,7 +48,7 @@ describe('seriesAppearance', () => {
     expect(style.color.toLowerCase()).not.toBe('#f39a3b')
   })
 
-  it('gives the equalized FR a deterministic palette color distinct from its source', () => {
+  it('gives the equalized FR an independently editable color', () => {
     const source: GraphSeries = {
       id: 'source', name: 'Juzear Nimbus', kind: 'measurement', data: [], defaultVisible: true,
       curveId: 'source', measurementKind: 'fr', active: true,
@@ -60,7 +61,7 @@ describe('seriesAppearance', () => {
     const frEq = seriesAppearance(equalized, input)
 
     expect(frEq.color).not.toBe(sourceStyle.color)
-    expect(frEq.color).toBe(pickEqualizedFrColor(sourceStyle.color))
+    expect(frEq.color).toBe('#123456')
     expect(pickEqualizedFrColor(sourceStyle.color)).toBe(pickEqualizedFrColor(sourceStyle.color))
     expect(frEq.lineWidth).toBe(1.6)
     expect(frEq.opacity).toBeGreaterThanOrEqual(0.9)

@@ -87,6 +87,7 @@ export function GraphToolbar() {
           value={normalization.targetDb}
           step="0.1"
           unit="dB"
+          unitPosition="before"
           onValueChange={(targetDb) => setNormalization({ ...normalization, targetDb })}
         />
         <NumberField
@@ -95,6 +96,7 @@ export function GraphToolbar() {
           min={MVP_NUMERIC_POLICY.minFrequencyHz}
           max={MVP_NUMERIC_POLICY.maxFrequencyHz}
           unit="Hz"
+          unitPosition="before"
           validate={validAnchor}
           onValueChange={(anchorHz) => setNormalization({ ...normalization, anchorHz })}
         />

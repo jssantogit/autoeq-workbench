@@ -34,20 +34,20 @@
 .tools-panel { color: var(--wb-text); background: var(--wb-surface); }
 .tools-section > h3 { color: var(--wb-text-muted); }
 
-.manageTable tr { border-color: var(--wb-border); background: var(--wb-surface-muted); }
-.manageTable tr.selected { background: var(--wb-surface); }
+.manageTable tr,
+.manageTable tbody.curves:empty { border-color: var(--wb-border); color: var(--wb-text-muted); background: var(--wb-surface-muted); }
 .manageTable button,
-.curve-row-visibility,
 .curve-import__trigger,
 .curve-import__chooser button { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
 .manageTable button:hover,
 .curve-import__trigger:hover,
 .curve-import__chooser button:hover { border-color: var(--wb-accent-hover); color: var(--wb-text); }
 .manageTable button[aria-pressed='true'] { border-color: var(--wb-accent); color: var(--wb-accent-text); background: var(--wb-accent); }
-.manageTable td.remove button { color: var(--color-danger); }
+.curve-row-remove { color: var(--color-danger) !important; }
 .curve-row-rename input { border-color: var(--wb-border); color: var(--wb-text); background: var(--color-input); }
 .curve-row-color { background: transparent; }
-.curve-row-visibility:has(input:checked) { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
+.curve-row-color--target { border-color: var(--color-target); background: var(--color-target); }
+.curve-row-advanced { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); box-shadow: 0 5px 16px rgb(0 0 0 / 18%); }
 
 .graph-toolbar { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-bg); }
 .graph-toolbar .zoom,

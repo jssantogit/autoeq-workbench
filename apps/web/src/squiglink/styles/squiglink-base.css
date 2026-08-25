@@ -99,6 +99,9 @@
 .graph-toolbar .normalize .number-field > span:first-child { position: absolute; left: 0; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); }
 .graph-toolbar .number-field__control { width: 76px; }
 .graph-toolbar .number-field input { min-width: 0; height: 34px; border-radius: 6px; padding: 4px 6px; text-align: center; }
+.graph-toolbar .normalize .number-field__control { height: 36px; border-radius: 6px; }
+.graph-toolbar .normalize .number-field__unit { min-width: 28px; }
+.graph-toolbar .normalize .number-field input { height: 34px; border-radius: 0; }
 .graph-toolbar .normalize .number-field + .number-field { margin-left: 6px; }
 .graph-toolbar .smooth { gap: 8px; }
 .graph-toolbar .smooth .number-field { color: inherit; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
@@ -133,36 +136,41 @@
 
 .manageTable colgroup { display: none; }
 .manageTable tbody.curves { display: flex; width: 100%; min-height: 0; flex: 0 1 auto; flex-direction: column; }
+.manageTable tbody.curves:empty {
+  min-height: 50px;
+  flex: 0 0 50px;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid;
+}
+.manageTable tbody.curves:empty::before {
+  content: 'No curves loaded';
+  padding: 14px 16px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+}
 
 .manageTable tr,
 tbody.curves > tr {
   display: flex;
   width: 100%;
   min-width: 0;
-  align-items: flex-start;
   border-top: 1px solid;
 }
 
-.manageTable td,
-tbody.curves > tr > td {
+.manageTable td.curve-manager-item {
   position: relative;
-  display: flex;
+  display: block;
   box-sizing: border-box;
-  min-height: 50px;
-  align-items: center;
-  justify-content: center;
-  flex: 50px 0 0;
-  padding: 0;
+  width: 100%;
+  min-width: 0;
+  min-height: 88px;
+  flex: 1 1 auto;
+  padding: 6px;
   vertical-align: middle;
 }
-
-.manageTable td.phoneId { order: 0; flex: 48px 0 0; padding-left: 6px; }
-.manageTable td.key { order: 1; min-width: 0; flex: auto 1 1; justify-content: flex-start; padding-inline: 6px; }
-.manageTable td.calibrate { order: 2; flex: 112px 0 0; justify-content: flex-end; white-space: nowrap; }
-.manageTable td.baselineButton { order: 3; flex: 36px 0 0; margin-left: 6px; }
-.manageTable td.hideButton { order: 4; flex: 36px 0 0; margin-left: 6px; }
-.manageTable td.lastColumn { order: 6; display: none; }
-.manageTable td.remove { order: 7; flex: 36px 0 0; margin: 0 16px 0 6px; text-align: center; }
 
 .manageTable button {
   box-sizing: border-box;
@@ -174,28 +182,28 @@ tbody.curves > tr > td {
   cursor: pointer;
   font-size: 0.66rem;
 }
-.manageTable td.remove button { width: 36px; padding: 0; font-size: 1rem; }
-.manageTable td.phoneId button { width: 42px; padding-inline: 2px; font-size: 0.6rem; }
-.manageTable td.baselineButton button { width: 36px; padding: 0; font-size: 0.54rem; }
 .manageTable button[aria-pressed='true'] { font-weight: 700; }
 
-.curve-row-name { display: flex; width: 100%; min-width: 0; align-items: center; gap: 4px; }
+.curve-manager-row__identity,
+.curve-manager-row__actions { display: flex; width: 100%; min-width: 0; align-items: center; gap: 6px; }
+.curve-manager-row__identity { min-height: 36px; }
+.curve-manager-row__actions { position: relative; min-height: 36px; padding-left: 42px; }
+.curve-row-remove,
+.curve-row-remove-placeholder { width: 36px; height: 36px; flex: 0 0 36px; }
+.curve-row-remove { padding: 0; font-size: 1rem !important; }
+.curve-row-action-placeholder { width: 62px; height: 36px; flex: 0 0 62px; }
 .curve-row-name__label { min-width: 0; flex: 1 1 auto; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.curve-row-name > button { width: 28px; height: 28px; min-height: 28px; flex: 0 0 auto; border-color: transparent; padding: 0; }
-.curve-row-rename { display: grid; width: 100%; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
-.curve-row-rename input { min-width: 0; grid-column: 1 / -1; height: 28px; border: 1px solid; border-radius: 5px; padding: 4px; }
-.curve-row-rename button { min-width: 0; height: 28px; min-height: 28px; padding-inline: 2px; }
+.curve-row-rename { display: grid; width: 100%; min-width: 0; grid-template-columns: minmax(0, 1fr) auto auto; gap: 3px; }
+.curve-row-rename input { min-width: 0; height: 36px; border: 1px solid; border-radius: 5px; padding: 4px 6px; }
+.curve-row-rename button { min-width: 0; padding-inline: 6px; }
 
-.curve-row-color { width: 20px; height: 20px; flex: 0 0 auto; border: 0; border-radius: 50%; padding: 0; vertical-align: middle; cursor: pointer; }
-.manageTable .number-field { display: inline-flex; width: 76px; margin-left: 4px; vertical-align: middle; }
+.curve-row-color { box-sizing: border-box; width: 36px; height: 36px; flex: 0 0 36px; border: 1px solid; border-radius: 6px; padding: 5px; vertical-align: middle; cursor: pointer; }
+.curve-row-color--target { display: block; border: 6px solid; cursor: default; }
+.curve-row-advanced { position: absolute; top: 42px; right: 0; z-index: 3; display: flex; width: min(240px, calc(100vw - 32px)); align-items: end; gap: 6px; border: 1px solid; border-radius: 6px; padding: 8px; }
+.manageTable .number-field { display: inline-flex; width: 130px; vertical-align: middle; }
 .manageTable .number-field > span:first-child { position: absolute; left: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.manageTable .number-field__control { width: 76px; }
+.manageTable .number-field__control { width: 130px; }
 .manageTable .number-field input { min-width: 0; height: 36px; border-radius: 6px; padding: 2px 4px; text-align: center; }
-
-.curve-row-visibility { position: relative; display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid; border-radius: 6px; cursor: pointer; }
-.curve-row-visibility input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
-.curve-row-visibility > span[aria-hidden='true'] { font-size: 0.92rem; line-height: 1; }
-.curve-row-visibility:has(input:not(:checked)) > span[aria-hidden='true'] { opacity: 0.28; }
 .curve-upload-actions {
   display: flex;
   width: 100%;

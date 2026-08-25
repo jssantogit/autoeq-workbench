@@ -45,6 +45,12 @@ describe('GraphToolbar', () => {
     expect(within(toolbar).getByRole('button', { name: 'Treble' })).toBeInTheDocument()
     expect(within(toolbar).getByLabelText('Normalize dB')).toBeInTheDocument()
     expect(within(toolbar).getByLabelText('Normalize Hz')).toBeInTheDocument()
+    const normalize = within(toolbar).getByRole('group', { name: 'Normalize' })
+    const fields = normalize.querySelectorAll('.number-field__control')
+    expect([...fields].map((field) => [...field.children].map((child) => child.textContent || child.tagName))).toEqual([
+      ['dB', 'INPUT'],
+      ['Hz', 'INPUT'],
+    ])
     expect(within(toolbar).getByLabelText('Smooth')).toBeInTheDocument()
     expect(within(toolbar).getByRole('button', { name: /inspect/i })).toBeInTheDocument()
     expect(within(toolbar).getByRole('button', { name: /label/i })).toBeInTheDocument()
@@ -59,10 +65,13 @@ describe('GraphToolbar', () => {
 
   it('commits bounded normalization and smoothing values', () => {
     render(<GraphToolbar />)
+    const db = screen.getByLabelText('Normalize dB')
     const hz = screen.getByLabelText('Normalize Hz')
+    fireEvent.change(db, { target: { value: '1.5' } })
+    fireEvent.blur(db)
     fireEvent.change(hz, { target: { value: '800' } })
     fireEvent.blur(hz)
-    expect(workspaceStore.getState().normalization.anchorHz).toBe(800)
+    expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 800, targetDb: 1.5 })
 
     fireEvent.change(hz, { target: { value: '25000' } })
     fireEvent.blur(hz)

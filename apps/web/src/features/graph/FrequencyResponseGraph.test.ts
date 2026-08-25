@@ -103,7 +103,7 @@ describe('buildGraphSeries', () => {
 
     expect(series.map(({ name }) => name)).toEqual([
       'Juzear Nimbus [1].txt',
-      'Juzear Nimbus [1] EQ',
+      'Juzear Nimbus [1].txt EQ',
       'JM-1 Target',
     ])
     expect(series.map(({ kind }) => kind)).toEqual(['measurement', 'equalized-fr', 'measurement'])
@@ -126,7 +126,7 @@ describe('buildGraphSeries', () => {
 
     expect(buildGraphSeries(deriveWorkspace(store.getState())).map(({ name }) => name)).toEqual([
       'Juzear Nimbus [1].txt',
-      'Juzear Nimbus [1] EQ',
+      'Juzear Nimbus [1].txt EQ',
     ])
   })
 
@@ -138,7 +138,7 @@ describe('buildGraphSeries', () => {
     store.getState().setFilters([filter], 'manual')
 
     expect(buildGraphSeries(deriveWorkspace(store.getState())).map(({ name }) => name)).toEqual([
-      'Juzear Nimbus [1].txt', 'Juzear Nimbus [1] EQ', 'Room overlay', 'JM-1 Target',
+      'Juzear Nimbus [1].txt', 'Juzear Nimbus [1].txt EQ', 'Room overlay', 'JM-1 Target',
     ])
 
     store.getState().setActiveFr('overlay')
@@ -162,7 +162,7 @@ describe('buildGraphSeries', () => {
     expect(derived.peq?.db.every((db) => Math.abs(db) < 1e-10)).toBe(true)
     expect(series.map(({ name }) => name)).toEqual([
       'Juzear Nimbus [1].txt',
-      'Juzear Nimbus [1] EQ',
+      'Juzear Nimbus [1].txt EQ',
       'JM-1 Target',
     ])
     expect(series.every((item) => !('markerFrequencyHz' in item))).toBe(true)
@@ -187,8 +187,8 @@ describe('buildGraphSeries', () => {
 
 describe('formatEqualizedFrName', () => {
   it.each([
-    ['Juzear Nimbus [1].txt', 'Juzear Nimbus [1] EQ'],
-    ['Truthear Nova.CSV', 'Truthear Nova EQ'],
+    ['Juzear Nimbus [1].txt', 'Juzear Nimbus [1].txt EQ'],
+    ['Truthear Nova.CSV', 'Truthear Nova.CSV EQ'],
     ['DUNU Titan S2', 'DUNU Titan S2 EQ'],
   ])('formats %s as %s', (name, expected) => {
     expect(formatEqualizedFrName(name)).toBe(expected)

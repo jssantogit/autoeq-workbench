@@ -265,10 +265,12 @@ select:focus-visible,
 }
 .number-field input[aria-invalid='true'] { border-color: var(--color-danger); }
 .number-field--with-unit .number-field__control { grid-template-columns: minmax(0, 1fr) auto; overflow: hidden; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-input); }
+.number-field--unit-before .number-field__control { grid-template-columns: auto minmax(0, 1fr); }
 .number-field--with-unit .number-field__control:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .number-field--with-unit .number-field__control:has(input[aria-invalid='true']) { border-color: var(--color-danger); }
 .number-field--with-unit input { min-width: 0; border: 0; border-radius: 0; outline: 0; }
 .number-field__unit { display: grid; max-width: 2.25rem; place-items: center; padding: 0 5px 0 2px; color: var(--color-text-muted); font: 0.64rem "Open Sans", "Segoe UI", system-ui, sans-serif; white-space: nowrap; }
+.number-field--unit-before .number-field__unit { border-right: 1px solid var(--color-border); padding: 0 5px; }
 
 .details-tab { min-width: 0; padding: 10px; }
 .metrics__status { margin: 3px 0 0; color: var(--color-text-muted); font-size: 0.72rem; }
