@@ -150,8 +150,9 @@
 .curve-row-name { display: flex; min-width: 0; align-items: center; gap: 4px; }
 .curve-row-name > span { min-width: 0; flex: 1; overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .curve-row-name > button { flex: 0 0 auto; }
-.curve-row-rename { display: grid; min-width: 210px; grid-template-columns: minmax(80px, 1fr) auto auto; gap: 3px; }
-.curve-row-rename input { min-width: 0; border: 1px solid; border-radius: 5px; padding: 4px; }
+.curve-row-rename { display: grid; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
+.curve-row-rename input { min-width: 0; grid-column: 1 / -1; border: 1px solid; border-radius: 5px; padding: 4px; }
+.curve-row-rename button { min-width: 0; padding-inline: 2px; }
 .manageTable td.calibrate { white-space: nowrap; }
 .curve-row-color { width: 26px; height: 28px; border: 1px solid; border-radius: 5px; padding: 2px; vertical-align: middle; cursor: pointer; }
 .manageTable .number-field { display: inline-flex; width: 76px; margin-left: 4px; vertical-align: middle; }
