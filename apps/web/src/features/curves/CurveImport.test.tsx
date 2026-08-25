@@ -187,6 +187,7 @@ describe('CurvesTab', () => {
     expect(within(workspace).getByRole('button', { name: 'Import FR / Target' })).toBeVisible()
     expect(within(workspace).queryByText('Upload FR')).not.toBeInTheDocument()
     expect(within(workspace).queryByText('Upload Target')).not.toBeInTheDocument()
+    expect(within(workspace).queryByText('Browse all curves')).not.toBeInTheDocument()
     expect(table.querySelector(':scope > tbody > tr > td')).toBeInTheDocument()
     expect(table.querySelectorAll(':scope > colgroup > col')).toHaveLength(7)
     expect(Array.from(table.querySelectorAll(':scope > colgroup > col')).map((col) => col.className)).toEqual([

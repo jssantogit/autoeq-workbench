@@ -131,7 +131,8 @@
   flex: 0 1 auto;
   flex-direction: column;
   border-collapse: collapse;
-  font-size: 0.7rem;
+  font-size: 14px;
+  line-height: 1em;
 }
 
 .manageTable colgroup { display: none; }
@@ -146,64 +147,184 @@
 .manageTable tbody.curves:empty::before {
   content: 'No curves loaded';
   padding: 14px 16px;
-  font-size: 0.75rem;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.6em;
   text-align: center;
   white-space: nowrap;
 }
 
-.manageTable tr,
 tbody.curves > tr {
   display: flex;
-  width: 100%;
-  min-width: 0;
+  align-items: flex-start;
   border-top: 1px solid;
 }
 
-.manageTable td.curve-manager-item {
+tbody.curves > tr > td {
   position: relative;
+  display: flex;
+  box-sizing: border-box;
+  min-height: 50px;
+  flex: 0 0 50px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.manageTable button,
+.manageTable input {
+  font: inherit;
+}
+
+tbody.curves > tr > td.button,
+tbody.curves > tr > td.remove {
+  box-sizing: border-box;
+  flex: 0 0 36px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+tbody.curves > tr > td.button {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+tbody.curves > tr > td.button::before,
+tbody.curves > tr > td.remove::before,
+tbody.curves > tr > td.button::after,
+tbody.curves > tr > td.remove::after {
+  position: absolute;
+  top: 6px;
+  left: 0;
   display: block;
   box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  min-height: 88px;
-  flex: 1 1 auto;
-  padding: 6px;
-  vertical-align: middle;
+  width: 36px;
+  height: 36px;
+  content: '';
+  pointer-events: none;
 }
 
-.manageTable button {
-  box-sizing: border-box;
-  height: 36px;
-  min-height: 36px;
+tbody.curves > tr > td.button::before,
+tbody.curves > tr > td.remove::before {
   border: 1px solid;
   border-radius: 6px;
-  padding: 0 6px;
-  cursor: pointer;
-  font-size: 0.66rem;
 }
-.manageTable button[aria-pressed='true'] { font-weight: 700; }
 
-.curve-manager-row__identity,
-.curve-manager-row__actions { display: flex; width: 100%; min-width: 0; align-items: center; gap: 6px; }
-.curve-manager-row__identity { min-height: 36px; }
-.curve-manager-row__actions { position: relative; min-height: 36px; padding-left: 42px; }
-.curve-row-remove,
-.curve-row-remove-placeholder { width: 36px; height: 36px; flex: 0 0 36px; }
-.curve-row-remove { padding: 0; font-size: 1rem !important; }
-.curve-row-action-placeholder { width: 62px; height: 36px; flex: 0 0 62px; }
-.curve-row-name__label { min-width: 0; flex: 1 1 auto; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.curve-row-rename { display: grid; width: 100%; min-width: 0; grid-template-columns: minmax(0, 1fr) auto auto; gap: 3px; }
-.curve-row-rename input { min-width: 0; height: 36px; border: 1px solid; border-radius: 5px; padding: 4px 6px; }
-.curve-row-rename button { min-width: 0; padding-inline: 6px; }
+tbody.curves > tr > td.button::after,
+tbody.curves > tr > td.remove::after {
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: 20px;
+}
 
-.curve-row-color { box-sizing: border-box; width: 36px; height: 36px; flex: 0 0 36px; border: 1px solid; border-radius: 6px; padding: 5px; vertical-align: middle; cursor: pointer; }
-.curve-row-color--target { display: block; border: 6px solid; cursor: default; }
-.curve-row-advanced { position: absolute; top: 42px; right: 0; z-index: 3; display: flex; width: min(240px, calc(100vw - 32px)); align-items: end; gap: 6px; border: 1px solid; border-radius: 6px; padding: 8px; }
-.manageTable .number-field { display: inline-flex; width: 130px; vertical-align: middle; }
+tbody.curves > tr > td.button > button,
+tbody.curves > tr > td.remove > button {
+  position: absolute;
+  z-index: 1;
+  top: 6px;
+  left: 0;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.curve-row-cell-placeholder { cursor: default !important; }
+.curve-row-cell-placeholder::before,
+.curve-row-cell-placeholder::after { display: none !important; }
+
+tbody.curves > tr > td.remove { order: 7; margin: 0 16px 0 6px; }
+tbody.curves > tr > td.remove::after {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M95.36 24.64a5 5 0 0 0-7.08 0L60 52.93 31.72 24.64a5 5 0 0 0-7.08 7.08L52.93 60 24.64 88.28a5 5 0 0 0 7.08 7.08L60 67.07l28.28 28.29a5 5 0 0 0 7.08-7.08L67.07 60l28.29-28.28a5 5 0 0 0 0-7.08Z'/%3E%3C/svg%3E");
+}
+
+tbody.curves > tr > td.button-baseline { order: 3; }
+tbody.curves > tr > td.button-baseline::after {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M80.37 85c-12.63 0-18.92-6.89-22-12.67A30.8 30.8 0 0 1 55 60.18V60a20.12 20.12 0 0 0-2.1-8c-2.46-4.7-6.68-7-12.9-7s-10.44 2.28-12.9 7A20.1 20.1 0 0 0 25 60a5 5 0 0 1-10 0c0-8.65 5.22-25 25-25s25 16.2 25 24.87C65.1 61.67 66.3 75 80.37 75c6 0 10.16-2.27 12.56-7A20.49 20.49 0 0 0 95 60a5 5 0 0 1 10 0 30 30 0 0 1-3 12.2C98 80.46 90.29 85 80.37 85Z'/%3E%3C/svg%3E");
+}
+tbody.curves > tr > td.button-baseline.selected::after {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect x='10' y='55' width='100' height='10' rx='5'/%3E%3C/svg%3E");
+}
+
+tbody.curves > tr > td.hideIcon { order: 4; }
+tbody.curves > tr > td.hideIcon::after {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M60 30C32.39 30 10 43.43 10 60s22.39 30 50 30 50-13.43 50-30-22.39-30-50-30Zm30.21 42.64C82.41 77.32 71.4 80 60 80 37.11 80 20 69.44 20 60c0-4.3 3.57-8.91 9.79-12.64C37.59 42.68 48.6 40 60 40c22.89 0 40 10.56 40 20 0 4.3-3.57 8.91-9.79 12.64Z'/%3E%3Ccircle cx='60' cy='60' r='10'/%3E%3C/svg%3E");
+}
+
+tbody.curves > tr > td.curve-color {
+  order: 0;
+  align-self: flex-start;
+  flex: 0 0 38px;
+  justify-content: flex-end;
+  cursor: pointer;
+}
+tbody.curves > tr > td.curve-color--target { cursor: default; }
+.curve-row-color {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  margin: 0 6px 0 0;
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+input.curve-row-color { appearance: none; background: currentColor; }
+input.curve-row-color::-webkit-color-swatch-wrapper { padding: 0; }
+input.curve-row-color::-webkit-color-swatch { border: 0; border-radius: 8px; }
+.curve-row-color--target { display: block; cursor: default; }
+
+tbody.curves > tr > td.item-line {
+  order: 1;
+  min-width: 0;
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  font-weight: 700;
+}
+.curve-row-name__label {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  padding: 0 6px;
+  color: inherit;
+  background: transparent;
+  font-weight: 700;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+span.curve-row-name__label { cursor: default; }
+.curve-row-rename { display: flex; width: 100%; min-width: 0; padding: 0 6px; }
+.curve-row-rename input { box-sizing: border-box; width: 100%; min-width: 0; height: 36px; border: 1px solid; border-radius: 6px; padding: 11px 6px; }
+
+tbody.curves > tr > td.levels { order: 2; flex: 0 0 86px; padding-left: 16px; }
+.manageTable .number-field { display: inline-flex; width: 70px; vertical-align: middle; }
 .manageTable .number-field > span:first-child { position: absolute; left: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.manageTable .number-field__control { width: 130px; }
-.manageTable .number-field input { min-width: 0; height: 36px; border-radius: 6px; padding: 2px 4px; text-align: center; }
+.manageTable .number-field__control { width: 70px; }
+.manageTable .number-field input { box-sizing: border-box; width: 70px; min-width: 0; height: 36px; border: 1px solid; border-radius: 6px; padding: 11px 6px 11px 0; font-size: 11px; line-height: 1em; text-align: center; text-transform: uppercase; }
+
+@media (max-width: 1200px) {
+  tbody.curves > tr { flex-wrap: wrap; }
+  tbody.curves > tr > td.curve-color { order: 2; }
+  tbody.curves > tr > td.item-line { flex: 0 0 100%; padding: 0 16px; }
+  tbody.curves > tr > td.levels { margin-left: auto; }
+}
+
+@media (max-width: 500px) {
+  tbody.curves > tr::before { order: 5; display: block; height: 0; flex: 1 1 100%; content: ''; }
+  tbody.curves > tr > td.levels { order: 4; margin-right: 16px; }
+  tbody.curves > tr > td.button-baseline { margin-left: auto; }
+  tbody.curves > tr > td.button-baseline,
+  tbody.curves > tr > td.hideIcon { order: 5; }
+}
 .curve-upload-actions {
   display: flex;
   width: 100%;
@@ -219,14 +340,17 @@ tbody.curves > tr {
   height: 36px;
   border: 1px solid;
   border-radius: 6px;
-  padding: 11px 16px;
+  padding: 11px 8px;
   cursor: pointer;
   font-size: 12px;
+  font-weight: 400;
   line-height: 1em;
   text-align: center;
+  text-transform: capitalize;
+  white-space: nowrap;
 }
-.curve-import__chooser { display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
-.curve-import__chooser button { height: 36px; border: 1px solid; border-radius: 6px; cursor: pointer; font-size: 12px; }
+.curve-import__chooser { display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.curve-import__chooser button { height: 36px; border: 1px solid; border-radius: 6px; padding: 11px 8px; cursor: pointer; font-size: 12px; font-weight: 400; line-height: 1em; text-transform: capitalize; white-space: nowrap; }
 .curve-import__input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); }
 .curve-upload-actions .field-error { margin: 0; }
 

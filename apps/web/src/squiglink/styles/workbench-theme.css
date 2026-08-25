@@ -36,18 +36,22 @@
 
 .manageTable tr,
 .manageTable tbody.curves:empty { border-color: var(--wb-border); color: var(--wb-text-muted); background: var(--wb-surface-muted); }
-.manageTable button,
 .curve-import__trigger,
 .curve-import__chooser button { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
-.manageTable button:hover,
 .curve-import__trigger:hover,
 .curve-import__chooser button:hover { border-color: var(--wb-accent-hover); color: var(--wb-text); }
-.manageTable button[aria-pressed='true'] { border-color: var(--wb-accent); color: var(--wb-accent-text); background: var(--wb-accent); }
-.curve-row-remove { color: var(--color-danger) !important; }
+.manageTable td.button::before,
+.manageTable td.remove::before { border-color: transparent; background: var(--wb-surface); }
+.manageTable td.button::after,
+.manageTable td.remove::after { background: var(--wb-text); }
+.manageTable td.button.selected::before { border-color: var(--wb-border); }
+.manageTable td.button.selected::after { background: var(--wb-text-muted); }
+.manageTable td.remove::before { border-color: var(--wb-border); }
+.manageTable td.remove::after { background: var(--color-danger); }
+.curve-row-name__label { color: var(--wb-text); }
 .curve-row-rename input { border-color: var(--wb-border); color: var(--wb-text); background: var(--color-input); }
-.curve-row-color { background: transparent; }
-.curve-row-color--target { border-color: var(--color-target); background: var(--color-target); }
-.curve-row-advanced { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); box-shadow: 0 5px 16px rgb(0 0 0 / 18%); }
+.curve-row-color--target { background: var(--color-target); }
+.manageTable .number-field input { border-color: var(--wb-text-muted); color: var(--wb-text); background: var(--color-input); }
 
 .graph-toolbar { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-bg); }
 .graph-toolbar .zoom,

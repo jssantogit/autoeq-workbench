@@ -12,8 +12,8 @@ const WIDTH = 800
 const HEIGHT = 346
 const PLOT_LEFT = 15
 const PLOT_RIGHT = 785
-const PLOT_TOP = 12
-const PLOT_BOTTOM = 322
+const PLOT_TOP = 20
+const PLOT_BOTTOM = 324
 const X_TICKS = [
   20, 30, 40, 50, 60, 80, 100, 150, 200, 300, 400, 500, 600, 800,
   1_000, 1_500, 2_000, 3_000, 4_000, 5_000, 6_000, 8_000, 10_000, 15_000, 20_000,
@@ -47,8 +47,7 @@ function formatFrequency(frequencyHz: number): string {
     : `${frequencyHz.toFixed(0)} Hz`
 }
 
-function formatXTick(frequencyHz: number, importance: number): string | null {
-  if (importance === 0) return null
+function formatXTick(frequencyHz: number): string {
   if (frequencyHz === 20) return '20Hz'
   if (frequencyHz === 20_000) return '20kHz'
   return frequencyHz >= 1_000 ? `${frequencyHz / 1_000}k` : String(frequencyHz)
@@ -132,7 +131,7 @@ export function createSquiglinkGraph(
     .attr('width', PLOT_RIGHT - PLOT_LEFT).attr('height', PLOT_BOTTOM - PLOT_TOP)
     .attr('fill', 'transparent')
   const x = scaleLog().range([PLOT_LEFT, PLOT_RIGHT])
-  const y = scaleLinear().domain([-30, 25]).range([PLOT_BOTTOM, PLOT_TOP])
+  const y = scaleLinear().domain([-30.5, 25]).range([PLOT_BOTTOM, PLOT_TOP])
   let current = initial
   let prepared: PreparedSeries[] = []
   let inspectorFrequency: number | null = null
@@ -218,27 +217,29 @@ export function createSquiglinkGraph(
       const importance = index === 0 || index === X_TICKS.length - 1
         ? 4
         : TICK_PATTERN[index % TICK_PATTERN.length]!
-      return { frequencyHz, importance, label: formatXTick(frequencyHz, importance) }
+      return { frequencyHz, importance, label: formatXTick(frequencyHz) }
     }).filter(({ frequencyHz }) => frequencyHz >= minimum && frequencyHz <= maximum)
     const xGroups = xAxis.selectAll<SVGGElement, (typeof ticks)[number]>('g[data-x-tick]')
       .data(ticks, (tick) => tick.frequencyHz).join((enter) => {
-        const group = enter.append('g').attr('data-x-tick', '')
+        const group = enter.append('g')
         group.append('line')
         group.append('text').attr('class', 'graph-axis-label graph-axis-label--x')
         return group
       })
+    xGroups.attr('data-x-tick', (tick) => tick.frequencyHz)
     xGroups.select('line').attr('data-x-grid', (tick) => tick.frequencyHz)
       .attr('x1', (tick) => x(tick.frequencyHz)).attr('x2', (tick) => x(tick.frequencyHz))
-      .attr('y1', PLOT_TOP).attr('y2', PLOT_BOTTOM)
+      .attr('y1', 20).attr('y2', 322)
       .attr('stroke', (tick) => tick.importance >= 2 ? palette.majorGrid : palette.minorGrid)
       .attr('stroke-width', (tick) => TICK_THICKNESS[tick.importance]!)
     xGroups.select('text')
-      .attr('class', (tick) => tick.label === null ? null : 'graph-axis-label graph-axis-label--x')
-      .attr('x', (tick) => x(tick.frequencyHz)).attr('y', 339)
-      .attr('fill', palette.axis).attr('font-size', current.view.presentation === 'compact' ? 13 : 10)
-      .attr('text-anchor', (tick) => tick.frequencyHz === minimum ? 'start' : tick.frequencyHz === maximum ? 'end' : 'middle')
+      .attr('class', 'graph-axis-label graph-axis-label--x')
+      .attr('x', (tick) => x(tick.frequencyHz)).attr('y', 330).attr('dy', '0.71em')
+      .attr('dx', (tick) => tick.frequencyHz === 20 ? 4 : tick.frequencyHz === 20_000 ? -5 : null)
+      .attr('fill', palette.axis).attr('font-size', (tick) => tick.importance === 0 ? '8.6' : '10')
+      .attr('font-weight', (tick) => tick.importance === 0 ? 'lighter' : null)
+      .attr('text-anchor', 'middle')
       .text((tick) => tick.label)
-      .attr('display', (tick) => tick.label === null ? 'none' : null)
 
     const yGroups = yAxis.selectAll<SVGGElement, number>('g[data-y-tick]')
       .data(Y_TICKS, (db) => db).join((enter) => {
@@ -250,17 +251,17 @@ export function createSquiglinkGraph(
     yGroups.select('line').attr('data-y-grid', (db) => db)
       .attr('x1', PLOT_LEFT).attr('x2', PLOT_RIGHT).attr('y1', (db) => y(db)).attr('y2', (db) => y(db))
       .attr('stroke', palette.majorGrid)
-      .attr('stroke-width', 0.55)
+      .attr('stroke-width', 0.2716216216216216)
+      .attr('stroke-linecap', 'round')
     yGroups.select('text').attr('data-y-label', (db) => db)
-      .attr('x', PLOT_LEFT + 24).attr('y', (db) => y(db)).attr('fill', palette.axis)
-      .attr('font-size', current.view.presentation === 'compact' ? 12 : 9)
-      .attr('dominant-baseline', (db) => db === 25 ? 'hanging' : db === -30 ? 'auto' : 'middle')
+      .attr('x', PLOT_LEFT + 3).attr('y', (db) => y(db)).attr('dy', -2).attr('fill', palette.axis)
+      .attr('font-size', 10).attr('text-anchor', 'start')
       .text((db) => db)
     yAxis.selectAll<SVGTextElement, number>('text[data-db-label]').data([0]).join('text')
       .attr('class', 'graph-axis-label graph-db-label').attr('data-db-label', '')
-      .attr('x', PLOT_LEFT + 4).attr('y', PLOT_TOP + 4).attr('fill', palette.axis)
-      .attr('font-size', current.view.presentation === 'compact' ? 12 : 9)
-      .attr('dominant-baseline', 'hanging').text('dB')
+      .attr('transform', `translate(${PLOT_RIGHT} 0) rotate(-90)`)
+      .attr('x', -10).attr('y', -(PLOT_RIGHT - PLOT_LEFT) - 2).attr('fill', palette.axis)
+      .attr('font-size', 10).attr('text-anchor', 'end').text('dB')
   }
 
   function renderSeries(): void {

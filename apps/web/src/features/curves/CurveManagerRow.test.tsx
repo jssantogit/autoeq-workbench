@@ -26,19 +26,25 @@ describe('CurveManagerRow', () => {
     uiStore.getState().registerCurve(source.id)
   })
 
-  it('uses two lines with a dominant name and no visible kind badge', () => {
+  it('uses source-shaped direct cells with a dominant name and no visible kind badge', () => {
     renderRow(source)
     const row = screen.getByRole('row', { name: source.name })
 
-    expect(row.children).toHaveLength(1)
-    expect(row.querySelector('.curve-manager-row__identity')).toHaveTextContent(source.name)
-    expect(row.querySelector('.curve-manager-row__actions')).toBeInTheDocument()
+    expect([...row.children].map(({ className }) => className)).toEqual([
+      'curve-color',
+      'item-line item-phone',
+      'levels',
+      'button button-baseline',
+      'button hideIcon',
+      'remove',
+    ])
     expect(screen.getByTitle(source.name)).toHaveTextContent(source.name)
     expect(screen.queryByRole('button', { name: /set .* active/i })).not.toBeInTheDocument()
     expect(screen.queryByText(/^FR$|^Target$/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: `Rename ${source.name}` })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: `Hide ${source.name}` })).toBeInTheDocument()
     expect(screen.getByLabelText(`${source.name} color`)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: `More options for ${source.name}` })).not.toBeInTheDocument()
   })
 
   it('keeps visibility, offset, and baseline display-only without changing raw samples', async () => {
@@ -48,7 +54,6 @@ describe('CurveManagerRow', () => {
 
     await user.click(screen.getByRole('button', { name: `Hide ${source.name}` }))
     expect(uiStore.getState().curveAppearance.source?.visible).toBe(false)
-    await user.click(screen.getByRole('button', { name: `More options for ${source.name}` }))
     const offset = screen.getByLabelText(`${source.name} offset dB`)
     fireEvent.change(offset, { target: { value: '3' } })
     fireEvent.blur(offset)
@@ -68,10 +73,15 @@ describe('CurveManagerRow', () => {
     expect(screen.getByRole('img', { name: 'Target reference fixed gray color' })).toBeInTheDocument()
     expect(screen.queryByLabelText('Target reference color')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Rename Target reference' }))
-    const rename = screen.getByRole('textbox', { name: 'Rename Target reference' })
+    let rename = screen.getByRole('textbox', { name: 'Rename Target reference' })
+    await user.type(rename, ' discarded')
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('textbox', { name: 'Rename Target reference' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Rename Target reference' }))
+    rename = screen.getByRole('textbox', { name: 'Rename Target reference' })
     await user.clear(rename)
     await user.type(rename, 'Reference target')
-    await user.click(screen.getByRole('button', { name: 'Save name' }))
+    await user.keyboard('{Enter}')
     expect(workspaceStore.getState().curves[1]?.name).toBe('Reference target')
 
     rerender(<table><tbody><CurveManagerRow curve={workspaceStore.getState().curves[1]!} /></tbody></table>)
@@ -86,6 +96,14 @@ describe('CurveManagerRow', () => {
 
     expect(screen.queryByRole('button', { name: /rename/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /remove/i })).not.toBeInTheDocument()
+    expect([...screen.getByRole('row', { name: `${source.name} EQ` }).children].map(({ className }) => className)).toEqual([
+      'curve-color',
+      'item-line item-phone',
+      'levels curve-row-cell-placeholder',
+      'button button-baseline curve-row-cell-placeholder',
+      'button hideIcon',
+      'remove curve-row-cell-placeholder',
+    ])
     await user.click(screen.getByRole('button', { name: `Hide ${source.name} EQ` }))
     expect(uiStore.getState().curveAppearance[EQUALIZED_FR_APPEARANCE_ID]?.visible).toBe(false)
     fireEvent.change(screen.getByLabelText(`${source.name} EQ color`), {

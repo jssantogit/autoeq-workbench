@@ -83,14 +83,28 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(zeroGrid).toHaveAttribute('stroke-width', adjacentGrid?.getAttribute('stroke-width'))
     const dbLabel = container.querySelector('[data-db-label]')
     expect(dbLabel).toHaveTextContent('dB')
-    expect(dbLabel).toHaveAttribute('x', '19')
-    expect(dbLabel).toHaveAttribute('y', '16')
-    expect(container.querySelectorAll('.graph-axis-label')).toHaveLength(23)
+    expect(dbLabel).toHaveAttribute('transform', 'translate(785 0) rotate(-90)')
+    expect(dbLabel).toHaveAttribute('x', '-10')
+    expect(dbLabel).toHaveAttribute('y', '-772')
+    expect(dbLabel).toHaveAttribute('text-anchor', 'end')
+    expect(container.querySelectorAll('.graph-axis-label')).toHaveLength(38)
+    expect([...container.querySelectorAll('[data-x-tick] text')].map((label) => label.textContent)).toEqual([
+      '20Hz', '30', '40', '50', '60', '80', '100', '150', '200', '300', '400', '500', '600', '800',
+      '1k', '1.5k', '2k', '3k', '4k', '5k', '6k', '8k', '10k', '15k', '20kHz',
+    ])
+    const xPositions = [20, 200, 2_000, 20_000].map((frequency) =>
+      Number(container.querySelector(`[data-x-tick="${frequency}"] text`)?.getAttribute('x')))
+    expect(xPositions[1]! - xPositions[0]!).toBeCloseTo(xPositions[2]! - xPositions[1]!, 6)
+    expect(xPositions[2]! - xPositions[1]!).toBeCloseTo(xPositions[3]! - xPositions[2]!, 6)
     expect([...container.querySelectorAll('[data-y-label]')].map((label) => label.textContent)).toEqual([
       '25', '20', '15', '10', '5', '0', '-5', '-10', '-15', '-20', '-25', '-30',
     ])
-    expect(container.querySelector('[data-y-label="25"]')).toHaveAttribute('dominant-baseline', 'hanging')
-    expect(container.querySelector('[data-y-label="-30"]')).toHaveAttribute('dominant-baseline', 'auto')
+    const yPositions = [25, 20, 15].map((db) =>
+      Number(container.querySelector(`[data-y-label="${db}"]`)?.getAttribute('y')))
+    expect(yPositions[1]! - yPositions[0]!).toBeCloseTo(yPositions[2]! - yPositions[1]!, 6)
+    expect(container.querySelector('[data-y-label="25"]')).toHaveAttribute('x', '18')
+    expect(container.querySelector('[data-y-label="25"]')).toHaveAttribute('dy', '-2')
+    expect(container.querySelector('[data-y-label="25"]')).toHaveAttribute('text-anchor', 'start')
     expect(container.querySelector('.graph-meta')).not.toBeInTheDocument()
     expect(container.querySelector('[class*="legend"]')).not.toBeInTheDocument()
     expect(container.innerHTML).not.toMatch(/sampling|dataZoom|toolbox|Reset View/)
@@ -145,7 +159,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
       .map((label) => Number(label.getAttribute('x')))
     expect(annotationXs.every((x) => x > yLabelX + 20)).toBe(true)
     expect(annotations.every((label) =>
-      Number(label.getAttribute('y')) < 322,
+      Number(label.getAttribute('y')) < 324,
     )).toBe(true)
   })
 
@@ -172,13 +186,13 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelectorAll('[data-y-grid]')).toHaveLength(12)
     expect([...container.querySelectorAll('[data-series-name]')].map((path) => path.getAttribute('d')))
       .toEqual(initialPaths)
-    expect(container.querySelector('.graph-axis-label--x')).toHaveAttribute('font-size', '13')
-    expect(container.querySelector('[data-y-label]')).toHaveAttribute('font-size', '12')
+    expect(container.querySelector('.graph-axis-label--x')).toHaveAttribute('font-size', '10')
+    expect(container.querySelector('[data-y-label]')).toHaveAttribute('font-size', '10')
 
     const labels = [...container.querySelectorAll('[data-curve-label]')]
     expect(labels[0]).toHaveAttribute('font-size', '19')
     expect(Number(labels[0]!.getAttribute('y')) - Number(labels[1]!.getAttribute('y'))).toBe(21)
-    expect(labels.every((label) => Number(label.getAttribute('y')) < 322)).toBe(true)
+    expect(labels.every((label) => Number(label.getAttribute('y')) < 324)).toBe(true)
 
     fireEvent.focus(screen.getByRole('slider', { name: 'Inspect graph frequency' }))
     const tooltip = container.querySelector('[data-inspector-tooltip-box]')
@@ -286,7 +300,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(screen.getByText('632 Hz')).toBeInTheDocument()
     expect(container.querySelector('[data-inspector-tooltip]')).toHaveTextContent(/Source:/)
     fireEvent.pointerMove(container.querySelector('[data-inspector-hit-area]')!, { clientX: 499 })
-    expect(container.querySelector('[data-inspector-tooltip]')).toHaveAttribute('transform', 'translate(611 30)')
+    expect(container.querySelector('[data-inspector-tooltip]')).toHaveAttribute('transform', 'translate(611 38)')
     fireEvent.pointerLeave(container.querySelector('[data-inspector-hit-area]')!)
     expect(container.querySelector('[data-inspector-crosshair]')).not.toBeInTheDocument()
     act(() => uiStore.getState().toggleInspector())
@@ -327,9 +341,9 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelectorAll('[aria-label="Visible graph series"] text')).toHaveLength(9)
     expect(screen.getByText('+2 more')).toBeInTheDocument()
     expect(screen.getByText('Curve 0')).toHaveAttribute('x', '67')
-    expect(screen.getByText('Curve 0')).toHaveAttribute('y', '302')
-    expect(screen.getByText('Curve 7')).toHaveAttribute('y', '197')
-    expect(screen.getByText('+2 more')).toHaveAttribute('y', '182')
+    expect(screen.getByText('Curve 0')).toHaveAttribute('y', '304')
+    expect(screen.getByText('Curve 7')).toHaveAttribute('y', '199')
+    expect(screen.getByText('+2 more')).toHaveAttribute('y', '184')
   })
 
   it('keeps graph narration and selected-filter overlays out of the SVG', () => {
