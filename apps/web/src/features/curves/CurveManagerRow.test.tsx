@@ -25,6 +25,21 @@ describe('CurveManagerRow', () => {
     uiStore.getState().registerCurve(source.id)
   })
 
+  it('keeps the Squiglink manager cell order while binding Workbench semantics', () => {
+    renderRow(source)
+    const row = screen.getByText('Source').closest('tr')!
+
+    expect(Array.from(row.children).map((cell) => cell.className)).toEqual([
+      'remove',
+      'phoneId',
+      'key',
+      'calibrate',
+      'baselineButton',
+      'hideButton',
+      'lastColumn',
+    ])
+  })
+
   it('controls active FR and display-only appearance without changing raw samples', async () => {
     const user = userEvent.setup()
     const rawSnapshot = structuredClone(source.rawPoints)
