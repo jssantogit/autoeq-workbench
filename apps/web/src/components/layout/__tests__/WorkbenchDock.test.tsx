@@ -31,9 +31,9 @@ describe('workbench shell', () => {
     expect(dockContent).toBeInTheDocument()
     expect(tablist).toHaveClass('dock-tabs', 'dock-tabs--segmented')
     expect(tablist.children).toHaveLength(3)
-    const handle = document.querySelector('.workbench-dock__handle')
-    expect(handle).toBeInTheDocument()
-    expect(handle).toHaveAttribute('aria-hidden', 'true')
+    expect(dock.querySelector('.workbench-dock__handle')).not.toBeInTheDocument()
+    expect(dock.firstElementChild).toBe(tablist)
+    expect(tablist.nextElementSibling).toBe(dockContent)
     expect(screen.getByRole('tab', { name: 'Curves' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('tab', { name: 'Curves' })).toHaveAttribute(
       'aria-controls',
