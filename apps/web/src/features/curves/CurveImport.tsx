@@ -3,21 +3,32 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { useUiStore } from '../../state/uiStore'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 
-interface CurveImportProps {
-  kind: CurveKind
-}
-
-export function CurveImport({ kind }: CurveImportProps) {
+export function CurveImport() {
   const addCurve = useWorkspaceStore((state) => state.addCurve)
   const registerCurve = useUiStore((state) => state.registerCurve)
-  const [error, setError] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const pendingKindRef = useRef<CurveKind | null>(null)
   const requestRef = useRef(0)
-  const label = kind === 'fr' ? 'Upload FR' : 'Upload Target'
+  const [chooserOpen, setChooserOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  function chooseKind(kind: CurveKind): void {
+    pendingKindRef.current = kind
+    setChooserOpen(false)
+    inputRef.current?.click()
+  }
 
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
-    if (file === undefined) return
+    const kind = pendingKindRef.current
     const input = event.currentTarget
+    pendingKindRef.current = null
+
+    if (file === undefined || kind === null) {
+      input.value = ''
+      return
+    }
+
     const request = ++requestRef.current
 
     try {
@@ -38,10 +49,28 @@ export function CurveImport({ kind }: CurveImportProps) {
 
   return (
     <div className="curve-import">
-      <label className="file-control">
-        <span>{label}</span>
-        <input aria-label={label} type="file" accept=".txt,.csv,text/plain,text/csv" onChange={handleFile} />
-      </label>
+      <button
+        type="button"
+        className="curve-import__trigger"
+        aria-expanded={chooserOpen}
+        onClick={() => setChooserOpen((open) => !open)}
+      >
+        Import FR / Target
+      </button>
+      {chooserOpen && (
+        <div className="curve-import__chooser" role="group" aria-label="Curve type">
+          <button type="button" onClick={() => chooseKind('fr')}>FR</button>
+          <button type="button" onClick={() => chooseKind('target')}>Target</button>
+        </div>
+      )}
+      <input
+        ref={inputRef}
+        className="curve-import__input"
+        aria-label="Curve file"
+        type="file"
+        accept=".txt,.csv,text/plain,text/csv"
+        onChange={handleFile}
+      />
       {error !== null && (
         <p className="field-error" role="alert">
           {error}
