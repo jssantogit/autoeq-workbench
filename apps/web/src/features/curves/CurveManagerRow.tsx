@@ -50,15 +50,16 @@ export function CurveManagerRow({ curve }: { curve: Curve }) {
   const baseline = baselineCurveId === curve.id
 
   return (
-    <tr className={`curve-manager-row addPhone${active ? ' selected' : ''}`}>
+    <tr className={`curve-manager-row${active ? ' selected' : ''}`}>
       <td className="remove">
-        <button type="button" aria-label={`Remove ${curve.name}`} onClick={remove}>x</button>
+        <button type="button" aria-label={`Remove ${curve.name}`} title="Remove graph" onClick={remove}>×</button>
       </td>
       <td className="phoneId">
         <button
           type="button"
           aria-label={`Set ${curve.name} as active ${kindLabel}`}
           aria-pressed={active}
+          title={`Set active ${kindLabel}`}
           onClick={activate}
         >
           {kindLabel}
@@ -78,8 +79,8 @@ export function CurveManagerRow({ curve }: { curve: Curve }) {
           </form>
         ) : (
           <div className="curve-row-name">
-            <span title={curve.name}>{curve.name}</span>
-            <button type="button" aria-label={`Rename ${curve.name}`} onClick={() => setRenaming(true)}>Rename</button>
+            <span className="curve-row-name__label" title={curve.name}>{curve.name}</span>
+            <button type="button" aria-label={`Rename ${curve.name}`} title="Rename graph" onClick={() => setRenaming(true)}>✎</button>
           </div>
         )}
       </td>
@@ -89,6 +90,7 @@ export function CurveManagerRow({ curve }: { curve: Curve }) {
             className="curve-row-color"
             type="color"
             aria-label={`${curve.name} color`}
+            title="Graph color"
             value={appearance?.color ?? '#1565c0'}
             onChange={(event) => setCurveColor(curve.id, event.target.value)}
           />
@@ -106,13 +108,14 @@ export function CurveManagerRow({ curve }: { curve: Curve }) {
           type="button"
           aria-label={`${baseline ? 'Clear' : 'Set'} ${curve.name} graph baseline`}
           aria-pressed={baseline}
+          title="Set as baseline"
           onClick={() => setBaselineCurve(baseline ? null : curve.id)}
         >
-          Baseline
+          BASE
         </button>
       </td>
       <td className="hideButton">
-        <label>
+        <label className="curve-row-visibility" title="Show graph">
           <span className="visually-hidden">{curve.name} visible</span>
           <input
             type="checkbox"
@@ -120,8 +123,10 @@ export function CurveManagerRow({ curve }: { curve: Curve }) {
             checked={appearance?.visible ?? true}
             onChange={(event) => setCurveVisible(curve.id, event.target.checked)}
           />
+          <span aria-hidden="true">◉</span>
         </label>
       </td>
+      <td className="lastColumn" aria-hidden="true" />
     </tr>
   )
 }
