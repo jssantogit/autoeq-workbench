@@ -3,6 +3,7 @@ import { Button } from '../../components/ui/Button'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 import { AutoEqConstraints } from './AutoEqConstraints'
 import { FilterEditor } from './FilterEditor'
+import { FilterIoControls } from './FilterIoControls'
 
 export function EqualizerTab() {
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -11,10 +12,8 @@ export function EqualizerTab() {
   const activeTargetId = useWorkspaceStore((state) => state.activeTargetId)
   const setActiveFr = useWorkspaceStore((state) => state.setActiveFr)
   const setActiveTarget = useWorkspaceStore((state) => state.setActiveTarget)
-  const filters = useWorkspaceStore((state) => state.filters)
   const frCurves = curves.filter((curve) => curve.kind === 'fr')
   const targetCurves = curves.filter((curve) => curve.kind === 'target')
-  const hasFilters = filters.length > 0
 
   return (
     <section className="equalizer-tab extra-eq" aria-label="Equalizer workspace">
@@ -62,11 +61,7 @@ export function EqualizerTab() {
         >
           Constraints
         </Button>
-        <Button className="import-filters" onClick={() => undefined}>Import</Button>
-        <Button className="export-filters" disabled={!hasFilters} onClick={() => undefined}>Export</Button>
-        <Button className="export-graphic-filters" disabled={!hasFilters} onClick={() => undefined}>
-          Export Graphic EQ (For Wavelet)
-        </Button>
+        <FilterIoControls />
       </div>
     </section>
   )
