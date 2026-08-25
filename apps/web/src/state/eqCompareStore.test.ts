@@ -1,6 +1,6 @@
 import type { Filter } from '@autoeq-workbench/core'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createEqCompareStore } from './eqCompareStore'
+import { createEqCompareStore, isCanonicalEqStateEqual } from './eqCompareStore'
 
 const filter: Filter = {
   id: 'filter-1',
@@ -65,6 +65,53 @@ describe('EQ compare store', () => {
     store.getState().flush()
 
     expect(store.getState().snapshots).toHaveLength(1)
+  })
+
+  it('matches only ordered canonical filter fields, provenance, and solution state', () => {
+    const left = {
+      ...capture(),
+      filters: [filter, { ...filter, id: 'filter-2', frequencyHz: 2_000 }],
+      selectedFilterId: 'filter-1',
+      preampDb: -2,
+      view: 'equalizer',
+    }
+    const sameCanonicalState = {
+      ...left,
+      filters: left.filters.map((item) => ({ ...item })),
+      selectedFilterId: null,
+      preampDb: -99,
+      view: 'tools',
+    }
+
+    expect(isCanonicalEqStateEqual(left, sameCanonicalState)).toBe(true)
+    expect(
+      isCanonicalEqStateEqual(left, {
+        ...sameCanonicalState,
+        filters: [...sameCanonicalState.filters].reverse(),
+      }),
+    ).toBe(false)
+
+    for (const changedFilter of [
+      { ...filter, id: 'changed' },
+      { ...filter, enabled: false },
+      { ...filter, type: 'LS' as const },
+      { ...filter, frequencyHz: 999 },
+      { ...filter, gainDb: 3 },
+      { ...filter, q: 2 },
+    ]) {
+      expect(
+        isCanonicalEqStateEqual(left, {
+          ...sameCanonicalState,
+          filters: [changedFilter, sameCanonicalState.filters[1]!],
+        }),
+      ).toBe(false)
+    }
+    expect(
+      isCanonicalEqStateEqual(left, { ...sameCanonicalState, filterProvenance: 'autoeq' }),
+    ).toBe(false)
+    expect(
+      isCanonicalEqStateEqual(left, { ...sameCanonicalState, solutionState: 'stale' }),
+    ).toBe(false)
   })
 
   it('retains the 100 newest deep-copied snapshots and clears trimmed selections', () => {

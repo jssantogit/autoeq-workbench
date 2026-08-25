@@ -35,7 +35,10 @@ function copyCapture(capture: EqSnapshotCapture): EqSnapshotCapture {
   return { ...capture, filters: capture.filters.map((filter) => ({ ...filter })) }
 }
 
-function sameCanonicalState(left: EqSnapshotCapture, right: EqSnapshotCapture): boolean {
+export function isCanonicalEqStateEqual(
+  left: Pick<EqSnapshotCapture, 'filters' | 'filterProvenance' | 'solutionState'>,
+  right: Pick<EqSnapshotCapture, 'filters' | 'filterProvenance' | 'solutionState'>,
+): boolean {
   return (
     left.filterProvenance === right.filterProvenance &&
     left.solutionState === right.solutionState &&
@@ -95,7 +98,7 @@ export function createEqCompareStore() {
 
       set((state) => {
         const newest = state.snapshots.at(-1)
-        if (newest !== undefined && sameCanonicalState(newest, capture)) return state
+        if (newest !== undefined && isCanonicalEqStateEqual(newest, capture)) return state
 
         const timestamp = Date.now()
         const shouldCoalesce =

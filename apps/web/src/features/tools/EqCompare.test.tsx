@@ -1,0 +1,130 @@
+import type { Filter } from '@autoeq-workbench/core'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createEqCompareStore, isCanonicalEqStateEqual } from '../../state/eqCompareStore'
+import { initializeEqCompareRecorder } from '../../state/initializeEqCompareRecorder'
+import { createWorkspaceStore } from '../../state/workspaceStore'
+import { EqCompare } from './EqCompare'
+
+const baseFilter: Filter = {
+  id: 'filter-1',
+  enabled: true,
+  type: 'PK',
+  frequencyHz: 1_000,
+  gainDb: 2,
+  q: 1,
+}
+
+function capture(gainDb: number) {
+  return {
+    filters: [{ ...baseFilter, gainDb }],
+    filterProvenance: 'manual' as const,
+    solutionState: 'clean' as const,
+    preampDb: -Math.max(0, gainDb),
+  }
+}
+
+describe('EqCompare', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(0)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('shows newest snapshots first with usable A/B assignment and bounded history controls', () => {
+    const compare = createEqCompareStore()
+    const workspace = createWorkspaceStore()
+    compare.getState().record(capture(1))
+    compare.getState().flush()
+    vi.setSystemTime(1_000)
+    compare.getState().record(capture(4))
+    compare.getState().flush()
+
+    render(<EqCompare compareStore={compare} workspaceStore={workspace} />)
+
+    const history = screen.getByRole('region', { name: 'EQ snapshot history' })
+    expect(history).toHaveStyle({ maxHeight: '20rem', overflowY: 'auto' })
+    expect(history).toHaveAttribute('tabindex', '0')
+    expect(within(history).getAllByTestId('snapshot-summary').map((node) => node.textContent)).toEqual([
+      expect.stringContaining('+4.0 dB'),
+      expect.stringContaining('+1.0 dB'),
+    ])
+
+    const rows = within(history).getAllByRole('listitem')
+    fireEvent.click(within(rows[0]!).getByRole('button', { name: 'Set A' }))
+    fireEvent.click(within(rows[1]!).getByRole('button', { name: 'Set B' }))
+
+    expect(within(rows[0]!).getByText('Assigned A')).toBeVisible()
+    expect(within(rows[1]!).getByText('Assigned B')).toBeVisible()
+    expect(screen.getByText(/A:.*\+4\.0 dB/)).toBeVisible()
+    expect(screen.getByText(/B:.*\+1\.0 dB/)).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Apply A' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Apply B' })).toBeEnabled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear history and selection' }))
+    expect(screen.getByText('No EQ snapshots yet.')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Apply A' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Apply B' })).toBeDisabled()
+  })
+
+  it('indicates exact current matches while ignoring selected and derived state', () => {
+    const compare = createEqCompareStore()
+    const workspace = createWorkspaceStore()
+    workspace.getState().setFilters(capture(3).filters, 'manual')
+    workspace.getState().selectFilter(baseFilter.id)
+    compare.getState().record({ ...capture(3), preampDb: -99 })
+    compare.getState().flush()
+    const id = compare.getState().snapshots[0]!.id
+    compare.getState().setA(id)
+
+    render(<EqCompare compareStore={compare} workspaceStore={workspace} />)
+
+    expect(screen.getByText('Current matches A')).toBeVisible()
+    act(() => workspace.getState().updateFilter(baseFilter.id, { q: 2 }))
+    expect(screen.queryByText('Current matches A')).not.toBeInTheDocument()
+  })
+
+  it('suppresses recording before one atomic apply, then supports deterministic undo and redo', () => {
+    const compare = createEqCompareStore()
+    const workspace = createWorkspaceStore()
+    const initial = capture(1)
+    const target = capture(5)
+    workspace.getState().setFilters(initial.filters, 'manual')
+    compare.getState().record(target)
+    compare.getState().flush()
+    const snapshot = compare.getState().snapshots[0]!
+    compare.getState().setA(snapshot.id)
+    const cleanupRecorder = initializeEqCompareRecorder(workspace, compare)
+    const calls: string[] = []
+    const suppressNext = compare.getState().suppressNext
+    const applyFilterSnapshot = workspace.getState().applyFilterSnapshot
+    compare.setState({ suppressNext: vi.fn(() => { calls.push('suppress'); suppressNext() }) })
+    workspace.setState({
+      applyFilterSnapshot: vi.fn((next) => {
+        calls.push('apply')
+        applyFilterSnapshot(next)
+      }),
+    })
+
+    render(<EqCompare compareStore={compare} workspaceStore={workspace} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Apply A' }))
+
+    expect(calls).toEqual(['suppress', 'apply'])
+    expect(isCanonicalEqStateEqual(workspace.getState(), snapshot)).toBe(true)
+    expect(workspace.getState().selectedFilterId).toBeNull()
+    expect(workspace.getState().filters).not.toBe(snapshot.filters)
+    expect(workspace.getState().filters[0]).not.toBe(snapshot.filters[0])
+    vi.advanceTimersByTime(500)
+    expect(compare.getState().snapshots).toHaveLength(1)
+
+    workspace.getState().undo()
+    expect(isCanonicalEqStateEqual(workspace.getState(), initial)).toBe(true)
+    workspace.getState().redo()
+    expect(isCanonicalEqStateEqual(workspace.getState(), snapshot)).toBe(true)
+
+    cleanupRecorder()
+  })
+})
