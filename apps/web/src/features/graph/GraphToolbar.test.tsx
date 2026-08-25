@@ -1,5 +1,5 @@
 import { DEFAULT_AUTOEQ_SETTINGS } from '@autoeq-workbench/core'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { uiStore } from '../../state/uiStore'
@@ -33,25 +33,27 @@ describe('GraphToolbar', () => {
     })
   })
 
-  it('exposes the source-derived graph controls and toggles zoom presets', async () => {
+  it('exposes the source-derived graph controls in one horizontal flow and toggles zoom presets', async () => {
     const user = userEvent.setup()
     render(<GraphToolbar />)
 
-    expect(screen.getByRole('button', { name: 'Bass' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Mids' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Treble' })).toBeInTheDocument()
-    expect(screen.getByLabelText('Normalize dB')).toBeInTheDocument()
-    expect(screen.getByLabelText('Normalize Hz')).toBeInTheDocument()
-    expect(screen.getByLabelText('Smooth')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /inspect/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /label/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /screenshot/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /recolor/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Switch to dark theme' })).toBeInTheDocument()
+    const toolbar = screen.getByRole('toolbar', { name: 'Graph tools' })
+    const themeToggle = within(toolbar).getByRole('button', { name: 'Switch to dark theme' })
+    expect(toolbar.firstElementChild).toBe(themeToggle)
+    expect(within(toolbar).getByRole('button', { name: 'Bass' })).toBeInTheDocument()
+    expect(within(toolbar).getByRole('button', { name: 'Mids' })).toBeInTheDocument()
+    expect(within(toolbar).getByRole('button', { name: 'Treble' })).toBeInTheDocument()
+    expect(within(toolbar).getByLabelText('Normalize dB')).toBeInTheDocument()
+    expect(within(toolbar).getByLabelText('Normalize Hz')).toBeInTheDocument()
+    expect(within(toolbar).getByLabelText('Smooth')).toBeInTheDocument()
+    expect(within(toolbar).getByRole('button', { name: /inspect/i })).toBeInTheDocument()
+    expect(within(toolbar).getByRole('button', { name: /label/i })).toBeInTheDocument()
+    expect(within(toolbar).getByRole('button', { name: /screenshot/i })).toBeInTheDocument()
+    expect(within(toolbar).getByRole('button', { name: /recolor/i })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Bass' }))
+    await user.click(within(toolbar).getByRole('button', { name: 'Bass' }))
     expect(uiStore.getState().graphZoomPreset).toBe('bass')
-    await user.click(screen.getByRole('button', { name: 'Bass' }))
+    await user.click(within(toolbar).getByRole('button', { name: 'Bass' }))
     expect(uiStore.getState().graphZoomPreset).toBe('full')
   })
 
