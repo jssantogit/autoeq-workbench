@@ -48,7 +48,7 @@ export function parseEqualizerApoFilters(text: string): FilterDefinition[] {
   for (const [index, sourceLine] of text.split(/\r\n?|\n/).entries()) {
     const line = sourceLine.trim()
 
-    if (!/^Filter(?:\b|(?=\d))/i.test(line)) {
+    if (!/^Filter\s*(?:\d+\s*)?:/i.test(line)) {
       continue
     }
 
