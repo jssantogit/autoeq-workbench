@@ -20,12 +20,14 @@ describe('downloadTextFile', () => {
     vi.stubGlobal('fetch', fetchMock)
     vi.stubGlobal('XMLHttpRequest', xhrMock)
 
-    let clickedAnchor: HTMLAnchorElement | undefined
+    let clickedDownload: string | undefined
+    let clickedHref: string | undefined
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
       this: HTMLAnchorElement,
     ) {
       expect(this.isConnected).toBe(true)
-      clickedAnchor = this
+      clickedDownload = this.download
+      clickedHref = this.href
     })
 
     downloadTextFile('filters.txt', 'Preamp: -4.2 dB', document, {
@@ -38,9 +40,8 @@ describe('downloadTextFile', () => {
     expect(blob).toBeInstanceOf(Blob)
     expect(blob.type).toBe('text/plain;charset=utf-8')
     expect(await blob.text()).toBe('Preamp: -4.2 dB')
-    expect(clickedAnchor?.download).toBe('filters.txt')
-    expect(clickedAnchor?.href).toBe('blob:test-download')
-    expect(clickedAnchor?.isConnected).toBe(false)
+    expect(clickedDownload).toBe('filters.txt')
+    expect(clickedHref).toBe('blob:test-download')
     expect(document.querySelector('a')).toBeNull()
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:test-download')
     expect(fetchMock).not.toHaveBeenCalled()
