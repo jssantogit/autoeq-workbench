@@ -18,6 +18,11 @@ export { biquadCoefficients } from './dsp/biquad.js'
 export type { BiquadCoefficients } from './dsp/biquad.js'
 export { cascadeMagnitudeDb } from './dsp/cascade.js'
 export { biquadMagnitudeDb } from './dsp/response.js'
+export {
+  formatEqualizerApoFilters,
+  parseEqualizerApoFilters,
+} from './io/equalizerApo.js'
+export type { FilterDefinition } from './io/equalizerApo.js'
 export { parseCurveText } from './io/parseCurve.js'
 export type { ParseCurveOptions } from './io/parseCurve.js'
 export { calculateErrorMetrics } from './metrics/errorMetrics.js'

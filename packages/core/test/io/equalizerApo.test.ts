@@ -1,0 +1,158 @@
+import { describe, expect, expectTypeOf, it } from 'vitest'
+
+import {
+  CoreError,
+  formatEqualizerApoFilters,
+  parseEqualizerApoFilters,
+  type Filter,
+  type FilterDefinition,
+} from '../../src/index.js'
+
+function expectCoreError(
+  operation: () => unknown,
+  category: 'parse' | 'validation' | 'export',
+  message: RegExp,
+) {
+  try {
+    operation()
+    throw new Error('Expected operation to throw')
+  } catch (error) {
+    expect(error).toBeInstanceOf(CoreError)
+    expect(error).toMatchObject({ category, name: 'CoreError' })
+    expect(error).toHaveProperty('message', expect.stringMatching(message))
+  }
+}
+
+describe('parseEqualizerApoFilters', () => {
+  it('exports filter definitions without runtime ids', () => {
+    expectTypeOf<FilterDefinition>().toEqualTypeOf<Omit<Filter, 'id'>>()
+  })
+
+  it('parses enabled and disabled Equalizer APO filters in source order', () => {
+    expect(
+      parseEqualizerApoFilters(
+        [
+          'Filter 1: ON PK Fc 1000 Hz Gain 2.5 dB Q 1.200',
+          'Filter 2: OFF LSC Fc 105 Hz Gain -2.5 dB Q 0.700',
+          'Filter 3: ON HSC Fc 10000 Hz Gain 1.5 dB Q 0.800',
+        ].join('\r\n'),
+      ),
+    ).toEqual([
+      { enabled: true, type: 'PK', frequencyHz: 1000, gainDb: 2.5, q: 1.2 },
+      { enabled: false, type: 'LS', frequencyHz: 105, gainDb: -2.5, q: 0.7 },
+      { enabled: true, type: 'HS', frequencyHz: 10000, gainDb: 1.5, q: 0.8 },
+    ])
+  })
+
+  it.each([
+    ['LS', 'LS'],
+    ['LSQ', 'LS'],
+    ['LSC', 'LS'],
+    ['HS', 'HS'],
+    ['HSQ', 'HS'],
+    ['HSC', 'HS'],
+  ] as const)('maps the %s shelf label to %s', (label, type) => {
+    expect(
+      parseEqualizerApoFilters(`Filter 1: ON ${label} Fc 100 Hz Gain 1 dB Q 0.9`),
+    ).toEqual([{ enabled: true, type, frequencyHz: 100, gainDb: 1, q: 0.9 }])
+  })
+
+  it.each(['LS', 'HS'])('defaults omitted %s Q to 0.707', (type) => {
+    expect(parseEqualizerApoFilters(`Filter 1: ON ${type} Fc 100 Hz Gain 1 dB`)).toEqual([
+      { enabled: true, type, frequencyHz: 100, gainDb: 1, q: 0.707 },
+    ])
+  })
+
+  it('ignores blank, preamp, comment, and unrelated lines', () => {
+    const text = [
+      'Preamp: -2.4 dB',
+      '# Equalizer APO comment',
+      '; another comment',
+      '// imported note',
+      'Include: other.txt',
+      '',
+      'Filter 1: ON PK Fc 1000 Hz Gain 1 dB Q 1',
+    ].join('\n')
+
+    expect(parseEqualizerApoFilters(text)).toHaveLength(1)
+  })
+
+  it.each([
+    ['missing PK Q', 'Filter 1: ON PK Fc 1000 Hz Gain 1 dB'],
+    ['unsupported state', 'Filter 1: MAYBE PK Fc 1000 Hz Gain 1 dB Q 1'],
+    ['unsupported type', 'Filter 1: ON LP Fc 1000 Hz Gain 1 dB Q 1'],
+    ['malformed recognized line', 'Filter 1: ON PK 1000 Hz Gain 1 dB Q 1'],
+    ['missing filter number', 'Filter: ON PK Fc 1000 Hz Gain 1 dB Q 1'],
+    ['trailing tokens', 'Filter 1: ON PK Fc 1000 Hz Gain 1 dB Q 1 extra'],
+  ])('rejects %s instead of silently ignoring it', (_name, text) => {
+    expectCoreError(() => parseEqualizerApoFilters(text), 'parse', /filter|unsupported|Q/i)
+  })
+
+  it.each([
+    ['frequency below minimum', 'Filter 1: ON PK Fc 19 Hz Gain 0 dB Q 1', /frequency/i],
+    ['frequency above maximum', 'Filter 1: ON PK Fc 20001 Hz Gain 0 dB Q 1', /frequency/i],
+    ['gain below minimum', 'Filter 1: ON PK Fc 1000 Hz Gain -15.1 dB Q 1', /gain/i],
+    ['gain above maximum', 'Filter 1: ON PK Fc 1000 Hz Gain 15.1 dB Q 1', /gain/i],
+    ['Q below minimum', 'Filter 1: ON PK Fc 1000 Hz Gain 0 dB Q 0.09', /Q/i],
+    ['Q above maximum', 'Filter 1: ON PK Fc 1000 Hz Gain 0 dB Q 12.1', /Q/i],
+    ['non-finite frequency', 'Filter 1: ON PK Fc Infinity Hz Gain 0 dB Q 1', /finite/i],
+    ['non-finite gain', 'Filter 1: ON PK Fc 1000 Hz Gain NaN dB Q 1', /finite/i],
+    ['non-finite Q', 'Filter 1: ON PK Fc 1000 Hz Gain 0 dB Q Infinity', /finite/i],
+  ])('rejects %s', (_name, text, message) => {
+    expectCoreError(() => parseEqualizerApoFilters(text), 'validation', message)
+  })
+
+  it('accepts the inclusive Workbench bounds', () => {
+    expect(
+      parseEqualizerApoFilters(
+        'Filter 1: ON PK Fc 20 Hz Gain -15 dB Q 0.1\n' +
+          'Filter 2: ON PK Fc 20000 Hz Gain 15 dB Q 12',
+      ),
+    ).toHaveLength(2)
+  })
+
+  it('rejects more than 64 recognized filters', () => {
+    const text = Array.from(
+      { length: 65 },
+      (_, index) => `Filter ${index + 1}: ON PK Fc 1000 Hz Gain 0 dB Q 1`,
+    ).join('\n')
+
+    expectCoreError(() => parseEqualizerApoFilters(text), 'validation', /64|filter/i)
+  })
+
+  it('rejects input with no recognized filters', () => {
+    expectCoreError(
+      () => parseEqualizerApoFilters('Preamp: -2.4 dB\n# no filters'),
+      'parse',
+      /no.*filter/i,
+    )
+  })
+})
+
+describe('formatEqualizerApoFilters', () => {
+  it('formats current filters in order with exact source conventions and CRLF', () => {
+    const filters: Filter[] = [
+      { id: 'peak', enabled: true, type: 'PK', frequencyHz: 1000, gainDb: 1, q: 1 },
+      { id: 'low', enabled: false, type: 'LS', frequencyHz: 105, gainDb: -2.5, q: 0.7 },
+      { id: 'high', enabled: true, type: 'HS', frequencyHz: 10000, gainDb: 1.5, q: 0.7 },
+    ]
+
+    expect(formatEqualizerApoFilters(filters, -2.34)).toBe(
+      'Preamp: -2.3 dB\r\n' +
+        'Filter 1: ON PK Fc 1000 Hz Gain 1.0 dB Q 1.000\r\n' +
+        'Filter 2: OFF LSC Fc 105 Hz Gain -2.5 dB Q 0.700\r\n' +
+        'Filter 3: ON HSC Fc 10000 Hz Gain 1.5 dB Q 0.700',
+    )
+  })
+
+  it.each([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
+    'rejects non-finite preamp %s',
+    (preampDb) => {
+      expectCoreError(
+        () => formatEqualizerApoFilters([], preampDb),
+        'export',
+        /preamp.*finite/i,
+      )
+    },
+  )
+})
