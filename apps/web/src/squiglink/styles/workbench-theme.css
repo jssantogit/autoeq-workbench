@@ -8,6 +8,7 @@
   --wb-border: #d7d0c4;
   --wb-accent: #ffa03a;
   --wb-accent-hover: #e98a27;
+  --wb-accent-text: #2b1807;
   --wb-copper: #9a642b;
 }
 
@@ -20,6 +21,7 @@
   --wb-border: #293237;
   --wb-accent: #ffa03a;
   --wb-accent-hover: #e98a27;
+  --wb-accent-text: #2b1807;
   --wb-copper: #9a642b;
 }
 
@@ -31,17 +33,23 @@
 .graphBox { border-color: var(--wb-border); }
 .tools-panel { color: var(--wb-text); background: var(--wb-surface); }
 .tools-section > h3 { color: var(--wb-text-muted); }
+
 .manageTable tr { border-color: var(--wb-border); background: var(--wb-surface-muted); }
 .manageTable tr.selected { background: var(--wb-surface); }
-.manageTable button { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
+.manageTable button,
+.curve-row-visibility,
+.curve-import__trigger,
+.curve-import__chooser button { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
 .manageTable button:hover,
-.manageTable button[aria-pressed='true'] { border-color: var(--wb-accent-hover); color: var(--wb-text); }
-.manageTable button[aria-pressed='true'] { background: var(--wb-surface-muted); }
+.curve-import__trigger:hover,
+.curve-import__chooser button:hover { border-color: var(--wb-accent-hover); color: var(--wb-text); }
+.manageTable button[aria-pressed='true'] { border-color: var(--wb-accent); color: var(--wb-accent-text); background: var(--wb-accent); }
 .manageTable td.remove button { color: var(--color-danger); }
-.curve-row-rename input,
-.curve-row-color { border-color: var(--wb-border); color: var(--wb-text); background: var(--color-input); }
-.manageTable td.hideButton input { accent-color: var(--wb-accent-hover); }
+.curve-row-rename input { border-color: var(--wb-border); color: var(--wb-text); background: var(--color-input); }
+.curve-row-color { background: transparent; }
+.curve-row-visibility:has(input:checked) { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
 .curve-manager-empty td { color: var(--wb-text-muted); }
+
 .graph-toolbar { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-bg); }
 .graph-toolbar .zoom,
 .graph-toolbar .normalize,
@@ -52,7 +60,7 @@
 .graph-toolbar .smooth .number-field { color: var(--wb-text-muted); }
 .graph-toolbar button:not(.theme-toggle) { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
 .graph-toolbar button:not(.theme-toggle):hover { border-color: var(--wb-accent-hover); color: var(--wb-text); }
-.graph-toolbar button[aria-pressed='true'] { border-color: var(--wb-accent-hover); color: var(--wb-text); background: var(--wb-surface-muted); box-shadow: inset 0 -2px var(--wb-accent); }
+.graph-toolbar button[aria-pressed='true'] { border-color: var(--wb-accent); color: var(--wb-accent-text); background: var(--wb-accent); box-shadow: none; }
 
 @media (max-width: 1000px) {
   .parts-secondary { border-color: var(--wb-border); }
