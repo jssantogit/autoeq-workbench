@@ -23,6 +23,8 @@ export {
   parseEqualizerApoFilters,
 } from './io/equalizerApo.js'
 export type { FilterDefinition } from './io/equalizerApo.js'
+export { createGraphicEq, formatGraphicEq } from './io/graphicEq.js'
+export type { GraphicEqPoint } from './io/graphicEq.js'
 export { parseCurveText } from './io/parseCurve.js'
 export type { ParseCurveOptions } from './io/parseCurve.js'
 export { calculateErrorMetrics } from './metrics/errorMetrics.js'
