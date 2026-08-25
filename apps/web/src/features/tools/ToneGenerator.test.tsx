@@ -56,14 +56,18 @@ describe('ToneGenerator', () => {
   it('plays and stops a sine tone from explicit controls, stopping file playback first', async () => {
     const user = userEvent.setup()
     const engine = mockEngine()
-    render(<ToneGenerator engine={engine} state={{ ...toneState, source: 'file', isPlaying: true }} />)
+    const { rerender } = render(
+      <ToneGenerator engine={engine} state={{ ...toneState, source: 'file', isPlaying: true }} />,
+    )
 
     expect(screen.getByText('Sine wave')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Stop tone' })).toBeDisabled()
     await user.click(screen.getByRole('button', { name: 'Play tone' }))
     expect(engine.stop).toHaveBeenCalledOnce()
     expect(engine.setSource).toHaveBeenCalledWith('tone')
     expect(engine.play).toHaveBeenCalledOnce()
 
+    rerender(<ToneGenerator engine={engine} state={{ ...toneState, source: 'tone', isPlaying: true }} />)
     await user.click(screen.getByRole('button', { name: 'Stop tone' }))
     expect(engine.stop).toHaveBeenCalledTimes(2)
   })
