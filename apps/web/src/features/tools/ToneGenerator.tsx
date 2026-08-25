@@ -30,6 +30,10 @@ export function ToneGenerator({ engine, state }: ToneGeneratorProps) {
     }
   }
 
+  function stopTone(): void {
+    if (state.source === 'tone' && state.isPlaying) engine.stop()
+  }
+
   return (
     <section className="sound-tools__source" aria-labelledby="tone-generator-heading">
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
@@ -90,7 +94,13 @@ export function ToneGenerator({ engine, state }: ToneGeneratorProps) {
           <button className="button" type="button" aria-label="Play tone" onClick={() => void playTone()}>
             Play
           </button>
-          <button className="button" type="button" aria-label="Stop tone" onClick={() => engine.stop()}>
+          <button
+            className="button"
+            type="button"
+            aria-label="Stop tone"
+            disabled={state.source !== 'tone' || !state.isPlaying}
+            onClick={stopTone}
+          >
             Stop
           </button>
         </div>
