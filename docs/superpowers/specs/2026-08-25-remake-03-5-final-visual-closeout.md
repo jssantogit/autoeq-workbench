@@ -1,9 +1,11 @@
 # Remake 03.5 — Final Visual Closeout Spec
 
-Status: approved for implementation
+Status: implemented; pending final visual acceptance
 Branch: `remake/squiglink-base`
 
 This spec is the source of truth for the final Remake 03.5 pass. Where it conflicts with earlier 03.5 notes about Curves composition, this document wins. The architectural/DSP contracts in the Squiglink source-first remake design still win for everything not explicitly changed here.
+
+Post-implementation decision: the final Curve Manager intentionally uses source-shaped direct table cells with responsive wrapping, rather than the earlier prescribed two-line component wrapper. That direct-cell composition is now the approved implementation direction and supersedes the previous `[remove][name] / [rename][hide][color]` prescription.
 
 ## 1. Scope and constraints
 
@@ -27,11 +29,11 @@ Do not modify `vendor/squiglink/**`.
 Do not port Squiglink legacy AutoEQ.
 Do not start Remake 04.
 
-Before implementation, synchronize `remake/squiglink-base` with the remote and verify a clean worktree.
+Before implementation work, synchronize `remake/squiglink-base` with the remote and verify a clean worktree.
 
 ## 2. Curves empty state
 
-The current empty state must match the compact upstream behavior rather than disappearing entirely or expanding vertically.
+The empty state must match the compact upstream behavior rather than disappearing entirely or expanding vertically.
 
 Requirements:
 
@@ -48,8 +50,6 @@ Do not reintroduce the previous expanding `curve-manager-empty` row.
 
 The graph label list must not add a visual sample, dash, gap, or special horizontal offset before Target names.
 
-Current behavior to remove: the Target label receives a small dashed sample and a different X offset.
-
 Requirements:
 
 - FR, Target and FR EQ labels all start at the same X position;
@@ -63,7 +63,7 @@ Tests must cover both text and SVG structure/alignment.
 
 ## 4. Normalize dB / Hz visual parity
 
-Port the Normalize control composition from Squiglink more literally.
+The Normalize control composition follows Squiglink visually.
 
 Visual order:
 
@@ -79,11 +79,11 @@ Important semantic constraint: do not port Squiglink `norm_sel` behavior. Workbe
 
 ## 5. Derived FR EQ in the Curves tab
 
-The graph already derives exactly one FR EQ from `activeFrId` when filters exist. The Curves manager must expose that same derived series.
+The graph derives exactly one FR EQ from `activeFrId` when the workspace has filters. The Curves manager must expose that same derived series.
 
 Requirements:
 
-- if `derived.frEq` exists, show one row named `<active FR name> EQ`;
+- if `derived.frEq` exists and the workspace has filters, show one row named `<active FR name> EQ`;
 - place it immediately after its source active FR;
 - never persist it into `workspaceStore.curves`;
 - never duplicate raw samples or create a fake imported Curve;
@@ -93,62 +93,68 @@ Requirements:
 - renaming the source FR automatically updates the EQ name;
 - graph contract remains exactly one derived FR EQ.
 
-The derived row may have its own UI appearance state for visibility/color, but must not become domain state. Use a stable derived appearance identifier rather than sharing all appearance state with the source FR.
+The derived row has its own UI appearance state for visibility/color, but does not become domain state. Use a stable derived appearance identifier rather than sharing visibility/color state with the source FR.
 
-The derived EQ cannot be independently renamed or removed. Preserve the two-line row geometry by reserving the corresponding control space or using non-interactive treatment where appropriate.
+The derived EQ cannot be independently renamed or removed. In the source-shaped row, keep the direct-cell alignment by using non-interactive placeholders for controls that do not semantically apply.
 
 ## 6. Curve Manager row composition
 
-The previous single-line source-shaped row made imported names too hard to read. This spec deliberately changes the Curves manager to a two-line composition while preserving the table/tbody/tr/td foundation and Squiglink-like density/tokens.
+The final approved implementation uses direct `table > tbody > tr > td` cells shaped after Squiglink rather than a custom wrapper component.
 
-Each imported curve item has two visual lines.
+The row structure is source-derived and currently consists of direct cells equivalent to:
 
-### Line 1 — identity
+- curve color/swatch;
+- curve name/inline rename;
+- display offset;
+- baseline;
+- hide/show;
+- remove.
 
-Composition:
-
-`[ remove ] [ curve name ]`
-
-Requirements:
-
-- compact source-like remove button;
-- do not display an FR/Target badge or label;
-- the name is the dominant element and receives the remaining width;
-- long names should remain readable and only ellipsize when genuinely necessary;
-- do not squeeze the name between multiple permanent controls.
-
-For the derived FR EQ row, keep the same alignment but do not expose an independent remove action.
-
-### Line 2 — appearance actions
-
-Composition:
-
-`[ Rename ] [ Hide/Show ] [ Color ]`
+This direct-cell structure is intentional and supersedes the earlier requirement that every row be implemented as two explicit wrapper lines.
 
 Requirements:
 
-- controls must be compact and touch-friendly;
-- rename acts only on imported FR/Target curves;
-- hide/show acts independently on FR, Target and derived FR EQ;
+- preserve `table.manageTable > tbody.curves > tr > td` as the composition foundation;
+- keep the curve name visually dominant and give it the available width;
+- do not display an `FR` / `Target` kind badge;
+- imported FR and Target names are renamed by interacting with the name itself; no separate permanent Rename button is required;
+- Enter commits inline rename and Escape cancels it;
 - FR color is editable;
-- FR EQ color is editable independently from its source FR;
-- Target remains contractually gray/dashed, so its color position is a fixed/non-interactive gray swatch rather than an arbitrary recolor control;
-- derived FR EQ has no independent rename.
+- Target uses a fixed gray, non-interactive swatch and remains gray/dashed in the graph;
+- hide/show remains available;
+- baseline remains available;
+- display offset remains available and display-only;
+- remove remains available for imported curves;
+- derived FR EQ has independent hide/show and color, but no independent rename, baseline, offset or remove action where those controls do not semantically apply.
 
-Do not restore a visible `FR` / `Target` kind badge merely to select active curves. Active FR/Target selection already exists in the Equalizer controls. Any retained manager selection behavior must not reduce name visibility.
+### Responsive behavior
+
+At narrower widths, the direct cells may wrap into multiple visual bands while remaining one semantic table row.
+
+Approved responsive behavior:
+
+- swatch and curve name form the identity area at the top of the wrapped row;
+- the name retains the remaining width and ellipsizes only when necessary;
+- display offset, baseline, hide/show and remove reorganize below as space requires;
+- the color swatch remains visually aligned with the curve name;
+- do not introduce a separate custom row wrapper solely to force two-line markup;
+- do not reintroduce a visible kind badge or another control that steals width from the name.
+
+Source-shaped direct cells plus responsive CSS are the final composition contract.
 
 ## 7. Baseline and display offset
 
-Do not lose baseline or display-offset functionality.
+Baseline and display offset are retained directly in the source-shaped row rather than being hidden behind an advanced disclosure.
 
-They do not need to remain permanently visible in the two primary lines. A compact secondary disclosure/popover/advanced control is acceptable, provided:
+Requirements:
 
 - baseline still works;
 - display offset remains display-only;
 - raw imported samples remain immutable;
-- no permanent third line is added to every row.
+- display offset may visually move both a source FR and its derived FR EQ according to the existing display-transform contract without modifying raw data;
+- responsive wrapping may reposition these cells, but must not remove their functionality.
 
-Use the smallest coherent solution.
+Do not move these concerns into DSP/domain state.
 
 ## 8. Graph contract
 
@@ -162,25 +168,32 @@ Never show isolated filter response, selected-filter vertical markers, isolated 
 
 Target remains gray dashed. FRs use semantic colors. FR EQ uses a distinct color and the name `<FR name> EQ`.
 
+The graph axis presentation remains aligned with Squiglink: logarithmic frequency spacing, source-like frequency ticks/labels, source-like dB axis placement, and no special visual emphasis for the 0 dB horizontal grid line.
+
 ## 9. Tests and acceptance
 
-Add or update tests for:
+Maintain or add tests for:
 
 - compact empty Curves state;
 - Import immediately after the manager rather than at viewport bottom;
 - absence of Target label sample/decorator and equal label X alignment for FR/Target/FR EQ;
+- preservation of legitimate spaces inside imported names;
+- source-like logarithmic Hz tick layout and dB axis treatment;
+- no special 0 dB grid emphasis;
 - Normalize DOM/visual composition as unit then input for both dB and Hz;
 - normalization semantics remaining simultaneous `targetDb` + `anchorHz`;
 - derived FR EQ appearing in Curves only when valid;
 - exactly one derived FR EQ, immediately after active source FR;
 - derived EQ not entering `workspaceStore.curves`;
 - source rename updating derived EQ name;
-- two-line manager composition;
+- source-shaped direct-cell manager structure;
+- responsive wrapping without sacrificing name visibility;
 - no visible FR/Target badge;
 - imported remove/rename/hide/color actions;
 - independent FR EQ hide/color without independent remove/rename;
 - Target fixed gray appearance;
-- baseline and display offset regressions.
+- baseline and display offset regressions;
+- raw imported samples remaining unchanged by display-only controls.
 
 Revalidate existing functionality and run the full project checks:
 
@@ -199,9 +212,13 @@ Remake 03.5 is not complete until:
 - repository was synchronized before edits;
 - empty manager is compact and source-like;
 - no label sample/dash/spacing artifact remains for Target, FR or FR EQ;
+- Hz/dB axes visually follow the Squiglink source presentation;
+- 0 dB has no special grid emphasis;
 - Normalize visually matches Squiglink's `[unit][value]` composition without changing Core semantics;
 - derived FR EQ appears correctly in Curves and remains derived-only;
-- Curve Manager uses the approved two-line composition with readable names;
+- Curve Manager uses the approved source-shaped direct-cell composition;
+- curve names remain readable and swatches stay aligned with names across responsive layouts;
+- no visible FR/Target kind badge is reintroduced;
 - Target remains gray dashed;
 - baseline/display offset and all existing functionality remain intact;
 - tests, typecheck, build and lint pass;
