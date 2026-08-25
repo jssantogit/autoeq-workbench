@@ -4,6 +4,7 @@ import {
   type AutoEqSettings,
   type Curve,
   type Filter,
+  type FilterDefinition,
 } from '@autoeq-workbench/core'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createWorkspaceStore, defaultNormalization, deriveWorkspace } from './workspaceStore'
@@ -255,6 +256,135 @@ describe('workspace history and filters', () => {
 
     expect(store.getState().filters).toEqual([filter])
     expect(store.getState().selectedFilterId).toBe(filter.id)
+  })
+
+  it('sorts filters stably in one history step without changing solution metadata or selection', () => {
+    const store = createWorkspaceStore()
+    const filters: Filter[] = [
+      { ...filter, id: 'high', frequencyHz: 2_000 },
+      { ...filter, id: 'low-first', frequencyHz: 100 },
+      { ...filter, id: 'low-second', frequencyHz: 100 },
+      { ...filter, id: 'middle', frequencyHz: 1_000 },
+    ]
+    store.getState().setFilters(filters, 'autoeq')
+    store.getState().updateFilter('middle', { gainDb: 4 })
+    store.getState().selectFilter('low-second')
+    const beforeSort = store.getState()
+
+    store.getState().sortFiltersByFrequency()
+
+    expect(store.getState().filters.map(({ id }) => id)).toEqual([
+      'low-first',
+      'low-second',
+      'middle',
+      'high',
+    ])
+    expect(store.getState()).toMatchObject({
+      filterProvenance: 'autoeq',
+      solutionState: 'modified',
+      selectedFilterId: 'low-second',
+    })
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      filters: beforeSort.filters,
+      filterProvenance: beforeSort.filterProvenance,
+      solutionState: beforeSort.solutionState,
+      selectedFilterId: beforeSort.selectedFilterId,
+    })
+    store.getState().undo()
+    expect(store.getState().filters.find(({ id }) => id === 'middle')?.gainDb).toBe(3)
+    store.getState().redo()
+    store.getState().redo()
+    expect(store.getState().filters.map(({ id }) => id)).toEqual([
+      'low-first',
+      'low-second',
+      'middle',
+      'high',
+    ])
+  })
+
+  it('does not record history when filters are already frequency-sorted', () => {
+    const store = createWorkspaceStore()
+    const sorted = [
+      { ...filter, id: 'low', frequencyHz: 100 },
+      { ...filter, id: 'high', frequencyHz: 2_000 },
+    ]
+    store.getState().setFilters(sorted, 'manual')
+    const beforeSort = store.getState()
+
+    store.getState().sortFiltersByFrequency()
+
+    expect(store.getState()).toBe(beforeSort)
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([])
+  })
+
+  it('atomically imports filter definitions with fresh IDs in one history step', () => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'autoeq')
+    store.getState().updateFilter(filter.id, { gainDb: 4 })
+    store.getState().selectFilter(filter.id)
+    const beforeImport = store.getState()
+    const imported: FilterDefinition[] = [
+      { enabled: false, type: 'LS', frequencyHz: 105, gainDb: -2.5, q: 0.7 },
+      { enabled: true, type: 'PK', frequencyHz: 2_500, gainDb: 6, q: 3.25 },
+    ]
+
+    store.getState().replaceFiltersFromImport(imported)
+
+    const afterImport = store.getState()
+    expect(afterImport.filters.map(({ id: _id, ...definition }) => definition)).toEqual(imported)
+    expect(new Set(afterImport.filters.map(({ id }) => id)).size).toBe(imported.length)
+    expect(afterImport.filters.every(({ id }) => id.startsWith('filter-'))).toBe(true)
+    expect(afterImport.filters.some(({ id }) => id === filter.id)).toBe(false)
+    expect(afterImport).toMatchObject({
+      filterProvenance: 'manual',
+      solutionState: 'clean',
+      selectedFilterId: null,
+    })
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      filters: beforeImport.filters,
+      filterProvenance: beforeImport.filterProvenance,
+      solutionState: beforeImport.solutionState,
+      selectedFilterId: beforeImport.selectedFilterId,
+    })
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([filter])
+    store.getState().redo()
+    store.getState().redo()
+    expect(store.getState()).toMatchObject({
+      filters: afterImport.filters,
+      filterProvenance: 'manual',
+      solutionState: 'clean',
+      selectedFilterId: null,
+    })
+  })
+
+  it.each([
+    ['an invalid definition', [{ enabled: true, type: 'PK', frequencyHz: 0, gainDb: 0, q: 1 }]],
+    [
+      'more than 64 definitions',
+      Array.from({ length: 65 }, () => ({
+        enabled: true,
+        type: 'PK' as const,
+        frequencyHz: 1_000,
+        gainDb: 0,
+        q: 1,
+      })),
+    ],
+  ] satisfies [string, FilterDefinition[]][])('rejects %s without changing state or history', (_label, imported) => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'manual')
+    const beforeImport = store.getState()
+
+    store.getState().replaceFiltersFromImport(imported)
+
+    expect(store.getState()).toBe(beforeImport)
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([])
   })
 
   it('rejects invalid normalization and DSP edits', () => {

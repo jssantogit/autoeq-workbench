@@ -16,6 +16,7 @@ import {
   type CurveKind,
   type ErrorMetrics,
   type Filter,
+  type FilterDefinition,
   type FilterType,
   type Normalization,
   type PreampResult,
@@ -56,6 +57,8 @@ export interface WorkspaceState {
   toggleFilter: (id: string) => void
   updateFilter: (id: string, updates: Partial<Omit<Filter, 'id'>>) => void
   reorderFilter: (id: string, direction: 'up' | 'down') => void
+  sortFiltersByFrequency: () => void
+  replaceFiltersFromImport: (filters: readonly FilterDefinition[]) => void
   canUndo: boolean
   canRedo: boolean
   undo: () => void
@@ -400,6 +403,51 @@ export function createWorkspaceStore() {
           filters,
           solutionState: afterManualEdit(state),
           filterProvenance: manualProvenance(state),
+        })
+      }),
+    sortFiltersByFrequency: () =>
+      set((state) => {
+        if (state.filters.every((filter, index) =>
+          index === 0 || state.filters[index - 1]!.frequencyHz <= filter.frequencyHz,
+        )) return state
+        return record(state, {
+          filters: [...state.filters].sort((left, right) => left.frequencyHz - right.frequencyHz),
+        })
+      }),
+    replaceFiltersFromImport: (filters) =>
+      set((state) => {
+        if (
+          filters.length > AUTOEQ_PRODUCT_LIMITS.hardMaxFilters ||
+          !filters.every((filter) =>
+            validFilter({
+              id: 'import-validation',
+              enabled: filter.enabled,
+              type: filter.type,
+              frequencyHz: filter.frequencyHz,
+              gainDb: filter.gainDb,
+              q: filter.q,
+            }),
+          )
+        ) return state
+
+        const reservedFilters = [...state.filters]
+        const importedFilters = filters.map((filter) => {
+          const imported: Filter = {
+            id: uniqueFilterId(reservedFilters),
+            enabled: filter.enabled,
+            type: filter.type,
+            frequencyHz: filter.frequencyHz,
+            gainDb: filter.gainDb,
+            q: filter.q,
+          }
+          reservedFilters.push(imported)
+          return imported
+        })
+        return record(state, {
+          filters: importedFilters,
+          selectedFilterId: null,
+          filterProvenance: 'manual',
+          solutionState: 'clean',
         })
       }),
     undo: () =>
