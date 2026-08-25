@@ -1,47 +1,45 @@
-import type { Filter, FilterType } from '@autoeq-workbench/core'
-import { useState } from 'react'
+import {
+  AUTOEQ_PRODUCT_LIMITS,
+  MVP_NUMERIC_POLICY,
+  type Filter,
+} from '@autoeq-workbench/core'
 import { NumberField } from '../../components/ui/NumberField'
+import { fromSquiglinkFilterType, toSquiglinkFilterType, type SquiglinkFilterType } from '../../squiglink/eq-io/filterTypeAdapter'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 
 interface FilterRowProps {
   filter: Filter
   index: number
-  count: number
   selected: boolean
 }
 
-export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
-  const [menuOpen, setMenuOpen] = useState(false)
+export function FilterRow({ filter, index, selected }: FilterRowProps) {
   const updateFilter = useWorkspaceStore((state) => state.updateFilter)
   const toggleFilter = useWorkspaceStore((state) => state.toggleFilter)
-  const duplicateFilter = useWorkspaceStore((state) => state.duplicateFilter)
-  const removeFilter = useWorkspaceStore((state) => state.removeFilter)
-  const reorderFilter = useWorkspaceStore((state) => state.reorderFilter)
   const selectFilter = useWorkspaceStore((state) => state.selectFilter)
   const rowNumber = index + 1
   const className = [
+    'filter',
     'filter-row',
     selected && 'filter-row--selected',
     !filter.enabled && 'filter-row--disabled',
   ].filter(Boolean).join(' ')
 
-  const handleRowKeyDown = (event: React.KeyboardEvent<HTMLTableRowElement>) => {
+  const handleRowKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return
     event.preventDefault()
     selectFilter(filter.id)
   }
 
-  const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
+  const handleRowClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target
-    if (
-      target instanceof Element &&
-      target.closest('button, input, select, textarea, summary, [role="button"]') !== null
-    ) return
+    if (target instanceof Element && target.closest('button, input, select, textarea') !== null) return
     selectFilter(filter.id)
   }
 
   return (
-    <tr
+    <div
+      role="row"
       className={className}
       aria-label={`Filter ${rowNumber}`}
       aria-selected={selected}
@@ -51,102 +49,63 @@ export function FilterRow({ filter, index, count, selected }: FilterRowProps) {
       onClick={handleRowClick}
       onKeyDown={handleRowKeyDown}
     >
-      <td data-label="ON">
+      <span role="cell" data-label="Type">
         <input
+          name="enabled"
           type="checkbox"
           checked={filter.enabled}
           aria-label={`Enable filter ${rowNumber}`}
           onChange={() => toggleFilter(filter.id)}
         />
-      </td>
-      <td data-label="Type">
         <select
-          value={filter.type}
+          name="type"
+          value={toSquiglinkFilterType(filter.type)}
           aria-label={`Filter ${rowNumber} type`}
-          onChange={(event) => updateFilter(filter.id, { type: event.target.value as FilterType })}
+          onChange={(event) => updateFilter(filter.id, {
+            type: fromSquiglinkFilterType(event.target.value as SquiglinkFilterType),
+          })}
         >
           <option value="PK">PK</option>
-          <option value="LS">LS</option>
-          <option value="HS">HS</option>
+          <option value="LSQ">LSQ</option>
+          <option value="HSQ">HSQ</option>
         </select>
-      </td>
-      <td data-label="Frequency">
+      </span>
+      <span role="cell" data-label="Frequency">
         <NumberField
           label={`Filter ${rowNumber} frequency Hz`}
           unit="Hz"
           value={filter.frequencyHz}
-          min={20}
-          max={20_000}
-          validate={(value) => value >= 20 && value <= 20_000}
+          min={MVP_NUMERIC_POLICY.minFrequencyHz}
+          max={MVP_NUMERIC_POLICY.maxFrequencyHz}
+          validate={(value) =>
+            value >= MVP_NUMERIC_POLICY.minFrequencyHz && value <= MVP_NUMERIC_POLICY.maxFrequencyHz}
           onValueChange={(frequencyHz) => updateFilter(filter.id, { frequencyHz })}
         />
-      </td>
-      <td data-label="Gain">
+      </span>
+      <span role="cell" data-label="Gain">
         <NumberField
           label={`Filter ${rowNumber} gain dB`}
           unit="dB"
           value={filter.gainDb}
-          min={-15}
-          max={15}
+          min={AUTOEQ_PRODUCT_LIMITS.minGainDb}
+          max={AUTOEQ_PRODUCT_LIMITS.maxGainDb}
           step="0.1"
-          validate={(value) => value >= -15 && value <= 15}
+          validate={(value) =>
+            value >= AUTOEQ_PRODUCT_LIMITS.minGainDb && value <= AUTOEQ_PRODUCT_LIMITS.maxGainDb}
           onValueChange={(gainDb) => updateFilter(filter.id, { gainDb })}
         />
-      </td>
-      <td data-label="Q">
+      </span>
+      <span role="cell" data-label="Q">
         <NumberField
           label={`Filter ${rowNumber} Q`}
           value={filter.q}
-          min={0.1}
-          max={12}
+          min={AUTOEQ_PRODUCT_LIMITS.minQ}
+          max={AUTOEQ_PRODUCT_LIMITS.maxQ}
           step="0.1"
-          validate={(value) => value >= 0.1 && value <= 12}
+          validate={(value) => value >= AUTOEQ_PRODUCT_LIMITS.minQ && value <= AUTOEQ_PRODUCT_LIMITS.maxQ}
           onValueChange={(q) => updateFilter(filter.id, { q })}
         />
-      </td>
-      <td className="filter-row__actions">
-        <details
-          className="filter-row__menu"
-          open={menuOpen}
-          onToggle={(event) => setMenuOpen(event.currentTarget.open)}
-        >
-          <summary role="button" aria-label={`Actions for filter ${rowNumber}`}>...</summary>
-          {menuOpen && <div className="filter-row__menu-panel">
-            <button
-              type="button"
-              aria-label={`Move filter ${rowNumber} up`}
-              disabled={index === 0}
-              onClick={() => reorderFilter(filter.id, 'up')}
-            >
-              Move up
-            </button>
-            <button
-              type="button"
-              aria-label={`Move filter ${rowNumber} down`}
-              disabled={index === count - 1}
-              onClick={() => reorderFilter(filter.id, 'down')}
-            >
-              Move down
-            </button>
-            <button
-              type="button"
-              aria-label={`Duplicate filter ${rowNumber}`}
-              disabled={count >= 64}
-              onClick={() => duplicateFilter(filter.id)}
-            >
-              Duplicate
-            </button>
-            <button
-              type="button"
-              className="filter-row__remove"
-              aria-label={`Remove filter ${rowNumber}`}
-              onClick={() => removeFilter(filter.id)}
-            >
-              Remove
-            </button>
-          </div>}
-        </details>
-      </td>
-    </tr>
+      </span>
+    </div>
   )
 }

@@ -162,6 +162,52 @@
 .manageTable td.hideButton input { width: 17px; height: 17px; margin: 0; cursor: pointer; }
 .curve-manager-empty td { height: 70px; text-align: center; }
 
+/* Source-derived Parametric Equalizer composition. */
+.extra-eq { min-width: 0; padding: 8px; }
+.extra-eq > h3 { margin: 0 0 8px; font-size: 0.82rem; }
+.select-eq-phone { display: grid; gap: 6px; margin-bottom: 8px; }
+.select-eq-phone label { display: grid; min-width: 0; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 6px; color: var(--color-text-muted); font-size: 0.68rem; font-weight: 650; }
+.select-eq-phone select { width: 100%; min-width: 0; height: 32px; border: 1px solid var(--color-border); border-radius: 6px; padding: 4px 8px; color: var(--color-text); background: var(--color-input); }
+.select-eq-phone select:disabled { color: var(--color-text-faint); }
+.filters-header,
+.filter { display: grid; grid-template-columns: 25% 29% 25% 21%; }
+.filters-header { gap: 4px; margin: 8px 0; color: var(--color-text-faint); font-size: 0.7rem; line-height: 1; }
+.filters { border-block: 1px solid var(--color-border); }
+.filter { min-width: 0; gap: 4px; border-top: 1px solid var(--color-border); padding: 3px 0; cursor: pointer; font: 0.69rem ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.filter:first-child { border-top: 0; }
+.filter > span { display: flex; min-width: 0; align-items: center; }
+.filter > span:first-child { gap: 3px; }
+.filter input[type='checkbox'] { width: 16px; height: 16px; flex: 0 0 auto; margin: 0; accent-color: var(--color-accent-active); }
+.filter select { width: 100%; min-width: 0; height: 28px; border: 1px solid var(--color-border); border-radius: 5px; color: var(--color-text); background: var(--color-input); font: inherit; }
+.filter .number-field { width: 100%; min-width: 0; }
+.filter .number-field > span:first-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.filter .number-field__control { border-radius: 5px; }
+.filter .number-field input { min-width: 0; height: 26px; padding: 2px 3px; }
+.filter .number-field__unit { padding-inline: 1px 3px; font-size: 0.58rem; }
+.filter-row--selected { background: var(--color-accent-soft); box-shadow: inset 3px 0 var(--color-accent-active); }
+.filter-row--disabled { color: var(--color-text-muted); background-image: linear-gradient(rgb(127 127 127 / 5%), rgb(127 127 127 / 5%)); }
+.filter-row--disabled select,
+.filter-row--disabled .number-field input { color: var(--color-text-muted); }
+.filter-editor__empty { margin: 22px; color: var(--color-text-faint); text-align: center; font-size: 0.75rem; }
+.filters-button { display: flex; flex-wrap: wrap; gap: 4px; }
+.filter-editor__toolbar { margin-top: 6px; }
+.filters-button .button { min-height: 30px; flex: 1 1 auto; border-radius: 6px; padding: 5px 8px; font-size: 0.7rem; }
+.filter-editor__toolbar .add-filter,
+.filter-editor__toolbar .remove-filter { max-width: 32px; font-size: 0.9rem; }
+.filter-editor__count { margin: 5px 0 8px; color: var(--color-text-muted); text-align: right; font-size: 0.68rem; }
+.autoeq-settings { display: grid; gap: 5px; margin-bottom: 8px; border-block: 1px solid var(--color-border); padding: 7px 0; }
+.settings-row { display: grid; min-width: 0; grid-template-columns: 62px repeat(2, minmax(0, 1fr)); align-items: end; gap: 5px; }
+.settings-row > span { align-self: center; color: var(--color-text-muted); font-size: 0.66rem; font-weight: 650; }
+.settings-row .number-field { min-width: 0; grid-template-columns: 28px minmax(0, 1fr); align-items: center; gap: 3px; }
+.settings-row .number-field input { min-width: 0; height: 28px; padding: 3px 5px; }
+.settings-row .number-field__control { min-width: 0; border-radius: 6px; }
+.settings-row--limit .number-field { grid-column: 2; }
+.filters-button--source-actions .autoeq,
+.filters-button--source-actions .autoeq-settings-toggle { flex-basis: calc(50% - 2px); }
+.filters-button--source-actions .import-filters,
+.filters-button--source-actions .export-filters,
+.filters-button--source-actions .export-graphic-filters { flex-basis: 100%; }
+
 @media (max-width: 1000px) {
   .graphtool { height: auto; min-height: 100dvh; overflow: visible; }
   .graphtool > .main { display: block; overflow: visible; }

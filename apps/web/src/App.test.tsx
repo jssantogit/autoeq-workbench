@@ -94,7 +94,7 @@ describe('App', () => {
     expect(within(equalizer).queryByText('20 Hz-20 kHz')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add filter' })).toBeInTheDocument()
     expect(screen.getByText('0 / 64 filters')).toBeVisible()
-    expect(within(equalizer).getByRole('button', { name: 'Auto EQ' })).toBeDisabled()
+    expect(within(equalizer).getByRole('button', { name: 'AutoEQ' })).toBeEnabled()
     await user.click(screen.getByRole('tab', { name: 'Tools' }))
     expect(screen.getByRole('heading', { name: 'Analysis' })).toBeVisible()
     expect(screen.getByRole('heading', { name: 'Metrics' })).toBeVisible()
