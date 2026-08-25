@@ -101,8 +101,13 @@ export function createEqCompareStore() {
         if (newest !== undefined && isCanonicalEqStateEqual(newest, capture)) return state
 
         const timestamp = Date.now()
+        const newestIsAssigned =
+          newest !== undefined &&
+          (state.aSnapshotId === newest.id || state.bSnapshotId === newest.id)
         const shouldCoalesce =
-          newest !== undefined && timestamp - newest.timestamp < RECORD_MIN_GAP_MS
+          newest !== undefined &&
+          !newestIsAssigned &&
+          timestamp - newest.timestamp < RECORD_MIN_GAP_MS
         const snapshot: EqSnapshot = {
           ...copyCapture(capture),
           id: shouldCoalesce ? newest.id : `eq-snapshot-${++nextSnapshotId}`,
