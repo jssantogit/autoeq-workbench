@@ -83,7 +83,7 @@
 }
 
 .graph-toolbar > * { flex: 0 0 auto; }
-.graph-toolbar > .theme-toggle { position: sticky; left: 0; z-index: 2; margin-right: 8px; }
+.graph-toolbar > .theme-toggle { margin-right: 8px; }
 .graph-toolbar .zoom,
 .graph-toolbar .normalize,
 .graph-toolbar .smooth,
@@ -109,58 +109,121 @@
 .tools-panel { min-width: 0; padding: 10px; }
 .tools-section > h3 { margin: 0 0 8px; font-size: 0.84rem; }
 
+/* Source-shaped Curves manager. The table/flex geometry follows style-alt.css. */
 .manage {
-  min-width: 0;
-  overflow-x: auto;
-  padding-block: 8px;
-}
-
-.curve-upload-actions {
   display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  padding: 0 8px 8px;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
 }
-
-.curve-upload-actions .file-control { min-height: 30px; border-radius: 6px; padding: 5px 9px; }
-.curve-upload-actions .field-error { margin-top: 4px; }
 
 .manageTable {
+  display: flex;
   width: 100%;
-  min-width: 390px;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
   border-collapse: collapse;
-  table-layout: fixed;
   font-size: 0.7rem;
 }
 
-.manageTable tr { border-bottom: 1px solid; }
-.manageTable tr.selected { box-shadow: inset 3px 0 var(--wb-accent); }
-.manageTable td { height: 42px; padding: 4px; vertical-align: middle; }
-.manageTable td.remove { width: 30px; text-align: center; }
-.manageTable td.phoneId { width: 48px; }
-.manageTable td.key { width: auto; min-width: 0; }
-.manageTable td.calibrate { width: 112px; }
-.manageTable td.baselineButton { width: 64px; }
-.manageTable td.hideButton { width: 34px; text-align: center; }
-.manageTable button { min-height: 28px; border: 1px solid; border-radius: 5px; padding: 4px 6px; cursor: pointer; font-size: 0.66rem; }
-.manageTable td.remove button { width: 24px; min-height: 24px; padding: 0; }
-.manageTable td.phoneId button { width: 42px; padding-inline: 2px; }
-.manageTable td.baselineButton button { width: 58px; padding-inline: 2px; }
+.manageTable colgroup { display: none; }
+.manageTable tbody.curves { display: flex; width: 100%; min-height: 0; flex: 0 1 auto; flex-direction: column; }
+
+.manageTable tr,
+tbody.curves > tr {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: flex-start;
+  border-top: 1px solid;
+}
+
+.manageTable td,
+tbody.curves > tr > td {
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  flex: 50px 0 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.manageTable td.phoneId { order: 0; flex: 48px 0 0; padding-left: 6px; }
+.manageTable td.key { order: 1; min-width: 0; flex: auto 1 1; justify-content: flex-start; padding-inline: 6px; }
+.manageTable td.calibrate { order: 2; flex: 112px 0 0; justify-content: flex-end; white-space: nowrap; }
+.manageTable td.baselineButton { order: 3; flex: 36px 0 0; margin-left: 6px; }
+.manageTable td.hideButton { order: 4; flex: 36px 0 0; margin-left: 6px; }
+.manageTable td.lastColumn { order: 6; display: none; }
+.manageTable td.remove { order: 7; flex: 36px 0 0; margin: 0 16px 0 6px; text-align: center; }
+
+.manageTable button {
+  box-sizing: border-box;
+  height: 36px;
+  min-height: 36px;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 0 6px;
+  cursor: pointer;
+  font-size: 0.66rem;
+}
+.manageTable td.remove button { width: 36px; padding: 0; font-size: 1rem; }
+.manageTable td.phoneId button { width: 42px; padding-inline: 2px; font-size: 0.6rem; }
+.manageTable td.baselineButton button { width: 36px; padding: 0; font-size: 0.54rem; }
 .manageTable button[aria-pressed='true'] { font-weight: 700; }
-.curve-row-name { display: flex; min-width: 0; align-items: center; gap: 4px; }
-.curve-row-name > span { min-width: 0; flex: 1; overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
-.curve-row-name > button { flex: 0 0 auto; }
-.curve-row-rename { display: grid; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
-.curve-row-rename input { min-width: 0; grid-column: 1 / -1; border: 1px solid; border-radius: 5px; padding: 4px; }
-.curve-row-rename button { min-width: 0; padding-inline: 2px; }
-.manageTable td.calibrate { white-space: nowrap; }
-.curve-row-color { width: 26px; height: 28px; border: 1px solid; border-radius: 5px; padding: 2px; vertical-align: middle; cursor: pointer; }
+
+.curve-row-name { display: flex; width: 100%; min-width: 0; align-items: center; gap: 4px; }
+.curve-row-name__label { min-width: 0; flex: 1 1 auto; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.curve-row-name > button { width: 28px; height: 28px; min-height: 28px; flex: 0 0 auto; border-color: transparent; padding: 0; }
+.curve-row-rename { display: grid; width: 100%; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
+.curve-row-rename input { min-width: 0; grid-column: 1 / -1; height: 28px; border: 1px solid; border-radius: 5px; padding: 4px; }
+.curve-row-rename button { min-width: 0; height: 28px; min-height: 28px; padding-inline: 2px; }
+
+.curve-row-color { width: 20px; height: 20px; flex: 0 0 auto; border: 0; border-radius: 50%; padding: 0; vertical-align: middle; cursor: pointer; }
 .manageTable .number-field { display: inline-flex; width: 76px; margin-left: 4px; vertical-align: middle; }
 .manageTable .number-field > span:first-child { position: absolute; left: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .manageTable .number-field__control { width: 76px; }
-.manageTable .number-field input { min-width: 0; height: 28px; padding: 2px 4px; }
-.manageTable td.hideButton input { width: 17px; height: 17px; margin: 0; cursor: pointer; }
-.curve-manager-empty td { height: 70px; text-align: center; }
+.manageTable .number-field input { min-width: 0; height: 36px; border-radius: 6px; padding: 2px 4px; text-align: center; }
+
+.curve-row-visibility { position: relative; display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid; border-radius: 6px; cursor: pointer; }
+.curve-row-visibility input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.curve-row-visibility > span[aria-hidden='true'] { font-size: 0.92rem; line-height: 1; }
+.curve-row-visibility:has(input:not(:checked)) > span[aria-hidden='true'] { opacity: 0.28; }
+.curve-manager-empty { min-height: 70px; flex: 1 1 auto; }
+.curve-manager-empty td { min-height: 70px; flex: 1 1 auto; padding: 14px 16px; text-align: center; }
+
+.curve-upload-actions {
+  display: flex;
+  width: 100%;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  padding: 16px;
+}
+
+.curve-import { position: relative; display: grid; width: 100%; min-width: 0; gap: 6px; }
+.curve-import__trigger {
+  box-sizing: border-box;
+  width: 100%;
+  height: 36px;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1em;
+  text-align: center;
+}
+.curve-import__chooser { display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.curve-import__chooser button { height: 36px; border: 1px solid; border-radius: 6px; cursor: pointer; font-size: 12px; }
+.curve-import__input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); }
+.curve-upload-actions .field-error { margin: 0; }
 
 /* Source-derived Parametric Equalizer composition. */
 .extra-eq { min-width: 0; padding: 8px; }
@@ -209,12 +272,14 @@
 .filters-button--source-actions .export-graphic-filters { flex-basis: 100%; }
 
 @media (max-width: 1000px) {
-  .graphtool { height: auto; min-height: 100dvh; overflow: visible; }
-  .graphtool > .main { display: block; overflow: visible; }
+  .graphtool { height: 100dvh; min-height: 100dvh; overflow: hidden; }
+  .graphtool > .main { display: flex; min-height: 0; flex-direction: column; overflow: hidden; }
   .parts-primary,
-  .parts-secondary { width: 100%; min-width: 0; overflow: visible; }
-  .parts-primary { order: 1; }
-  .parts-secondary { order: 2; border-top: 1px solid; border-right: 0; }
+  .parts-secondary { width: 100%; min-width: 0; }
+  .parts-primary { order: 1; flex: 0 0 auto; overflow: visible; }
+  .parts-secondary { order: 2; min-height: 0; flex: 1 1 auto; overflow: hidden; border-top: 1px solid; border-right: 0; }
   .graph-sizer { max-width: 100%; }
-  .parts-secondary .workbench-dock { min-height: 0; }
+  .parts-secondary .workbench-dock { height: 100%; min-height: 0; }
+  .manage { height: 100%; min-height: 0; }
+  .manageTable { min-height: 0; flex: 1 1 auto; overflow-y: auto; }
 }
