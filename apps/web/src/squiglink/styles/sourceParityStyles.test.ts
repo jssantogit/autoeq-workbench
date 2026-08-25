@@ -1,23 +1,19 @@
 import { describe, expect, it } from 'vitest'
-import indexCss from '../../index.css?raw'
-import baseCss from './squiglink-base.css?raw'
-import themeCss from './workbench-theme.css?raw'
-
-function describeRaw(label: string, css: string): string {
-  return `${label}: type=${typeof css}; length=${css.length}; head=${JSON.stringify(css.slice(0, 160))}`
-}
+import indexCss from '../../index.css?inline'
+import baseCss from './squiglink-base.css?inline'
+import themeCss from './workbench-theme.css?inline'
 
 function rule(css: string, selectorPattern: RegExp, label: string): string {
   const match = css.match(selectorPattern)
-  expect(match, `${describeRaw(label, css)}; selector rule missing`).not.toBeNull()
+  expect(match, `Missing CSS rule for ${label}`).not.toBeNull()
   return match?.[1] ?? ''
 }
 
 describe('Squiglink source parity styles', () => {
-  it('loads the expected CSS sources as raw text', () => {
-    expect(baseCss, describeRaw('baseCss', baseCss)).toContain('.manageTable')
-    expect(indexCss, describeRaw('indexCss', indexCss)).toContain('.dock-tabs')
-    expect(themeCss, describeRaw('themeCss', themeCss)).toContain('.graph-toolbar')
+  it('loads the expected CSS sources as inline text', () => {
+    expect(baseCss).toContain('.manageTable')
+    expect(indexCss).toContain('.dock-tabs')
+    expect(themeCss).toContain('.graph-toolbar')
   })
 
   it('keeps the toolbar theme toggle in normal horizontal scroll flow', () => {
