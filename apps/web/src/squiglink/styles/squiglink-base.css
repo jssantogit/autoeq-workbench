@@ -313,8 +313,7 @@ tbody.curves > tr > td.levels { order: 2; flex: 0 0 86px; padding-left: 16px; }
 
 @media (max-width: 1200px) {
   tbody.curves > tr { flex-wrap: wrap; }
-  tbody.curves > tr > td.curve-color { order: 2; }
-  tbody.curves > tr > td.item-line { flex: 0 0 100%; padding: 0 16px; }
+  tbody.curves > tr > td.item-line { flex: 0 0 calc(100% - 38px); padding: 0 16px 0 0; }
   tbody.curves > tr > td.levels { margin-left: auto; }
 }
 
