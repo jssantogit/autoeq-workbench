@@ -229,7 +229,7 @@ describe('CurvesTab', () => {
     expect(uiStore.getState().curveAppearance['curve-0']).toBeUndefined()
   })
 
-  it('renders an empty state and six or more rows in the same manager table', () => {
+  it('keeps an empty manager compact and renders six or more rows in the same table', () => {
     const manyCurves = Array.from({ length: 8 }, (_, index): Curve => ({
       ...curves[0]!,
       id: `many-${index}`,
@@ -243,8 +243,10 @@ describe('CurvesTab', () => {
 
     workspaceStore.setState({ curves: [], activeFrId: null, activeTargetId: null })
     rerender(<CurvesTab />)
-    expect(screen.getByText('No curves loaded')).toBeInTheDocument()
+    expect(screen.queryByText('No curves loaded')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Import FR / Target' })).toBeVisible()
-    expect(within(screen.getByRole('table', { name: 'Curve manager' })).getAllByRole('row')).toHaveLength(1)
+    const emptyTable = screen.getByRole('table', { name: 'Curve manager' })
+    expect(within(emptyTable).queryAllByRole('row')).toHaveLength(0)
+    expect(emptyTable.querySelector('tbody.curves')).toBeEmptyDOMElement()
   })
 })

@@ -89,6 +89,12 @@ select:focus-visible,
   outline-offset: 2px;
 }
 
+[data-inspector-hit-area]:focus { outline: none; }
+[data-inspector-hit-area]:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
 .workbench {
   display: flex;
   width: min(1440px, 100%);

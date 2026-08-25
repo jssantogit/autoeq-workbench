@@ -18,11 +18,7 @@ export function CurvesTab() {
           <col className="lastColumn" />
         </colgroup>
         <tbody className="curves">
-          {curves.length === 0 ? (
-            <tr className="curve-manager-empty">
-              <td colSpan={7}>No curves loaded</td>
-            </tr>
-          ) : curves.map((curve) => <CurveManagerRow key={curve.id} curve={curve} />)}
+          {curves.map((curve) => <CurveManagerRow key={curve.id} curve={curve} />)}
         </tbody>
       </table>
       <div className="curve-upload-actions">

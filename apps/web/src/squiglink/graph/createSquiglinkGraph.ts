@@ -248,10 +248,9 @@ export function createSquiglinkGraph(
         return group
       })
     yGroups.select('line').attr('data-y-grid', (db) => db)
-      .attr('data-emphasis', (db) => db === 0 ? 'zero' : 'normal')
       .attr('x1', PLOT_LEFT).attr('x2', PLOT_RIGHT).attr('y1', (db) => y(db)).attr('y2', (db) => y(db))
-      .attr('stroke', (db) => db === 0 ? palette.axis : palette.majorGrid)
-      .attr('stroke-width', (db) => db === 0 ? 1.2 : 0.55)
+      .attr('stroke', palette.majorGrid)
+      .attr('stroke-width', 0.55)
     yGroups.select('text').attr('data-y-label', (db) => db)
       .attr('x', PLOT_LEFT + 24).attr('y', (db) => y(db)).attr('fill', palette.axis)
       .attr('font-size', current.view.presentation === 'compact' ? 12 : 9)

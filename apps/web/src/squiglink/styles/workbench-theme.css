@@ -48,7 +48,6 @@
 .curve-row-rename input { border-color: var(--wb-border); color: var(--wb-text); background: var(--color-input); }
 .curve-row-color { background: transparent; }
 .curve-row-visibility:has(input:checked) { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
-.curve-manager-empty td { color: var(--wb-text-muted); }
 
 .graph-toolbar { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-bg); }
 .graph-toolbar .zoom,
