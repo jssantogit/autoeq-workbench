@@ -76,10 +76,10 @@ describe('App', () => {
     expect(graphToolbar.compareDocumentPosition(graph)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(graph.compareDocumentPosition(dock)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(screen.queryByRole('button', { name: 'Reset View' })).not.toBeInTheDocument()
-    expect(within(graphToolbar).queryByLabelText('+ FR')).not.toBeInTheDocument()
-    expect(within(graphToolbar).queryByLabelText('+ Target')).not.toBeInTheDocument()
+    expect(within(graphToolbar).queryByLabelText('Upload FR')).not.toBeInTheDocument()
+    expect(within(graphToolbar).queryByLabelText('Upload Target')).not.toBeInTheDocument()
     const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
-    expect(within(curveManager).getAllByLabelText(/^\+ (FR|Target)$/)).toHaveLength(2)
+    expect(within(curveManager).getAllByLabelText(/^Upload (FR|Target)$/)).toHaveLength(2)
     expect(graphToolbar).toHaveClass('tools', 'graph-toolbar')
     expect(within(graphToolbar).getByRole('group', { name: 'Normalize' })).toBeVisible()
     expect(within(graphToolbar).getByLabelText('Normalize dB')).toHaveValue(0)
@@ -146,8 +146,8 @@ describe('App', () => {
     Object.defineProperty(fr, 'text', { value: async () => text })
     Object.defineProperty(target, 'text', { value: async () => text })
 
-    fireEvent.change(within(uploadToolbar).getByLabelText('+ FR'), { target: { files: [fr] } })
-    fireEvent.change(within(uploadToolbar).getByLabelText('+ Target'), { target: { files: [target] } })
+    fireEvent.change(within(uploadToolbar).getByLabelText('Upload FR'), { target: { files: [fr] } })
+    fireEvent.change(within(uploadToolbar).getByLabelText('Upload Target'), { target: { files: [target] } })
 
     await waitFor(() => expect(workspaceStore.getState().curves).toHaveLength(2))
     expect(workspaceStore.getState().curves.map(({ kind }) => kind)).toEqual(['fr', 'target'])
@@ -158,18 +158,18 @@ describe('App', () => {
     render(<App />)
     const uploadToolbar = screen.getByRole('toolbar', { name: 'Curve uploads' })
     const frImport = within(uploadToolbar)
-      .getByLabelText('+ FR')
+      .getByLabelText('Upload FR')
       .closest<HTMLElement>('.curve-import')!
     const file = new File([], 'broken.csv', { type: 'text/csv' })
     Object.defineProperty(file, 'text', { value: async () => 'not curve data' })
 
-    fireEvent.change(within(frImport).getByLabelText('+ FR'), {
+    fireEvent.change(within(frImport).getByLabelText('Upload FR'), {
       target: { files: [file] },
     })
 
     expect(await within(frImport).findByRole('alert')).toHaveTextContent('[parse]')
     const targetImport = within(uploadToolbar)
-      .getByLabelText('+ Target')
+      .getByLabelText('Upload Target')
       .closest<HTMLElement>('.curve-import')!
     expect(within(targetImport).queryByRole('alert')).not.toBeInTheDocument()
   })

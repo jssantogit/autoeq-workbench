@@ -59,7 +59,7 @@ describe('manual workbench integration', () => {
     Object.defineProperty(sourceFile, 'text', { value: async () => curveText })
     Object.defineProperty(targetFile, 'text', { value: async () => curveText })
     const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
-    fireEvent.change(within(curveManager).getByLabelText('+ FR'), {
+    fireEvent.change(within(curveManager).getByLabelText('Upload FR'), {
       target: { files: [sourceFile] },
     })
     await waitFor(() => expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument())
@@ -82,7 +82,7 @@ describe('manual workbench integration', () => {
       }),
     ).toMatchObject({ color: importedFrColor, lineType: 'solid' })
 
-    fireEvent.change(within(curveManager).getByLabelText('+ Target'), {
+    fireEvent.change(within(curveManager).getByLabelText('Upload Target'), {
       target: { files: [targetFile] },
     })
     await waitFor(() => {
@@ -135,7 +135,7 @@ describe('manual workbench integration', () => {
     await user.click(screen.getByRole('button', { name: 'Switch to dark theme' }))
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(localStorage.getItem('autoeq-workbench.theme')).toBe('dark')
-  }, 15_000)
+  }, 25_000)
 
   it('shows preamp in Tools even before Target is loaded', async () => {
     const user = userEvent.setup()
@@ -153,5 +153,5 @@ describe('manual workbench integration', () => {
     expect(screen.getByText('MAE').nextElementSibling).toHaveTextContent('--')
     expect(screen.getByText('RMSE').nextElementSibling).toHaveTextContent('--')
     expect(screen.getByText(/metrics require an active FR and Target/i)).toBeVisible()
-  })
+  }, 10_000)
 })

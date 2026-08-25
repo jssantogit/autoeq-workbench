@@ -110,6 +110,58 @@
 .tools-panel { min-width: 0; padding: 10px; }
 .tools-section > h3 { margin: 0 0 8px; font-size: 0.84rem; }
 
+.manage {
+  min-width: 0;
+  overflow-x: auto;
+  padding-block: 8px;
+}
+
+.curve-upload-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 0 8px 8px;
+}
+
+.curve-upload-actions .file-control { min-height: 30px; border-radius: 6px; padding: 5px 9px; }
+.curve-upload-actions .field-error { margin-top: 4px; }
+
+.manageTable {
+  width: 100%;
+  min-width: 390px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.7rem;
+}
+
+.manageTable tr { border-bottom: 1px solid; }
+.manageTable tr.selected { box-shadow: inset 3px 0 var(--wb-accent); }
+.manageTable td { height: 42px; padding: 4px; vertical-align: middle; }
+.manageTable td.remove { width: 30px; text-align: center; }
+.manageTable td.phoneId { width: 48px; }
+.manageTable td.key { width: auto; min-width: 0; }
+.manageTable td.calibrate { width: 112px; }
+.manageTable td.baselineButton { width: 64px; }
+.manageTable td.hideButton { width: 34px; text-align: center; }
+.manageTable button { min-height: 28px; border: 1px solid; border-radius: 5px; padding: 4px 6px; cursor: pointer; font-size: 0.66rem; }
+.manageTable td.remove button { width: 24px; min-height: 24px; padding: 0; }
+.manageTable td.phoneId button { width: 42px; padding-inline: 2px; }
+.manageTable td.baselineButton button { width: 58px; padding-inline: 2px; }
+.manageTable button[aria-pressed='true'] { font-weight: 700; }
+.curve-row-name { display: flex; min-width: 0; align-items: center; gap: 4px; }
+.curve-row-name > span { min-width: 0; flex: 1; overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.curve-row-name > button { flex: 0 0 auto; }
+.curve-row-rename { display: grid; min-width: 210px; grid-template-columns: minmax(80px, 1fr) auto auto; gap: 3px; }
+.curve-row-rename input { min-width: 0; border: 1px solid; border-radius: 5px; padding: 4px; }
+.manageTable td.calibrate { white-space: nowrap; }
+.curve-row-color { width: 26px; height: 28px; border: 1px solid; border-radius: 5px; padding: 2px; vertical-align: middle; cursor: pointer; }
+.manageTable .number-field { display: inline-flex; width: 76px; margin-left: 4px; vertical-align: middle; }
+.manageTable .number-field > span:first-child { position: absolute; left: 0; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.manageTable .number-field__control { width: 76px; }
+.manageTable .number-field input { min-width: 0; height: 28px; padding: 2px 4px; }
+.manageTable td.hideButton input { width: 17px; height: 17px; margin: 0; cursor: pointer; }
+.curve-manager-empty td { height: 70px; text-align: center; }
+
 @media (max-width: 1000px) {
   .graphtool { height: auto; min-height: 100dvh; overflow: visible; }
   .graphtool > .main { display: block; overflow: visible; }

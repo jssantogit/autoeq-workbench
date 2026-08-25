@@ -215,20 +215,6 @@ select:focus-visible,
 .panel__header { min-height: 42px; padding: 8px 12px 0; }
 .panel__body { min-width: 0; padding: 10px 12px 14px; }
 
-.curves-tab { min-width: 0; padding: 8px 10px 10px; }
-.curve-upload-toolbar { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; padding: 2px 8px 6px; }
-.curve-upload-toolbar .curve-import { min-width: 0; }
-.curve-upload-toolbar .file-control { min-height: 28px; border-radius: 6px; padding: 4px 8px; }
-.curve-upload-toolbar .field-error { margin-top: 4px; }
-.curve-manager__section + .curve-manager__section { margin-top: 8px; }
-.curve-manager__heading { min-height: 24px; margin: 0; padding: 4px 8px; color: var(--color-text-faint); font-size: 0.68rem; letter-spacing: 0.06em; }
-.curve-manager { display: grid; margin: 0; border-block: 1px solid var(--color-border); padding: 0; list-style: none; }
-.curve-manager__empty { margin: 0; padding: 2px 8px 4px; color: var(--color-text-faint); font-size: 0.72rem; }
-.curve-manager__row { position: relative; display: grid; min-width: 0; grid-template-columns: 12px minmax(100px, 1fr) 24px 28px; align-items: center; gap: 10px; border-top: 1px solid var(--color-border); padding: 5px 8px; }
-.curve-manager__row:first-child { border-top: 0; }
-.curve-manager__indicator--fr { width: 10px; height: 10px; border: 1px solid rgb(0 0 0 / 15%); border-radius: 50%; }
-.curve-manager__indicator--target { width: 12px; border-top: 2px dashed var(--color-target); }
-.curve-manager__name { overflow: hidden; font-size: 0.78rem; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .curve-import { display: grid; justify-items: start; }
 .file-control {
   position: relative;
@@ -249,23 +235,6 @@ select:focus-visible,
 .file-control input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .field-error { margin: 8px 0 0; color: var(--color-danger); font-size: 0.72rem; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
-
-.visibility-control,
-.color-control { display: inline-flex; min-height: 34px; align-items: center; gap: 8px; color: var(--color-text-muted); font-size: 0.73rem; }
-.visibility-control { cursor: pointer; }
-.visibility-control input { width: 18px; height: 18px; accent-color: var(--color-accent-active); }
-.color-control input { width: 42px; height: 32px; border: 1px solid var(--color-border); border-radius: 8px; padding: 3px; background: var(--color-input); cursor: pointer; }
-.curve-menu summary { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 5px; cursor: pointer; color: var(--color-text-muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 1px; list-style: none; }
-.curve-menu summary::-webkit-details-marker { display: none; }
-.curve-menu summary:hover,
-.curve-menu[open] summary { color: var(--color-text); background: var(--color-bg-subtle); }
-.curve-menu__panel { position: absolute; z-index: 5; right: 8px; display: grid; width: min(260px, calc(100vw - 40px)); gap: 4px; margin-top: 5px; border: 1px solid var(--color-border); border-radius: 9px; padding: 8px; background: var(--color-bg-elevated); box-shadow: var(--shadow-surface); }
-.curve-menu__panel button { min-height: 30px; border: 0; border-radius: 6px; padding: 5px 8px; color: var(--color-text); background: transparent; text-align: left; cursor: pointer; }
-.curve-menu__panel button:hover { background: var(--color-bg-subtle); }
-.curve-menu__rename { display: grid; grid-template-columns: 1fr auto; gap: 5px; border-top: 1px solid var(--color-border); padding-top: 6px; }
-.curve-menu__rename label { display: grid; gap: 3px; color: var(--color-text-muted); font-size: 0.68rem; }
-.curve-menu__rename input { min-width: 0; border: 1px solid var(--color-border); border-radius: 6px; padding: 6px; color: var(--color-text); background: var(--color-input); }
-.curve-menu__remove { color: var(--color-danger) !important; }
 
 .number-field { display: grid; gap: 3px; color: var(--color-text-muted); font-size: 0.68rem; }
 .number-field__control { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr); color: var(--color-text); }
@@ -377,8 +346,7 @@ select:focus-visible,
   .workbench-dock__handle { display: block; width: 56px; height: 4px; margin: 0 auto 7px; border-radius: 4px; background: var(--color-border-strong); }
   .dock-tabs { width: calc(100% - 14px); margin-inline: 7px; }
   .dock-tabs button { min-width: 0; min-height: 34px; padding-inline: 4px; }
-  .curves-tab { padding: 6px 0 8px; }
-  .curve-manager__row { grid-template-columns: 10px minmax(70px, 1fr) 22px 28px; gap: 6px; padding-inline: 5px; }
+  .curves-tab { padding-block: 6px; }
   .equalizer-profile__fr-row { width: 100%; }
   .details-tab { padding: 8px 0; }
   .details-tab__sections { grid-template-columns: 1fr; }
@@ -386,7 +354,6 @@ select:focus-visible,
 }
 
 @media (max-width: 380px) {
-  .color-control { justify-content: space-between; }
   .metric-list { grid-template-columns: 1fr; }
   .metric-list__item:nth-child(even) { padding-left: 0; border-left: 0; }
   .filter-table th:nth-child(1) { width: 9%; }

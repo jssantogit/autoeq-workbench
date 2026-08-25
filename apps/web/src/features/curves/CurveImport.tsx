@@ -12,6 +12,7 @@ export function CurveImport({ kind }: CurveImportProps) {
   const registerCurve = useUiStore((state) => state.registerCurve)
   const [error, setError] = useState<string | null>(null)
   const requestRef = useRef(0)
+  const label = kind === 'fr' ? 'Upload FR' : 'Upload Target'
 
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -38,8 +39,8 @@ export function CurveImport({ kind }: CurveImportProps) {
   return (
     <div className="curve-import">
       <label className="file-control">
-        <span>{kind === 'fr' ? '+ FR' : '+ Target'}</span>
-        <input type="file" accept=".txt,.csv,text/plain,text/csv" onChange={handleFile} />
+        <span>{label}</span>
+        <input aria-label={label} type="file" accept=".txt,.csv,text/plain,text/csv" onChange={handleFile} />
       </label>
       {error !== null && (
         <p className="field-error" role="alert">

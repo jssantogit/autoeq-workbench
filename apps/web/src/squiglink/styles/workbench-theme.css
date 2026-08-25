@@ -31,6 +31,17 @@
 .graphBox { border-color: var(--wb-border); }
 .tools-panel { color: var(--wb-text); background: var(--wb-surface); }
 .tools-section > h3 { color: var(--wb-text-muted); }
+.manageTable tr { border-color: var(--wb-border); background: var(--wb-surface-muted); }
+.manageTable tr.selected { background: var(--wb-surface); }
+.manageTable button { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
+.manageTable button:hover,
+.manageTable button[aria-pressed='true'] { border-color: var(--wb-accent-hover); color: var(--wb-text); }
+.manageTable button[aria-pressed='true'] { background: var(--wb-surface-muted); }
+.manageTable td.remove button { color: var(--color-danger); }
+.curve-row-rename input,
+.curve-row-color { border-color: var(--wb-border); color: var(--wb-text); background: var(--color-input); }
+.manageTable td.hideButton input { accent-color: var(--wb-accent-hover); }
+.curve-manager-empty td { color: var(--wb-text-muted); }
 .graph-toolbar { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-bg); }
 .graph-toolbar .zoom,
 .graph-toolbar .normalize,
