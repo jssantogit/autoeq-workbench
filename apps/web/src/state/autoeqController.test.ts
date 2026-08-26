@@ -1,6 +1,7 @@
 import {
   DEFAULT_AUTOEQ_SETTINGS,
   type AutoEqResult,
+  type AutoEqSettings,
   type Curve,
   type Filter,
   type StandardAutoEqInput,
@@ -19,12 +20,12 @@ import { createUiStore } from './uiStore'
 import { createWorkspaceStore, type WorkspaceState } from './workspaceStore'
 
 const priorFilter: Filter = {
-  id: 'prior-filter',
+  id: 'autoeq-1',
   enabled: true,
   type: 'PK',
-  frequencyHz: 750,
-  gainDb: -2,
-  q: 1.2,
+  frequencyHz: 1_000,
+  gainDb: 2,
+  q: 1,
 }
 
 function syntheticCurve(id: string, kind: Curve['kind'], middleDb: number): Curve {
@@ -66,7 +67,7 @@ function createReadyWorkspace() {
   const workspace = createWorkspaceStore()
   workspace.getState().addCurve(syntheticCurve('fr-1', 'fr', 2))
   workspace.getState().addCurve(syntheticCurve('target-1', 'target', 0))
-  workspace.getState().setFilters([priorFilter], 'manual')
+  workspace.getState().applyAutoEqResult(createAutoEqResult(2))
   return workspace
 }
 
@@ -94,6 +95,15 @@ function numericalState(state: WorkspaceState): WorkspaceState {
     })),
     normalization: { ...state.normalization },
     autoeqSettings: { ...state.autoeqSettings },
+  }
+}
+
+function solutionSnapshot(state: WorkspaceState) {
+  return {
+    filters: state.filters.map((filter) => ({ ...filter })),
+    filterProvenance: state.filterProvenance,
+    solutionState: state.solutionState,
+    autoEqRun: state.autoEqRun === null ? null : structuredClone(state.autoEqRun),
   }
 }
 
@@ -199,17 +209,21 @@ describe('AutoEQ controller', () => {
 
   it('preserves the prior solution on cancellation', async () => {
     const { workspace, runStore, controller } = setup()
+    const before = solutionSnapshot(workspace.getState())
+    expect(before.autoEqRun).not.toBeNull()
     const pending = controller.runAutoEq()
 
     controller.cancelAutoEq()
     await pending
 
-    expect(workspace.getState().filters).toEqual([priorFilter])
+    expect(solutionSnapshot(workspace.getState())).toEqual(before)
     expect(runStore.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
   })
 
   it('preserves the prior solution and exposes only a structured Worker error', async () => {
     const { workspace, runStore, controller, runs } = setup()
+    const before = solutionSnapshot(workspace.getState())
+    expect(before.autoEqRun).not.toBeNull()
     const pending = controller.runAutoEq()
 
     runs[0]!.reject(new AutoEqWorkerError({
@@ -218,7 +232,7 @@ describe('AutoEQ controller', () => {
     }))
     await pending
 
-    expect(workspace.getState().filters).toEqual([priorFilter])
+    expect(solutionSnapshot(workspace.getState())).toEqual(before)
     expect(runStore.getState()).toMatchObject({
       status: 'error',
       activeRunId: null,
@@ -264,6 +278,27 @@ describe('AutoEQ run-input signature', () => {
     removedSelection.curves = removedSelection.curves.filter(({ id }) => id !== base.activeFrId)
     expect(createAutoEqRunInputSignature(removedSelection)).toBeNull()
   })
+
+  it.each([
+    ['minFrequencyHz', DEFAULT_AUTOEQ_SETTINGS.minFrequencyHz + 1],
+    ['maxFrequencyHz', DEFAULT_AUTOEQ_SETTINGS.maxFrequencyHz - 1],
+    ['minGainDb', DEFAULT_AUTOEQ_SETTINGS.minGainDb + 1],
+    ['maxGainDb', DEFAULT_AUTOEQ_SETTINGS.maxGainDb - 1],
+    ['minQ', DEFAULT_AUTOEQ_SETTINGS.minQ + 0.1],
+    ['maxQ', DEFAULT_AUTOEQ_SETTINGS.maxQ - 1],
+    ['maxFilters', DEFAULT_AUTOEQ_SETTINGS.maxFilters - 1],
+  ] satisfies [keyof AutoEqSettings, number][])(
+    'changes when AutoEqSettings.%s changes',
+    (field, value) => {
+      const base = numericalState(createReadyWorkspace().getState())
+      const changed = numericalState(base)
+      changed.autoeqSettings[field] = value
+
+      expect(createAutoEqRunInputSignature(changed)).not.toBe(
+        createAutoEqRunInputSignature(base),
+      )
+    },
+  )
 })
 
 describe('AutoEQ obsolete result rejection', () => {
@@ -299,13 +334,15 @@ describe('AutoEQ obsolete result rejection', () => {
     }],
   ] as const)('discards a result after %s changes', async (_label, changeWorkspace) => {
     const { workspace, runStore, controller, runs } = setup()
+    expect(workspace.getState().autoEqRun).not.toBeNull()
     const pending = controller.runAutoEq()
 
     changeWorkspace(workspace)
+    const beforeResolution = solutionSnapshot(workspace.getState())
     runs[0]!.resolve(createAutoEqResult(8))
     await pending
 
-    expect(workspace.getState().filters).toEqual([priorFilter])
+    expect(solutionSnapshot(workspace.getState())).toEqual(beforeResolution)
     expect(runStore.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
   })
 

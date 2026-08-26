@@ -13,7 +13,7 @@ interface WorkerScope {
 
 const workerScope = self as unknown as WorkerScope
 
-function publicError(cause: unknown): AutoEqPublicError {
+export function sanitizeAutoEqError(cause: unknown): AutoEqPublicError {
   if (
     cause instanceof CoreError &&
     (cause.category === 'validation' ||
@@ -35,6 +35,6 @@ workerScope.onmessage = ({ data }) => {
       result: runStandardAutoEq(data.input),
     })
   } catch (cause) {
-    workerScope.postMessage({ type: 'error', runId: data.runId, error: publicError(cause) })
+    workerScope.postMessage({ type: 'error', runId: data.runId, error: sanitizeAutoEqError(cause) })
   }
 }
