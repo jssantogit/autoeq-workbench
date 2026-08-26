@@ -347,17 +347,19 @@ POWERAMP_MANUAL_ENTRY_POLICY = {
 
 This is a Workbench manual-entry/export precision policy, not a claim about Poweramp backup-file schema.
 
-Quantization must:
+Quantization uses **constrained grid projection**. For every adjustable coordinate, select the nearest value in:
 
-- clamp first;
-- round to nearest policy step;
-- normalize floating artifacts;
-- normalize `-0` to `0`;
-- keep shelves at Q 0.7.
+```text
+representable = manual-entry grid ∩ effective run envelope
+```
 
-Discrete refinement runs on the quantized parameter grid and may test current and ±1 policy step for eligible coordinates. It must never return an objective worse than the raw quantized candidate selected as its starting point.
+This is not equivalent to clamp-then-round, because rounding after clamping may escape a decimal effective envelope. If two representable points are equally near, use the approved deterministic tie-breakers. Normalize floating artifacts and `-0` to `0`.
 
-After discrete refinement, remove any filter whose delivered gain is exactly `0 dB`. A structurally dead filter must not survive merely because it was non-zero before quantization.
+For PK filters, frequency, gain, and Q must each have a representable point. `minQ..maxQ` is the PK-Q envelope. Shelves require representable frequency and gain but always use Q 0.7 independently of the PK-Q envelope. If any required coordinate has no representable point, omit that filter without rejecting the run. A valid run may therefore deliver zero filters.
+
+Discrete refinement starts only from filters that survived constrained grid projection. It runs on the manual-entry grid and may test current and ±1 policy step only when the tested point remains inside the effective envelope. It must never return an objective worse than the raw quantized candidate selected as its starting point.
+
+After discrete refinement, remove any filter whose delivered gain is exactly `0 dB`. A structurally dead filter must not survive merely because it was non-zero before quantization. Final ordering, IDs, metrics, cancellation audit, preamp, and manifest are computed from the exact list that remains after projection, omission, discrete refinement, and zero-gain cleanup.
 
 ## 10. Final ordering, IDs, metrics, preamp, and manifest
 

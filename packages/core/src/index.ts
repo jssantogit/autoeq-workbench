@@ -17,10 +17,13 @@ export type { ObjectiveInput } from './autoeq/loss.js'
 export { findResidualRegions, generateCandidates } from './autoeq/candidates.js'
 export type { FilterCandidate, ResidualRegion } from './autoeq/candidates.js'
 export { auditCancellations } from './autoeq/cancellation.js'
+export { discreteRefine } from './autoeq/discreteRefine.js'
 export { refineFilters } from './autoeq/refine.js'
 export { optimizeGreedy } from './autoeq/optimize.js'
 export type { OptimizationState } from './autoeq/optimize.js'
 export { pruneFilters } from './autoeq/prune.js'
+export { POWERAMP_MANUAL_ENTRY_POLICY, quantizeFilters } from './autoeq/quantize.js'
+export { runStandardAutoEq } from './autoeq/runStandardAutoEq.js'
 export type {
   AutoEqConfig,
   AutoEqResult,
