@@ -65,7 +65,14 @@ export function runStandardAutoEq(input: StandardAutoEqInput): AutoEqResult {
   const discrete = discreteRefine({ filters: quantized, desiredDb, frequencies, config })
   const delivered = sortDeliveredFilters(
     discrete.filter((filter) => filter.gainDb !== 0),
-  ).map((filter, index) => ({ ...filter, id: `autoeq-${index + 1}` }))
+  ).map((filter, index): Filter => ({
+    id: `autoeq-${index + 1}`,
+    enabled: filter.enabled,
+    type: filter.type,
+    frequencyHz: filter.frequencyHz,
+    gainDb: filter.gainDb,
+    q: filter.q,
+  }))
 
   const deliveredDb = cascadeMagnitudeDb(delivered, frequencies, config.sampleRateHz)
   const residualDb = desiredDb.map((value, index) => value - deliveredDb[index]!)

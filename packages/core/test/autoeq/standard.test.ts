@@ -202,6 +202,20 @@ describe('runStandardAutoEq', () => {
       maxFilters: 5,
     }))
 
+    for (const filters of [result.filters, result.manifest.finalFilters]) {
+      for (const filter of filters) {
+        expect(Object.keys(filter).sort()).toEqual([
+          'enabled',
+          'frequencyHz',
+          'gainDb',
+          'id',
+          'q',
+          'type',
+        ])
+        expect(filter).not.toHaveProperty('regionOctaves')
+      }
+    }
+
     expect(result.filters.map(({ id }) => id)).toEqual(
       result.filters.map((_, index) => `autoeq-${index + 1}`),
     )
