@@ -16,6 +16,9 @@ export { evaluateObjective } from './autoeq/loss.js'
 export type { ObjectiveInput } from './autoeq/loss.js'
 export { findResidualRegions, generateCandidates } from './autoeq/candidates.js'
 export type { FilterCandidate, ResidualRegion } from './autoeq/candidates.js'
+export { refineFilters } from './autoeq/refine.js'
+export { optimizeGreedy } from './autoeq/optimize.js'
+export type { OptimizationState } from './autoeq/optimize.js'
 export type {
   AutoEqConfig,
   AutoEqResult,
