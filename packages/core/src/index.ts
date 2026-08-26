@@ -11,6 +11,18 @@ export {
   isValidAutoEqSettings,
 } from './config/autoeqSettings.js'
 export type { AutoEqSettings } from './config/autoeqSettings.js'
+export { STANDARD_V1_CONFIG, resolveStandardAutoEqConfig } from './autoeq/config.js'
+export { evaluateObjective } from './autoeq/loss.js'
+export type { ObjectiveInput } from './autoeq/loss.js'
+export type {
+  AutoEqConfig,
+  AutoEqResult,
+  CancellationAudit,
+  CancellationPair,
+  RunManifest,
+  StandardAlgorithmParameters,
+  StandardAutoEqInput,
+} from './autoeq/types.js'
 export { createLogGrid } from './curves/grid.js'
 export { interpolateLogFrequency } from './curves/interpolate.js'
 export { applyOffset, normalizationOffset } from './curves/normalize.js'
