@@ -1,8 +1,9 @@
 import { cascadeMagnitudeDb } from '../dsp/cascade.js'
 import { CoreError } from '../types/error.js'
 import type { Filter } from '../types/filter.js'
+import { auditCancellations } from './cancellation.js'
 import { evaluateObjective } from './loss.js'
-import type { AutoEqConfig, CancellationAudit } from './types.js'
+import type { AutoEqConfig } from './types.js'
 
 interface RefineInput {
   filters: readonly Filter[]
@@ -22,8 +23,6 @@ const COORDINATE_PASSES: readonly CoordinatePass[] = [
   { fcOctaveStep: 1 / 24, gainStepDb: 0.25, qOctaveStep: 1 / 8 },
   { fcOctaveStep: 1 / 96, gainStepDb: 0.1, qOctaveStep: 1 / 32 },
 ]
-
-const NO_CANCELLATION: CancellationAudit = { pairs: [], totalScore: 0 }
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value))
@@ -68,7 +67,7 @@ export function evaluateCascadeObjective(
   return evaluateObjective({
     residualDb,
     filters,
-    cancellationAudit: NO_CANCELLATION,
+    cancellationAudit: auditCancellations(filters, frequencies, config.sampleRateHz),
     config,
   })
 }
