@@ -142,6 +142,35 @@ describe('EqualizerTab', () => {
     expect(screen.getAllByRole('region', { name: 'AutoEQ Settings' })).toHaveLength(1)
   })
 
+  it('keeps AutoEQ disabled when active FR and Target do not cover the evaluation range', () => {
+    workspaceStore.setState({
+      curves: [
+        {
+          ...curve('fr-1', 'Measurement A', 'fr'),
+          rawPoints: [
+            { frequencyHz: 40, db: 0 },
+            { frequencyHz: 10_000, db: 0 },
+          ],
+        },
+        {
+          ...curve('target-1', 'Target A', 'target'),
+          rawPoints: [
+            { frequencyHz: 40, db: 0 },
+            { frequencyHz: 10_000, db: 0 },
+          ],
+        },
+      ],
+      activeFrId: 'fr-1',
+      activeTargetId: 'target-1',
+    })
+    const derived = deriveWorkspace(workspaceStore.getState())
+
+    expect(derived.status).toBe('coverage-error')
+    render(<EqualizerTab derived={derived} />)
+
+    expect(screen.getByRole('button', { name: 'AutoEQ' })).toBeDisabled()
+  })
+
   it('turns the action into Cancel without a progress meter while running', async () => {
     const user = userEvent.setup()
     setReadyCurves()
