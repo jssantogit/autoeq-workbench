@@ -1,5 +1,6 @@
 import type { Filter } from '@autoeq-workbench/core'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createAutoEqRunRecord } from '../test/autoEqFixture'
 import { createEqCompareStore, isCanonicalEqStateEqual } from './eqCompareStore'
 
 const filter: Filter = {
@@ -11,11 +12,15 @@ const filter: Filter = {
   q: 1,
 }
 
-function capture(overrides: Partial<Filter> = {}) {
+function capture(
+  overrides: Partial<Filter> = {},
+  autoEqRun: ReturnType<typeof createAutoEqRunRecord> | null = null,
+) {
   return {
     filters: [{ ...filter, ...overrides }],
     filterProvenance: 'manual' as const,
     solutionState: 'clean' as const,
+    autoEqRun,
     preampDb: -2,
   }
 }
@@ -112,6 +117,33 @@ describe('EQ compare store', () => {
     expect(
       isCanonicalEqStateEqual(left, { ...sameCanonicalState, solutionState: 'stale' }),
     ).toBe(false)
+    expect(
+      isCanonicalEqStateEqual(left, {
+        ...sameCanonicalState,
+        autoEqRun: createAutoEqRunRecord(),
+      }),
+    ).toBe(false)
+    expect(
+      isCanonicalEqStateEqual(
+        { ...left, autoEqRun: createAutoEqRunRecord() },
+        { ...sameCanonicalState, autoEqRun: createAutoEqRunRecord() },
+      ),
+    ).toBe(true)
+  })
+
+  it('deep-copies the AutoEQ run manifest into snapshots', () => {
+    const store = createEqCompareStore()
+    const autoEqRun = createAutoEqRunRecord()
+
+    store.getState().record(capture({}, autoEqRun))
+    store.getState().flush()
+
+    const snapshot = store.getState().snapshots[0]!
+    expect(snapshot.autoEqRun).toEqual(autoEqRun)
+    expect(snapshot.autoEqRun).not.toBe(autoEqRun)
+    expect(snapshot.autoEqRun!.manifest).not.toBe(autoEqRun.manifest)
+    autoEqRun.manifest.algorithmParameters.deadbandDb = 9
+    expect(snapshot.autoEqRun!.manifest.algorithmParameters.deadbandDb).toBe(0.1)
   })
 
   it('retains the 100 newest deep-copied snapshots and clears trimmed selections', () => {

@@ -1,6 +1,7 @@
 import type { Filter } from '@autoeq-workbench/core'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createAutoEqRunRecord } from '../../test/autoEqFixture'
 import { createEqCompareStore, isCanonicalEqStateEqual } from '../../state/eqCompareStore'
 import { initializeEqCompareRecorder } from '../../state/initializeEqCompareRecorder'
 import { createWorkspaceStore } from '../../state/workspaceStore'
@@ -15,11 +16,15 @@ const baseFilter: Filter = {
   q: 1,
 }
 
-function capture(gainDb: number) {
+function capture(
+  gainDb: number,
+  autoEqRun: ReturnType<typeof createAutoEqRunRecord> | null = null,
+) {
   return {
     filters: [{ ...baseFilter, gainDb }],
-    filterProvenance: 'manual' as const,
+    filterProvenance: autoEqRun ? ('autoeq' as const) : ('manual' as const),
     solutionState: 'clean' as const,
+    autoEqRun,
     preampDb: -Math.max(0, gainDb),
   }
 }
@@ -95,7 +100,7 @@ describe('EqCompare', () => {
     const compare = createEqCompareStore()
     const workspace = createWorkspaceStore()
     const initial = capture(1)
-    const target = capture(5)
+    const target = capture(5, createAutoEqRunRecord(5))
     workspace.getState().setFilters(initial.filters, 'manual')
     compare.getState().record(target)
     compare.getState().flush()
@@ -121,14 +126,48 @@ describe('EqCompare', () => {
     expect(workspace.getState().selectedFilterId).toBeNull()
     expect(workspace.getState().filters).not.toBe(snapshot.filters)
     expect(workspace.getState().filters[0]).not.toBe(snapshot.filters[0])
+    expect(workspace.getState().autoEqRun).toEqual(snapshot.autoEqRun)
+    expect(workspace.getState().autoEqRun).not.toBe(snapshot.autoEqRun)
+    expect(workspace.getState().autoEqRun!.manifest).not.toBe(snapshot.autoEqRun!.manifest)
     vi.advanceTimersByTime(500)
     expect(compare.getState().snapshots).toHaveLength(1)
 
     workspace.getState().undo()
     expect(isCanonicalEqStateEqual(workspace.getState(), initial)).toBe(true)
+    expect(workspace.getState().autoEqRun).toBeNull()
     workspace.getState().redo()
     expect(isCanonicalEqStateEqual(workspace.getState(), snapshot)).toBe(true)
+    expect(workspace.getState().autoEqRun).toEqual(snapshot.autoEqRun)
 
     cleanupRecorder()
+  })
+
+  it('keeps distinct filters and AutoEQ manifests paired while switching A and B', () => {
+    const compare = createEqCompareStore()
+    const workspace = createWorkspaceStore()
+    const a = capture(5, createAutoEqRunRecord(5))
+    const b = capture(-4, createAutoEqRunRecord(-4))
+    compare.getState().record(a)
+    compare.getState().flush()
+    const aSnapshot = compare.getState().snapshots[0]!
+    compare.getState().setA(aSnapshot.id)
+    vi.setSystemTime(1_000)
+    compare.getState().record(b)
+    compare.getState().flush()
+    const bSnapshot = compare.getState().snapshots[1]!
+    compare.getState().setB(bSnapshot.id)
+
+    render(<EqCompare compareStore={compare} workspaceStore={workspace} />)
+
+    for (const [buttonName, expected] of [
+      ['Apply A', aSnapshot],
+      ['Apply B', bSnapshot],
+      ['Apply A', aSnapshot],
+    ] as const) {
+      fireEvent.click(screen.getByRole('button', { name: buttonName }))
+      expect(isCanonicalEqStateEqual(workspace.getState(), expected)).toBe(true)
+      expect(workspace.getState().autoEqRun).toEqual(expected.autoEqRun)
+      expect(workspace.getState().autoEqRun).not.toBe(expected.autoEqRun)
+    }
   })
 })

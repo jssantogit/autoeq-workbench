@@ -28,9 +28,10 @@ export function EqCompare({
   const filters = useStore(workspaceStore, (state) => state.filters)
   const filterProvenance = useStore(workspaceStore, (state) => state.filterProvenance)
   const solutionState = useStore(workspaceStore, (state) => state.solutionState)
+  const autoEqRun = useStore(workspaceStore, (state) => state.autoEqRun)
   const aSnapshot = snapshots.find(({ id }) => id === aSnapshotId)
   const bSnapshot = snapshots.find(({ id }) => id === bSnapshotId)
-  const currentState = { filters, filterProvenance, solutionState }
+  const currentState = { filters, filterProvenance, solutionState, autoEqRun }
 
   const apply = (snapshot: EqSnapshot | undefined) => {
     if (snapshot === undefined) return
@@ -39,6 +40,7 @@ export function EqCompare({
       filters: snapshot.filters,
       filterProvenance: snapshot.filterProvenance,
       solutionState: snapshot.solutionState,
+      autoEqRun: snapshot.autoEqRun,
     })
   }
 

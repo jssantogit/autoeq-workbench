@@ -12,6 +12,7 @@ import {
   prepareCurve,
   residualError,
   type Curve,
+  type AutoEqResult,
   type AutoEqSettings,
   type CurveKind,
   type ErrorMetrics,
@@ -28,6 +29,9 @@ import {
   restoreHistorySnapshot,
   type WorkspaceHistorySnapshot,
 } from './history'
+import { cloneAutoEqRunRecord, type AutoEqRunRecord } from './autoEqRun'
+
+export type { AutoEqRunRecord } from './autoEqRun'
 
 export type SolutionState = 'clean' | 'modified' | 'stale'
 export type FilterProvenance = 'manual' | 'autoeq'
@@ -36,6 +40,7 @@ export interface FilterSnapshotState {
   filters: Filter[]
   filterProvenance: FilterProvenance | null
   solutionState: SolutionState
+  autoEqRun: AutoEqRunRecord | null
 }
 
 export interface WorkspaceState {
@@ -48,6 +53,7 @@ export interface WorkspaceState {
   selectedFilterId: string | null
   solutionState: SolutionState
   filterProvenance: FilterProvenance | null
+  autoEqRun: AutoEqRunRecord | null
   addCurve: (curve: Curve) => boolean
   setActiveFr: (id: string | null) => void
   setActiveTarget: (id: string | null) => void
@@ -56,6 +62,7 @@ export interface WorkspaceState {
   setNormalization: (value: Normalization) => void
   setAutoEqSettings: (settings: AutoEqSettings) => void
   setFilters: (filters: Filter[], provenance: FilterProvenance) => void
+  applyAutoEqResult: (result: AutoEqResult) => void
   applyFilterSnapshot: (snapshot: FilterSnapshotState) => void
   selectFilter: (id: string | null) => void
   addFilter: (type: FilterType) => void
@@ -113,6 +120,7 @@ const initialState = {
   selectedFilterId: null,
   solutionState: 'clean' as const,
   filterProvenance: null,
+  autoEqRun: null,
   canUndo: false,
   canRedo: false,
 }
@@ -133,6 +141,7 @@ function uniqueFilterId(filters: Filter[]): string {
 }
 
 function validFilter(filter: Filter): boolean {
+  if (typeof filter !== 'object' || filter === null) return false
   return (
     typeof filter.id === 'string' &&
     filter.id.length > 0 &&
@@ -150,6 +159,80 @@ function validFilter(filter: Filter): boolean {
   )
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function hasFiniteFields(value: unknown, fields: readonly string[]): boolean {
+  return isRecord(value) && fields.every((field) => Number.isFinite(value[field]))
+}
+
+function validAutoEqResult(result: AutoEqResult): boolean {
+  if (!isRecord(result) || !isRecord(result.manifest)) return false
+  const { manifest } = result
+  const metricsAreFinite = hasFiniteFields(result.metrics, [
+    'maeDb',
+    'rmseDb',
+    'maxAbsDb',
+    'maxAbsFrequencyHz',
+  ])
+  const algorithmParametersAreFinite = hasFiniteFields(manifest.algorithmParameters, [
+    'deadbandDb',
+    'huberDeltaDb',
+    'candidateThresholdDb',
+    'minObjectiveImprovement',
+    'pruneTolerance',
+    'filterCountWeight',
+    'highQWeight',
+    'gainWeight',
+    'cancellationWeight',
+  ])
+  const auditIsValid =
+    isRecord(result.cancellationAudit) &&
+    Number.isFinite(result.cancellationAudit.totalScore) &&
+    Array.isArray(result.cancellationAudit.pairs) &&
+    result.cancellationAudit.pairs.every(
+      (pair) =>
+        isRecord(pair) &&
+        typeof pair.filterAId === 'string' &&
+        typeof pair.filterBId === 'string' &&
+        Number.isFinite(pair.score) &&
+        ['moderate', 'strong'].includes(pair.severity),
+    )
+
+  return (
+    Array.isArray(result.filters) &&
+    result.filters.length <= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters &&
+    result.filters.every(validFilter) &&
+    new Set(result.filters.map(({ id }) => id)).size === result.filters.length &&
+    metricsAreFinite &&
+    Number.isFinite(result.preampDb) &&
+    auditIsValid &&
+    manifest.schemaVersion === 1 &&
+    manifest.algorithmVersion === 'standard-v1' &&
+    manifest.profile === 'Standard' &&
+    Number.isFinite(manifest.sampleRateHz) &&
+    manifest.sampleRateHz > 0 &&
+    Number.isInteger(manifest.fitPointsPerOctave) &&
+    manifest.fitPointsPerOctave > 0 &&
+    isRecord(manifest.autoeqSettings) &&
+    isValidAutoEqSettings(manifest.autoeqSettings) &&
+    isRecord(manifest.normalization) &&
+    Number.isFinite(manifest.normalization.anchorHz) &&
+    manifest.normalization.anchorHz >= MVP_NUMERIC_POLICY.minFrequencyHz &&
+    manifest.normalization.anchorHz <= MVP_NUMERIC_POLICY.maxFrequencyHz &&
+    Number.isFinite(manifest.normalization.targetDb) &&
+    typeof manifest.sourceName === 'string' &&
+    typeof manifest.targetName === 'string' &&
+    algorithmParametersAreFinite &&
+    Array.isArray(manifest.finalFilters) &&
+    JSON.stringify(result.filters) === JSON.stringify(manifest.finalFilters) &&
+    JSON.stringify(result.metrics) === JSON.stringify(manifest.metrics) &&
+    result.preampDb === manifest.preampDb &&
+    JSON.stringify(result.cancellationAudit) === JSON.stringify(manifest.cancellationAudit)
+  )
+}
+
 function afterManualEdit(state: WorkspaceState): SolutionState {
   if (state.solutionState === 'stale') return 'stale'
   return state.filterProvenance === 'autoeq' ? 'modified' : 'clean'
@@ -160,7 +243,8 @@ function manualProvenance(state: WorkspaceState): FilterProvenance {
 }
 
 function afterNormalizationChange(state: WorkspaceState): SolutionState {
-  return state.filters.length > 0 && state.filterProvenance === 'autoeq'
+  return state.filterProvenance === 'autoeq' &&
+    (state.filters.length > 0 || state.autoEqRun !== null)
     ? 'stale'
     : state.solutionState
 }
@@ -176,8 +260,8 @@ function curveCollectionUpdate(
   return {
     ...update,
     solutionState:
-      state.filters.length > 0 &&
       state.filterProvenance === 'autoeq' &&
+      (state.filters.length > 0 || state.autoEqRun !== null) &&
       selectedInputsChanged
         ? 'stale'
         : state.solutionState,
@@ -310,6 +394,7 @@ export function createWorkspaceStore() {
           filters: filters.map((filter) => ({ ...filter })),
           selectedFilterId,
           filterProvenance: replacesAutoEq ? 'autoeq' : provenance,
+          autoEqRun: replacesAutoEq ? state.autoEqRun : null,
           solutionState:
             provenance === 'autoeq'
               ? 'clean'
@@ -318,6 +403,17 @@ export function createWorkspaceStore() {
                 : replacesAutoEq
                   ? 'modified'
                   : 'clean',
+        })
+      }),
+    applyAutoEqResult: (result) =>
+      set((state) => {
+        if (!validAutoEqResult(result)) return state
+        return record(state, {
+          filters: result.filters.map((filter) => ({ ...filter })),
+          selectedFilterId: null,
+          filterProvenance: 'autoeq',
+          solutionState: 'clean',
+          autoEqRun: cloneAutoEqRunRecord({ manifest: result.manifest }),
         })
       }),
     applyFilterSnapshot: (snapshot) =>
@@ -333,6 +429,7 @@ export function createWorkspaceStore() {
           filters: snapshot.filters.map((filter) => ({ ...filter })),
           filterProvenance: snapshot.filterProvenance,
           solutionState: snapshot.solutionState,
+          autoEqRun: cloneAutoEqRunRecord(snapshot.autoEqRun),
           selectedFilterId: null,
         })
       }),
@@ -435,6 +532,8 @@ export function createWorkspaceStore() {
         )) return state
         return record(state, {
           filters: [...state.filters].sort((left, right) => left.frequencyHz - right.frequencyHz),
+          solutionState: afterManualEdit(state),
+          filterProvenance: manualProvenance(state),
         })
       }),
     replaceFiltersFromImport: (filters) =>
@@ -471,6 +570,7 @@ export function createWorkspaceStore() {
           selectedFilterId: null,
           filterProvenance: 'manual',
           solutionState: 'clean',
+          autoEqRun: null,
         })
       }),
     undo: () =>

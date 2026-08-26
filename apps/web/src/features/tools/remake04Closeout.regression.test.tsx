@@ -26,6 +26,7 @@ function capture(gainDb: number) {
     filters: [{ ...filter, gainDb }],
     filterProvenance: 'manual' as const,
     solutionState: 'clean' as const,
+    autoEqRun: null,
     preampDb: -Math.max(0, gainDb),
   }
 }

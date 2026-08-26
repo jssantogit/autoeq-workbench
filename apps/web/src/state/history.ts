@@ -1,5 +1,6 @@
 import type { AutoEqSettings, Filter, Normalization } from '@autoeq-workbench/core'
 import type { FilterProvenance, SolutionState } from './workspaceStore'
+import { cloneAutoEqRunRecord, type AutoEqRunRecord } from './autoEqRun'
 
 export interface WorkspaceHistorySnapshot {
   normalization: Normalization
@@ -8,6 +9,7 @@ export interface WorkspaceHistorySnapshot {
   selectedFilterId: string | null
   solutionState: SolutionState
   filterProvenance: FilterProvenance | null
+  autoEqRun: AutoEqRunRecord | null
   activeFrId: string | null
   activeTargetId: string | null
 }
@@ -25,6 +27,7 @@ export function createHistorySnapshot(
     selectedFilterId: state.selectedFilterId,
     solutionState: state.solutionState,
     filterProvenance: state.filterProvenance,
+    autoEqRun: cloneAutoEqRunRecord(state.autoEqRun),
     activeFrId: state.activeFrId,
     activeTargetId: state.activeTargetId,
   }
@@ -35,8 +38,8 @@ export function restoreHistorySnapshot(
   activeIds: ActiveCurveIds,
 ): WorkspaceHistoryState {
   const solutionState =
-    snapshot.filters.length > 0 &&
     snapshot.filterProvenance === 'autoeq' &&
+    (snapshot.filters.length > 0 || snapshot.autoEqRun !== null) &&
     (snapshot.activeFrId !== activeIds.activeFrId ||
       snapshot.activeTargetId !== activeIds.activeTargetId)
       ? 'stale'
@@ -49,5 +52,6 @@ export function restoreHistorySnapshot(
     selectedFilterId: snapshot.selectedFilterId,
     solutionState,
     filterProvenance: snapshot.filterProvenance,
+    autoEqRun: cloneAutoEqRunRecord(snapshot.autoEqRun),
   }
 }

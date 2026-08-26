@@ -5,6 +5,7 @@ import {
   type Filter,
 } from '@autoeq-workbench/core'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createAutoEqResult } from '../test/autoEqFixture'
 import { createEqCompareStore } from './eqCompareStore'
 import { initializeEqCompareRecorder } from './initializeEqCompareRecorder'
 import { createUiStore } from './uiStore'
@@ -56,6 +57,26 @@ describe('initializeEqCompareRecorder', () => {
     expect(compare.getState().snapshots[1]?.filterProvenance).toBe('manual')
     expect(compare.getState().snapshots[2]?.solutionState).toBe('stale')
 
+    cleanup()
+  })
+
+  it('records the AutoEQ run manifest with its canonical filters', () => {
+    const workspace = createWorkspaceStore()
+    const compare = createEqCompareStore()
+    const cleanup = initializeEqCompareRecorder(workspace, compare)
+    const result = createAutoEqResult()
+
+    workspace.getState().applyAutoEqResult(result)
+    vi.advanceTimersByTime(500)
+
+    const snapshot = compare.getState().snapshots[0]!
+    expect(snapshot).toMatchObject({
+      filters: result.filters,
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+      autoEqRun: { manifest: result.manifest },
+    })
+    expect(snapshot.autoEqRun!.manifest).not.toBe(result.manifest)
     cleanup()
   })
 

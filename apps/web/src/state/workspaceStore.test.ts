@@ -8,6 +8,7 @@ import {
   type FilterDefinition,
 } from '@autoeq-workbench/core'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { createAutoEqResult } from '../test/autoEqFixture'
 import {
   createWorkspaceStore,
   defaultNormalization,
@@ -68,6 +69,7 @@ describe('workspace curve collection', () => {
       activeFrId: null,
       activeTargetId: null,
       normalization: defaultNormalization,
+      autoEqRun: null,
     })
   })
 
@@ -195,6 +197,170 @@ describe('workspace curve collection', () => {
 })
 
 describe('workspace history and filters', () => {
+  it('applies an isolated AutoEQ result atomically in one undoable history step', () => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'manual')
+    store.getState().selectFilter(filter.id)
+    const result = createAutoEqResult(4)
+    const expectedManifest = structuredClone(result.manifest)
+
+    store.getState().applyAutoEqResult(result)
+
+    expect(store.getState()).toMatchObject({
+      filters: result.filters,
+      selectedFilterId: null,
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+      autoEqRun: { manifest: expectedManifest },
+    })
+    expect(store.getState().filters).not.toBe(result.filters)
+    expect(store.getState().autoEqRun!.manifest).not.toBe(result.manifest)
+    expect(store.getState().autoEqRun!.manifest.finalFilters).not.toBe(result.manifest.finalFilters)
+
+    result.filters[0]!.gainDb = 9
+    result.manifest.finalFilters[0]!.gainDb = 9
+    result.manifest.algorithmParameters.deadbandDb = 9
+    expect(store.getState().filters[0]!.gainDb).toBe(4)
+    expect(store.getState().autoEqRun!.manifest).toEqual(expectedManifest)
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      filters: [filter],
+      selectedFilterId: filter.id,
+      filterProvenance: 'manual',
+      solutionState: 'clean',
+      autoEqRun: null,
+    })
+    store.getState().redo()
+    expect(store.getState()).toMatchObject({
+      filters: [{ ...filter, id: 'autoeq-1', gainDb: 4 }],
+      selectedFilterId: null,
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+      autoEqRun: { manifest: expectedManifest },
+    })
+  })
+
+  it('preserves the AutoEQ run through modified and stale states but clears it on import', () => {
+    const store = createWorkspaceStore()
+    const result = createAutoEqResult()
+    store.getState().applyAutoEqResult(result)
+
+    store.getState().updateFilter('autoeq-1', { gainDb: 4 })
+    expect(store.getState()).toMatchObject({
+      filterProvenance: 'autoeq',
+      solutionState: 'modified',
+      autoEqRun: { manifest: result.manifest },
+    })
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
+    expect(store.getState()).toMatchObject({
+      activeFrId: source.id,
+      activeTargetId: target.id,
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+    store.getState().setNormalization({ anchorHz: 1_000, targetDb: -1 })
+    store.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxGainDb: 12 })
+    expect(store.getState()).toMatchObject({
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+
+    store.getState().replaceFiltersFromImport([
+      { enabled: true, type: 'PK', frequencyHz: 2_000, gainDb: 2, q: 1 },
+    ])
+    expect(store.getState()).toMatchObject({
+      filterProvenance: 'manual',
+      solutionState: 'clean',
+      autoEqRun: null,
+    })
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+    store.getState().redo()
+    expect(store.getState().autoEqRun).toBeNull()
+  })
+
+  it('rejects an inconsistent AutoEQ result atomically without adding history', () => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'manual')
+    const before = store.getState()
+    const result = createAutoEqResult()
+    result.manifest.finalFilters[0]!.gainDb = 9
+
+    store.getState().applyAutoEqResult(result)
+
+    expect(store.getState()).toBe(before)
+    const mismatchedMetrics = createAutoEqResult()
+    mismatchedMetrics.metrics.maeDb = 9
+    store.getState().applyAutoEqResult(mismatchedMetrics)
+    expect(store.getState()).toBe(before)
+    const missingMetrics = createAutoEqResult()
+    missingMetrics.metrics = {} as typeof missingMetrics.metrics
+    expect(() => store.getState().applyAutoEqResult(missingMetrics)).not.toThrow()
+    expect(store.getState()).toBe(before)
+    const missingAlgorithmParameters = createAutoEqResult()
+    missingAlgorithmParameters.manifest.algorithmParameters = null as never
+    expect(() => store.getState().applyAutoEqResult(missingAlgorithmParameters)).not.toThrow()
+    expect(store.getState()).toBe(before)
+    const malformedFilters = createAutoEqResult()
+    malformedFilters.filters = [null as never]
+    expect(() => store.getState().applyAutoEqResult(malformedFilters)).not.toThrow()
+    expect(store.getState()).toBe(before)
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([])
+  })
+
+  it('stales a successful empty AutoEQ run when its settings change', () => {
+    const store = createWorkspaceStore()
+    const result = createAutoEqResult()
+    result.filters = []
+    result.manifest.finalFilters = []
+
+    store.getState().applyAutoEqResult(result)
+    expect(store.getState()).toMatchObject({
+      filters: [],
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+      autoEqRun: { manifest: result.manifest },
+    })
+
+    store.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 8 })
+    expect(store.getState()).toMatchObject({
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+  })
+
+  it.each(['add', 'remove', 'toggle', 'reorder'] as const)(
+    'keeps the AutoEQ run and marks a clean solution modified on %s',
+    (operation) => {
+      const store = createWorkspaceStore()
+      const result = createAutoEqResult()
+      if (operation === 'reorder') {
+        const second = { ...result.filters[0]!, id: 'autoeq-2', frequencyHz: 2_000 }
+        result.filters.push(second)
+        result.manifest.finalFilters.push({ ...second })
+      }
+      store.getState().applyAutoEqResult(result)
+
+      if (operation === 'add') store.getState().addFilter('PK')
+      if (operation === 'remove') store.getState().removeFilter('autoeq-1')
+      if (operation === 'toggle') store.getState().toggleFilter('autoeq-1')
+      if (operation === 'reorder') store.getState().reorderFilter('autoeq-2', 'up')
+
+      expect(store.getState()).toMatchObject({
+        filterProvenance: 'autoeq',
+        solutionState: 'modified',
+        autoEqRun: { manifest: result.manifest },
+      })
+    },
+  )
+
   it('stores valid AutoEQ settings as copied undoable snapshots and rejects invalid updates', () => {
     const store = createWorkspaceStore()
     const settings: AutoEqSettings = { ...DEFAULT_AUTOEQ_SETTINGS, minFrequencyHz: 30, maxQ: 10 }
@@ -382,6 +548,7 @@ describe('workspace history and filters', () => {
       ],
       filterProvenance: 'manual',
       solutionState: 'stale',
+      autoEqRun: null,
     }
     const expectedFilters = snapshot.filters.map((item) => ({ ...item }))
 
@@ -447,6 +614,7 @@ describe('workspace history and filters', () => {
       filters,
       filterProvenance: 'autoeq',
       solutionState: 'clean',
+      autoEqRun: null,
     })
 
     expect(store.getState()).toBe(beforeApply)

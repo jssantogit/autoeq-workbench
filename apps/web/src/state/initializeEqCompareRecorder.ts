@@ -11,13 +11,15 @@ export function initializeEqCompareRecorder(
     if (
       state.filters === previousState.filters &&
       state.filterProvenance === previousState.filterProvenance &&
-      state.solutionState === previousState.solutionState
+      state.solutionState === previousState.solutionState &&
+      state.autoEqRun === previousState.autoEqRun
     ) return
 
     compare.getState().record({
       filters: state.filters,
       filterProvenance: state.filterProvenance,
       solutionState: state.solutionState,
+      autoEqRun: state.autoEqRun,
       preampDb: calculatePreampDb(state.filters, MVP_NUMERIC_POLICY.sampleRateHz).preampDb,
     })
   })

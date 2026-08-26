@@ -1,6 +1,7 @@
 import type { Filter } from '@autoeq-workbench/core'
 import { createStore } from 'zustand/vanilla'
 import type { FilterProvenance, SolutionState } from './workspaceStore'
+import { cloneAutoEqRunRecord, type AutoEqRunRecord } from './autoEqRun'
 
 export const RECORD_DEBOUNCE_MS = 500
 export const RECORD_MIN_GAP_MS = 1_000
@@ -12,6 +13,7 @@ export interface EqSnapshot {
   filters: Filter[]
   filterProvenance: FilterProvenance | null
   solutionState: SolutionState
+  autoEqRun: AutoEqRunRecord | null
   preampDb: number
   summary: string
 }
@@ -32,16 +34,21 @@ export interface EqCompareState {
 }
 
 function copyCapture(capture: EqSnapshotCapture): EqSnapshotCapture {
-  return { ...capture, filters: capture.filters.map((filter) => ({ ...filter })) }
+  return {
+    ...capture,
+    filters: capture.filters.map((filter) => ({ ...filter })),
+    autoEqRun: cloneAutoEqRunRecord(capture.autoEqRun),
+  }
 }
 
 export function isCanonicalEqStateEqual(
-  left: Pick<EqSnapshotCapture, 'filters' | 'filterProvenance' | 'solutionState'>,
-  right: Pick<EqSnapshotCapture, 'filters' | 'filterProvenance' | 'solutionState'>,
+  left: Pick<EqSnapshotCapture, 'filters' | 'filterProvenance' | 'solutionState' | 'autoEqRun'>,
+  right: Pick<EqSnapshotCapture, 'filters' | 'filterProvenance' | 'solutionState' | 'autoEqRun'>,
 ): boolean {
   return (
     left.filterProvenance === right.filterProvenance &&
     left.solutionState === right.solutionState &&
+    JSON.stringify(left.autoEqRun) === JSON.stringify(right.autoEqRun) &&
     left.filters.length === right.filters.length &&
     left.filters.every((filter, index) => {
       const other = right.filters[index]
