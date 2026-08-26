@@ -182,7 +182,7 @@ export function resolveStandardAutoEqConfig(settings: AutoEqSettings): AutoEqCon
 - [ ] **Step 4: Implement `resolveStandardAutoEqConfig()`** using `isValidAutoEqSettings()`. Reject invalid input rather than clamp/widen it and preserve a valid requested effective envelope exactly.
 - [ ] **Step 5: Write objective RED tests** for mean deadbanded Huber behavior, zero fit inside ±0.1 dB, filter-count cost, high-Q cost above Q=2, gain cost above ±6 dB, and cancellation cost supplied by the audit.
 - [ ] **Step 6: Implement `evaluateObjective()`** as `mean(deadbandedHuber) + structural penalties`. Reject empty/mismatched/non-finite residual input with a structured validation/numeric error rather than returning `NaN`.
-- [ ] **Step 7: Run** the two new test files plus `pnpm --filter @autoeq-workbench/core typecheck` and confirm GREEN.
+- [ ] **Step 7: Run** `pnpm --filter @autoeq-workbench/core test -- test/autoeq/config.test.ts test/autoeq/loss.test.ts` and `pnpm --filter @autoeq-workbench/core typecheck`; confirm GREEN.
 - [ ] **Step 8: Commit** `feat(core): define Standard AutoEQ contracts and objective`.
 
 ---
@@ -226,12 +226,13 @@ export function generateCandidates(input: {
 Candidate IDs are deterministic temporary optimizer identities. After sort/deduplication, assign `candidate-1`, `candidate-2`, ... in returned order. Accepted filters retain their deterministic temporary IDs during optimization/cancellation scoring; Task 5 replaces them with final `autoeq-1..N` IDs after delivery ordering.
 
 - [ ] **Step 1: Write RED tests** for sub-threshold termination, sign-change splitting, geometric-center PK generation, effective gain/Q/Fc clamping, LS evidence, HS evidence, effective-range exclusion, stable ordering, 1/48-octave same-type deduplication, and deterministic temporary IDs.
-- [ ] **Step 2: Confirm RED** with `pnpm --filter @autoeq-workbench/core test -- test/autoeq/candidates.test.ts`.
+- [ ] **Step 2: Run** `pnpm --filter @autoeq-workbench/core test -- test/autoeq/candidates.test.ts` and confirm RED.
 - [ ] **Step 3: Implement residual regions** with equal-length, ascending-frequency, and finiteness validation.
 - [ ] **Step 4: Implement PK seeds** using geometric center and `Q = center / max(1e-9, end-start)`, clamped to `config.minPkQ..maxPkQ`; initial gain comes from log-frequency interpolation of residual at center and is clamped to effective gain.
 - [ ] **Step 5: Implement shelves** only when at least 70% of eligible samples in the approved low/high region share sign and median absolute residual is at least threshold. Keep Q 0.7 and do not generate a nominal shelf whose Fc is outside the effective run range.
 - [ ] **Step 6: Implement deterministic sort, dedupe, and temporary ID assignment** exactly from the spec.
-- [ ] **Step 7: Confirm GREEN** and commit `feat(core): generate deterministic AutoEQ candidates`.
+- [ ] **Step 7: Re-run** the candidate test file and core typecheck; confirm GREEN.
+- [ ] **Step 8: Commit** `feat(core): generate deterministic AutoEQ candidates`.
 
 ---
 
@@ -267,11 +268,13 @@ export function optimizeGreedy(input: {
 
 - [ ] **Step 1: Write a RED synthetic one-PK refinement test** starting near a known 1 kHz / +6 dB / Q2 response and assert final cascade MAE is lower than initial MAE.
 - [ ] **Step 2: Write RED envelope tests** proving no refined Fc/gain/PK-Q escapes the effective config and shelves remain Q 0.7.
-- [ ] **Step 3: Implement the three approved coordinate passes:** `1/6 octave, 1 dB, 1/2 Q-octave`; `1/24, 0.25 dB, 1/8 Q-octave`; `1/96, 0.1 dB, 1/32 Q-octave`. Evaluate the complete cascade for every tested coordinate.
-- [ ] **Step 4: Implement deterministic exact-tie resolution:** lower absolute gain, then lower Q, then lower Fc, then stable list order.
-- [ ] **Step 5: Write greedy RED tests** proving a broad material correction adds at least one but fewer than the ceiling, `maxFilters=0` returns `[]`, accepted objective values are monotonic non-increasing, and improvement below `0.005` stops addition.
-- [ ] **Step 6: Implement `optimizeGreedy()`** from zero filters. Recompute residual from the entire accepted cascade after every accepted addition. Never mutate input arrays or seed from current workspace filters.
-- [ ] **Step 7: Confirm GREEN**, run core typecheck, commit `feat(core): optimize Standard AutoEQ cascade`.
+- [ ] **Step 3: Run** `pnpm --filter @autoeq-workbench/core test -- test/autoeq/refine.test.ts` and confirm RED.
+- [ ] **Step 4: Implement the three approved coordinate passes:** `1/6 octave, 1 dB, 1/2 Q-octave`; `1/24, 0.25 dB, 1/8 Q-octave`; `1/96, 0.1 dB, 1/32 Q-octave`. Evaluate the complete cascade for every tested coordinate.
+- [ ] **Step 5: Implement deterministic exact-tie resolution:** lower absolute gain, then lower Q, then lower Fc, then stable list order.
+- [ ] **Step 6: Write greedy RED tests** proving a broad material correction adds at least one but fewer than the ceiling, `maxFilters=0` returns `[]`, accepted objective values are monotonic non-increasing, and improvement below `0.005` stops addition.
+- [ ] **Step 7: Implement `optimizeGreedy()`** from zero filters. Recompute residual from the entire accepted cascade after every accepted addition. Never mutate input arrays or seed from current workspace filters.
+- [ ] **Step 8: Re-run** the refinement test file and core typecheck; confirm GREEN.
+- [ ] **Step 9: Commit** `feat(core): optimize Standard AutoEQ cascade`.
 
 ---
 
@@ -301,11 +304,13 @@ export function pruneFilters(input: {
 ```
 
 - [ ] **Step 1: Write RED audit tests** for nearby opposite-sign PKs scoring higher than far-apart pairs, >1 octave pairs omitted, `moderate >= 0.35`, `strong >= 0.65`, stable pair IDs/order, and zero score for no qualifying pair.
-- [ ] **Step 2: Implement pair score** as cosine similarity of absolute individual responses × `(1 - octaveDistance)` × `min(abs(gainA), abs(gainB))/15`, only for opposite non-zero gains within one octave.
-- [ ] **Step 3: Wire `audit.totalScore` into the objective**. Do not maintain a second cancellation approximation.
-- [ ] **Step 4: Write RED pruning tests** for <0.05 dB removal, objective-neutral/removal-tolerant filters removed, a required +6 dB synthetic PK retained, restart-from-zero after each removal, and final refine pass.
-- [ ] **Step 5: Implement iterative pruning** exactly from the approved spec.
-- [ ] **Step 6: Confirm GREEN**, run full core suite, commit `feat(core): audit and prune AutoEQ filters`.
+- [ ] **Step 2: Run** `pnpm --filter @autoeq-workbench/core test -- test/autoeq/cancellation.test.ts` and confirm RED.
+- [ ] **Step 3: Implement pair score** as cosine similarity of absolute individual responses × `(1 - octaveDistance)` × `min(abs(gainA), abs(gainB))/15`, only for opposite non-zero gains within one octave.
+- [ ] **Step 4: Wire `audit.totalScore` into the objective**. Do not maintain a second cancellation approximation.
+- [ ] **Step 5: Write RED pruning tests** for <0.05 dB removal, objective-neutral/removal-tolerant filters removed, a required +6 dB synthetic PK retained, restart-from-zero after each removal, and final refine pass.
+- [ ] **Step 6: Implement iterative pruning** exactly from the approved spec.
+- [ ] **Step 7: Re-run** the cancellation tests and full core suite; confirm GREEN.
+- [ ] **Step 8: Commit** `feat(core): audit and prune AutoEQ filters`.
 
 ---
 
@@ -347,13 +352,15 @@ export function runStandardAutoEq(input: StandardAutoEqInput): AutoEqResult
 `calculatePreampDb()` remains the preamp authority. Its existing dense 20–20k grid and safety rounding already return a 0.1 dB manual-entry-safe preamp. Do not independently re-round preamp with a competing formula; `preampStepDb` documents the delivery precision shared with that existing behavior.
 
 - [ ] **Step 1: Write quantization RED tests** for clamp-before-round, 1 Hz / 0.1 dB / 0.01 Q grid, shelf Q 0.7, decimal normalization, and `-0 -> 0`.
-- [ ] **Step 2: Implement quantization** with decimal-safe nearest-step rounding while respecting the effective run config.
-- [ ] **Step 3: Write discrete-refinement RED tests** proving two passes of current/±1-step search never worsen the raw quantized objective and never leave the policy grid or effective bounds.
-- [ ] **Step 4: Implement discrete refinement** with the same deterministic tie-breakers used by continuous refinement.
-- [ ] **Step 5: Write pipeline RED tests** covering source/target preparation on 96 ppo; fit subset inside effective frequency range; one known inverse-PK case reaching MAE <0.25 dB with `maxFilters<=5`; two identical runs deep-equal; final zero-gain filters removed; final list frequency-sorted; IDs exactly `autoeq-1..N`; final audit derived after quantization/cleanup and after final IDs are assigned; final metrics derived from delivered filters over the effective fit interval; preamp derived from delivered filters through `calculatePreampDb()` on the full supported band; manifest contains no timestamp, UUID, or browser runId.
-- [ ] **Step 6: Implement exact pipeline order:** validate → prepare canonical grid → select fit subset → desired correction → greedy optimize → prune/final continuous refine → quantize → discrete refine → remove delivered 0 dB filters → deterministic final sort → assign `autoeq-1..N` → exact final cascade → final metrics → full-band preamp → final cancellation audit → manifest.
-- [ ] **Step 7: Assert in tests that `result.filters`, `manifest.finalFilters`, metrics, preamp, and audit all describe that same final list.**
-- [ ] **Step 8: Run** `pnpm --filter @autoeq-workbench/core test` and `pnpm --filter @autoeq-workbench/core typecheck`; commit `feat(core): complete Standard AutoEQ v1 pipeline`.
+- [ ] **Step 2: Run** `pnpm --filter @autoeq-workbench/core test -- test/autoeq/quantize.test.ts` and confirm RED.
+- [ ] **Step 3: Implement quantization** with decimal-safe nearest-step rounding while respecting the effective run config.
+- [ ] **Step 4: Write discrete-refinement RED tests** proving two passes of current/±1-step search never worsen the raw quantized objective and never leave the policy grid or effective bounds.
+- [ ] **Step 5: Implement discrete refinement** with the same deterministic tie-breakers used by continuous refinement.
+- [ ] **Step 6: Write pipeline RED tests** covering source/target preparation on 96 ppo; fit subset inside effective frequency range; one known inverse-PK case reaching MAE <0.25 dB with `maxFilters<=5`; two identical runs deep-equal; final zero-gain filters removed; final list frequency-sorted; IDs exactly `autoeq-1..N`; final audit derived after quantization/cleanup and after final IDs are assigned; final metrics derived from delivered filters over the effective fit interval; preamp derived from delivered filters through `calculatePreampDb()` on the full supported band; manifest contains no timestamp, UUID, or browser runId.
+- [ ] **Step 7: Implement exact pipeline order:** validate → prepare canonical grid → select fit subset → desired correction → greedy optimize → prune/final continuous refine → quantize → discrete refine → remove delivered 0 dB filters → deterministic final sort → assign `autoeq-1..N` → exact final cascade → final metrics → full-band preamp → final cancellation audit → manifest.
+- [ ] **Step 8: Assert in tests that `result.filters`, `manifest.finalFilters`, metrics, preamp, and audit all describe that same final list.**
+- [ ] **Step 9: Run** `pnpm --filter @autoeq-workbench/core test` and `pnpm --filter @autoeq-workbench/core typecheck`; confirm GREEN.
+- [ ] **Step 10: Commit** `feat(core): complete Standard AutoEQ v1 pipeline`.
 
 ---
 
@@ -382,16 +389,18 @@ applyAutoEqResult: (result: AutoEqResult) => void
 
 Extend `FilterSnapshotState`, `WorkspaceHistorySnapshot`, `EqSnapshot`, and `EqSnapshotCapture` with `autoEqRun: AutoEqRunRecord | null`.
 
-Implement one helper that deep-copies the JSON-safe manifest/filter arrays when recording/restoring. Compare canonical equality must include the run record; because the manifest is deterministic JSON-safe data, a stable deep comparison is acceptable. Do not compare transient Worker state.
+Implement one helper that deep-copies the JSON-safe manifest/filter arrays when recording/restoring. Canonical Compare equality must include `autoEqRun` exactly; because the manifest is deterministic JSON-safe data, use `JSON.stringify(left.autoEqRun) === JSON.stringify(right.autoEqRun)` in the equality helper. Do not compare transient Worker state.
 
 - [ ] **Step 1: Write workspace RED tests** proving `applyAutoEqResult()` is one undo point, sets delivered filters, clears selection, sets provenance `autoeq`, state `clean`, and stores an isolated deep copy of the manifest.
 - [ ] **Step 2: Write history RED tests** proving Undo/Redo restores the associated run record together with filters/provenance/state.
 - [ ] **Step 3: Write lifecycle RED tests** proving manual edit after AutoEQ keeps the run record and marks `modified`; active FR/Target, normalization, or settings change keeps the record and marks `stale`; importing a new independent manual filter set clears the record.
-- [ ] **Step 4: Implement `autoEqRun` + `applyAutoEqResult()`**. This action is the production route that creates a clean AutoEQ solution. Validate and deep-copy the result before recording history.
-- [ ] **Step 5: Extend history snapshots** to deep-copy and restore the run record.
-- [ ] **Step 6: Write Compare RED tests** proving A/B snapshots retain and restore the matching run record, canonical equality includes that record, and applying A/B never associates one manifest with another filter solution.
-- [ ] **Step 7: Extend Compare capture/recorder** with `autoEqRun`; keep the Remake 04 snapshot cap, debounce, coalescing, and assigned-snapshot freeze behavior unchanged.
-- [ ] **Step 8: Run** state-focused tests plus `pnpm --filter @autoeq-workbench/web typecheck`; commit `feat(web): track AutoEQ run provenance in workspace history`.
+- [ ] **Step 4: Run** `pnpm --filter @autoeq-workbench/web test -- src/state/workspaceStore.test.ts` and confirm RED.
+- [ ] **Step 5: Implement `autoEqRun` + `applyAutoEqResult()`**. This action is the production route that creates a clean AutoEQ solution. Validate and deep-copy the result before recording history.
+- [ ] **Step 6: Extend history snapshots** to deep-copy and restore the run record.
+- [ ] **Step 7: Write Compare RED tests** proving A/B snapshots retain and restore the matching run record, canonical equality includes that record, and applying A/B never associates one manifest with another filter solution.
+- [ ] **Step 8: Extend Compare capture/recorder** with `autoEqRun`; keep the Remake 04 snapshot cap, debounce, coalescing, and assigned-snapshot freeze behavior unchanged.
+- [ ] **Step 9: Run** `pnpm --filter @autoeq-workbench/web test -- src/state/workspaceStore.test.ts src/state/eqCompareStore.test.ts src/state/initializeEqCompareRecorder.test.ts` and `pnpm --filter @autoeq-workbench/web typecheck`; confirm GREEN.
+- [ ] **Step 10: Commit** `feat(web): track AutoEQ run provenance in workspace history`.
 
 ---
 
@@ -429,15 +438,17 @@ export function cancelAutoEq(): void
 Worker messages carry `{ type, runId, ...payload }`. `runId` is browser-only and never enters core manifest data.
 
 - [ ] **Step 1: Write client RED tests** with a fake Worker adapter for success result, structured error, terminate-on-cancel, fresh Worker on the next run, and late-message/runId rejection.
-- [ ] **Step 2: Implement `autoeq.worker.ts`** importing only public core APIs and serializing `CoreError` as category + message. Unexpected exceptions become a safe `optimization` or `numeric` public error message without exposing a stack trace to product UI.
-- [ ] **Step 3: Implement `autoeqClient.ts`** as one disposable Worker per run; no persistent pool and no progress percentage.
-- [ ] **Step 4: Write transient-store RED tests** for `idle -> running -> idle`, `idle -> running -> error`, dismiss/reset, and cancellation returning to idle without an error banner.
-- [ ] **Step 5: Implement `autoeqRunStore`** separate from undoable workspace state.
-- [ ] **Step 6: Write controller RED tests** proving it captures immutable active FR/Target/normalization/settings, rejects a workspace that is not ready, applies only a valid current result, and never mutates filters on cancel/error.
-- [ ] **Step 7: Define and test a pure run-input signature** from active FR ID + active Target ID + their numerical raw point data + normalization + `AutoEqSettings`. Display names are provenance only and do not affect numerical obsolescence. Removing/replacing selected numerical input changes the signature.
-- [ ] **Step 8: Add obsolete-result RED tests** where FR/Target selection, selected curve numerical data, normalization, or settings change before resolution; confirm the result is discarded and the prior solution survives. Also prove an unrelated tab/theme/UI change does not obsolete the result.
-- [ ] **Step 9: Implement controller orchestration**: preflight current workspace, capture input/signature, start client, compare the current signature before commit, call `applyAutoEqResult()` only on match, and clear active transient run state on every terminal path.
-- [ ] **Step 10: Run** worker/controller tests plus web typecheck; commit `feat(web): run AutoEQ safely in a disposable worker`.
+- [ ] **Step 2: Run** `pnpm --filter @autoeq-workbench/web test -- src/workers/autoeqClient.test.ts` and confirm RED.
+- [ ] **Step 3: Implement `autoeq.worker.ts`** importing only public core APIs. A caught `CoreError` serializes its approved category + message. Any non-`CoreError` exception serializes exactly `{ category: 'optimization', message: 'AutoEQ optimization failed.' }`; product UI never receives its stack trace.
+- [ ] **Step 4: Implement `autoeqClient.ts`** as one disposable Worker per run; no persistent pool and no progress percentage.
+- [ ] **Step 5: Write transient-store RED tests** for `idle -> running -> idle`, `idle -> running -> error`, dismiss/reset, and cancellation returning to idle without an error banner.
+- [ ] **Step 6: Implement `autoeqRunStore`** separate from undoable workspace state.
+- [ ] **Step 7: Write controller RED tests** proving it captures immutable active FR/Target/normalization/settings, rejects a workspace that is not ready, applies only a valid current result, and never mutates filters on cancel/error.
+- [ ] **Step 8: Define and test a pure run-input signature** from active FR ID + active Target ID + their numerical raw point data + normalization + `AutoEqSettings`. Display names are provenance only and do not affect numerical obsolescence. Removing/replacing selected numerical input changes the signature.
+- [ ] **Step 9: Add obsolete-result RED tests** where FR/Target selection, selected curve numerical data, normalization, or settings change before resolution; confirm the result is discarded and the prior solution survives. Also prove an unrelated tab/theme/UI change does not obsolete the result.
+- [ ] **Step 10: Implement controller orchestration**: preflight current workspace, capture input/signature, start client, compare the current signature before commit, call `applyAutoEqResult()` only on match, and clear active transient run state on every terminal path.
+- [ ] **Step 11: Run** `pnpm --filter @autoeq-workbench/web test -- src/workers/autoeqClient.test.ts src/state/autoeqRunStore.test.ts src/state/autoeqController.test.ts` and `pnpm --filter @autoeq-workbench/web typecheck`; confirm GREEN.
+- [ ] **Step 12: Commit** `feat(web): run AutoEQ safely in a disposable worker`.
 
 ---
 
@@ -457,11 +468,13 @@ Worker messages carry `{ type, runId, ...payload }`. `runId` is browser-only and
 - [ ] **Step 1: Write UI RED tests** proving AutoEQ is disabled without valid ready active FR+Target coverage, enabled when ready and idle, and no duplicate Standard settings surface appears.
 - [ ] **Step 2: Write running-state RED tests** proving the main action becomes `Cancel`, there is no percentage/progress meter, and clicking it invokes `cancelAutoEq()`.
 - [ ] **Step 3: Write error-state RED tests** proving a structured public error is shown compactly with accessible alert semantics while the prior filter rows stay present.
-- [ ] **Step 4: Write success integration RED tests** with a mocked controller result proving the canonical filter table updates, solution becomes clean AutoEQ, and graph/Tools consumers update through existing canonical state rather than result-specific side channels.
-- [ ] **Step 5: Implement UI wiring** in the existing source-shaped AutoEQ button row. Keep Constraints, Filter I/O, FR selector, and Target selector in their current composition.
-- [ ] **Step 6: Pass `derived` from `App` to `EqualizerTab`** and update `App.test.tsx` fixtures accordingly. No AutoEQ DSP belongs in React.
-- [ ] **Step 7: Add only the compact running/error CSS needed in `apps/web/src/index.css`**, reusing current CSS variables/density and preserving Light/Dark behavior.
-- [ ] **Step 8: Run** Equalizer, App, graph, and Tools tests plus web typecheck/build; commit `feat(web): expose Standard AutoEQ workflow`.
+- [ ] **Step 4: Write success integration RED tests** with a mocked controller completion proving the canonical filter table updates, solution becomes clean AutoEQ, and graph/Tools consumers update through existing canonical state rather than result-specific side channels.
+- [ ] **Step 5: Run** `pnpm --filter @autoeq-workbench/web test -- src/features/filters/EqualizerTab.test.tsx src/App.test.tsx` and confirm RED.
+- [ ] **Step 6: Implement UI wiring** in the existing source-shaped AutoEQ button row. Keep Constraints, Filter I/O, FR selector, and Target selector in their current composition.
+- [ ] **Step 7: Pass `derived` from `App` to `EqualizerTab`** and update `App.test.tsx` fixtures accordingly. No AutoEQ DSP belongs in React.
+- [ ] **Step 8: Add only the compact running/error CSS needed in `apps/web/src/index.css`**, reusing current CSS variables/density and preserving Light/Dark behavior.
+- [ ] **Step 9: Run** `pnpm --filter @autoeq-workbench/web test -- src/features/filters/EqualizerTab.test.tsx src/App.test.tsx src/features/graph/FrequencyResponseGraph.component.test.tsx src/features/tools` plus `pnpm --filter @autoeq-workbench/web typecheck` and `pnpm --filter @autoeq-workbench/web build`; confirm GREEN.
+- [ ] **Step 10: Commit** `feat(web): expose Standard AutoEQ workflow`.
 
 ---
 
