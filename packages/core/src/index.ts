@@ -14,6 +14,8 @@ export type { AutoEqSettings } from './config/autoeqSettings.js'
 export { STANDARD_V1_CONFIG, resolveStandardAutoEqConfig } from './autoeq/config.js'
 export { evaluateObjective } from './autoeq/loss.js'
 export type { ObjectiveInput } from './autoeq/loss.js'
+export { findResidualRegions, generateCandidates } from './autoeq/candidates.js'
+export type { FilterCandidate, ResidualRegion } from './autoeq/candidates.js'
 export type {
   AutoEqConfig,
   AutoEqResult,
