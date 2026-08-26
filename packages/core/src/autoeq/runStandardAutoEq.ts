@@ -15,14 +15,21 @@ import type { AutoEqResult, RunManifest, StandardAutoEqInput } from './types.js'
 
 const TYPE_ORDER = { LS: 0, PK: 1, HS: 2 } as const
 
-function sortDeliveredFilters(filters: readonly Filter[]): Filter[] {
+export function finalizeDeliveredFilters(filters: readonly Filter[]): Filter[] {
   return [...filters].sort((left, right) =>
     left.frequencyHz - right.frequencyHz ||
     TYPE_ORDER[left.type] - TYPE_ORDER[right.type] ||
-    left.gainDb - right.gainDb ||
+    Math.abs(left.gainDb) - Math.abs(right.gainDb) ||
     left.q - right.q ||
-    left.id.localeCompare(right.id)
-  )
+    left.frequencyHz - right.frequencyHz
+  ).map((filter, index): Filter => ({
+    id: `autoeq-${index + 1}`,
+    enabled: filter.enabled,
+    type: filter.type,
+    frequencyHz: filter.frequencyHz,
+    gainDb: filter.gainDb,
+    q: filter.q,
+  }))
 }
 
 export function runStandardAutoEq(input: StandardAutoEqInput): AutoEqResult {
@@ -63,16 +70,9 @@ export function runStandardAutoEq(input: StandardAutoEqInput): AutoEqResult {
   const pruned = pruneFilters({ filters: optimized.filters, desiredDb, frequencies, config })
   const quantized = quantizeFilters(pruned, config)
   const discrete = discreteRefine({ filters: quantized, desiredDb, frequencies, config })
-  const delivered = sortDeliveredFilters(
+  const delivered = finalizeDeliveredFilters(
     discrete.filter((filter) => filter.gainDb !== 0),
-  ).map((filter, index): Filter => ({
-    id: `autoeq-${index + 1}`,
-    enabled: filter.enabled,
-    type: filter.type,
-    frequencyHz: filter.frequencyHz,
-    gainDb: filter.gainDb,
-    q: filter.q,
-  }))
+  )
 
   const deliveredDb = cascadeMagnitudeDb(delivered, frequencies, config.sampleRateHz)
   const residualDb = desiredDb.map((value, index) => value - deliveredDb[index]!)

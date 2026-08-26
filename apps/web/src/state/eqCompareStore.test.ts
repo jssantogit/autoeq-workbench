@@ -21,6 +21,7 @@ function capture(
     filterProvenance: 'manual' as const,
     solutionState: 'clean' as const,
     autoEqRun,
+    runInputSignature: null,
     preampDb: -2,
   }
 }
@@ -89,6 +90,11 @@ describe('EQ compare store', () => {
     }
 
     expect(isCanonicalEqStateEqual(left, sameCanonicalState)).toBe(true)
+    const sameCanonicalWithDifferentContext = {
+      ...sameCanonicalState,
+      runInputSignature: 'different-run-context',
+    }
+    expect(isCanonicalEqStateEqual(left, sameCanonicalWithDifferentContext)).toBe(true)
     expect(
       isCanonicalEqStateEqual(left, {
         ...sameCanonicalState,

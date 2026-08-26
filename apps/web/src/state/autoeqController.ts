@@ -1,7 +1,6 @@
 import {
   isValidAutoEqSettings,
   type AutoEqResult,
-  type AutoEqSettings,
   type Curve,
   type StandardAutoEqInput,
 } from '@autoeq-workbench/core'
@@ -15,51 +14,16 @@ import {
 } from '../workers/autoeqClient'
 import { autoEqRunStore, type AutoEqRunState } from './autoeqRunStore'
 import {
+  createAutoEqRunInputSignature,
+  getSelectedAutoEqCurves,
+} from './autoEqRunInputSignature'
+import {
   deriveWorkspace,
   workspaceStore,
   type WorkspaceState,
 } from './workspaceStore'
 
-type RunSignatureState = Pick<
-  WorkspaceState,
-  'curves' | 'activeFrId' | 'activeTargetId' | 'normalization' | 'autoeqSettings'
->
-
-function selectedCurves(state: RunSignatureState): { source: Curve; target: Curve } | null {
-  const source = state.curves.find(
-    (curve) => curve.id === state.activeFrId && curve.kind === 'fr',
-  )
-  const target = state.curves.find(
-    (curve) => curve.id === state.activeTargetId && curve.kind === 'target',
-  )
-  return source === undefined || target === undefined ? null : { source, target }
-}
-
-function settingsSignature(settings: AutoEqSettings): number[] {
-  return [
-    settings.minFrequencyHz,
-    settings.maxFrequencyHz,
-    settings.minGainDb,
-    settings.maxGainDb,
-    settings.minQ,
-    settings.maxQ,
-    settings.maxFilters,
-  ]
-}
-
-export function createAutoEqRunInputSignature(state: RunSignatureState): string | null {
-  const selected = selectedCurves(state)
-  if (selected === null) return null
-
-  return JSON.stringify({
-    activeFrId: selected.source.id,
-    activeTargetId: selected.target.id,
-    sourcePoints: selected.source.rawPoints.map(({ frequencyHz, db }) => [frequencyHz, db]),
-    targetPoints: selected.target.rawPoints.map(({ frequencyHz, db }) => [frequencyHz, db]),
-    normalization: [state.normalization.anchorHz, state.normalization.targetDb],
-    settings: settingsSignature(state.autoeqSettings),
-  })
-}
+export { createAutoEqRunInputSignature } from './autoEqRunInputSignature'
 
 function cloneCurve(curve: Curve): Curve {
   return {
@@ -70,7 +34,7 @@ function cloneCurve(curve: Curve): Curve {
 }
 
 function captureRunInput(state: WorkspaceState): StandardAutoEqInput | null {
-  const selected = selectedCurves(state)
+  const selected = getSelectedAutoEqCurves(state)
   if (selected === null) return null
 
   return {
@@ -144,7 +108,13 @@ export function createAutoEqController({
       if (runStore.getState().activeRunId !== runId) return
 
       if (createAutoEqRunInputSignature(workspace.getState()) === signature) {
-        workspace.getState().applyAutoEqResult(result)
+        if (!workspace.getState().applyAutoEqResult(result)) {
+          runStore.getState().fail(runId, {
+            category: 'optimization',
+            message: 'AutoEQ optimization failed.',
+          })
+          return
+        }
       }
       runStore.getState().finish(runId)
     } catch (cause) {

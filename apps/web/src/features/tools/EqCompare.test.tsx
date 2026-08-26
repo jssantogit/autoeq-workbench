@@ -1,7 +1,7 @@
-import type { Filter } from '@autoeq-workbench/core'
+import { DEFAULT_AUTOEQ_SETTINGS, type Curve, type Filter } from '@autoeq-workbench/core'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createAutoEqRunRecord } from '../../test/autoEqFixture'
+import { createAutoEqResult, createAutoEqRunRecord } from '../../test/autoEqFixture'
 import { createEqCompareStore, isCanonicalEqStateEqual } from '../../state/eqCompareStore'
 import { initializeEqCompareRecorder } from '../../state/initializeEqCompareRecorder'
 import { createWorkspaceStore } from '../../state/workspaceStore'
@@ -16,6 +16,20 @@ const baseFilter: Filter = {
   q: 1,
 }
 
+function curve(id: string, kind: Curve['kind'], db = 0): Curve {
+  return {
+    id,
+    name: id,
+    kind,
+    rawPoints: [
+      { frequencyHz: 20, db },
+      { frequencyHz: 1_000, db },
+      { frequencyHz: 20_000, db },
+    ],
+    metadata: { synthetic: true },
+  }
+}
+
 function capture(
   gainDb: number,
   autoEqRun: ReturnType<typeof createAutoEqRunRecord> | null = null,
@@ -25,6 +39,7 @@ function capture(
     filterProvenance: autoEqRun ? ('autoeq' as const) : ('manual' as const),
     solutionState: 'clean' as const,
     autoEqRun,
+    runInputSignature: null,
     preampDb: -Math.max(0, gainDb),
   }
 }
@@ -169,5 +184,93 @@ describe('EqCompare', () => {
       expect(workspace.getState().autoEqRun).toEqual(expected.autoEqRun)
       expect(workspace.getState().autoEqRun).not.toBe(expected.autoEqRun)
     }
+  })
+
+  it.each([
+    ['settings', (workspace: ReturnType<typeof createWorkspaceStore>) => {
+      workspace.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 8 })
+    }],
+    ['normalization', (workspace: ReturnType<typeof createWorkspaceStore>) => {
+      workspace.getState().setNormalization({ anchorHz: 1_000, targetDb: 1 })
+    }],
+    ['selected IDs', (workspace: ReturnType<typeof createWorkspaceStore>) => {
+      workspace.getState().addCurve(curve('fr-2', 'fr', 1))
+      workspace.getState().setActiveFr('fr-2')
+    }],
+    ['same-ID numerical points', (workspace: ReturnType<typeof createWorkspaceStore>) => {
+      workspace.setState((state) => ({
+        curves: state.curves.map((item) => item.id === state.activeFrId
+          ? { ...item, rawPoints: item.rawPoints.map((point, index) => index === 1
+            ? { ...point, db: point.db + 0.5 }
+            : point) }
+          : item),
+      }))
+    }],
+  ] as const)('marks a clean AutoEQ snapshot stale after %s change', (_label, changeContext) => {
+    const compare = createEqCompareStore()
+    const workspace = createWorkspaceStore()
+    workspace.getState().addCurve(curve('fr-1', 'fr', 2))
+    workspace.getState().addCurve(curve('target-1', 'target'))
+    const cleanupRecorder = initializeEqCompareRecorder(workspace, compare)
+    workspace.getState().applyAutoEqResult(createAutoEqResult(3))
+    compare.getState().flush()
+    const snapshot = compare.getState().snapshots[0]!
+    compare.getState().setA(snapshot.id)
+    changeContext(workspace)
+
+    render(<EqCompare compareStore={compare} workspaceStore={workspace} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Apply A' }))
+
+    expect(workspace.getState()).toMatchObject({
+      filters: snapshot.filters,
+      filterProvenance: 'autoeq',
+      solutionState: 'stale',
+      autoEqRun: snapshot.autoEqRun,
+    })
+    cleanupRecorder()
+  })
+
+  it('marks a modified AutoEQ snapshot stale after its run context changes', () => {
+    const compare = createEqCompareStore()
+    const workspace = createWorkspaceStore()
+    workspace.getState().addCurve(curve('fr-1', 'fr', 2))
+    workspace.getState().addCurve(curve('target-1', 'target'))
+    const cleanupRecorder = initializeEqCompareRecorder(workspace, compare)
+    workspace.getState().applyAutoEqResult(createAutoEqResult(3))
+    workspace.getState().updateFilter('autoeq-1', { gainDb: 4 })
+    compare.getState().flush()
+    const snapshot = compare.getState().snapshots[0]!
+    expect(snapshot.solutionState).toBe('modified')
+    compare.getState().setB(snapshot.id)
+    workspace.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 8 })
+
+    render(<EqCompare compareStore={compare} workspaceStore={workspace} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Apply B' }))
+
+    expect(workspace.getState()).toMatchObject({
+      filters: snapshot.filters,
+      filterProvenance: 'autoeq',
+      solutionState: 'stale',
+      autoEqRun: snapshot.autoEqRun,
+    })
+    cleanupRecorder()
+  })
+
+  it.each([
+    ['an existing stale AutoEQ snapshot', { ...capture(3, createAutoEqRunRecord(3)), solutionState: 'stale' as const }],
+    ['a manual snapshot', { ...capture(3), solutionState: 'modified' as const }],
+  ])('retains the stored state for %s', (_label, stored) => {
+    const compare = createEqCompareStore()
+    const workspace = createWorkspaceStore()
+    compare.getState().record(stored)
+    compare.getState().flush()
+    compare.getState().setA(compare.getState().snapshots[0]!.id)
+    workspace.getState().addCurve(curve('fr-1', 'fr'))
+    workspace.getState().addCurve(curve('target-1', 'target'))
+
+    render(<EqCompare compareStore={compare} workspaceStore={workspace} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Apply A' }))
+
+    expect(workspace.getState().solutionState).toBe(stored.solutionState)
   })
 })

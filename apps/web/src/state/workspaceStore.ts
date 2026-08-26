@@ -62,7 +62,7 @@ export interface WorkspaceState {
   setNormalization: (value: Normalization) => void
   setAutoEqSettings: (settings: AutoEqSettings) => void
   setFilters: (filters: Filter[], provenance: FilterProvenance) => void
-  applyAutoEqResult: (result: AutoEqResult) => void
+  applyAutoEqResult: (result: AutoEqResult) => boolean
   applyFilterSnapshot: (snapshot: FilterSnapshotState) => void
   selectFilter: (id: string | null) => void
   addFilter: (type: FilterType) => void
@@ -405,17 +405,17 @@ export function createWorkspaceStore() {
                   : 'clean',
         })
       }),
-    applyAutoEqResult: (result) =>
-      set((state) => {
-        if (!validAutoEqResult(result)) return state
-        return record(state, {
-          filters: result.filters.map((filter) => ({ ...filter })),
-          selectedFilterId: null,
-          filterProvenance: 'autoeq',
-          solutionState: 'clean',
-          autoEqRun: cloneAutoEqRunRecord({ manifest: result.manifest }),
-        })
-      }),
+    applyAutoEqResult: (result) => {
+      if (!validAutoEqResult(result)) return false
+      set((state) => record(state, {
+        filters: result.filters.map((filter) => ({ ...filter })),
+        selectedFilterId: null,
+        filterProvenance: 'autoeq',
+        solutionState: 'clean',
+        autoEqRun: cloneAutoEqRunRecord({ manifest: result.manifest }),
+      }))
+      return true
+    },
     applyFilterSnapshot: (snapshot) =>
       set((state) => {
         if (

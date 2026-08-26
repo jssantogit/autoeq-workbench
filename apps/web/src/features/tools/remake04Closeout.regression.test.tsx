@@ -27,6 +27,7 @@ function capture(gainDb: number) {
     filterProvenance: 'manual' as const,
     solutionState: 'clean' as const,
     autoEqRun: null,
+    runInputSignature: null,
     preampDb: -Math.max(0, gainDb),
   }
 }

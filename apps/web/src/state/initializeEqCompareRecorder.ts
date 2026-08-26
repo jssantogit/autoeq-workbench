@@ -1,6 +1,7 @@
 import { MVP_NUMERIC_POLICY, calculatePreampDb } from '@autoeq-workbench/core'
 import type { StoreApi } from 'zustand/vanilla'
 import { eqCompareStore, type EqCompareState } from './eqCompareStore'
+import { createAutoEqRunInputSignature } from './autoEqRunInputSignature'
 import { workspaceStore, type WorkspaceState } from './workspaceStore'
 
 export function initializeEqCompareRecorder(
@@ -20,6 +21,7 @@ export function initializeEqCompareRecorder(
       filterProvenance: state.filterProvenance,
       solutionState: state.solutionState,
       autoEqRun: state.autoEqRun,
+      runInputSignature: createAutoEqRunInputSignature(state),
       preampDb: calculatePreampDb(state.filters, MVP_NUMERIC_POLICY.sampleRateHz).preampDb,
     })
   })

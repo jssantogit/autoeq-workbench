@@ -6,6 +6,7 @@ import {
   type EqCompareState,
   type EqSnapshot,
 } from '../../state/eqCompareStore'
+import { createAutoEqRunInputSignature } from '../../state/autoEqRunInputSignature'
 import {
   workspaceStore as defaultWorkspaceStore,
   type WorkspaceState,
@@ -35,11 +36,15 @@ export function EqCompare({
 
   const apply = (snapshot: EqSnapshot | undefined) => {
     if (snapshot === undefined) return
+    const incompatibleAutoEqContext =
+      snapshot.filterProvenance === 'autoeq' &&
+      snapshot.solutionState !== 'stale' &&
+      createAutoEqRunInputSignature(workspaceStore.getState()) !== snapshot.runInputSignature
     compareStore.getState().suppressNext()
     workspaceStore.getState().applyFilterSnapshot({
       filters: snapshot.filters,
       filterProvenance: snapshot.filterProvenance,
-      solutionState: snapshot.solutionState,
+      solutionState: incompatibleAutoEqContext ? 'stale' : snapshot.solutionState,
       autoEqRun: snapshot.autoEqRun,
     })
   }

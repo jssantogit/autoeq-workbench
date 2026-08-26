@@ -14,6 +14,7 @@ export interface EqSnapshot {
   filterProvenance: FilterProvenance | null
   solutionState: SolutionState
   autoEqRun: AutoEqRunRecord | null
+  runInputSignature: string | null
   preampDb: number
   summary: string
 }

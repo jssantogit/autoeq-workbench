@@ -204,7 +204,7 @@ describe('workspace history and filters', () => {
     const result = createAutoEqResult(4)
     const expectedManifest = structuredClone(result.manifest)
 
-    store.getState().applyAutoEqResult(result)
+    expect(store.getState().applyAutoEqResult(result)).toBe(true)
 
     expect(store.getState()).toMatchObject({
       filters: result.filters,
@@ -244,7 +244,7 @@ describe('workspace history and filters', () => {
   it('preserves the AutoEQ run through modified and stale states but clears it on import', () => {
     const store = createWorkspaceStore()
     const result = createAutoEqResult()
-    store.getState().applyAutoEqResult(result)
+    expect(store.getState().applyAutoEqResult(result)).toBe(true)
 
     store.getState().updateFilter('autoeq-1', { gainDb: 4 })
     expect(store.getState()).toMatchObject({
@@ -292,24 +292,24 @@ describe('workspace history and filters', () => {
     const result = createAutoEqResult()
     result.manifest.finalFilters[0]!.gainDb = 9
 
-    store.getState().applyAutoEqResult(result)
+    expect(store.getState().applyAutoEqResult(result)).toBe(false)
 
     expect(store.getState()).toBe(before)
     const mismatchedMetrics = createAutoEqResult()
     mismatchedMetrics.metrics.maeDb = 9
-    store.getState().applyAutoEqResult(mismatchedMetrics)
+    expect(store.getState().applyAutoEqResult(mismatchedMetrics)).toBe(false)
     expect(store.getState()).toBe(before)
     const missingMetrics = createAutoEqResult()
     missingMetrics.metrics = {} as typeof missingMetrics.metrics
-    expect(() => store.getState().applyAutoEqResult(missingMetrics)).not.toThrow()
+    expect(store.getState().applyAutoEqResult(missingMetrics)).toBe(false)
     expect(store.getState()).toBe(before)
     const missingAlgorithmParameters = createAutoEqResult()
     missingAlgorithmParameters.manifest.algorithmParameters = null as never
-    expect(() => store.getState().applyAutoEqResult(missingAlgorithmParameters)).not.toThrow()
+    expect(store.getState().applyAutoEqResult(missingAlgorithmParameters)).toBe(false)
     expect(store.getState()).toBe(before)
     const malformedFilters = createAutoEqResult()
     malformedFilters.filters = [null as never]
-    expect(() => store.getState().applyAutoEqResult(malformedFilters)).not.toThrow()
+    expect(store.getState().applyAutoEqResult(malformedFilters)).toBe(false)
     expect(store.getState()).toBe(before)
     store.getState().undo()
     expect(store.getState().filters).toEqual([])

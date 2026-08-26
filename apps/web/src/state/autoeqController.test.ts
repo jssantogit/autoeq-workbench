@@ -196,6 +196,7 @@ describe('AutoEQ controller', () => {
 
   it('does not mutate the prior solution when canonical workspace validation rejects a result', async () => {
     const { workspace, runStore, controller, runs } = setup()
+    const before = solutionSnapshot(workspace.getState())
     const pending = controller.runAutoEq()
     const malformed = createAutoEqResult(4)
     malformed.filters[0]!.gainDb = Number.POSITIVE_INFINITY
@@ -203,8 +204,12 @@ describe('AutoEQ controller', () => {
     runs[0]!.resolve(malformed)
     await pending
 
-    expect(workspace.getState().filters).toEqual([priorFilter])
-    expect(runStore.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
+    expect(solutionSnapshot(workspace.getState())).toEqual(before)
+    expect(runStore.getState()).toMatchObject({
+      status: 'error',
+      activeRunId: null,
+      error: { category: 'optimization', message: 'AutoEQ optimization failed.' },
+    })
   })
 
   it('preserves the prior solution on cancellation', async () => {

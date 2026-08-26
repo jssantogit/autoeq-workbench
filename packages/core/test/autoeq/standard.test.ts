@@ -19,6 +19,7 @@ import {
   type Normalization,
   type StandardAutoEqInput,
 } from '../../src/index.js'
+import { finalizeDeliveredFilters } from '../../src/autoeq/runStandardAutoEq.js'
 
 const normalization: Normalization = { anchorHz: 20, targetDb: 0 }
 
@@ -77,6 +78,26 @@ function fitData(input: StandardAutoEqInput) {
 }
 
 describe('runStandardAutoEq', () => {
+  it('uses absolute gain and stable input order for final same-frequency/type ties', () => {
+    const tied: Filter[] = [
+      { id: 'temporary-z', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: -3, q: 1 },
+      { id: 'temporary-a', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 2, q: 2 },
+      { id: 'stable-first', enabled: false, type: 'PK', frequencyHz: 2_000, gainDb: 2, q: 1 },
+      { id: 'stable-second', enabled: true, type: 'PK', frequencyHz: 2_000, gainDb: -2, q: 1 },
+    ]
+
+    expect(finalizeDeliveredFilters(tied).map(({ id, gainDb, enabled }) => ({
+      id,
+      gainDb,
+      enabled,
+    }))).toEqual([
+      { id: 'autoeq-1', gainDb: 2, enabled: true },
+      { id: 'autoeq-2', gainDb: -3, enabled: true },
+      { id: 'autoeq-3', gainDb: 2, enabled: false },
+      { id: 'autoeq-4', gainDb: -2, enabled: true },
+    ])
+  })
+
   it.each([
     undefined,
     { ...syntheticInput(), source: undefined },
