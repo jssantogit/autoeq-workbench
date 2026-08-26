@@ -147,6 +147,26 @@ describe('normalization', () => {
     expectCoreError(
       () =>
         normalizationOffset(raw, {
+          mode: 'db',
+          frequencyHz: 10,
+          levelDb: 60,
+        }),
+      'validation',
+      /outside|coverage|extrapolat/i,
+    )
+    expectCoreError(
+      () =>
+        normalizationOffset(raw, {
+          mode: 'db',
+          frequencyHz: 20_000,
+          levelDb: 60,
+        }),
+      'validation',
+      /outside|coverage|extrapolat/i,
+    )
+    expectCoreError(
+      () =>
+        normalizationOffset(raw, {
           mode: 'hz',
           frequencyHz: 0,
           levelDb: 60,
@@ -157,7 +177,27 @@ describe('normalization', () => {
     expectCoreError(
       () =>
         normalizationOffset(raw, {
+          mode: 'db',
+          frequencyHz: -500,
+          levelDb: 60,
+        }),
+      'validation',
+      /positive/i,
+    )
+    expectCoreError(
+      () =>
+        normalizationOffset(raw, {
           mode: 'hz',
+          frequencyHz: 100,
+          levelDb: Number.NaN,
+        }),
+      'validation',
+      /finite/i,
+    )
+    expectCoreError(
+      () =>
+        normalizationOffset(raw, {
+          mode: 'db',
           frequencyHz: 100,
           levelDb: Number.NaN,
         }),

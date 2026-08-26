@@ -27,6 +27,14 @@ export function normalizationOffset(
   }
 
   const absoluteOffset = calculateSquiglinkLoudnessOffset(points, normalization.levelDb)
+  const first = points[0]!
+  const last = points[points.length - 1]!
+  if (normalization.frequencyHz < first.frequencyHz || normalization.frequencyHz > last.frequencyHz) {
+    throw new CoreError(
+      'validation',
+      `Frequency ${normalization.frequencyHz} Hz is outside curve coverage; extrapolation is not supported`,
+    )
+  }
   const offsetDb = absoluteOffset - normalization.levelDb
   if (!Number.isFinite(offsetDb)) {
     throw new CoreError('numeric', 'Normalization produced a non-finite offset')

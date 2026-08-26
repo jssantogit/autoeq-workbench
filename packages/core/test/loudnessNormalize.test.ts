@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CoreError,
   calculateSquiglinkLoudnessOffset,
+  createLogGrid,
   normalizationOffset,
   prepareCurve,
   type Curve,
@@ -96,7 +97,7 @@ function referenceSquiglinkFindOffset(
     const p = iso223_params
     let i = 0
     fv.forEach(function (f) {
-      while (i < p.f.length && f >= p.f[i]!) {
+      if (f >= p.f[i]!) {
         i++
       }
       const i0 = Math.max(0, i - 1)
@@ -157,17 +158,14 @@ function referenceSquiglinkFindOffset(
 }
 
 describe('calculateSquiglinkLoudnessOffset', () => {
-  const fixturePoints: CurvePoint[] = [
-    { frequencyHz: 20, db: 65 },
-    { frequencyHz: 50, db: 62 },
-    { frequencyHz: 100, db: 60 },
-    { frequencyHz: 500, db: 58 },
-    { frequencyHz: 1000, db: 60 },
-    { frequencyHz: 2500, db: 63 },
-    { frequencyHz: 5000, db: 59 },
-    { frequencyHz: 10000, db: 55 },
-    { frequencyHz: 20000, db: 50 },
-  ]
+  const fixturePoints: CurvePoint[] = createLogGrid(20, 20_000, 48).map((frequencyHz) => {
+    const logF = Math.log10(frequencyHz)
+    const bass = 5 / (1 + Math.exp((frequencyHz - 150) / 40))
+    const earGain = 8 * Math.exp(-Math.pow(logF - Math.log10(3000), 2) / 0.08)
+    const trebleRollOff = -3 * Math.max(0, logF - Math.log10(6000))
+    const db = 60 + bass + earGain + trebleRollOff
+    return { frequencyHz, db }
+  })
 
   it('matches the pinned Squiglink reference translation to 1e-9 dB', () => {
     const rawPairs: Array<[number, number]> = fixturePoints.map((p) => [p.frequencyHz, p.db])
