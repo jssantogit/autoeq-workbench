@@ -29,7 +29,7 @@ function App() {
       secondary={(
         <WorkbenchDock
           curves={<CurvesTab derived={derived} />}
-          equalizer={<EqualizerTab />}
+          equalizer={<EqualizerTab derived={derived} />}
           tools={<ToolsTab filters={workspace.filters} derived={derived} />}
         />
       )}

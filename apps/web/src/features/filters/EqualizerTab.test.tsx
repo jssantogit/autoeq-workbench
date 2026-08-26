@@ -2,8 +2,19 @@ import { DEFAULT_AUTOEQ_SETTINGS, type Curve, type Filter } from '@autoeq-workbe
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { workspaceStore } from '../../state/workspaceStore'
+import { autoEqRunStore } from '../../state/autoeqRunStore'
+import { deriveWorkspace, workspaceStore } from '../../state/workspaceStore'
 import { EqualizerTab } from './EqualizerTab'
+
+const { cancelAutoEqMock, runAutoEqMock } = vi.hoisted(() => ({
+  cancelAutoEqMock: vi.fn(),
+  runAutoEqMock: vi.fn(),
+}))
+
+vi.mock('../../state/autoeqController', () => ({
+  cancelAutoEq: cancelAutoEqMock,
+  runAutoEq: runAutoEqMock,
+}))
 
 const curve = (id: string, name: string, kind: Curve['kind']): Curve => ({
   id,
@@ -25,12 +36,28 @@ const filter: Filter = {
   q: 1,
 }
 
+function renderEqualizer() {
+  return render(<EqualizerTab derived={deriveWorkspace(workspaceStore.getState())} />)
+}
+
+function setReadyCurves() {
+  workspaceStore.setState({
+    curves: [curve('fr-1', 'Measurement A', 'fr'), curve('target-1', 'Target A', 'target')],
+    activeFrId: 'fr-1',
+    activeTargetId: 'target-1',
+  })
+}
+
 describe('EqualizerTab', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
   })
 
   beforeEach(() => {
+    cancelAutoEqMock.mockReset()
+    runAutoEqMock.mockReset()
+    runAutoEqMock.mockResolvedValue(undefined)
+    autoEqRunStore.getState().reset()
     workspaceStore.setState({
       curves: [],
       activeFrId: null,
@@ -46,7 +73,7 @@ describe('EqualizerTab', () => {
   })
 
   it('uses the source composition and final action positions', () => {
-    render(<EqualizerTab />)
+    renderEqualizer()
 
     const panel = screen.getByRole('region', { name: 'Equalizer workspace' })
     expect(panel).toHaveClass('extra-eq')
@@ -63,7 +90,7 @@ describe('EqualizerTab', () => {
     expect(within(panel).getByRole('button', { name: 'Remove selected filter' })).toHaveTextContent('-')
     expect(within(panel).getByRole('button', { name: 'Sort filters' })).toBeVisible()
     expect(within(panel).getByRole('button', { name: 'AutoEQ settings' })).toBeVisible()
-    expect(within(panel).getByRole('button', { name: 'AutoEQ' })).toBeEnabled()
+    expect(within(panel).getByRole('button', { name: 'AutoEQ' })).toBeDisabled()
     expect(within(panel).getByRole('button', { name: 'Import' })).toBeVisible()
     expect(within(panel).getByRole('button', { name: 'Export' })).toBeDisabled()
     expect(within(panel).getByRole('button', { name: 'Export Graphic EQ (For Wavelet)' })).toBeDisabled()
@@ -82,7 +109,7 @@ describe('EqualizerTab', () => {
       activeFrId: 'fr-1',
       activeTargetId: 'target-1',
     })
-    render(<EqualizerTab />)
+    renderEqualizer()
 
     const selectors = screen.getByRole('group', { name: 'Equalizer profile' })
     const fr = within(selectors).getByRole('combobox', { name: 'FR' })
@@ -101,34 +128,55 @@ describe('EqualizerTab', () => {
     expect(workspaceStore.getState()).toMatchObject({ activeFrId: 'fr-2', activeTargetId: 'target-2' })
   })
 
-  it('keeps AutoEQ inert without workers or network activity', async () => {
+  it('enables AutoEQ only for ready active coverage without adding another settings surface', async () => {
     const user = userEvent.setup()
-    const worker = vi.fn()
-    const fetchMock = vi.fn()
-    const xhr = vi.fn()
-    vi.stubGlobal('Worker', worker)
-    vi.stubGlobal('fetch', fetchMock)
-    vi.stubGlobal('XMLHttpRequest', xhr)
+    setReadyCurves()
+    renderEqualizer()
+
+    const action = screen.getByRole('button', { name: 'AutoEQ' })
+    expect(action).toBeEnabled()
+    expect(screen.queryByText('Standard')).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'AutoEQ Settings' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'AutoEQ settings' }))
+    expect(screen.getAllByRole('region', { name: 'AutoEQ Settings' })).toHaveLength(1)
+  })
+
+  it('turns the action into Cancel without a progress meter while running', async () => {
+    const user = userEvent.setup()
+    setReadyCurves()
+    autoEqRunStore.getState().start('run-1')
+    renderEqualizer()
+
+    expect(screen.queryByRole('button', { name: 'AutoEQ' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+    expect(screen.queryByText(/\d+%/)).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(cancelAutoEqMock).toHaveBeenCalledOnce()
+  })
+
+  it('shows a compact structured error without replacing prior filter rows', () => {
     workspaceStore.setState({
       filters: [filter],
       selectedFilterId: filter.id,
       filterProvenance: 'manual',
       solutionState: 'modified',
     })
-    render(<EqualizerTab />)
-    const before = workspaceStore.getState()
+    autoEqRunStore.getState().reject({
+      category: 'optimization',
+      message: 'AutoEQ optimization failed.',
+    })
+    renderEqualizer()
 
-    await user.click(screen.getByRole('button', { name: 'AutoEQ' }))
-
-    expect(workspaceStore.getState()).toEqual(before)
-    expect(worker).not.toHaveBeenCalled()
-    expect(fetchMock).not.toHaveBeenCalled()
-    expect(xhr).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert')).toHaveTextContent('[optimization] AutoEQ optimization failed.')
+    expect(screen.getByRole('row', { name: 'Filter 1' })).toBeVisible()
+    expect(screen.getByLabelText('Filter 1 gain dB')).toHaveValue(2)
   })
 
   it('toggles the validated constraints control', async () => {
     const user = userEvent.setup()
-    render(<EqualizerTab />)
+    renderEqualizer()
     const toggle = screen.getByRole('button', { name: 'AutoEQ settings' })
 
     expect(toggle).toHaveAttribute('aria-expanded', 'false')

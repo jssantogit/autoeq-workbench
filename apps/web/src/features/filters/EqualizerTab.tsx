@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import { Button } from '../../components/ui/Button'
-import { useWorkspaceStore } from '../../state/workspaceStore'
+import { cancelAutoEq, runAutoEq } from '../../state/autoeqController'
+import { useAutoEqRunStore } from '../../state/autoeqRunStore'
+import { type WorkspaceDerived, useWorkspaceStore } from '../../state/workspaceStore'
 import { AutoEqConstraints } from './AutoEqConstraints'
 import { FilterEditor } from './FilterEditor'
 import { FilterIoControls } from './FilterIoControls'
 
-export function EqualizerTab() {
+export function EqualizerTab({ derived }: { derived: WorkspaceDerived }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const runStatus = useAutoEqRunStore((state) => state.status)
+  const runError = useAutoEqRunStore((state) => state.error)
   const curves = useWorkspaceStore((state) => state.curves)
   const activeFrId = useWorkspaceStore((state) => state.activeFrId)
   const activeTargetId = useWorkspaceStore((state) => state.activeTargetId)
@@ -51,7 +55,13 @@ export function EqualizerTab() {
       <FilterEditor />
       {settingsOpen && <AutoEqConstraints />}
       <div className="filters-button filters-button--source-actions">
-        <Button className="autoeq" onClick={() => undefined}>AutoEQ</Button>
+        <Button
+          className={`autoeq${runStatus === 'running' ? ' autoeq--running' : ''}`}
+          disabled={runStatus !== 'running' && derived.status !== 'ready'}
+          onClick={runStatus === 'running' ? cancelAutoEq : () => void runAutoEq()}
+        >
+          {runStatus === 'running' ? 'Cancel' : 'AutoEQ'}
+        </Button>
         <Button
           className="autoeq-settings-toggle"
           aria-label="AutoEQ settings"
@@ -63,6 +73,11 @@ export function EqualizerTab() {
         </Button>
         <FilterIoControls />
       </div>
+      {runError !== null && (
+        <p className="autoeq-error" role="alert">
+          [{runError.category}] {runError.message}
+        </p>
+      )}
     </section>
   )
 }

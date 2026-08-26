@@ -1,13 +1,21 @@
-import { DEFAULT_AUTOEQ_SETTINGS } from '@autoeq-workbench/core'
+import { DEFAULT_AUTOEQ_SETTINGS, type Curve } from '@autoeq-workbench/core'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
+import { createAutoEqResult } from './test/autoEqFixture'
 import { uiStore } from './state/uiStore'
-import { workspaceStore } from './state/workspaceStore'
+import { workspaceStore, type WorkspaceDerived } from './state/workspaceStore'
 
-const { exportFrequencyResponseGraphMock } = vi.hoisted(() => ({
+const { cancelAutoEqMock, exportFrequencyResponseGraphMock, runAutoEqMock } = vi.hoisted(() => ({
+  cancelAutoEqMock: vi.fn(),
   exportFrequencyResponseGraphMock: vi.fn(),
+  runAutoEqMock: vi.fn(),
+}))
+
+vi.mock('./state/autoeqController', () => ({
+  cancelAutoEq: cancelAutoEqMock,
+  runAutoEq: runAutoEqMock,
 }))
 
 vi.mock('./features/graph/graphScreenshot', () => ({
@@ -15,8 +23,23 @@ vi.mock('./features/graph/graphScreenshot', () => ({
 }))
 
 vi.mock('./features/graph/FrequencyResponseGraph', () => ({
-  FrequencyResponseGraph: () => <section aria-label="Frequency Response graph" />,
+  FrequencyResponseGraph: ({ derived }: { derived: WorkspaceDerived }) => (
+    <section aria-label="Frequency Response graph">
+      {derived.hasFilters ? 'Graph filters active' : 'Graph filters empty'}
+    </section>
+  ),
 }))
+
+const readyCurve = (id: string, name: string, kind: Curve['kind']): Curve => ({
+  id,
+  name,
+  kind,
+  rawPoints: [
+    { frequencyHz: 20, db: 0 },
+    { frequencyHz: 20_000, db: 0 },
+  ],
+  metadata: {},
+})
 
 async function chooseCurveKind(
   user: ReturnType<typeof userEvent.setup>,
@@ -30,6 +53,9 @@ async function chooseCurveKind(
 
 describe('App', () => {
   beforeEach(() => {
+    cancelAutoEqMock.mockReset()
+    runAutoEqMock.mockReset()
+    runAutoEqMock.mockResolvedValue(undefined)
     exportFrequencyResponseGraphMock.mockReset()
     exportFrequencyResponseGraphMock.mockResolvedValue({ ok: true, message: 'Graph screenshot downloaded.' })
     uiStore.setState({ activeDockTab: 'curves', curveAppearance: {}, inspectorEnabled: true })
@@ -39,6 +65,11 @@ describe('App', () => {
       activeTargetId: null,
       normalization: { anchorHz: 500, targetDb: 0 },
       autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
+      filters: [],
+      selectedFilterId: null,
+      filterProvenance: null,
+      solutionState: 'clean',
+      autoEqRun: null,
     })
   })
 
@@ -105,7 +136,7 @@ describe('App', () => {
     expect(within(equalizer).queryByText('20 Hz-20 kHz')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add filter' })).toBeInTheDocument()
     expect(screen.getByText('0 / 64 filters')).toBeVisible()
-    expect(within(equalizer).getByRole('button', { name: 'AutoEQ' })).toBeEnabled()
+    expect(within(equalizer).getByRole('button', { name: 'AutoEQ' })).toBeDisabled()
     await user.click(screen.getByRole('tab', { name: 'Tools' }))
     const tools = screen.getByRole('region', { name: 'Tools workspace' })
     expect(within(tools).getByRole('heading', { name: 'Sound Tools' })).toBeVisible()
@@ -121,6 +152,45 @@ describe('App', () => {
     expect(within(tools).queryByText('Total filters')).not.toBeInTheDocument()
     expect(within(tools).queryByText('Solution state')).not.toBeInTheDocument()
     expect(within(tools).queryByText('Provenance')).not.toBeInTheDocument()
+  })
+
+  it('updates Equalizer, graph, and Tools consumers through canonical AutoEQ completion state', async () => {
+    const user = userEvent.setup()
+    const result = createAutoEqResult(3)
+    workspaceStore.setState({
+      curves: [
+        readyCurve('fr-1', 'Source', 'fr'),
+        readyCurve('target-1', 'Target', 'target'),
+      ],
+      activeFrId: 'fr-1',
+      activeTargetId: 'target-1',
+      filters: [],
+      selectedFilterId: null,
+      filterProvenance: null,
+      solutionState: 'clean',
+      autoEqRun: null,
+    })
+    runAutoEqMock.mockImplementation(async () => {
+      workspaceStore.getState().applyAutoEqResult(result)
+    })
+    render(<App />)
+
+    expect(screen.getByText('Graph filters empty')).toBeVisible()
+    await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
+    await user.click(screen.getByRole('button', { name: 'AutoEQ' }))
+
+    await waitFor(() => expect(screen.getByRole('row', { name: 'Filter 1' })).toBeVisible())
+    expect(screen.getByLabelText('Filter 1 gain dB')).toHaveValue(3)
+    expect(workspaceStore.getState()).toMatchObject({
+      filters: result.filters,
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+    })
+    expect(screen.getByText('Graph filters active')).toBeVisible()
+
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
+    await user.click(screen.getByText('Analysis'))
+    expect(screen.getByText('-3.00 dB')).toBeVisible()
   })
 
   it('commits valid normalization edits directly and toggles inspector without navigation', async () => {
