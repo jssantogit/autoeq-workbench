@@ -1,4 +1,5 @@
 import { interpolateLogFrequency } from './interpolate.js'
+import { calculateSquiglinkLoudnessOffset } from './loudnessNormalize.js'
 import { CoreError } from '../types/error.js'
 import type { CurvePoint, Normalization } from '../types/curve.js'
 
@@ -6,15 +7,27 @@ export function normalizationOffset(
   points: readonly CurvePoint[],
   normalization: Normalization,
 ): number {
-  if (!Number.isFinite(normalization.anchorHz) || normalization.anchorHz <= 0) {
-    throw new CoreError('validation', 'Normalization anchor frequency must be finite and positive')
+  if (normalization.mode !== 'hz' && normalization.mode !== 'db') {
+    throw new CoreError('validation', `Invalid normalization mode: ${String(normalization.mode)}`)
   }
-  if (!Number.isFinite(normalization.targetDb)) {
-    throw new CoreError('validation', 'Normalization target dB must be finite')
+  if (!Number.isFinite(normalization.frequencyHz) || normalization.frequencyHz <= 0) {
+    throw new CoreError('validation', 'Normalization frequency must be finite and positive')
+  }
+  if (!Number.isFinite(normalization.levelDb)) {
+    throw new CoreError('validation', 'Normalization level dB must be finite')
   }
 
-  const anchorDb = interpolateLogFrequency(points, [normalization.anchorHz])[0]!
-  const offsetDb = normalization.targetDb - anchorDb
+  if (normalization.mode === 'hz') {
+    const anchorDb = interpolateLogFrequency(points, [normalization.frequencyHz])[0]!
+    const offsetDb = -anchorDb
+    if (!Number.isFinite(offsetDb)) {
+      throw new CoreError('numeric', 'Normalization produced a non-finite offset')
+    }
+    return offsetDb
+  }
+
+  const absoluteOffset = calculateSquiglinkLoudnessOffset(points, normalization.levelDb)
+  const offsetDb = absoluteOffset - normalization.levelDb
   if (!Number.isFinite(offsetDb)) {
     throw new CoreError('numeric', 'Normalization produced a non-finite offset')
   }

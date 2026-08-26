@@ -9,6 +9,7 @@ import {
   normalizationOffset,
   prepareCurve,
   type Curve,
+  type Normalization,
   type PreparedCurve,
 } from '../src/index.js'
 
@@ -108,25 +109,70 @@ describe('normalization', () => {
   it('finds the anchor level by log-frequency interpolation without mutating raw points', () => {
     const copy = structuredClone(raw)
 
-    expect(normalizationOffset(raw, { anchorHz: 1000, targetDb: 0 })).toBe(-90)
+    expect(
+      normalizationOffset(raw, {
+        mode: 'hz',
+        frequencyHz: 1000,
+        levelDb: 60,
+      }),
+    ).toBe(-90)
     expect(raw).toEqual(copy)
+
+    const flat = [
+      { frequencyHz: 20, db: 7 },
+      { frequencyHz: 500, db: 10 },
+      { frequencyHz: 20_000, db: 4 },
+    ]
+
+    expect(
+      normalizationOffset(flat, {
+        mode: 'hz',
+        frequencyHz: 500,
+        levelDb: 60,
+      }),
+    ).toBe(-10)
   })
 
   it('rejects invalid normalization values and anchors outside curve coverage', () => {
     expectCoreError(
-      () => normalizationOffset(raw, { anchorHz: 10, targetDb: 0 }),
+      () =>
+        normalizationOffset(raw, {
+          mode: 'hz',
+          frequencyHz: 10,
+          levelDb: 60,
+        }),
       'validation',
       /outside|coverage|extrapolat/i,
     )
     expectCoreError(
-      () => normalizationOffset(raw, { anchorHz: 0, targetDb: 0 }),
+      () =>
+        normalizationOffset(raw, {
+          mode: 'hz',
+          frequencyHz: 0,
+          levelDb: 60,
+        }),
       'validation',
       /positive/i,
     )
     expectCoreError(
-      () => normalizationOffset(raw, { anchorHz: 100, targetDb: Number.NaN }),
+      () =>
+        normalizationOffset(raw, {
+          mode: 'hz',
+          frequencyHz: 100,
+          levelDb: Number.NaN,
+        }),
       'validation',
-      /target.*finite/i,
+      /finite/i,
+    )
+    expectCoreError(
+      () =>
+        normalizationOffset(raw, {
+          mode: 'unknown' as unknown as 'hz',
+          frequencyHz: 500,
+          levelDb: 60,
+        }),
+      'validation',
+      /mode/i,
     )
   })
 
@@ -164,7 +210,7 @@ describe('prepareCurve', () => {
       kind: 'fr' | 'target'
       frequencies: number[]
       db: number[]
-      normalization: { anchorHz: number; targetDb: number }
+      normalization: { mode: 'hz' | 'db'; frequencyHz: number; levelDb: number }
       offsetDb: number
     }>()
   })
@@ -172,7 +218,7 @@ describe('prepareCurve', () => {
   it('interpolates and normalizes onto a copied grid without changing the curve', () => {
     const original = structuredClone(curve)
     const frequencies = [100, 1000, 10_000]
-    const normalization = { anchorHz: 1000, targetDb: 0 }
+    const normalization: Normalization = { mode: 'hz', frequencyHz: 1000, levelDb: 60 }
     const prepared = prepareCurve(curve, normalization, frequencies)
 
     expect(prepared).toEqual({
@@ -181,12 +227,30 @@ describe('prepareCurve', () => {
       kind: 'fr',
       frequencies: [100, 1000, 10_000],
       db: [-10, 0, 10],
-      normalization: { anchorHz: 1000, targetDb: 0 },
+      normalization: { mode: 'hz', frequencyHz: 1000, levelDb: 60 },
       offsetDb: -90,
     })
     expect(prepared.frequencies).not.toBe(frequencies)
     expect(prepared.normalization).not.toBe(normalization)
     expect(curve).toEqual(original)
+
+    const flatFixture: Curve = {
+      id: 'flat-1',
+      name: 'Flat Fixture',
+      kind: 'fr',
+      rawPoints: [
+        { frequencyHz: 20, db: 7 },
+        { frequencyHz: 500, db: 10 },
+        { frequencyHz: 20_000, db: 4 },
+      ],
+      metadata: {},
+    }
+    const preparedFlat = prepareCurve(
+      flatFixture,
+      { mode: 'hz', frequencyHz: 500, levelDb: 60 },
+      [500],
+    )
+    expect(preparedFlat.db[0]).toBeCloseTo(0, 12)
   })
 })
 

@@ -21,7 +21,7 @@ import {
 } from '../../src/index.js'
 import { finalizeDeliveredFilters } from '../../src/autoeq/runStandardAutoEq.js'
 
-const normalization: Normalization = { anchorHz: 20, targetDb: 0 }
+const normalization: Normalization = { mode: 'hz', frequencyHz: 20, levelDb: 0 }
 
 function syntheticInput(settings: AutoEqSettings = { ...DEFAULT_AUTOEQ_SETTINGS }): StandardAutoEqInput {
   const frequencies = createEvaluationGrid()

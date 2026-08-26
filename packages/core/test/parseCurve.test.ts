@@ -9,6 +9,7 @@ import {
   type Filter,
   type FilterType,
   type Normalization,
+  type NormalizationMode,
   type ParseCurveOptions,
 } from '../src/index.js'
 import {
@@ -45,9 +46,11 @@ describe('core domain types', () => {
       name: string
       kind: CurveKind
     }>()
+    expectTypeOf<NormalizationMode>().toEqualTypeOf<'hz' | 'db'>()
     expectTypeOf<Normalization>().toEqualTypeOf<{
-      anchorHz: number
-      targetDb: number
+      mode: 'hz' | 'db'
+      frequencyHz: number
+      levelDb: number
     }>()
     expectTypeOf<FilterType>().toEqualTypeOf<'PK' | 'LS' | 'HS'>()
     expectTypeOf<Filter>().toMatchTypeOf<{

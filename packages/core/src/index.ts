@@ -35,6 +35,7 @@ export type {
 } from './autoeq/types.js'
 export { createLogGrid } from './curves/grid.js'
 export { interpolateLogFrequency } from './curves/interpolate.js'
+export { calculateSquiglinkLoudnessOffset } from './curves/loudnessNormalize.js'
 export { applyOffset, normalizationOffset } from './curves/normalize.js'
 export { biquadCoefficients } from './dsp/biquad.js'
 export type { BiquadCoefficients } from './dsp/biquad.js'
@@ -62,5 +63,6 @@ export type {
   CurveMetadata,
   CurvePoint,
   Normalization,
+  NormalizationMode,
   PreparedCurve,
 } from './types/curve.js'
