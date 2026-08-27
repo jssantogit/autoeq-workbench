@@ -1,4 +1,5 @@
-import { useRef, useState, type ChangeEvent } from 'react'
+import { CoreError } from '@autoeq-workbench/core'
+import { type ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import {
   createWorkbenchSessionFromWorkspace,
@@ -6,12 +7,17 @@ import {
   serializeWorkbenchSession,
 } from '../../session/workbenchSession'
 import { downloadTextFile } from '../../squiglink/eq-io/downloadTextFile'
+import { getExportFilenameBase } from '../../squiglink/eq-io/exportSanitizers'
 import { useWorkspaceStore, workspaceStore } from '../../state/workspaceStore'
 
-function safeFilenameBase(name: string): string {
-  return Array.from(name, (character) =>
-    character.charCodeAt(0) < 32 || /[<>:"/\\|?*]/.test(character) ? '_' : character,
-  ).join('')
+function getSessionErrorMessage(cause: unknown, fallback: string): string {
+  if (cause instanceof CoreError) {
+    return `[${cause.category}] ${cause.message}`
+  }
+  if (cause instanceof Error && cause.message.startsWith('Invalid Workbench session')) {
+    return cause.message
+  }
+  return fallback
 }
 
 export function SessionControls() {
@@ -19,10 +25,18 @@ export function SessionControls() {
   const activeFrId = useWorkspaceStore((state) => state.activeFrId)
   const inputRef = useRef<HTMLInputElement>(null)
   const requestRef = useRef(0)
+  const isMountedRef = useRef(true)
   const [error, setError] = useState<string | null>(null)
 
   const activeFrName = curves.find((curve) => curve.id === activeFrId && curve.kind === 'fr')?.name
-  const filenameBase = safeFilenameBase(activeFrName ?? 'Workbench').trim() || 'Workbench'
+  const filenameBase = getExportFilenameBase(activeFrName)
+
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
 
   function exportSession() {
     try {
@@ -31,28 +45,25 @@ export function SessionControls() {
       downloadTextFile(`${filenameBase}.autoeq-workbench.json`, serialized)
       setError(null)
     } catch (cause) {
-      const message = cause instanceof Error ? cause.message : 'Unable to export session'
-      setError(message)
+      setError(getSessionErrorMessage(cause, 'Unable to export session'))
     }
   }
 
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
-    if (file === undefined) return
     const input = event.currentTarget
+    input.value = ''
+    if (file === undefined) return
     const request = ++requestRef.current
 
     try {
       const text = await file.text()
-      if (request !== requestRef.current) return
+      if (request !== requestRef.current || !isMountedRef.current) return
       importWorkbenchSession(text)
       setError(null)
     } catch (cause) {
-      if (request !== requestRef.current) return
-      const message = cause instanceof Error ? cause.message : 'Unable to import session'
-      setError(message)
-    } finally {
-      if (request === requestRef.current) input.value = ''
+      if (request !== requestRef.current || !isMountedRef.current) return
+      setError(getSessionErrorMessage(cause, 'Unable to import session'))
     }
   }
 
@@ -67,7 +78,7 @@ export function SessionControls() {
         accept=".autoeq-workbench.json,.json,application/json"
         onChange={handleFile}
       />
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+      <div className="session-controls__actions">
         <Button className="button export-session" onClick={exportSession}>
           Export Session
         </Button>

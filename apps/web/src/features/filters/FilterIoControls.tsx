@@ -7,18 +7,16 @@ import {
   MVP_NUMERIC_POLICY,
   parseEqualizerApoFilters,
 } from '@autoeq-workbench/core'
-import { type ChangeEvent, useRef, useState } from 'react'
+import { type ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { downloadTextFile } from '../../squiglink/eq-io/downloadTextFile'
+import {
+  getExportFilenameBase,
+  safePowerampPresetName,
+} from '../../squiglink/eq-io/exportSanitizers'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 
 export type ExportDestination = 'Equalizer APO' | 'Poweramp' | 'Wavelet'
-
-function safeFilenameBase(name: string): string {
-  return Array.from(name, (character) =>
-    character.charCodeAt(0) < 32 || /[<>:"/\\|?*]/.test(character) ? '_' : character,
-  ).join('')
-}
 
 export function FilterIoControls() {
   const curves = useWorkspaceStore((state) => state.curves)
@@ -27,31 +25,41 @@ export function FilterIoControls() {
   const replaceFilters = useWorkspaceStore((state) => state.replaceFiltersFromImport)
   const inputRef = useRef<HTMLInputElement>(null)
   const requestRef = useRef(0)
+  const isMountedRef = useRef(true)
   const [destination, setDestination] = useState<ExportDestination>('Equalizer APO')
   const [error, setError] = useState<string | null>(null)
   const activeFrName = curves.find((curve) => curve.id === activeFrId && curve.kind === 'fr')?.name
-  const filenameBase = safeFilenameBase(activeFrName ?? 'Workbench').trim() || 'Workbench'
+  const filenameBase = getExportFilenameBase(activeFrName)
+  const powerampPresetName = safePowerampPresetName(activeFrName)
   const hasFilters = filters.length > 0
+
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
 
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
-    if (file === undefined) return
     const input = event.currentTarget
+    input.value = ''
+    if (file === undefined) return
     const request = ++requestRef.current
 
     try {
       const text = await file.text()
       const parsed = parseEqualizerApoFilters(text)
-      if (request !== requestRef.current) return
+      if (request !== requestRef.current || !isMountedRef.current) return
       replaceFilters(parsed)
       setError(null)
     } catch (cause) {
-      if (request !== requestRef.current) return
-      const category = cause instanceof CoreError ? cause.category : 'parse'
-      const message = cause instanceof Error ? cause.message : 'Unable to read filter file'
-      setError(`[${category}] ${message}`)
-    } finally {
-      if (request === requestRef.current) input.value = ''
+      if (request !== requestRef.current || !isMountedRef.current) return
+      if (cause instanceof CoreError) {
+        setError(`[${cause.category}] ${cause.message}`)
+      } else {
+        setError('Unable to read filter file')
+      }
     }
   }
 
@@ -67,7 +75,7 @@ export function FilterIoControls() {
         downloadTextFile(
           `${filenameBase} Poweramp.txt`,
           formatPowerampText({
-            name: activeFrName ?? 'Workbench',
+            name: powerampPresetName,
             preampDb,
             filters,
           }),
@@ -80,9 +88,11 @@ export function FilterIoControls() {
       }
       setError(null)
     } catch (cause) {
-      const category = cause instanceof CoreError ? cause.category : 'export'
-      const message = cause instanceof Error ? cause.message : 'Unable to export filters'
-      setError(`[${category}] ${message}`)
+      if (cause instanceof CoreError) {
+        setError(`[${cause.category}] ${cause.message}`)
+      } else {
+        setError('Unable to export filters')
+      }
     }
   }
 

@@ -245,4 +245,70 @@ describe('SessionControls', () => {
 
     expect(workspaceStore.getState().curves).toEqual([])
   })
+
+  it('handles unmount cleanup while import is pending without state update or mutation', async () => {
+    const deferredRead = deferred<string>()
+    const { unmount } = render(<SessionControls />)
+
+    selectFile(fileWithText('pending.json', () => deferredRead.promise))
+    unmount()
+
+    const fixture = validSessionFixture()
+    await act(async () => {
+      deferredRead.resolve(JSON.stringify(fixture))
+      await deferredRead.promise
+    })
+
+    expect(workspaceStore.getState().curves).toEqual([])
+  })
+
+  it('resets file input immediately so same-file reselection fires while pending', async () => {
+    const firstRead = deferred<string>()
+    render(<SessionControls />)
+
+    selectFile(fileWithText('same.json', () => firstRead.promise))
+
+    const input = screen.getByLabelText('Import Workbench session') as HTMLInputElement
+    expect(input.value).toBe('')
+
+    const fixture = validSessionFixture()
+    selectFile(fileWithText('same.json', async () => JSON.stringify(fixture)))
+
+    await waitFor(() => {
+      expect(workspaceStore.getState().curves).toHaveLength(2)
+    })
+
+    await act(async () => {
+      firstRead.resolve(JSON.stringify({ ...fixture, curves: [] }))
+      await firstRead.promise
+    })
+
+    expect(workspaceStore.getState().curves).toHaveLength(2)
+  })
+
+  it('masks unknown native file read errors with a safe public error message', async () => {
+    render(<SessionControls />)
+    selectFile(fileWithText('secret.json', async () => {
+      throw new Error('/var/secrets/keys.json: permission denied')
+    }))
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Unable to import session')
+    expect(alert).not.toHaveTextContent('/var/secrets/keys.json')
+    expect(workspaceStore.getState().curves).toEqual([])
+  })
+
+  it('masks unknown export errors with a safe public error message', async () => {
+    vi.mocked(downloadTextFile).mockImplementationOnce(() => {
+      throw new Error('/system/fs/write failed')
+    })
+    const user = userEvent.setup()
+    render(<SessionControls />)
+
+    await user.click(screen.getByRole('button', { name: 'Export Session' }))
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Unable to export session')
+    expect(alert).not.toHaveTextContent('/system/fs/write')
+  })
 })

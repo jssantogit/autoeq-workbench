@@ -291,4 +291,78 @@ describe('FilterIoControls', () => {
     expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
     expect(downloadTextFile).not.toHaveBeenCalled()
   })
+
+  it('exports Poweramp successfully when active FR contains CR/LF without injecting directives', async () => {
+    const user = userEvent.setup()
+    const newlineFr: Curve = {
+      ...activeFr,
+      name: 'Studio/Left\r\n:Take?\nSecond Line',
+    }
+    workspaceStore.setState({ curves: [newlineFr], activeFrId: newlineFr.id, filters: mixedFilters })
+    render(<FilterIoControls />)
+
+    const select = screen.getByRole('combobox', { name: /export/i })
+    const exportButton = screen.getByRole('button', { name: 'Export' })
+
+    await user.selectOptions(select, 'Poweramp')
+    await user.click(exportButton)
+
+    expect(downloadTextFile).toHaveBeenCalledOnce()
+    const [filename, content] = vi.mocked(downloadTextFile).mock.calls[0]!
+    expect(filename).toBe('Studio_Left___Take__Second Line Poweramp.txt')
+    expect(content).toContain('# AutoEQ Workbench — Studio/Left :Take? Second Line\n# Poweramp-style manual-entry preset')
+    expect(content).not.toContain('\r')
+    expect(content).not.toContain(':Take?\nSecond Line')
+  })
+
+  it('handles unmount cleanup while import is pending without state update or mutation', async () => {
+    const deferredRead = deferred<string>()
+    const { unmount } = render(<FilterIoControls />)
+
+    selectFile(fileWithText('pending.txt', () => deferredRead.promise))
+    unmount()
+
+    await act(async () => {
+      deferredRead.resolve('Filter 1: ON PK Fc 2000 Hz Gain 3 dB Q 1')
+      await deferredRead.promise
+    })
+
+    expect(workspaceStore.getState().filters).toEqual(existingFilters)
+  })
+
+  it('resets file input immediately so same-file reselection fires while pending', async () => {
+    const firstRead = deferred<string>()
+    render(<FilterIoControls />)
+
+    const file = fileWithText('same.txt', () => firstRead.promise)
+    selectFile(file)
+
+    const input = screen.getByLabelText('Import Equalizer APO filters') as HTMLInputElement
+    expect(input.value).toBe('')
+
+    selectFile(fileWithText('same.txt', async () => 'Filter 1: ON PK Fc 3000 Hz Gain 2 dB Q 1'))
+
+    await waitFor(() => {
+      expect(workspaceStore.getState().filters[0]?.frequencyHz).toBe(3_000)
+    })
+
+    await act(async () => {
+      firstRead.resolve('Filter 1: ON PK Fc 1000 Hz Gain 1 dB Q 1')
+      await firstRead.promise
+    })
+
+    expect(workspaceStore.getState().filters[0]?.frequencyHz).toBe(3_000)
+  })
+
+  it('masks unknown native file read errors with a safe public error message', async () => {
+    render(<FilterIoControls />)
+    selectFile(fileWithText('secret.txt', async () => {
+      throw new Error('/var/secrets/keys.txt: permission denied')
+    }))
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Unable to read filter file')
+    expect(alert).not.toHaveTextContent('/var/secrets/keys.txt')
+    expect(workspaceStore.getState().filters).toEqual(existingFilters)
+  })
 })
