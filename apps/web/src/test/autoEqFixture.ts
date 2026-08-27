@@ -6,7 +6,7 @@ import {
   type RunManifest,
 } from '@autoeq-workbench/core'
 
-const normalization: Normalization = { anchorHz: 500, targetDb: 0 }
+const normalization: Normalization = { mode: 'hz', frequencyHz: 500, levelDb: 60 }
 
 export function createAutoEqResult(gainDb = 3): AutoEqResult {
   const filters: Filter[] = [
@@ -21,7 +21,7 @@ export function createAutoEqResult(gainDb = 3): AutoEqResult {
     preampDb,
     cancellationAudit,
     manifest: {
-      schemaVersion: 1,
+      schemaVersion: 2,
       algorithmVersion: 'standard-v1',
       profile: 'Standard',
       sampleRateHz: 48_000,

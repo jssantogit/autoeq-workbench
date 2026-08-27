@@ -271,9 +271,17 @@ describe('AutoEQ run-input signature', () => {
     changedPoints.curves[0]!.rawPoints[1]!.db += 0.25
     expect(createAutoEqRunInputSignature(changedPoints)).not.toBe(signature)
 
-    const changedNormalization = numericalState(base)
-    changedNormalization.normalization.targetDb = 1
-    expect(createAutoEqRunInputSignature(changedNormalization)).not.toBe(signature)
+    const changedMode = numericalState(base)
+    changedMode.normalization.mode = 'db'
+    expect(createAutoEqRunInputSignature(changedMode)).not.toBe(signature)
+
+    const changedFrequency = numericalState(base)
+    changedFrequency.normalization.frequencyHz = 1_000
+    expect(createAutoEqRunInputSignature(changedFrequency)).not.toBe(signature)
+
+    const changedLevel = numericalState(base)
+    changedLevel.normalization.levelDb = 65
+    expect(createAutoEqRunInputSignature(changedLevel)).not.toBe(signature)
 
     const changedSettings = numericalState(base)
     changedSettings.autoeqSettings.maxFilters -= 1
@@ -328,8 +336,14 @@ describe('AutoEQ obsolete result rejection', () => {
           : curve),
       }))
     }],
-    ['normalization', (workspace: ReturnType<typeof createWorkspaceStore>) => {
-      workspace.getState().setNormalization({ anchorHz: 500, targetDb: 1 })
+    ['normalization mode', (workspace: ReturnType<typeof createWorkspaceStore>) => {
+      workspace.getState().setNormalization({ mode: 'db', frequencyHz: 500, levelDb: 60 })
+    }],
+    ['normalization frequency', (workspace: ReturnType<typeof createWorkspaceStore>) => {
+      workspace.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 60 })
+    }],
+    ['normalization level', (workspace: ReturnType<typeof createWorkspaceStore>) => {
+      workspace.getState().setNormalization({ mode: 'hz', frequencyHz: 500, levelDb: 65 })
     }],
     ['settings', (workspace: ReturnType<typeof createWorkspaceStore>) => {
       workspace.getState().setAutoEqSettings({

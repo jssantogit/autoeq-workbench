@@ -155,7 +155,7 @@ describe('workspace curve collection', () => {
     store.getState().addCurve(source)
     store.getState().addCurve(target)
     store.getState().setFilters([filter], 'autoeq')
-    store.getState().setNormalization({ anchorHz: 800, targetDb: 1 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 800, levelDb: 61 })
     store.getState().undo()
     expect(store.getState().canRedo).toBe(true)
 
@@ -260,7 +260,7 @@ describe('workspace history and filters', () => {
       solutionState: 'stale',
       autoEqRun: { manifest: result.manifest },
     })
-    store.getState().setNormalization({ anchorHz: 1_000, targetDb: -1 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 59 })
     store.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxGainDb: 12 })
     expect(store.getState()).toMatchObject({
       solutionState: 'stale',
@@ -404,7 +404,7 @@ describe('workspace history and filters', () => {
   it('keeps normalization and filter undo/redo independent from curve collection', () => {
     const store = createWorkspaceStore()
     store.getState().setFilters([filter], 'autoeq')
-    store.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 58 })
     store.getState().updateFilter(filter.id, { gainDb: 6 })
 
     store.getState().undo()
@@ -413,7 +413,7 @@ describe('workspace history and filters', () => {
     expect(store.getState().normalization).toEqual(defaultNormalization)
     store.getState().redo()
     store.getState().redo()
-    expect(store.getState().normalization).toEqual({ anchorHz: 1_000, targetDb: -2 })
+    expect(store.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 1_000, levelDb: 58 })
     expect(store.getState().filters[0]?.gainDb).toBe(6)
   })
 
@@ -649,7 +649,7 @@ describe('workspace history and filters', () => {
   it('rejects invalid normalization and DSP edits', () => {
     const store = createWorkspaceStore()
     store.getState().setFilters([filter], 'manual')
-    store.getState().setNormalization({ anchorHz: 0, targetDb: 2 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 0, levelDb: 62 })
     store.getState().updateFilter(filter.id, { gainDb: Number.NaN })
 
     expect(store.getState().normalization).toEqual(defaultNormalization)
@@ -674,7 +674,7 @@ describe('workspace history and filters', () => {
     matchingStore.getState().addCurve(source)
     matchingStore.getState().addCurve(target)
     matchingStore.getState().setFilters([filter], 'autoeq')
-    matchingStore.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
+    matchingStore.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 58 })
     matchingStore.getState().undo()
     expect(matchingStore.getState()).toMatchObject({
       normalization: defaultNormalization,
@@ -686,11 +686,49 @@ describe('workspace history and filters', () => {
     changedStore.getState().addCurve(target)
     changedStore.getState().addCurve(extra)
     changedStore.getState().setFilters([filter], 'autoeq')
-    changedStore.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
+    changedStore.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 58 })
     changedStore.getState().setActiveFr(extra.id)
     changedStore.getState().undo()
     expect(changedStore.getState()).toMatchObject({
       normalization: defaultNormalization,
+      solutionState: 'stale',
+    })
+  })
+
+  it('stales clean AutoEQ solution on normalization mode and value changes as single undoable edits', () => {
+    const store = createWorkspaceStore()
+    const result = createAutoEqResult()
+    store.getState().applyAutoEqResult(result)
+    expect(store.getState().solutionState).toBe('clean')
+
+    store.getState().setNormalization({ mode: 'db', frequencyHz: 500, levelDb: 60 })
+    expect(store.getState()).toMatchObject({
+      normalization: { mode: 'db', frequencyHz: 500, levelDb: 60 },
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      normalization: defaultNormalization,
+      solutionState: 'clean',
+    })
+
+    store.getState().redo()
+    expect(store.getState()).toMatchObject({
+      normalization: { mode: 'db', frequencyHz: 500, levelDb: 60 },
+      solutionState: 'stale',
+    })
+
+    store.getState().setNormalization({ mode: 'db', frequencyHz: 1000, levelDb: 60 })
+    expect(store.getState()).toMatchObject({
+      normalization: { mode: 'db', frequencyHz: 1000, levelDb: 60 },
+      solutionState: 'stale',
+    })
+
+    store.getState().setNormalization({ mode: 'db', frequencyHz: 1000, levelDb: 65 })
+    expect(store.getState()).toMatchObject({
+      normalization: { mode: 'db', frequencyHz: 1000, levelDb: 65 },
       solutionState: 'stale',
     })
   })
@@ -717,12 +755,12 @@ describe('deriveWorkspace', () => {
     store.getState().addCurve(source)
     store.getState().addCurve(target)
     store.getState().addCurve(extra)
-    store.getState().setNormalization({ anchorHz: 500, targetDb: 3 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 500, levelDb: 60 })
 
     const derived = deriveWorkspace(store.getState())
 
     expect(derived.measurementCurves).toHaveLength(3)
-    expect(derived.measurementCurves.every(({ db }) => Math.abs(db[1]! - 3) < 1e-10)).toBe(true)
+    expect(derived.measurementCurves.every(({ db }) => Math.abs(db[1]! - 0) < 1e-10)).toBe(true)
     expect([source, target, extra].map(({ rawPoints }) => rawPoints)).toEqual(snapshots)
   })
 

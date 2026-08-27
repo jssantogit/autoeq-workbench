@@ -191,7 +191,7 @@ describe('EqCompare', () => {
       workspace.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 8 })
     }],
     ['normalization', (workspace: ReturnType<typeof createWorkspaceStore>) => {
-      workspace.getState().setNormalization({ anchorHz: 1_000, targetDb: 1 })
+      workspace.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 61 })
     }],
     ['selected IDs', (workspace: ReturnType<typeof createWorkspaceStore>) => {
       workspace.getState().addCurve(curve('fr-2', 'fr', 1))

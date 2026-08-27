@@ -32,7 +32,7 @@ const input: StandardAutoEqInput = {
     ],
     metadata: {},
   },
-  normalization: { anchorHz: 500, targetDb: 0 },
+  normalization: { mode: 'hz', frequencyHz: 500, levelDb: 60 },
   settings: { ...DEFAULT_AUTOEQ_SETTINGS },
 }
 

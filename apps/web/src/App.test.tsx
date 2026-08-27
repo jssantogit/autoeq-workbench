@@ -63,7 +63,7 @@ describe('App', () => {
       curves: [],
       activeFrId: null,
       activeTargetId: null,
-      normalization: { anchorHz: 500, targetDb: 0 },
+      normalization: { mode: 'hz', frequencyHz: 500, levelDb: 60 },
       autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
       filters: [],
       selectedFilterId: null,
@@ -124,7 +124,7 @@ describe('App', () => {
     expect(within(curveManager).queryByText('Upload Target')).not.toBeInTheDocument()
     expect(graphToolbar).toHaveClass('tools', 'graph-toolbar')
     expect(within(graphToolbar).getByRole('group', { name: 'Normalize' })).toBeVisible()
-    expect(within(graphToolbar).getByLabelText('Normalize dB')).toHaveValue(0)
+    expect(within(graphToolbar).getByLabelText('Normalize dB')).toHaveValue(60)
     expect(within(graphToolbar).getByLabelText('Normalize Hz')).toHaveValue(500)
     expect(screen.queryByRole('heading', { name: 'Curves' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
@@ -198,8 +198,8 @@ describe('App', () => {
     uiStore.setState({ activeDockTab: 'tools' })
     render(<App />)
     const graphToolbar = screen.getByRole('toolbar', { name: 'Graph tools' })
-    const target = within(graphToolbar).getByLabelText('Normalize dB')
-    const anchor = within(graphToolbar).getByLabelText('Normalize Hz')
+    const level = within(graphToolbar).getByLabelText('Normalize dB')
+    const frequency = within(graphToolbar).getByLabelText('Normalize Hz')
     const inspector = within(graphToolbar).getByRole('button', { name: 'Inspect' })
 
     expect(inspector).toHaveAttribute('aria-pressed', 'true')
@@ -207,19 +207,19 @@ describe('App', () => {
     expect(inspector).toHaveAttribute('aria-pressed', 'false')
     expect(uiStore.getState().inspectorEnabled).toBe(false)
 
-    await user.clear(target)
-    await user.type(target, '1.5')
-    fireEvent.blur(target)
-    await user.clear(anchor)
-    await user.type(anchor, '800')
-    fireEvent.keyDown(anchor, { key: 'Enter' })
-    expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 800, targetDb: 1.5 })
+    await user.clear(level)
+    await user.type(level, '61.5')
+    fireEvent.blur(level)
+    await user.clear(frequency)
+    await user.type(frequency, '800')
+    fireEvent.keyDown(frequency, { key: 'Enter' })
+    expect(workspaceStore.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 800, levelDb: 61.5 })
     expect(uiStore.getState().activeDockTab).toBe('tools')
 
-    await user.clear(anchor)
-    fireEvent.blur(anchor)
-    expect(anchor).toHaveAttribute('aria-invalid', 'true')
-    expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 800, targetDb: 1.5 })
+    await user.clear(frequency)
+    fireEvent.blur(frequency)
+    expect(frequency).toHaveAttribute('aria-invalid', 'true')
+    expect(workspaceStore.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 800, levelDb: 61.5 })
     expect(screen.getAllByLabelText('Normalize dB')).toHaveLength(1)
     expect(screen.getAllByLabelText('Normalize Hz')).toHaveLength(1)
     expect(screen.queryByRole('button', { name: 'Apply normalization' })).not.toBeInTheDocument()

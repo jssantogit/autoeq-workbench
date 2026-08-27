@@ -3,20 +3,38 @@ import { describe, expect, it } from 'vitest'
 import { createWorkspaceStore, defaultNormalization } from './workspaceStore'
 
 describe('workspace numeric policy', () => {
-  it('rejects normalization anchors outside the 20 Hz-20 kHz workspace range', () => {
+  it('starts with exact default normalization', () => {
+    const store = createWorkspaceStore()
+    expect(store.getState().normalization).toEqual({
+      mode: 'hz',
+      frequencyHz: 500,
+      levelDb: 60,
+    })
+  })
+
+  it('rejects normalization values outside mode hz/db, frequency 20-20000 Hz, and level 0-100 dB', () => {
     const store = createWorkspaceStore()
 
-    store.getState().setNormalization({ anchorHz: 19, targetDb: 0 })
+    store.getState().setNormalization({ mode: 'invalid' as never, frequencyHz: 500, levelDb: 60 })
     expect(store.getState().normalization).toEqual(defaultNormalization)
 
-    store.getState().setNormalization({ anchorHz: 20_001, targetDb: 0 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 19, levelDb: 60 })
     expect(store.getState().normalization).toEqual(defaultNormalization)
 
-    store.getState().setNormalization({ anchorHz: 20, targetDb: 1 })
-    expect(store.getState().normalization).toEqual({ anchorHz: 20, targetDb: 1 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 20_001, levelDb: 60 })
+    expect(store.getState().normalization).toEqual(defaultNormalization)
 
-    store.getState().setNormalization({ anchorHz: 20_000, targetDb: 2 })
-    expect(store.getState().normalization).toEqual({ anchorHz: 20_000, targetDb: 2 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 500, levelDb: -0.1 })
+    expect(store.getState().normalization).toEqual(defaultNormalization)
+
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 500, levelDb: 100.1 })
+    expect(store.getState().normalization).toEqual(defaultNormalization)
+
+    store.getState().setNormalization({ mode: 'db', frequencyHz: 20, levelDb: 0 })
+    expect(store.getState().normalization).toEqual({ mode: 'db', frequencyHz: 20, levelDb: 0 })
+
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 20_000, levelDb: 100 })
+    expect(store.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 20_000, levelDb: 100 })
   })
 
   it('stores only AutoEQ effective settings that stay inside hard product limits', () => {

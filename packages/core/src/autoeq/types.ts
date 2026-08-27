@@ -43,7 +43,7 @@ export interface CancellationAudit {
 }
 
 export interface RunManifest {
-  schemaVersion: 1
+  schemaVersion: 2
   algorithmVersion: 'standard-v1'
   profile: 'Standard'
   sampleRateHz: number

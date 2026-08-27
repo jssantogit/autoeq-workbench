@@ -84,21 +84,21 @@ export function GraphToolbar() {
         <span>Normalize:</span>
         <NumberField
           label="Normalize dB"
-          value={normalization.targetDb}
+          value={normalization.levelDb}
           step="0.1"
           unit="dB"
           unitPosition="before"
-          onValueChange={(targetDb) => setNormalization({ ...normalization, targetDb })}
+          onValueChange={(levelDb) => setNormalization({ ...normalization, levelDb })}
         />
         <NumberField
           label="Normalize Hz"
-          value={normalization.anchorHz}
+          value={normalization.frequencyHz}
           min={MVP_NUMERIC_POLICY.minFrequencyHz}
           max={MVP_NUMERIC_POLICY.maxFrequencyHz}
           unit="Hz"
           unitPosition="before"
           validate={validAnchor}
-          onValueChange={(anchorHz) => setNormalization({ ...normalization, anchorHz })}
+          onValueChange={(frequencyHz) => setNormalization({ ...normalization, frequencyHz })}
         />
       </div>
       <div className="smooth">

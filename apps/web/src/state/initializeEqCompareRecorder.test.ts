@@ -88,7 +88,7 @@ describe('initializeEqCompareRecorder', () => {
 
     workspace.setState({ selectedFilterId: 'filter-1' })
     workspace.setState({ activeFrId: 'curve-1' })
-    workspace.setState({ normalization: { anchorHz: 1_000, targetDb: 1 } })
+    workspace.setState({ normalization: { mode: 'hz', frequencyHz: 1_000, levelDb: 61 } })
     workspace.setState({ autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 8 } })
     ui.getState().setActiveDockTab('tools')
     ui.getState().setTheme('dark')

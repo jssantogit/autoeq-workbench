@@ -21,6 +21,7 @@ import {
   type FilterType,
   type Normalization,
   type PreampResult,
+  type RunManifest,
 } from '@autoeq-workbench/core'
 import { createStore } from 'zustand/vanilla'
 import { useStore } from 'zustand'
@@ -107,8 +108,9 @@ export interface WorkspaceDerived {
 }
 
 export const defaultNormalization: Readonly<Normalization> = {
-  anchorHz: 500,
-  targetDb: 0,
+  mode: 'hz',
+  frequencyHz: 500,
+  levelDb: 60,
 }
 
 const initialState = {
@@ -167,15 +169,8 @@ function hasFiniteFields(value: unknown, fields: readonly string[]): boolean {
   return isRecord(value) && fields.every((field) => Number.isFinite(value[field]))
 }
 
-function validAutoEqResult(result: AutoEqResult): boolean {
-  if (!isRecord(result) || !isRecord(result.manifest)) return false
-  const { manifest } = result
-  const metricsAreFinite = hasFiniteFields(result.metrics, [
-    'maeDb',
-    'rmseDb',
-    'maxAbsDb',
-    'maxAbsFrequencyHz',
-  ])
+function isValidRunManifest(manifest: RunManifest): boolean {
+  if (typeof manifest !== 'object' || manifest === null) return false
   const algorithmParametersAreFinite = hasFiniteFields(manifest.algorithmParameters, [
     'deadbandDb',
     'huberDeltaDb',
@@ -187,28 +182,31 @@ function validAutoEqResult(result: AutoEqResult): boolean {
     'gainWeight',
     'cancellationWeight',
   ])
+  const normalizationIsValid =
+    isRecord(manifest.normalization) &&
+    (manifest.normalization.mode === 'hz' || manifest.normalization.mode === 'db') &&
+    Number.isFinite(manifest.normalization.frequencyHz) &&
+    manifest.normalization.frequencyHz >= MVP_NUMERIC_POLICY.minFrequencyHz &&
+    manifest.normalization.frequencyHz <= MVP_NUMERIC_POLICY.maxFrequencyHz &&
+    Number.isFinite(manifest.normalization.levelDb) &&
+    manifest.normalization.levelDb >= 0 &&
+    manifest.normalization.levelDb <= 100
+
   const auditIsValid =
-    isRecord(result.cancellationAudit) &&
-    Number.isFinite(result.cancellationAudit.totalScore) &&
-    Array.isArray(result.cancellationAudit.pairs) &&
-    result.cancellationAudit.pairs.every(
-      (pair) =>
+    isRecord(manifest.cancellationAudit) &&
+    Number.isFinite(manifest.cancellationAudit.totalScore) &&
+    Array.isArray(manifest.cancellationAudit.pairs) &&
+    manifest.cancellationAudit.pairs.every(
+      (pair: unknown) =>
         isRecord(pair) &&
         typeof pair.filterAId === 'string' &&
         typeof pair.filterBId === 'string' &&
         Number.isFinite(pair.score) &&
-        ['moderate', 'strong'].includes(pair.severity),
+        (pair.severity === 'moderate' || pair.severity === 'strong'),
     )
 
   return (
-    Array.isArray(result.filters) &&
-    result.filters.length <= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters &&
-    result.filters.every(validFilter) &&
-    new Set(result.filters.map(({ id }) => id)).size === result.filters.length &&
-    metricsAreFinite &&
-    Number.isFinite(result.preampDb) &&
-    auditIsValid &&
-    manifest.schemaVersion === 1 &&
+    manifest.schemaVersion === 2 &&
     manifest.algorithmVersion === 'standard-v1' &&
     manifest.profile === 'Standard' &&
     Number.isFinite(manifest.sampleRateHz) &&
@@ -217,15 +215,32 @@ function validAutoEqResult(result: AutoEqResult): boolean {
     manifest.fitPointsPerOctave > 0 &&
     isRecord(manifest.autoeqSettings) &&
     isValidAutoEqSettings(manifest.autoeqSettings) &&
-    isRecord(manifest.normalization) &&
-    Number.isFinite(manifest.normalization.anchorHz) &&
-    manifest.normalization.anchorHz >= MVP_NUMERIC_POLICY.minFrequencyHz &&
-    manifest.normalization.anchorHz <= MVP_NUMERIC_POLICY.maxFrequencyHz &&
-    Number.isFinite(manifest.normalization.targetDb) &&
+    normalizationIsValid &&
     typeof manifest.sourceName === 'string' &&
     typeof manifest.targetName === 'string' &&
     algorithmParametersAreFinite &&
     Array.isArray(manifest.finalFilters) &&
+    manifest.finalFilters.every(validFilter) &&
+    hasFiniteFields(manifest.metrics, [
+      'maeDb',
+      'rmseDb',
+      'maxAbsDb',
+      'maxAbsFrequencyHz',
+    ]) &&
+    Number.isFinite(manifest.preampDb) &&
+    auditIsValid
+  )
+}
+
+function validAutoEqResult(result: AutoEqResult): boolean {
+  if (!isRecord(result) || !isValidRunManifest(result.manifest)) return false
+  const { manifest } = result
+
+  return (
+    Array.isArray(result.filters) &&
+    result.filters.length <= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters &&
+    result.filters.every(validFilter) &&
+    new Set(result.filters.map(({ id }) => id)).size === result.filters.length &&
     JSON.stringify(result.filters) === JSON.stringify(manifest.finalFilters) &&
     JSON.stringify(result.metrics) === JSON.stringify(manifest.metrics) &&
     result.preampDb === manifest.preampDb &&
@@ -354,12 +369,17 @@ export function createWorkspaceStore() {
     setNormalization: (value) =>
       set((state) => {
         if (
-          !Number.isFinite(value.anchorHz) ||
-          value.anchorHz < MVP_NUMERIC_POLICY.minFrequencyHz ||
-          value.anchorHz > MVP_NUMERIC_POLICY.maxFrequencyHz ||
-          !Number.isFinite(value.targetDb) ||
-          (value.anchorHz === state.normalization.anchorHz &&
-            value.targetDb === state.normalization.targetDb)
+          !isRecord(value) ||
+          (value.mode !== 'hz' && value.mode !== 'db') ||
+          !Number.isFinite(value.frequencyHz) ||
+          value.frequencyHz < MVP_NUMERIC_POLICY.minFrequencyHz ||
+          value.frequencyHz > MVP_NUMERIC_POLICY.maxFrequencyHz ||
+          !Number.isFinite(value.levelDb) ||
+          value.levelDb < 0 ||
+          value.levelDb > 100 ||
+          (value.mode === state.normalization.mode &&
+            value.frequencyHz === state.normalization.frequencyHz &&
+            value.levelDb === state.normalization.levelDb)
         ) return state
         return record(state, {
           normalization: { ...value },

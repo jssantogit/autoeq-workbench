@@ -28,7 +28,7 @@ describe('GraphToolbar', () => {
       curves: [],
       activeFrId: null,
       activeTargetId: null,
-      normalization: { anchorHz: 500, targetDb: 0 },
+      normalization: { mode: 'hz', frequencyHz: 500, levelDb: 60 },
       autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
     })
   })
@@ -67,15 +67,15 @@ describe('GraphToolbar', () => {
     render(<GraphToolbar />)
     const db = screen.getByLabelText('Normalize dB')
     const hz = screen.getByLabelText('Normalize Hz')
-    fireEvent.change(db, { target: { value: '1.5' } })
+    fireEvent.change(db, { target: { value: '61.5' } })
     fireEvent.blur(db)
     fireEvent.change(hz, { target: { value: '800' } })
     fireEvent.blur(hz)
-    expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 800, targetDb: 1.5 })
+    expect(workspaceStore.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 800, levelDb: 61.5 })
 
     fireEvent.change(hz, { target: { value: '25000' } })
     fireEvent.blur(hz)
-    expect(workspaceStore.getState().normalization.anchorHz).toBe(800)
+    expect(workspaceStore.getState().normalization.frequencyHz).toBe(800)
     expect(hz).toHaveAttribute('aria-invalid', 'true')
 
     const smoothing = screen.getByLabelText('Smooth')

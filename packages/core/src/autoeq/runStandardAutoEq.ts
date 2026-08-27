@@ -80,7 +80,7 @@ export function runStandardAutoEq(input: StandardAutoEqInput): AutoEqResult {
   const preampDb = calculatePreampDb(delivered, config.sampleRateHz).preampDb
   const cancellationAudit = auditCancellations(delivered, frequencies, config.sampleRateHz)
   const manifest: RunManifest = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     algorithmVersion: config.algorithmVersion,
     profile: 'Standard',
     sampleRateHz: config.sampleRateHz,

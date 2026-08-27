@@ -30,7 +30,11 @@ export function createAutoEqRunInputSignature(state: AutoEqRunSignatureState): s
     activeTargetId: selected.target.id,
     sourcePoints: selected.source.rawPoints.map(({ frequencyHz, db }) => [frequencyHz, db]),
     targetPoints: selected.target.rawPoints.map(({ frequencyHz, db }) => [frequencyHz, db]),
-    normalization: [state.normalization.anchorHz, state.normalization.targetDb],
+    normalization: [
+      state.normalization.mode,
+      state.normalization.frequencyHz,
+      state.normalization.levelDb,
+    ],
     settings: [
       settings.minFrequencyHz,
       settings.maxFrequencyHz,

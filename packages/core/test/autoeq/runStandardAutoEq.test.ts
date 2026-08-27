@@ -284,7 +284,7 @@ describe('runStandardAutoEq', () => {
     expect(result.manifest.preampDb).toBe(preampDb)
     expect(result.manifest.cancellationAudit).toEqual(cancellationAudit)
     expect(result.manifest).toMatchObject({
-      schemaVersion: 1,
+      schemaVersion: 2,
       algorithmVersion: 'standard-v1',
       profile: 'Standard',
       sampleRateHz: 48_000,
@@ -294,5 +294,27 @@ describe('runStandardAutoEq', () => {
       targetName: input.target.name,
     })
     expect(JSON.stringify(result.manifest)).not.toMatch(/timestamp|uuid|runId/i)
+  })
+
+  it('delivers identical deterministic Standard-v1 outputs and schemaVersion 2 for default normalization', () => {
+    const input = {
+      source: syntheticInput().source,
+      target: syntheticInput().target,
+      normalization: { mode: 'hz' as const, frequencyHz: 500, levelDb: 60 },
+      settings: DEFAULT_AUTOEQ_SETTINGS,
+    }
+    const result1 = runStandardAutoEq(input)
+    const result2 = runStandardAutoEq(input)
+
+    expect(result1.manifest.schemaVersion).toBe(2)
+    expect(result1.manifest.algorithmVersion).toBe('standard-v1')
+    expect(result1.manifest.normalization).toEqual({
+      mode: 'hz',
+      frequencyHz: 500,
+      levelDb: 60,
+    })
+    expect(result1).toEqual(result2)
+    expect(result1.filters.length).toBeLessThanOrEqual(5)
+    expect(result1.metrics.maeDb).toBeLessThan(0.25)
   })
 })
