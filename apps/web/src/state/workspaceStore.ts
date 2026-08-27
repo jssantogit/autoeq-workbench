@@ -31,6 +31,12 @@ import {
   type WorkspaceHistorySnapshot,
 } from './history'
 import { cloneAutoEqRunRecord, type AutoEqRunRecord } from './autoEqRun'
+import {
+  cloneCurve,
+  cloneFilter,
+  validateWorkbenchSession,
+  type WorkbenchSessionV1,
+} from '../session/workbenchSession'
 
 export type { AutoEqRunRecord } from './autoEqRun'
 
@@ -65,6 +71,7 @@ export interface WorkspaceState {
   setFilters: (filters: Filter[], provenance: FilterProvenance) => void
   applyAutoEqResult: (result: AutoEqResult) => boolean
   applyFilterSnapshot: (snapshot: FilterSnapshotState) => void
+  applySession: (session: WorkbenchSessionV1) => boolean
   selectFilter: (id: string | null) => void
   addFilter: (type: FilterType) => void
   removeFilter: (id: string) => void
@@ -453,6 +460,31 @@ export function createWorkspaceStore() {
           selectedFilterId: null,
         })
       }),
+    applySession: (session) => {
+      let validated: WorkbenchSessionV1
+      try {
+        validated = validateWorkbenchSession(session)
+      } catch {
+        return false
+      }
+      past.length = 0
+      future.length = 0
+      set(() => ({
+        curves: validated.curves.map(cloneCurve),
+        activeFrId: validated.activeFrId,
+        activeTargetId: validated.activeTargetId,
+        normalization: { ...validated.normalization },
+        autoeqSettings: { ...validated.autoeqSettings },
+        filters: validated.filters.map(cloneFilter),
+        selectedFilterId: null,
+        solutionState: validated.solutionState,
+        filterProvenance: validated.filterProvenance,
+        autoEqRun: cloneAutoEqRunRecord(validated.autoEqRun),
+        canUndo: false,
+        canRedo: false,
+      }))
+      return true
+    },
     selectFilter: (id) =>
       set((state) => ({
         selectedFilterId:

@@ -1,0 +1,424 @@
+import {
+  AUTOEQ_PRODUCT_LIMITS,
+  isValidAutoEqSettings,
+  MVP_NUMERIC_POLICY,
+  type AutoEqSettings,
+  type Curve,
+  type CurvePoint,
+  type Filter,
+  type Normalization,
+  type RunManifest,
+} from '@autoeq-workbench/core'
+import type { StoreApi } from 'zustand/vanilla'
+
+import { cloneAutoEqRunRecord, type AutoEqRunRecord } from '../state/autoEqRun'
+import { cancelAutoEq } from '../state/autoeqController'
+import { autoEqRunStore, type AutoEqRunState } from '../state/autoeqRunStore'
+import { eqCompareStore, type EqCompareState } from '../state/eqCompareStore'
+import {
+  workspaceStore,
+  type FilterProvenance,
+  type SolutionState,
+  type WorkspaceState,
+} from '../state/workspaceStore'
+
+export const WORKBENCH_SESSION_SCHEMA_VERSION = 1 as const
+
+export interface WorkbenchSessionV1 {
+  schemaVersion: 1
+  curves: Curve[]
+  activeFrId: string | null
+  activeTargetId: string | null
+  normalization: Normalization
+  autoeqSettings: AutoEqSettings
+  filters: Filter[]
+  filterProvenance: FilterProvenance | null
+  solutionState: SolutionState
+  autoEqRun: AutoEqRunRecord | null
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function hasFiniteFields(value: unknown, fields: readonly string[]): boolean {
+  return isRecord(value) && fields.every((field) => Number.isFinite(value[field]))
+}
+
+export function cloneCurvePoint(point: CurvePoint): CurvePoint {
+  return {
+    frequencyHz: point.frequencyHz,
+    db: point.db,
+  }
+}
+
+export function cloneCurve(curve: Curve): Curve {
+  return {
+    id: curve.id,
+    name: curve.name,
+    kind: curve.kind,
+    rawPoints: curve.rawPoints.map(cloneCurvePoint),
+    metadata: { ...curve.metadata },
+  }
+}
+
+export function cloneFilter(filter: Filter): Filter {
+  return {
+    id: filter.id,
+    enabled: filter.enabled,
+    type: filter.type,
+    frequencyHz: filter.frequencyHz,
+    gainDb: filter.gainDb,
+    q: filter.q,
+  }
+}
+
+function isValidPoint(point: unknown): point is CurvePoint {
+  if (!isRecord(point)) return false
+  return (
+    Number.isFinite(point.frequencyHz) &&
+    (point.frequencyHz as number) > 0 &&
+    Number.isFinite(point.db)
+  )
+}
+
+function isValidCurve(curve: unknown): curve is Curve {
+  if (!isRecord(curve)) return false
+  if (typeof curve.id !== 'string' || curve.id.trim().length === 0) return false
+  if (typeof curve.name !== 'string' || curve.name.trim().length === 0) return false
+  if (curve.kind !== 'fr' && curve.kind !== 'target') return false
+  if (!Array.isArray(curve.rawPoints) || curve.rawPoints.length === 0) return false
+  if (!curve.rawPoints.every(isValidPoint)) return false
+  if (curve.metadata !== undefined && !isRecord(curve.metadata)) return false
+  return true
+}
+
+function isValidNormalization(normalization: unknown): normalization is Normalization {
+  if (!isRecord(normalization)) return false
+  return (
+    (normalization.mode === 'hz' || normalization.mode === 'db') &&
+    Number.isFinite(normalization.frequencyHz) &&
+    (normalization.frequencyHz as number) >= MVP_NUMERIC_POLICY.minFrequencyHz &&
+    (normalization.frequencyHz as number) <= MVP_NUMERIC_POLICY.maxFrequencyHz &&
+    Number.isFinite(normalization.levelDb) &&
+    (normalization.levelDb as number) >= 0 &&
+    (normalization.levelDb as number) <= 100
+  )
+}
+
+function isValidFilter(filter: unknown): filter is Filter {
+  if (!isRecord(filter)) return false
+  return (
+    typeof filter.id === 'string' &&
+    filter.id.trim().length > 0 &&
+    typeof filter.enabled === 'boolean' &&
+    (filter.type === 'PK' || filter.type === 'LS' || filter.type === 'HS') &&
+    Number.isFinite(filter.frequencyHz) &&
+    (filter.frequencyHz as number) >= MVP_NUMERIC_POLICY.minFrequencyHz &&
+    (filter.frequencyHz as number) <= MVP_NUMERIC_POLICY.maxFrequencyHz &&
+    Number.isFinite(filter.gainDb) &&
+    (filter.gainDb as number) >= AUTOEQ_PRODUCT_LIMITS.minGainDb &&
+    (filter.gainDb as number) <= AUTOEQ_PRODUCT_LIMITS.maxGainDb &&
+    Number.isFinite(filter.q) &&
+    (filter.q as number) >= AUTOEQ_PRODUCT_LIMITS.minQ &&
+    (filter.q as number) <= AUTOEQ_PRODUCT_LIMITS.maxQ
+  )
+}
+
+function isValidSettings(settings: unknown): settings is AutoEqSettings {
+  return isRecord(settings) && isValidAutoEqSettings(settings as unknown as AutoEqSettings)
+}
+
+function isValidRunManifest(manifest: unknown): manifest is RunManifest {
+  if (!isRecord(manifest)) return false
+  const algorithmParametersAreFinite = hasFiniteFields(manifest.algorithmParameters, [
+    'deadbandDb',
+    'huberDeltaDb',
+    'candidateThresholdDb',
+    'minObjectiveImprovement',
+    'pruneTolerance',
+    'filterCountWeight',
+    'highQWeight',
+    'gainWeight',
+    'cancellationWeight',
+  ])
+
+  const auditIsValid =
+    isRecord(manifest.cancellationAudit) &&
+    Number.isFinite(manifest.cancellationAudit.totalScore) &&
+    Array.isArray(manifest.cancellationAudit.pairs) &&
+    manifest.cancellationAudit.pairs.every(
+      (pair: unknown) =>
+        isRecord(pair) &&
+        typeof pair.filterAId === 'string' &&
+        typeof pair.filterBId === 'string' &&
+        Number.isFinite(pair.score) &&
+        (pair.severity === 'moderate' || pair.severity === 'strong'),
+    )
+
+  return (
+    manifest.schemaVersion === 2 &&
+    manifest.algorithmVersion === 'standard-v1' &&
+    manifest.profile === 'Standard' &&
+    Number.isFinite(manifest.sampleRateHz) &&
+    (manifest.sampleRateHz as number) > 0 &&
+    Number.isInteger(manifest.fitPointsPerOctave) &&
+    (manifest.fitPointsPerOctave as number) > 0 &&
+    isValidSettings(manifest.autoeqSettings) &&
+    isValidNormalization(manifest.normalization) &&
+    typeof manifest.sourceName === 'string' &&
+    typeof manifest.targetName === 'string' &&
+    algorithmParametersAreFinite &&
+    Array.isArray(manifest.finalFilters) &&
+    manifest.finalFilters.length <= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters &&
+    manifest.finalFilters.every(isValidFilter) &&
+    new Set(manifest.finalFilters.map(({ id }) => id)).size === manifest.finalFilters.length &&
+    hasFiniteFields(manifest.metrics, [
+      'maeDb',
+      'rmseDb',
+      'maxAbsDb',
+      'maxAbsFrequencyHz',
+    ]) &&
+    Number.isFinite(manifest.preampDb) &&
+    auditIsValid
+  )
+}
+
+function areFiltersEqual(left: readonly Filter[], right: readonly Filter[]): boolean {
+  if (left.length !== right.length) return false
+  return left.every((filter, index) => {
+    const other = right[index]
+    return (
+      other !== undefined &&
+      filter.id === other.id &&
+      filter.enabled === other.enabled &&
+      filter.type === other.type &&
+      filter.frequencyHz === other.frequencyHz &&
+      filter.gainDb === other.gainDb &&
+      filter.q === other.q
+    )
+  })
+}
+
+export function validateWorkbenchSession(input: unknown): WorkbenchSessionV1 {
+  if (!isRecord(input)) {
+    throw new Error('Invalid Workbench session: expected JSON object.')
+  }
+
+  if (input.schemaVersion !== WORKBENCH_SESSION_SCHEMA_VERSION) {
+    throw new Error('Invalid Workbench session: unsupported schema version.')
+  }
+
+  if (!Array.isArray(input.curves)) {
+    throw new Error('Invalid Workbench session: curves must be an array.')
+  }
+
+  for (const curve of input.curves) {
+    if (!isValidCurve(curve)) {
+      throw new Error('Invalid Workbench session: malformed curve definition.')
+    }
+  }
+
+  const curveIds = new Set(input.curves.map((c: Curve) => c.id))
+  if (curveIds.size !== input.curves.length) {
+    throw new Error('Invalid Workbench session: duplicate curve IDs found.')
+  }
+
+  if (input.activeFrId !== null) {
+    if (typeof input.activeFrId !== 'string') {
+      throw new Error('Invalid Workbench session: activeFrId must be string or null.')
+    }
+    const matchingFr = input.curves.find((c: Curve) => c.id === input.activeFrId)
+    if (!matchingFr || matchingFr.kind !== 'fr') {
+      throw new Error('Invalid Workbench session: activeFrId must reference an FR curve.')
+    }
+  }
+
+  if (input.activeTargetId !== null) {
+    if (typeof input.activeTargetId !== 'string') {
+      throw new Error('Invalid Workbench session: activeTargetId must be string or null.')
+    }
+    const matchingTarget = input.curves.find((c: Curve) => c.id === input.activeTargetId)
+    if (!matchingTarget || matchingTarget.kind !== 'target') {
+      throw new Error('Invalid Workbench session: activeTargetId must reference a Target curve.')
+    }
+  }
+
+  if (!isValidNormalization(input.normalization)) {
+    throw new Error('Invalid Workbench session: invalid normalization parameters.')
+  }
+
+  if (!isValidSettings(input.autoeqSettings)) {
+    throw new Error('Invalid Workbench session: invalid AutoEQ settings.')
+  }
+
+  if (!Array.isArray(input.filters)) {
+    throw new Error('Invalid Workbench session: filters must be an array.')
+  }
+
+  if (input.filters.length > AUTOEQ_PRODUCT_LIMITS.hardMaxFilters) {
+    throw new Error('Invalid Workbench session: filter count exceeds maximum limit.')
+  }
+
+  for (const filter of input.filters) {
+    if (!isValidFilter(filter)) {
+      throw new Error('Invalid Workbench session: malformed filter definition.')
+    }
+  }
+
+  const filterIds = new Set(input.filters.map((f: Filter) => f.id))
+  if (filterIds.size !== input.filters.length) {
+    throw new Error('Invalid Workbench session: duplicate filter IDs found.')
+  }
+
+  const provenance = input.filterProvenance
+  if (provenance !== null && provenance !== 'manual' && provenance !== 'autoeq') {
+    throw new Error('Invalid Workbench session: invalid filter provenance.')
+  }
+
+  const solutionState = input.solutionState
+  if (solutionState !== 'clean' && solutionState !== 'modified' && solutionState !== 'stale') {
+    throw new Error('Invalid Workbench session: invalid solution state.')
+  }
+
+  let autoEqRun: AutoEqRunRecord | null = null
+  if (input.autoEqRun !== null) {
+    if (!isRecord(input.autoEqRun) || !isValidRunManifest(input.autoEqRun.manifest)) {
+      throw new Error('Invalid Workbench session: invalid AutoEQ run record or manifest.')
+    }
+    autoEqRun = cloneAutoEqRunRecord({ manifest: input.autoEqRun.manifest })
+  }
+
+  if (provenance === null) {
+    if (input.filters.length > 0) {
+      throw new Error('Invalid Workbench session: null provenance cannot contain filters.')
+    }
+    if (autoEqRun !== null) {
+      throw new Error('Invalid Workbench session: null provenance cannot have an AutoEQ run.')
+    }
+    if (solutionState !== 'clean') {
+      throw new Error('Invalid Workbench session: null provenance must have clean solution state.')
+    }
+  } else if (provenance === 'manual') {
+    if (autoEqRun !== null) {
+      throw new Error('Invalid Workbench session: manual provenance cannot have an AutoEQ run.')
+    }
+    if (solutionState !== 'clean') {
+      throw new Error('Invalid Workbench session: manual provenance must have clean solution state.')
+    }
+  } else if (provenance === 'autoeq') {
+    if (autoEqRun === null) {
+      throw new Error('Invalid Workbench session: AutoEQ provenance requires an AutoEQ run record.')
+    }
+    if (solutionState === 'clean') {
+      if (!areFiltersEqual(input.filters as Filter[], autoEqRun.manifest.finalFilters)) {
+        throw new Error(
+          'Invalid Workbench session: clean AutoEQ solution filters do not match manifest final filters.',
+        )
+      }
+    }
+  }
+
+  return {
+    schemaVersion: WORKBENCH_SESSION_SCHEMA_VERSION,
+    curves: input.curves.map(cloneCurve),
+    activeFrId: input.activeFrId,
+    activeTargetId: input.activeTargetId,
+    normalization: {
+      mode: input.normalization.mode,
+      frequencyHz: input.normalization.frequencyHz,
+      levelDb: input.normalization.levelDb,
+    },
+    autoeqSettings: {
+      minFrequencyHz: input.autoeqSettings.minFrequencyHz,
+      maxFrequencyHz: input.autoeqSettings.maxFrequencyHz,
+      minGainDb: input.autoeqSettings.minGainDb,
+      maxGainDb: input.autoeqSettings.maxGainDb,
+      minQ: input.autoeqSettings.minQ,
+      maxQ: input.autoeqSettings.maxQ,
+      maxFilters: input.autoeqSettings.maxFilters,
+    },
+    filters: input.filters.map(cloneFilter),
+    filterProvenance: provenance,
+    solutionState,
+    autoEqRun,
+  }
+}
+
+export function serializeWorkbenchSession(input: WorkbenchSessionV1): string {
+  const validated = validateWorkbenchSession(input)
+  const stableObject: WorkbenchSessionV1 = {
+    schemaVersion: WORKBENCH_SESSION_SCHEMA_VERSION,
+    curves: validated.curves.map(cloneCurve),
+    activeFrId: validated.activeFrId,
+    activeTargetId: validated.activeTargetId,
+    normalization: { ...validated.normalization },
+    autoeqSettings: { ...validated.autoeqSettings },
+    filters: validated.filters.map(cloneFilter),
+    filterProvenance: validated.filterProvenance,
+    solutionState: validated.solutionState,
+    autoEqRun: cloneAutoEqRunRecord(validated.autoEqRun),
+  }
+  return JSON.stringify(stableObject, null, 2) + '\n'
+}
+
+export function deserializeWorkbenchSession(text: string): WorkbenchSessionV1 {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(text)
+  } catch {
+    throw new Error('Invalid Workbench session JSON.')
+  }
+  return validateWorkbenchSession(parsed)
+}
+
+export function createWorkbenchSessionFromWorkspace(state: WorkspaceState): WorkbenchSessionV1 {
+  return validateWorkbenchSession({
+    schemaVersion: WORKBENCH_SESSION_SCHEMA_VERSION,
+    curves: state.curves.map(cloneCurve),
+    activeFrId: state.activeFrId,
+    activeTargetId: state.activeTargetId,
+    normalization: { ...state.normalization },
+    autoeqSettings: { ...state.autoeqSettings },
+    filters: state.filters.map(cloneFilter),
+    filterProvenance: state.filterProvenance,
+    solutionState: state.solutionState,
+    autoEqRun: cloneAutoEqRunRecord(state.autoEqRun),
+  })
+}
+
+export interface ImportSessionDependencies {
+  workspaceStore?: StoreApi<WorkspaceState>
+  compareStore?: StoreApi<EqCompareState>
+  runStore?: StoreApi<AutoEqRunState>
+  cancelAutoEq?: () => void
+}
+
+export function importWorkbenchSession(
+  input: string | WorkbenchSessionV1,
+  deps: ImportSessionDependencies = {},
+): WorkbenchSessionV1 {
+  const session = typeof input === 'string'
+    ? deserializeWorkbenchSession(input)
+    : validateWorkbenchSession(input)
+
+  if (deps.cancelAutoEq) {
+    deps.cancelAutoEq()
+  } else {
+    cancelAutoEq()
+  }
+
+  const ws = deps.workspaceStore ?? workspaceStore
+  const applied = ws.getState().applySession(session)
+  if (!applied) {
+    throw new Error('Failed to apply Workbench session.')
+  }
+
+  const comp = deps.compareStore ?? eqCompareStore
+  comp.getState().clear()
+
+  const run = deps.runStore ?? autoEqRunStore
+  run.getState().reset()
+
+  return session
+}

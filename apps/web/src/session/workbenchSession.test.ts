@@ -1,0 +1,695 @@
+import {
+  AUTOEQ_PRODUCT_LIMITS,
+  DEFAULT_AUTOEQ_SETTINGS,
+  MVP_NUMERIC_POLICY,
+  type Curve,
+  type Filter,
+} from '@autoeq-workbench/core'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { createAutoEqResult, createAutoEqRunRecord } from '../test/autoEqFixture'
+import {
+  type AutoEqClient,
+} from '../workers/autoeqClient'
+import { createAutoEqController } from '../state/autoeqController'
+import { createAutoEqRunStore } from '../state/autoeqRunStore'
+import { createEqCompareStore } from '../state/eqCompareStore'
+import {
+  createWorkspaceStore,
+  defaultNormalization,
+} from '../state/workspaceStore'
+import {
+  deserializeWorkbenchSession,
+  importWorkbenchSession,
+  serializeWorkbenchSession,
+  WORKBENCH_SESSION_SCHEMA_VERSION,
+  type WorkbenchSessionV1,
+} from './workbenchSession'
+
+function createSampleCurveFr(): Curve {
+  return {
+    id: 'fr-custom-1',
+    name: 'Sample FR',
+    kind: 'fr',
+    rawPoints: [
+      { frequencyHz: 20, db: -2 },
+      { frequencyHz: 500, db: 0 },
+      { frequencyHz: 1_000, db: 1.5 },
+      { frequencyHz: 20_000, db: -3 },
+    ],
+    metadata: { source: 'synthetic-test' },
+  }
+}
+
+function createSampleCurveTarget(): Curve {
+  return {
+    id: 'target-custom-1',
+    name: 'Sample Target',
+    kind: 'target',
+    rawPoints: [
+      { frequencyHz: 20, db: 4 },
+      { frequencyHz: 500, db: 0 },
+      { frequencyHz: 1_000, db: -1 },
+      { frequencyHz: 20_000, db: 2 },
+    ],
+    metadata: { targetType: 'in-ear' },
+  }
+}
+
+function createSampleFilterManual(): Filter {
+  return {
+    id: 'custom-filter-1',
+    enabled: true,
+    type: 'PK',
+    frequencyHz: 1_250,
+    gainDb: -3.5,
+    q: 1.4,
+  }
+}
+
+function createValidManualSession(): WorkbenchSessionV1 {
+  const fr = createSampleCurveFr()
+  const target = createSampleCurveTarget()
+  return {
+    schemaVersion: 1,
+    curves: [fr, target],
+    activeFrId: fr.id,
+    activeTargetId: target.id,
+    normalization: { mode: 'hz', frequencyHz: 500, levelDb: 60 },
+    autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
+    filters: [createSampleFilterManual()],
+    filterProvenance: 'manual',
+    solutionState: 'clean',
+    autoEqRun: null,
+  }
+}
+
+function createValidAutoEqSession(): WorkbenchSessionV1 {
+  const fr = createSampleCurveFr()
+  const target = createSampleCurveTarget()
+  const result = createAutoEqResult(2.5)
+  return {
+    schemaVersion: 1,
+    curves: [fr, target],
+    activeFrId: fr.id,
+    activeTargetId: target.id,
+    normalization: { mode: 'hz', frequencyHz: 500, levelDb: 60 },
+    autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
+    filters: result.filters.map((filter) => ({ ...filter })),
+    filterProvenance: 'autoeq',
+    solutionState: 'clean',
+    autoEqRun: { manifest: result.manifest },
+  }
+}
+
+describe('Workbench Session V1 Serialization and Round-Trip', () => {
+  it('exposes WORKBENCH_SESSION_SCHEMA_VERSION as 1', () => {
+    expect(WORKBENCH_SESSION_SCHEMA_VERSION).toBe(1)
+  })
+
+  it('serializes deterministically with exact key order, 2 spaces, and trailing newline', () => {
+    const fixture = createValidManualSession()
+    const encoded1 = serializeWorkbenchSession(fixture)
+    const encoded2 = serializeWorkbenchSession(fixture)
+
+    expect(encoded1).toBe(encoded2)
+    expect(encoded1.endsWith('\n')).toBe(true)
+
+    const expectedKeyOrder = [
+      '"schemaVersion"',
+      '"curves"',
+      '"activeFrId"',
+      '"activeTargetId"',
+      '"normalization"',
+      '"autoeqSettings"',
+      '"filters"',
+      '"filterProvenance"',
+      '"solutionState"',
+      '"autoEqRun"',
+    ]
+
+    let lastIndex = -1
+    for (const key of expectedKeyOrder) {
+      const index = encoded1.indexOf(key)
+      expect(index).toBeGreaterThan(lastIndex)
+      lastIndex = index
+    }
+
+    const deserialized = deserializeWorkbenchSession(encoded1)
+    expect(deserialized).toEqual(fixture)
+    expect(serializeWorkbenchSession(deserialized)).toBe(encoded1)
+  })
+
+  it('round-trips an empty/initial session faithfully', () => {
+    const emptySession: WorkbenchSessionV1 = {
+      schemaVersion: 1,
+      curves: [],
+      activeFrId: null,
+      activeTargetId: null,
+      normalization: { ...defaultNormalization },
+      autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
+      filters: [],
+      filterProvenance: null,
+      solutionState: 'clean',
+      autoEqRun: null,
+    }
+
+    const encoded = serializeWorkbenchSession(emptySession)
+    expect(encoded.endsWith('\n')).toBe(true)
+    expect(deserializeWorkbenchSession(encoded)).toEqual(emptySession)
+  })
+
+  it('round-trips clean, modified, and stale AutoEQ sessions while preserving IDs and points', () => {
+    const autoEqSession = createValidAutoEqSession()
+    const encodedClean = serializeWorkbenchSession(autoEqSession)
+    expect(deserializeWorkbenchSession(encodedClean)).toEqual(autoEqSession)
+
+    // Modified AutoEQ session
+    const modifiedSession: WorkbenchSessionV1 = {
+      ...autoEqSession,
+      filters: [{ ...autoEqSession.filters[0]!, gainDb: 5.0 }],
+      solutionState: 'modified',
+    }
+    const encodedModified = serializeWorkbenchSession(modifiedSession)
+    expect(deserializeWorkbenchSession(encodedModified)).toEqual(modifiedSession)
+
+    // Stale AutoEQ session
+    const staleSession: WorkbenchSessionV1 = {
+      ...autoEqSession,
+      solutionState: 'stale',
+    }
+    const encodedStale = serializeWorkbenchSession(staleSession)
+    expect(deserializeWorkbenchSession(encodedStale)).toEqual(staleSession)
+  })
+
+  it('deep clones deserialized values and does not leak parser-owned or input references', () => {
+    const fixture = createValidAutoEqSession()
+    const encoded = serializeWorkbenchSession(fixture)
+    const deserialized1 = deserializeWorkbenchSession(encoded)
+    const deserialized2 = deserializeWorkbenchSession(encoded)
+
+    expect(deserialized1).toEqual(deserialized2)
+    expect(deserialized1.curves).not.toBe(deserialized2.curves)
+    expect(deserialized1.curves[0]).not.toBe(deserialized2.curves[0])
+    expect(deserialized1.curves[0]!.rawPoints).not.toBe(deserialized2.curves[0]!.rawPoints)
+    expect(deserialized1.normalization).not.toBe(deserialized2.normalization)
+    expect(deserialized1.autoeqSettings).not.toBe(deserialized2.autoeqSettings)
+    expect(deserialized1.filters).not.toBe(deserialized2.filters)
+    expect(deserialized1.autoEqRun).not.toBe(deserialized2.autoEqRun)
+
+    // Mutating deserialized1 must not affect deserialized2
+    deserialized1.curves[0]!.name = 'Mutated'
+    deserialized1.filters[0]!.gainDb = -10
+    expect(deserialized2.curves[0]!.name).toBe(fixture.curves[0]!.name)
+    expect(deserialized2.filters[0]!.gainDb).toBe(fixture.filters[0]!.gainDb)
+  })
+})
+
+describe('Workbench Session Deserialization Validation Matrix', () => {
+  it.each([
+    ['not JSON syntax', '{ not json }'],
+    ['empty string', ''],
+    ['whitespace only', '   \n  '],
+    ['JSON string', '"just a string"'],
+    ['JSON number', '123'],
+    ['JSON array', '[]'],
+    ['JSON boolean', 'true'],
+    ['JSON null', 'null'],
+  ])('rejects malformed or non-object JSON: %s', (_label, input) => {
+    expect(() => deserializeWorkbenchSession(input)).toThrow()
+    try {
+      deserializeWorkbenchSession(input)
+    } catch (cause) {
+      expect(cause).toBeInstanceOf(Error)
+      // Must not leak file paths
+      expect((cause as Error).message).not.toMatch(/[/\\](?:home|usr|apps|packages|node_modules)/)
+    }
+  })
+
+  it.each([
+    ['missing schemaVersion', (s: Record<string, unknown>) => { delete s.schemaVersion }],
+    ['schemaVersion 2', (s: Record<string, unknown>) => { s.schemaVersion = 2 }],
+    ['schemaVersion 0', (s: Record<string, unknown>) => { s.schemaVersion = 0 }],
+    ['schemaVersion string "1"', (s: Record<string, unknown>) => { s.schemaVersion = '1' }],
+    ['schemaVersion null', (s: Record<string, unknown>) => { s.schemaVersion = null }],
+  ])('rejects invalid schema version: %s', (_label, mutate) => {
+    const session = createValidManualSession() as unknown as Record<string, unknown>
+    mutate(session)
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
+  it('rejects duplicate curve IDs', () => {
+    const session = createValidManualSession()
+    const fr = createSampleCurveFr()
+    const target = createSampleCurveTarget()
+    session.curves = [
+      fr,
+      { ...target, id: fr.id },
+    ]
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
+  it('rejects duplicate filter IDs', () => {
+    const session = createValidManualSession()
+    const f1 = createSampleFilterManual()
+    session.filters = [
+      f1,
+      { ...f1, frequencyHz: 2_000 },
+    ]
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
+  it.each([
+    ['missing curves array', (s: WorkbenchSessionV1) => { (s as unknown as Record<string, unknown>).curves = null }],
+    ['curve not object', (s: WorkbenchSessionV1) => { (s.curves as unknown[])[0] = 'not-an-object' }],
+    ['empty curve name', (s: WorkbenchSessionV1) => { s.curves[0]!.name = '' }],
+    ['whitespace curve name', (s: WorkbenchSessionV1) => { s.curves[0]!.name = '   ' }],
+    ['invalid curve kind', (s: WorkbenchSessionV1) => { (s.curves[0] as unknown as Record<string, unknown>).kind = 'custom' }],
+    ['missing rawPoints', (s: WorkbenchSessionV1) => { (s.curves[0] as unknown as Record<string, unknown>).rawPoints = null }],
+    ['non-finite point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = Number.NaN }],
+    ['infinite point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = Number.POSITIVE_INFINITY }],
+    ['non-positive point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = 0 }],
+    ['negative point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = -10 }],
+    ['non-finite point db', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.db = Number.NaN }],
+    ['infinite point db', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.db = Number.NEGATIVE_INFINITY }],
+  ])('rejects invalid curve data: %s', (_label, mutate) => {
+    const session = createValidManualSession()
+    mutate(session)
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
+  it('rejects activeFrId when not referencing an existing FR curve', () => {
+    const session = createValidManualSession()
+    session.activeFrId = 'non-existent-curve-id'
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+
+    // Referencing a target curve as FR
+    session.activeFrId = session.curves.find((c) => c.kind === 'target')!.id
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
+  it('rejects activeTargetId when not referencing an existing Target curve', () => {
+    const session = createValidManualSession()
+    session.activeTargetId = 'non-existent-target-id'
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+
+    // Referencing an FR curve as Target
+    session.activeTargetId = session.curves.find((c) => c.kind === 'fr')!.id
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
+  it.each([
+    ['missing normalization', (s: WorkbenchSessionV1) => { (s as unknown as Record<string, unknown>).normalization = null }],
+    ['invalid mode', (s: WorkbenchSessionV1) => { (s.normalization as unknown as Record<string, unknown>).mode = 'linear' }],
+    ['frequency below min', (s: WorkbenchSessionV1) => { s.normalization.frequencyHz = MVP_NUMERIC_POLICY.minFrequencyHz - 1 }],
+    ['frequency above max', (s: WorkbenchSessionV1) => { s.normalization.frequencyHz = MVP_NUMERIC_POLICY.maxFrequencyHz + 1 }],
+    ['level below 0', (s: WorkbenchSessionV1) => { s.normalization.levelDb = -1 }],
+    ['level above 100', (s: WorkbenchSessionV1) => { s.normalization.levelDb = 101 }],
+    ['non-finite frequency', (s: WorkbenchSessionV1) => { s.normalization.frequencyHz = Number.NaN }],
+    ['non-finite level', (s: WorkbenchSessionV1) => { s.normalization.levelDb = Number.POSITIVE_INFINITY }],
+  ])('rejects invalid normalization: %s', (_label, mutate) => {
+    const session = createValidManualSession()
+    mutate(session)
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
+  it.each([
+    ['minFrequencyHz >= maxFrequencyHz', (s: WorkbenchSessionV1) => { s.autoeqSettings.minFrequencyHz = s.autoeqSettings.maxFrequencyHz }],
+    ['minGainDb >= maxGainDb', (s: WorkbenchSessionV1) => { s.autoeqSettings.minGainDb = s.autoeqSettings.maxGainDb }],
+    ['minQ >= maxQ', (s: WorkbenchSessionV1) => { s.autoeqSettings.minQ = s.autoeqSettings.maxQ }],
+    ['maxFilters < 0', (s: WorkbenchSessionV1) => { s.autoeqSettings.maxFilters = -1 }],
+    ['maxFilters > hardMax', (s: WorkbenchSessionV1) => { s.autoeqSettings.maxFilters = AUTOEQ_PRODUCT_LIMITS.hardMaxFilters + 1 }],
+    ['non-integer maxFilters', (s: WorkbenchSessionV1) => { s.autoeqSettings.maxFilters = 5.5 }],
+  ])('rejects invalid AutoEQ settings: %s', (_label, mutate) => {
+    const session = createValidManualSession()
+    mutate(session)
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
+  it.each([
+    ['filters not array', (s: WorkbenchSessionV1) => { (s as unknown as Record<string, unknown>).filters = null }],
+    ['exceeds hardMaxFilters', (s: WorkbenchSessionV1) => {
+      const baseFilter = createSampleFilterManual()
+      s.filters = Array.from({ length: AUTOEQ_PRODUCT_LIMITS.hardMaxFilters + 1 }, (_, i) => ({
+        ...baseFilter,
+        id: `f-${i}`,
+      }))
+    }],
+    ['filter not object', (s: WorkbenchSessionV1) => { (s.filters as unknown[])[0] = 'not-an-object' }],
+    ['empty filter id', (s: WorkbenchSessionV1) => { s.filters[0]!.id = '' }],
+    ['non-boolean enabled', (s: WorkbenchSessionV1) => { (s.filters[0] as unknown as Record<string, unknown>).enabled = 'true' }],
+    ['invalid filter type', (s: WorkbenchSessionV1) => { (s.filters[0] as unknown as Record<string, unknown>).type = 'BELL' }],
+    ['frequency below min', (s: WorkbenchSessionV1) => { s.filters[0]!.frequencyHz = 10 }],
+    ['frequency above max', (s: WorkbenchSessionV1) => { s.filters[0]!.frequencyHz = 25_000 }],
+    ['gain below limit', (s: WorkbenchSessionV1) => { s.filters[0]!.gainDb = -20 }],
+    ['gain above limit', (s: WorkbenchSessionV1) => { s.filters[0]!.gainDb = 20 }],
+    ['q below limit', (s: WorkbenchSessionV1) => { s.filters[0]!.q = 0.05 }],
+    ['q above limit', (s: WorkbenchSessionV1) => { s.filters[0]!.q = 15 }],
+  ])('rejects invalid filter: %s', (_label, mutate) => {
+    const session = createValidManualSession()
+    mutate(session)
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
+  describe('Provenance and State Coherence', () => {
+    it('rejects filterProvenance: null with non-empty filters', () => {
+      const session = createValidManualSession()
+      session.filterProvenance = null
+      session.filters = [createSampleFilterManual()]
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('rejects filterProvenance: null with non-null autoEqRun', () => {
+      const session = createValidManualSession()
+      session.filterProvenance = null
+      session.filters = []
+      session.autoEqRun = createAutoEqRunRecord()
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('rejects filterProvenance: null with solutionState !== "clean"', () => {
+      const session = createValidManualSession()
+      session.filterProvenance = null
+      session.filters = []
+      session.solutionState = 'modified'
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('rejects filterProvenance: "manual" with non-null autoEqRun', () => {
+      const session = createValidManualSession()
+      session.filterProvenance = 'manual'
+      session.autoEqRun = createAutoEqRunRecord()
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('rejects filterProvenance: "manual" with solutionState !== "clean"', () => {
+      const session = createValidManualSession()
+      session.filterProvenance = 'manual'
+      session.solutionState = 'modified'
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('rejects filterProvenance: "autoeq" with null autoEqRun', () => {
+      const session = createValidAutoEqSession()
+      session.autoEqRun = null
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('rejects autoEqRun present when filterProvenance is not "autoeq"', () => {
+      const session = createValidAutoEqSession()
+      session.filterProvenance = 'manual'
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('rejects clean AutoEQ session when filters do not match manifest finalFilters', () => {
+      const session = createValidAutoEqSession()
+      session.solutionState = 'clean'
+      session.filters = [
+        {
+          ...session.filters[0]!,
+          gainDb: session.filters[0]!.gainDb + 1.0,
+        },
+      ]
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('rejects malformed AutoEQ run manifest schema 2', () => {
+      const session = createValidAutoEqSession()
+      // Schema version not 2
+      const badManifest = {
+        ...session.autoEqRun!.manifest,
+        schemaVersion: 1 as unknown as 2,
+      }
+      session.autoEqRun = { manifest: badManifest }
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('rejects manifest with duplicate finalFilter IDs or invalid parameters', () => {
+      const session = createValidAutoEqSession()
+      const manifest = {
+        ...session.autoEqRun!.manifest,
+        finalFilters: [
+          session.filters[0]!,
+          { ...session.filters[0]!, frequencyHz: 2_000 },
+        ],
+      }
+      session.autoEqRun = { manifest }
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+  })
+
+  it('ensures public error messages contain no local paths or stack leakages', () => {
+    const badJson = '{ "broken": '
+    try {
+      deserializeWorkbenchSession(badJson)
+      expect.unreachable('Should have thrown')
+    } catch (cause) {
+      expect(cause).toBeInstanceOf(Error)
+      const message = (cause as Error).message
+      expect(message).not.toContain('/home')
+      expect(message).not.toContain('\\')
+      expect(message).not.toContain('.ts')
+    }
+  })
+})
+
+describe('Atomic Workspace Session Replacement & Import Coordinator', () => {
+  let workspace: ReturnType<typeof createWorkspaceStore>
+  let compare: ReturnType<typeof createEqCompareStore>
+  let runStore: ReturnType<typeof createAutoEqRunStore>
+
+  beforeEach(() => {
+    workspace = createWorkspaceStore()
+    compare = createEqCompareStore()
+    runStore = createAutoEqRunStore()
+  })
+
+  it('workspaceStore.applySession replaces state atomically and clears undo/redo history', () => {
+    // Populate workspace and build undo history
+    const fr = createSampleCurveFr()
+    const target = createSampleCurveTarget()
+    workspace.getState().addCurve(fr)
+    workspace.getState().addCurve(target)
+    workspace.getState().addFilter('PK')
+    workspace.getState().addFilter('LS')
+    expect(workspace.getState().canUndo).toBe(true)
+    expect(workspace.getState().filters).toHaveLength(2)
+
+    const sessionToImport = createValidAutoEqSession()
+    const success = workspace.getState().applySession(sessionToImport)
+
+    expect(success).toBe(true)
+    const state = workspace.getState()
+    expect(state.curves).toEqual(sessionToImport.curves)
+    expect(state.activeFrId).toBe(sessionToImport.activeFrId)
+    expect(state.activeTargetId).toBe(sessionToImport.activeTargetId)
+    expect(state.normalization).toEqual(sessionToImport.normalization)
+    expect(state.autoeqSettings).toEqual(sessionToImport.autoeqSettings)
+    expect(state.filters).toEqual(sessionToImport.filters)
+    expect(state.filterProvenance).toBe('autoeq')
+    expect(state.solutionState).toBe('clean')
+    expect(state.autoEqRun).toEqual(sessionToImport.autoEqRun)
+
+    // History and selection cleared
+    expect(state.selectedFilterId).toBeNull()
+    expect(state.canUndo).toBe(false)
+    expect(state.canRedo).toBe(false)
+
+    // Calling undo/redo does nothing
+    workspace.getState().undo()
+    expect(workspace.getState().filters).toEqual(sessionToImport.filters)
+    workspace.getState().redo()
+    expect(workspace.getState().filters).toEqual(sessionToImport.filters)
+  })
+
+  it('workspaceStore.applySession rejects invalid session with zero mutation to prior state and history', () => {
+    const fr = createSampleCurveFr()
+    workspace.getState().addCurve(fr)
+    workspace.getState().addFilter('PK')
+    expect(workspace.getState().canUndo).toBe(true)
+
+    const priorState = { ...workspace.getState() }
+    const invalidSession = {
+      ...createValidManualSession(),
+      schemaVersion: 99 as unknown as 1,
+    }
+
+    const success = workspace.getState().applySession(invalidSession)
+    expect(success).toBe(false)
+
+    expect(workspace.getState().curves).toEqual(priorState.curves)
+    expect(workspace.getState().filters).toEqual(priorState.filters)
+    expect(workspace.getState().canUndo).toBe(true)
+  })
+
+  it('importWorkbenchSession invalid import produces zero mutation across workspace, history, compare, and runStore', () => {
+    // Setup initial state
+    const fr = createSampleCurveFr()
+    workspace.getState().addCurve(fr)
+    workspace.getState().addFilter('PK')
+    compare.getState().record({
+      filters: workspace.getState().filters,
+      filterProvenance: workspace.getState().filterProvenance,
+      solutionState: workspace.getState().solutionState,
+      autoEqRun: workspace.getState().autoEqRun,
+      runInputSignature: 'test-sig',
+      preampDb: 0,
+    })
+    compare.getState().flush()
+    expect(compare.getState().snapshots).toHaveLength(1)
+
+    const priorWorkspaceCurves = [...workspace.getState().curves]
+    const priorWorkspaceFilters = [...workspace.getState().filters]
+    const priorCanUndo = workspace.getState().canUndo
+    const priorCompareSnapshots = [...compare.getState().snapshots]
+
+    const cancelSpy = vi.fn()
+
+    expect(() =>
+      importWorkbenchSession('{"schemaVersion": 999}', {
+        workspaceStore: workspace,
+        compareStore: compare,
+        runStore,
+        cancelAutoEq: cancelSpy,
+      }),
+    ).toThrow()
+
+    // Assert zero mutation
+    expect(cancelSpy).not.toHaveBeenCalled()
+    expect(workspace.getState().curves).toEqual(priorWorkspaceCurves)
+    expect(workspace.getState().filters).toEqual(priorWorkspaceFilters)
+    expect(workspace.getState().canUndo).toBe(priorCanUndo)
+    expect(compare.getState().snapshots).toEqual(priorCompareSnapshots)
+    expect(runStore.getState().status).toBe('idle')
+  })
+
+  it('importWorkbenchSession valid import cancels active AutoEQ, updates workspace, clears history, clears Compare, and resets runStore', () => {
+    // Setup initial state
+    const fr = createSampleCurveFr()
+    workspace.getState().addCurve(fr)
+    workspace.getState().addFilter('PK')
+    compare.getState().record({
+      filters: workspace.getState().filters,
+      filterProvenance: workspace.getState().filterProvenance,
+      solutionState: workspace.getState().solutionState,
+      autoEqRun: workspace.getState().autoEqRun,
+      runInputSignature: 'test-sig',
+      preampDb: 0,
+    })
+    compare.getState().flush()
+    compare.getState().setA(compare.getState().snapshots[0]!.id)
+    expect(compare.getState().snapshots).toHaveLength(1)
+    expect(compare.getState().aSnapshotId).not.toBeNull()
+
+    const cancelSpy = vi.fn()
+    const validSession = createValidAutoEqSession()
+    const serialized = serializeWorkbenchSession(validSession)
+
+    const result = importWorkbenchSession(serialized, {
+      workspaceStore: workspace,
+      compareStore: compare,
+      runStore,
+      cancelAutoEq: cancelSpy,
+    })
+
+    expect(result).toEqual(validSession)
+    expect(cancelSpy).toHaveBeenCalledTimes(1)
+
+    // Workspace assertions
+    expect(workspace.getState().curves).toEqual(validSession.curves)
+    expect(workspace.getState().filters).toEqual(validSession.filters)
+    expect(workspace.getState().selectedFilterId).toBeNull()
+    expect(workspace.getState().canUndo).toBe(false)
+    expect(workspace.getState().canRedo).toBe(false)
+
+    // Compare store assertions
+    expect(compare.getState().snapshots).toEqual([])
+    expect(compare.getState().aSnapshotId).toBeNull()
+    expect(compare.getState().bSnapshotId).toBeNull()
+
+    // Run store assertions
+    expect(runStore.getState().status).toBe('idle')
+    expect(runStore.getState().activeRunId).toBeNull()
+    expect(runStore.getState().error).toBeNull()
+  })
+
+  it('prevents a simulated late Worker result from overwriting an imported session', async () => {
+    let lateResolve: ((result: ReturnType<typeof createAutoEqResult>) => void) | null = null
+    const client: AutoEqClient = {
+      run: () =>
+        new Promise((resolve) => {
+          lateResolve = resolve
+        }),
+      cancel: vi.fn(),
+    }
+
+    let nextRun = 0
+    const controller = createAutoEqController({
+      workspace,
+      runStore,
+      client,
+      createRunId: () => `run-${++nextRun}`,
+    })
+
+    // Setup workspace ready for AutoEQ
+    const fr = createSampleCurveFr()
+    const target = createSampleCurveTarget()
+    workspace.getState().addCurve(fr)
+    workspace.getState().addCurve(target)
+    workspace.getState().setActiveFr(fr.id)
+    workspace.getState().setActiveTarget(target.id)
+
+    // Start AutoEQ run in background
+    const pendingRun = controller.runAutoEq()
+    expect(runStore.getState().status).toBe('running')
+    expect(runStore.getState().activeRunId).toBe('run-1')
+
+    // While run is pending, import a new session
+    const importedSession = createValidManualSession()
+    importedSession.filters = [
+      {
+        id: 'imported-filter-99',
+        enabled: true,
+        type: 'HS',
+        frequencyHz: 8_000,
+        gainDb: -4,
+        q: 0.7,
+      },
+    ]
+    importedSession.curves = [
+      {
+        ...fr,
+        id: 'imported-fr-99',
+        name: 'Imported FR 99',
+      },
+      {
+        ...target,
+        id: 'imported-target-99',
+        name: 'Imported Target 99',
+      },
+    ]
+    importedSession.activeFrId = 'imported-fr-99'
+    importedSession.activeTargetId = 'imported-target-99'
+
+    importWorkbenchSession(serializeWorkbenchSession(importedSession), {
+      workspaceStore: workspace,
+      compareStore: compare,
+      runStore,
+      cancelAutoEq: () => controller.cancelAutoEq(),
+    })
+
+    expect(workspace.getState().filters[0]!.id).toBe('imported-filter-99')
+    expect(runStore.getState().status).toBe('idle')
+
+    // Simulate late worker result resolving
+    const lateResult = createAutoEqResult(6)
+    lateResolve!(lateResult)
+    await pendingRun
+
+    // Imported session must NOT be overwritten
+    expect(workspace.getState().filters[0]!.id).toBe('imported-filter-99')
+    expect(workspace.getState().curves[0]!.id).toBe('imported-fr-99')
+    expect(workspace.getState().filterProvenance).toBe('manual')
+    expect(workspace.getState().autoEqRun).toBeNull()
+  })
+})
