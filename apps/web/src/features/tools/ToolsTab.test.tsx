@@ -18,7 +18,7 @@ vi.mock('./EqCompare', () => ({
 }))
 
 describe('ToolsTab', () => {
-  it('orders Sound Tools, Compare A/B, then secondary Analysis and forwards canonical EQ', () => {
+  it('orders Sound Tools, Compare A/B, Session, then secondary Analysis and forwards canonical EQ', () => {
     const filter: Filter = {
       id: 'filter-1',
       enabled: true,
@@ -38,6 +38,7 @@ describe('ToolsTab', () => {
     expect([...tools.children]).toEqual([
       screen.getByRole('region', { name: 'Sound Tools' }),
       screen.getByRole('region', { name: 'Compare A/B' }),
+      screen.getByRole('region', { name: 'Session' }),
       container.querySelector('details'),
     ])
     expect(container.querySelector('details')).not.toHaveAttribute('open')

@@ -92,8 +92,8 @@ describe('EqualizerTab', () => {
     expect(within(panel).getByRole('button', { name: 'AutoEQ settings' })).toBeVisible()
     expect(within(panel).getByRole('button', { name: 'AutoEQ' })).toBeDisabled()
     expect(within(panel).getByRole('button', { name: 'Import' })).toBeVisible()
+    expect(within(panel).getByRole('combobox', { name: 'Export format' })).toBeVisible()
     expect(within(panel).getByRole('button', { name: 'Export' })).toBeDisabled()
-    expect(within(panel).getByRole('button', { name: 'Export Graphic EQ (For Wavelet)' })).toBeDisabled()
     expect(within(panel).getByText('0 / 64 filters')).toBeVisible()
   })
 

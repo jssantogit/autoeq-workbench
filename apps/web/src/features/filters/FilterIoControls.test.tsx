@@ -2,6 +2,7 @@ import {
   calculatePreampDb,
   formatEqualizerApoFilters,
   formatGraphicEq,
+  formatPowerampText,
   MVP_NUMERIC_POLICY,
   parseEqualizerApoFilters,
   type Curve,
@@ -23,6 +24,11 @@ vi.mock('../../squiglink/eq-io/downloadTextFile', () => ({ downloadTextFile: vi.
 
 const existingFilters: Filter[] = [
   { id: 'existing', enabled: true, type: 'HS', frequencyHz: 8_000, gainDb: 1, q: 0.8 },
+]
+
+const mixedFilters: Filter[] = [
+  { id: 'f-1', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 3, q: 1.41 },
+  { id: 'f-2', enabled: false, type: 'HS', frequencyHz: 10_000, gainDb: -4, q: 0.71 },
 ]
 
 const activeFr: Curve = {
@@ -166,52 +172,123 @@ describe('FilterIoControls', () => {
     expect(workspaceStore.getState().filters[0]?.frequencyHz).toBe(2_000)
   })
 
-  it('downloads exact PEQ and GraphicEQ content from canonical state without network access', async () => {
+  it('exposes exact destination choices in an accessible select', () => {
+    render(<FilterIoControls />)
+    const select = screen.getByRole('combobox', { name: /export/i })
+    const options = Array.from(select.querySelectorAll('option')).map((option) => option.textContent)
+    expect(options).toEqual(['Equalizer APO', 'Poweramp', 'Wavelet'])
+  })
+
+  it('downloads exact APO, Poweramp, and Wavelet outputs with correct suffixes, safety preamp, and disabled filter exclusion', async () => {
     const user = userEvent.setup()
     const fetchMock = vi.fn()
     const xhr = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
     vi.stubGlobal('XMLHttpRequest', xhr)
-    workspaceStore.setState({ curves: [activeFr], activeFrId: activeFr.id })
-    render(<FilterIoControls />)
-    const preampDb = calculatePreampDb(existingFilters, MVP_NUMERIC_POLICY.sampleRateHz).preampDb
 
-    await user.click(screen.getByRole('button', { name: 'Export' }))
-    await user.click(screen.getByRole('button', { name: 'Export Graphic EQ (For Wavelet)' }))
+    workspaceStore.setState({ curves: [activeFr], activeFrId: activeFr.id, filters: mixedFilters })
+    render(<FilterIoControls />)
+
+    const select = screen.getByRole('combobox', { name: /export/i })
+    const exportButton = screen.getByRole('button', { name: 'Export' })
+    const expectedPreamp = calculatePreampDb(mixedFilters, MVP_NUMERIC_POLICY.sampleRateHz).preampDb
+
+    // 1. Equalizer APO
+    await user.selectOptions(select, 'Equalizer APO')
+    await user.click(exportButton)
 
     expect(downloadTextFile).toHaveBeenNthCalledWith(
       1,
-      'Studio_Left_Take_ PEQ.txt',
-      formatEqualizerApoFilters(existingFilters, preampDb),
+      'Studio_Left_Take_ Equalizer APO.txt',
+      formatEqualizerApoFilters(mixedFilters, expectedPreamp),
     )
+    const apoOutput = vi.mocked(downloadTextFile).mock.calls[0]![1]
+    expect(apoOutput).toContain(`Preamp: ${expectedPreamp.toFixed(1)} dB`)
+    expect(apoOutput).toContain('Filter 1: ON PK Fc 1000 Hz Gain 3.0 dB Q 1.410')
+    expect(apoOutput).not.toContain('10000')
+    expect(apoOutput).not.toContain('HSC')
+
+    // 2. Poweramp
+    await user.selectOptions(select, 'Poweramp')
+    await user.click(exportButton)
+
     expect(downloadTextFile).toHaveBeenNthCalledWith(
       2,
-      'Studio_Left_Take_ Graphic EQ.txt',
-      formatGraphicEq(existingFilters, MVP_NUMERIC_POLICY.sampleRateHz),
+      'Studio_Left_Take_ Poweramp.txt',
+      formatPowerampText({
+        name: activeFr.name,
+        preampDb: expectedPreamp,
+        filters: mixedFilters,
+      }),
     )
-    expect(vi.mocked(downloadTextFile).mock.calls[1]?.[1]).toMatch(/^GraphicEQ: /)
+    const powerampOutput = vi.mocked(downloadTextFile).mock.calls[1]![1]
+    expect(powerampOutput).toContain('# AutoEQ Workbench — Studio/Left:Take?')
+    expect(powerampOutput).toContain('# Poweramp-style manual-entry preset')
+    expect(powerampOutput).toContain(`Preamp: ${expectedPreamp.toFixed(1)} dB`)
+    expect(powerampOutput).toContain('Filter 1: ON PK Fc 1000 Hz Gain 3.0 dB Q 1.41')
+    expect(powerampOutput).not.toContain('10000')
+    expect(powerampOutput).not.toContain('HS')
+
+    // 3. Wavelet
+    await user.selectOptions(select, 'Wavelet')
+    await user.click(exportButton)
+
+    expect(downloadTextFile).toHaveBeenNthCalledWith(
+      3,
+      'Studio_Left_Take_ Wavelet GraphicEQ.txt',
+      formatGraphicEq(mixedFilters, MVP_NUMERIC_POLICY.sampleRateHz),
+    )
+    const waveletOutput = vi.mocked(downloadTextFile).mock.calls[2]![1]
+    expect(waveletOutput).toMatch(/^GraphicEQ: /)
+    expect(waveletOutput).toBe(formatGraphicEq([mixedFilters[0]!], MVP_NUMERIC_POLICY.sampleRateHz))
+
+    // Assert filenames end with exact suffixes from brief
+    expect(vi.mocked(downloadTextFile).mock.calls[0]![0]).toMatch(/ Equalizer APO\.txt$/)
+    expect(vi.mocked(downloadTextFile).mock.calls[1]![0]).toMatch(/ Poweramp\.txt$/)
+    expect(vi.mocked(downloadTextFile).mock.calls[2]![0]).toMatch(/ Wavelet GraphicEQ\.txt$/)
+
     expect(fetchMock).not.toHaveBeenCalled()
     expect(xhr).not.toHaveBeenCalled()
   })
 
-  it('uses the Workbench filename when there is no active FR', async () => {
+  it('uses the Workbench filename fallback for all destinations when there is no active FR', async () => {
     const user = userEvent.setup()
+    workspaceStore.setState({ curves: [], activeFrId: null, filters: existingFilters })
     render(<FilterIoControls />)
 
-    await user.click(screen.getByRole('button', { name: 'Export' }))
+    const select = screen.getByRole('combobox', { name: /export/i })
+    const exportButton = screen.getByRole('button', { name: 'Export' })
 
-    expect(downloadTextFile).toHaveBeenCalledWith(
-      'Workbench PEQ.txt',
+    await user.selectOptions(select, 'Equalizer APO')
+    await user.click(exportButton)
+    expect(downloadTextFile).toHaveBeenNthCalledWith(
+      1,
+      'Workbench Equalizer APO.txt',
       expect.stringMatching(/^Preamp: /),
+    )
+
+    await user.selectOptions(select, 'Poweramp')
+    await user.click(exportButton)
+    expect(downloadTextFile).toHaveBeenNthCalledWith(
+      2,
+      'Workbench Poweramp.txt',
+      expect.stringContaining('# AutoEQ Workbench — Workbench'),
+    )
+
+    await user.selectOptions(select, 'Wavelet')
+    await user.click(exportButton)
+    expect(downloadTextFile).toHaveBeenNthCalledWith(
+      3,
+      'Workbench Wavelet GraphicEQ.txt',
+      expect.stringMatching(/^GraphicEQ: /),
     )
   })
 
-  it('disables both exports with no filters', () => {
+  it('disables export with no filters', () => {
     workspaceStore.setState({ filters: [] })
     render(<FilterIoControls />)
 
     expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Export Graphic EQ (For Wavelet)' })).toBeDisabled()
     expect(downloadTextFile).not.toHaveBeenCalled()
   })
 })

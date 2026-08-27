@@ -3,6 +3,7 @@ import {
   CoreError,
   formatEqualizerApoFilters,
   formatGraphicEq,
+  formatPowerampText,
   MVP_NUMERIC_POLICY,
   parseEqualizerApoFilters,
 } from '@autoeq-workbench/core'
@@ -10,6 +11,8 @@ import { type ChangeEvent, useRef, useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { downloadTextFile } from '../../squiglink/eq-io/downloadTextFile'
 import { useWorkspaceStore } from '../../state/workspaceStore'
+
+export type ExportDestination = 'Equalizer APO' | 'Poweramp' | 'Wavelet'
 
 function safeFilenameBase(name: string): string {
   return Array.from(name, (character) =>
@@ -24,6 +27,7 @@ export function FilterIoControls() {
   const replaceFilters = useWorkspaceStore((state) => state.replaceFiltersFromImport)
   const inputRef = useRef<HTMLInputElement>(null)
   const requestRef = useRef(0)
+  const [destination, setDestination] = useState<ExportDestination>('Equalizer APO')
   const [error, setError] = useState<string | null>(null)
   const activeFrName = curves.find((curve) => curve.id === activeFrId && curve.kind === 'fr')?.name
   const filenameBase = safeFilenameBase(activeFrName ?? 'Workbench').trim() || 'Workbench'
@@ -51,19 +55,35 @@ export function FilterIoControls() {
     }
   }
 
-  function exportPeq() {
-    const preampDb = calculatePreampDb(filters, MVP_NUMERIC_POLICY.sampleRateHz).preampDb
-    downloadTextFile(
-      `${filenameBase} PEQ.txt`,
-      formatEqualizerApoFilters(filters, preampDb),
-    )
-  }
-
-  function exportGraphicEq() {
-    downloadTextFile(
-      `${filenameBase} Graphic EQ.txt`,
-      formatGraphicEq(filters, MVP_NUMERIC_POLICY.sampleRateHz),
-    )
+  function exportFilters() {
+    try {
+      const preampDb = calculatePreampDb(filters, MVP_NUMERIC_POLICY.sampleRateHz).preampDb
+      if (destination === 'Equalizer APO') {
+        downloadTextFile(
+          `${filenameBase} Equalizer APO.txt`,
+          formatEqualizerApoFilters(filters, preampDb),
+        )
+      } else if (destination === 'Poweramp') {
+        downloadTextFile(
+          `${filenameBase} Poweramp.txt`,
+          formatPowerampText({
+            name: activeFrName ?? 'Workbench',
+            preampDb,
+            filters,
+          }),
+        )
+      } else if (destination === 'Wavelet') {
+        downloadTextFile(
+          `${filenameBase} Wavelet GraphicEQ.txt`,
+          formatGraphicEq(filters, MVP_NUMERIC_POLICY.sampleRateHz),
+        )
+      }
+      setError(null)
+    } catch (cause) {
+      const category = cause instanceof CoreError ? cause.category : 'export'
+      const message = cause instanceof Error ? cause.message : 'Unable to export filters'
+      setError(`[${category}] ${message}`)
+    }
   }
 
   return (
@@ -77,10 +97,16 @@ export function FilterIoControls() {
         onChange={handleFile}
       />
       <Button className="import-filters" onClick={() => inputRef.current?.click()}>Import</Button>
-      <Button className="export-filters" disabled={!hasFilters} onClick={exportPeq}>Export</Button>
-      <Button className="export-graphic-filters" disabled={!hasFilters} onClick={exportGraphicEq}>
-        Export Graphic EQ (For Wavelet)
-      </Button>
+      <select
+        aria-label="Export format"
+        value={destination}
+        onChange={(event) => setDestination(event.target.value as ExportDestination)}
+      >
+        <option value="Equalizer APO">Equalizer APO</option>
+        <option value="Poweramp">Poweramp</option>
+        <option value="Wavelet">Wavelet</option>
+      </select>
+      <Button className="export-filters" disabled={!hasFilters} onClick={exportFilters}>Export</Button>
       {error !== null && <p className="field-error" role="alert">{error}</p>}
     </>
   )
