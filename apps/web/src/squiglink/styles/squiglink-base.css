@@ -101,6 +101,7 @@
 .graph-toolbar .number-field input { min-width: 0; height: 34px; border-radius: 6px; padding: 4px 6px; text-align: center; }
 .graph-toolbar .normalize .number-field__control { height: 36px; border-radius: 6px; }
 .graph-toolbar .normalize .number-field__unit { min-width: 28px; }
+.graph-toolbar .normalize button.number-field__unit { min-width: 28px; min-height: 34px; border: 0; border-right: 1px solid var(--wb-border); border-radius: 0; padding: 0 4px; font-weight: 700; }
 .graph-toolbar .normalize .number-field input { height: 34px; border-radius: 0; }
 .graph-toolbar .normalize .number-field + .number-field { margin-left: 6px; }
 .graph-toolbar .smooth { gap: 8px; }

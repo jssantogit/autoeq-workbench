@@ -103,10 +103,14 @@ describe('manual workbench integration', () => {
     await user.clear(levelDbInput)
     await user.type(levelDbInput, '61')
     fireEvent.blur(levelDbInput)
-    expect(workspaceStore.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 500, levelDb: 61 })
+    expect(workspaceStore.getState().normalization).toEqual({ mode: 'db', frequencyHz: 500, levelDb: 61 })
     await user.clear(levelDbInput)
     await user.type(levelDbInput, '60')
     fireEvent.blur(levelDbInput)
+    expect(workspaceStore.getState().normalization).toEqual({ mode: 'db', frequencyHz: 500, levelDb: 60 })
+
+    const normalizeGroup = screen.getByRole('group', { name: 'Normalize' })
+    await user.click(within(normalizeGroup).getByRole('button', { name: 'Hz' }))
     expect(workspaceStore.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 500, levelDb: 60 })
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))

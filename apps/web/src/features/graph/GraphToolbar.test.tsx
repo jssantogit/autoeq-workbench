@@ -46,6 +46,10 @@ describe('GraphToolbar', () => {
     expect(within(toolbar).getByLabelText('Normalize dB')).toBeInTheDocument()
     expect(within(toolbar).getByLabelText('Normalize Hz')).toBeInTheDocument()
     const normalize = within(toolbar).getByRole('group', { name: 'Normalize' })
+    const dbButton = within(normalize).getByRole('button', { name: 'dB' })
+    const hzButton = within(normalize).getByRole('button', { name: 'Hz' })
+    expect(dbButton).toHaveAttribute('aria-pressed', 'false')
+    expect(hzButton).toHaveAttribute('aria-pressed', 'true')
     const fields = normalize.querySelectorAll('.number-field__control')
     expect([...fields].map((field) => [...field.children].map((child) => child.textContent || child.tagName))).toEqual([
       ['dB', 'INPUT'],
@@ -69,6 +73,7 @@ describe('GraphToolbar', () => {
     const hz = screen.getByLabelText('Normalize Hz')
     fireEvent.change(db, { target: { value: '61.5' } })
     fireEvent.blur(db)
+    expect(workspaceStore.getState().normalization).toEqual({ mode: 'db', frequencyHz: 500, levelDb: 61.5 })
     fireEvent.change(hz, { target: { value: '800' } })
     fireEvent.blur(hz)
     expect(workspaceStore.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 800, levelDb: 61.5 })

@@ -1,3 +1,4 @@
+import { createLogGrid } from './grid.js'
 import { interpolateLogFrequency } from './interpolate.js'
 import { calculateSquiglinkLoudnessOffset } from './loudnessNormalize.js'
 import { CoreError } from '../types/error.js'
@@ -26,15 +27,19 @@ export function normalizationOffset(
     return offsetDb
   }
 
-  const absoluteOffset = calculateSquiglinkLoudnessOffset(points, normalization.levelDb)
-  const first = points[0]!
-  const last = points[points.length - 1]!
-  if (normalization.frequencyHz < first.frequencyHz || normalization.frequencyHz > last.frequencyHz) {
-    throw new CoreError(
-      'validation',
-      `Frequency ${normalization.frequencyHz} Hz is outside curve coverage; extrapolation is not supported`,
-    )
-  }
+  // Validate points coverage and requested anchor frequency using interpolateLogFrequency
+  interpolateLogFrequency(points, [normalization.frequencyHz])
+
+  const minHz = points[0]!.frequencyHz
+  const maxHz = points[points.length - 1]!.frequencyHz
+  const gridFrequencies = createLogGrid(minHz, maxHz, 48)
+  const gridDb = interpolateLogFrequency(points, gridFrequencies)
+  const gridPoints: CurvePoint[] = gridFrequencies.map((frequencyHz, index) => ({
+    frequencyHz,
+    db: gridDb[index]!,
+  }))
+
+  const absoluteOffset = calculateSquiglinkLoudnessOffset(gridPoints, normalization.levelDb)
   const offsetDb = absoluteOffset - normalization.levelDb
   if (!Number.isFinite(offsetDb)) {
     throw new CoreError('numeric', 'Normalization produced a non-finite offset')

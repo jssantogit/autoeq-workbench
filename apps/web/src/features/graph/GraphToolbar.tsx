@@ -1,4 +1,3 @@
-import { MVP_NUMERIC_POLICY } from '@autoeq-workbench/core'
 import { useState } from 'react'
 import { ThemeToggle } from '../../components/layout/ThemeToggle'
 import { NumberField } from '../../components/ui/NumberField'
@@ -9,11 +8,7 @@ import {
 } from '../../state/uiStore'
 import { useWorkspaceStore } from '../../state/workspaceStore'
 import { exportFrequencyResponseGraph } from './graphScreenshot'
-
-const validAnchor = (value: number) =>
-  Number.isFinite(value) &&
-  value >= MVP_NUMERIC_POLICY.minFrequencyHz &&
-  value <= MVP_NUMERIC_POLICY.maxFrequencyHz
+import { NormalizeControl } from './NormalizeControl'
 
 export function GraphToolbar() {
   const [screenshotStatus, setScreenshotStatus] = useState('')
@@ -30,8 +25,6 @@ export function GraphToolbar() {
   const registerCurve = useUiStore((state) => state.registerCurve)
   const setCurveColor = useUiStore((state) => state.setCurveColor)
   const curves = useWorkspaceStore((state) => state.curves)
-  const normalization = useWorkspaceStore((state) => state.normalization)
-  const setNormalization = useWorkspaceStore((state) => state.setNormalization)
 
   function toggleZoom(preset: Exclude<GraphZoomPreset, 'full'>): void {
     setGraphZoomPreset(graphZoomPreset === preset ? 'full' : preset)
@@ -80,27 +73,7 @@ export function GraphToolbar() {
         <button type="button" aria-pressed={graphZoomPreset === 'midrange'} onClick={() => toggleZoom('midrange')}>Mids</button>
         <button type="button" aria-pressed={graphZoomPreset === 'treble'} onClick={() => toggleZoom('treble')}>Treble</button>
       </div>
-      <div className="normalize" role="group" aria-label="Normalize">
-        <span>Normalize:</span>
-        <NumberField
-          label="Normalize dB"
-          value={normalization.levelDb}
-          step="0.1"
-          unit="dB"
-          unitPosition="before"
-          onValueChange={(levelDb) => setNormalization({ ...normalization, levelDb })}
-        />
-        <NumberField
-          label="Normalize Hz"
-          value={normalization.frequencyHz}
-          min={MVP_NUMERIC_POLICY.minFrequencyHz}
-          max={MVP_NUMERIC_POLICY.maxFrequencyHz}
-          unit="Hz"
-          unitPosition="before"
-          validate={validAnchor}
-          onValueChange={(frequencyHz) => setNormalization({ ...normalization, frequencyHz })}
-        />
-      </div>
+      <NormalizeControl />
       <div className="smooth">
         <NumberField
           label="Smooth"

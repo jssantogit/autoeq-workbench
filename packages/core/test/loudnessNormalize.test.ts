@@ -238,6 +238,14 @@ describe('calculateSquiglinkLoudnessOffset', () => {
 })
 
 describe('dB mode normalization and relative recentering', () => {
+  const evaluateSyntheticResponse = (frequencyHz: number): number => {
+    const logF = Math.log10(frequencyHz)
+    const bass = 6 / (1 + Math.exp((frequencyHz - 120) / 35))
+    const earGain = 7.5 * Math.exp(-Math.pow(logF - Math.log10(3000), 2) / 0.08)
+    const trebleRollOff = -4 * Math.max(0, logF - Math.log10(7000))
+    return 62 + bass + earGain + trebleRollOff
+  }
+
   const curveFixtureA: Curve = {
     id: 'curve-a',
     name: 'Curve A',
@@ -268,6 +276,51 @@ describe('dB mode normalization and relative recentering', () => {
 
   const frequencies = [20, 100, 1000, 10000, 20000]
 
+  it('yields the same dB offset within tight tolerance when the same curve is sampled sparsely vs densely', () => {
+    const sparseGrid = createLogGrid(20, 20_000, 4) // ~40 points
+    const denseGrid = createLogGrid(20, 20_000, 100) // ~1000 points
+
+    const sparsePoints: CurvePoint[] = sparseGrid.map((frequencyHz) => ({
+      frequencyHz,
+      db: evaluateSyntheticResponse(frequencyHz),
+    }))
+    const densePoints: CurvePoint[] = denseGrid.map((frequencyHz) => ({
+      frequencyHz,
+      db: evaluateSyntheticResponse(frequencyHz),
+    }))
+
+    const sparseCopy = structuredClone(sparsePoints)
+    const denseCopy = structuredClone(densePoints)
+
+    const norm: Normalization = { mode: 'db', frequencyHz: 500, levelDb: 60 }
+    const sparseOffset = normalizationOffset(sparsePoints, norm)
+    const denseOffset = normalizationOffset(densePoints, norm)
+
+    expect(Number.isFinite(sparseOffset)).toBe(true)
+    expect(Number.isFinite(denseOffset)).toBe(true)
+    // Sampling invariance across sparse vs dense samplings of the same smooth mathematical curve
+    expect(Math.abs(sparseOffset - denseOffset)).toBeLessThan(0.02)
+    // Ensure no raw input mutation
+    expect(sparsePoints).toEqual(sparseCopy)
+    expect(densePoints).toEqual(denseCopy)
+  })
+
+  it('matches the direct pinned-source reference evaluated on the canonical grid', () => {
+    const canonicalGrid = createLogGrid(20, 20_000, 48)
+    const canonicalPoints: CurvePoint[] = canonicalGrid.map((frequencyHz) => ({
+      frequencyHz,
+      db: evaluateSyntheticResponse(frequencyHz),
+    }))
+    const canonicalPairs: Array<[number, number]> = canonicalPoints.map((p) => [p.frequencyHz, p.db])
+
+    const norm: Normalization = { mode: 'db', frequencyHz: 500, levelDb: 60 }
+    const productionOffset = normalizationOffset(canonicalPoints, norm)
+    const referenceOffset = referenceSquiglinkFindOffset(canonicalPairs, norm.levelDb) - norm.levelDb
+
+    expect(Number.isFinite(productionOffset)).toBe(true)
+    expect(Math.abs(productionOffset - referenceOffset)).toBeLessThan(1e-9)
+  })
+
   it('produces finite dB values on prepared curve in dB mode', () => {
     const norm: Normalization = { mode: 'db', frequencyHz: 500, levelDb: 60 }
     const prepared = prepareCurve(curveFixtureA, norm, frequencies)
@@ -283,21 +336,16 @@ describe('dB mode normalization and relative recentering', () => {
     const offsetA = normalizationOffset(curveFixtureA.rawPoints, norm)
     const offsetB = normalizationOffset(curveFixtureB.rawPoints, norm)
 
-    const absA = calculateSquiglinkLoudnessOffset(curveFixtureA.rawPoints, norm.levelDb)
-    const absB = calculateSquiglinkLoudnessOffset(curveFixtureB.rawPoints, norm.levelDb)
-
-    expect(offsetA).toBeCloseTo(absA - norm.levelDb, 12)
-    expect(offsetB).toBeCloseTo(absB - norm.levelDb, 12)
-    expect(offsetA - offsetB).toBeCloseTo(absA - absB, 12)
-
     const prepA = prepareCurve(curveFixtureA, norm, frequencies)
     const prepB = prepareCurve(curveFixtureB, norm, frequencies)
+
+    expect(offsetA - offsetB).toBeCloseTo(prepA.offsetDb - prepB.offsetDb, 12)
 
     for (let i = 0; i < frequencies.length; i += 1) {
       const relativeDiff = prepA.db[i]! - prepB.db[i]!
       const rawAAtF = curveFixtureA.rawPoints[i]!.db
       const rawBAtF = curveFixtureB.rawPoints[i]!.db
-      const expectedDiff = rawAAtF + absA - (rawBAtF + absB)
+      const expectedDiff = rawAAtF + offsetA - (rawBAtF + offsetB)
       expect(relativeDiff).toBeCloseTo(expectedDiff, 10)
     }
   })
