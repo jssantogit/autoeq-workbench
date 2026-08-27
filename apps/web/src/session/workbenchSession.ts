@@ -26,6 +26,14 @@ export const WORKBENCH_SESSION_SCHEMA_VERSION = 1 as const
 
 declare const ValidatedSessionBrand: unique symbol
 
+export type DeepReadonly<T> = T extends (...args: readonly unknown[]) => unknown
+  ? T
+  : T extends readonly (infer U)[]
+    ? ReadonlyArray<DeepReadonly<U>>
+    : T extends object
+      ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
+      : T
+
 export interface WorkbenchSessionV1 {
   schemaVersion: 1
   curves: Curve[]
@@ -39,19 +47,44 @@ export interface WorkbenchSessionV1 {
   autoEqRun: AutoEqRunRecord | null
 }
 
-export type ValidatedWorkbenchSessionV1 = WorkbenchSessionV1 & {
+export type ValidatedWorkbenchSessionV1 = DeepReadonly<WorkbenchSessionV1> & {
   readonly [ValidatedSessionBrand]: true
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false
+  }
+  const proto = Object.getPrototypeOf(value)
+  return proto === Object.prototype || proto === null
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function hasFiniteFields(value: unknown, fields: readonly string[]): boolean {
-  return isRecord(value) && fields.every((field) => Number.isFinite(value[field]))
+function deepFreeze<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') {
+    return obj
+  }
+  if (Object.isFrozen(obj)) {
+    return obj
+  }
+  Object.freeze(obj)
+  for (const key of Object.keys(obj)) {
+    const value = (obj as Record<string, unknown>)[key]
+    if (value !== null && (typeof value === 'object' || typeof value === 'function')) {
+      deepFreeze(value)
+    }
+  }
+  return obj
 }
 
-export function cloneCurvePoint(point: CurvePoint): CurvePoint {
+function hasFiniteFields(value: unknown, fields: readonly string[]): boolean {
+  return isRecord(value) && fields.every((field) => Number.isFinite((value as Record<string, unknown>)[field]))
+}
+
+export function cloneCurvePoint(point: DeepReadonly<CurvePoint> | CurvePoint): CurvePoint {
   return {
     frequencyHz: point.frequencyHz,
     db: point.db,
@@ -59,7 +92,9 @@ export function cloneCurvePoint(point: CurvePoint): CurvePoint {
 }
 
 export function cloneCurveMetadata(
-  metadata: Record<string, string | number | boolean>,
+  metadata:
+    | DeepReadonly<Record<string, string | number | boolean>>
+    | Record<string, string | number | boolean>,
 ): Record<string, string | number | boolean> {
   const cloned: Record<string, string | number | boolean> = {}
   for (const [key, value] of Object.entries(metadata)) {
@@ -68,7 +103,7 @@ export function cloneCurveMetadata(
   return cloned
 }
 
-export function cloneCurve(curve: Curve): Curve {
+export function cloneCurve(curve: DeepReadonly<Curve> | Curve): Curve {
   return {
     id: curve.id,
     name: curve.name,
@@ -78,7 +113,7 @@ export function cloneCurve(curve: Curve): Curve {
   }
 }
 
-export function cloneFilter(filter: Filter): Filter {
+export function cloneFilter(filter: DeepReadonly<Filter> | Filter): Filter {
   return {
     id: filter.id,
     enabled: filter.enabled,
@@ -101,7 +136,7 @@ function isValidPoint(point: unknown): point is CurvePoint {
 function isValidCurveMetadata(
   metadata: unknown,
 ): metadata is Record<string, string | number | boolean> {
-  if (!isRecord(metadata)) return false
+  if (!isPlainObject(metadata)) return false
   for (const [key, value] of Object.entries(metadata)) {
     if (typeof key !== 'string') return false
     if (typeof value === 'string' || typeof value === 'boolean') {
@@ -224,7 +259,9 @@ function isValidRunManifest(manifest: unknown): manifest is RunManifest {
   )
 }
 
-function canonicalizeRunManifest(manifest: RunManifest): RunManifest {
+function canonicalizeRunManifest(
+  manifest: DeepReadonly<RunManifest> | RunManifest,
+): RunManifest {
   return {
     schemaVersion: 2,
     algorithmVersion: 'standard-v1',
@@ -298,7 +335,10 @@ function areAutoEqSettingsEqual(left: AutoEqSettings, right: AutoEqSettings): bo
   )
 }
 
-function areFiltersEqual(left: readonly Filter[], right: readonly Filter[]): boolean {
+function areFiltersEqual(
+  left: readonly (DeepReadonly<Filter> | Filter)[],
+  right: readonly (DeepReadonly<Filter> | Filter)[],
+): boolean {
   if (left.length !== right.length) return false
   return left.every((filter, index) => {
     const other = right[index]
@@ -462,7 +502,7 @@ export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSess
     }
   }
 
-  return {
+  const session = {
     schemaVersion: WORKBENCH_SESSION_SCHEMA_VERSION,
     curves: input.curves.map(cloneCurve),
     activeFrId: input.activeFrId,
@@ -485,10 +525,14 @@ export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSess
     filterProvenance: provenance,
     solutionState,
     autoEqRun,
-  } as ValidatedWorkbenchSessionV1
+  }
+
+  return deepFreeze(session) as unknown as ValidatedWorkbenchSessionV1
 }
 
-export function serializeWorkbenchSession(input: WorkbenchSessionV1): string {
+export function serializeWorkbenchSession(
+  input: WorkbenchSessionV1 | ValidatedWorkbenchSessionV1,
+): string {
   const validated = validateWorkbenchSession(input)
   const stableObject: WorkbenchSessionV1 = {
     schemaVersion: WORKBENCH_SESSION_SCHEMA_VERSION,
@@ -540,7 +584,7 @@ export interface ImportSessionDependencies {
 }
 
 export function importWorkbenchSession(
-  input: string | WorkbenchSessionV1,
+  input: string | WorkbenchSessionV1 | ValidatedWorkbenchSessionV1,
   deps: ImportSessionDependencies = {},
 ): ValidatedWorkbenchSessionV1 {
   const session = typeof input === 'string'

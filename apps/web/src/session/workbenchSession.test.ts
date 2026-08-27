@@ -202,11 +202,90 @@ describe('Workbench Session V1 Serialization and Round-Trip', () => {
     expect(deserialized1.filters).not.toBe(deserialized2.filters)
     expect(deserialized1.autoEqRun).not.toBe(deserialized2.autoEqRun)
 
-    // Mutating deserialized1 must not affect deserialized2
-    deserialized1.curves[0]!.name = 'Mutated'
-    deserialized1.filters[0]!.gainDb = -10
-    expect(deserialized2.curves[0]!.name).toBe(fixture.curves[0]!.name)
-    expect(deserialized2.filters[0]!.gainDb).toBe(fixture.filters[0]!.gainDb)
+    expect(deserialized1.curves[0]!.name).toBe(fixture.curves[0]!.name)
+    expect(deserialized1.filters[0]!.gainDb).toBe(fixture.filters[0]!.gainDb)
+  })
+
+  it('deep freezes validated session and prevents runtime and typed mutation of nested structures', () => {
+    const fixture = createValidAutoEqSession()
+    const validated = validateWorkbenchSession(fixture)
+
+    // Deep freeze verification across all structures
+    expect(Object.isFrozen(validated)).toBe(true)
+    expect(Object.isFrozen(validated.curves)).toBe(true)
+    expect(Object.isFrozen(validated.curves[0])).toBe(true)
+    expect(Object.isFrozen(validated.curves[0]!.rawPoints)).toBe(true)
+    expect(Object.isFrozen(validated.curves[0]!.rawPoints[0])).toBe(true)
+    expect(Object.isFrozen(validated.curves[0]!.metadata)).toBe(true)
+    expect(Object.isFrozen(validated.normalization)).toBe(true)
+    expect(Object.isFrozen(validated.autoeqSettings)).toBe(true)
+    expect(Object.isFrozen(validated.filters)).toBe(true)
+    expect(Object.isFrozen(validated.filters[0])).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun)).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun!.manifest)).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun!.manifest.autoeqSettings)).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun!.manifest.normalization)).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun!.manifest.algorithmParameters)).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun!.manifest.finalFilters)).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun!.manifest.finalFilters[0])).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun!.manifest.metrics)).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun!.manifest.cancellationAudit)).toBe(true)
+    expect(Object.isFrozen(validated.autoEqRun!.manifest.cancellationAudit.pairs)).toBe(true)
+    if (validated.autoEqRun!.manifest.cancellationAudit.pairs.length > 0) {
+      expect(Object.isFrozen(validated.autoEqRun!.manifest.cancellationAudit.pairs[0])).toBe(true)
+    }
+
+    // Runtime mutation attempts throw TypeError in strict mode
+    expect(() => {
+      // @ts-expect-error - statically disallowed
+      validated.curves[0]!.name = 'Mutated'
+    }).toThrow(TypeError)
+
+    expect(() => {
+      // @ts-expect-error - statically disallowed
+      validated.curves[0]!.rawPoints[0]!.db = 999
+    }).toThrow(TypeError)
+
+    expect(() => {
+      // @ts-expect-error - statically disallowed
+      validated.curves[0]!.metadata.source = 'modified'
+    }).toThrow(TypeError)
+
+    expect(() => {
+      // @ts-expect-error - statically disallowed
+      validated.filters[0]!.gainDb = -10
+    }).toThrow(TypeError)
+
+    expect(() => {
+      // @ts-expect-error - statically disallowed
+      validated.autoeqSettings.maxGainDb = 50
+    }).toThrow(TypeError)
+
+    expect(() => {
+      // @ts-expect-error - statically disallowed
+      validated.autoEqRun!.manifest.finalFilters[0]!.gainDb = 99
+    }).toThrow(TypeError)
+  })
+
+  it('applying deep-frozen validated session produces a mutable copy in workspaceStore', () => {
+    const workspace = createWorkspaceStore()
+    const fixture = createValidAutoEqSession()
+    const validated = validateWorkbenchSession(fixture)
+
+    workspace.getState().applySession(validated)
+
+    // Store state can be modified independently without throwing
+    expect(() => {
+      workspace.getState().renameCurve(validated.curves[0]!.id, 'New Name')
+    }).not.toThrow()
+    expect(workspace.getState().curves[0]!.name).toBe('New Name')
+    expect(validated.curves[0]!.name).toBe(fixture.curves[0]!.name)
+
+    expect(() => {
+      workspace.getState().updateFilter(validated.filters[0]!.id, { gainDb: 3.0 })
+    }).not.toThrow()
+    expect(workspace.getState().filters[0]!.gainDb).toBe(3.0)
+    expect(validated.filters[0]!.gainDb).toBe(fixture.filters[0]!.gainDb)
   })
 })
 
@@ -315,6 +394,26 @@ describe('Workbench Session Deserialization Validation Matrix', () => {
       mutate(session)
       expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
     })
+
+    const invalidMetadataCases: [string, () => unknown][] = [
+      ['Date object in metadata', () => new Date()],
+      ['URL object in metadata', () => new URL('https://example.com/spec')],
+      ['Class instance in metadata', () => new (class CustomMeta {})()],
+      ...(typeof File !== 'undefined'
+        ? [['File object in metadata', () => new File(['test'], 'meta.csv')] as [string, () => unknown]]
+        : []),
+    ]
+
+    it.each(invalidMetadataCases)(
+      'rejects non-plain object metadata container and prevents silent canonicalization to empty object: %s',
+      (_label, createBadObj) => {
+        const session = createValidManualSession()
+        session.curves[0]!.metadata = createBadObj() as unknown as Record<string, string>
+        expect(() => validateWorkbenchSession(session)).toThrow(
+          'Invalid Workbench session: malformed curve definition.',
+        )
+      },
+    )
 
     it('canonically reconstructs curve metadata preserving string, finite number, and boolean', () => {
       const session = createValidManualSession()

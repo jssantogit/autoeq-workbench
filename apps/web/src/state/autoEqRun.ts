@@ -4,6 +4,8 @@ export interface AutoEqRunRecord {
   manifest: RunManifest
 }
 
-export function cloneAutoEqRunRecord(record: AutoEqRunRecord | null): AutoEqRunRecord | null {
-  return record === null ? null : structuredClone(record)
+export function cloneAutoEqRunRecord(
+  record: AutoEqRunRecord | { readonly manifest: unknown } | null | undefined,
+): AutoEqRunRecord | null {
+  return !record ? null : structuredClone(record as AutoEqRunRecord)
 }
