@@ -146,6 +146,21 @@ describe('formatEqualizerApoFilters', () => {
     )
   })
 
+  it('omits disabled filters when passed an active-only filter list', () => {
+    const activeFilters: Filter[] = [
+      { id: 'peak', enabled: true, type: 'PK', frequencyHz: 1000, gainDb: 1, q: 1 },
+      { id: 'high', enabled: true, type: 'HS', frequencyHz: 10000, gainDb: 1.5, q: 0.7 },
+    ]
+
+    const text = formatEqualizerApoFilters(activeFilters, -2.3)
+    expect(text).not.toContain('OFF')
+    expect(text).toBe(
+      'Preamp: -2.3 dB\r\n' +
+        'Filter 1: ON PK Fc 1000 Hz Gain 1.0 dB Q 1.000\r\n' +
+        'Filter 2: ON HSC Fc 10000 Hz Gain 1.5 dB Q 0.700',
+    )
+  })
+
   it.each([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
     'rejects non-finite preamp %s',
     (preampDb) => {

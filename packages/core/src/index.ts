@@ -46,6 +46,8 @@ export {
   parseEqualizerApoFilters,
 } from './io/equalizerApo.js'
 export type { FilterDefinition } from './io/equalizerApo.js'
+export { formatPowerampText } from './exports/powerampText.js'
+export type { PowerampTextInput } from './exports/powerampText.js'
 export { createGraphicEq, formatGraphicEq } from './io/graphicEq.js'
 export type { GraphicEqPoint } from './io/graphicEq.js'
 export { parseCurveText } from './io/parseCurve.js'

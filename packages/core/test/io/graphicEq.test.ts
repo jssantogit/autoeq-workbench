@@ -144,4 +144,19 @@ describe('formatGraphicEq', () => {
     expect(pairs[0]).toBe('20 0.0')
     expect(pairs.every((pair) => /^\d+ -?\d+\.\d$/.test(pair))).toBe(true)
   })
+
+  it('produces identical output whether disabled filters are present or omitted', () => {
+    const enabledOnly: Filter[] = [
+      { id: 'low', enabled: true, type: 'LS', frequencyHz: 120, gainDb: 3, q: 0.7 },
+      { id: 'peak', enabled: true, type: 'PK', frequencyHz: 1450, gainDb: -5, q: 1.4 },
+    ]
+    const withDisabled: Filter[] = [
+      ...enabledOnly,
+      { id: 'off', enabled: false, type: 'PK', frequencyHz: 4000, gainDb: 12, q: 2 },
+    ]
+
+    expect(formatGraphicEq(withDisabled, sampleRateHz)).toBe(
+      formatGraphicEq(enabledOnly, sampleRateHz),
+    )
+  })
 })
