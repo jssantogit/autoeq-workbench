@@ -45,6 +45,39 @@ function captureRunInput(state: WorkspaceState): StandardAutoEqInput | null {
   }
 }
 
+function matchesCapturedProvenance(
+  manifest: AutoEqResult['manifest'] | undefined,
+  input: StandardAutoEqInput,
+): boolean {
+  if (!manifest || typeof manifest !== 'object') return false
+  if (manifest.sourceName !== input.source.name || manifest.targetName !== input.target.name) {
+    return false
+  }
+  const norm = manifest.normalization
+  if (
+    !norm ||
+    norm.mode !== input.normalization.mode ||
+    norm.frequencyHz !== input.normalization.frequencyHz ||
+    norm.levelDb !== input.normalization.levelDb
+  ) {
+    return false
+  }
+  const settings = manifest.autoeqSettings
+  if (
+    !settings ||
+    settings.minFrequencyHz !== input.settings.minFrequencyHz ||
+    settings.maxFrequencyHz !== input.settings.maxFrequencyHz ||
+    settings.minGainDb !== input.settings.minGainDb ||
+    settings.maxGainDb !== input.settings.maxGainDb ||
+    settings.minQ !== input.settings.minQ ||
+    settings.maxQ !== input.settings.maxQ ||
+    settings.maxFilters !== input.settings.maxFilters
+  ) {
+    return false
+  }
+  return true
+}
+
 interface AutoEqControllerDependencies {
   workspace: StoreApi<WorkspaceState>
   runStore: StoreApi<AutoEqRunState>
@@ -108,7 +141,10 @@ export function createAutoEqController({
       if (runStore.getState().activeRunId !== runId) return
 
       if (createAutoEqRunInputSignature(workspace.getState()) === signature) {
-        if (!workspace.getState().applyAutoEqResult(result)) {
+        if (
+          !matchesCapturedProvenance(result?.manifest, input) ||
+          !workspace.getState().applyAutoEqResult(result)
+        ) {
           runStore.getState().fail(runId, {
             category: 'optimization',
             message: 'AutoEQ optimization failed.',

@@ -8,7 +8,10 @@ import {
 
 const normalization: Normalization = { mode: 'hz', frequencyHz: 500, levelDb: 60 }
 
-export function createAutoEqResult(gainDb = 3): AutoEqResult {
+export function createAutoEqResult(
+  gainDb = 3,
+  manifestOverrides: Partial<RunManifest> = {},
+): AutoEqResult {
   const filters: Filter[] = [
     { id: 'autoeq-1', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb, q: 1 },
   ]
@@ -45,6 +48,7 @@ export function createAutoEqResult(gainDb = 3): AutoEqResult {
       metrics: { ...metrics },
       preampDb,
       cancellationAudit: { ...cancellationAudit, pairs: [] },
+      ...manifestOverrides,
     },
   }
 }

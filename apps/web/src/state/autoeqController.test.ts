@@ -31,7 +31,7 @@ const priorFilter: Filter = {
 function syntheticCurve(id: string, kind: Curve['kind'], middleDb: number): Curve {
   return {
     id,
-    name: kind === 'fr' ? `Synthetic FR ${id}` : `Synthetic Target ${id}`,
+    name: kind === 'fr' ? 'Source' : 'Target',
     kind,
     rawPoints: [
       { frequencyHz: 20, db: middleDb / 2 },
@@ -202,6 +202,43 @@ describe('AutoEQ controller', () => {
     malformed.filters[0]!.gainDb = Number.POSITIVE_INFINITY
 
     runs[0]!.resolve(malformed)
+    await pending
+
+    expect(solutionSnapshot(workspace.getState())).toEqual(before)
+    expect(runStore.getState()).toMatchObject({
+      status: 'error',
+      activeRunId: null,
+      error: { category: 'optimization', message: 'AutoEQ optimization failed.' },
+    })
+  })
+
+  it.each([
+    ['normalization mode', (result: AutoEqResult) => {
+      result.manifest.normalization.mode = 'db'
+    }],
+    ['normalization frequency', (result: AutoEqResult) => {
+      result.manifest.normalization.frequencyHz = 1_000
+    }],
+    ['normalization level', (result: AutoEqResult) => {
+      result.manifest.normalization.levelDb = 65
+    }],
+    ['settings', (result: AutoEqResult) => {
+      result.manifest.autoeqSettings.maxFilters = 8
+    }],
+    ['sourceName', (result: AutoEqResult) => {
+      result.manifest.sourceName = 'Mismatched Source'
+    }],
+    ['targetName', (result: AutoEqResult) => {
+      result.manifest.targetName = 'Mismatched Target'
+    }],
+  ] as const)('rejects Worker result with mismatched %s when workspace signature is unchanged', async (_label, mutateResult) => {
+    const { workspace, runStore, controller, runs } = setup()
+    const before = solutionSnapshot(workspace.getState())
+    const pending = controller.runAutoEq()
+    const result = createAutoEqResult(4)
+    mutateResult(result)
+
+    runs[0]!.resolve(result)
     await pending
 
     expect(solutionSnapshot(workspace.getState())).toEqual(before)

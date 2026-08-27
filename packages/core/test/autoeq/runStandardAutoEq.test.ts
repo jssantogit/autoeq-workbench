@@ -313,8 +313,46 @@ describe('runStandardAutoEq', () => {
       frequencyHz: 500,
       levelDb: 60,
     })
-    expect(result1).toEqual(result2)
-    expect(result1.filters.length).toBeLessThanOrEqual(5)
-    expect(result1.metrics.maeDb).toBeLessThan(0.25)
+    expect(result1.filters).toEqual([
+      {
+        id: 'autoeq-1',
+        enabled: true,
+        type: 'PK',
+        frequencyHz: 82,
+        gainDb: -0.7,
+        q: 0.15,
+      },
+      {
+        id: 'autoeq-2',
+        enabled: true,
+        type: 'PK',
+        frequencyHz: 1000,
+        gainDb: 5.7,
+        q: 2.16,
+      },
+      {
+        id: 'autoeq-3',
+        enabled: true,
+        type: 'PK',
+        frequencyHz: 8666,
+        gainDb: -0.7,
+        q: 0.18,
+      },
+    ])
+    expect(result1.metrics).toEqual({
+      maeDb: 0.05190838449315958,
+      rmseDb: 0.061293683388416766,
+      maxAbsDb: 0.2903911151493715,
+      maxAbsFrequencyHz: 20000,
+    })
+    expect(result1.preampDb).toBe(-5.4)
+    expect(result1.cancellationAudit).toEqual({
+      pairs: [],
+      totalScore: 0,
+    })
+    expect(result1.manifest.finalFilters).toEqual(result1.filters)
+    expect(result1.manifest.metrics).toEqual(result1.metrics)
+    expect(result1.manifest.preampDb).toBe(result1.preampDb)
+    expect(result1.manifest.cancellationAudit).toEqual(result1.cancellationAudit)
   })
 })
