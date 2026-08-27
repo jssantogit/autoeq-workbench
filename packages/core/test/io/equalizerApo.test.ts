@@ -131,7 +131,7 @@ describe('parseEqualizerApoFilters', () => {
 })
 
 describe('formatEqualizerApoFilters', () => {
-  it('formats current filters in order with exact source conventions and CRLF', () => {
+  it('formats current filters in order with exact source conventions and CRLF, omitting disabled filters', () => {
     const filters: Filter[] = [
       { id: 'peak', enabled: true, type: 'PK', frequencyHz: 1000, gainDb: 1, q: 1 },
       { id: 'low', enabled: false, type: 'LS', frequencyHz: 105, gainDb: -2.5, q: 0.7 },
@@ -141,9 +141,31 @@ describe('formatEqualizerApoFilters', () => {
     expect(formatEqualizerApoFilters(filters, -2.34)).toBe(
       'Preamp: -2.3 dB\r\n' +
         'Filter 1: ON PK Fc 1000 Hz Gain 1.0 dB Q 1.000\r\n' +
-        'Filter 2: OFF LSC Fc 105 Hz Gain -2.5 dB Q 0.700\r\n' +
-        'Filter 3: ON HSC Fc 10000 Hz Gain 1.5 dB Q 0.700',
+        'Filter 2: ON HSC Fc 10000 Hz Gain 1.5 dB Q 0.700',
     )
+  })
+
+  it('omits disabled filters and densely renumbers remaining enabled filters in mixed filter list', () => {
+    const mixedFilters: Filter[] = [
+      { id: 'f1', enabled: false, type: 'PK', frequencyHz: 100, gainDb: 1, q: 1 },
+      { id: 'f2', enabled: true, type: 'PK', frequencyHz: 500, gainDb: -2, q: 1.5 },
+      { id: 'f3', enabled: false, type: 'LS', frequencyHz: 80, gainDb: 3, q: 0.707 },
+      { id: 'f4', enabled: true, type: 'HS', frequencyHz: 12000, gainDb: 2.5, q: 0.8 },
+      { id: 'f5', enabled: false, type: 'PK', frequencyHz: 8000, gainDb: -1, q: 2 },
+    ]
+
+    expect(formatEqualizerApoFilters(mixedFilters, -4.5)).toBe(
+      'Preamp: -4.5 dB\r\n' +
+        'Filter 1: ON PK Fc 500 Hz Gain -2.0 dB Q 1.500\r\n' +
+        'Filter 2: ON HSC Fc 12000 Hz Gain 2.5 dB Q 0.800',
+    )
+  })
+
+  it('outputs only preamp line when all filters are disabled', () => {
+    const disabledFilters: Filter[] = [
+      { id: 'f1', enabled: false, type: 'PK', frequencyHz: 1000, gainDb: 1, q: 1 },
+    ]
+    expect(formatEqualizerApoFilters(disabledFilters, 0)).toBe('Preamp: 0.0 dB')
   })
 
   it('omits disabled filters when passed an active-only filter list', () => {

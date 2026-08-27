@@ -17,7 +17,9 @@ function isFiniteNumber(value: unknown): value is number {
 
 function isOnGrid(value: number, step: number): boolean {
   const steps = value / step
-  return Math.abs(steps - Math.round(steps)) < 1e-6
+  const nearest = Math.round(steps)
+  const tolerance = Math.max(1, Math.abs(nearest)) * Number.EPSILON * 64
+  return Math.abs(steps - nearest) <= tolerance
 }
 
 function normalizeZero(value: number): number {
@@ -53,6 +55,9 @@ export function formatPowerampText(input: PowerampTextInput): string {
   }
   if (typeof input.name !== 'string') {
     throw new CoreError('export', 'Poweramp preset name must be a string')
+  }
+  if (/[\r\n]/.test(input.name)) {
+    throw new CoreError('export', 'Poweramp preset name cannot contain newline characters')
   }
   if (!isFiniteNumber(input.preampDb)) {
     throw new CoreError('export', 'Poweramp preamp must be finite')

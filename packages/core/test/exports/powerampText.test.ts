@@ -136,6 +136,9 @@ describe('formatPowerampText', () => {
     ['non-finite preamp NaN', { name: 'Demo', preampDb: Number.NaN, filters: [] }, /preamp.*finite/i],
     ['non-finite preamp Infinity', { name: 'Demo', preampDb: Number.POSITIVE_INFINITY, filters: [] }, /preamp.*finite/i],
     ['non-string name', { name: 123 as unknown as string, preampDb: 0, filters: [] }, /name.*string/i],
+    ['name with newline \\n', { name: 'Demo\nPreamp: 10.0 dB', preampDb: 0, filters: [] }, /name.*newline/i],
+    ['name with carriage return \\r', { name: 'Demo\rPreamp: 10.0 dB', preampDb: 0, filters: [] }, /name.*newline/i],
+    ['name with CRLF \\r\\n', { name: 'Demo\r\nFilter 1: ON PK Fc 1000 Hz Gain 10 dB Q 1', preampDb: 0, filters: [] }, /name.*newline/i],
     ['invalid filters array', { name: 'Demo', preampDb: 0, filters: null as unknown as Filter[] }, /filter.*array/i],
   ])('rejects invalid top-level input: %s', (_name, input, message) => {
     expectCoreExportError(() => formatPowerampText(input), message)
@@ -248,5 +251,38 @@ describe('formatPowerampText', () => {
         'Filter 1: ON PK Fc 1000 Hz Gain 2.0 dB Q 1.41',
       ].join('\n'),
     )
+  })
+
+  it.each([
+    ['frequency with 5e-7 offset', 1000.0000005, 0, 1, /frequency.*grid/i],
+    ['gain with 5e-8 offset', 1000, 1.20000005, 1, /gain.*grid/i],
+    ['Q with 5e-9 offset', 1000, 0, 1.410000005, /Q.*grid/i],
+  ])('rejects off-grid numbers close to boundary: %s', (_desc, frequencyHz, gainDb, q, message) => {
+    expectCoreExportError(
+      () =>
+        formatPowerampText({
+          name: 'Boundary Test',
+          preampDb: 0,
+          filters: [{ id: '1', enabled: true, type: 'PK', frequencyHz, gainDb, q }],
+        }),
+      message,
+    )
+  })
+
+  it('accepts float numbers with standard representational noise on grid', () => {
+    const output = formatPowerampText({
+      name: 'Float Noise Test',
+      preampDb: 0.3,
+      filters: [
+        { id: '1', enabled: true, type: 'PK', frequencyHz: 1000, gainDb: 0.3, q: 1.41 },
+        { id: '2', enabled: true, type: 'LS', frequencyHz: 105, gainDb: 0.7, q: 0.7 },
+        { id: '3', enabled: true, type: 'HS', frequencyHz: 10000, gainDb: -1.2, q: 0.8 },
+      ],
+    })
+
+    expect(output).toContain('Preamp: 0.3 dB')
+    expect(output).toContain('Filter 1: ON PK Fc 1000 Hz Gain 0.3 dB Q 1.41')
+    expect(output).toContain('Filter 2: ON LS Fc 105 Hz Gain 0.7 dB Q 0.70')
+    expect(output).toContain('Filter 3: ON HS Fc 10000 Hz Gain -1.2 dB Q 0.80')
   })
 })

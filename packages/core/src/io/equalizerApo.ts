@@ -131,9 +131,10 @@ export function formatEqualizerApoFilters(
   }
   const lines = [`Preamp: ${preampDb.toFixed(1)} dB`]
 
-  for (const [index, filter] of filters.entries()) {
+  const enabledFilters = filters.filter((filter) => filter.enabled)
+  for (const [index, filter] of enabledFilters.entries()) {
     lines.push(
-      `Filter ${index + 1}: ${filter.enabled ? 'ON' : 'OFF'} ${typeLabels[filter.type]} ` +
+      `Filter ${index + 1}: ON ${typeLabels[filter.type]} ` +
         `Fc ${filter.frequencyHz.toFixed(0)} Hz Gain ${filter.gainDb.toFixed(1)} dB ` +
         `Q ${filter.q.toFixed(3)}`,
     )
