@@ -354,5 +354,6 @@ describe('runStandardAutoEq', () => {
     expect(result1.manifest.metrics).toEqual(result1.metrics)
     expect(result1.manifest.preampDb).toBe(result1.preampDb)
     expect(result1.manifest.cancellationAudit).toEqual(result1.cancellationAudit)
+    expect(result2).toEqual(result1)
   })
 })
