@@ -31,12 +31,7 @@ import {
   type WorkspaceHistorySnapshot,
 } from './history'
 import { cloneAutoEqRunRecord, type AutoEqRunRecord } from './autoEqRun'
-import {
-  cloneCurve,
-  cloneFilter,
-  validateWorkbenchSession,
-  type WorkbenchSessionV1,
-} from '../session/workbenchSession'
+import type { ValidatedWorkbenchSessionV1 } from '../session/workbenchSession'
 
 export type { AutoEqRunRecord } from './autoEqRun'
 
@@ -71,7 +66,7 @@ export interface WorkspaceState {
   setFilters: (filters: Filter[], provenance: FilterProvenance) => void
   applyAutoEqResult: (result: AutoEqResult) => boolean
   applyFilterSnapshot: (snapshot: FilterSnapshotState) => void
-  applySession: (session: WorkbenchSessionV1) => boolean
+  applySession: (session: ValidatedWorkbenchSessionV1) => void
   selectFilter: (id: string | null) => void
   addFilter: (type: FilterType) => void
   removeFilter: (id: string) => void
@@ -461,29 +456,38 @@ export function createWorkspaceStore() {
         })
       }),
     applySession: (session) => {
-      let validated: WorkbenchSessionV1
-      try {
-        validated = validateWorkbenchSession(session)
-      } catch {
-        return false
-      }
       past.length = 0
       future.length = 0
       set(() => ({
-        curves: validated.curves.map(cloneCurve),
-        activeFrId: validated.activeFrId,
-        activeTargetId: validated.activeTargetId,
-        normalization: { ...validated.normalization },
-        autoeqSettings: { ...validated.autoeqSettings },
-        filters: validated.filters.map(cloneFilter),
+        curves: session.curves.map((curve) => ({
+          id: curve.id,
+          name: curve.name,
+          kind: curve.kind,
+          rawPoints: curve.rawPoints.map((point) => ({
+            frequencyHz: point.frequencyHz,
+            db: point.db,
+          })),
+          metadata: { ...curve.metadata },
+        })),
+        activeFrId: session.activeFrId,
+        activeTargetId: session.activeTargetId,
+        normalization: { ...session.normalization },
+        autoeqSettings: { ...session.autoeqSettings },
+        filters: session.filters.map((filter) => ({
+          id: filter.id,
+          enabled: filter.enabled,
+          type: filter.type,
+          frequencyHz: filter.frequencyHz,
+          gainDb: filter.gainDb,
+          q: filter.q,
+        })),
         selectedFilterId: null,
-        solutionState: validated.solutionState,
-        filterProvenance: validated.filterProvenance,
-        autoEqRun: cloneAutoEqRunRecord(validated.autoEqRun),
+        solutionState: session.solutionState,
+        filterProvenance: session.filterProvenance,
+        autoEqRun: cloneAutoEqRunRecord(session.autoEqRun),
         canUndo: false,
         canRedo: false,
       }))
-      return true
     },
     selectFilter: (id) =>
       set((state) => ({

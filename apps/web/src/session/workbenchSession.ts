@@ -24,6 +24,8 @@ import {
 
 export const WORKBENCH_SESSION_SCHEMA_VERSION = 1 as const
 
+declare const ValidatedSessionBrand: unique symbol
+
 export interface WorkbenchSessionV1 {
   schemaVersion: 1
   curves: Curve[]
@@ -35,6 +37,10 @@ export interface WorkbenchSessionV1 {
   filterProvenance: FilterProvenance | null
   solutionState: SolutionState
   autoEqRun: AutoEqRunRecord | null
+}
+
+export type ValidatedWorkbenchSessionV1 = WorkbenchSessionV1 & {
+  readonly [ValidatedSessionBrand]: true
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -52,13 +58,23 @@ export function cloneCurvePoint(point: CurvePoint): CurvePoint {
   }
 }
 
+export function cloneCurveMetadata(
+  metadata: Record<string, string | number | boolean>,
+): Record<string, string | number | boolean> {
+  const cloned: Record<string, string | number | boolean> = {}
+  for (const [key, value] of Object.entries(metadata)) {
+    cloned[key] = value
+  }
+  return cloned
+}
+
 export function cloneCurve(curve: Curve): Curve {
   return {
     id: curve.id,
     name: curve.name,
     kind: curve.kind,
     rawPoints: curve.rawPoints.map(cloneCurvePoint),
-    metadata: { ...curve.metadata },
+    metadata: cloneCurveMetadata(curve.metadata),
   }
 }
 
@@ -82,14 +98,38 @@ function isValidPoint(point: unknown): point is CurvePoint {
   )
 }
 
+function isValidCurveMetadata(
+  metadata: unknown,
+): metadata is Record<string, string | number | boolean> {
+  if (!isRecord(metadata)) return false
+  for (const [key, value] of Object.entries(metadata)) {
+    if (typeof key !== 'string') return false
+    if (typeof value === 'string' || typeof value === 'boolean') {
+      continue
+    }
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      continue
+    }
+    return false
+  }
+  return true
+}
+
 function isValidCurve(curve: unknown): curve is Curve {
   if (!isRecord(curve)) return false
   if (typeof curve.id !== 'string' || curve.id.trim().length === 0) return false
   if (typeof curve.name !== 'string' || curve.name.trim().length === 0) return false
   if (curve.kind !== 'fr' && curve.kind !== 'target') return false
-  if (!Array.isArray(curve.rawPoints) || curve.rawPoints.length === 0) return false
-  if (!curve.rawPoints.every(isValidPoint)) return false
-  if (curve.metadata !== undefined && !isRecord(curve.metadata)) return false
+  if (!Array.isArray(curve.rawPoints) || curve.rawPoints.length < 2) return false
+
+  let lastFreq = 0
+  for (const point of curve.rawPoints) {
+    if (!isValidPoint(point)) return false
+    if (point.frequencyHz <= lastFreq) return false
+    lastFreq = point.frequencyHz
+  }
+
+  if (!isValidCurveMetadata(curve.metadata)) return false
   return true
 }
 
@@ -184,6 +224,80 @@ function isValidRunManifest(manifest: unknown): manifest is RunManifest {
   )
 }
 
+function canonicalizeRunManifest(manifest: RunManifest): RunManifest {
+  return {
+    schemaVersion: 2,
+    algorithmVersion: 'standard-v1',
+    profile: 'Standard',
+    sampleRateHz: manifest.sampleRateHz,
+    fitPointsPerOctave: manifest.fitPointsPerOctave,
+    autoeqSettings: {
+      minFrequencyHz: manifest.autoeqSettings.minFrequencyHz,
+      maxFrequencyHz: manifest.autoeqSettings.maxFrequencyHz,
+      minGainDb: manifest.autoeqSettings.minGainDb,
+      maxGainDb: manifest.autoeqSettings.maxGainDb,
+      minQ: manifest.autoeqSettings.minQ,
+      maxQ: manifest.autoeqSettings.maxQ,
+      maxFilters: manifest.autoeqSettings.maxFilters,
+    },
+    normalization: {
+      mode: manifest.normalization.mode,
+      frequencyHz: manifest.normalization.frequencyHz,
+      levelDb: manifest.normalization.levelDb,
+    },
+    sourceName: manifest.sourceName,
+    targetName: manifest.targetName,
+    algorithmParameters: {
+      deadbandDb: manifest.algorithmParameters.deadbandDb,
+      huberDeltaDb: manifest.algorithmParameters.huberDeltaDb,
+      candidateThresholdDb: manifest.algorithmParameters.candidateThresholdDb,
+      minObjectiveImprovement: manifest.algorithmParameters.minObjectiveImprovement,
+      pruneTolerance: manifest.algorithmParameters.pruneTolerance,
+      filterCountWeight: manifest.algorithmParameters.filterCountWeight,
+      highQWeight: manifest.algorithmParameters.highQWeight,
+      gainWeight: manifest.algorithmParameters.gainWeight,
+      cancellationWeight: manifest.algorithmParameters.cancellationWeight,
+    },
+    finalFilters: manifest.finalFilters.map(cloneFilter),
+    metrics: {
+      maeDb: manifest.metrics.maeDb,
+      rmseDb: manifest.metrics.rmseDb,
+      maxAbsDb: manifest.metrics.maxAbsDb,
+      maxAbsFrequencyHz: manifest.metrics.maxAbsFrequencyHz,
+    },
+    preampDb: manifest.preampDb,
+    cancellationAudit: {
+      pairs: manifest.cancellationAudit.pairs.map((pair) => ({
+        filterAId: pair.filterAId,
+        filterBId: pair.filterBId,
+        score: pair.score,
+        severity: pair.severity,
+      })),
+      totalScore: manifest.cancellationAudit.totalScore,
+    },
+  }
+}
+
+function areNormalizationsEqual(left: Normalization, right: Normalization): boolean {
+  return (
+    left.mode === right.mode &&
+    left.frequencyHz === right.frequencyHz &&
+    left.levelDb === right.levelDb
+  )
+}
+
+function areAutoEqSettingsEqual(left: AutoEqSettings, right: AutoEqSettings): boolean {
+  return (
+    left.minFrequencyHz === right.minFrequencyHz &&
+    left.maxFrequencyHz === right.maxFrequencyHz &&
+    left.minGainDb === right.minGainDb &&
+    left.maxGainDb === right.maxGainDb &&
+    left.minQ === right.minQ &&
+    left.maxQ === right.maxQ &&
+    left.maxFilters === right.maxFilters
+  )
+}
+
 function areFiltersEqual(left: readonly Filter[], right: readonly Filter[]): boolean {
   if (left.length !== right.length) return false
   return left.every((filter, index) => {
@@ -200,7 +314,7 @@ function areFiltersEqual(left: readonly Filter[], right: readonly Filter[]): boo
   })
 }
 
-export function validateWorkbenchSession(input: unknown): WorkbenchSessionV1 {
+export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSessionV1 {
   if (!isRecord(input)) {
     throw new Error('Invalid Workbench session: expected JSON object.')
   }
@@ -224,6 +338,7 @@ export function validateWorkbenchSession(input: unknown): WorkbenchSessionV1 {
     throw new Error('Invalid Workbench session: duplicate curve IDs found.')
   }
 
+  let activeFr: Curve | null = null
   if (input.activeFrId !== null) {
     if (typeof input.activeFrId !== 'string') {
       throw new Error('Invalid Workbench session: activeFrId must be string or null.')
@@ -232,8 +347,10 @@ export function validateWorkbenchSession(input: unknown): WorkbenchSessionV1 {
     if (!matchingFr || matchingFr.kind !== 'fr') {
       throw new Error('Invalid Workbench session: activeFrId must reference an FR curve.')
     }
+    activeFr = matchingFr
   }
 
+  let activeTarget: Curve | null = null
   if (input.activeTargetId !== null) {
     if (typeof input.activeTargetId !== 'string') {
       throw new Error('Invalid Workbench session: activeTargetId must be string or null.')
@@ -242,6 +359,7 @@ export function validateWorkbenchSession(input: unknown): WorkbenchSessionV1 {
     if (!matchingTarget || matchingTarget.kind !== 'target') {
       throw new Error('Invalid Workbench session: activeTargetId must reference a Target curve.')
     }
+    activeTarget = matchingTarget
   }
 
   if (!isValidNormalization(input.normalization)) {
@@ -286,7 +404,7 @@ export function validateWorkbenchSession(input: unknown): WorkbenchSessionV1 {
     if (!isRecord(input.autoEqRun) || !isValidRunManifest(input.autoEqRun.manifest)) {
       throw new Error('Invalid Workbench session: invalid AutoEQ run record or manifest.')
     }
-    autoEqRun = cloneAutoEqRunRecord({ manifest: input.autoEqRun.manifest })
+    autoEqRun = { manifest: canonicalizeRunManifest(input.autoEqRun.manifest) }
   }
 
   if (provenance === null) {
@@ -311,6 +429,31 @@ export function validateWorkbenchSession(input: unknown): WorkbenchSessionV1 {
       throw new Error('Invalid Workbench session: AutoEQ provenance requires an AutoEQ run record.')
     }
     if (solutionState === 'clean') {
+      if (activeFr === null || activeTarget === null) {
+        throw new Error(
+          'Invalid Workbench session: clean AutoEQ solution requires active FR and Target curves.',
+        )
+      }
+      if (activeFr.name !== autoEqRun.manifest.sourceName) {
+        throw new Error(
+          'Invalid Workbench session: clean AutoEQ active FR name does not match manifest source name.',
+        )
+      }
+      if (activeTarget.name !== autoEqRun.manifest.targetName) {
+        throw new Error(
+          'Invalid Workbench session: clean AutoEQ active Target name does not match manifest target name.',
+        )
+      }
+      if (!areNormalizationsEqual(input.normalization as Normalization, autoEqRun.manifest.normalization)) {
+        throw new Error(
+          'Invalid Workbench session: clean AutoEQ normalization does not match manifest normalization.',
+        )
+      }
+      if (!areAutoEqSettingsEqual(input.autoeqSettings as AutoEqSettings, autoEqRun.manifest.autoeqSettings)) {
+        throw new Error(
+          'Invalid Workbench session: clean AutoEQ settings do not match manifest settings.',
+        )
+      }
       if (!areFiltersEqual(input.filters as Filter[], autoEqRun.manifest.finalFilters)) {
         throw new Error(
           'Invalid Workbench session: clean AutoEQ solution filters do not match manifest final filters.',
@@ -342,7 +485,7 @@ export function validateWorkbenchSession(input: unknown): WorkbenchSessionV1 {
     filterProvenance: provenance,
     solutionState,
     autoEqRun,
-  }
+  } as ValidatedWorkbenchSessionV1
 }
 
 export function serializeWorkbenchSession(input: WorkbenchSessionV1): string {
@@ -357,12 +500,14 @@ export function serializeWorkbenchSession(input: WorkbenchSessionV1): string {
     filters: validated.filters.map(cloneFilter),
     filterProvenance: validated.filterProvenance,
     solutionState: validated.solutionState,
-    autoEqRun: cloneAutoEqRunRecord(validated.autoEqRun),
+    autoEqRun: validated.autoEqRun
+      ? { manifest: canonicalizeRunManifest(validated.autoEqRun.manifest) }
+      : null,
   }
   return JSON.stringify(stableObject, null, 2) + '\n'
 }
 
-export function deserializeWorkbenchSession(text: string): WorkbenchSessionV1 {
+export function deserializeWorkbenchSession(text: string): ValidatedWorkbenchSessionV1 {
   let parsed: unknown
   try {
     parsed = JSON.parse(text)
@@ -372,7 +517,7 @@ export function deserializeWorkbenchSession(text: string): WorkbenchSessionV1 {
   return validateWorkbenchSession(parsed)
 }
 
-export function createWorkbenchSessionFromWorkspace(state: WorkspaceState): WorkbenchSessionV1 {
+export function createWorkbenchSessionFromWorkspace(state: WorkspaceState): ValidatedWorkbenchSessionV1 {
   return validateWorkbenchSession({
     schemaVersion: WORKBENCH_SESSION_SCHEMA_VERSION,
     curves: state.curves.map(cloneCurve),
@@ -397,28 +542,27 @@ export interface ImportSessionDependencies {
 export function importWorkbenchSession(
   input: string | WorkbenchSessionV1,
   deps: ImportSessionDependencies = {},
-): WorkbenchSessionV1 {
+): ValidatedWorkbenchSessionV1 {
   const session = typeof input === 'string'
     ? deserializeWorkbenchSession(input)
     : validateWorkbenchSession(input)
 
-  if (deps.cancelAutoEq) {
-    deps.cancelAutoEq()
-  } else {
-    cancelAutoEq()
+  const runStore = deps.runStore ?? autoEqRunStore
+  if (runStore.getState().activeRunId !== null) {
+    if (deps.cancelAutoEq) {
+      deps.cancelAutoEq()
+    } else {
+      cancelAutoEq()
+    }
   }
 
   const ws = deps.workspaceStore ?? workspaceStore
-  const applied = ws.getState().applySession(session)
-  if (!applied) {
-    throw new Error('Failed to apply Workbench session.')
-  }
+  ws.getState().applySession(session)
 
   const comp = deps.compareStore ?? eqCompareStore
   comp.getState().clear()
 
-  const run = deps.runStore ?? autoEqRunStore
-  run.getState().reset()
+  runStore.getState().reset()
 
   return session
 }

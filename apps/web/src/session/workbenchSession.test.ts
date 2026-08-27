@@ -4,6 +4,7 @@ import {
   MVP_NUMERIC_POLICY,
   type Curve,
   type Filter,
+  type RunManifest,
 } from '@autoeq-workbench/core'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -22,6 +23,7 @@ import {
   deserializeWorkbenchSession,
   importWorkbenchSession,
   serializeWorkbenchSession,
+  validateWorkbenchSession,
   WORKBENCH_SESSION_SCHEMA_VERSION,
   type WorkbenchSessionV1,
 } from './workbenchSession'
@@ -37,7 +39,7 @@ function createSampleCurveFr(): Curve {
       { frequencyHz: 1_000, db: 1.5 },
       { frequencyHz: 20_000, db: -3 },
     ],
-    metadata: { source: 'synthetic-test' },
+    metadata: { source: 'synthetic-test', sampleRate: 48000, verified: true },
   }
 }
 
@@ -85,9 +87,12 @@ function createValidManualSession(): WorkbenchSessionV1 {
 }
 
 function createValidAutoEqSession(): WorkbenchSessionV1 {
-  const fr = createSampleCurveFr()
-  const target = createSampleCurveTarget()
-  const result = createAutoEqResult(2.5)
+  const fr = { ...createSampleCurveFr(), name: 'Source' }
+  const target = { ...createSampleCurveTarget(), name: 'Target' }
+  const result = createAutoEqResult(2.5, {
+    sourceName: 'Source',
+    targetName: 'Target',
+  })
   return {
     schemaVersion: 1,
     curves: [fr, target],
@@ -259,23 +264,72 @@ describe('Workbench Session Deserialization Validation Matrix', () => {
     expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
   })
 
-  it.each([
-    ['missing curves array', (s: WorkbenchSessionV1) => { (s as unknown as Record<string, unknown>).curves = null }],
-    ['curve not object', (s: WorkbenchSessionV1) => { (s.curves as unknown[])[0] = 'not-an-object' }],
-    ['empty curve name', (s: WorkbenchSessionV1) => { s.curves[0]!.name = '' }],
-    ['whitespace curve name', (s: WorkbenchSessionV1) => { s.curves[0]!.name = '   ' }],
-    ['invalid curve kind', (s: WorkbenchSessionV1) => { (s.curves[0] as unknown as Record<string, unknown>).kind = 'custom' }],
-    ['missing rawPoints', (s: WorkbenchSessionV1) => { (s.curves[0] as unknown as Record<string, unknown>).rawPoints = null }],
-    ['non-finite point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = Number.NaN }],
-    ['infinite point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = Number.POSITIVE_INFINITY }],
-    ['non-positive point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = 0 }],
-    ['negative point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = -10 }],
-    ['non-finite point db', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.db = Number.NaN }],
-    ['infinite point db', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.db = Number.NEGATIVE_INFINITY }],
-  ])('rejects invalid curve data: %s', (_label, mutate) => {
-    const session = createValidManualSession()
-    mutate(session)
-    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  describe('Curve Usability and Ordering', () => {
+    it.each([
+      ['missing curves array', (s: WorkbenchSessionV1) => { (s as unknown as Record<string, unknown>).curves = null }],
+      ['curve not object', (s: WorkbenchSessionV1) => { (s.curves as unknown[])[0] = 'not-an-object' }],
+      ['empty curve name', (s: WorkbenchSessionV1) => { s.curves[0]!.name = '' }],
+      ['whitespace curve name', (s: WorkbenchSessionV1) => { s.curves[0]!.name = '   ' }],
+      ['invalid curve kind', (s: WorkbenchSessionV1) => { (s.curves[0] as unknown as Record<string, unknown>).kind = 'custom' }],
+      ['missing rawPoints', (s: WorkbenchSessionV1) => { (s.curves[0] as unknown as Record<string, unknown>).rawPoints = null }],
+      ['empty rawPoints (0 points)', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints = [] }],
+      ['single point (1 point)', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints = [{ frequencyHz: 1_000, db: 0 }] }],
+      ['non-finite point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = Number.NaN }],
+      ['infinite point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = Number.POSITIVE_INFINITY }],
+      ['non-positive point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = 0 }],
+      ['negative point frequency', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.frequencyHz = -10 }],
+      ['non-finite point db', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.db = Number.NaN }],
+      ['infinite point db', (s: WorkbenchSessionV1) => { s.curves[0]!.rawPoints[0]!.db = Number.NEGATIVE_INFINITY }],
+      ['descending frequency order', (s: WorkbenchSessionV1) => {
+        s.curves[0]!.rawPoints = [
+          { frequencyHz: 1_000, db: 0 },
+          { frequencyHz: 500, db: 1 },
+        ]
+      }],
+      ['duplicate frequency points', (s: WorkbenchSessionV1) => {
+        s.curves[0]!.rawPoints = [
+          { frequencyHz: 1_000, db: 0 },
+          { frequencyHz: 1_000, db: 1 },
+        ]
+      }],
+    ])('rejects invalid curve data: %s', (_label, mutate) => {
+      const session = createValidManualSession()
+      mutate(session)
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+  })
+
+  describe('Curve Metadata Validation and Serializability', () => {
+    it.each([
+      ['missing metadata property', (s: WorkbenchSessionV1) => { delete (s.curves[0] as unknown as Record<string, unknown>).metadata }],
+      ['metadata is null', (s: WorkbenchSessionV1) => { (s.curves[0] as unknown as Record<string, unknown>).metadata = null }],
+      ['metadata is array', (s: WorkbenchSessionV1) => { (s.curves[0] as unknown as Record<string, unknown>).metadata = ['tag1', 'tag2'] }],
+      ['metadata is primitive string', (s: WorkbenchSessionV1) => { (s.curves[0] as unknown as Record<string, unknown>).metadata = 'meta' }],
+      ['nested object in metadata', (s: WorkbenchSessionV1) => { s.curves[0]!.metadata = { nested: { val: 1 } } as unknown as Record<string, string> }],
+      ['array value in metadata', (s: WorkbenchSessionV1) => { s.curves[0]!.metadata = { tags: ['a', 'b'] } as unknown as Record<string, string> }],
+      ['null value in metadata', (s: WorkbenchSessionV1) => { s.curves[0]!.metadata = { author: null } as unknown as Record<string, string> }],
+      ['NaN number in metadata', (s: WorkbenchSessionV1) => { s.curves[0]!.metadata = { sampleRate: Number.NaN } }],
+      ['Infinity number in metadata', (s: WorkbenchSessionV1) => { s.curves[0]!.metadata = { sampleRate: Number.POSITIVE_INFINITY } }],
+    ])('rejects non-serializable curve metadata: %s', (_label, mutate) => {
+      const session = createValidManualSession()
+      mutate(session)
+      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('canonically reconstructs curve metadata preserving string, finite number, and boolean', () => {
+      const session = createValidManualSession()
+      session.curves[0]!.metadata = {
+        source: 'local-file.csv',
+        sampleRate: 44100,
+        calibrated: false,
+      }
+      const validated = validateWorkbenchSession(session)
+      expect(validated.curves[0]!.metadata).toEqual({
+        source: 'local-file.csv',
+        sampleRate: 44100,
+        calibrated: false,
+      })
+    })
   })
 
   it('rejects activeFrId when not referencing an existing FR curve', () => {
@@ -401,21 +455,69 @@ describe('Workbench Session Deserialization Validation Matrix', () => {
       expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
     })
 
-    it('rejects clean AutoEQ session when filters do not match manifest finalFilters', () => {
-      const session = createValidAutoEqSession()
-      session.solutionState = 'clean'
-      session.filters = [
-        {
-          ...session.filters[0]!,
-          gainDb: session.filters[0]!.gainDb + 1.0,
-        },
-      ]
-      expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    describe('Clean AutoEQ Context Coherence', () => {
+      it('rejects clean AutoEQ session when activeFrId is null', () => {
+        const session = createValidAutoEqSession()
+        session.activeFrId = null
+        expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+      })
+
+      it('rejects clean AutoEQ session when activeTargetId is null', () => {
+        const session = createValidAutoEqSession()
+        session.activeTargetId = null
+        expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+      })
+
+      it('rejects clean AutoEQ session when active FR name does not match manifest sourceName', () => {
+        const session = createValidAutoEqSession()
+        session.curves.find((c) => c.id === session.activeFrId)!.name = 'Different Source'
+        expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+      })
+
+      it('rejects clean AutoEQ session when active Target name does not match manifest targetName', () => {
+        const session = createValidAutoEqSession()
+        session.curves.find((c) => c.id === session.activeTargetId)!.name = 'Different Target'
+        expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+      })
+
+      it('rejects clean AutoEQ session when normalization does not match manifest normalization', () => {
+        const session = createValidAutoEqSession()
+        session.normalization.frequencyHz = 1_000
+        expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+      })
+
+      it('rejects clean AutoEQ session when autoeqSettings does not match manifest settings', () => {
+        const session = createValidAutoEqSession()
+        session.autoeqSettings.maxGainDb = 8.0
+        expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+      })
+
+      it('rejects clean AutoEQ session when filters do not match manifest finalFilters', () => {
+        const session = createValidAutoEqSession()
+        session.filters = [
+          {
+            ...session.filters[0]!,
+            gainDb: session.filters[0]!.gainDb + 1.0,
+          },
+        ]
+        expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+      })
+
+      it('accepts modified AutoEQ session even if filters numerically equal manifest (sticky modified)', () => {
+        const session = createValidAutoEqSession()
+        session.solutionState = 'modified'
+        expect(validateWorkbenchSession(session).solutionState).toBe('modified')
+      })
+
+      it('accepts stale AutoEQ session even if context matches manifest (sticky stale)', () => {
+        const session = createValidAutoEqSession()
+        session.solutionState = 'stale'
+        expect(validateWorkbenchSession(session).solutionState).toBe('stale')
+      })
     })
 
     it('rejects malformed AutoEQ run manifest schema 2', () => {
       const session = createValidAutoEqSession()
-      // Schema version not 2
       const badManifest = {
         ...session.autoEqRun!.manifest,
         schemaVersion: 1 as unknown as 2,
@@ -435,6 +537,17 @@ describe('Workbench Session Deserialization Validation Matrix', () => {
       }
       session.autoEqRun = { manifest }
       expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+    })
+
+    it('canonically reconstructs manifest stripping unknown extra fields', () => {
+      const session = createValidAutoEqSession()
+      const rawManifestWithExtra = {
+        ...session.autoEqRun!.manifest,
+        unknownField: 'secret_leak',
+      }
+      session.autoEqRun = { manifest: rawManifestWithExtra as unknown as RunManifest }
+      const validated = validateWorkbenchSession(session)
+      expect((validated.autoEqRun!.manifest as unknown as Record<string, unknown>).unknownField).toBeUndefined()
     })
   })
 
@@ -464,7 +577,7 @@ describe('Atomic Workspace Session Replacement & Import Coordinator', () => {
     runStore = createAutoEqRunStore()
   })
 
-  it('workspaceStore.applySession replaces state atomically and clears undo/redo history', () => {
+  it('workspaceStore.applySession replaces state atomically with validated session and clears undo/redo history', () => {
     // Populate workspace and build undo history
     const fr = createSampleCurveFr()
     const target = createSampleCurveTarget()
@@ -476,9 +589,9 @@ describe('Atomic Workspace Session Replacement & Import Coordinator', () => {
     expect(workspace.getState().filters).toHaveLength(2)
 
     const sessionToImport = createValidAutoEqSession()
-    const success = workspace.getState().applySession(sessionToImport)
+    const validated = validateWorkbenchSession(sessionToImport)
+    workspace.getState().applySession(validated)
 
-    expect(success).toBe(true)
     const state = workspace.getState()
     expect(state.curves).toEqual(sessionToImport.curves)
     expect(state.activeFrId).toBe(sessionToImport.activeFrId)
@@ -500,26 +613,6 @@ describe('Atomic Workspace Session Replacement & Import Coordinator', () => {
     expect(workspace.getState().filters).toEqual(sessionToImport.filters)
     workspace.getState().redo()
     expect(workspace.getState().filters).toEqual(sessionToImport.filters)
-  })
-
-  it('workspaceStore.applySession rejects invalid session with zero mutation to prior state and history', () => {
-    const fr = createSampleCurveFr()
-    workspace.getState().addCurve(fr)
-    workspace.getState().addFilter('PK')
-    expect(workspace.getState().canUndo).toBe(true)
-
-    const priorState = { ...workspace.getState() }
-    const invalidSession = {
-      ...createValidManualSession(),
-      schemaVersion: 99 as unknown as 1,
-    }
-
-    const success = workspace.getState().applySession(invalidSession)
-    expect(success).toBe(false)
-
-    expect(workspace.getState().curves).toEqual(priorState.curves)
-    expect(workspace.getState().filters).toEqual(priorState.filters)
-    expect(workspace.getState().canUndo).toBe(true)
   })
 
   it('importWorkbenchSession invalid import produces zero mutation across workspace, history, compare, and runStore', () => {
@@ -563,7 +656,39 @@ describe('Atomic Workspace Session Replacement & Import Coordinator', () => {
     expect(runStore.getState().status).toBe('idle')
   })
 
-  it('importWorkbenchSession valid import cancels active AutoEQ, updates workspace, clears history, clears Compare, and resets runStore', () => {
+  it('importWorkbenchSession does NOT invoke cancel when runStore is idle', () => {
+    expect(runStore.getState().activeRunId).toBeNull()
+    const cancelSpy = vi.fn()
+    const validSession = createValidAutoEqSession()
+
+    importWorkbenchSession(validSession, {
+      workspaceStore: workspace,
+      compareStore: compare,
+      runStore,
+      cancelAutoEq: cancelSpy,
+    })
+
+    expect(cancelSpy).not.toHaveBeenCalled()
+  })
+
+  it('importWorkbenchSession invokes cancel when runStore has an active run', () => {
+    runStore.getState().start('active-run-123')
+    expect(runStore.getState().activeRunId).toBe('active-run-123')
+
+    const cancelSpy = vi.fn()
+    const validSession = createValidAutoEqSession()
+
+    importWorkbenchSession(validSession, {
+      workspaceStore: workspace,
+      compareStore: compare,
+      runStore,
+      cancelAutoEq: cancelSpy,
+    })
+
+    expect(cancelSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('importWorkbenchSession valid import updates workspace, clears history, clears Compare, and resets runStore', () => {
     // Setup initial state
     const fr = createSampleCurveFr()
     workspace.getState().addCurve(fr)
@@ -593,7 +718,6 @@ describe('Atomic Workspace Session Replacement & Import Coordinator', () => {
     })
 
     expect(result).toEqual(validSession)
-    expect(cancelSpy).toHaveBeenCalledTimes(1)
 
     // Workspace assertions
     expect(workspace.getState().curves).toEqual(validSession.curves)
