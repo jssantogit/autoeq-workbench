@@ -95,7 +95,6 @@
 .graph-toolbar .zoom button:last-of-type { border-radius: 0 6px 6px 0; }
 .graph-toolbar .zoom button + button { border-left: 0; }
 .graph-toolbar .number-field { display: flex; align-items: center; gap: 5px; }
-.graph-toolbar .normalize .number-field > span:first-child { position: absolute; left: 0; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); }
 .graph-toolbar .number-field__control { width: 76px; }
 .graph-toolbar .number-field input { min-width: 0; height: 34px; border-radius: 6px; padding: 4px 6px; text-align: center; }
 .graph-toolbar .normalize .number-field__control { height: 36px; border-radius: 6px; }
@@ -129,7 +128,7 @@
 .eq-compare__slot-value { min-width: 0; overflow-wrap: anywhere; color: var(--color-text-muted); font-size: 0.72rem; }
 .eq-compare__current { color: var(--color-text-muted); font-size: 0.64rem; white-space: nowrap; }
 .eq-compare__history { max-height: 20rem; min-width: 0; overflow-x: hidden; overflow-y: auto; }
-.eq-compare__empty { margin: 0; padding: 8px 0; color: var(--color-text-faint); font-size: 0.72rem; }
+.eq-compare__empty { margin: 0; padding: 8px 0; color: var(--color-text-muted); font-size: 0.72rem; }
 .eq-compare__snapshots { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .eq-compare__snapshot { min-width: 0; border: 1px solid var(--color-border); border-radius: 6px; padding: 7px; }
 .eq-compare__snapshot-summary { overflow-wrap: anywhere; font-size: 0.72rem; }
@@ -259,6 +258,7 @@ tbody.curves > tr > td.remove > button {
   cursor: pointer;
 }
 .curve-row-cell-placeholder { cursor: default !important; }
+.curve-manager-row--derived .curve-row-cell-placeholder { display: none; }
 .curve-row-cell-placeholder::before,
 .curve-row-cell-placeholder::after { display: none !important; }
 
@@ -338,6 +338,8 @@ tbody.curves > tr > td.levels { order: 2; flex: 0 0 86px; padding-left: 16px; }
 @media (max-width: 1200px) {
   tbody.curves > tr { flex-wrap: wrap; }
   tbody.curves > tr > td.item-line { flex: 0 0 calc(100% - 38px); padding: 0 16px 0 0; }
+  tbody.curves > tr.curve-manager-row--derived { flex-wrap: nowrap; }
+  tbody.curves > tr.curve-manager-row--derived > td.item-line { flex: 1 1 auto; }
   tbody.curves > tr > td.levels { margin-left: auto; }
 }
 

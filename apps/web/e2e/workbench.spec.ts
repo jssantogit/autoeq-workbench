@@ -66,9 +66,9 @@ test('authoritative Workbench workflow survives export and Session restore', asy
   await expect(hzButton).toHaveAttribute('aria-pressed', 'true')
   await expect(normalize.getByLabel('Normalize Hz')).toHaveValue('500')
   await expect(normalize.getByLabel('Normalize dB')).toHaveValue('60')
-  await dbButton.press('Enter')
+  await dbButton.click()
   await expect(dbButton).toHaveAttribute('aria-pressed', 'true')
-  await hzButton.press('Enter')
+  await hzButton.click()
   await expect(hzButton).toHaveAttribute('aria-pressed', 'true')
   await expect(normalize.getByLabel('Normalize dB')).toHaveValue('60')
 
@@ -121,7 +121,7 @@ test('authoritative Workbench workflow survives export and Session restore', asy
   const sessionPath = await (await sessionDownloadPromise).path()
   expect(sessionPath).not.toBeNull()
 
-  await dbButton.press('Enter')
+  await dbButton.click()
   await normalize.getByLabel('Normalize dB').fill('80')
   await normalize.getByLabel('Normalize dB').press('Enter')
   await page.getByRole('tab', { name: 'Equalizer' }).click()
