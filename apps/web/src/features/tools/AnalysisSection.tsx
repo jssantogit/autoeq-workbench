@@ -59,6 +59,8 @@ export function AnalysisSection({ derived }: { derived: WorkspaceDerived }) {
       value: displayFrequency(derived.metrics?.maxAbsFrequencyHz),
     },
     { label: 'Preamp', value: displayDb(derived.preamp?.preampDb) },
+    { label: 'Active filters', value: String(filters.filter(({ enabled }) => enabled).length) },
+    { label: 'Total filters', value: String(filters.length) },
     { label: 'Solution state', value: solutionState[0]!.toUpperCase() + solutionState.slice(1) },
     { label: 'Origin', value: autoEqRun?.manifest.algorithmVersion ?? '--' },
     { label: 'Moderate cancellations', value: String(moderateCancellations) },
