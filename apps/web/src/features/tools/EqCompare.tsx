@@ -17,8 +17,6 @@ interface EqCompareProps {
   workspaceStore?: StoreApi<WorkspaceState>
 }
 
-const buttonStyle = { minHeight: 36, minWidth: 0 }
-
 export function EqCompare({
   compareStore = defaultCompareStore,
   workspaceStore = defaultWorkspaceStore,
@@ -50,27 +48,19 @@ export function EqCompare({
   }
 
   return (
-    <section
-      className="tools-section eq-compare"
-      aria-labelledby="eq-compare-heading"
-      style={{ minWidth: 0 }}
-    >
+    <section className="tools-section eq-compare" aria-labelledby="eq-compare-heading">
       <h3 id="eq-compare-heading">Compare A/B</h3>
-      <div
-        aria-label="Compare controls"
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 7 }}
-      >
-        <button className="button" type="button" style={buttonStyle} disabled={aSnapshot === undefined} onClick={() => apply(aSnapshot)}>
+      <div className="eq-compare__controls" aria-label="Compare controls">
+        <button className="button" type="button" disabled={aSnapshot === undefined} onClick={() => apply(aSnapshot)}>
           Apply A
         </button>
-        <button className="button" type="button" style={buttonStyle} disabled={bSnapshot === undefined} onClick={() => apply(bSnapshot)}>
+        <button className="button" type="button" disabled={bSnapshot === undefined} onClick={() => apply(bSnapshot)}>
           Apply B
         </button>
         <button
           type="button"
-          className="button"
+          className="button eq-compare__clear"
           aria-label="Clear history and selection"
-          style={{ ...buttonStyle, gridColumn: '1 / -1' }}
           disabled={snapshots.length === 0 && aSnapshotId === null && bSnapshotId === null}
           onClick={() => compareStore.getState().clear()}
         >
@@ -78,45 +68,47 @@ export function EqCompare({
         </button>
       </div>
 
-      <div aria-live="polite" style={{ display: 'grid', gap: 3, margin: '8px 0' }}>
-        <span>A: {aSnapshot?.summary ?? 'Not assigned'}</span>
-        <span>B: {bSnapshot?.summary ?? 'Not assigned'}</span>
-        {aSnapshot !== undefined && isCanonicalEqStateEqual(currentState, aSnapshot) && (
-          <span>Current matches A</span>
-        )}
-        {bSnapshot !== undefined && isCanonicalEqStateEqual(currentState, bSnapshot) && (
-          <span>Current matches B</span>
-        )}
+      <div className="eq-compare__status" aria-live="polite">
+        <div className="eq-compare__slot" role="group" aria-label="A comparison slot">
+          <span className="eq-compare__slot-label">A</span>
+          <span className="eq-compare__slot-value">{aSnapshot?.summary ?? 'Not assigned'}</span>
+          {aSnapshot !== undefined && isCanonicalEqStateEqual(currentState, aSnapshot) && (
+            <span className="eq-compare__current">Current matches A</span>
+          )}
+        </div>
+        <div className="eq-compare__slot" role="group" aria-label="B comparison slot">
+          <span className="eq-compare__slot-label">B</span>
+          <span className="eq-compare__slot-value">{bSnapshot?.summary ?? 'Not assigned'}</span>
+          {bSnapshot !== undefined && isCanonicalEqStateEqual(currentState, bSnapshot) && (
+            <span className="eq-compare__current">Current matches B</span>
+          )}
+        </div>
       </div>
 
       <div
+        className="eq-compare__history"
         role="region"
         aria-label="EQ snapshot history"
         tabIndex={0}
-        style={{ maxHeight: '20rem', minWidth: 0, overflowX: 'hidden', overflowY: 'auto' }}
       >
         {snapshots.length === 0 ? (
-          <p>No EQ snapshots yet.</p>
+          <p className="eq-compare__empty">No EQ snapshots yet.</p>
         ) : (
-          <ul style={{ display: 'grid', gap: 7, margin: 0, padding: 0, listStyle: 'none' }}>
+          <ul className="eq-compare__snapshots">
             {[...snapshots].reverse().map((snapshot) => {
               const assignedA = snapshot.id === aSnapshotId
               const assignedB = snapshot.id === bSnapshotId
               return (
-                <li
-                  key={snapshot.id}
-                  style={{ minWidth: 0, padding: 8, border: '1px solid var(--color-border)', borderRadius: 6 }}
-                >
-                  <div data-testid="snapshot-summary" style={{ overflowWrap: 'anywhere' }}>
+                <li className="eq-compare__snapshot" key={snapshot.id}>
+                  <div className="eq-compare__snapshot-summary" data-testid="snapshot-summary">
                     {snapshot.summary}
                   </div>
-                  <div style={{ display: 'flex', minWidth: 0, flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+                  <div className="eq-compare__snapshot-actions">
                     <button
                       type="button"
                       className="button"
                       aria-label={`Set A: ${snapshot.summary}`}
                       aria-pressed={assignedA}
-                      style={buttonStyle}
                       onClick={() => compareStore.getState().setA(snapshot.id)}
                     >
                       Set A
@@ -126,7 +118,6 @@ export function EqCompare({
                       className="button"
                       aria-label={`Set B: ${snapshot.summary}`}
                       aria-pressed={assignedB}
-                      style={buttonStyle}
                       onClick={() => compareStore.getState().setB(snapshot.id)}
                     >
                       Set B

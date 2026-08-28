@@ -57,7 +57,7 @@ export function SoundTools({ filters, preampDb, createEngine = createAudioEngine
     <section className="tools-section sound-tools" aria-labelledby="sound-tools-heading">
       <h3 id="sound-tools-heading">Sound Tools</h3>
       {owned !== null && (
-        <div style={{ display: 'grid', minWidth: 0, gap: 9 }}>
+        <div className="sound-tools__sources">
           <ToneGenerator engine={owned.engine} state={owned.state} />
           <MusicPlayer engine={owned.engine} state={owned.state} />
         </div>

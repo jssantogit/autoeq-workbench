@@ -111,8 +111,30 @@
 .graph-toolbar .miscTools .theme-toggle { margin-left: 4px; }
 .graph-toolbar button:disabled { cursor: not-allowed; opacity: 0.45; }
 
-.tools-panel { min-width: 0; padding: 10px; }
+.tools-panel { display: grid; min-width: 0; padding: 8px; }
+.tools-section { min-width: 0; border-top: 1px solid var(--color-border); padding: 10px 0; }
+.tools-section:first-child { border-top: 0; padding-top: 0; }
 .tools-section > h3 { margin: 0 0 8px; font-size: 0.84rem; }
+.tools-section--analysis > summary { cursor: pointer; color: var(--color-text-muted); font-size: 0.84rem; font-weight: 700; }
+.sound-tools__sources { display: grid; min-width: 0; gap: 9px; }
+.session-controls__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.session-controls__actions .button,
+.eq-compare .button { min-width: 0; min-height: 34px; }
+.eq-compare__controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.eq-compare__clear { grid-column: 1 / -1; }
+.eq-compare__status { display: grid; gap: 4px; margin: 8px 0; }
+.eq-compare__slot { display: grid; min-width: 0; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 6px; border-top: 1px solid var(--color-border); padding: 6px 0; }
+.eq-compare__slot:last-child { border-bottom: 1px solid var(--color-border); }
+.eq-compare__slot-label { font-weight: 700; text-align: center; }
+.eq-compare__slot-value { min-width: 0; overflow-wrap: anywhere; color: var(--color-text-muted); font-size: 0.72rem; }
+.eq-compare__current { color: var(--color-text-muted); font-size: 0.64rem; white-space: nowrap; }
+.eq-compare__history { max-height: 20rem; min-width: 0; overflow-x: hidden; overflow-y: auto; }
+.eq-compare__empty { margin: 0; padding: 8px 0; color: var(--color-text-faint); font-size: 0.72rem; }
+.eq-compare__snapshots { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.eq-compare__snapshot { min-width: 0; border: 1px solid var(--color-border); border-radius: 6px; padding: 7px; }
+.eq-compare__snapshot-summary { overflow-wrap: anywhere; font-size: 0.72rem; }
+.eq-compare__snapshot-actions { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; color: var(--color-text-muted); font-size: 0.66rem; }
+.analysis-section__details { margin-top: 8px; border-top: 1px solid var(--color-border); padding-top: 8px; }
 
 /* Source-shaped Curves manager. The table/flex geometry follows style-alt.css. */
 .manage {

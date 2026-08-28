@@ -4,6 +4,25 @@ import path from 'node:path'
 
 const fixture = (name: string) => path.join(import.meta.dirname, 'fixtures', name)
 
+function silentWav(): Buffer {
+  const sampleCount = 80
+  const dataSize = sampleCount * 2
+  const wav = Buffer.alloc(44 + dataSize)
+  wav.write('RIFF', 0, 'ascii')
+  wav.writeUInt32LE(36 + dataSize, 4)
+  wav.write('WAVEfmt ', 8, 'ascii')
+  wav.writeUInt32LE(16, 16)
+  wav.writeUInt16LE(1, 20)
+  wav.writeUInt16LE(1, 22)
+  wav.writeUInt32LE(8_000, 24)
+  wav.writeUInt32LE(16_000, 28)
+  wav.writeUInt16LE(2, 32)
+  wav.writeUInt16LE(16, 34)
+  wav.write('data', 36, 'ascii')
+  wav.writeUInt32LE(dataSize, 40)
+  return wav
+}
+
 async function importCurve(page: Page, kind: 'FR' | 'Target', filename: string) {
   await page.getByRole('button', { name: 'Import FR / Target' }).click()
   const chooserPromise = page.waitForEvent('filechooser')
@@ -195,3 +214,42 @@ for (const width of [390, 1440]) {
     expect(await panel.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
   })
 }
+
+test('Tools stays cohesive with audio, snapshots, Session, and Analysis on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 })
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Tools' }).click()
+
+  const tools = page.getByRole('region', { name: 'Tools workspace' })
+  await expect(tools.getByText('No local file selected')).toBeVisible()
+  await expect(tools.getByText('No EQ snapshots yet.')).toBeVisible()
+  await expect(tools.getByRole('button', { name: 'Export Session' })).toBeVisible()
+  await expect(tools.getByRole('button', { name: 'Import Session' })).toBeVisible()
+
+  await tools.getByLabel('Choose local audio file').setInputFiles({
+    name: 'synthetic-silence.wav',
+    mimeType: 'audio/wav',
+    buffer: silentWav(),
+  })
+  await expect(tools.getByText('synthetic-silence.wav')).toBeVisible()
+  await expect(tools.getByRole('button', { name: 'Play file' })).toBeEnabled()
+
+  await page.getByRole('tab', { name: 'Equalizer' }).click()
+  await page.getByRole('button', { name: 'Add filter' }).click()
+  await page.waitForTimeout(600)
+  await page.getByRole('tab', { name: 'Tools' }).click()
+  await expect(tools.getByRole('listitem')).toHaveCount(1)
+  await tools.getByRole('button', { name: /^Set A:/ }).click()
+
+  await page.getByRole('tab', { name: 'Equalizer' }).click()
+  await page.getByLabel('Filter 1 gain dB').fill('2')
+  await page.getByLabel('Filter 1 gain dB').press('Enter')
+  await page.waitForTimeout(600)
+  await page.getByRole('tab', { name: 'Tools' }).click()
+  await expect(tools.getByRole('listitem')).toHaveCount(2)
+
+  const analysis = tools.getByText('Analysis', { exact: true }).locator('..')
+  await tools.getByText('Analysis', { exact: true }).click()
+  await expect(analysis).toHaveAttribute('open', '')
+  expect(await tools.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
+})

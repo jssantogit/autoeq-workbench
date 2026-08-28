@@ -66,8 +66,10 @@ describe('EqCompare', () => {
     render(<EqCompare compareStore={compare} workspaceStore={workspace} />)
 
     const history = screen.getByRole('region', { name: 'EQ snapshot history' })
-    expect(history).toHaveStyle({ maxHeight: '20rem', overflowY: 'auto' })
+    expect(history).toHaveClass('eq-compare__history')
     expect(history).toHaveAttribute('tabindex', '0')
+    expect(within(screen.getByRole('group', { name: 'A comparison slot' })).getByText('Not assigned')).toBeVisible()
+    expect(within(screen.getByRole('group', { name: 'B comparison slot' })).getByText('Not assigned')).toBeVisible()
     expect(within(history).getAllByTestId('snapshot-summary').map((node) => node.textContent)).toEqual([
       expect.stringContaining('+4.0 dB'),
       expect.stringContaining('+1.0 dB'),
@@ -83,8 +85,8 @@ describe('EqCompare', () => {
 
     expect(within(rows[0]!).getByText('Assigned A')).toBeVisible()
     expect(within(rows[1]!).getByText('Assigned B')).toBeVisible()
-    expect(screen.getByText(/A:.*\+4\.0 dB/)).toBeVisible()
-    expect(screen.getByText(/B:.*\+1\.0 dB/)).toBeVisible()
+    expect(within(screen.getByRole('group', { name: 'A comparison slot' })).getByText(/\+4\.0 dB/)).toBeVisible()
+    expect(within(screen.getByRole('group', { name: 'B comparison slot' })).getByText(/\+1\.0 dB/)).toBeVisible()
     expect(screen.getByRole('button', { name: 'Apply A' })).toBeEnabled()
     expect(screen.getByRole('button', { name: 'Apply B' })).toBeEnabled()
 
@@ -106,9 +108,10 @@ describe('EqCompare', () => {
 
     render(<EqCompare compareStore={compare} workspaceStore={workspace} />)
 
-    expect(screen.getByText('Current matches A')).toBeVisible()
+    const aSlot = screen.getByRole('group', { name: 'A comparison slot' })
+    expect(within(aSlot).getByText('Current matches A')).toBeVisible()
     act(() => workspace.getState().updateFilter(baseFilter.id, { q: 2 }))
-    expect(screen.queryByText('Current matches A')).not.toBeInTheDocument()
+    expect(within(aSlot).queryByText('Current matches A')).not.toBeInTheDocument()
   })
 
   it('suppresses recording before one atomic apply, then supports deterministic undo and redo', () => {
