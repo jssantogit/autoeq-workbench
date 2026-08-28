@@ -1,6 +1,7 @@
 import { createLogGrid } from './grid.js'
 import { interpolateLogFrequency } from './interpolate.js'
 import { calculateSquiglinkLoudnessOffset } from './loudnessNormalize.js'
+import { MVP_NUMERIC_POLICY } from '../config/numericPolicy.js'
 import { CoreError } from '../types/error.js'
 import type { CurvePoint, Normalization } from '../types/curve.js'
 
@@ -30,9 +31,11 @@ export function normalizationOffset(
   // Validate points coverage and requested anchor frequency using interpolateLogFrequency
   interpolateLogFrequency(points, [normalization.frequencyHz])
 
-  const minHz = points[0]!.frequencyHz
-  const maxHz = points[points.length - 1]!.frequencyHz
-  const gridFrequencies = createLogGrid(minHz, maxHz, 48)
+  const gridFrequencies = createLogGrid(
+    MVP_NUMERIC_POLICY.minFrequencyHz,
+    MVP_NUMERIC_POLICY.maxFrequencyHz,
+    48,
+  )
   const gridDb = interpolateLogFrequency(points, gridFrequencies)
   const gridPoints: CurvePoint[] = gridFrequencies.map((frequencyHz, index) => ({
     frequencyHz,

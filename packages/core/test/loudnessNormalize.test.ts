@@ -305,6 +305,27 @@ describe('dB mode normalization and relative recentering', () => {
     expect(densePoints).toEqual(denseCopy)
   })
 
+  it('ignores samples outside the fixed Workbench frequency domain', () => {
+    const inDomainPoints: CurvePoint[] = [
+      { frequencyHz: 20, db: 60 },
+      { frequencyHz: 100, db: 64 },
+      { frequencyHz: 1000, db: 62 },
+      { frequencyHz: 10_000, db: 58 },
+      { frequencyHz: 20_000, db: 55 },
+    ]
+    const extendedPoints: CurvePoint[] = [
+      { frequencyHz: 10, db: 120 },
+      ...inDomainPoints,
+      { frequencyHz: 40_000, db: 120 },
+    ]
+    const norm: Normalization = { mode: 'db', frequencyHz: 500, levelDb: 60 }
+
+    expect(normalizationOffset(extendedPoints, norm)).toBeCloseTo(
+      normalizationOffset(inDomainPoints, norm),
+      12,
+    )
+  })
+
   it('matches the direct pinned-source reference evaluated on the canonical grid', () => {
     const canonicalGrid = createLogGrid(20, 20_000, 48)
     const canonicalPoints: CurvePoint[] = canonicalGrid.map((frequencyHz) => ({
