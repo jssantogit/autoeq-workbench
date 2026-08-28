@@ -39,7 +39,17 @@ describe('GraphToolbar', () => {
 
     const toolbar = screen.getByRole('toolbar', { name: 'Graph tools' })
     const themeToggle = within(toolbar).getByRole('button', { name: 'Switch to dark theme' })
-    expect(toolbar.firstElementChild).toBe(themeToggle)
+    expect([...toolbar.children].slice(0, 4).map((element) => element.className)).toEqual([
+      'miscTools',
+      'zoom',
+      'normalize',
+      'smooth',
+    ])
+    const primaryActions = toolbar.querySelector('.miscTools')!
+    expect([...primaryActions.querySelectorAll('button')].map((button) =>
+      button.getAttribute('aria-label') ?? button.textContent
+    )).toEqual(['Inspect', 'Label', 'Screenshot', 'Recolor', 'Switch to dark theme'])
+    expect(primaryActions.lastElementChild).toBe(themeToggle)
     expect(within(toolbar).getByRole('button', { name: 'Bass' })).toBeInTheDocument()
     expect(within(toolbar).getByRole('button', { name: 'Mids' })).toBeInTheDocument()
     expect(within(toolbar).getByRole('button', { name: 'Treble' })).toBeInTheDocument()

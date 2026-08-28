@@ -66,7 +66,13 @@ export function GraphToolbar() {
 
   return (
     <div className="tools graph-toolbar" role="toolbar" aria-label="Graph tools">
-      <ThemeToggle />
+      <div className="miscTools">
+        <button type="button" aria-pressed={inspectorEnabled} onClick={toggleInspector}>Inspect</button>
+        <button type="button" aria-pressed={labelsEnabled} onClick={toggleLabels}>Label</button>
+        <button type="button" disabled={screenshotPending} title={screenshotStatus || 'Download graph screenshot'} onClick={() => void takeScreenshot()}>Screenshot</button>
+        <button type="button" onClick={recolorVisibleFrs}>Recolor</button>
+        <ThemeToggle />
+      </div>
       <div className="zoom" role="group" aria-label="Zoom">
         <span>Zoom:</span>
         <button type="button" aria-pressed={graphZoomPreset === 'bass'} onClick={() => toggleZoom('bass')}>Bass</button>
@@ -83,12 +89,6 @@ export function GraphToolbar() {
           validate={(value) => Number.isFinite(value) && value >= 0}
           onValueChange={setSmoothingLevel}
         />
-      </div>
-      <div className="miscTools">
-        <button type="button" aria-pressed={inspectorEnabled} onClick={toggleInspector}>Inspect</button>
-        <button type="button" aria-pressed={labelsEnabled} onClick={toggleLabels}>Label</button>
-        <button type="button" disabled={screenshotPending} title={screenshotStatus || 'Download graph screenshot'} onClick={() => void takeScreenshot()}>Screenshot</button>
-        <button type="button" onClick={recolorVisibleFrs}>Recolor</button>
       </div>
       <span className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
         {screenshotStatus}
