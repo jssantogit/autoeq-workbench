@@ -73,6 +73,14 @@ test('authoritative Workbench workflow survives export and Session restore', asy
   await expect(normalize.getByLabel('Normalize dB')).toHaveValue('60')
 
   await page.getByRole('tab', { name: 'Equalizer' }).click()
+  await expect(page.getByRole('button', { name: 'Settings' })).toBeVisible()
+  await expect(page.getByText('Constraints', { exact: true })).toHaveCount(0)
+  await expect(page.getByText(/\/ 64 filters/)).toHaveCount(0)
+  expect(await page.getByLabel('Export format').getByRole('option').allTextContents()).toEqual([
+    'Equalizer APO',
+    'Poweramp',
+    'Wavelet',
+  ])
   await page.getByRole('button', { name: 'Add filter' }).click()
   await page.getByLabel('Filter 1 frequency Hz').fill('750')
   await page.getByLabel('Filter 1 frequency Hz').press('Enter')
@@ -84,6 +92,8 @@ test('authoritative Workbench workflow survives export and Session restore', asy
 
   const autoEq = page.getByRole('button', { name: 'AutoEQ', exact: true })
   await autoEq.click()
+  await expect(page.getByRole('status', { name: 'AutoEQ running' })).toContainText(/^\d{2}:\d{2}$/)
+  await expect(page.getByRole('button', { name: 'Cancel' })).toBeVisible()
   await expect(page.getByLabel('Filter 1 frequency Hz')).not.toHaveValue('750', { timeout: 120_000 })
   await expect(autoEq).toHaveText('AutoEQ')
   const filterRows = page.getByRole('row', { name: /^Filter \d+$/ })
