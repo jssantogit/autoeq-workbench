@@ -36,28 +36,29 @@ export function FilterEditor() {
           {filters.length === 0 && <p className="filter-editor__empty">Add a filter to begin EQ.</p>}
         </div>
       </div>
-      <div className="filters-button filter-editor__toolbar">
-        <Button
-          className="add-filter"
-          aria-label="Add filter"
-          disabled={atLimit}
-          title="Add PK filter"
-          onClick={() => addFilter('PK')}
-        >+</Button>
-        <Button
-          className="remove-filter"
-          aria-label="Remove selected filter"
-          disabled={selectedFilterId === null}
-          title={selectedFilterId === null ? 'Select a filter to remove it' : 'Remove selected filter'}
-          onClick={() => selectedFilterId !== null && removeFilter(selectedFilterId)}
-        >-</Button>
-        <Button className="sort-filters" aria-label="Sort filters" onClick={sortFilters}>Sort</Button>
-        <Button disabled={!canUndo} onClick={undo}>Undo</Button>
-        <Button disabled={!canRedo} onClick={redo}>Redo</Button>
+      <div className="filter-editor__toolbar">
+        <div className="filter-editor__operations" role="group" aria-label="Filter operations">
+          <Button
+            className="add-filter"
+            aria-label="Add filter"
+            disabled={atLimit}
+            title="Add PK filter"
+            onClick={() => addFilter('PK')}
+          >+</Button>
+          <Button
+            className="remove-filter"
+            aria-label="Remove selected filter"
+            disabled={selectedFilterId === null}
+            title={selectedFilterId === null ? 'Select a filter to remove it' : 'Remove selected filter'}
+            onClick={() => selectedFilterId !== null && removeFilter(selectedFilterId)}
+          >-</Button>
+          <Button className="sort-filters" aria-label="Sort filters" onClick={sortFilters}>Sort</Button>
+        </div>
+        <div className="filter-editor__history" role="group" aria-label="Filter history">
+          <Button disabled={!canUndo} onClick={undo}>Undo</Button>
+          <Button disabled={!canRedo} onClick={redo}>Redo</Button>
+        </div>
       </div>
-      <p className="filter-editor__count" role="status">
-        {filters.length} / {AUTOEQ_PRODUCT_LIMITS.hardMaxFilters} filters
-      </p>
     </div>
   )
 }

@@ -6,18 +6,19 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { workspaceStore } from '../../state/workspaceStore'
-import { AutoEqConstraints } from './AutoEqConstraints'
+import { AutoEqSettings } from './AutoEqSettings'
 
-describe('AutoEqConstraints', () => {
+describe('AutoEqSettings', () => {
   beforeEach(() => {
     workspaceStore.setState({ autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS } })
   })
 
   it('edits the existing seven validated AutoEqSettings fields', async () => {
     const user = userEvent.setup()
-    render(<AutoEqConstraints />)
+    render(<AutoEqSettings />)
 
     expect(screen.getAllByRole('spinbutton')).toHaveLength(7)
+    expect(screen.getAllByRole('columnheader').map(({ textContent }) => textContent)).toEqual(['Min', 'Max'])
     const minimumFrequency = screen.getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })
     const maximumGain = screen.getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })
     const maximumQ = screen.getByRole('spinbutton', { name: 'AutoEQ maximum Q' })
@@ -45,7 +46,7 @@ describe('AutoEqConstraints', () => {
 
   it('uses product bounds and leaves invalid cross-bound edits uncommitted', async () => {
     const user = userEvent.setup()
-    render(<AutoEqConstraints />)
+    render(<AutoEqSettings />)
 
     const minimumFrequency = screen.getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })
     const minimumGain = screen.getByRole('spinbutton', { name: 'AutoEQ minimum gain dB' })

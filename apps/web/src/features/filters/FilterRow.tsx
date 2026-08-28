@@ -21,7 +21,6 @@ export function FilterRow({ filter, index, selected }: FilterRowProps) {
   const className = [
     'filter',
     'filter-row',
-    selected && 'filter-row--selected',
     !filter.enabled && 'filter-row--disabled',
   ].filter(Boolean).join(' ')
 

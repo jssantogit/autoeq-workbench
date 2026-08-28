@@ -3,7 +3,7 @@ import { Button } from '../../components/ui/Button'
 import { cancelAutoEq, runAutoEq } from '../../state/autoeqController'
 import { useAutoEqRunStore } from '../../state/autoeqRunStore'
 import { type WorkspaceDerived, useWorkspaceStore } from '../../state/workspaceStore'
-import { AutoEqConstraints } from './AutoEqConstraints'
+import { AutoEqSettings } from './AutoEqSettings'
 import { FilterEditor } from './FilterEditor'
 import { FilterIoControls } from './FilterIoControls'
 
@@ -21,9 +21,20 @@ export function EqualizerTab({ derived }: { derived: WorkspaceDerived }) {
 
   return (
     <section className="equalizer-tab extra-eq" aria-label="Equalizer workspace">
-      <h3>Parametric Equalizer</h3>
+      <div className="equalizer-heading">
+        <h3>Parametric Equalizer</h3>
+        <Button
+          className="autoeq-settings-toggle"
+          aria-expanded={settingsOpen}
+          aria-controls="autoeq-settings"
+          onClick={() => setSettingsOpen((open) => !open)}
+        >
+          Settings
+        </Button>
+      </div>
+      {settingsOpen && <AutoEqSettings />}
       <div className="select-eq-phone" role="group" aria-label="Equalizer profile">
-        <label>
+        <label className="select-eq-phone__fr">
           <span>FR</span>
           <select
             name="phone"
@@ -37,40 +48,32 @@ export function EqualizerTab({ derived }: { derived: WorkspaceDerived }) {
             {frCurves.map((curve) => <option key={curve.id} value={curve.id}>{curve.name}</option>)}
           </select>
         </label>
-        <label>
-          <span>Target</span>
-          <select
-            name="target"
-            value={activeTargetId ?? ''}
-            disabled={targetCurves.length === 0}
-            onChange={(event) => setActiveTarget(event.target.value)}
+        <div className="target-autoeq" role="group" aria-label="Target and AutoEQ">
+          <label>
+            <span>Target</span>
+            <select
+              name="target"
+              value={activeTargetId ?? ''}
+              disabled={targetCurves.length === 0}
+              onChange={(event) => setActiveTarget(event.target.value)}
+            >
+              {targetCurves.length === 0
+                ? <option value="">No Target loaded</option>
+                : activeTargetId === null && <option value="">Select Target</option>}
+              {targetCurves.map((curve) => <option key={curve.id} value={curve.id}>{curve.name}</option>)}
+            </select>
+          </label>
+          <Button
+            className={`autoeq${runStatus === 'running' ? ' autoeq--running' : ''}`}
+            disabled={runStatus !== 'running' && derived.status !== 'ready'}
+            onClick={runStatus === 'running' ? cancelAutoEq : () => void runAutoEq()}
           >
-            {targetCurves.length === 0
-              ? <option value="">No Target loaded</option>
-              : activeTargetId === null && <option value="">Select Target</option>}
-            {targetCurves.map((curve) => <option key={curve.id} value={curve.id}>{curve.name}</option>)}
-          </select>
-        </label>
+            {runStatus === 'running' ? 'Cancel' : 'AutoEQ'}
+          </Button>
+        </div>
       </div>
       <FilterEditor />
-      {settingsOpen && <AutoEqConstraints />}
-      <div className="filters-button filters-button--source-actions">
-        <Button
-          className={`autoeq${runStatus === 'running' ? ' autoeq--running' : ''}`}
-          disabled={runStatus !== 'running' && derived.status !== 'ready'}
-          onClick={runStatus === 'running' ? cancelAutoEq : () => void runAutoEq()}
-        >
-          {runStatus === 'running' ? 'Cancel' : 'AutoEQ'}
-        </Button>
-        <Button
-          className="autoeq-settings-toggle"
-          aria-label="AutoEQ settings"
-          aria-expanded={settingsOpen}
-          aria-controls="autoeq-settings"
-          onClick={() => setSettingsOpen((open) => !open)}
-        >
-          Constraints
-        </Button>
+      <div className="filter-io-actions">
         <FilterIoControls />
       </div>
       {runError !== null && (

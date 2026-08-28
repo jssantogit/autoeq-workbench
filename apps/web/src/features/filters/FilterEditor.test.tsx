@@ -125,18 +125,19 @@ describe('FilterEditor', () => {
     expect(workspaceStore.getState().filters[0]?.gainDb).toBe(3)
   })
 
-  it('marks selected and disabled filters without relying on color alone', () => {
+  it('keeps selected filters semantic without adding a visual highlight', () => {
     workspaceStore.setState({ filters: [{ ...filter, enabled: false }], selectedFilterId: filter.id })
     render(<FilterEditor />)
     const row = screen.getByRole('row', { name: /filter 1/i })
 
-    expect(row).toHaveClass('filter-row--selected', 'filter-row--disabled')
+    expect(row).not.toHaveClass('filter-row--selected')
+    expect(row).toHaveClass('filter-row--disabled')
     expect(row).toHaveAttribute('data-selected', 'true')
     expect(row).toHaveAttribute('data-enabled', 'false')
     expect(row).toHaveAttribute('aria-selected', 'true')
   })
 
-  it('uses the product hard filter limit in controls and status', () => {
+  it('uses the product hard filter limit without exposing a hard-limit counter', () => {
     workspaceStore.setState({
       filters: Array.from({ length: AUTOEQ_PRODUCT_LIMITS.hardMaxFilters }, (_, index) => ({
         ...filter,
@@ -146,6 +147,6 @@ describe('FilterEditor', () => {
     render(<FilterEditor />)
 
     expect(screen.getByRole('button', { name: 'Add filter' })).toBeDisabled()
-    expect(screen.getByText(`${AUTOEQ_PRODUCT_LIMITS.hardMaxFilters} / ${AUTOEQ_PRODUCT_LIMITS.hardMaxFilters} filters`)).toBeVisible()
+    expect(screen.queryByText(/\/ 64 filters/)).not.toBeInTheDocument()
   })
 })

@@ -89,12 +89,15 @@ describe('EqualizerTab', () => {
     expect(within(panel).getByRole('button', { name: 'Add filter' })).toHaveTextContent('+')
     expect(within(panel).getByRole('button', { name: 'Remove selected filter' })).toHaveTextContent('-')
     expect(within(panel).getByRole('button', { name: 'Sort filters' })).toBeVisible()
-    expect(within(panel).getByRole('button', { name: 'AutoEQ settings' })).toBeVisible()
+    expect(within(panel).getByRole('button', { name: 'Settings' })).toBeVisible()
     expect(within(panel).getByRole('button', { name: 'AutoEQ' })).toBeDisabled()
     expect(within(panel).getByRole('button', { name: 'Import' })).toBeVisible()
     expect(within(panel).getByRole('combobox', { name: 'Export format' })).toBeVisible()
+    expect(within(panel).getByRole('combobox', { name: 'Export format' })).toHaveTextContent(
+      'Equalizer APOPowerampWavelet',
+    )
     expect(within(panel).getByRole('button', { name: 'Export' })).toBeDisabled()
-    expect(within(panel).getByText('0 / 64 filters')).toBeVisible()
+    expect(within(panel).queryByText(/\/ 64 filters/)).not.toBeInTheDocument()
   })
 
   it('lists profiles separately and updates canonical active IDs', async () => {
@@ -138,7 +141,7 @@ describe('EqualizerTab', () => {
     expect(screen.queryByText('Standard')).not.toBeInTheDocument()
     expect(screen.queryByRole('region', { name: 'AutoEQ Settings' })).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'AutoEQ settings' }))
+    await user.click(screen.getByRole('button', { name: 'Settings' }))
     expect(screen.getAllByRole('region', { name: 'AutoEQ Settings' })).toHaveLength(1)
   })
 
@@ -206,7 +209,7 @@ describe('EqualizerTab', () => {
   it('toggles the validated constraints control', async () => {
     const user = userEvent.setup()
     renderEqualizer()
-    const toggle = screen.getByRole('button', { name: 'AutoEQ settings' })
+    const toggle = screen.getByRole('button', { name: 'Settings' })
 
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
     expect(screen.queryByRole('region', { name: 'AutoEQ Settings' })).not.toBeInTheDocument()

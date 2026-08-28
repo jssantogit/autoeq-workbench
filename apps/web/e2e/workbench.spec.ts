@@ -158,3 +158,40 @@ for (const width of [360, 390]) {
     expect((await firstRow.boundingBox())!.height).toBeLessThanOrEqual(89)
   })
 }
+
+for (const width of [390, 1440]) {
+  test(`equalizer remains legible with zero, five, and ten filters at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/')
+    await importCurve(page, 'FR', 'source.txt')
+    await importCurve(page, 'Target', 'target.csv')
+    await page.getByRole('tab', { name: 'Equalizer' }).click()
+
+    const panel = page.getByRole('region', { name: 'Equalizer workspace' })
+    await expect(panel.getByText('Add a filter to begin EQ.')).toBeVisible()
+    await expect(panel.getByRole('button', { name: 'Settings' })).toBeVisible()
+    await expect(panel.getByRole('button', { name: 'AutoEQ' })).toBeVisible()
+    await expect(panel.getByRole('button', { name: 'Import' })).toBeVisible()
+    await expect(panel.getByRole('button', { name: 'Export' })).toBeVisible()
+
+    await panel.getByRole('button', { name: 'Settings' }).click()
+    const settings = panel.getByRole('region', { name: 'AutoEQ Settings' })
+    const targetActions = panel.getByRole('group', { name: 'Target and AutoEQ' })
+    const [settingsBox, targetBox] = await Promise.all([settings.boundingBox(), targetActions.boundingBox()])
+    expect(settingsBox).not.toBeNull()
+    expect(targetBox).not.toBeNull()
+    expect(targetBox!.y).toBeGreaterThanOrEqual(settingsBox!.y + settingsBox!.height)
+    await panel.getByRole('button', { name: 'Settings' }).click()
+
+    const add = panel.getByRole('button', { name: 'Add filter' })
+    for (let index = 0; index < 5; index += 1) await add.click()
+    await expect(panel.getByRole('row', { name: /^Filter \d+$/ })).toHaveCount(5)
+    for (let index = 0; index < 5; index += 1) await add.click()
+    const rows = panel.getByRole('row', { name: /^Filter \d+$/ })
+    await expect(rows).toHaveCount(10)
+    await rows.last().scrollIntoViewIfNeeded()
+    await expect(rows.last()).toBeVisible()
+    await expect(panel.getByRole('columnheader')).toHaveCount(4)
+    expect(await panel.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
+  })
+}

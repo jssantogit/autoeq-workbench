@@ -97,7 +97,7 @@ export function FilterIoControls() {
   }
 
   return (
-    <>
+    <div className="filter-io-controls" role="group" aria-label="Filter import and export">
       <input
         ref={inputRef}
         hidden
@@ -118,6 +118,6 @@ export function FilterIoControls() {
       </select>
       <Button className="export-filters" disabled={!hasFilters} onClick={exportFilters}>Export</Button>
       {error !== null && <p className="field-error" role="alert">{error}</p>}
-    </>
+    </div>
   )
 }
