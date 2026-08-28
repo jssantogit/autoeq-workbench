@@ -150,8 +150,8 @@ describe('App', () => {
     expect(screen.queryByText('48 kHz')).not.toBeInTheDocument()
     expect(within(tools).queryByText('Active filters')).not.toBeInTheDocument()
     expect(within(tools).queryByText('Total filters')).not.toBeInTheDocument()
-    expect(within(tools).queryByText('Solution state')).not.toBeInTheDocument()
-    expect(within(tools).queryByText('Provenance')).not.toBeInTheDocument()
+    expect(within(tools).getByText('Solution state')).toBeInTheDocument()
+    expect(within(tools).getByText('Origin')).toBeInTheDocument()
   })
 
   it('updates Equalizer, graph, and Tools consumers through canonical AutoEQ completion state', async () => {
