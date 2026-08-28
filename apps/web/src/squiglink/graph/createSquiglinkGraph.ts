@@ -229,7 +229,7 @@ export function createSquiglinkGraph(
     xGroups.attr('data-x-tick', (tick) => tick.frequencyHz)
     xGroups.select('line').attr('data-x-grid', (tick) => tick.frequencyHz)
       .attr('x1', (tick) => x(tick.frequencyHz)).attr('x2', (tick) => x(tick.frequencyHz))
-      .attr('y1', 20).attr('y2', 322)
+      .attr('y1', 10).attr('y2', 312)
       .attr('stroke', (tick) => tick.importance >= 2 ? palette.majorGrid : palette.minorGrid)
       .attr('stroke-width', (tick) => TICK_THICKNESS[tick.importance]!)
     xGroups.select('text')
@@ -286,20 +286,20 @@ export function createSquiglinkGraph(
       .attr('data-curve-label-group', (item) => item.id)
     groups.each(function renderLabel(item, index) {
       const group = select(this)
-      const labelY = PLOT_BOTTOM - (compact ? 24 : 20) - index * (compact ? 21 : 15)
+      const labelY = PLOT_BOTTOM - (compact ? 24 : 20) - index * (compact ? 14 : 15)
       group.selectAll('line').remove()
       group.selectAll<SVGTextElement, PreparedSeries>('text').data([item]).join('text')
         .attr('class', 'graph-curve-label').attr('data-curve-label', item.id)
         .attr('x', 67).attr('y', labelY).attr('fill', item.color)
-        .attr('font-size', compact ? 19 : 10).attr('font-weight', 650)
+        .attr('font-size', compact ? 11 : 10).attr('font-weight', 650)
         .style('white-space', 'pre').text(item.name)
     })
     const overflow = current.view.labelsEnabled ? prepared.length - visible.length : 0
     labelLayer.selectAll<SVGTextElement, number>('text[data-label-overflow]').data(overflow > 0 ? [overflow] : [])
       .join('text').attr('data-label-overflow', '')
       .attr('class', 'graph-curve-label graph-curve-label--overflow').attr('x', 67)
-      .attr('y', PLOT_BOTTOM - (compact ? 24 : 20) - visible.length * (compact ? 21 : 15))
-      .attr('fill', palette.axis).attr('font-size', compact ? 18 : 9)
+      .attr('y', PLOT_BOTTOM - (compact ? 24 : 20) - visible.length * (compact ? 14 : 15))
+      .attr('fill', palette.axis).attr('font-size', compact ? 10 : 9)
       .text((count) => `+${count} more`)
   }
 

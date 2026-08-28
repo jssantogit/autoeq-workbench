@@ -190,8 +190,8 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-y-label]')).toHaveAttribute('font-size', '10')
 
     const labels = [...container.querySelectorAll('[data-curve-label]')]
-    expect(labels[0]).toHaveAttribute('font-size', '19')
-    expect(Number(labels[0]!.getAttribute('y')) - Number(labels[1]!.getAttribute('y'))).toBe(21)
+    expect(labels[0]).toHaveAttribute('font-size', '11')
+    expect(Number(labels[0]!.getAttribute('y')) - Number(labels[1]!.getAttribute('y'))).toBe(14)
     expect(labels.every((label) => Number(label.getAttribute('y')) < 324)).toBe(true)
 
     fireEvent.focus(screen.getByRole('slider', { name: 'Inspect graph frequency' }))

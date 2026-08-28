@@ -29,6 +29,11 @@ describe('createSquiglinkGraph', () => {
     expect(svg.querySelectorAll('[data-graph-axis="y"]')).toHaveLength(1)
     expect(svg.querySelectorAll('[data-x-grid]')).toHaveLength(25)
     expect(svg.querySelectorAll('[data-y-grid]')).toHaveLength(12)
+    expect(svg.querySelector('[data-x-grid="20"]')).toHaveAttribute('y1', '10')
+    expect(svg.querySelector('[data-x-grid="20"]')).toHaveAttribute('y2', '312')
+    expect(svg.querySelector('[data-x-tick="40"] text')).toHaveAttribute('font-size', '8.6')
+    expect(svg.querySelector('[data-y-label="25"]')).toHaveAttribute('x', '18')
+    expect(svg.querySelector('[data-y-label="25"]')).toHaveAttribute('dy', '-2')
     expect([...svg.querySelectorAll('[data-series-name]')].map((path) =>
       path.getAttribute('data-series-name'))).toEqual(['FR', 'Target'])
 
