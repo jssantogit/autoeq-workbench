@@ -140,8 +140,8 @@
 .manageTable colgroup { display: none; }
 .manageTable tbody.curves { display: flex; width: 100%; min-height: 0; flex: 0 1 auto; flex-direction: column; }
 .manageTable tbody.curves:empty {
-  min-height: 50px;
-  flex: 0 0 50px;
+  min-height: 44px;
+  flex: 0 0 44px;
   align-items: center;
   justify-content: center;
   border-top: 1px solid;
@@ -165,8 +165,8 @@ tbody.curves > tr > td {
   position: relative;
   display: flex;
   box-sizing: border-box;
-  min-height: 50px;
-  flex: 0 0 50px;
+  min-height: 44px;
+  flex: 0 0 44px;
   align-items: center;
   justify-content: center;
   padding: 0;
@@ -199,7 +199,7 @@ tbody.curves > tr > td.remove::before,
 tbody.curves > tr > td.button::after,
 tbody.curves > tr > td.remove::after {
   position: absolute;
-  top: 6px;
+  top: 4px;
   left: 0;
   display: block;
   box-sizing: border-box;
@@ -226,7 +226,7 @@ tbody.curves > tr > td.button > button,
 tbody.curves > tr > td.remove > button {
   position: absolute;
   z-index: 1;
-  top: 6px;
+  top: 4px;
   left: 0;
   box-sizing: border-box;
   width: 36px;
@@ -320,7 +320,6 @@ tbody.curves > tr > td.levels { order: 2; flex: 0 0 86px; padding-left: 16px; }
 }
 
 @media (max-width: 500px) {
-  tbody.curves > tr::before { order: 5; display: block; height: 0; flex: 1 1 100%; content: ''; }
   tbody.curves > tr > td.levels { order: 4; margin-right: 16px; }
   tbody.curves > tr > td.button-baseline { margin-left: auto; }
   tbody.curves > tr > td.button-baseline,
@@ -331,7 +330,7 @@ tbody.curves > tr > td.levels { order: 2; flex: 0 0 86px; padding-left: 16px; }
   width: 100%;
   flex: 0 0 auto;
   align-items: flex-start;
-  padding: 16px;
+  padding: 8px 16px;
 }
 
 .curve-import { position: relative; display: grid; width: 100%; min-width: 0; gap: 6px; }

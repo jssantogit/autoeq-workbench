@@ -12,6 +12,13 @@ async function importCurve(page: Page, kind: 'FR' | 'Target', filename: string) 
   await expect(page.getByRole('row', { name: filename })).toBeVisible()
 }
 
+async function importFr(page: Page) {
+  await page.getByRole('button', { name: 'Import FR / Target' }).click()
+  const chooserPromise = page.waitForEvent('filechooser')
+  await page.getByRole('group', { name: 'Curve type' }).getByRole('button', { name: 'FR' }).click()
+  await (await chooserPromise).setFiles(fixture('source.txt'))
+}
+
 async function downloadText(download: Download): Promise<string> {
   const filename = await download.path()
   expect(filename).not.toBeNull()
@@ -113,3 +120,41 @@ test('authoritative Workbench workflow survives export and Session restore', asy
   await expect(page.getByRole('row', { name: 'Filter 1' })).toHaveAttribute('data-enabled', 'false')
   await expect(filterRows).toHaveCount(deliveredCount)
 })
+
+for (const width of [360, 390]) {
+  test(`curve manager stays compact and operable at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.goto('/')
+    await importFr(page)
+    await importFr(page)
+    await importFr(page)
+
+    const rows = page.locator('tr.curve-manager-row')
+    await expect(rows).toHaveCount(3)
+    const firstRow = rows.first()
+    await firstRow.getByRole('button', { name: 'Rename source.txt' }).click()
+    const longName = 'A deliberately long imported source curve name over forty characters'
+    await firstRow.getByRole('textbox', { name: 'Rename source.txt' }).fill(longName)
+    await firstRow.getByRole('textbox', { name: 'Rename source.txt' }).press('Enter')
+
+    const name = firstRow.getByTitle(longName)
+    await expect(name).toHaveCSS('text-overflow', 'ellipsis')
+    await expect(name).toHaveCSS('white-space', 'nowrap')
+    for (const control of [
+      firstRow.getByLabel(`${longName} offset dB`),
+      firstRow.getByRole('button', { name: `Set ${longName} graph baseline` }),
+      firstRow.getByRole('button', { name: `Hide ${longName}` }),
+      firstRow.getByRole('button', { name: `Remove ${longName}` }),
+    ]) {
+      await expect(control).toBeVisible()
+      const [rowBox, controlBox] = await Promise.all([firstRow.boundingBox(), control.boundingBox()])
+      expect(rowBox).not.toBeNull()
+      expect(controlBox).not.toBeNull()
+      expect(controlBox!.x).toBeGreaterThanOrEqual(rowBox!.x)
+      expect(controlBox!.x + controlBox!.width).toBeLessThanOrEqual(rowBox!.x + rowBox!.width)
+      expect(controlBox!.y).toBeGreaterThanOrEqual(rowBox!.y)
+      expect(controlBox!.y + controlBox!.height).toBeLessThanOrEqual(rowBox!.y + rowBox!.height)
+    }
+    expect((await firstRow.boundingBox())!.height).toBeLessThanOrEqual(89)
+  })
+}
