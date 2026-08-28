@@ -16,7 +16,6 @@ export function AutoEqRunControl({ disabled }: { disabled: boolean }) {
 
   useEffect(() => {
     if (status !== 'running') return
-    setNowMs(performance.now())
     const interval = window.setInterval(() => setNowMs(performance.now()), 250)
     return () => window.clearInterval(interval)
   }, [status, startedAtMs])
