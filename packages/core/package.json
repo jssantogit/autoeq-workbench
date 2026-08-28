@@ -6,12 +6,15 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "benchmark": "tsx benchmarks/run.ts",
+    "benchmark:update": "tsx benchmarks/run.ts --write-baseline",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
     "lint": "tsc --noEmit"
   },
   "devDependencies": {
+    "tsx": "^4.23.12",
     "typescript": "~6.0.2",
     "vitest": "^4.1.0"
   }

@@ -1,0 +1,385 @@
+[
+  {
+    "caseId": "flat_identity",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 61.652798000000075,
+    "maeDb": 0,
+    "rmseDb": 0,
+    "maxAbsDb": 0,
+    "filterCount": 0,
+    "maxQ": 0,
+    "maxFilterBoostDb": 0,
+    "preampDb": 0,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": []
+  },
+  {
+    "caseId": "broad_bass_shelf",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 170.27453700000012,
+    "maeDb": 0.03971859894186965,
+    "rmseDb": 0.04540792414732821,
+    "maxAbsDb": 0.0806815978661728,
+    "filterCount": 1,
+    "maxQ": 0.7,
+    "maxFilterBoostDb": 5.9,
+    "preampDb": -5.9,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": [
+      {
+        "id": "autoeq-1",
+        "enabled": true,
+        "type": "LS",
+        "frequencyHz": 119,
+        "gainDb": 5.9,
+        "q": 0.7
+      }
+    ]
+  },
+  {
+    "caseId": "single_mid_peak",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 517.7524430000001,
+    "maeDb": 0.05190838449315958,
+    "rmseDb": 0.061293683388416766,
+    "maxAbsDb": 0.2903911151493715,
+    "filterCount": 3,
+    "maxQ": 2.16,
+    "maxFilterBoostDb": 5.7,
+    "preampDb": -5.4,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": [
+      {
+        "id": "autoeq-1",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 82,
+        "gainDb": -0.7,
+        "q": 0.15
+      },
+      {
+        "id": "autoeq-2",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 1000,
+        "gainDb": 5.7,
+        "q": 2.16
+      },
+      {
+        "id": "autoeq-3",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 8666,
+        "gainDb": -0.7,
+        "q": 0.18
+      }
+    ]
+  },
+  {
+    "caseId": "vocal_multi_feature",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 2089.425443,
+    "maeDb": 0.10549096278318928,
+    "rmseDb": 0.12518090030050652,
+    "maxAbsDb": 0.3020135381982535,
+    "filterCount": 5,
+    "maxQ": 2.62,
+    "maxFilterBoostDb": 5.7,
+    "preampDb": -5.7,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": [
+      {
+        "id": "autoeq-1",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 41,
+        "gainDb": 1.1,
+        "q": 0.37
+      },
+      {
+        "id": "autoeq-2",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 296,
+        "gainDb": -2.4,
+        "q": 1.95
+      },
+      {
+        "id": "autoeq-3",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 1494,
+        "gainDb": 5.7,
+        "q": 1.62
+      },
+      {
+        "id": "autoeq-4",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 3490,
+        "gainDb": -3.5,
+        "q": 2.62
+      },
+      {
+        "id": "autoeq-5",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 13554,
+        "gainDb": 1.1,
+        "q": 0.28
+      }
+    ]
+  },
+  {
+    "caseId": "irregular_treble",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 696.3115000000003,
+    "maeDb": 0.02982562613776251,
+    "rmseDb": 0.0575293843042914,
+    "maxAbsDb": 0.22816516073720938,
+    "filterCount": 3,
+    "maxQ": 3.47,
+    "maxFilterBoostDb": 4,
+    "preampDb": -3.8,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": [
+      {
+        "id": "autoeq-1",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 6025,
+        "gainDb": 4,
+        "q": 2.64
+      },
+      {
+        "id": "autoeq-2",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 8990,
+        "gainDb": -4.9,
+        "q": 3.47
+      },
+      {
+        "id": "autoeq-3",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 12904,
+        "gainDb": 3.2,
+        "q": 2.22
+      }
+    ]
+  },
+  {
+    "caseId": "narrow_feature",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 383.4250460000003,
+    "maeDb": 0.04316472036553759,
+    "rmseDb": 0.15081640261325777,
+    "maxAbsDb": 1.7910039348873816,
+    "filterCount": 1,
+    "maxQ": 6.94,
+    "maxFilterBoostDb": 6.2,
+    "preampDb": -6.2,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": [
+      {
+        "id": "autoeq-1",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 2498,
+        "gainDb": 6.2,
+        "q": 6.94
+      }
+    ]
+  },
+  {
+    "caseId": "filter_budget",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 604.2093750000004,
+    "maeDb": 0.7440040610453453,
+    "rmseDb": 1.1319415402242152,
+    "maxAbsDb": 3.4274150546709445,
+    "filterCount": 3,
+    "maxQ": 1.78,
+    "maxFilterBoostDb": 3.5,
+    "preampDb": -3.1,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": [
+      {
+        "id": "autoeq-1",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 262,
+        "gainDb": -4.4,
+        "q": 1.78
+      },
+      {
+        "id": "autoeq-2",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 809,
+        "gainDb": 3.5,
+        "q": 1.26
+      },
+      {
+        "id": "autoeq-3",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 2392,
+        "gainDb": -5.2,
+        "q": 1.56
+      }
+    ]
+  },
+  {
+    "caseId": "quantization_sensitive",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 81.9385599999996,
+    "maeDb": 0.37793528786477465,
+    "rmseDb": 0.4074880954222698,
+    "maxAbsDb": 0.4973707188915929,
+    "filterCount": 1,
+    "maxQ": 1.76,
+    "maxFilterBoostDb": 4,
+    "preampDb": -4,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": [
+      {
+        "id": "autoeq-1",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 1235,
+        "gainDb": 4,
+        "q": 1.76
+      }
+    ]
+  },
+  {
+    "caseId": "preamp_overlap",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 2801.3261250000005,
+    "maeDb": 0.12478252568700204,
+    "rmseDb": 0.14909919378034073,
+    "maxAbsDb": 0.48436911374827085,
+    "filterCount": 6,
+    "maxQ": 2.67,
+    "maxFilterBoostDb": 2.2,
+    "preampDb": -1,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": [
+      {
+        "id": "autoeq-1",
+        "enabled": true,
+        "type": "LS",
+        "frequencyHz": 82,
+        "gainDb": 1,
+        "q": 0.7
+      },
+      {
+        "id": "autoeq-2",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 203,
+        "gainDb": -3,
+        "q": 0.94
+      },
+      {
+        "id": "autoeq-3",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 493,
+        "gainDb": 1.3,
+        "q": 2.67
+      },
+      {
+        "id": "autoeq-4",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 1576,
+        "gainDb": 2.2,
+        "q": 2.5
+      },
+      {
+        "id": "autoeq-5",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 4688,
+        "gainDb": -4.1,
+        "q": 0.25
+      },
+      {
+        "id": "autoeq-6",
+        "enabled": true,
+        "type": "HS",
+        "frequencyHz": 12243,
+        "gainDb": -3.3,
+        "q": 0.7
+      }
+    ]
+  },
+  {
+    "caseId": "opposing_filters_pressure",
+    "algorithmVersion": "standard-v1",
+    "elapsedMs": 3127.556509,
+    "maeDb": 0.07410438358713266,
+    "rmseDb": 0.0957036154444386,
+    "maxAbsDb": 0.3911615218760449,
+    "filterCount": 5,
+    "maxQ": 2.67,
+    "maxFilterBoostDb": 6.4,
+    "preampDb": -5.3,
+    "moderateCancellations": 0,
+    "strongCancellations": 0,
+    "filters": [
+      {
+        "id": "autoeq-1",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 71,
+        "gainDb": -0.7,
+        "q": 0.18
+      },
+      {
+        "id": "autoeq-2",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 964,
+        "gainDb": 6.4,
+        "q": 2.67
+      },
+      {
+        "id": "autoeq-3",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 1358,
+        "gainDb": -4.5,
+        "q": 2.41
+      },
+      {
+        "id": "autoeq-4",
+        "enabled": true,
+        "type": "PK",
+        "frequencyHz": 3494,
+        "gainDb": 3.5,
+        "q": 1.52
+      },
+      {
+        "id": "autoeq-5",
+        "enabled": true,
+        "type": "HS",
+        "frequencyHz": 8409,
+        "gainDb": -0.6,
+        "q": 0.7
+      }
+    ]
+  }
+]
