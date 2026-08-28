@@ -10,6 +10,7 @@ export type { AutoEqPublicError }
 export interface AutoEqRunUiState {
   status: AutoEqRunStatus
   activeRunId: string | null
+  startedAtMs: number | null
   error: AutoEqPublicError | null
 }
 
@@ -26,18 +27,19 @@ export interface AutoEqRunState extends AutoEqRunUiState {
 const idleState: AutoEqRunUiState = {
   status: 'idle',
   activeRunId: null,
+  startedAtMs: null,
   error: null,
 }
 
-export function createAutoEqRunStore() {
+export function createAutoEqRunStore(now: () => number = () => performance.now()) {
   return createStore<AutoEqRunState>()((set) => ({
     ...idleState,
-    start: (activeRunId) => set({ status: 'running', activeRunId, error: null }),
+    start: (activeRunId) => set({ status: 'running', activeRunId, startedAtMs: now(), error: null }),
     finish: (runId) => set((state) => state.activeRunId === runId ? idleState : state),
     fail: (runId, error) => set((state) => state.activeRunId === runId
-      ? { status: 'error', activeRunId: null, error: { ...error } }
+      ? { status: 'error', activeRunId: null, startedAtMs: null, error: { ...error } }
       : state),
-    reject: (error) => set({ status: 'error', activeRunId: null, error: { ...error } }),
+    reject: (error) => set({ status: 'error', activeRunId: null, startedAtMs: null, error: { ...error } }),
     cancel: (runId) => set((state) => state.activeRunId === runId ? idleState : state),
     dismissError: () => set(idleState),
     reset: () => set(idleState),

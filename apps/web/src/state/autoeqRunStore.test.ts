@@ -4,17 +4,18 @@ import { createAutoEqRunStore } from './autoeqRunStore'
 
 describe('AutoEQ transient run store', () => {
   it('transitions idle to running to idle on success', () => {
-    const store = createAutoEqRunStore()
+    const store = createAutoEqRunStore(() => 1_250)
 
     store.getState().start('run-1')
     expect(store.getState()).toMatchObject({
       status: 'running',
       activeRunId: 'run-1',
+      startedAtMs: 1_250,
       error: null,
     })
 
     store.getState().finish('run-1')
-    expect(store.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
+    expect(store.getState()).toMatchObject({ status: 'idle', activeRunId: null, startedAtMs: null, error: null })
   })
 
   it('transitions idle to running to a structured error without an active run', () => {
@@ -29,6 +30,7 @@ describe('AutoEQ transient run store', () => {
     expect(store.getState()).toMatchObject({
       status: 'error',
       activeRunId: null,
+      startedAtMs: null,
       error: { category: 'validation', message: 'Synthetic input is not ready.' },
     })
   })
@@ -37,11 +39,11 @@ describe('AutoEQ transient run store', () => {
     const store = createAutoEqRunStore()
     store.getState().reject({ category: 'numeric', message: 'Synthetic numeric failure.' })
     store.getState().dismissError()
-    expect(store.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
+    expect(store.getState()).toMatchObject({ status: 'idle', activeRunId: null, startedAtMs: null, error: null })
 
     store.getState().start('run-2')
     store.getState().reset()
-    expect(store.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
+    expect(store.getState()).toMatchObject({ status: 'idle', activeRunId: null, startedAtMs: null, error: null })
   })
 
   it('returns cancellation to idle without an error banner', () => {
@@ -50,20 +52,24 @@ describe('AutoEQ transient run store', () => {
 
     store.getState().cancel('run-1')
 
-    expect(store.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
+    expect(store.getState()).toMatchObject({ status: 'idle', activeRunId: null, startedAtMs: null, error: null })
   })
 
   it('ignores terminal state from a replaced run', () => {
-    const store = createAutoEqRunStore()
+    let now = 100
+    const store = createAutoEqRunStore(() => now)
     store.getState().start('run-1')
+    now = 200
     store.getState().start('run-2')
 
     store.getState().fail('run-1', { category: 'optimization', message: 'Late failure.' })
     store.getState().finish('run-1')
+    store.getState().cancel('run-1')
 
     expect(store.getState()).toMatchObject({
       status: 'running',
       activeRunId: 'run-2',
+      startedAtMs: 200,
       error: null,
     })
   })

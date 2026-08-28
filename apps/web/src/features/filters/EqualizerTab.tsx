@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { Button } from '../../components/ui/Button'
-import { cancelAutoEq, runAutoEq } from '../../state/autoeqController'
 import { useAutoEqRunStore } from '../../state/autoeqRunStore'
 import { type WorkspaceDerived, useWorkspaceStore } from '../../state/workspaceStore'
+import { AutoEqRunControl } from './AutoEqRunControl'
 import { AutoEqSettings } from './AutoEqSettings'
 import { FilterEditor } from './FilterEditor'
 import { FilterIoControls } from './FilterIoControls'
 
 export function EqualizerTab({ derived }: { derived: WorkspaceDerived }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const runStatus = useAutoEqRunStore((state) => state.status)
   const runError = useAutoEqRunStore((state) => state.error)
   const curves = useWorkspaceStore((state) => state.curves)
   const activeFrId = useWorkspaceStore((state) => state.activeFrId)
@@ -63,13 +62,7 @@ export function EqualizerTab({ derived }: { derived: WorkspaceDerived }) {
               {targetCurves.map((curve) => <option key={curve.id} value={curve.id}>{curve.name}</option>)}
             </select>
           </label>
-          <Button
-            className={`autoeq${runStatus === 'running' ? ' autoeq--running' : ''}`}
-            disabled={runStatus !== 'running' && derived.status !== 'ready'}
-            onClick={runStatus === 'running' ? cancelAutoEq : () => void runAutoEq()}
-          >
-            {runStatus === 'running' ? 'Cancel' : 'AutoEQ'}
-          </Button>
+          <AutoEqRunControl disabled={derived.status !== 'ready'} />
         </div>
       </div>
       <FilterEditor />

@@ -227,6 +227,16 @@ select:focus-visible,
 .file-control input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .field-error { margin: 8px 0 0; color: var(--color-danger); font-size: 0.72rem; }
 .autoeq--running { border-color: var(--color-danger); color: var(--color-danger); }
+.autoeq-run-control,
+.autoeq-run-status { display: inline-flex; align-items: center; gap: 6px; }
+.autoeq-run-status { color: var(--color-text-muted); font: 0.68rem ui-monospace, "SFMono-Regular", Consolas, monospace; white-space: nowrap; }
+.autoeq-run-spinner { width: 12px; height: 12px; box-sizing: border-box; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: autoeq-spin 700ms linear infinite; }
+
+@keyframes autoeq-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .autoeq-run-spinner { border-top-color: currentColor; animation: none; }
+}
 .autoeq-error { margin: 6px 0 0; color: var(--color-danger); font-size: 0.72rem; line-height: 1.35; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 
