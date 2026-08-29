@@ -16,6 +16,25 @@ export function getExportFilenameBase(
   return safeFilenameBase(name ?? fallback).trim() || fallback
 }
 
+interface FilterExportFilenameContext {
+  activeFrName: string | null | undefined
+  filterProvenance: 'manual' | 'autoeq' | null
+  autoEqRun: { manifest: { sourceName: string; targetName: string } } | null
+}
+
+export function getFilterExportFilenameBase({
+  activeFrName,
+  filterProvenance,
+  autoEqRun,
+}: FilterExportFilenameContext): string {
+  if (filterProvenance === 'autoeq' && autoEqRun !== null) {
+    const sourceName = getExportFilenameBase(autoEqRun.manifest.sourceName)
+    const targetName = getExportFilenameBase(autoEqRun.manifest.targetName)
+    return `${sourceName} - [${targetName}]`
+  }
+  return `${getExportFilenameBase(activeFrName)} - [EQ]`
+}
+
 export function safePowerampPresetName(
   name: string | null | undefined,
   fallback = 'Workbench',

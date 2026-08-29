@@ -11,7 +11,7 @@ import { type ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { downloadTextFile } from '../../squiglink/eq-io/downloadTextFile'
 import {
-  getExportFilenameBase,
+  getFilterExportFilenameBase,
   safePowerampPresetName,
 } from '../../squiglink/eq-io/exportSanitizers'
 import { useWorkspaceStore } from '../../state/workspaceStore'
@@ -22,6 +22,8 @@ export function FilterIoControls() {
   const curves = useWorkspaceStore((state) => state.curves)
   const activeFrId = useWorkspaceStore((state) => state.activeFrId)
   const filters = useWorkspaceStore((state) => state.filters)
+  const filterProvenance = useWorkspaceStore((state) => state.filterProvenance)
+  const autoEqRun = useWorkspaceStore((state) => state.autoEqRun)
   const replaceFilters = useWorkspaceStore((state) => state.replaceFiltersFromImport)
   const inputRef = useRef<HTMLInputElement>(null)
   const requestRef = useRef(0)
@@ -29,7 +31,7 @@ export function FilterIoControls() {
   const [destination, setDestination] = useState<ExportDestination>('Equalizer APO')
   const [error, setError] = useState<string | null>(null)
   const activeFrName = curves.find((curve) => curve.id === activeFrId && curve.kind === 'fr')?.name
-  const filenameBase = getExportFilenameBase(activeFrName)
+  const filenameBase = getFilterExportFilenameBase({ activeFrName, filterProvenance, autoEqRun })
   const powerampPresetName = safePowerampPresetName(activeFrName)
   const hasFilters = filters.length > 0
 
@@ -68,12 +70,12 @@ export function FilterIoControls() {
       const preampDb = calculatePreampDb(filters, MVP_NUMERIC_POLICY.sampleRateHz).preampDb
       if (destination === 'Equalizer APO') {
         downloadTextFile(
-          `${filenameBase} Equalizer APO.txt`,
+          `${filenameBase}.txt`,
           formatEqualizerApoFilters(filters, preampDb),
         )
       } else if (destination === 'Poweramp') {
         downloadTextFile(
-          `${filenameBase} Poweramp.txt`,
+          `${filenameBase}.txt`,
           formatPowerampText({
             name: powerampPresetName,
             preampDb,
@@ -82,7 +84,7 @@ export function FilterIoControls() {
         )
       } else if (destination === 'Wavelet') {
         downloadTextFile(
-          `${filenameBase} Wavelet GraphicEQ.txt`,
+          `${filenameBase}.txt`,
           formatGraphicEq(filters, MVP_NUMERIC_POLICY.sampleRateHz),
         )
       }

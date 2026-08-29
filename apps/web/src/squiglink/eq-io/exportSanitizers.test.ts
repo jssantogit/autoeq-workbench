@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  getFilterExportFilenameBase,
   getExportFilenameBase,
   safeFilenameBase,
   safePowerampPresetName,
@@ -31,6 +32,37 @@ describe('exportSanitizers', () => {
       expect(getExportFilenameBase('   ')).toBe('Workbench')
       expect(getExportFilenameBase('\t\r\n')).toBe('Workbench')
       expect(getExportFilenameBase('???', 'DefaultName')).toBe('DefaultName')
+    })
+  })
+
+  describe('getFilterExportFilenameBase', () => {
+    it('uses frozen AutoEQ manifest names instead of renamed current curves', () => {
+      expect(getFilterExportFilenameBase({
+        activeFrName: 'Renamed FR',
+        filterProvenance: 'autoeq',
+        autoEqRun: { manifest: { sourceName: 'Dunu Titan S2', targetName: 'JM-1' } },
+      })).toBe('Dunu Titan S2 - [JM-1]')
+    })
+
+    it('uses the current FR with an EQ label for manual filters and falls back without an FR', () => {
+      expect(getFilterExportFilenameBase({
+        activeFrName: 'HD 600',
+        filterProvenance: 'manual',
+        autoEqRun: null,
+      })).toBe('HD 600 - [EQ]')
+      expect(getFilterExportFilenameBase({
+        activeFrName: null,
+        filterProvenance: null,
+        autoEqRun: null,
+      })).toBe('Workbench - [EQ]')
+    })
+
+    it('sanitizes AutoEQ name components without removing the provenance structure', () => {
+      expect(getFilterExportFilenameBase({
+        activeFrName: 'Renamed FR',
+        filterProvenance: 'autoeq',
+        autoEqRun: { manifest: { sourceName: 'Dunu/Titan:S2?', targetName: 'JM<1>|*' } },
+      })).toBe('Dunu_Titan_S2_ - [JM_1___]')
     })
   })
 

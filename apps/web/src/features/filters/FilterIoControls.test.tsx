@@ -13,6 +13,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { deriveWorkspace, workspaceStore } from '../../state/workspaceStore'
 import { downloadTextFile } from '../../squiglink/eq-io/downloadTextFile'
+import { createAutoEqRunRecord } from '../../test/autoEqFixture'
 import { FilterIoControls } from './FilterIoControls'
 
 vi.mock('@autoeq-workbench/core', async (importOriginal) => {
@@ -78,6 +79,7 @@ describe('FilterIoControls', () => {
       selectedFilterId: existingFilters[0]!.id,
       filterProvenance: 'manual',
       solutionState: 'modified',
+      autoEqRun: null,
       canUndo: false,
       canRedo: false,
     })
@@ -179,7 +181,7 @@ describe('FilterIoControls', () => {
     expect(options).toEqual(['Equalizer APO', 'Poweramp', 'Wavelet'])
   })
 
-  it('downloads exact APO, Poweramp, and Wavelet outputs with correct suffixes, safety preamp, and disabled filter exclusion', async () => {
+  it('downloads exact APO, Poweramp, and Wavelet outputs with one manual-EQ filename, safety preamp, and disabled filter exclusion', async () => {
     const user = userEvent.setup()
     const fetchMock = vi.fn()
     const xhr = vi.fn()
@@ -199,7 +201,7 @@ describe('FilterIoControls', () => {
 
     expect(downloadTextFile).toHaveBeenNthCalledWith(
       1,
-      'Studio_Left_Take_ Equalizer APO.txt',
+      'Studio_Left_Take_ - [EQ].txt',
       formatEqualizerApoFilters(mixedFilters, expectedPreamp),
     )
     const apoOutput = vi.mocked(downloadTextFile).mock.calls[0]![1]
@@ -214,7 +216,7 @@ describe('FilterIoControls', () => {
 
     expect(downloadTextFile).toHaveBeenNthCalledWith(
       2,
-      'Studio_Left_Take_ Poweramp.txt',
+      'Studio_Left_Take_ - [EQ].txt',
       formatPowerampText({
         name: activeFr.name,
         preampDb: expectedPreamp,
@@ -235,23 +237,62 @@ describe('FilterIoControls', () => {
 
     expect(downloadTextFile).toHaveBeenNthCalledWith(
       3,
-      'Studio_Left_Take_ Wavelet GraphicEQ.txt',
+      'Studio_Left_Take_ - [EQ].txt',
       formatGraphicEq(mixedFilters, MVP_NUMERIC_POLICY.sampleRateHz),
     )
     const waveletOutput = vi.mocked(downloadTextFile).mock.calls[2]![1]
     expect(waveletOutput).toMatch(/^GraphicEQ: /)
     expect(waveletOutput).toBe(formatGraphicEq([mixedFilters[0]!], MVP_NUMERIC_POLICY.sampleRateHz))
 
-    // Assert filenames end with exact suffixes from brief
-    expect(vi.mocked(downloadTextFile).mock.calls[0]![0]).toMatch(/ Equalizer APO\.txt$/)
-    expect(vi.mocked(downloadTextFile).mock.calls[1]![0]).toMatch(/ Poweramp\.txt$/)
-    expect(vi.mocked(downloadTextFile).mock.calls[2]![0]).toMatch(/ Wavelet GraphicEQ\.txt$/)
+    expect(vi.mocked(downloadTextFile).mock.calls.map(([filename]) => filename)).toEqual([
+      'Studio_Left_Take_ - [EQ].txt',
+      'Studio_Left_Take_ - [EQ].txt',
+      'Studio_Left_Take_ - [EQ].txt',
+    ])
 
     expect(fetchMock).not.toHaveBeenCalled()
     expect(xhr).not.toHaveBeenCalled()
   })
 
-  it('uses the Workbench filename fallback for all destinations when there is no active FR', async () => {
+  it.each([
+    ['clean', 'target-1'],
+    ['modified', 'target-1'],
+    ['stale', 'target-2'],
+  ] as const)('uses frozen AutoEQ manifest names for a %s solution across all destinations', async (
+    solutionState,
+    activeTargetId,
+  ) => {
+    const user = userEvent.setup()
+    workspaceStore.setState({
+      curves: [
+        { ...activeFr, name: 'Renamed FR' },
+        { ...activeFr, id: 'target-1', name: 'Renamed Target', kind: 'target' },
+        { ...activeFr, id: 'target-2', name: 'Another Target', kind: 'target' },
+      ],
+      activeFrId: activeFr.id,
+      activeTargetId,
+      filters: mixedFilters,
+      filterProvenance: 'autoeq',
+      solutionState,
+      autoEqRun: createAutoEqRunRecord(),
+    })
+    render(<FilterIoControls />)
+
+    const select = screen.getByRole('combobox', { name: /export/i })
+    const exportButton = screen.getByRole('button', { name: 'Export' })
+    for (const destination of ['Equalizer APO', 'Poweramp', 'Wavelet']) {
+      await user.selectOptions(select, destination)
+      await user.click(exportButton)
+    }
+
+    expect(vi.mocked(downloadTextFile).mock.calls.map(([filename]) => filename)).toEqual([
+      'Source - [Target].txt',
+      'Source - [Target].txt',
+      'Source - [Target].txt',
+    ])
+  })
+
+  it('uses the Workbench EQ filename fallback for all destinations when there is no active FR', async () => {
     const user = userEvent.setup()
     workspaceStore.setState({ curves: [], activeFrId: null, filters: existingFilters })
     render(<FilterIoControls />)
@@ -263,7 +304,7 @@ describe('FilterIoControls', () => {
     await user.click(exportButton)
     expect(downloadTextFile).toHaveBeenNthCalledWith(
       1,
-      'Workbench Equalizer APO.txt',
+      'Workbench - [EQ].txt',
       expect.stringMatching(/^Preamp: /),
     )
 
@@ -271,7 +312,7 @@ describe('FilterIoControls', () => {
     await user.click(exportButton)
     expect(downloadTextFile).toHaveBeenNthCalledWith(
       2,
-      'Workbench Poweramp.txt',
+      'Workbench - [EQ].txt',
       expect.stringContaining('# AutoEQ Workbench — Workbench'),
     )
 
@@ -279,7 +320,7 @@ describe('FilterIoControls', () => {
     await user.click(exportButton)
     expect(downloadTextFile).toHaveBeenNthCalledWith(
       3,
-      'Workbench Wavelet GraphicEQ.txt',
+      'Workbench - [EQ].txt',
       expect.stringMatching(/^GraphicEQ: /),
     )
   })
@@ -309,7 +350,7 @@ describe('FilterIoControls', () => {
 
     expect(downloadTextFile).toHaveBeenCalledOnce()
     const [filename, content] = vi.mocked(downloadTextFile).mock.calls[0]!
-    expect(filename).toBe('Studio_Left___Take__Second Line Poweramp.txt')
+    expect(filename).toBe('Studio_Left___Take__Second Line - [EQ].txt')
     expect(content).toContain('# AutoEQ Workbench — Studio/Left :Take? Second Line\n# Poweramp-style manual-entry preset')
     expect(content).not.toContain('\r')
     expect(content).not.toContain(':Take?\nSecond Line')
