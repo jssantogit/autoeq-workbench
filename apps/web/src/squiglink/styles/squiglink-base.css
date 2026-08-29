@@ -258,7 +258,6 @@ tbody.curves > tr > td.remove > button {
   cursor: pointer;
 }
 .curve-row-cell-placeholder { cursor: default !important; }
-.curve-manager-row--derived .curve-row-cell-placeholder { display: none; }
 .curve-row-cell-placeholder::before,
 .curve-row-cell-placeholder::after { display: none !important; }
 
@@ -338,8 +337,6 @@ tbody.curves > tr > td.levels { order: 2; flex: 0 0 86px; padding-left: 16px; }
 @media (max-width: 1200px) {
   tbody.curves > tr { flex-wrap: wrap; }
   tbody.curves > tr > td.item-line { flex: 0 0 calc(100% - 38px); padding: 0 16px 0 0; }
-  tbody.curves > tr.curve-manager-row--derived { flex-wrap: nowrap; }
-  tbody.curves > tr.curve-manager-row--derived > td.item-line { flex: 1 1 auto; }
   tbody.curves > tr > td.levels { margin-left: auto; }
 }
 

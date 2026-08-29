@@ -157,9 +157,12 @@ for (const width of [360, 390]) {
     await importFr(page)
     await importFr(page)
     await importFr(page)
+    await page.getByRole('tab', { name: 'Equalizer' }).click()
+    await page.getByRole('button', { name: 'Add filter' }).click()
+    await page.getByRole('tab', { name: 'Curves' }).click()
 
     const rows = page.locator('tr.curve-manager-row')
-    await expect(rows).toHaveCount(3)
+    await expect(rows).toHaveCount(4)
     const firstRow = rows.first()
     await firstRow.getByRole('button', { name: 'Rename source.txt' }).click()
     const longName = 'A deliberately long imported source curve name over forty characters'
@@ -185,6 +188,9 @@ for (const width of [360, 390]) {
       expect(controlBox!.y + controlBox!.height).toBeLessThanOrEqual(rowBox!.y + rowBox!.height)
     }
     expect((await firstRow.boundingBox())!.height).toBeLessThanOrEqual(89)
+    const eqRow = page.getByRole('row', { name: `${longName} EQ` })
+    await expect(eqRow).toBeVisible()
+    expect((await eqRow.boundingBox())!.height).toBe((await firstRow.boundingBox())!.height)
   })
 }
 

@@ -149,6 +149,8 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-target-label-sample]')).not.toBeInTheDocument()
     expect([...container.querySelectorAll('[data-curve-label]')]
       .every((label) => label.getAttribute('x') === '67')).toBe(true)
+    expect([...container.querySelectorAll('[data-curve-label]')]
+      .every((label) => label.getAttribute('font-size') === '12')).toBe(true)
     expect(screen.queryByText('Hidden comparison')).not.toBeInTheDocument()
 
     const yLabelX = Number(container.querySelector('[data-y-label="-30"]')?.getAttribute('x'))
@@ -190,8 +192,8 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-y-label]')).toHaveAttribute('font-size', '10')
 
     const labels = [...container.querySelectorAll('[data-curve-label]')]
-    expect(labels[0]).toHaveAttribute('font-size', '11')
-    expect(Number(labels[0]!.getAttribute('y')) - Number(labels[1]!.getAttribute('y'))).toBe(14)
+    expect(labels[0]).toHaveAttribute('font-size', '12')
+    expect(Number(labels[0]!.getAttribute('y')) - Number(labels[1]!.getAttribute('y'))).toBe(16)
     expect(labels.every((label) => Number(label.getAttribute('y')) < 324)).toBe(true)
 
     fireEvent.focus(screen.getByRole('slider', { name: 'Inspect graph frequency' }))
@@ -342,8 +344,8 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(screen.getByText('+2 more')).toBeInTheDocument()
     expect(screen.getByText('Curve 0')).toHaveAttribute('x', '67')
     expect(screen.getByText('Curve 0')).toHaveAttribute('y', '304')
-    expect(screen.getByText('Curve 7')).toHaveAttribute('y', '199')
-    expect(screen.getByText('+2 more')).toHaveAttribute('y', '184')
+    expect(screen.getByText('Curve 7')).toHaveAttribute('y', '192')
+    expect(screen.getByText('+2 more')).toHaveAttribute('y', '176')
   })
 
   it('keeps graph narration and selected-filter overlays out of the SVG', () => {

@@ -286,19 +286,19 @@ export function createSquiglinkGraph(
       .attr('data-curve-label-group', (item) => item.id)
     groups.each(function renderLabel(item, index) {
       const group = select(this)
-      const labelY = PLOT_BOTTOM - (compact ? 24 : 20) - index * (compact ? 14 : 15)
+      const labelY = PLOT_BOTTOM - (compact ? 24 : 20) - index * 16
       group.selectAll('line').remove()
       group.selectAll<SVGTextElement, PreparedSeries>('text').data([item]).join('text')
         .attr('class', 'graph-curve-label').attr('data-curve-label', item.id)
         .attr('x', 67).attr('y', labelY).attr('fill', item.color)
-        .attr('font-size', compact ? 11 : 10).attr('font-weight', 650)
+        .attr('font-size', 12).attr('font-weight', 650)
         .style('white-space', 'pre').text(item.name)
     })
     const overflow = current.view.labelsEnabled ? prepared.length - visible.length : 0
     labelLayer.selectAll<SVGTextElement, number>('text[data-label-overflow]').data(overflow > 0 ? [overflow] : [])
       .join('text').attr('data-label-overflow', '')
       .attr('class', 'graph-curve-label graph-curve-label--overflow').attr('x', 67)
-      .attr('y', PLOT_BOTTOM - (compact ? 24 : 20) - visible.length * (compact ? 14 : 15))
+      .attr('y', PLOT_BOTTOM - (compact ? 24 : 20) - visible.length * 16)
       .attr('fill', palette.axis).attr('font-size', compact ? 10 : 9)
       .text((count) => `+${count} more`)
   }
