@@ -457,9 +457,11 @@ git commit -m "feat(core): add bounded Standard v2 hybrid search"
 
 **Produces:** `cyclicDiscreteRefineV2()`, `buildDeliverableV2()`, `compressDeliverableV2()`, `runStandardAutoEqV2()`.
 
+**Approved pre-closeout amendment:** keep `standard-v2` and the exact manual grid, but replace Frequency's once-per-cycle movement with deterministic coordinate-local descent over consecutive `Fc ± 1 Hz` neighbors. Stay on Frequency after every accepted `1 Hz` move; leave it only at a local optimum, envelope boundary, or deadline. Gain/Q behavior and all approved constants remain unchanged. One-filter trials must reuse unchanged cached responses and apply `currentCascade - oldFilterResponse + newFilterResponse`. Tests must pin consecutive moves, Frequency-before-Gain/Q visitation, envelope handling, deterministic ranking/ties and repeats, cooperative deadline/checkpoint behavior, and unchanged-filter response reuse.
+
 - [ ] **Step 1: Write failing discrete/checkpoint/compression tests**
 
-Assert cyclic discrete refinement can improve beyond two cycles, stays on the existing manual grid (`1 Hz`, `0.1 dB`, `0.01 Q`), and never worsens the ranking tuple.
+Assert cyclic discrete refinement can improve beyond two cycles, stays on the existing manual grid (`1 Hz`, `0.1 dB`, `0.01 Q`), and never worsens the ranking tuple. Under the pre-closeout amendment, assert Frequency performs consecutive deterministic `±1 Hz` local descent to a coordinate-local optimum before Gain/Q, respects the effective envelope, checks the deadline before each trial and continuation step, preserves the last complete checkpoint, and recomputes only the changed filter response.
 
 Assert zero-filter checkpoint exists immediately and every checkpoint is quantized, valid, `filters.length <= settings.maxFilters`, and only replaced by an equal-or-better deliverable.
 
@@ -469,7 +471,7 @@ Create one redundant cascade where removing a filter + bounded refit remains ins
 
 ```text
 constrained quantization (manual grid ∩ effective envelope)
-→ cyclic discrete refinement until a full cycle has no improvement/deadline
+→ cyclic discrete refinement with Frequency coordinate-local descent until a full cycle has no improvement/deadline
 → remove exact 0 dB filters
 → deterministic sort
 → autoeq-1..N IDs

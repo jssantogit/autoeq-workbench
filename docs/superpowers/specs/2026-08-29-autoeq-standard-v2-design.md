@@ -293,6 +293,16 @@ Each search iteration has two stages:
 
 Equal cheap scores resolve by stable frequency/type/parameter ordering.
 
+### 9.1 Pre-closeout response-cache amendment
+
+For every one-filter trial, reuse every unchanged accepted-filter response and compute only the changed filter response. Update the trial cascade pointwise as:
+
+```text
+candidateCascade = currentCascade - oldFilterResponse + newFilterResponse
+```
+
+The accepted solution replaces only the changed filter and its cached response. This amendment does not change response math, fit-grid precision, ranking, or delivery-grid policy.
+
 ## 10. Hybrid search and bounded alternatives
 
 The main path is deterministic residual pursuit/greedy search.
@@ -378,6 +388,20 @@ The best deliverable checkpoint must always be:
 A zero-filter checkpoint exists from the start, so timeout always has a valid result.
 
 The checkpoint is monotonic: replace it only with an equal-or-better deliverable according to Section 5. A longer Time Limit follows the same deterministic search prefix and therefore cannot make the best available deliverable worse.
+
+### 13.1 Pre-closeout Frequency discrete-refinement amendment
+
+Standard v2 retains the exact delivery grid (`1 Hz`, `0.1 dB`, `0.01 Q`, and `0.1 dB` preamp) and the `standard-v2` algorithm identity. Frequency refinement uses deterministic coordinate-local descent:
+
+1. evaluate only representable `Fc - 1 Hz` and `Fc + 1 Hz` neighbors inside the effective frequency envelope;
+2. choose the better neighbor with the existing solution-ranking tuple and deterministic tie-breaking;
+3. when a neighbor improves the solution, accept that exact `1 Hz` move and remain on Frequency;
+4. repeat from the accepted Fc until neither neighbor improves, the envelope blocks another move, or the deadline prevents the next trial;
+5. only then visit Gain, Q, and subsequent filters.
+
+Gain and Q retain their existing coordinate behavior. Frequency descent must not skip grid points, use coarse-to-fine search, binary search, interpolation, a new step, or a new tuning constant. The superseded cyclic trajectory is not an equivalence authority; repeated runs under this amended contract must remain deterministic.
+
+The hard cooperative deadline is checked before every trial and before continuing another accepted local Frequency step. After expiration, no new expensive operation starts, and the last complete valid deliverable checkpoint remains authoritative.
 
 ## 14. Precision-first compression
 
