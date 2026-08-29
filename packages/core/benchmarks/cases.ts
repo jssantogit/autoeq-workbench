@@ -1,16 +1,16 @@
 import {
   cascadeMagnitudeDb,
   createEvaluationGrid,
-  DEFAULT_AUTOEQ_SETTINGS,
+  DEFAULT_AUTOEQ_SETTINGS_V1,
   MVP_NUMERIC_POLICY,
-  type AutoEqSettings,
+  type AutoEqSettingsV1,
   type Curve,
   type Filter,
   type Normalization,
-  type StandardAutoEqInput,
+  type StandardAutoEqInputV1,
 } from '../src/index.js'
 
-export interface BenchmarkCase extends StandardAutoEqInput {
+export interface BenchmarkCase extends StandardAutoEqInputV1 {
   id: string
 }
 
@@ -30,7 +30,7 @@ function filter(
 function benchmarkCase(
   id: string,
   desiredFilters: readonly Filter[],
-  settings: AutoEqSettings = { ...DEFAULT_AUTOEQ_SETTINGS },
+  settings: AutoEqSettingsV1 = { ...DEFAULT_AUTOEQ_SETTINGS_V1 },
 ): BenchmarkCase {
   const desiredDb = cascadeMagnitudeDb(
     desiredFilters,
@@ -78,7 +78,7 @@ export const BENCHMARK_CASES: readonly BenchmarkCase[] = [
       filter('budget-4', 'PK', 2500, -5, 2),
       filter('budget-5', 'PK', 7000, 4, 2),
     ],
-    { ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 3 },
+    { ...DEFAULT_AUTOEQ_SETTINGS_V1, maxFilters: 3 },
   ),
   benchmarkCase('quantization_sensitive', [filter('off-grid', 'PK', 1234.56, 4.37, 1.37)]),
   benchmarkCase('preamp_overlap', [

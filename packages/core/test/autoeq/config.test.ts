@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   CoreError,
-  DEFAULT_AUTOEQ_SETTINGS,
+  DEFAULT_AUTOEQ_SETTINGS_V1,
   MVP_NUMERIC_POLICY,
   STANDARD_V1_CONFIG,
   resolveStandardAutoEqConfig,
@@ -10,7 +10,7 @@ import {
 
 describe('resolveStandardAutoEqConfig', () => {
   it('resolves product defaults with the approved Standard v1 algorithm', () => {
-    expect(resolveStandardAutoEqConfig(DEFAULT_AUTOEQ_SETTINGS)).toEqual({
+    expect(resolveStandardAutoEqConfig(DEFAULT_AUTOEQ_SETTINGS_V1)).toEqual({
       algorithmVersion: 'standard-v1',
       sampleRateHz: MVP_NUMERIC_POLICY.sampleRateHz,
       fitPointsPerOctave: MVP_NUMERIC_POLICY.evaluationPointsPerOctave,
@@ -64,7 +64,7 @@ describe('resolveStandardAutoEqConfig', () => {
 
   it.each([0, 64])('accepts maxFilters=%i', (maxFilters) => {
     expect(resolveStandardAutoEqConfig({
-      ...DEFAULT_AUTOEQ_SETTINGS,
+      ...DEFAULT_AUTOEQ_SETTINGS_V1,
       maxFilters,
     }).maxFilters).toBe(maxFilters)
   })
@@ -80,7 +80,7 @@ describe('resolveStandardAutoEqConfig', () => {
     { maxFilters: 65 },
   ])('rejects an invalid effective envelope: %o', (update) => {
     try {
-      resolveStandardAutoEqConfig({ ...DEFAULT_AUTOEQ_SETTINGS, ...update })
+      resolveStandardAutoEqConfig({ ...DEFAULT_AUTOEQ_SETTINGS_V1, ...update })
       throw new Error('Expected config resolution to throw')
     } catch (error) {
       expect(error).toBeInstanceOf(CoreError)

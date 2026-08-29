@@ -7,10 +7,17 @@ export {
 export { MVP_NUMERIC_POLICY, createEvaluationGrid } from './config/numericPolicy.js'
 export {
   AUTOEQ_PRODUCT_LIMITS,
+  AUTOEQ_TIME_LIMIT_OPTIONS,
   DEFAULT_AUTOEQ_SETTINGS,
+  DEFAULT_AUTOEQ_SETTINGS_V1,
   isValidAutoEqSettings,
+  isValidAutoEqSettingsV1,
 } from './config/autoeqSettings.js'
-export type { AutoEqSettings } from './config/autoeqSettings.js'
+export type {
+  AutoEqSettings,
+  AutoEqSettingsV1,
+  AutoEqTimeLimitSeconds,
+} from './config/autoeqSettings.js'
 export { STANDARD_V1_CONFIG, resolveStandardAutoEqConfig } from './autoeq/config.js'
 export { evaluateObjective } from './autoeq/loss.js'
 export type { ObjectiveInput } from './autoeq/loss.js'
@@ -27,11 +34,19 @@ export { runStandardAutoEq } from './autoeq/runStandardAutoEq.js'
 export type {
   AutoEqConfig,
   AutoEqResult,
+  AutoEqResultV1,
+  AutoEqResultV2,
   CancellationAudit,
   CancellationPair,
   RunManifest,
+  RunManifestV1,
+  RunManifestV2,
   StandardAlgorithmParameters,
   StandardAutoEqInput,
+  StandardAutoEqInputV1,
+  StandardAutoEqInputV2,
+  StandardV2AlgorithmParameters,
+  StandardV2TerminationReason,
 } from './autoeq/types.js'
 export { createLogGrid } from './curves/grid.js'
 export { interpolateLogFrequency } from './curves/interpolate.js'

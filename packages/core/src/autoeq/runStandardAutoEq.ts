@@ -11,7 +11,11 @@ import { discreteRefine } from './discreteRefine.js'
 import { optimizeGreedy } from './optimize.js'
 import { pruneFilters } from './prune.js'
 import { quantizeFilters } from './quantize.js'
-import type { AutoEqResult, RunManifest, StandardAutoEqInput } from './types.js'
+import type {
+  AutoEqResultV1,
+  RunManifestV1,
+  StandardAutoEqInputV1,
+} from './types.js'
 
 const TYPE_ORDER = { LS: 0, PK: 1, HS: 2 } as const
 
@@ -32,7 +36,7 @@ export function finalizeDeliveredFilters(filters: readonly Filter[]): Filter[] {
   }))
 }
 
-export function runStandardAutoEq(input: StandardAutoEqInput): AutoEqResult {
+export function runStandardAutoEq(input: StandardAutoEqInputV1): AutoEqResultV1 {
   if (
     input === null ||
     typeof input !== 'object' ||
@@ -79,13 +83,21 @@ export function runStandardAutoEq(input: StandardAutoEqInput): AutoEqResult {
   const metrics = calculateErrorMetrics(residualDb, frequencies)
   const preampDb = calculatePreampDb(delivered, config.sampleRateHz).preampDb
   const cancellationAudit = auditCancellations(delivered, frequencies, config.sampleRateHz)
-  const manifest: RunManifest = {
+  const manifest: RunManifestV1 = {
     schemaVersion: 2,
     algorithmVersion: config.algorithmVersion,
     profile: 'Standard',
     sampleRateHz: config.sampleRateHz,
     fitPointsPerOctave: config.fitPointsPerOctave,
-    autoeqSettings: { ...input.settings },
+    autoeqSettings: {
+      minFrequencyHz: input.settings.minFrequencyHz,
+      maxFrequencyHz: input.settings.maxFrequencyHz,
+      minGainDb: input.settings.minGainDb,
+      maxGainDb: input.settings.maxGainDb,
+      minQ: input.settings.minQ,
+      maxQ: input.settings.maxQ,
+      maxFilters: input.settings.maxFilters,
+    },
     normalization: { ...input.normalization },
     sourceName: input.source.name,
     targetName: input.target.name,

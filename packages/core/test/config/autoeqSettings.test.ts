@@ -1,8 +1,12 @@
 import {
   AUTOEQ_PRODUCT_LIMITS,
+  AUTOEQ_TIME_LIMIT_OPTIONS,
   DEFAULT_AUTOEQ_SETTINGS,
+  DEFAULT_AUTOEQ_SETTINGS_V1,
   MVP_NUMERIC_POLICY,
   isValidAutoEqSettings,
+  isValidAutoEqSettingsV1,
+  type AutoEqSettings,
 } from '../../src/index.js'
 import { describe, expect, it } from 'vitest'
 
@@ -18,7 +22,8 @@ describe('AutoEQ settings', () => {
       defaultMaxFilters: 10,
       hardMaxFilters: 64,
     })
-    expect(DEFAULT_AUTOEQ_SETTINGS).toEqual({
+    expect(AUTOEQ_TIME_LIMIT_OPTIONS).toEqual([5, 15, 30, 60, 120])
+    expect(DEFAULT_AUTOEQ_SETTINGS_V1).toEqual({
       minFrequencyHz: MVP_NUMERIC_POLICY.minFrequencyHz,
       maxFrequencyHz: MVP_NUMERIC_POLICY.maxFrequencyHz,
       minGainDb: -15,
@@ -27,7 +32,12 @@ describe('AutoEQ settings', () => {
       maxQ: 12,
       maxFilters: 10,
     })
+    expect(DEFAULT_AUTOEQ_SETTINGS).toEqual({
+      ...DEFAULT_AUTOEQ_SETTINGS_V1,
+      timeLimitSeconds: 30,
+    })
     expect(Object.isFrozen(AUTOEQ_PRODUCT_LIMITS)).toBe(true)
+    expect(Object.isFrozen(DEFAULT_AUTOEQ_SETTINGS_V1)).toBe(true)
     expect(Object.isFrozen(DEFAULT_AUTOEQ_SETTINGS)).toBe(true)
   })
 
@@ -41,6 +51,7 @@ describe('AutoEQ settings', () => {
       minQ: 0.5,
       maxQ: 8,
       maxFilters: 6,
+      timeLimitSeconds: 30,
     })).toBe(true)
     expect(isValidAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 0 })).toBe(true)
     expect(isValidAutoEqSettings({
@@ -74,5 +85,21 @@ describe('AutoEQ settings', () => {
     ['non-finite maxFilters', { maxFilters: Number.NaN }],
   ])('rejects %s', (_label, update) => {
     expect(isValidAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, ...update })).toBe(false)
+  })
+
+  it('accepts only the five approved time limits', () => {
+    for (const timeLimitSeconds of [5, 15, 30, 60, 120] as const) {
+      expect(isValidAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, timeLimitSeconds })).toBe(true)
+    }
+    for (const timeLimitSeconds of [0, 10, 29, 31, 121, Number.NaN]) {
+      expect(isValidAutoEqSettings({
+        ...DEFAULT_AUTOEQ_SETTINGS,
+        timeLimitSeconds,
+      } as AutoEqSettings)).toBe(false)
+    }
+  })
+
+  it('validates the frozen historical settings shape separately', () => {
+    expect(isValidAutoEqSettingsV1(DEFAULT_AUTOEQ_SETTINGS_V1)).toBe(true)
   })
 })

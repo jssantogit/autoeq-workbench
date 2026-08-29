@@ -1,6 +1,9 @@
 import { MVP_NUMERIC_POLICY } from './numericPolicy.js'
 
-export interface AutoEqSettings {
+export const AUTOEQ_TIME_LIMIT_OPTIONS = [5, 15, 30, 60, 120] as const
+export type AutoEqTimeLimitSeconds = (typeof AUTOEQ_TIME_LIMIT_OPTIONS)[number]
+
+export interface AutoEqSettingsV1 {
   minFrequencyHz: number
   maxFrequencyHz: number
   minGainDb: number
@@ -8,6 +11,10 @@ export interface AutoEqSettings {
   minQ: number
   maxQ: number
   maxFilters: number
+}
+
+export interface AutoEqSettings extends AutoEqSettingsV1 {
+  timeLimitSeconds: AutoEqTimeLimitSeconds
 }
 
 export const AUTOEQ_PRODUCT_LIMITS = Object.freeze({
@@ -21,7 +28,7 @@ export const AUTOEQ_PRODUCT_LIMITS = Object.freeze({
   hardMaxFilters: 64,
 })
 
-export const DEFAULT_AUTOEQ_SETTINGS: Readonly<AutoEqSettings> = Object.freeze({
+export const DEFAULT_AUTOEQ_SETTINGS_V1: Readonly<AutoEqSettingsV1> = Object.freeze({
   minFrequencyHz: AUTOEQ_PRODUCT_LIMITS.minFrequencyHz,
   maxFrequencyHz: AUTOEQ_PRODUCT_LIMITS.maxFrequencyHz,
   minGainDb: AUTOEQ_PRODUCT_LIMITS.minGainDb,
@@ -31,7 +38,12 @@ export const DEFAULT_AUTOEQ_SETTINGS: Readonly<AutoEqSettings> = Object.freeze({
   maxFilters: AUTOEQ_PRODUCT_LIMITS.defaultMaxFilters,
 })
 
-export function isValidAutoEqSettings(settings: AutoEqSettings): boolean {
+export const DEFAULT_AUTOEQ_SETTINGS: Readonly<AutoEqSettings> = Object.freeze({
+  ...DEFAULT_AUTOEQ_SETTINGS_V1,
+  timeLimitSeconds: 30,
+})
+
+export function isValidAutoEqSettingsV1(settings: AutoEqSettingsV1): boolean {
   return (
     Number.isFinite(settings.minFrequencyHz) &&
     Number.isFinite(settings.maxFrequencyHz) &&
@@ -51,5 +63,12 @@ export function isValidAutoEqSettings(settings: AutoEqSettings): boolean {
     settings.minQ < settings.maxQ &&
     settings.maxFilters >= 0 &&
     settings.maxFilters <= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters
+  )
+}
+
+export function isValidAutoEqSettings(settings: AutoEqSettings): boolean {
+  return (
+    isValidAutoEqSettingsV1(settings) &&
+    AUTOEQ_TIME_LIMIT_OPTIONS.includes(settings.timeLimitSeconds)
   )
 }

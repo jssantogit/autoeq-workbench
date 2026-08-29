@@ -1,4 +1,4 @@
-import type { AutoEqSettings } from '../config/autoeqSettings.js'
+import type { AutoEqSettings, AutoEqSettingsV1 } from '../config/autoeqSettings.js'
 import type { ErrorMetrics } from '../metrics/errorMetrics.js'
 import type { Curve, Normalization } from '../types/curve.js'
 import type { Filter } from '../types/filter.js'
@@ -42,13 +42,26 @@ export interface CancellationAudit {
   totalScore: number
 }
 
-export interface RunManifest {
+export interface StandardV2AlgorithmParameters {
+  targetRmseDb: 0.25
+  targetMaxAbsDb: 0.75
+  candidateResidualFloorDb: 0.15
+  pkQScaleMultipliers: readonly [0.5, 1, 2]
+  maxExactCandidatesPerIteration: 8
+  maxActiveSearchPaths: 3
+  alternateRetentionRatio: 1.02
+  maxJointRefinementCycles: 6
+}
+
+export type StandardV2TerminationReason = 'target-reached' | 'converged' | 'time-limit'
+
+export interface RunManifestV1 {
   schemaVersion: 2
   algorithmVersion: 'standard-v1'
   profile: 'Standard'
   sampleRateHz: number
   fitPointsPerOctave: number
-  autoeqSettings: AutoEqSettings
+  autoeqSettings: AutoEqSettingsV1
   normalization: Normalization
   sourceName: string
   targetName: string
@@ -59,17 +72,55 @@ export interface RunManifest {
   cancellationAudit: CancellationAudit
 }
 
-export interface AutoEqResult {
+export interface RunManifestV2 {
+  schemaVersion: 3
+  algorithmVersion: 'standard-v2'
+  profile: 'Standard'
+  sampleRateHz: number
+  fitPointsPerOctave: number
+  autoeqSettings: AutoEqSettings
+  normalization: Normalization
+  sourceName: string
+  targetName: string
+  algorithmParameters: StandardV2AlgorithmParameters
+  finalFilters: Filter[]
+  metrics: ErrorMetrics
+  preampDb: number
+  cancellationAudit: CancellationAudit
+  terminationReason: StandardV2TerminationReason
+  targetAchieved: boolean
+}
+
+export interface AutoEqResultV1 {
   filters: Filter[]
   metrics: ErrorMetrics
   preampDb: number
   cancellationAudit: CancellationAudit
-  manifest: RunManifest
+  manifest: RunManifestV1
 }
 
-export interface StandardAutoEqInput {
+export interface AutoEqResultV2 {
+  filters: Filter[]
+  metrics: ErrorMetrics
+  preampDb: number
+  cancellationAudit: CancellationAudit
+  manifest: RunManifestV2
+}
+
+export interface StandardAutoEqInputV1 {
+  source: Curve
+  target: Curve
+  normalization: Normalization
+  settings: AutoEqSettingsV1
+}
+
+export interface StandardAutoEqInputV2 {
   source: Curve
   target: Curve
   normalization: Normalization
   settings: AutoEqSettings
 }
+
+export type RunManifest = RunManifestV1 | RunManifestV2
+export type AutoEqResult = AutoEqResultV1 | AutoEqResultV2
+export type StandardAutoEqInput = StandardAutoEqInputV1

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   CoreError,
-  DEFAULT_AUTOEQ_SETTINGS,
+  DEFAULT_AUTOEQ_SETTINGS_V1,
   MVP_NUMERIC_POLICY,
   POWERAMP_MANUAL_ENTRY_POLICY,
   auditCancellations,
@@ -13,17 +13,19 @@ import {
   desiredCorrection,
   prepareCurve,
   runStandardAutoEq,
-  type AutoEqSettings,
+  type AutoEqSettingsV1,
   type Curve,
   type Filter,
   type Normalization,
-  type StandardAutoEqInput,
+  type StandardAutoEqInputV1,
 } from '../../src/index.js'
 import { finalizeDeliveredFilters } from '../../src/autoeq/runStandardAutoEq.js'
 
 const normalization: Normalization = { mode: 'hz', frequencyHz: 20, levelDb: 0 }
 
-function syntheticInput(settings: AutoEqSettings = { ...DEFAULT_AUTOEQ_SETTINGS }): StandardAutoEqInput {
+function syntheticInput(
+  settings: AutoEqSettingsV1 = { ...DEFAULT_AUTOEQ_SETTINGS_V1 },
+): StandardAutoEqInputV1 {
   const frequencies = createEvaluationGrid()
   const knownFilter: Filter = {
     id: 'known-pk',
@@ -58,7 +60,7 @@ function syntheticInput(settings: AutoEqSettings = { ...DEFAULT_AUTOEQ_SETTINGS 
   return { source, target, normalization, settings }
 }
 
-function fitData(input: StandardAutoEqInput) {
+function fitData(input: StandardAutoEqInputV1) {
   const frequencies = createEvaluationGrid()
   const preparedSource = prepareCurve(input.source, input.normalization, frequencies)
   const preparedTarget = prepareCurve(input.target, input.normalization, frequencies)
@@ -105,7 +107,7 @@ describe('runStandardAutoEq', () => {
     { ...syntheticInput(), settings: undefined },
   ])('rejects missing run inputs with a structured validation error', (invalidInput) => {
     try {
-      runStandardAutoEq(invalidInput as unknown as StandardAutoEqInput)
+      runStandardAutoEq(invalidInput as unknown as StandardAutoEqInputV1)
       throw new Error('Expected runStandardAutoEq to throw')
     } catch (error) {
       expect(error).toBeInstanceOf(CoreError)
@@ -114,7 +116,7 @@ describe('runStandardAutoEq', () => {
   })
 
   it('recovers a known inverse PK below 0.25 dB MAE with at most five filters', () => {
-    const input = syntheticInput({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 5 })
+    const input = syntheticInput({ ...DEFAULT_AUTOEQ_SETTINGS_V1, maxFilters: 5 })
 
     const result = runStandardAutoEq(input)
 
@@ -123,18 +125,18 @@ describe('runStandardAutoEq', () => {
   })
 
   it('returns deeply identical results for identical inputs', () => {
-    const input = syntheticInput({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 5 })
+    const input = syntheticInput({ ...DEFAULT_AUTOEQ_SETTINGS_V1, maxFilters: 5 })
 
     expect(runStandardAutoEq(input)).toEqual(runStandardAutoEq(input))
   })
 
   it('treats maxFilters zero and 64 as ceilings rather than fill targets', () => {
     const zero = runStandardAutoEq(syntheticInput({
-      ...DEFAULT_AUTOEQ_SETTINGS,
+      ...DEFAULT_AUTOEQ_SETTINGS_V1,
       maxFilters: 0,
     }))
     const maximum = runStandardAutoEq(syntheticInput({
-      ...DEFAULT_AUTOEQ_SETTINGS,
+      ...DEFAULT_AUTOEQ_SETTINGS_V1,
       maxFilters: 64,
     }))
 
@@ -144,8 +146,8 @@ describe('runStandardAutoEq', () => {
   })
 
   it('honors the exact narrower effective envelope', () => {
-    const settings: AutoEqSettings = {
-      ...DEFAULT_AUTOEQ_SETTINGS,
+    const settings: AutoEqSettingsV1 = {
+      ...DEFAULT_AUTOEQ_SETTINGS_V1,
       minFrequencyHz: 500,
       maxFrequencyHz: 2_000,
       minGainDb: -3,
@@ -171,7 +173,7 @@ describe('runStandardAutoEq', () => {
 
   it('succeeds with an empty delivered list when all generated PKs are unrepresentable', () => {
     const result = runStandardAutoEq(syntheticInput({
-      ...DEFAULT_AUTOEQ_SETTINGS,
+      ...DEFAULT_AUTOEQ_SETTINGS_V1,
       minFrequencyHz: 500,
       maxFrequencyHz: 2_000,
       minQ: 0.101,
@@ -187,8 +189,8 @@ describe('runStandardAutoEq', () => {
   })
 
   it('keeps every final coordinate on-grid and inside decimal effective bounds', () => {
-    const settings: AutoEqSettings = {
-      ...DEFAULT_AUTOEQ_SETTINGS,
+    const settings: AutoEqSettingsV1 = {
+      ...DEFAULT_AUTOEQ_SETTINGS_V1,
       minFrequencyHz: 900.2,
       maxFrequencyHz: 1_100.8,
       minGainDb: 0.04,
@@ -219,7 +221,7 @@ describe('runStandardAutoEq', () => {
 
   it('delivers sorted quantized non-zero filters with final deterministic IDs', () => {
     const result = runStandardAutoEq(syntheticInput({
-      ...DEFAULT_AUTOEQ_SETTINGS,
+      ...DEFAULT_AUTOEQ_SETTINGS_V1,
       maxFilters: 5,
     }))
 
@@ -256,7 +258,7 @@ describe('runStandardAutoEq', () => {
   })
 
   it('derives final diagnostics and manifest from the exact delivered filters', () => {
-    const input = syntheticInput({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 5 })
+    const input = syntheticInput({ ...DEFAULT_AUTOEQ_SETTINGS_V1, maxFilters: 5 })
     const result = runStandardAutoEq(input)
     const { fitFrequencies, fitDesiredDb } = fitData(input)
     const deliveredDb = cascadeMagnitudeDb(
@@ -301,13 +303,14 @@ describe('runStandardAutoEq', () => {
       source: syntheticInput().source,
       target: syntheticInput().target,
       normalization: { mode: 'hz' as const, frequencyHz: 500, levelDb: 60 },
-      settings: DEFAULT_AUTOEQ_SETTINGS,
+      settings: DEFAULT_AUTOEQ_SETTINGS_V1,
     }
     const result1 = runStandardAutoEq(input)
     const result2 = runStandardAutoEq(input)
 
     expect(result1.manifest.schemaVersion).toBe(2)
     expect(result1.manifest.algorithmVersion).toBe('standard-v1')
+    expect('timeLimitSeconds' in result1.manifest.autoeqSettings).toBe(false)
     expect(result1.manifest.normalization).toEqual({
       mode: 'hz',
       frequencyHz: 500,

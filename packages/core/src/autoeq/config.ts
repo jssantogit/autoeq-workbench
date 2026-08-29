@@ -1,4 +1,7 @@
-import { isValidAutoEqSettings, type AutoEqSettings } from '../config/autoeqSettings.js'
+import {
+  isValidAutoEqSettingsV1,
+  type AutoEqSettingsV1,
+} from '../config/autoeqSettings.js'
 import { MVP_NUMERIC_POLICY } from '../config/numericPolicy.js'
 import { CoreError } from '../types/error.js'
 import type { AutoEqConfig, StandardAlgorithmParameters } from './types.js'
@@ -20,8 +23,8 @@ export const STANDARD_V1_CONFIG = Object.freeze({
   algorithm: STANDARD_V1_ALGORITHM,
 })
 
-export function resolveStandardAutoEqConfig(settings: AutoEqSettings): AutoEqConfig {
-  if (!isValidAutoEqSettings(settings)) {
+export function resolveStandardAutoEqConfig(settings: AutoEqSettingsV1): AutoEqConfig {
+  if (!isValidAutoEqSettingsV1(settings)) {
     throw new CoreError('validation', 'Invalid AutoEQ settings')
   }
 
