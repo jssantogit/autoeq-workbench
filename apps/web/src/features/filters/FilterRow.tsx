@@ -100,7 +100,7 @@ export function FilterRow({ filter, index, selected }: FilterRowProps) {
           value={filter.q}
           min={AUTOEQ_PRODUCT_LIMITS.minQ}
           max={AUTOEQ_PRODUCT_LIMITS.maxQ}
-          step="0.1"
+          step="0.01"
           validate={(value) => value >= AUTOEQ_PRODUCT_LIMITS.minQ && value <= AUTOEQ_PRODUCT_LIMITS.maxQ}
           onValueChange={(q) => updateFilter(filter.id, { q })}
         />
