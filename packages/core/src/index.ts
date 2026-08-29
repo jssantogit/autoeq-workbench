@@ -47,6 +47,26 @@ export {
   replaceV2ResponseCacheFilter,
 } from './autoeq/v2/responseCache.js'
 export type { V2ResponseCache } from './autoeq/v2/responseCache.js'
+export {
+  generateV2Candidates,
+  rankV2CandidateShortlist,
+} from './autoeq/v2/candidates.js'
+export type { CandidateInput, V2FilterCandidate } from './autoeq/v2/candidates.js'
+export {
+  JOINT_REFINEMENT_SCALES,
+  evaluateV2Solution,
+  jointRefineV2,
+} from './autoeq/v2/jointRefine.js'
+export type {
+  JointRefineInput,
+  JointRefineResult,
+  V2EvaluatedSolution,
+} from './autoeq/v2/jointRefine.js'
+export {
+  retainV2SearchPaths,
+  searchStandardV2WorkingSolutions,
+} from './autoeq/v2/search.js'
+export type { SearchInput, SearchResult } from './autoeq/v2/search.js'
 export type {
   AutoEqConfig,
   AutoEqResult,
