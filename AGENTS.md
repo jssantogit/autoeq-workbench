@@ -22,9 +22,9 @@
 
 ## Approved References
 
-- Design: `docs/superpowers/specs/2026-08-23-autoeq-workbench-design.md`
-- Foundations/manual workbench plan: `docs/superpowers/plans/2026-08-23-01-foundations-manual-workbench.md`
-- Visual foundation closeout design: `docs/superpowers/specs/2026-08-23-visual-foundation-closeout-design.md`
-- Visual foundation closeout plan: `docs/superpowers/plans/2026-08-23-01-5-visual-foundation-closeout.md`
-- AutoEQ Standard engine plan: `docs/superpowers/plans/2026-08-23-02-autoeq-standard-engine.md`
-- Integration/export/benchmarks plan: `docs/superpowers/plans/2026-08-23-03-integration-export-benchmarks.md`
+- Source-first remake design: `docs/superpowers/specs/2026-08-24-squiglink-source-first-remake-design.md`
+- Standard AutoEQ v1 design: `docs/superpowers/specs/2026-08-25-autoeq-standard-v1-design.md`
+- Plan 3 integration/visual-closeout design: `docs/superpowers/specs/2026-08-26-plan-03-integration-visual-closeout-design.md`
+- Plan 3A: `docs/superpowers/plans/2026-08-26-plan-03a-normalization-session-exports.md`
+- Plan 3B: `docs/superpowers/plans/2026-08-26-plan-03b-validation-diagnostics-e2e.md`
+- Plan 3C: `docs/superpowers/plans/2026-08-26-plan-03c-squiglink-visual-alignment.md`
