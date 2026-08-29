@@ -22,17 +22,21 @@ interface FilterExportFilenameContext {
   autoEqRun: { manifest: { sourceName: string; targetName: string } } | null
 }
 
+function getCurveExportFilenameBase(name: string | null | undefined): string {
+  return getExportFilenameBase(name?.replace(/\.(?:txt|csv)$/i, ''))
+}
+
 export function getFilterExportFilenameBase({
   activeFrName,
   filterProvenance,
   autoEqRun,
 }: FilterExportFilenameContext): string {
   if (filterProvenance === 'autoeq' && autoEqRun !== null) {
-    const sourceName = getExportFilenameBase(autoEqRun.manifest.sourceName)
-    const targetName = getExportFilenameBase(autoEqRun.manifest.targetName)
+    const sourceName = getCurveExportFilenameBase(autoEqRun.manifest.sourceName)
+    const targetName = getCurveExportFilenameBase(autoEqRun.manifest.targetName)
     return `${sourceName} - [${targetName}]`
   }
-  return `${getExportFilenameBase(activeFrName)} - [EQ]`
+  return `${getCurveExportFilenameBase(activeFrName)} - [EQ]`
 }
 
 export function safePowerampPresetName(

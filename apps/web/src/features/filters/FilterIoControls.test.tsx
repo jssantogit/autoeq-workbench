@@ -274,7 +274,13 @@ describe('FilterIoControls', () => {
       filters: mixedFilters,
       filterProvenance: 'autoeq',
       solutionState,
-      autoEqRun: createAutoEqRunRecord(),
+      autoEqRun: {
+        manifest: {
+          ...createAutoEqRunRecord().manifest,
+          sourceName: 'Source.txt',
+          targetName: 'Target.CSV',
+        },
+      },
     })
     render(<FilterIoControls />)
 

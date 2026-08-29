@@ -44,11 +44,19 @@ async function downloadText(download: Download): Promise<string> {
   return readFile(filename!, 'utf8')
 }
 
-async function exportFilters(page: Page, format: 'Equalizer APO' | 'Poweramp' | 'Wavelet') {
+async function exportFilters(
+  page: Page,
+  format: 'Equalizer APO' | 'Poweramp' | 'Wavelet',
+  suggestedFilename?: string,
+) {
   await page.getByLabel('Export format').selectOption(format)
   const downloadPromise = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Export', exact: true }).click()
-  return downloadText(await downloadPromise)
+  const download = await downloadPromise
+  if (suggestedFilename !== undefined) {
+    expect(download.suggestedFilename()).toBe(suggestedFilename)
+  }
+  return downloadText(download)
 }
 
 test('authoritative Workbench workflow survives export and Session restore', async ({ page }) => {
@@ -112,7 +120,7 @@ test('authoritative Workbench workflow survives export and Session restore', asy
   await page.getByLabel('Enable filter 1').uncheck()
   await expect(page.getByRole('row', { name: 'Filter 1' })).toHaveAttribute('data-enabled', 'false')
 
-  const apo = await exportFilters(page, 'Equalizer APO')
+  const apo = await exportFilters(page, 'Equalizer APO', 'source - [target].txt')
   expect(apo).toContain('Preamp:')
   expect(apo).not.toContain(`Fc ${disabledFrequency} Hz`)
   const poweramp = await exportFilters(page, 'Poweramp')

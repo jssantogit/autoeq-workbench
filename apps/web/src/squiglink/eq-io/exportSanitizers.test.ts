@@ -36,6 +36,33 @@ describe('exportSanitizers', () => {
   })
 
   describe('getFilterExportFilenameBase', () => {
+    it.each([
+      ['Source.txt', 'Target.txt'],
+      ['Source.csv', 'Target.CSV'],
+    ])('removes terminal curve extensions from AutoEQ components', (sourceName, targetName) => {
+      expect(getFilterExportFilenameBase({
+        activeFrName: 'Renamed FR',
+        filterProvenance: 'autoeq',
+        autoEqRun: { manifest: { sourceName, targetName } },
+      })).toBe('Source - [Target]')
+    })
+
+    it('removes a terminal curve extension from a manual-EQ source', () => {
+      expect(getFilterExportFilenameBase({
+        activeFrName: 'Source.txt',
+        filterProvenance: 'manual',
+        autoEqRun: null,
+      })).toBe('Source - [EQ]')
+    })
+
+    it('preserves non-terminal curve extension text', () => {
+      expect(getFilterExportFilenameBase({
+        activeFrName: 'comparison.txt v2',
+        filterProvenance: 'manual',
+        autoEqRun: null,
+      })).toBe('comparison.txt v2 - [EQ]')
+    })
+
     it('uses frozen AutoEQ manifest names instead of renamed current curves', () => {
       expect(getFilterExportFilenameBase({
         activeFrName: 'Renamed FR',
