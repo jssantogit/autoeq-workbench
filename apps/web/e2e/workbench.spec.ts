@@ -225,6 +225,47 @@ for (const width of [390, 1440]) {
   })
 }
 
+test('equalizer uses the available dock height for the filter workspace', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Equalizer' }).click()
+
+  const panel = page.getByRole('region', { name: 'Equalizer workspace' })
+  const filters = panel.getByRole('rowgroup')
+  const ioActions = panel.getByRole('group', { name: 'Filter import and export' })
+  const [panelBox, filtersBox, ioBox] = await Promise.all([
+    panel.boundingBox(),
+    filters.boundingBox(),
+    ioActions.boundingBox(),
+  ])
+
+  expect(panelBox).not.toBeNull()
+  expect(filtersBox).not.toBeNull()
+  expect(ioBox).not.toBeNull()
+  expect(filtersBox!.height).toBeGreaterThan(panelBox!.height * 0.35)
+  const bottomGap = panelBox!.y + panelBox!.height - (ioBox!.y + ioBox!.height)
+  expect(bottomGap).toBeGreaterThanOrEqual(0)
+  expect(bottomGap).toBeLessThanOrEqual(12)
+})
+
+test('equalizer controls do not overlap when vertical space is constrained', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 600 })
+  await page.goto('/')
+  await page.getByRole('tab', { name: 'Equalizer' }).click()
+
+  const panel = page.getByRole('region', { name: 'Equalizer workspace' })
+  await panel.getByRole('button', { name: 'Settings' }).click()
+  const toolbar = panel.locator('.filter-editor__toolbar')
+  const ioActions = panel.getByRole('group', { name: 'Filter import and export' })
+  const [toolbarBox, ioBox] = await Promise.all([toolbar.boundingBox(), ioActions.boundingBox()])
+
+  expect(toolbarBox).not.toBeNull()
+  expect(ioBox).not.toBeNull()
+  expect(toolbarBox!.y + toolbarBox!.height).toBeLessThanOrEqual(ioBox!.y)
+  await ioActions.scrollIntoViewIfNeeded()
+  await expect(ioActions).toBeVisible()
+})
+
 test('Tools stays cohesive with audio, snapshots, Session, and Analysis on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 900 })
   await page.goto('/')

@@ -379,7 +379,7 @@ tbody.curves > tr > td.levels { order: 2; flex: 0 0 86px; padding-left: 16px; }
 .curve-upload-actions .field-error { margin: 0; }
 
 /* Source-derived Parametric Equalizer composition. */
-.extra-eq { min-width: 0; padding: 8px; }
+.extra-eq { display: flex; min-width: 0; min-height: 0; flex-direction: column; padding: 8px; }
 .equalizer-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .equalizer-heading h3 { margin: 0; font-size: 0.82rem; }
 .equalizer-heading .button { min-height: 28px; border-radius: 6px; padding: 4px 8px; font-size: 0.68rem; }
@@ -389,10 +389,13 @@ tbody.curves > tr > td.levels { order: 2; flex: 0 0 86px; padding-left: 16px; }
 .select-eq-phone select:disabled { color: var(--color-text-faint); }
 .target-autoeq { display: grid; min-width: 0; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
 .target-autoeq .button { min-width: 76px; min-height: 32px; border-radius: 6px; padding: 4px 10px; font-size: 0.7rem; }
+.filter-editor,
+.filter-table { display: flex; flex: 1 1 auto; flex-direction: column; }
+.filter-table { min-height: 0; }
 .filters-header,
 .filter { display: grid; grid-template-columns: 25fr 29fr 25fr 21fr; }
 .filters-header { gap: 4px; margin: 8px 0; color: var(--color-text-faint); font-size: 0.7rem; line-height: 1; }
-.filters { border-block: 1px solid var(--color-border); }
+.filters { min-height: 40px; flex: 1 1 auto; overflow-y: auto; border-block: 1px solid var(--color-border); }
 .filter { min-width: 0; gap: 4px; border-top: 1px solid var(--color-border); padding: 3px 0; cursor: pointer; font: 0.69rem ui-monospace, "SFMono-Regular", Consolas, monospace; }
 .filter:first-child { border-top: 0; }
 .filter > span { display: flex; min-width: 0; align-items: center; }
