@@ -257,9 +257,21 @@ tbody.curves > tr > td.remove > button {
   background: transparent;
   cursor: pointer;
 }
-.curve-row-cell-placeholder { cursor: default !important; }
-.curve-row-cell-placeholder::before,
-.curve-row-cell-placeholder::after { display: none !important; }
+.curve-row-cell-placeholder { opacity: 0.62; cursor: default !important; }
+tbody.curves > tr > td.levels.curve-row-cell-placeholder::before {
+  position: absolute;
+  top: 4px;
+  left: 16px;
+  display: block;
+  box-sizing: border-box;
+  width: 70px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-input);
+  content: '';
+  pointer-events: none;
+}
 
 tbody.curves > tr > td.remove { order: 7; margin: 0 16px 0 6px; }
 tbody.curves > tr > td.remove::after {

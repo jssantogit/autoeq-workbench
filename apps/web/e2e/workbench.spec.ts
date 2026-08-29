@@ -150,10 +150,11 @@ test('authoritative Workbench workflow survives export and Session restore', asy
   await expect(filterRows).toHaveCount(deliveredCount)
 })
 
-for (const width of [360, 390]) {
+for (const width of [360, 390, 1440]) {
   test(`curve manager stays compact and operable at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/')
+    if (width === 390) await page.getByRole('button', { name: 'Switch to dark theme' }).click()
     await importFr(page)
     await importFr(page)
     await importFr(page)
@@ -191,6 +192,26 @@ for (const width of [360, 390]) {
     const eqRow = page.getByRole('row', { name: `${longName} EQ` })
     await expect(eqRow).toBeVisible()
     expect((await eqRow.boundingBox())!.height).toBe((await firstRow.boundingBox())!.height)
+    const placeholderSurfaces = await eqRow.locator('.curve-row-cell-placeholder').evaluateAll((cells) =>
+      cells.map((cell) => {
+        const style = getComputedStyle(cell, '::before')
+        return {
+          display: style.display,
+          width: style.width,
+          height: style.height,
+          visibility: style.visibility,
+          backgroundColor: style.backgroundColor,
+          opacity: getComputedStyle(cell).opacity,
+        }
+      }))
+    expect(placeholderSurfaces.map(({ display, width, height }) => ({ display, width, height }))).toEqual([
+      { display: 'block', width: '70px', height: '36px' },
+      { display: 'block', width: '36px', height: '36px' },
+      { display: 'block', width: '36px', height: '36px' },
+    ])
+    expect(placeholderSurfaces.every(({ visibility, backgroundColor, opacity }) =>
+      visibility === 'visible' && backgroundColor !== 'rgba(0, 0, 0, 0)' && opacity === '0.62',
+    )).toBe(true)
   })
 }
 
