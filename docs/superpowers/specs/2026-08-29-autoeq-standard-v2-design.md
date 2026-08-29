@@ -18,57 +18,55 @@ Read it together with:
 
 Where this design conflicts with Standard v1 behavior for the **new algorithm only**, this design wins. `standard-v1` itself remains frozen and must not be silently retuned or rewritten.
 
-The product goal is to replace the current UI execution path with a more accurate and substantially more efficient **Standard v2** optimizer while preserving the existing local-only Worker architecture and the existing Equalizer workflow.
+The product goal is to replace the current UI execution path with a more accurate and substantially more efficient Standard v2 optimizer while preserving the existing local-only Worker architecture and Equalizer workflow.
 
-The three priorities, in order, are:
+Priorities, in order:
 
-1. **precision** — make the delivered EQ adhere to the requested Target across the effective fit interval, including mids and treble;
-2. **filter efficiency** — use the smallest practical delivered cascade without sacrificing the required precision;
-3. **speed** — avoid the combinatorial cost pattern that can make difficult real-world runs take tens of seconds or longer.
+1. **precision** — adhere to the requested Target across the effective fit interval, including mids and treble;
+2. **filter efficiency** — minimize the delivered cascade without sacrificing required precision;
+3. **speed** — remove the v1 cost pattern that can make difficult real-world runs take tens of seconds or longer.
 
-Standard v2 is a new versioned algorithm. It is not an in-place mutation of Standard v1.
+### 1.1 Final precision target
 
-### 1.1 User-visible target
-
-For a final quantized deliverable, Standard v2 considers the fit target achieved only when both are true:
+A final quantized deliverable is target-achieved only when both are true:
 
 ```text
 RMSE   <= 0.25 dB
 maxAbs <= 0.75 dB
 ```
 
-There is no special treble relaxation. Within the effective fit interval, frequencies are treated uniformly on the canonical logarithmic grid. With default settings the interval is the full Workbench domain, 20 Hz–20 kHz.
+There is no special treble relaxation. Within the effective fit interval, samples are treated uniformly on the canonical logarithmic grid. With default settings the interval is the full Workbench domain, 20 Hz–20 kHz.
 
 ### 1.2 Explicitly out of scope
 
-Standard v2 does **not** include:
+Standard v2 does not add:
 
-- new filter types beyond PK/LS/HS;
+- filter types beyond PK/LS/HS;
 - frequency-dependent treble de-weighting;
-- a v1/v2 selector in the product UI;
+- a v1/v2 UI selector;
 - fake percentage progress;
-- a visible precision/timeout warning badge;
+- visible precision/timeout warning badges;
 - new export destinations;
-- changes to graph appearance or graph series;
+- graph-series or graph-appearance changes;
 - cloud/server optimization;
 - WASM as a requirement;
-- changes to the frozen `standard-v1` numerical contract;
-- widening existing product hard bounds for frequency, gain, Q, or delivered filter count.
+- wider frequency/gain/Q/filter-count product bounds;
+- any numerical change to frozen `standard-v1`.
 
-## 2. Product integration rule
+## 2. Product integration and version boundary
 
-The existing AutoEQ button remains the sole user entry point. The product UI runs **Standard v2** by default after this work lands.
+The existing AutoEQ button remains the sole entry point. After this work lands, the product runs Standard v2 by default.
 
-The historical core entry point remains available for reproducibility:
+The historical core entry point remains frozen:
 
 ```ts
-runStandardAutoEq(input)   // frozen standard-v1
-runStandardAutoEqV2(input) // new standard-v2
+runStandardAutoEq(input)   // standard-v1
+runStandardAutoEqV2(input) // standard-v2
 ```
 
-The browser Worker must call `runStandardAutoEqV2()` explicitly. Do not alias or redefine `runStandardAutoEq()` to mean v2.
+The Worker calls `runStandardAutoEqV2()` explicitly. Do not alias or redefine `runStandardAutoEq()` to mean v2.
 
-The existing Worker/client/controller responsibilities remain unchanged:
+The existing browser lifecycle remains:
 
 ```text
 immutable run-input capture
@@ -77,21 +75,21 @@ disposable Web Worker
         ↓
 standard-v2 core engine
         ↓
-runId / input-signature guard
+runId + input-signature guard
         ↓
 atomic workspace apply
 ```
 
-React, Zustand, Worker code, and export code do not become numerical authorities.
+`packages/core` remains the sole numerical authority. React, Zustand, Worker orchestration, and export code do not contain alternate optimization formulas.
 
-## 3. Existing hard product bounds remain authoritative
+## 3. Existing product constraints
 
-Standard v2 continues to use the existing Workbench product bounds:
+Standard v2 preserves the approved Workbench bounds:
 
 ```text
 sample rate:           48,000 Hz
 Workbench domain:      20–20,000 Hz
-fit grid density:      96 points/octave
+fit density:           96 points/octave
 filter gain:           -15..+15 dB
 PK Q:                  0.1..12
 shelf Q:               0.7
@@ -99,13 +97,11 @@ default Max Filters:   10
 hard Max Filters:      64
 ```
 
-The user's effective `minFrequencyHz`, `maxFrequencyHz`, `minGainDb`, `maxGainDb`, `minQ`, `maxQ`, and `maxFilters` remain hard constraints on the delivered result.
-
-A valid setting may narrow an envelope but never widen beyond product limits.
+The user's effective frequency, gain, Q, and final filter-count envelopes remain hard delivered-result constraints. Valid settings may narrow product bounds but never widen them.
 
 ## 4. AutoEqSettings v2 and Time Limit
 
-Standard v2 extends the settings contract with a discrete runtime budget:
+Extend the settings contract with a discrete runtime budget:
 
 ```ts
 export type AutoEqTimeLimitSeconds = 5 | 15 | 30 | 60 | 120
@@ -122,23 +118,15 @@ export interface AutoEqSettings {
 }
 ```
 
-The default is:
+Default:
 
 ```text
 timeLimitSeconds = 30
 ```
 
-Only the five approved values are valid. Arbitrary numeric timeout values are rejected rather than clamped.
+Only `5 | 15 | 30 | 60 | 120` is valid. Arbitrary timeout numbers are rejected, not clamped.
 
-`timeLimitSeconds` is part of:
-
-- the captured run input;
-- AutoEQ settings validation;
-- the input signature used to reject obsolete results;
-- session persistence;
-- the Standard v2 run manifest.
-
-Changing Time Limit after a run is a relevant settings change and therefore makes the existing AutoEQ result stale under the same rules as other relevant AutoEQ setting changes.
+`timeLimitSeconds` participates in settings validation, captured run input, input signature, session persistence, staleness, and the Standard v2 manifest.
 
 ### 4.1 UI
 
@@ -148,25 +136,13 @@ Add one compact row below `Max Filters` in `AutoEQ Settings`:
 Time Limit       [30 s ▾]
 ```
 
-Use a native/select-style control consistent with the existing export-format selector used for Equalizer APO / Poweramp / Wavelet.
+Use the same native/select-style visual vocabulary as the existing Equalizer APO / Poweramp / Wavelet export selector. Options, in order, are `5 s`, `15 s`, `30 s`, `60 s`, `120 s`.
 
-Options, in order:
+Do not create a second AutoEQ settings surface.
 
-```text
-5 s
-15 s
-30 s
-60 s
-120 s
-```
+## 5. Precision and solution ranking
 
-Do not add a second AutoEQ settings surface.
-
-## 5. Precision model
-
-### 5.1 Evaluation grid
-
-Prepare source and target using the existing normalization and canonical 96-points-per-octave logarithmic grid.
+Prepare source and target with the existing normalization on the canonical 96-ppo logarithmic grid.
 
 Desired correction remains:
 
@@ -174,66 +150,53 @@ Desired correction remains:
 desired(f) = target(f) - source(f)
 ```
 
-Evaluate fit on the subset satisfying the user's effective frequency interval:
+Fit samples satisfy:
 
 ```text
 minFrequencyHz <= f <= maxFrequencyHz
 ```
 
-All fit-grid samples inside that interval carry equal weight. Standard v2 does not down-weight higher frequencies merely because they are high frequencies.
+All fit samples in that interval carry equal weight.
 
-### 5.2 Target envelope
+### 5.1 Target envelope
 
-The final delivered solution is target-achieved iff:
+Target achievement is evaluated only from the exact final delivered cascade:
 
 ```ts
 metrics.rmseDb <= 0.25 && metrics.maxAbsDb <= 0.75
 ```
 
-These metrics are computed from the **final quantized, discretely refined, delivered cascade**, not from a continuous intermediate solution.
+A continuous or over-budget working solution does not count as success.
 
-The thresholds are sufficient. Once a deliverable inside the envelope has been found and compressed successfully, the optimizer does not spend remaining runtime chasing smaller RMSE/maxAbs values for their own sake.
+The thresholds are sufficient. Once a delivered solution is inside the envelope and compression is complete, the optimizer does not spend remaining runtime pursuing lower RMSE/maxAbs for their own sake.
 
-### 5.3 Ranking solutions outside the target envelope
+### 5.2 Ranking outside the envelope
 
-While a solution is outside the target envelope, its primary normalized violation is:
+Primary normalized violation is:
 
 ```text
-violation = max(
-  rmseDb / 0.25,
-  maxAbsDb / 0.75
-)
+violation = max(rmseDb / 0.25, maxAbsDb / 0.75)
 ```
 
-Lower is better.
+Lower is better. This prevents low average error from hiding a bad local region.
 
-This prevents an excellent global average from hiding a bad local residual region.
-
-For numerically meaningful ties, use this ordering:
+The deterministic comparison tuple is:
 
 1. lower normalized violation;
 2. lower RMSE;
 3. lower maxAbs;
-4. lower cancellation severity/score;
-5. lower filter aggressiveness;
-6. lower filter count;
-7. stable deterministic parameter/list ordering.
+4. lower cancellation `totalScore`;
+5. lower maximum Q;
+6. lower maximum absolute filter gain;
+7. lower sum of absolute filter gains;
+8. lower filter count;
+9. deterministic parameter/list ordering.
 
-Filter count is therefore not allowed to trade away primary fit accuracy during the fit phase.
+Filter count and aggressiveness are therefore secondary. They cannot trade away materially better fit while the target envelope is unmet.
 
-### 5.4 Aggressiveness tie-break
+## 6. Core architecture: deterministic hybrid residual search
 
-Aggressiveness is secondary only. It may prefer, among essentially equivalent fits:
-
-- lower absolute gain;
-- lower Q;
-- fewer nearby opposite-sign cancellations.
-
-It must not reject a materially more accurate solution merely to reduce Q, gain, cancellation score, or filter count while the target envelope has not been achieved.
-
-## 6. Standard v2 architecture
-
-Standard v2 uses a **deterministic hybrid residual search**:
+Standard v2 uses:
 
 ```text
 FR + Target
@@ -242,7 +205,7 @@ prepared residual
     ↓
 multi-scale feature detection
     ↓
-PK / LS / HS seed generation
+PK / LS / HS seeds
     ↓
 cheap candidate scoring
     ↓
@@ -250,148 +213,105 @@ small exact shortlist
     ↓
 main greedy path + bounded alternatives
     ↓
-iterative joint cascade refinement
+iterative joint refinement
     ↓
 final-cap compression
     ↓
-quantization + discrete refinement
+quantization + cyclic discrete refinement
     ↓
 final metrics / preamp / audit / manifest
 ```
 
-The search is intentionally not a broad beam search and not a randomized global optimizer.
+It is not a broad beam search and not a randomized optimizer.
 
-### 6.1 Determinism
+Outside wall-clock timeout, identical numerical inputs, settings, and algorithm version must produce identical filters, order/IDs, metrics, audit, preamp, and manifest.
 
-Outside wall-clock timeout, identical numerical inputs, settings, and algorithm version must produce the exact same:
+The wall-clock deadline is the only approved exception to strict cross-machine identity because different machines may finish a different number of safe checkpoints. Timeout output is best-effort deterministic. Tests inject a controlled clock so timeout behavior is exactly reproducible in tests.
 
-- filters;
-- order and IDs;
-- metrics;
-- preamp;
-- cancellation audit;
-- manifest.
+## 7. Versioned v2 search constants
 
-Search ordering, candidate ordering, tie-breaking, and refinement ordering are deterministic.
-
-A wall-clock deadline is the only approved exception to strict cross-machine output identity: two machines may complete a different number of safe checkpoints before the same time limit. Timeout output is therefore **best-effort deterministic**.
-
-Tests must use an injected deterministic clock so timeout behavior itself is reproducible under test.
-
-## 7. Multi-scale candidate generation
-
-Standard v1's single broad same-sign-region seed is not sufficient for v2. Standard v2 must identify local residual structure at multiple widths.
-
-### 7.1 PK feature seeds
-
-For material residual structure:
-
-1. identify deterministic local extrema of the signed residual;
-2. locate surrounding sign crossings and/or half-height boundaries where available;
-3. estimate a characteristic bandwidth in log-frequency space;
-4. seed frequency at the local residual extremum, clamped to the effective frequency envelope;
-5. seed gain from the signed residual at the extremum, clamped to the effective gain envelope;
-6. derive a base Q estimate from the feature width;
-7. create a small deterministic family around that Q estimate to represent broader, nominal, and narrower interpretations.
-
-The initial v2 family is:
+The initial Standard v2 search contract includes:
 
 ```text
-Q scale multipliers: 0.5, 1.0, 2.0
+targetRmseDb                    0.25
+targetMaxAbsDb                  0.75
+candidateResidualFloorDb        0.15
+PK Q scale multipliers          0.5, 1.0, 2.0
+maxExactCandidatesPerIteration  8
+maxActiveSearchPaths            3
+alternateRetentionRatio         1.02
+maxJointRefinementCycles         6
 ```
 
-Each resulting Q is constrained to the user's effective PK-Q envelope.
+`alternateRetentionRatio = 1.02` means an alternate candidate/path may be retained only when its primary normalized violation is no worse than 2% above the current best at that branch point, or when it is the best deterministic escape from an otherwise stagnant main path. At most three active paths exist at once.
 
-Near-duplicate seeds must be deduplicated deterministically.
+These values are versioned Standard v2 behavior. Any later tuning after v2 closeout requires a new approved algorithm version or an explicit spec amendment before closeout.
 
-### 7.2 Edge/shelf seeds
+## 8. Multi-scale candidate generation
 
-LS and HS candidates use broad edge structure rather than fixed nominal frequencies only.
+### 8.1 PK seeds
 
-For each edge:
+For material signed residual structure:
+
+1. find deterministic local extrema;
+2. locate surrounding sign crossings and/or half-height boundaries when available;
+3. estimate characteristic bandwidth in log-frequency space;
+4. seed Fc at the local extremum, clamped to the effective frequency envelope;
+5. seed gain from the signed residual at Fc, clamped to the effective gain envelope;
+6. derive a base Q from feature width;
+7. create Q variants at `0.5×`, `1×`, and `2×` base Q, constrained to the effective PK-Q envelope;
+8. deduplicate near-equivalent seeds deterministically.
+
+The `0.15 dB` candidate floor is deliberately below the final `0.75 dB` maxAbs target so refinement can close residual structure before it becomes a final failure.
+
+### 8.2 Shelf seeds
+
+LS/HS candidates use broad edge evidence rather than only fixed nominal frequencies:
 
 - require consistent signed residual evidence across a broad edge region;
-- estimate shelf transition frequency from the residual transition geometry;
-- use shelf Q = 0.7;
+- estimate transition frequency from residual geometry;
+- use Q `0.7`;
 - seed gain from a robust signed statistic of the edge residual;
-- clamp frequency and gain to the effective run envelope.
+- constrain Fc/gain to the effective run envelope.
 
-No excluded frequency may be inspected to justify a shelf outside the user's fit interval.
+Excluded frequencies cannot justify a shelf outside the user's fit interval.
 
-### 7.3 Candidate threshold
+## 9. Response caching and two-stage candidate evaluation
 
-Candidate detection must remain sensitive below the final maxAbs target so the optimizer can close residuals before they become final failures.
+V2 must not rebuild unchanged filter responses for every trial.
 
-The initial versioned detection floor is:
-
-```text
-candidateResidualFloorDb = 0.15
-```
-
-This is an algorithm parameter, not a UI setting.
-
-## 8. Fast candidate scoring and response caching
-
-Standard v2 must remove the v1 cost pattern of repeatedly rebuilding the complete cascade for every cheap trial.
-
-The engine maintains:
-
-- the current sum of per-filter dB responses on the fit grid;
-- each accepted filter's individual fit-grid response;
-- the current delivered/residual arrays;
-- reusable candidate response buffers where beneficial.
-
-When testing a coordinate change to one filter, update the cascade as:
+Maintain the current sum of per-filter dB responses and individual accepted-filter responses on the fit grid. A one-filter coordinate trial updates the cascade as:
 
 ```text
 candidateCascade = currentCascade - oldFilterResponse + newFilterResponse
 ```
 
-Do not recompute all unchanged filters for that trial.
+Each search iteration has two stages:
 
-### 8.1 Two-stage candidate evaluation
+1. cheap candidate ranking against the current residual;
+2. exact whole-cascade evaluation/refinement only for the best eight candidates.
 
-Each iteration uses two stages:
+Equal cheap scores resolve by stable frequency/type/parameter ordering.
 
-1. **cheap ranking** — estimate residual improvement using the candidate's standalone response against the current residual;
-2. **exact shortlist** — only the best candidates enter complete-cascade refinement/evaluation.
+## 10. Hybrid search and bounded alternatives
 
-The initial versioned exact shortlist cap is:
+The main path is deterministic residual pursuit/greedy search.
 
-```text
-maxExactCandidatesPerIteration = 8
-```
-
-Candidate ordering after scores are equal must remain deterministic.
-
-## 9. Hybrid search and bounded alternatives
-
-The primary search remains residual pursuit/greedy because it is efficient and naturally incremental.
-
-Unlike v1, Standard v2 may preserve a very small number of alternate cascades when:
-
-- candidate scores are materially close; or
-- the main path stagnates outside the target envelope.
-
-The branch width is fixed and bounded:
+When alternatives fall within `alternateRetentionRatio` or the main path stagnates outside the envelope, retain deterministic alternate cascades, but never more than:
 
 ```text
 maxActiveSearchPaths = 3
 ```
 
-This means one main path plus at most two alternatives. Alternatives use the same deterministic candidate and refinement rules. There is no unbounded queue and no nested beam expansion.
+That is one main path plus at most two alternatives. There is no unbounded queue or nested beam expansion.
 
-When paths exceed the cap, retain the best paths according to the Standard v2 solution ranking and deterministic tie-breaks.
+When pruning paths back to the cap, use the solution-ranking tuple from Section 5.
 
-## 10. Working filter budget versus delivered Max Filters
+## 11. Working budget versus delivered Max Filters
 
-`Max Filters` changes meaning from a v1 search ceiling to a **hard delivered-solution ceiling**.
+`Max Filters` is a **hard delivered-solution ceiling**, not necessarily the internal working ceiling.
 
-The optimizer may temporarily use more filters internally to discover a better decomposition, but the user must never receive more than `settings.maxFilters`.
-
-### 10.1 Working oversubscription cap
-
-The internal working cap is deterministic:
+Internal working cap:
 
 ```ts
 workingMaxFilters = maxFilters === 0
@@ -411,15 +331,15 @@ Max Filters 20 → working cap 30
 Max Filters 64 → working cap 64
 ```
 
-This allows temporary over-completeness without allowing search size to grow without bound.
+`Max Filters = 0` means both working and delivered generated-filter counts are zero.
 
-A `Max Filters` value of `0` still means the delivered and working solution both contain zero generated filters.
+The user must never receive more filters than `settings.maxFilters`.
 
-## 11. Iterative joint refinement
+## 12. Iterative joint refinement
 
-After an accepted candidate materially improves a path, refine the **whole cascade**, not only the newly added filter.
+After an accepted candidate materially improves a retained path, refine the entire cascade, not only the new filter.
 
-Use deterministic coordinate refinement with the established coarse-to-fine scales:
+Use the established deterministic scales:
 
 ```ts
 [
@@ -429,72 +349,59 @@ Use deterministic coordinate refinement with the established coarse-to-fine scal
 ]
 ```
 
-The difference from v1 is control flow: v2 cycles through coarse → medium → fine and may repeat the sequence while material improvement continues.
+Unlike v1's one fixed sequence, v2 may repeat coarse → medium → fine for up to six joint cycles while the ranking tuple improves.
 
-The initial hard cap is:
+A cycle stops/restarts only at deterministic boundaries. Stop early when a full cycle yields no better tuple, the path is dominated/pruned, or the runtime deadline is reached.
 
-```text
-maxJointRefinementCycles = 6
-```
+Shelves keep Q `0.7`. PK Fc/gain/Q remain inside the effective user envelope.
 
-Stop refinement early when:
+## 13. Monotonic best-deliverable checkpoint
 
-- a target-achieved deliverable has been established and the fit phase can transition to compression;
-- a complete cycle makes no material improvement;
-- the search path is dominated by another retained path;
-- the runtime deadline has been reached.
-
-For shelves, Q remains fixed at 0.7. For PK filters, Fc/gain/Q remain within the user's effective envelope.
-
-## 12. Best deliverable checkpoint
-
-The engine maintains two distinct concepts throughout the run:
+The engine maintains two concepts:
 
 ```text
 working solution
 best deliverable checkpoint
 ```
 
-The **working solution** may be continuous and may temporarily exceed `Max Filters` up to `workingMaxFilters`.
+The working solution may be continuous and may contain up to `workingMaxFilters`.
 
-The **best deliverable checkpoint** must always be:
+The best deliverable checkpoint must always be:
 
-- at or below `Max Filters`;
+- at/below `Max Filters`;
 - representable on the delivery/manual-entry grid;
 - fully quantized;
 - discretely refined;
-- valid under all effective gain/Q/frequency constraints;
+- valid under all effective constraints;
 - fully scored with final-style metrics.
 
-A valid zero-filter checkpoint exists from the beginning, so a timeout never leaves the engine without something valid to return.
+A zero-filter checkpoint exists from the start, so timeout always has a valid result.
 
-The best deliverable checkpoint is monotonic according to the v2 solution ranking: later work may replace it only with an equal-or-better deliverable.
+The checkpoint is monotonic: replace it only with an equal-or-better deliverable according to Section 5. A longer Time Limit follows the same deterministic search prefix and therefore cannot make the best available deliverable worse.
 
-This monotonic checkpoint rule guarantees that increasing Time Limit cannot make the best available result worse, provided the longer run follows the same deterministic search prefix.
+## 14. Precision-first compression
 
-## 13. Precision-first compression
-
-Once a working path can produce a delivered cascade inside the `0.25 / 0.75` target envelope, optimization switches from fit acquisition to filter compression.
+Once a working path can produce a delivered cascade inside `0.25 / 0.75`, fit acquisition gives way to compression.
 
 Compression uses deterministic backward elimination:
 
-1. estimate the impact of removing each delivered filter;
-2. try the least-important removal first;
+1. estimate removal impact for each delivered filter;
+2. test least-important removals first;
 3. remove one filter;
-4. jointly refit the remaining filters;
+4. jointly refit the remainder;
 5. quantize and discrete-refine the reduced cascade;
-6. keep the removal only when the reduced **delivered** result remains inside the target envelope;
-7. repeat until no single-filter removal can remain inside the envelope.
+6. keep removal only if the reduced delivered result remains inside both precision limits;
+7. repeat until no remaining single filter can be removed and re-refined while preserving the envelope.
 
-If a simple removal loses the envelope, a short refit under the final cap may allow the remaining filters to absorb its work before the removal is rejected.
+A normally completed `target-reached` result is therefore **one-filter locally minimal**.
 
-The final target-achieved cascade should therefore be **one-filter locally minimal**: no remaining single filter can be removed and re-refined while keeping the final delivered solution inside both target limits.
+If a simple removal loses the envelope, a bounded refit of the remaining filters may absorb the removed filter's work before the removal is rejected.
 
-If the target envelope was never reached, compression still enforces `Max Filters` and retains the best deliverable available according to the normalized-violation ranking.
+If the envelope is never reached, final-cap compression still produces the best valid deliverable according to Section 5.
 
-## 14. Quantization and discrete refinement
+## 15. Quantization and cyclic discrete refinement
 
-Standard v2 keeps the approved manual-entry delivery precision:
+Keep the approved delivery precision:
 
 ```ts
 {
@@ -505,36 +412,23 @@ Standard v2 keeps the approved manual-entry delivery precision:
 }
 ```
 
-Projection remains constrained to:
+Projection remains:
 
 ```text
 manual-entry grid ∩ effective user envelope
 ```
 
-The v1 rule that an unrepresentable coordinate may cause that candidate filter to be omitted remains valid.
+An unrepresentable required coordinate may omit that candidate filter under the existing rule.
 
-### 14.1 Iterative discrete refinement
+V2 replaces fixed two-pass discrete refinement with deterministic cyclic refinement. For each coordinate, test current and neighboring representable grid values. Continue while a complete cycle improves the ranking tuple and the deadline allows another cycle.
 
-V2 replaces the fixed two-pass discrete refinement with cyclic deterministic refinement.
+Never replace the current best deliverable checkpoint with a worse result.
 
-For each adjustable coordinate, evaluate current and neighboring representable manual-grid values. Continue cycling while a full cycle produces a material improvement.
+After discrete refinement, remove exact `0 dB` filters, sort deterministically, assign `autoeq-1`, `autoeq-2`, …, and recompute metrics, preamp, and cancellation audit from the exact delivered list.
 
-Do not start a new discrete cycle after the deadline.
+## 16. Runtime budget and timeout
 
-Discrete refinement must never replace the current best delivered checkpoint with a worse result.
-
-After discrete refinement:
-
-- remove exact `0 dB` filters;
-- sort deterministically;
-- assign deterministic IDs `autoeq-1`, `autoeq-2`, ...;
-- recompute metrics, preamp, and cancellation audit from the exact delivered list.
-
-## 15. Runtime budget and timeout semantics
-
-### 15.1 Deadline source
-
-The core v2 runner accepts an injected monotonic clock dependency for testability:
+The v2 runner accepts an injectable monotonic clock:
 
 ```ts
 interface StandardV2Runtime {
@@ -542,57 +436,35 @@ interface StandardV2Runtime {
 }
 ```
 
-Production uses a monotonic browser/JS runtime clock. Unit tests use a controlled fake clock.
+Production uses a monotonic JS runtime clock; tests use a controlled fake clock.
 
-The deadline is:
+Deadline:
 
 ```text
 startMs + timeLimitSeconds * 1000
 ```
 
-The clock begins when the Worker starts executing the core algorithm, not when the user first clicks the button.
+The clock starts when the Worker starts executing the core algorithm.
 
-### 15.2 Cooperative hard timeout
+### 16.1 Cooperative hard budget
 
-The approved `Time Limit` is a hard optimizer budget with safe-checkpoint semantics.
+Check the deadline before starting each primitive expensive action, including exact candidate evaluation, coordinate trial, new refinement cycle, compression/refit attempt, and discrete-refinement trial/cycle.
 
-The runner must check the deadline before starting each primitive expensive action, including:
+Once the deadline is reached, start no further expensive optimizer action. Return the best complete deliverable checkpoint already available.
 
-- exact candidate evaluation;
-- coordinate/refinement trial;
-- new refinement cycle;
-- compression removal/refit attempt;
-- discrete-refinement trial/cycle.
+A primitive already executing may finish before the next check, so wall-clock completion may exceed the selected limit only by one bounded primitive evaluation. No new iteration/phase begins after deadline.
 
-Once the deadline has been reached, the engine must not start another expensive optimizer action. It returns the best complete deliverable checkpoint already available.
+### 16.2 Timeout is a normal result
 
-The currently executing primitive numerical evaluation may complete before the next check. Therefore wall-clock completion may exceed the selected limit only by one bounded primitive evaluation; the engine must never intentionally begin another iteration or phase after the deadline.
+Timeout returns a normal `AutoEqResult` with `terminationReason = 'time-limit'`. If the input signature still matches, the UI applies it normally. No timeout warning/banner/badge is added.
 
-### 15.3 Timeout is not an error
+### 16.3 Cancel remains distinct
 
-Expiration returns a normal `AutoEqResult` with:
+User Cancel terminates the Worker, invalidates the run, applies no partial checkpoint, preserves the prior workspace solution/run record, and is not an optimization failure.
 
-```text
-terminationReason = time-limit
-```
+## 17. Termination reasons
 
-The UI applies it normally if the captured input signature still matches.
-
-No timeout warning/banner/badge is added to normal product UI.
-
-### 15.4 Cancel remains different
-
-User Cancel:
-
-- terminates the Worker;
-- invalidates the run;
-- applies no partial or timeout checkpoint;
-- preserves the prior workspace solution and prior AutoEQ run record;
-- is not treated as optimization failure.
-
-## 16. Termination rules
-
-Standard v2 terminates normally for one of three manifest reasons:
+Standard v2 records exactly one:
 
 ```ts
 type StandardV2TerminationReason =
@@ -601,39 +473,35 @@ type StandardV2TerminationReason =
   | 'time-limit'
 ```
 
-Use `target-reached` only when the final delivered checkpoint satisfies both precision thresholds and compression has reached one-filter local minimality, or no further safe compression attempt can be started before an already-reached deadline.
+Use `target-reached` only when the final delivered checkpoint satisfies both precision thresholds **and** compression has completed one-filter local-minimality checking before the deadline.
 
-Use `converged` when the deterministic search/refinement has no material improvement path remaining before the time limit.
+Use `converged` when deterministic search/refinement has no improving path remaining before the deadline.
 
-Use `time-limit` when the deadline prevents further search or required fit/compression work before normal convergence.
+Use `time-limit` whenever the deadline prevents further required fit or compression work. A timeout result may still have `targetAchieved = true` if its best delivered checkpoint already lies inside the precision envelope; it simply means compression/convergence was not fully completed before time expired.
 
-The manifest also records:
+The manifest records:
 
 ```ts
 targetAchieved: boolean
 ```
 
-This is diagnostic/provenance data. It is not a requirement to add visible UI status.
+This is diagnostic provenance only; no new visible status is required.
 
-## 17. Preamp and cancellation audit
+## 18. Preamp and cancellation
 
-Preamp remains computed from the exact final delivered cascade using the existing dense full-band policy over the supported Workbench domain.
+Preamp remains computed from the exact final delivered cascade using the existing dense full-band Workbench policy.
 
-The final cancellation audit is likewise computed only from the exact final delivered filters after quantization, discrete refinement, zero-gain cleanup, and final sorting.
+The final cancellation audit is also recomputed from the exact final delivered filters after quantization, discrete refinement, zero-gain cleanup, and sorting.
 
-Cancellation is a secondary structural preference while fitting. It must not override a materially better fit outside the precision envelope.
+Cancellation is a secondary preference and cannot override materially better fit while the target envelope is unmet.
 
-## 18. Manifest versioning
+## 19. Manifest versioning
 
-Historical Standard v1 manifests remain valid and unchanged.
-
-Define explicit versioned unions instead of widening the existing v1 interface in place:
+Historical v1 manifests remain unchanged. Define explicit unions:
 
 ```ts
 type RunManifest = RunManifestV1 | RunManifestV2
 ```
-
-### 18.1 RunManifestV1
 
 `RunManifestV1` remains:
 
@@ -642,11 +510,9 @@ schemaVersion = 2
 algorithmVersion = standard-v1
 ```
 
-Its historical settings shape remains the v1 shape and must not be retroactively given a Time Limit field.
+Its historical settings shape remains the v1 shape without Time Limit.
 
-### 18.2 RunManifestV2
-
-Standard v2 uses:
+`RunManifestV2` uses:
 
 ```text
 schemaVersion = 3
@@ -675,22 +541,11 @@ terminationReason
 targetAchieved
 ```
 
-Do **not** store:
+Do not persist timestamps, random/browser run IDs, `elapsedMs`, or machine identifiers. Runtime belongs to benchmarks, not the reproducible manifest.
 
-- wall-clock timestamp;
-- random/browser runId;
-- `elapsedMs`;
-- machine identifier.
+Names remain provenance only, not numerical signature data.
 
-`elapsedMs` belongs to benchmarks/diagnostics, not the reproducible run manifest.
-
-Names remain provenance only and do not become numerical input-signature data.
-
-## 19. Session schema evolution
-
-The Workbench session schema evolves explicitly from v1 to v2.
-
-### 19.1 WorkbenchSessionV2
+## 20. Workbench Session v2 migration
 
 New session exports use:
 
@@ -709,81 +564,60 @@ interface WorkbenchSessionV2 {
 }
 ```
 
-The inclusion/exclusion policy for session state otherwise remains the approved Plan 3 policy.
+The previously approved include/exclude policy for session state otherwise remains unchanged.
 
-### 19.2 Importing WorkbenchSessionV1
-
-A valid v1 session migrates deterministically on import:
+A valid Workbench Session v1 migrates deterministically:
 
 ```text
-old AutoEQ settings
-      ↓
+v1 settings
+   ↓
 add timeLimitSeconds = 30
-      ↓
+   ↓
 WorkbenchSessionV2 in memory
 ```
 
-Any historical `standard-v1` run manifest inside `autoEqRun` is preserved as `RunManifestV1`. Do not rewrite it to schema 3, do not inject a fake timeout, and do not relabel it as Standard v2.
+Any embedded historical `standard-v1` run manifest stays a `RunManifestV1`. Do not inject a fake timeout, rewrite its schema, or relabel its algorithm.
 
-After migration, any new session export uses schema 2.
+After migration, new exports use session schema 2. Invalid imports remain fully non-mutating.
 
-Invalid sessions remain non-mutating failures under the existing parse/validate-then-apply rule.
+## 21. Input signature and staleness
 
-## 20. Input signature and staleness
+The v2 input signature includes active FR/Target IDs and numerical raw points, normalization, and every effective AutoEQ setting including `timeLimitSeconds`.
 
-The Standard v2 input signature includes the same numerical authorities as before plus `timeLimitSeconds`:
+Names remain provenance only. Theme, tab, graph appearance, labels, smoothing, audio transport, Compare A/B, and unrelated UI state remain excluded.
 
-- active FR identity and raw numerical points;
-- active Target identity and raw numerical points;
-- normalization;
-- all effective AutoEQ settings, including Time Limit.
+Changing Time Limit after a run therefore makes the prior AutoEQ result stale under the existing relevant-settings rule.
 
-Names remain provenance only.
+## 22. Benchmark corpus
 
-Theme, open tab, graph appearance, labels, smoothing, audio transport, Compare A/B, and unrelated UI state remain excluded.
+The frozen Standard v1 benchmark remains the comparison baseline. V2 adds a broader deterministic corpus.
 
-A result is applied only if the current workspace signature still matches the signature captured at run start.
+### 22.1 Known-solvable cases
 
-## 21. Benchmark design
+Create synthetic/sanitized cases whose desired correction comes from a known valid quantized PK/LS/HS cascade within product constraints. Include:
 
-The existing Standard v1 benchmark remains the frozen comparison baseline. Standard v2 adds a broader corpus and reports v1/v2 side by side where meaningful.
-
-### 21.1 Known-solvable cases
-
-Create deterministic synthetic/sanitized cases whose desired correction is generated from a known valid, quantized PK/LS/HS cascade within product constraints. The corpus must include:
-
-- broad bass shelf plus midrange structure;
-- alternating peaks/valleys in roughly 2–8 kHz;
-- dense irregular structure in roughly 6–20 kHz;
-- mixed broad and narrow features;
+- broad bass plus midrange structure;
+- alternating peaks/valleys around 2–8 kHz;
+- dense irregular structure around 6–20 kHz;
+- mixed broad/narrow features;
 - partially overlapping filters;
-- a case requiring close to the final `Max Filters` cap;
-- quantization-sensitive features;
-- a case where a larger working cascade must compress back under the final cap.
+- a case close to final `Max Filters`;
+- quantization-sensitive structure;
+- a case requiring an over-complete working cascade before final-cap compression.
 
-Because these cases have a known feasible delivered solution, failure to reach the precision envelope under a reasonable budget is optimizer evidence rather than proof of mathematical impossibility.
+These cases must reach the precision envelope with sufficient `Max Filters` under the default 30-second budget.
 
-### 21.2 Adversarial/stress cases
+### 22.2 Adversarial/stress cases
 
-Add cases designed to create many residual extrema and candidate conflicts, especially in mids and treble. These cases need not have a known perfect solution.
+Add deterministic cases with many residual extrema/candidate conflicts, especially in mids and treble. They need not have a known perfect solution. They verify bounded runtime, stability, valid timeout delivery, candidate-count control, and checkpoint quality.
 
-They verify:
+### 22.3 Holdout
 
-- bounded runtime;
-- stability;
-- valid timeout result;
-- candidate-count control;
-- quality of the best checkpoint under pressure.
+Reserve part of the synthetic corpus as holdout validation. Do not repeatedly tune algorithm constants against holdout outputs. Use holdout to detect fixture overfitting before closeout.
 
-### 21.3 Holdout cases
+## 23. Benchmark output and acceptance gates
 
-Reserve part of the synthetic corpus as holdout validation. Internal algorithm constants may not be tuned by repeatedly targeting only the holdout outputs.
-
-The holdout is used to detect overfitting to the development fixtures.
-
-## 22. Benchmark metrics
-
-For every benchmark case record at least:
+Record at least:
 
 ```text
 algorithmVersion
@@ -802,135 +636,80 @@ strongCancellations
 final filters
 ```
 
-Benchmark runtime is diagnostic evidence and is intentionally separate from the reproducible manifest.
+Acceptance:
 
-## 23. Acceptance gates
+- known-solvable cases with adequate `Max Filters` pass `RMSE <= 0.25` and `maxAbs <= 0.75` at the default 30 s;
+- every normal result, including timeout, satisfies `finalFilters.length <= settings.maxFilters`;
+- non-time-limited repeated runs are exactly reproducible;
+- fake-clock timeout runs are exactly reproducible;
+- longer Time Limit never produces a worse best-deliverable checkpoint than a shorter prefix-equivalent run;
+- cases where v1 already comfortably passes the v2 envelope also pass it under v2;
+- a normally completed `target-reached` result is one-filter locally minimal;
+- lower filter count never justifies leaving the precision envelope.
 
-### 23.1 Correctness
+### 23.1 Performance target
 
-For every known-solvable case that is configured with sufficient final `Max Filters` and budget, the delivered result must satisfy:
-
-```text
-RMSE   <= 0.25 dB
-maxAbs <= 0.75 dB
-```
-
-The result used for the assertion must already be quantized, discretely refined, and at/below final `Max Filters`.
-
-### 23.2 Final cap
-
-At every normal termination, including timeout:
+On a consistent project reference benchmark environment with default 30 s:
 
 ```text
-finalFilters.length <= settings.maxFilters
+typical cases: <= 3 s target
+stress cases:  <= 10 s target
 ```
 
-This invariant must hold independently of the larger internal working cap.
+The selected `5 / 15 / 30 / 60 / 120 s` value remains the hard optimizer budget.
 
-### 23.3 Determinism
-
-For non-time-limited completion, repeated runs with identical numerical inputs/settings must produce identical numerical result and manifest content.
-
-Timeout tests with an injected deterministic clock must likewise be exactly reproducible.
-
-### 23.4 Monotonic Time Limit
-
-For the same input and settings other than Time Limit, a longer budget must never replace the best deliverable checkpoint with a worse one according to the Standard v2 ranking.
-
-The search strategy itself must not change because the selected timeout is larger; the timeout controls how long the same deterministic search prefix may continue.
-
-### 23.5 Performance target
-
-On the project reference benchmark environment at the default 30-second setting:
-
-```text
-typical cases: target <= 3 s
-stress cases:  target <= 10 s
-```
-
-The hard user budget remains the selected `5 / 15 / 30 / 60 / 120 s` value.
-
-Absolute timing may be reported rather than asserted in a flaky unit test when CI hardware variability makes a millisecond hard gate unreliable. The implementation may not claim the performance goal without benchmark evidence from a consistent reference environment.
-
-### 23.6 No material regression on easy v1 successes
-
-Cases where Standard v1 already comfortably satisfies the v2 target envelope must continue to satisfy the same envelope under Standard v2.
-
-V2 is not required to produce numerically lower RMSE than v1 once both are already inside the approved envelope; after target achievement, filter compression and runtime are more relevant than chasing smaller residual metrics.
-
-### 23.7 Filter efficiency
-
-A final target-achieved v2 solution must be one-filter locally minimal under the approved compression procedure.
-
-The benchmark must report filter count against v1, but lower filter count never justifies leaving the precision envelope.
+Because shared CI timing can vary, absolute millisecond targets may be reported rather than encoded as flaky unit-test assertions. The implementation may not claim the performance target without evidence from a consistent reference environment.
 
 ## 24. Real-world validation
 
-Synthetic benchmarks are necessary but not sufficient.
+Synthetic benchmarks are necessary but not sufficient. Before closeout, manually smoke-test real imported FR/Target pairs, including at least one difficult pair representative of the long-running, dense mid/treble behavior observed in actual use.
 
-Before Standard v2 is considered closed, perform manual product smoke tests with real imported FR/Target pairs, including at least one difficult pair that produces dense mid/treble residual structure and is representative of the long-running behavior observed in actual use.
+Private/user-provided curves need not be committed. Repository fixtures remain synthetic or sanitized.
 
-These private/user-provided curves do not need to be committed to the repository. Repository fixtures remain synthetic or sanitized.
-
-Manual validation should confirm:
-
-- visibly closer adherence through mids and treble;
-- no unexpected high-frequency relaxation;
-- sensible filter count;
-- selected Time Limit behavior;
-- responsive Cancel;
-- no result above `Max Filters`;
-- no regression in import/export or graph integration.
+Manual validation must confirm closer mid/treble adherence, no high-frequency relaxation, sensible filter count, correct Time Limit behavior, responsive Cancel, no result above Max Filters, and no import/export/graph regression.
 
 ## 25. Testing strategy
 
-Implementation must be test-driven at the numerical boundaries.
+Core tests cover at least:
 
-Core tests must cover at least:
-
-- v1 remains unchanged and callable;
-- v2 config/settings validation;
-- allowed Time Limit values and default 30 s;
-- multi-scale deterministic candidate generation;
-- candidate deduplication and ordering;
-- response-cache equivalence to full cascade recomputation;
-- exact shortlist cap;
-- bounded search-path width;
-- iterative joint refinement monotonicity;
-- working oversubscription cap formula;
-- final `Max Filters` invariant;
-- best-deliverable monotonicity;
+- frozen v1 behavior remains callable and unchanged;
+- v2 settings validation and exact Time Limit domain/default;
+- deterministic multi-scale candidate generation/dedup/order;
+- response-cache equivalence to full-cascade recomputation;
+- exact shortlist cap `8`;
+- active search-path cap `3` and 2% alternate-retention rule;
+- iterative joint-refinement monotonicity and six-cycle cap;
+- working oversubscription formula;
+- final Max Filters invariant;
+- monotonic best-deliverable checkpoint;
 - target-envelope detection from delivered metrics;
-- backward-elimination compression;
-- one-filter local minimality for target-achieved solutions;
+- backward elimination and one-filter local minimality;
 - quantization and cyclic discrete refinement;
-- timeout at safe checkpoints with fake clock;
-- `target-reached`, `converged`, and `time-limit` manifest reasons;
-- manifest schema 2 v1 compatibility and schema 3 v2 validation;
+- fake-clock timeout checkpoints;
+- all three termination reasons plus `targetAchieved`;
+- RunManifestV1 schema 2 compatibility and RunManifestV2 schema 3 validation;
 - Workbench Session v1 → v2 migration;
-- `timeLimitSeconds` in signatures/staleness;
+- Time Limit in signatures/staleness;
 - deterministic final IDs/order.
 
-Web tests must cover at least:
+Web tests cover at least:
 
-- Time Limit selector renders exactly `5/15/30/60/120 s`;
-- 30 s is default;
-- settings changes flow into captured Worker input;
+- Time Limit selector exactly `5/15/30/60/120 s`;
+- 30 s default;
+- setting captured into Worker input;
 - timeout result applies normally;
 - Cancel still applies nothing partial;
-- obsolete result rejection still works;
+- obsolete-result rejection still works;
 - old session import migrates to 30 s;
 - new session export uses schema 2;
-- historical Standard v1 provenance survives session migration;
-- the UI does not add a v1/v2 selector or timeout warning.
+- historical v1 provenance survives migration;
+- no v1/v2 selector or timeout warning is added.
 
-Relevant browser E2E must cover the real AutoEQ run flow and session round-trip.
+Relevant Playwright E2E covers the real AutoEQ run flow and session round-trip.
 
 ## 26. CI and verification
 
-The implementation is not complete until the exact implementation SHA passes the repository gates.
-
-At minimum:
+Implementation is not complete until the exact implementation SHA passes repository gates. At minimum:
 
 ```text
 focused core tests
@@ -946,54 +725,54 @@ git diff --check
 exact-SHA CI success
 ```
 
-Visual/manual validation is required only where the acceptance criteria are visual or real-data product smoke tests.
+Visual/manual validation is required where acceptance is visual or based on real-data smoke testing.
 
 ## 27. Implementation boundaries
 
-Prefer focused v2 modules under `packages/core/src/autoeq/` rather than turning existing v1 files into mixed-version conditionals.
+Prefer focused v2 modules under `packages/core/src/autoeq/` instead of mixing version branches throughout frozen v1 files.
 
-Shared numerical primitives may be reused only when their behavior is genuinely version-neutral. Anything whose behavior is part of Standard v1's frozen numerical contract must not be modified in a way that changes v1 output.
+Shared numerical primitives may be reused only when behavior is genuinely version-neutral. Any behavior that participates in the frozen v1 numerical contract must remain output-stable.
 
-Recommended separation is conceptually:
+Conceptual separation:
 
 ```text
 autoeq/
-  v1 or existing frozen modules
+  existing/frozen v1 modules
   v2/
     config
-    score/ranking
+    ranking
     candidates
     response cache
     search paths
-    refine
+    joint refine
     deliverable/compress
     discrete refine
     runtime/deadline
     runStandardAutoEqV2
 ```
 
-Exact filenames are an implementation-plan concern, but version boundaries must remain explicit.
+Exact filenames are an implementation-plan decision; the version boundary is not.
 
-## 28. Final approved behavior summary
+## 28. Final approved behavior
 
-Standard v2 is the product-default AutoEQ algorithm while Standard v1 remains frozen and reproducible.
+Standard v2 becomes the product-default AutoEQ while Standard v1 remains frozen and reproducible.
 
-The v2 engine:
+V2:
 
 - treats the effective logarithmic fit interval uniformly, including treble;
-- seeks a delivered `RMSE <= 0.25 dB` and `maxAbs <= 0.75 dB`;
+- seeks delivered `RMSE <= 0.25 dB` and `maxAbs <= 0.75 dB`;
 - does not trade primary precision for filter count during fit acquisition;
 - uses deterministic multi-scale residual candidates;
-- uses cached response updates and cheap candidate triage for speed;
-- follows a greedy main path with at most two bounded alternatives;
-- repeatedly jointly refines the whole cascade;
-- may temporarily exceed the user's final Max Filters under a deterministic working cap;
-- compresses precision-first back to the user's hard delivered cap;
-- evaluates success only on the final quantized/discretely-refined deliverable;
+- uses response caching and cheap candidate triage for speed;
+- follows one greedy main path with at most two bounded alternatives;
+- iteratively jointly refines the whole cascade;
+- may temporarily exceed final Max Filters under the deterministic working cap;
+- compresses precision-first back to the hard delivered cap;
+- counts success only on the final quantized/discretely-refined deliverable;
 - keeps a monotonic valid deliverable checkpoint throughout the run;
-- exposes a compact `5 / 15 / 30 / 60 / 120 s` Time Limit selector, default 30 s;
+- exposes `5 / 15 / 30 / 60 / 120 s` Time Limit, default 30 s;
 - returns the best valid checkpoint on timeout without a new UI warning;
-- keeps Cancel destructive only to the Worker, never to the prior workspace solution;
+- preserves Cancel as no-partial-apply;
 - records versioned diagnostic provenance without timestamps or elapsed wall time;
-- migrates old Workbench Session v1 files deterministically to Session v2 with a 30 s default;
-- validates against known-solvable, adversarial, holdout, and real-world smoke cases before closeout.
+- migrates Workbench Session v1 to v2 with a 30-second default while preserving historical v1 manifests;
+- must pass known-solvable, adversarial, holdout, and real-world validation before closeout.
