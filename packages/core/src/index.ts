@@ -67,6 +67,22 @@ export {
   searchStandardV2WorkingSolutions,
 } from './autoeq/v2/search.js'
 export type { SearchInput, SearchResult } from './autoeq/v2/search.js'
+export { cyclicDiscreteRefineV2, quantizeV2Filters } from './autoeq/v2/discreteRefine.js'
+export type {
+  DiscreteRefineV2Input,
+  DiscreteRefineV2Result,
+} from './autoeq/v2/discreteRefine.js'
+export {
+  buildDeliverableV2,
+  compressDeliverableV2,
+} from './autoeq/v2/deliverable.js'
+export type {
+  BuildDeliverableV2Input,
+  CompressDeliverableV2Input,
+  CompressDeliverableV2Result,
+  V2Deliverable,
+} from './autoeq/v2/deliverable.js'
+export { runStandardAutoEqV2 } from './autoeq/v2/runStandardAutoEqV2.js'
 export type {
   AutoEqConfig,
   AutoEqResult,
