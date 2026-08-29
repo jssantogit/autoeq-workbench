@@ -474,16 +474,6 @@ export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSess
           'Invalid Workbench session: clean AutoEQ solution requires active FR and Target curves.',
         )
       }
-      if (activeFr.name !== autoEqRun.manifest.sourceName) {
-        throw new Error(
-          'Invalid Workbench session: clean AutoEQ active FR name does not match manifest source name.',
-        )
-      }
-      if (activeTarget.name !== autoEqRun.manifest.targetName) {
-        throw new Error(
-          'Invalid Workbench session: clean AutoEQ active Target name does not match manifest target name.',
-        )
-      }
       if (!areNormalizationsEqual(input.normalization as Normalization, autoEqRun.manifest.normalization)) {
         throw new Error(
           'Invalid Workbench session: clean AutoEQ normalization does not match manifest normalization.',

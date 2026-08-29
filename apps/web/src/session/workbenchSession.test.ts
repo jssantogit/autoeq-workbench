@@ -567,16 +567,28 @@ describe('Workbench Session Deserialization Validation Matrix', () => {
         expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
       })
 
-      it('rejects clean AutoEQ session when active FR name does not match manifest sourceName', () => {
+      it('round-trips a clean AutoEQ session after the active FR is renamed', () => {
         const session = createValidAutoEqSession()
         session.curves.find((c) => c.id === session.activeFrId)!.name = 'Different Source'
-        expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+
+        const restored = deserializeWorkbenchSession(serializeWorkbenchSession(session))
+
+        expect(restored.curves.find((c) => c.id === restored.activeFrId)?.name).toBe('Different Source')
+        expect(restored.autoEqRun?.manifest.sourceName).toBe('Source')
+        expect(restored.autoEqRun).toEqual(session.autoEqRun)
+        expect(restored.solutionState).toBe('clean')
       })
 
-      it('rejects clean AutoEQ session when active Target name does not match manifest targetName', () => {
+      it('round-trips a clean AutoEQ session after the active Target is renamed', () => {
         const session = createValidAutoEqSession()
         session.curves.find((c) => c.id === session.activeTargetId)!.name = 'Different Target'
-        expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+
+        const restored = deserializeWorkbenchSession(serializeWorkbenchSession(session))
+
+        expect(restored.curves.find((c) => c.id === restored.activeTargetId)?.name).toBe('Different Target')
+        expect(restored.autoEqRun?.manifest.targetName).toBe('Target')
+        expect(restored.autoEqRun).toEqual(session.autoEqRun)
+        expect(restored.solutionState).toBe('clean')
       })
 
       it('rejects clean AutoEQ session when normalization does not match manifest normalization', () => {
