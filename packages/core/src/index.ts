@@ -31,6 +31,22 @@ export type { OptimizationState } from './autoeq/optimize.js'
 export { pruneFilters } from './autoeq/prune.js'
 export { POWERAMP_MANUAL_ENTRY_POLICY, quantizeFilters } from './autoeq/quantize.js'
 export { runStandardAutoEq } from './autoeq/runStandardAutoEq.js'
+export {
+  STANDARD_V2_CONFIG,
+  calculateWorkingMaxFilters,
+  resolveStandardAutoEqV2Config,
+} from './autoeq/v2/config.js'
+export type { StandardAutoEqV2Config } from './autoeq/v2/config.js'
+export { compareV2Solutions, isV2TargetAchieved } from './autoeq/v2/ranking.js'
+export type { V2Solution } from './autoeq/v2/ranking.js'
+export { createStandardV2Deadline } from './autoeq/v2/runtime.js'
+export type { StandardV2Deadline, StandardV2Runtime } from './autoeq/v2/runtime.js'
+export {
+  appendV2ResponseCacheFilter,
+  createV2ResponseCache,
+  replaceV2ResponseCacheFilter,
+} from './autoeq/v2/responseCache.js'
+export type { V2ResponseCache } from './autoeq/v2/responseCache.js'
 export type {
   AutoEqConfig,
   AutoEqResult,
