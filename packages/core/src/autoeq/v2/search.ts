@@ -49,6 +49,16 @@ export function retainV2SearchPaths<T extends V2Solution>(
   return ordinary.slice(0, 3)
 }
 
+export function retainV2NextActivePaths<T extends V2Solution>(
+  previousActive: readonly T[],
+  expanded: readonly T[],
+  mainPathImproved: boolean,
+): T[] {
+  const mainPath = previousActive[0]
+  const mainStagnant = mainPath !== undefined && !mainPathImproved && violation(mainPath) > 1
+  return retainV2SearchPaths(expanded, mainStagnant)
+}
+
 function candidateFilter(
   candidate: ReturnType<typeof rankV2CandidateShortlist>[number],
   index: number,
@@ -109,8 +119,10 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
   let jointRefinementCount = 0
   while (active.some((path) => path.filters.length < input.config.workingMaxFilters)) {
     const expanded: V2EvaluatedSolution[] = []
+    let mainPathImproved = false
     let expired = false
-    for (const path of active) {
+    for (let pathIndex = 0; pathIndex < active.length; pathIndex += 1) {
+      const path = active[pathIndex]!
       if (path.filters.length >= input.config.workingMaxFilters) continue
       const shortlist = rankV2CandidateShortlist(generateV2Candidates({
         frequencies: input.frequencies,
@@ -163,6 +175,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
               peakWorkingFilterCount,
               refined.solution.filters.length,
             )
+            if (pathIndex === 0) mainPathImproved = true
             if (compareV2Solutions(refined.solution, best) < 0) best = refined.solution
             if (phase === 'staged') stagedImproved = true
             else break
@@ -190,7 +203,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
         termination: 'converged',
       }
     }
-    active = retainV2SearchPaths(expanded, false)
+    active = retainV2NextActivePaths(active, expanded, mainPathImproved)
     for (const checkpoint of active) {
       input.onWorkingSolution?.(checkpoint)
       if (input.deadline.isExpired()) {
