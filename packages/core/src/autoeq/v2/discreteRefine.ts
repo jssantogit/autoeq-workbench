@@ -1,9 +1,13 @@
+import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
+import type { BiquadResponseGrid } from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
+import { auditCancellations } from '../cancellation.js'
 import { POWERAMP_MANUAL_ENTRY_POLICY } from '../quantize.js'
 import type { StandardAutoEqV2Config } from './config.js'
-import { compareV2Solutions } from './ranking.js'
+import { compareV2PrimaryMetrics, compareV2Solutions } from './ranking.js'
 import { evaluateV2Solution, type V2EvaluatedSolution } from './jointRefine.js'
 import type { StandardV2Deadline } from './runtime.js'
+import { replaceV2ResponseCacheFilter } from './responseCache.js'
 
 export interface DiscreteRefineV2Input {
   filters: readonly Filter[]
@@ -11,6 +15,7 @@ export interface DiscreteRefineV2Input {
   frequencies: readonly number[]
   config: StandardAutoEqV2Config
   deadline: StandardV2Deadline
+  responseGrid?: BiquadResponseGrid
 }
 
 export interface DiscreteRefineV2Result {
@@ -18,6 +23,27 @@ export interface DiscreteRefineV2Result {
   solution: V2EvaluatedSolution
   completedCycles: number
   expired: boolean
+}
+
+export interface AcceptedDiscreteMove {
+  filterIndex: number
+  coordinate: 'frequencyHz' | 'gainDb' | 'q'
+  from: number
+  to: number
+}
+
+export interface DiscreteTrial {
+  filterIndex: number
+  coordinate: 'frequencyHz' | 'gainDb' | 'q'
+  from: number
+  to: number
+}
+
+export interface DiscreteRefineTrace {
+  onTrial?: (trial: DiscreteTrial) => void
+  onAcceptedMove?: (move: AcceptedDiscreteMove) => void
+  onResponseComputed?: (trial: DiscreteTrial) => void
+  onCancellationAuditComputed?: () => void
 }
 
 function decimals(step: number): number {
@@ -59,17 +85,38 @@ export function quantizeV2Filters(
 
 export function cyclicDiscreteRefineV2(
   input: DiscreteRefineV2Input,
+  trace?: DiscreteRefineTrace,
 ): DiscreteRefineV2Result {
   let solution = evaluateV2Solution(
     quantizeV2Filters(input.filters, input.config),
     input.desiredDb,
     input.frequencies,
     input.config.sampleRateHz,
+    input.responseGrid,
   )
   let completedCycles = 0
+  const validAudits = new WeakSet<V2EvaluatedSolution>([solution])
+  const withCancellationAudit = (candidate: V2EvaluatedSolution): V2EvaluatedSolution => {
+    if (validAudits.has(candidate)) return candidate
+    trace?.onCancellationAuditComputed?.()
+    const audited = {
+      ...candidate,
+      cancellationAudit: auditCancellations(
+        candidate.filters,
+        input.frequencies,
+        input.config.sampleRateHz,
+      ),
+    }
+    validAudits.add(audited)
+    return audited
+  }
+  const finish = (expired: boolean): DiscreteRefineV2Result => {
+    solution = withCancellationAudit(solution)
+    return { filters: solution.filters, solution, completedCycles, expired }
+  }
   while (true) {
     if (input.deadline.isExpired()) {
-      return { filters: solution.filters, solution, completedCycles, expired: true }
+      return finish(true)
     }
     const cycleStart = solution
     for (let filterIndex = 0; filterIndex < solution.filters.length; filterIndex += 1) {
@@ -80,30 +127,90 @@ export function cyclicDiscreteRefineV2(
           ? [['q', POWERAMP_MANUAL_ENTRY_POLICY.qStep, input.config.minPkQ, input.config.maxPkQ]]
           : []),
       ] as Array<[keyof Pick<Filter, 'frequencyHz' | 'gainDb' | 'q'>, number, number, number]>) {
-        let best = solution
-        const current = solution.filters[filterIndex]!
-        for (const direction of [-1, 1]) {
-          const value = project(current[coordinate] + direction * step, step, minimum, maximum)
-          if (value === null || value === current[coordinate]) continue
-          if (input.deadline.isExpired()) {
-            return { filters: solution.filters, solution, completedCycles, expired: true }
+        let continueCoordinate = true
+        let previous: { value: number; solution: V2EvaluatedSolution } | null = null
+        while (continueCoordinate) {
+          let best = solution
+          const current = solution.filters[filterIndex]!
+          for (const direction of [-1, 1]) {
+            const value = project(current[coordinate] + direction * step, step, minimum, maximum)
+            if (value === null || value === current[coordinate]) continue
+            if (input.deadline.isExpired()) {
+              return finish(true)
+            }
+            const trial: DiscreteTrial = {
+              filterIndex,
+              coordinate,
+              from: current[coordinate],
+              to: value,
+            }
+            trace?.onTrial?.(trial)
+            let candidate: V2EvaluatedSolution
+            if (previous?.value === value) {
+              candidate = previous.solution
+            } else {
+              trace?.onResponseComputed?.(trial)
+              const filters = solution.filters.map((filter, index) =>
+                index === filterIndex ? { ...filter, [coordinate]: value } : filter)
+              const responseCache = replaceV2ResponseCacheFilter(
+                solution.responseCache,
+                filterIndex,
+                filters[filterIndex]!,
+                input.frequencies,
+                input.config.sampleRateHz,
+              )
+              const residualDb = input.desiredDb.map((desired, index) =>
+                desired - responseCache.cascadeDb[index]!)
+              const metrics = calculateErrorMetrics(residualDb, input.frequencies)
+              candidate = {
+                filters,
+                responseCache,
+                cascadeDb: responseCache.cascadeDb,
+                residualDb,
+                metrics,
+                cancellationAudit: solution.cancellationAudit,
+              }
+            }
+            if (input.deadline.isExpired()) {
+              return finish(true)
+            }
+            const primaryComparison = compareV2PrimaryMetrics(candidate.metrics, best.metrics)
+            if (primaryComparison < 0) {
+              best = candidate
+            } else if (primaryComparison === 0) {
+              const auditedCandidate = withCancellationAudit(candidate)
+              const auditedBest = withCancellationAudit(best)
+              best = compareV2Solutions(auditedCandidate, auditedBest) < 0
+                ? auditedCandidate
+                : auditedBest
+            }
           }
-          const filters = solution.filters.map((filter, index) =>
-            index === filterIndex ? { ...filter, [coordinate]: value } : filter)
-          const candidate = evaluateV2Solution(
-            filters,
-            input.desiredDb,
-            input.frequencies,
-            input.config.sampleRateHz,
-          )
-          if (compareV2Solutions(candidate, best) < 0) best = candidate
+          const accepted = best.filters[filterIndex]!
+          if (accepted[coordinate] === current[coordinate]) break
+          trace?.onAcceptedMove?.({
+            filterIndex,
+            coordinate,
+            from: current[coordinate],
+            to: accepted[coordinate],
+          })
+          previous = { value: current[coordinate], solution }
+          solution = best
+          continueCoordinate = coordinate === 'frequencyHz'
+          if (continueCoordinate && input.deadline.isExpired()) {
+            return finish(true)
+          }
         }
-        solution = best
       }
     }
     completedCycles += 1
-    if (compareV2Solutions(solution, cycleStart) >= 0) {
-      return { filters: solution.filters, solution, completedCycles, expired: false }
+    if (solution === cycleStart) return finish(false)
+    const primaryComparison = compareV2PrimaryMetrics(solution.metrics, cycleStart.metrics)
+    if (primaryComparison > 0) return finish(false)
+    if (primaryComparison === 0) {
+      solution = withCancellationAudit(solution)
+      if (compareV2Solutions(solution, withCancellationAudit(cycleStart)) >= 0) {
+        return finish(false)
+      }
     }
   }
 }

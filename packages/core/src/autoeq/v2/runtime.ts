@@ -1,7 +1,9 @@
 import type { AutoEqTimeLimitSeconds } from '../../config/autoeqSettings.js'
+import type { V2CandidateBoundaryMode } from './candidates.js'
 
 export interface StandardV2Runtime {
   nowMs(): number
+  onBoundaryModeAttempt?(mode: V2CandidateBoundaryMode): void
 }
 
 export interface StandardV2Deadline {

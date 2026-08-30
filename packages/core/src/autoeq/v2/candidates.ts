@@ -1,8 +1,14 @@
-import { biquadMagnitudeDb } from '../../dsp/response.js'
+import {
+  biquadMagnitudeDbOnGrid,
+  createBiquadResponseGrid,
+  type BiquadResponseGrid,
+} from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
 import type { StandardAutoEqV2Config } from './config.js'
 
 const TYPE_ORDER = { LS: 0, PK: 1, HS: 2 } as const
+
+export type V2CandidateBoundaryMode = 'sign-crossing' | 'half-height' | 'mixed'
 
 export interface V2FilterCandidate {
   type: Filter['type']
@@ -11,6 +17,7 @@ export interface V2FilterCandidate {
   q: number
   featureIndex: number
   qScale: 0.5 | 1 | 2 | null
+  boundaryMode?: V2CandidateBoundaryMode
   cheapScore: number
 }
 
@@ -18,6 +25,7 @@ export interface CandidateInput {
   frequencies: readonly number[]
   residualDb: readonly number[]
   config: StandardAutoEqV2Config
+  boundaryMode: V2CandidateBoundaryMode
 }
 
 function clamp(value: number, minimum: number, maximum: number): number {
@@ -34,14 +42,12 @@ function median(values: readonly number[]): number {
 
 function candidateCheapScore(
   candidate: Omit<V2FilterCandidate, 'cheapScore'>,
-  frequencies: readonly number[],
   residualDb: readonly number[],
-  sampleRateHz: number,
+  responseGrid: BiquadResponseGrid,
 ): number {
-  const response = biquadMagnitudeDb(
+  const response = biquadMagnitudeDbOnGrid(
     { id: '', enabled: true, ...candidate },
-    frequencies,
-    sampleRateHz,
+    responseGrid,
   )
   let decrease = 0
   for (let index = 0; index < residualDb.length; index += 1) {
@@ -56,6 +62,7 @@ function boundaryIndex(
   residualDb: readonly number[],
   centerIndex: number,
   direction: -1 | 1,
+  preferHalfHeight = false,
 ): number {
   const center = residualDb[centerIndex]!
   const halfHeight = Math.abs(center) / 2
@@ -66,7 +73,7 @@ function boundaryIndex(
     index += direction
   ) {
     if (Math.sign(residualDb[index]!) !== Math.sign(center) || residualDb[index] === 0) {
-      return index
+      return preferHalfHeight ? halfHeightIndex ?? index : index
     }
     if (halfHeightIndex === null && Math.abs(residualDb[index]!) <= halfHeight) {
       halfHeightIndex = index
@@ -85,13 +92,39 @@ function createShelf(
   const evidenceCount = Math.max(3, Math.ceil(frequencies.length / 4))
   if (frequencies.length < evidenceCount) return null
   const start = type === 'LS' ? 0 : frequencies.length - evidenceCount
-  const evidence = residualDb.slice(start, start + evidenceCount)
-  const signedMedian = median(evidence)
-  if (Math.abs(signedMedian) < config.algorithm.candidateResidualFloorDb) return null
+  let evidence = residualDb.slice(start, start + evidenceCount)
+  let evidenceFrequencies = frequencies.slice(start, start + evidenceCount)
+  let signedMedian = median(evidence)
   const matching = evidence.filter((value) => Math.sign(value) === Math.sign(signedMedian)).length
-  if (matching / evidence.length < 0.75) return null
-  const evidenceFrequencies = frequencies.slice(start, start + evidenceCount)
-  if (evidenceFrequencies.at(-1)! / evidenceFrequencies[0]! < 1.4) return null
+  const fixedEvidenceIsUsable =
+    Math.abs(signedMedian) >= config.algorithm.candidateResidualFloorDb &&
+    matching / evidence.length >= 0.75 &&
+    evidenceFrequencies.at(-1)! / evidenceFrequencies[0]! >= 1.4
+
+  if (!fixedEvidenceIsUsable) {
+    const edgeIndex = type === 'LS' ? 0 : frequencies.length - 1
+    const direction = type === 'LS' ? 1 : -1
+    const edgeSign = Math.sign(residualDb[edgeIndex]!)
+    const contiguousIndices: number[] = []
+    for (
+      let index = edgeIndex;
+      index >= 0 && index < frequencies.length;
+      index += direction
+    ) {
+      const value = residualDb[index]!
+      if (
+        Math.abs(value) < config.algorithm.candidateResidualFloorDb ||
+        Math.sign(value) !== edgeSign
+      ) break
+      contiguousIndices.push(index)
+    }
+    contiguousIndices.sort((left, right) => left - right)
+    if (contiguousIndices.length < 3) return null
+    evidence = contiguousIndices.map((index) => residualDb[index]!)
+    evidenceFrequencies = contiguousIndices.map((index) => frequencies[index]!)
+    if (evidenceFrequencies.at(-1)! / evidenceFrequencies[0]! < 1.4) return null
+    signedMedian = median(evidence)
+  }
 
   const halfHeight = Math.abs(signedMedian) / 2
   const searchIndices = type === 'LS'
@@ -117,6 +150,7 @@ export function generateV2Candidates({
   frequencies,
   residualDb,
   config,
+  boundaryMode,
 }: CandidateInput): V2FilterCandidate[] {
   if (frequencies.length === 0 || frequencies.length !== residualDb.length) return []
   const effectiveFrequencies: number[] = []
@@ -142,22 +176,28 @@ export function generateV2Candidates({
       ? value >= previous && value > next
       : value <= previous && value < next
     if (!isExtremum) continue
-    const leftIndex = boundaryIndex(effectiveResidualDb, index, -1)
-    const rightIndex = boundaryIndex(effectiveResidualDb, index, 1)
     const centerHz = effectiveFrequencies[index]!
-    const baseQ = centerHz / Math.max(
-      Number.EPSILON,
-      effectiveFrequencies[rightIndex]! - effectiveFrequencies[leftIndex]!,
-    )
-    for (const qScale of config.algorithm.pkQScaleMultipliers) {
-      candidates.push({
+    const selectedModes = boundaryMode === 'mixed'
+      ? ['sign-crossing', 'half-height'] as const
+      : [boundaryMode]
+    for (const selectedMode of selectedModes) {
+      const preferHalfHeight = selectedMode === 'half-height'
+      const leftIndex = boundaryIndex(effectiveResidualDb, index, -1, preferHalfHeight)
+      const rightIndex = boundaryIndex(effectiveResidualDb, index, 1, preferHalfHeight)
+      const baseQ = centerHz / Math.max(
+        Number.EPSILON,
+        effectiveFrequencies[rightIndex]! - effectiveFrequencies[leftIndex]!,
+      )
+      candidates.push(...config.algorithm.pkQScaleMultipliers.map((qScale):
+        Omit<V2FilterCandidate, 'cheapScore'> => ({
         type: 'PK',
         frequencyHz: centerHz,
         gainDb: clamp(value, config.minGainDb, config.maxGainDb),
         q: clamp(baseQ * qScale, config.minPkQ, config.maxPkQ),
         featureIndex: originalIndices[index]!,
         qScale,
-      })
+        boundaryMode: selectedMode,
+      })))
     }
   }
 
@@ -183,13 +223,13 @@ export function generateV2Candidates({
     ].join('|')
     if (!deduplicated.has(key)) deduplicated.set(key, candidate)
   }
+  const responseGrid = createBiquadResponseGrid(effectiveFrequencies, config.sampleRateHz)
   return [...deduplicated.values()].map((candidate) => ({
     ...candidate,
     cheapScore: candidateCheapScore(
       candidate,
-      effectiveFrequencies,
       effectiveResidualDb,
-      config.sampleRateHz,
+      responseGrid,
     ),
   }))
 }
@@ -197,11 +237,43 @@ export function generateV2Candidates({
 export function rankV2CandidateShortlist(
   candidates: readonly V2FilterCandidate[],
 ): V2FilterCandidate[] {
-  return [...candidates].sort((left, right) =>
+  const ranked = [...candidates].sort((left, right) =>
     right.cheapScore - left.cheapScore ||
     left.frequencyHz - right.frequencyHz ||
     TYPE_ORDER[left.type] - TYPE_ORDER[right.type] ||
     left.gainDb - right.gainDb ||
     left.q - right.q
-  ).slice(0, 8)
+  )
+  const deduplicated: V2FilterCandidate[] = []
+  const seen = new Set<string>()
+  for (const candidate of ranked) {
+    const key = [
+      candidate.featureIndex,
+      candidate.type,
+      candidate.frequencyHz,
+      candidate.gainDb,
+      candidate.q,
+    ].join('|')
+    if (seen.has(key)) continue
+    seen.add(key)
+    deduplicated.push(candidate)
+  }
+
+  const representatives = new Map<string, V2FilterCandidate>()
+  for (const candidate of deduplicated) {
+    const key = `${candidate.featureIndex}|${candidate.boundaryMode ?? candidate.type}`
+    if (!representatives.has(key)) {
+      representatives.set(key, candidate)
+    }
+  }
+  const shortlist = [...representatives.values()].slice(0, 8)
+  if (shortlist.length === 8) return shortlist
+
+  const admitted = new Set(shortlist)
+  for (const candidate of deduplicated) {
+    if (admitted.has(candidate)) continue
+    shortlist.push(candidate)
+    if (shortlist.length === 8) break
+  }
+  return shortlist
 }

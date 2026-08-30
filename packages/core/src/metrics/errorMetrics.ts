@@ -20,10 +20,6 @@ export function calculateErrorMetrics(
   if (residual.length !== frequencies.length) {
     throw new CoreError('validation', 'Residual and frequency arrays must have equal length')
   }
-  if ([...residual, ...frequencies].some((value) => !Number.isFinite(value))) {
-    throw new CoreError('validation', 'Residual and frequency values must be finite')
-  }
-
   let absoluteSum = 0
   let squaredSum = 0
   let maxAbsDb = -1
@@ -31,6 +27,9 @@ export function calculateErrorMetrics(
 
   for (let index = 0; index < residual.length; index += 1) {
     const value = residual[index]!
+    if (!Number.isFinite(value) || !Number.isFinite(frequencies[index]!)) {
+      throw new CoreError('validation', 'Residual and frequency values must be finite')
+    }
     const absolute = Math.abs(value)
     absoluteSum += absolute
     squaredSum += value ** 2

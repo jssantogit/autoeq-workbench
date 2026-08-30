@@ -22,6 +22,12 @@ function compareNumber(left: number, right: number): number {
   return left < right ? -1 : left > right ? 1 : 0
 }
 
+export function compareV2PrimaryMetrics(left: ErrorMetrics, right: ErrorMetrics): number {
+  return compareNumber(normalizedViolation(left), normalizedViolation(right)) ||
+    compareNumber(left.rmseDb, right.rmseDb) ||
+    compareNumber(left.maxAbsDb, right.maxAbsDb)
+}
+
 export function compareV2Solutions(left: V2Solution, right: V2Solution): number {
   const leftMaxQ = Math.max(0, ...left.filters.map((filter) => filter.q))
   const rightMaxQ = Math.max(0, ...right.filters.map((filter) => filter.q))
@@ -30,9 +36,7 @@ export function compareV2Solutions(left: V2Solution, right: V2Solution): number 
   const leftGainSum = left.filters.reduce((sum, filter) => sum + Math.abs(filter.gainDb), 0)
   const rightGainSum = right.filters.reduce((sum, filter) => sum + Math.abs(filter.gainDb), 0)
   const scalarComparison =
-    compareNumber(normalizedViolation(left.metrics), normalizedViolation(right.metrics)) ||
-    compareNumber(left.metrics.rmseDb, right.metrics.rmseDb) ||
-    compareNumber(left.metrics.maxAbsDb, right.metrics.maxAbsDb) ||
+    compareV2PrimaryMetrics(left.metrics, right.metrics) ||
     compareNumber(left.cancellationAudit.totalScore, right.cancellationAudit.totalScore) ||
     compareNumber(leftMaxQ, rightMaxQ) ||
     compareNumber(leftMaxGain, rightMaxGain) ||

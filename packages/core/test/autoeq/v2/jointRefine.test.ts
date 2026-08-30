@@ -3,11 +3,14 @@ import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_AUTOEQ_SETTINGS,
   JOINT_REFINEMENT_SCALES,
+  auditCancellations,
   compareV2Solutions,
+  createEvaluationGrid,
   evaluateV2Solution,
   jointRefineV2,
   resolveStandardAutoEqV2Config,
   type Filter,
+  type StandardAutoEqV2Config,
   type StandardV2Deadline,
 } from '../../../src/index.js'
 
@@ -18,6 +21,50 @@ const desiredFilter: Filter = {
 const config = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
 
 describe('Standard v2 joint refinement', () => {
+  it('preserves an accepted Frequency update when Gain is accepted afterward', () => {
+    const evaluationFrequencies = createEvaluationGrid()
+    const targetFilters: Filter[] = [
+      { id: '', enabled: true, type: 'PK', frequencyHz: 90, gainDb: 2, q: 1.2 },
+      { id: '', enabled: true, type: 'PK', frequencyHz: 220, gainDb: -2.4, q: 1.5 },
+      { id: '', enabled: true, type: 'PK', frequencyHz: 520, gainDb: 2.8, q: 1.8 },
+      { id: '', enabled: true, type: 'PK', frequencyHz: 1_200, gainDb: -3, q: 2 },
+      { id: '', enabled: true, type: 'PK', frequencyHz: 2_600, gainDb: 3.2, q: 2.4 },
+      { id: '', enabled: true, type: 'PK', frequencyHz: 5_200, gainDb: -3, q: 2.8 },
+      { id: '', enabled: true, type: 'PK', frequencyHz: 9_000, gainDb: 2.5, q: 3 },
+      { id: '', enabled: true, type: 'PK', frequencyHz: 15_000, gainDb: -2, q: 2.5 },
+    ]
+    const desiredDb = evaluateV2Solution(
+      targetFilters,
+      [],
+      evaluationFrequencies,
+      config.sampleRateHz,
+    ).cascadeDb
+    const start = evaluateV2Solution([
+      {
+        id: 'low', enabled: true, type: 'PK',
+        frequencyHz: 553.9433990439313, gainDb: -2.5367754514278293, q: 0.1,
+      },
+      {
+        id: 'high', enabled: true, type: 'PK',
+        frequencyHz: 16138.043853904759, gainDb: -3.413619784726027, q: 0.559811357732104,
+      },
+    ], desiredDb, evaluationFrequencies, config.sampleRateHz)
+
+    const result = jointRefineV2({
+      solution: start,
+      desiredDb,
+      frequencies: evaluationFrequencies,
+      config: {
+        ...config,
+        algorithm: { ...config.algorithm, maxJointRefinementCycles: 1 },
+      } as unknown as StandardAutoEqV2Config,
+      deadline: { isExpired: () => false },
+    })
+
+    expect(result.solution.filters[1]!.frequencyHz).not.toBe(16138.043853904759)
+    expect(result.solution.filters[1]!.gainDb).not.toBe(-3.413619784726027)
+  })
+
   it('uses the approved scales and never worsens a solution', () => {
     expect(JOINT_REFINEMENT_SCALES).toEqual([
       { fcOctaveStep: 1 / 6, gainStepDb: 1, qOctaveStep: 1 / 2 },
@@ -40,6 +87,49 @@ describe('Standard v2 joint refinement', () => {
 
     expect(compareV2Solutions(result.solution, start)).toBeLessThanOrEqual(0)
     expect(result.completedCycles).toBeLessThanOrEqual(6)
+  })
+
+  it('reuses an already evaluated starting response grid', () => {
+    const desiredDb = evaluateV2Solution([desiredFilter], [], frequencies, config.sampleRateHz)
+      .cascadeDb
+    const start = evaluateV2Solution([desiredFilter], desiredDb, frequencies, config.sampleRateHz)
+
+    const result = jointRefineV2({
+      solution: start,
+      desiredDb,
+      frequencies,
+      config,
+      deadline: { isExpired: () => false },
+    })
+
+    expect(result.solution.responseCache.responseGrid).toBe(start.responseCache.responseGrid)
+  })
+
+  it('defers cancellation audits until an accepted primary improvement must be returned', () => {
+    const desiredDb = evaluateV2Solution([desiredFilter], [], frequencies, config.sampleRateHz)
+      .cascadeDb
+    const start = evaluateV2Solution([
+      { ...desiredFilter, frequencyHz: 900, gainDb: 2.5 },
+    ], desiredDb, frequencies, config.sampleRateHz)
+    let auditComputations = 0
+
+    const result = jointRefineV2({
+      solution: start,
+      desiredDb,
+      frequencies,
+      config,
+      deadline: { isExpired: () => false },
+    }, {
+      onCancellationAuditComputed: () => { auditComputations += 1 },
+    })
+
+    expect(auditComputations).toBeGreaterThan(0)
+    expect(auditComputations).toBeLessThan(result.coordinateTrials)
+    expect(result.solution.cancellationAudit).toEqual(auditCancellations(
+      result.solution.filters,
+      frequencies,
+      config.sampleRateHz,
+    ))
   })
 
   it('keeps shelves at Q 0.7', () => {
@@ -76,5 +166,34 @@ describe('Standard v2 joint refinement', () => {
 
     expect(result.expired).toBe(true)
     expect(result.coordinateTrials).toBe(0)
+  })
+
+  it('does not publish a coordinate evaluation that crosses the deadline', () => {
+    let checks = 0
+    const desiredFrequencyHz = config.minFrequencyHz * 2 ** (1 / 6)
+    const desiredDb = evaluateV2Solution(
+      [{ ...desiredFilter, frequencyHz: desiredFrequencyHz }],
+      [],
+      frequencies,
+      config.sampleRateHz,
+    ).cascadeDb
+    const start = evaluateV2Solution(
+      [{ ...desiredFilter, frequencyHz: config.minFrequencyHz }],
+      desiredDb,
+      frequencies,
+      config.sampleRateHz,
+    )
+
+    const result = jointRefineV2({
+      solution: start,
+      desiredDb,
+      frequencies,
+      config,
+      deadline: { isExpired: () => ++checks > 4 },
+    })
+
+    expect(result.expired).toBe(true)
+    expect(result.coordinateTrials).toBe(2)
+    expect(result.solution.filters).toEqual(start.filters)
   })
 })

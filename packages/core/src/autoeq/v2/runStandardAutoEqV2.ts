@@ -3,10 +3,13 @@ import { desiredCorrection, prepareCurve } from '../../curves/derive.js'
 import { CoreError } from '../../types/error.js'
 import type { AutoEqResultV2, RunManifestV2, StandardAutoEqInputV2 } from '../types.js'
 import { resolveStandardAutoEqV2Config } from './config.js'
-import { buildDeliverableV2, compressDeliverableV2, type V2Deliverable } from './deliverable.js'
-import { compareV2Solutions, isV2TargetAchieved, type V2Solution } from './ranking.js'
+import { buildDeliverableV2, compressDeliverableV2 } from './deliverable.js'
+import { compareV2Solutions, isV2TargetAchieved } from './ranking.js'
 import { createStandardV2Deadline, type StandardV2Runtime } from './runtime.js'
-import { searchStandardV2WorkingSolutions } from './search.js'
+import {
+  searchStandardV2WorkingSolutions,
+  type SearchResult,
+} from './search.js'
 
 export function runStandardAutoEqV2(
   input: StandardAutoEqInputV2,
@@ -53,22 +56,40 @@ export function runStandardAutoEqV2(
     bestDeliverable = compressed.deliverable
     terminationReason = compressed.completed ? 'target-reached' : 'time-limit'
   } else {
-    let bestWorking: V2Solution | null = null
-    const search = searchStandardV2WorkingSolutions({
-      desiredDb,
-      frequencies,
-      config,
-      deadline,
-      onWorkingSolution: (solution) => {
-        if (bestWorking !== null && compareV2Solutions(solution, bestWorking) >= 0) return
-        bestWorking = solution
-        const deliverable = buildDeliverableV2({
-          filters: solution.filters, desiredDb, frequencies, config, deadline,
-        })
-        if (compareV2Solutions(deliverable, bestDeliverable) < 0) bestDeliverable = deliverable
-      },
-      isTargetCapable: () => isV2TargetAchieved(bestDeliverable.metrics),
-    })
+    let searchTermination: SearchResult['termination'] = 'converged'
+    for (const boundaryMode of ['half-height', 'sign-crossing', 'mixed'] as const) {
+      if (deadline.isExpired()) {
+        searchTermination = 'time-limit'
+        break
+      }
+      runtime.onBoundaryModeAttempt?.(boundaryMode)
+      const search = searchStandardV2WorkingSolutions({
+        desiredDb,
+        frequencies,
+        config,
+        deadline,
+        boundaryMode,
+        onWorkingSolution: (solution) => {
+          const deliverable = buildDeliverableV2({
+            filters: solution.filters,
+            desiredDb,
+            frequencies,
+            config,
+            deadline,
+            responseGrid: solution.responseCache.responseGrid,
+            fallbackOnExpiration: bestDeliverable,
+          })
+          if (compareV2Solutions(deliverable, bestDeliverable) < 0) bestDeliverable = deliverable
+        },
+        isTargetCapable: () => isV2TargetAchieved(bestDeliverable.metrics),
+      })
+      searchTermination = search.termination
+      if (
+        isV2TargetAchieved(bestDeliverable.metrics) ||
+        search.termination === 'time-limit' ||
+        deadline.isExpired()
+      ) break
+    }
     if (isV2TargetAchieved(bestDeliverable.metrics) && !deadline.isExpired()) {
       const compressed = compressDeliverableV2({
         deliverable: bestDeliverable, desiredDb, frequencies, config, deadline,
@@ -76,7 +97,7 @@ export function runStandardAutoEqV2(
       bestDeliverable = compressed.deliverable
       terminationReason = compressed.completed ? 'target-reached' : 'time-limit'
     } else {
-      terminationReason = search.termination === 'time-limit' || deadline.isExpired()
+      terminationReason = searchTermination === 'time-limit' || deadline.isExpired()
         ? 'time-limit'
         : 'converged'
     }

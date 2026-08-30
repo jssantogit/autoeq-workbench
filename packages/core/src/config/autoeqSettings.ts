@@ -40,7 +40,7 @@ export const DEFAULT_AUTOEQ_SETTINGS_V1: Readonly<AutoEqSettingsV1> = Object.fre
 
 export const DEFAULT_AUTOEQ_SETTINGS: Readonly<AutoEqSettings> = Object.freeze({
   ...DEFAULT_AUTOEQ_SETTINGS_V1,
-  timeLimitSeconds: 30,
+  timeLimitSeconds: 60,
 })
 
 export function isValidAutoEqSettingsV1(settings: AutoEqSettingsV1): boolean {

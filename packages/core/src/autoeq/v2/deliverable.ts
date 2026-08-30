@@ -1,4 +1,5 @@
 import { calculatePreampDb } from '../../metrics/preamp.js'
+import type { BiquadResponseGrid } from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
 import { finalizeDeliveredFilters } from '../runStandardAutoEq.js'
 import type { StandardAutoEqV2Config } from './config.js'
@@ -17,6 +18,8 @@ export interface BuildDeliverableV2Input {
   frequencies: readonly number[]
   config: StandardAutoEqV2Config
   deadline: StandardV2Deadline
+  responseGrid?: BiquadResponseGrid
+  fallbackOnExpiration?: V2Deliverable
 }
 
 export interface CompressDeliverableV2Input extends Omit<BuildDeliverableV2Input, 'filters'> {
@@ -47,6 +50,7 @@ function constrainToCap(input: BuildDeliverableV2Input): Filter[] {
         input.desiredDb,
         input.frequencies,
         input.config.sampleRateHz,
+        input.responseGrid,
       )
       if (best === null || compareV2Solutions(candidate, best) < 0) best = candidate
     }
@@ -56,17 +60,37 @@ function constrainToCap(input: BuildDeliverableV2Input): Filter[] {
 }
 
 export function buildDeliverableV2(input: BuildDeliverableV2Input): V2Deliverable {
+  if (input.fallbackOnExpiration && input.deadline.isExpired()) {
+    return input.fallbackOnExpiration
+  }
+  const constrained = constrainToCap(input)
+  if (input.fallbackOnExpiration && input.deadline.isExpired()) {
+    return input.fallbackOnExpiration
+  }
   const discrete = cyclicDiscreteRefineV2({
     ...input,
-    filters: constrainToCap(input),
+    filters: constrained,
   })
+  if (
+    input.fallbackOnExpiration &&
+    (discrete.expired || input.deadline.isExpired())
+  ) {
+    return input.fallbackOnExpiration
+  }
   const delivered = finalizeDeliveredFilters(
     discrete.filters.filter((filter) => filter.gainDb !== 0),
   )
-  return withPreamp(
-    evaluateV2Solution(delivered, input.desiredDb, input.frequencies, input.config.sampleRateHz),
+  const evaluated = evaluateV2Solution(
+    delivered,
+    input.desiredDb,
+    input.frequencies,
     input.config.sampleRateHz,
+    discrete.solution.responseCache.responseGrid,
   )
+  if (input.fallbackOnExpiration && input.deadline.isExpired()) {
+    return input.fallbackOnExpiration
+  }
+  return withPreamp(evaluated, input.config.sampleRateHz)
 }
 
 export function compressDeliverableV2(
@@ -90,6 +114,7 @@ export function compressDeliverableV2(
           input.desiredDb,
           input.frequencies,
           input.config.sampleRateHz,
+          deliverable.responseCache.responseGrid,
         ),
       })
     }
@@ -106,18 +131,23 @@ export function compressDeliverableV2(
         config: input.config,
         deadline: input.deadline,
       })
+      if (refined.expired) return { deliverable, completed: false, expired: true }
       const candidate = buildDeliverableV2({
         filters: refined.solution.filters,
         desiredDb: input.desiredDb,
         frequencies: input.frequencies,
         config: input.config,
         deadline: input.deadline,
+        responseGrid: refined.solution.responseCache.responseGrid,
+        fallbackOnExpiration: deliverable,
       })
+      if (input.deadline.isExpired()) {
+        return { deliverable, completed: false, expired: true }
+      }
       if (isV2TargetAchieved(candidate.metrics)) {
         accepted = candidate
         break
       }
-      if (refined.expired) return { deliverable, completed: false, expired: true }
     }
     if (accepted === null) return { deliverable, completed: true, expired: false }
     deliverable = accepted

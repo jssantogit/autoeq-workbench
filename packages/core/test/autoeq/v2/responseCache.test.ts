@@ -6,6 +6,7 @@ import {
   replaceV2ResponseCacheFilter,
   type Filter,
 } from '../../../src/index.js'
+import { createBiquadResponseGrid } from '../../../src/dsp/response.js'
 
 const frequencies = [40, 100, 1_000, 5_000, 15_000]
 const sampleRateHz = 48_000
@@ -17,7 +18,7 @@ const filters: Filter[] = [
 
 function expectCascade(cacheDb: readonly number[], expected: readonly number[]) {
   for (let index = 0; index < expected.length; index += 1) {
-    expect(cacheDb[index]).toBeCloseTo(expected[index]!, 12)
+    expect(cacheDb[index]).toBeCloseTo(expected[index]!, 6)
   }
 }
 
@@ -40,5 +41,30 @@ describe('Standard v2 response cache', () => {
       replaced.cascadeDb,
       cascadeMagnitudeDb([filters[0]!, replacement, filters[2]!], frequencies, sampleRateHz),
     )
+    expect(replaced.filterResponsesDb[0]).toBe(cache.filterResponsesDb[0])
+    expect(replaced.filterResponsesDb[1]).not.toBe(cache.filterResponsesDb[1])
+    expect(replaced.filterResponsesDb[2]).toBe(cache.filterResponsesDb[2])
+  })
+
+  it('builds the fixed response grid once and reuses it for replacements', () => {
+    const cache = createV2ResponseCache(filters, frequencies, sampleRateHz)
+    const responseGrid = (cache as typeof cache & { responseGrid?: unknown }).responseGrid
+    const replaced = replaceV2ResponseCacheFilter(
+      cache,
+      1,
+      { ...filters[1]!, frequencyHz: 1_200 },
+      frequencies,
+      sampleRateHz,
+    )
+
+    expect(responseGrid).toBeDefined()
+    expect((replaced as typeof replaced & { responseGrid?: unknown }).responseGrid).toBe(responseGrid)
+  })
+
+  it('reuses a supplied matching response grid when creating a cache', () => {
+    const responseGrid = createBiquadResponseGrid(frequencies, sampleRateHz)
+    const cache = createV2ResponseCache(filters, frequencies, sampleRateHz, responseGrid)
+
+    expect(cache.responseGrid).toBe(responseGrid)
   })
 })

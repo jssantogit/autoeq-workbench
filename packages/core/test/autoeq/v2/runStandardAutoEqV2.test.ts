@@ -6,6 +6,7 @@ import {
   runStandardAutoEqV2,
   type Curve,
   type StandardAutoEqInputV2,
+  type V2CandidateBoundaryMode,
 } from '../../../src/index.js'
 
 function input(): StandardAutoEqInputV2 {
@@ -51,5 +52,52 @@ describe('runStandardAutoEqV2', () => {
 
     expect(result.filters).toEqual([])
     expect(result.manifest.terminationReason).toBe('time-limit')
+  })
+
+  it('attempts coherent geometries before the mixed fallback under one live deadline', () => {
+    const runInput = input()
+    runInput.source.rawPoints = runInput.source.rawPoints.map((point) => ({
+      ...point,
+      db: point.frequencyHz >= 1_000 ? -2 : 0,
+    }))
+    runInput.settings = { ...runInput.settings, maxFilters: 0 }
+    const attempts: V2CandidateBoundaryMode[] = []
+
+    const result = runStandardAutoEqV2(runInput, {
+      nowMs: () => 0,
+      onBoundaryModeAttempt: (mode) => attempts.push(mode),
+    })
+
+    expect(result.manifest.terminationReason).toBe('converged')
+    expect(attempts).toEqual(['half-height', 'sign-crossing', 'mixed'])
+  })
+
+  it('starts no search attempt when the initial complete checkpoint reaches the target', () => {
+    const attempts: V2CandidateBoundaryMode[] = []
+
+    const result = runStandardAutoEqV2(input(), {
+      nowMs: () => 0,
+      onBoundaryModeAttempt: (mode) => attempts.push(mode),
+    })
+
+    expect(result.manifest.targetAchieved).toBe(true)
+    expect(attempts).toEqual([])
+  })
+
+  it('starts no later geometry after the shared deadline expires in the first attempt', () => {
+    const runInput = input()
+    runInput.source.rawPoints = runInput.source.rawPoints.map((point) => ({
+      ...point,
+      db: point.frequencyHz >= 1_000 ? -2 : 0,
+    }))
+    const attempts: V2CandidateBoundaryMode[] = []
+
+    const result = runStandardAutoEqV2(runInput, {
+      nowMs: () => attempts.length === 0 ? 0 : 5_000,
+      onBoundaryModeAttempt: (mode) => attempts.push(mode),
+    })
+
+    expect(result.manifest.terminationReason).toBe('time-limit')
+    expect(attempts).toEqual(['half-height'])
   })
 })

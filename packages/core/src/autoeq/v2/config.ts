@@ -11,7 +11,7 @@ const STANDARD_V2_ALGORITHM: Readonly<StandardV2AlgorithmParameters> = Object.fr
   targetRmseDb: 0.25,
   targetMaxAbsDb: 0.75,
   candidateResidualFloorDb: 0.15,
-  pkQScaleMultipliers: [0.5, 1, 2],
+  pkQScaleMultipliers: [0.5, 1, 2] as const,
   maxExactCandidatesPerIteration: 8,
   maxActiveSearchPaths: 3,
   alternateRetentionRatio: 1.02,

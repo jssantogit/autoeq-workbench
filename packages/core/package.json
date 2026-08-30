@@ -7,6 +7,8 @@
   },
   "scripts": {
     "benchmark": "tsx benchmarks/run.ts",
+    "benchmark:v2": "tsx benchmarks/runV2.ts",
+    "benchmark:v2:holdout": "tsx benchmarks/runV2.ts --holdout",
     "benchmark:update": "tsx benchmarks/run.ts --write-baseline",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

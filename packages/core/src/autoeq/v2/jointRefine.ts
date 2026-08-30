@@ -1,8 +1,9 @@
 import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
+import type { BiquadResponseGrid } from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
 import { auditCancellations } from '../cancellation.js'
 import type { StandardAutoEqV2Config } from './config.js'
-import { compareV2Solutions, type V2Solution } from './ranking.js'
+import { compareV2PrimaryMetrics, compareV2Solutions, type V2Solution } from './ranking.js'
 import {
   createV2ResponseCache,
   replaceV2ResponseCacheFilter,
@@ -37,6 +38,10 @@ export interface JointRefineResult {
   expired: boolean
 }
 
+export interface JointRefineTrace {
+  onCancellationAuditComputed?: () => void
+}
+
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value))
 }
@@ -46,9 +51,15 @@ export function evaluateV2Solution(
   desiredDb: readonly number[],
   frequencies: readonly number[],
   sampleRateHz: number,
+  responseGrid?: BiquadResponseGrid,
 ): V2EvaluatedSolution {
   const copiedFilters = filters.map((filter) => ({ ...filter }))
-  const responseCache = createV2ResponseCache(copiedFilters, frequencies, sampleRateHz)
+  const responseCache = createV2ResponseCache(
+    copiedFilters,
+    frequencies,
+    sampleRateHz,
+    responseGrid,
+  )
   const residualDb = desiredDb.length === frequencies.length
     ? desiredDb.map((value, index) => value - responseCache.cascadeDb[index]!)
     : frequencies.map(() => 0)
@@ -86,7 +97,7 @@ function evaluatedReplacement(
     cascadeDb: responseCache.cascadeDb,
     residualDb,
     metrics: calculateErrorMetrics(residualDb, frequencies),
-    cancellationAudit: auditCancellations(filters, frequencies, config.sampleRateHz),
+    cancellationAudit: solution.cancellationAudit,
   }
 }
 
@@ -100,46 +111,73 @@ function uniqueTrials(filters: readonly Filter[]): Filter[] {
   })
 }
 
-export function jointRefineV2(input: JointRefineInput): JointRefineResult {
-  let solution = evaluateV2Solution(
-    input.solution.filters,
-    input.desiredDb,
-    input.frequencies,
-    input.config.sampleRateHz,
-  )
+export function jointRefineV2(
+  input: JointRefineInput,
+  trace?: JointRefineTrace,
+): JointRefineResult {
+  let solution = 'responseCache' in input.solution
+    ? input.solution as V2EvaluatedSolution
+    : evaluateV2Solution(
+        input.solution.filters,
+        input.desiredDb,
+        input.frequencies,
+        input.config.sampleRateHz,
+      )
+  const validAudits = new WeakSet<V2EvaluatedSolution>([solution])
+  const withCancellationAudit = (candidate: V2EvaluatedSolution): V2EvaluatedSolution => {
+    if (validAudits.has(candidate)) return candidate
+    trace?.onCancellationAuditComputed?.()
+    const audited = {
+      ...candidate,
+      cancellationAudit: auditCancellations(
+        candidate.filters,
+        input.frequencies,
+        input.config.sampleRateHz,
+      ),
+    }
+    validAudits.add(audited)
+    return audited
+  }
+  const finish = (expired: boolean): JointRefineResult => {
+    solution = withCancellationAudit(solution)
+    return { solution, completedCycles, coordinateTrials, expired }
+  }
   let completedCycles = 0
   let coordinateTrials = 0
 
   for (let cycle = 0; cycle < input.config.algorithm.maxJointRefinementCycles; cycle += 1) {
     if (input.deadline.isExpired()) {
-      return { solution, completedCycles, coordinateTrials, expired: true }
+      return finish(true)
     }
     const cycleStart = solution
     for (const scale of JOINT_REFINEMENT_SCALES) {
       for (let filterIndex = 0; filterIndex < solution.filters.length; filterIndex += 1) {
         const startingFilter = solution.filters[filterIndex]!
-        const coordinates: Filter[][] = [
-          uniqueTrials([
-            { ...startingFilter, frequencyHz: clamp(startingFilter.frequencyHz * 2 ** -scale.fcOctaveStep, input.config.minFrequencyHz, input.config.maxFrequencyHz) },
-            { ...startingFilter, frequencyHz: clamp(startingFilter.frequencyHz * 2 ** scale.fcOctaveStep, input.config.minFrequencyHz, input.config.maxFrequencyHz) },
-          ]),
-          uniqueTrials([
-            { ...startingFilter, gainDb: clamp(startingFilter.gainDb - scale.gainStepDb, input.config.minGainDb, input.config.maxGainDb) },
-            { ...startingFilter, gainDb: clamp(startingFilter.gainDb + scale.gainStepDb, input.config.minGainDb, input.config.maxGainDb) },
-          ]),
-        ]
+        const coordinates: Array<'frequencyHz' | 'gainDb' | 'q'> = ['frequencyHz', 'gainDb']
         if (startingFilter.type === 'PK') {
-          coordinates.push(uniqueTrials([
-            { ...startingFilter, q: clamp(startingFilter.q * 2 ** -scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
-            { ...startingFilter, q: clamp(startingFilter.q * 2 ** scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
-          ]))
+          coordinates.push('q')
         }
 
-        for (const trials of coordinates) {
+        for (const coordinate of coordinates) {
+          const currentFilter = solution.filters[filterIndex]!
+          const trials = coordinate === 'frequencyHz'
+            ? uniqueTrials([
+                { ...currentFilter, frequencyHz: clamp(currentFilter.frequencyHz * 2 ** -scale.fcOctaveStep, input.config.minFrequencyHz, input.config.maxFrequencyHz) },
+                { ...currentFilter, frequencyHz: clamp(currentFilter.frequencyHz * 2 ** scale.fcOctaveStep, input.config.minFrequencyHz, input.config.maxFrequencyHz) },
+              ])
+            : coordinate === 'gainDb'
+              ? uniqueTrials([
+                  { ...currentFilter, gainDb: clamp(currentFilter.gainDb - scale.gainStepDb, input.config.minGainDb, input.config.maxGainDb) },
+                  { ...currentFilter, gainDb: clamp(currentFilter.gainDb + scale.gainStepDb, input.config.minGainDb, input.config.maxGainDb) },
+                ])
+              : uniqueTrials([
+                  { ...currentFilter, q: clamp(currentFilter.q * 2 ** -scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
+                  { ...currentFilter, q: clamp(currentFilter.q * 2 ** scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
+                ])
           let best = solution
           for (const trial of trials) {
             if (input.deadline.isExpired()) {
-              return { solution, completedCycles, coordinateTrials, expired: true }
+              return finish(true)
             }
             coordinateTrials += 1
             const candidate = evaluatedReplacement(
@@ -150,14 +188,31 @@ export function jointRefineV2(input: JointRefineInput): JointRefineResult {
               input.frequencies,
               input.config,
             )
-            if (compareV2Solutions(candidate, best) < 0) best = candidate
+            if (input.deadline.isExpired()) {
+              return finish(true)
+            }
+            const primaryComparison = compareV2PrimaryMetrics(candidate.metrics, best.metrics)
+            if (primaryComparison < 0) {
+              best = candidate
+            } else if (primaryComparison === 0) {
+              const auditedCandidate = withCancellationAudit(candidate)
+              const auditedBest = withCancellationAudit(best)
+              best = compareV2Solutions(auditedCandidate, auditedBest) < 0
+                ? auditedCandidate
+                : auditedBest
+            }
           }
           solution = best
         }
       }
     }
     completedCycles += 1
-    if (compareV2Solutions(solution, cycleStart) >= 0) break
+    const primaryComparison = compareV2PrimaryMetrics(solution.metrics, cycleStart.metrics)
+    if (primaryComparison > 0) break
+    if (primaryComparison === 0) {
+      solution = withCancellationAudit(solution)
+      if (compareV2Solutions(solution, withCancellationAudit(cycleStart)) >= 0) break
+    }
   }
-  return { solution, completedCycles, coordinateTrials, expired: false }
+  return finish(false)
 }

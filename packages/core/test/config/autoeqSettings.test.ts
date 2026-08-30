@@ -34,7 +34,7 @@ describe('AutoEQ settings', () => {
     })
     expect(DEFAULT_AUTOEQ_SETTINGS).toEqual({
       ...DEFAULT_AUTOEQ_SETTINGS_V1,
-      timeLimitSeconds: 30,
+      timeLimitSeconds: 60,
     })
     expect(Object.isFrozen(AUTOEQ_PRODUCT_LIMITS)).toBe(true)
     expect(Object.isFrozen(DEFAULT_AUTOEQ_SETTINGS_V1)).toBe(true)

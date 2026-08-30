@@ -51,7 +51,11 @@ export {
   generateV2Candidates,
   rankV2CandidateShortlist,
 } from './autoeq/v2/candidates.js'
-export type { CandidateInput, V2FilterCandidate } from './autoeq/v2/candidates.js'
+export type {
+  CandidateInput,
+  V2CandidateBoundaryMode,
+  V2FilterCandidate,
+} from './autoeq/v2/candidates.js'
 export {
   JOINT_REFINEMENT_SCALES,
   evaluateV2Solution,
@@ -69,8 +73,11 @@ export {
 export type { SearchInput, SearchResult } from './autoeq/v2/search.js'
 export { cyclicDiscreteRefineV2, quantizeV2Filters } from './autoeq/v2/discreteRefine.js'
 export type {
+  AcceptedDiscreteMove,
+  DiscreteRefineTrace,
   DiscreteRefineV2Input,
   DiscreteRefineV2Result,
+  DiscreteTrial,
 } from './autoeq/v2/discreteRefine.js'
 export {
   buildDeliverableV2,

@@ -1,8 +1,15 @@
+import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
 import type { Filter } from '../../types/filter.js'
-import { generateV2Candidates, rankV2CandidateShortlist } from './candidates.js'
+import { auditCancellations } from '../cancellation.js'
+import {
+  generateV2Candidates,
+  rankV2CandidateShortlist,
+  type V2CandidateBoundaryMode,
+} from './candidates.js'
 import type { StandardAutoEqV2Config } from './config.js'
 import { evaluateV2Solution, jointRefineV2, type V2EvaluatedSolution } from './jointRefine.js'
 import { compareV2Solutions, type V2Solution } from './ranking.js'
+import { appendV2ResponseCacheFilter } from './responseCache.js'
 import type { StandardV2Deadline } from './runtime.js'
 
 export interface SearchInput {
@@ -10,14 +17,16 @@ export interface SearchInput {
   frequencies: readonly number[]
   config: StandardAutoEqV2Config
   deadline: StandardV2Deadline
+  boundaryMode: V2CandidateBoundaryMode
   isTargetCapable?: (solution: V2Solution) => boolean
-  onWorkingSolution?: (solution: V2Solution) => void
+  onWorkingSolution?: (solution: V2EvaluatedSolution) => void
 }
 
 export interface SearchResult {
   bestSolution: V2EvaluatedSolution
   activeSolutions: V2EvaluatedSolution[]
   peakWorkingFilterCount: number
+  jointRefinementCount: number
   termination: 'target-capable' | 'converged' | 'time-limit'
 }
 
@@ -54,6 +63,34 @@ function candidateFilter(
   }
 }
 
+function appendCandidate(
+  path: V2EvaluatedSolution,
+  filter: Filter,
+  input: SearchInput,
+): V2EvaluatedSolution {
+  const filters = [...path.filters, filter]
+  const responseCache = appendV2ResponseCacheFilter(
+    path.responseCache,
+    filter,
+    input.frequencies,
+    input.config.sampleRateHz,
+  )
+  const residualDb = input.desiredDb.map((desired, index) =>
+    desired - responseCache.cascadeDb[index]!)
+  return {
+    filters,
+    responseCache,
+    cascadeDb: responseCache.cascadeDb,
+    residualDb,
+    metrics: calculateErrorMetrics(residualDb, input.frequencies),
+    cancellationAudit: auditCancellations(
+      filters,
+      input.frequencies,
+      input.config.sampleRateHz,
+    ),
+  }
+}
+
 export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResult {
   const zero = evaluateV2Solution([], input.desiredDb, input.frequencies, input.config.sampleRateHz)
   if (input.deadline.isExpired()) {
@@ -61,6 +98,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       bestSolution: zero,
       activeSolutions: [zero],
       peakWorkingFilterCount: 0,
+      jointRefinementCount: 0,
       termination: 'time-limit',
     }
   }
@@ -68,6 +106,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
   let active = [zero]
   let best = zero
   let peakWorkingFilterCount = 0
+  let jointRefinementCount = 0
   while (active.some((path) => path.filters.length < input.config.workingMaxFilters)) {
     const expanded: V2EvaluatedSolution[] = []
     let expired = false
@@ -77,56 +116,108 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
         frequencies: input.frequencies,
         residualDb: path.residualDb,
         config: input.config,
+        boundaryMode: input.boundaryMode,
       }))
+      const appendedCandidates: V2EvaluatedSolution[] = []
       for (const candidate of shortlist) {
         if (input.deadline.isExpired()) {
           expired = true
           break
         }
-        const appended = evaluateV2Solution(
-          [...path.filters, candidateFilter(candidate, path.filters.length)],
-          input.desiredDb,
-          input.frequencies,
-          input.config.sampleRateHz,
-        )
-        const refined = jointRefineV2({
-          solution: appended,
-          desiredDb: input.desiredDb,
-          frequencies: input.frequencies,
-          config: input.config,
-          deadline: input.deadline,
-        })
-        if (compareV2Solutions(refined.solution, path) < 0) {
-          expanded.push(refined.solution)
-          peakWorkingFilterCount = Math.max(
-            peakWorkingFilterCount,
-            refined.solution.filters.length,
-          )
-          input.onWorkingSolution?.(refined.solution)
-          if (compareV2Solutions(refined.solution, best) < 0) best = refined.solution
-          if (input.isTargetCapable?.(refined.solution)) {
-            return {
-              bestSolution: best,
-              activeSolutions: [refined.solution],
+        appendedCandidates.push(appendCandidate(
+          path,
+          candidateFilter(candidate, path.filters.length),
+          input,
+        ))
+      }
+      if (expired) break
+
+      const rankedAppended = [...appendedCandidates].sort(compareV2Solutions)
+      const staged = retainV2SearchPaths(rankedAppended, false)
+      const stagedSet = new Set(staged)
+      const deferred = rankedAppended.filter((candidate) => !stagedSet.has(candidate))
+      let stagedImproved = false
+      for (const phase of ['staged', 'fallback'] as const) {
+        if (phase === 'fallback' && stagedImproved) break
+        const candidates = phase === 'staged' ? staged : deferred
+        for (const appended of candidates) {
+          if (input.deadline.isExpired()) {
+            expired = true
+            break
+          }
+          jointRefinementCount += 1
+          const refined = jointRefineV2({
+            solution: appended,
+            desiredDb: input.desiredDb,
+            frequencies: input.frequencies,
+            config: input.config,
+            deadline: input.deadline,
+          })
+          if (refined.expired) {
+            expired = true
+            break
+          }
+          if (compareV2Solutions(refined.solution, path) < 0) {
+            expanded.push(refined.solution)
+            peakWorkingFilterCount = Math.max(
               peakWorkingFilterCount,
-              termination: refined.expired ? 'time-limit' : 'target-capable',
-            }
+              refined.solution.filters.length,
+            )
+            if (compareV2Solutions(refined.solution, best) < 0) best = refined.solution
+            if (phase === 'staged') stagedImproved = true
+            else break
           }
         }
-        if (refined.expired) {
-          expired = true
-          break
-        }
+        if (expired) break
       }
       if (expired) break
     }
     if (expired) {
-      return { bestSolution: best, activeSolutions: active, peakWorkingFilterCount, termination: 'time-limit' }
+      return {
+        bestSolution: best,
+        activeSolutions: active,
+        peakWorkingFilterCount,
+        jointRefinementCount,
+        termination: 'time-limit',
+      }
     }
     if (expanded.length === 0) {
-      return { bestSolution: best, activeSolutions: active, peakWorkingFilterCount, termination: 'converged' }
+      return {
+        bestSolution: best,
+        activeSolutions: active,
+        peakWorkingFilterCount,
+        jointRefinementCount,
+        termination: 'converged',
+      }
     }
     active = retainV2SearchPaths(expanded, false)
+    for (const checkpoint of active) {
+      input.onWorkingSolution?.(checkpoint)
+      if (input.deadline.isExpired()) {
+        return {
+          bestSolution: best,
+          activeSolutions: active,
+          peakWorkingFilterCount,
+          jointRefinementCount,
+          termination: 'time-limit',
+        }
+      }
+      if (input.isTargetCapable?.(checkpoint)) {
+        return {
+          bestSolution: best,
+          activeSolutions: [checkpoint],
+          peakWorkingFilterCount,
+          jointRefinementCount,
+          termination: 'target-capable',
+        }
+      }
+    }
   }
-  return { bestSolution: best, activeSolutions: active, peakWorkingFilterCount, termination: 'converged' }
+  return {
+    bestSolution: best,
+    activeSolutions: active,
+    peakWorkingFilterCount,
+    jointRefinementCount,
+    termination: 'converged',
+  }
 }

@@ -64,4 +64,74 @@ describe('Standard v2 deliverables', () => {
     expect(kept.deliverable.filters).toHaveLength(2)
     expect(kept.completed).toBe(true)
   })
+
+  it('keeps the last complete deliverable when the deadline expires during removal refinement', () => {
+    const config = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 2 })
+    const desired = filter('desired', 1_000, 4)
+    const desiredDb = evaluateV2Solution([desired], [], frequencies, 48_000).cascadeDb
+    const solution = evaluateV2Solution(
+      [filter('a', 1_000, 4), filter('b', 1_000, 0.1)],
+      desiredDb,
+      frequencies,
+      48_000,
+    )
+    const original = { ...solution, preampDb: -4.1 }
+    let checks = 0
+
+    const compressed = compressDeliverableV2({
+      deliverable: original,
+      desiredDb,
+      frequencies,
+      config,
+      deadline: { isExpired: () => ++checks >= 5 },
+    })
+
+    expect(compressed).toMatchObject({ completed: false, expired: true })
+    expect(compressed.deliverable).toBe(original)
+  })
+
+  it('returns the prior checkpoint when discrete delivery work crosses the deadline', () => {
+    const config = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
+    const desiredDb = evaluateV2Solution(
+      [filter('desired', config.minFrequencyHz + 1, 2)],
+      [],
+      frequencies,
+      config.sampleRateHz,
+    ).cascadeDb
+    const fallbackOnExpiration = buildDeliverableV2({
+      filters: [], desiredDb, frequencies, config, deadline,
+    })
+    let checks = 0
+
+    const result = buildDeliverableV2({
+      filters: [filter('start', config.minFrequencyHz, 2)],
+      desiredDb,
+      frequencies,
+      config,
+      deadline: { isExpired: () => ++checks > 3 },
+      fallbackOnExpiration,
+    })
+
+    expect(result).toBe(fallbackOnExpiration)
+  })
+
+  it('does not start preamp work when final delivered-cascade scoring crosses the deadline', () => {
+    const config = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
+    const desiredDb = frequencies.map(() => 1)
+    const fallbackOnExpiration = buildDeliverableV2({
+      filters: [], desiredDb, frequencies, config, deadline,
+    })
+    let checks = 0
+
+    const result = buildDeliverableV2({
+      filters: [],
+      desiredDb,
+      frequencies,
+      config,
+      deadline: { isExpired: () => ++checks > 4 },
+      fallbackOnExpiration,
+    })
+
+    expect(result).toBe(fallbackOnExpiration)
+  })
 })

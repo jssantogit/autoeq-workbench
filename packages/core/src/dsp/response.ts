@@ -2,6 +2,16 @@ import { biquadCoefficients } from './biquad.js'
 import { CoreError } from '../types/error.js'
 import type { Filter } from '../types/filter.js'
 
+export interface BiquadResponseGrid {
+  sourceFrequencies: readonly number[]
+  frequencies: number[]
+  sampleRateHz: number
+  cosW: number[]
+  sinW: number[]
+  cos2W: number[]
+  sin2W: number[]
+}
+
 export function validateResponseInput(
   frequencies: readonly number[],
   sampleRateHz: number,
@@ -48,6 +58,60 @@ export function biquadMagnitudeDb(
       (denominatorRe ** 2 + denominatorIm ** 2)
     const magnitude = Math.sqrt(magnitudeSquared)
     const magnitudeDb = 20 * Math.log10(Math.max(magnitude, 1e-300))
+
+    if (!Number.isFinite(magnitudeDb)) {
+      throw new CoreError('numeric', 'Biquad magnitude must be finite')
+    }
+    return magnitudeDb
+  })
+}
+
+export function createBiquadResponseGrid(
+  frequencies: readonly number[],
+  sampleRateHz: number,
+): BiquadResponseGrid {
+  validateResponseInput(frequencies, sampleRateHz)
+  const grid: BiquadResponseGrid = {
+    sourceFrequencies: frequencies,
+    frequencies: [...frequencies],
+    sampleRateHz,
+    cosW: [],
+    sinW: [],
+    cos2W: [],
+    sin2W: [],
+  }
+  for (const frequencyHz of frequencies) {
+    const w = (2 * Math.PI * frequencyHz) / sampleRateHz
+    grid.cosW.push(Math.cos(w))
+    grid.sinW.push(Math.sin(w))
+    grid.cos2W.push(Math.cos(2 * w))
+    grid.sin2W.push(Math.sin(2 * w))
+  }
+  return grid
+}
+
+export function biquadMagnitudeDbOnGrid(
+  filter: Filter,
+  grid: BiquadResponseGrid,
+): number[] {
+  const { b0, b1, b2, a0, a1, a2 } = biquadCoefficients(filter, grid.sampleRateHz)
+  const numeratorConstant = b0 * b0 + b1 * b1 + b2 * b2
+  const numeratorCosW = 2 * (b0 * b1 + b1 * b2)
+  const numeratorCos2W = 2 * b0 * b2
+  const denominatorConstant = a0 * a0 + a1 * a1 + a2 * a2
+  const denominatorCosW = 2 * (a0 * a1 + a1 * a2)
+  const denominatorCos2W = 2 * a0 * a2
+  return grid.frequencies.map((_, index) => {
+    const cosW = grid.cosW[index]!
+    const cos2W = grid.cos2W[index]!
+    const numeratorSquared =
+      numeratorConstant + numeratorCosW * cosW + numeratorCos2W * cos2W
+    const denominatorSquared =
+      denominatorConstant + denominatorCosW * cosW + denominatorCos2W * cos2W
+    const magnitudeSquared = numeratorSquared / denominatorSquared
+    const magnitudeDb = magnitudeSquared > 0
+      ? 10 * Math.log10(magnitudeSquared)
+      : -6_000
 
     if (!Number.isFinite(magnitudeDb)) {
       throw new CoreError('numeric', 'Biquad magnitude must be finite')
