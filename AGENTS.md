@@ -12,8 +12,9 @@
 - Keep `packages/core` framework-agnostic; it must not import React, Zustand, Tailwind CSS, or ECharts.
 - Standard AutoEQ v1 remains frozen unless a later approved design/version explicitly changes it.
 - `vendor/squiglink/` is immutable reference only and must never be runtime-imported.
-- Use only synthetic or explicitly sanitized test fixtures.
-- Never commit secrets, private curves, user data, credentials, or local environment files.
+- Use only synthetic or explicitly sanitized test fixtures by default.
+- Approved exception: the four raw measurement files already versioned under `packages/core/benchmarks/research/raw/` are explicitly authorized research benchmark source data under `docs/superpowers/specs/2026-08-30-autoeq-research-bench-raw-corpus-amendment.md`. They may be filename-renamed or moved within the research corpus without content changes. Do not add any other raw/private/user curve data without a new explicit approval.
+- Never commit secrets, private curves outside the approved research-corpus exception, user data, credentials, or local environment files.
 
 ## Repository Verification Gates
 
@@ -38,6 +39,9 @@
 - Standard AutoEQ v1 design: `docs/superpowers/specs/2026-08-25-autoeq-standard-v1-design.md`
 - Standard AutoEQ v2 design: `docs/superpowers/specs/2026-08-29-autoeq-standard-v2-design.md`
 - Standard AutoEQ v2 plan: `docs/superpowers/plans/2026-08-29-autoeq-standard-v2.md`
+- AutoEQ Research Bench design: `docs/superpowers/specs/2026-08-30-autoeq-research-bench-design.md`
+- AutoEQ Research Bench raw-corpus amendment: `docs/superpowers/specs/2026-08-30-autoeq-research-bench-raw-corpus-amendment.md`
+- AutoEQ Research Bench implementation plan: `docs/superpowers/plans/2026-08-30-autoeq-research-bench.md`
 - Plan 3 integration/visual-closeout design: `docs/superpowers/specs/2026-08-26-plan-03-integration-visual-closeout-design.md`
 - Plan 3A: `docs/superpowers/plans/2026-08-26-plan-03a-normalization-session-exports.md`
 - Plan 3B: `docs/superpowers/plans/2026-08-26-plan-03b-validation-diagnostics-e2e.md`
