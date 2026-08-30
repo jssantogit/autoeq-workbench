@@ -1,5 +1,7 @@
 import type { Curve } from '../../src/types/curve.js'
 import type { ErrorMetrics } from '../../src/metrics/errorMetrics.js'
+import type { BandMetric } from '../../src/metrics/bandMetrics.js'
+import type { Filter } from '../../src/types/filter.js'
 import type { StandardV2ResearchPhase } from '../../src/autoeq/v2/researchTrace.js'
 
 export type ResearchCaseId = 'titan-to-storm' | 'titan-to-u12t' | 'titan-to-trio'
@@ -62,3 +64,45 @@ export interface ResearchTelemetrySnapshot {
 }
 
 export type ResearchTerminationReason = 'target-reached' | 'converged' | 'time-limit'
+
+export interface ResearchFinalQuality {
+  maeDb: number
+  rmseDb: number
+  maxAbsDb: number
+  maxAbsFrequencyHz: number
+  targetAchieved: boolean
+  terminationReason: ResearchTerminationReason
+  deliveredFilterCount: number
+  preampDb: number
+}
+
+export interface ResearchRunRow {
+  caseId: ResearchCaseId
+  budgetSeconds: 5 | 15 | 30 | 60 | 120
+  maxFilters: number
+  repeatIndex: number
+  elapsedMs: number
+  final: ResearchFinalQuality
+  bands: BandMetric[]
+  counters: StandardV2ResearchCounters
+  timeToQuality: ResearchTimeToQuality
+  timeline: ResearchCheckpoint[]
+  filters: Filter[]
+}
+
+export interface ResearchAggregateRow {
+  caseId: ResearchCaseId
+  budgetSeconds: number
+  maxFilters: number
+  runCount: number
+  rmseDb: { best: number; median: number; worst: number; spread: number }
+  maxAbsDb: { best: number; median: number; worst: number; spread: number }
+  targetAchievedCount: number
+  targetAchievedRate: number
+  terminationReasons: Record<string, number>
+  timeToQualityMedian: ResearchTimeToQuality
+  timeToQualityWorst: ResearchTimeToQuality
+  elapsedMs: { best: number; median: number; worst: number; spread: number }
+  peakWorkingFilterCount: { best: number; median: number; worst: number; spread: number }
+  jointRefinementCount: { best: number; median: number; worst: number; spread: number }
+}

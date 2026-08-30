@@ -50,6 +50,8 @@ const targetDefinitions: Readonly<Record<ResearchCaseId, RawCurveDefinition>> = 
   },
 }
 
+let cachedResearchCases: ResearchCase[] | undefined
+
 function readRawCurve(definition: RawCurveDefinition): Curve {
   const text = readFileSync(new URL(`./raw/${definition.fileName}`, import.meta.url), 'utf8')
   return parseCurveText(text, {
@@ -59,12 +61,27 @@ function readRawCurve(definition: RawCurveDefinition): Curve {
 }
 
 export function loadResearchCases(): ResearchCase[] {
-  const source = readRawCurve(sourceDefinition)
+  if (cachedResearchCases === undefined) {
+    const source = readRawCurve(sourceDefinition)
+    cachedResearchCases = (Object.keys(targetDefinitions) as ResearchCaseId[]).map((id) => ({
+      id,
+      source,
+      target: readRawCurve(targetDefinitions[id]),
+    }))
+  }
 
-  return (Object.keys(targetDefinitions) as ResearchCaseId[]).map((id) => ({
+  return cachedResearchCases.map(({ id, source, target }) => ({
     id,
-    source,
-    target: readRawCurve(targetDefinitions[id]),
+    source: {
+      ...source,
+      rawPoints: source.rawPoints.map((point) => ({ ...point })),
+      metadata: { ...source.metadata },
+    },
+    target: {
+      ...target,
+      rawPoints: target.rawPoints.map((point) => ({ ...point })),
+      metadata: { ...target.metadata },
+    },
   }))
 }
 
