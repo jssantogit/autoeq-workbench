@@ -109,10 +109,8 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
   let jointRefinementCount = 0
   while (active.some((path) => path.filters.length < input.config.workingMaxFilters)) {
     const expanded: V2EvaluatedSolution[] = []
-    let mainPathImproved = false
     let expired = false
-    for (let pathIndex = 0; pathIndex < active.length; pathIndex += 1) {
-      const path = active[pathIndex]!
+    for (const path of active) {
       if (path.filters.length >= input.config.workingMaxFilters) continue
       const shortlist = rankV2CandidateShortlist(generateV2Candidates({
         frequencies: input.frequencies,
@@ -165,7 +163,6 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
               peakWorkingFilterCount,
               refined.solution.filters.length,
             )
-            if (pathIndex === 0) mainPathImproved = true
             if (compareV2Solutions(refined.solution, best) < 0) best = refined.solution
             if (phase === 'staged') stagedImproved = true
             else break
@@ -193,8 +190,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
         termination: 'converged',
       }
     }
-    const mainStagnant = !mainPathImproved && violation(active[0]!) > 1
-    active = retainV2SearchPaths(expanded, mainStagnant)
+    active = retainV2SearchPaths(expanded, false)
     for (const checkpoint of active) {
       input.onWorkingSolution?.(checkpoint)
       if (input.deadline.isExpired()) {
