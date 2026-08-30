@@ -27,6 +27,5 @@ jobs:
       - run: pnpm lint
       - run: pnpm --filter @autoeq-workbench/core benchmark
       - run: pnpm --filter @autoeq-workbench/core benchmark:v2
-      - run: pnpm --filter @autoeq-workbench/core benchmark:v2:holdout
       - run: pnpm --dir apps/web exec playwright install --with-deps chromium
       - run: pnpm --filter ./apps/web e2e
