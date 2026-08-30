@@ -65,7 +65,7 @@ jobs:
           RESEARCH_PROFILE_CELL: ${{ inputs.profile_cell }}
         run: |
           set -euo pipefail
-          args=(--output-dir autoeq-research)
+          args=(--output-dir "$GITHUB_WORKSPACE/autoeq-research")
           if [[ "$RESEARCH_PURPOSE" == "baseline" ]]; then
             args+=(
               --preset full
