@@ -340,6 +340,7 @@ function isValidRunManifestV2(manifest: unknown): manifest is RunManifestV2 {
     algorithmParametersAreValid &&
     Array.isArray(manifest.finalFilters) &&
     manifest.finalFilters.length <= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters &&
+    manifest.finalFilters.length <= (manifest.autoeqSettings as AutoEqSettings).maxFilters &&
     manifest.finalFilters.every(isValidFilter) &&
     new Set(manifest.finalFilters.map(({ id }) => id)).size === manifest.finalFilters.length &&
     metricsAreValid &&

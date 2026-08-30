@@ -20,6 +20,7 @@ import {
   type V2EvaluatedSolution,
   type V2Solution,
 } from '../../../src/index.js'
+import { retainV2NextActivePaths } from '../../../src/autoeq/v2/search.js'
 
 function solution(violation: number): V2Solution {
   const metrics: ErrorMetrics = {
@@ -154,6 +155,19 @@ describe('Standard v2 bounded search', () => {
     expect(retainV2SearchPaths([solution(1), solution(1.03), solution(1.04)], false)).toHaveLength(1)
     expect(retainV2SearchPaths([solution(1), solution(1.03), solution(1.04)], true))
       .toHaveLength(2)
+  })
+
+  it('wires main-path stagnation into global next-path retention', () => {
+    const expanded = [solution(1), solution(1.03), solution(1.04)]
+
+    const stagnant = retainV2NextActivePaths([solution(1.2)], expanded, false)
+    expect(stagnant.map((entry) => entry.metrics.rmseDb / 0.25)).toEqual([1, 1.03])
+
+    const improved = retainV2NextActivePaths([solution(1.2)], expanded, true)
+    expect(improved.map((entry) => entry.metrics.rmseDb / 0.25)).toEqual([1])
+
+    const alreadyInsideEnvelope = retainV2NextActivePaths([solution(0.9)], expanded, false)
+    expect(alreadyInsideEnvelope.map((entry) => entry.metrics.rmseDb / 0.25)).toEqual([1])
   })
 
   it('returns a bounded zero-filter solution without starting work at an expired deadline', () => {
