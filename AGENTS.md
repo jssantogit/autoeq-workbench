@@ -36,6 +36,8 @@
 - Efficient Workflow v2 plan: `docs/superpowers/plans/2026-08-29-efficient-workflow-v2.md`
 - Source-first remake design: `docs/superpowers/specs/2026-08-24-squiglink-source-first-remake-design.md`
 - Standard AutoEQ v1 design: `docs/superpowers/specs/2026-08-25-autoeq-standard-v1-design.md`
+- Standard AutoEQ v2 design: `docs/superpowers/specs/2026-08-29-autoeq-standard-v2-design.md`
+- Standard AutoEQ v2 plan: `docs/superpowers/plans/2026-08-29-autoeq-standard-v2.md`
 - Plan 3 integration/visual-closeout design: `docs/superpowers/specs/2026-08-26-plan-03-integration-visual-closeout-design.md`
 - Plan 3A: `docs/superpowers/plans/2026-08-26-plan-03a-normalization-session-exports.md`
 - Plan 3B: `docs/superpowers/plans/2026-08-26-plan-03b-validation-diagnostics-e2e.md`

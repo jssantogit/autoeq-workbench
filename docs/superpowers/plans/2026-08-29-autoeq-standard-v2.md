@@ -17,9 +17,9 @@
 - Final target is simultaneous `RMSE <= 0.25 dB` and `maxAbs <= 0.75 dB` on the exact quantized delivered cascade.
 - No treble de-weighting; effective fit-grid samples are uniform.
 - PK/LS/HS only; 20–20,000 Hz; gain -15..+15 dB; PK Q 0.1..12; shelf Q 0.7; hard delivered Max Filters 64.
-- Time Limit is exactly `5 | 15 | 30 | 60 | 120`, default 30; timeout is normal result; Cancel applies no partial result.
+- Time Limit is exactly `5 | 15 | 30 | 60 | 120`, default 60; timeout is normal result; Cancel applies no partial result.
 - Non-timeout v2 runs are exactly deterministic. Timeout is best-effort deterministic across machines and exact under the injected fake clock.
-- V1 manifest remains schema 2 with historical settings; v2 manifest is schema 3. Session v2 is schema 2; session-v1 migration adds `timeLimitSeconds: 30` only to workspace settings.
+- V1 manifest remains schema 2 with historical settings; v2 manifest is schema 3. Session v2 is schema 2; session migration adds `timeLimitSeconds: 60` only when absent and never overwrites a persisted approved value.
 - Use synthetic/sanitized fixtures only. Never commit private FR/Target data.
 - Efficient Workflow v2: minimal directed reads, focused tests during tasks, one global gate pass after the diff stabilizes, no routine narration, no repeated benchmark/global runs without a concrete reason.
 - Preserve unrelated WIP; never reset, clean, stash, or overwrite it for convenience.
@@ -78,7 +78,7 @@ Pin this contract:
 
 ```ts
 expect(AUTOEQ_TIME_LIMIT_OPTIONS).toEqual([5, 15, 30, 60, 120])
-expect(DEFAULT_AUTOEQ_SETTINGS.timeLimitSeconds).toBe(30)
+expect(DEFAULT_AUTOEQ_SETTINGS.timeLimitSeconds).toBe(60)
 expect(DEFAULT_AUTOEQ_SETTINGS_V1).toEqual({
   minFrequencyHz: 20,
   maxFrequencyHz: 20_000,
@@ -124,7 +124,7 @@ export interface AutoEqSettings extends AutoEqSettingsV1 {
 }
 ```
 
-`DEFAULT_AUTOEQ_SETTINGS_V1` is the current 7-field default. `DEFAULT_AUTOEQ_SETTINGS = { ...DEFAULT_AUTOEQ_SETTINGS_V1, timeLimitSeconds: 30 }`. Move the existing numeric/bounds checks unchanged into `isValidAutoEqSettingsV1()`; current `isValidAutoEqSettings()` additionally requires membership in the five-option tuple. Never clamp timeout values.
+`DEFAULT_AUTOEQ_SETTINGS_V1` is the current 7-field default. `DEFAULT_AUTOEQ_SETTINGS = { ...DEFAULT_AUTOEQ_SETTINGS_V1, timeLimitSeconds: 60 }`. Move the existing numeric/bounds checks unchanged into `isValidAutoEqSettingsV1()`; current `isValidAutoEqSettings()` additionally requires membership in the five-option tuple. Never clamp timeout values.
 
 - [ ] **Step 3: Write failing v1 manifest-compatibility tests**
 
@@ -415,9 +415,11 @@ Assert `compareV2Solutions(result.solution, start.solution) <= 0`, `completedCyc
 
 With deterministic violations `1.000, 1.010, 1.019, 1.021`, ordinary alternatives through `1.019` are eligible and `1.021` is not. Active paths never exceed three. A single deterministic escape outside 1.02 is allowed only when the main path is stagnant, still within the three-path cap.
 
+Under the approved staged-retention amendment, add a search regression proving that one active parent exact-appends the full shortlist but normally starts joint refinement for at most three eligible appended cascades. Add a false-convergence regression where all staged survivors fail to improve the parent but a non-staged candidate improves after refinement; assert that fallback reaches the first such improvement and stops. Assert deterministic repeats, unchanged global path cap, cooperative deadline behavior, and an internal `jointRefinementCount` that is not persisted in result manifests.
+
 - [ ] **Step 5: Implement joint refinement and search**
 
-Each accepted candidate triggers whole-cascade coarse→medium→fine refinement using cached one-filter replacement. Repeat cycles only while the ranking tuple improves, max 6, with deadline checks before each exact candidate evaluation, coordinate trial, and new cycle.
+For each active parent, exact-append the full cheap shortlist, rank the appended complete cascades with the approved tuple, retain at most three eligible appended cascades using the existing retention rule, and trigger whole-cascade coarse→medium→fine refinement for those staged survivors. Accept a refined cascade only when it improves its parent. If no staged survivor improves the parent, refine non-staged appends in exact tuple order and stop fallback at the first accepted improvement, target-capable result, deadline, or exhaustion. Repeat cycles only while the ranking tuple improves, max 6, with deadline checks before each exact append, refinement, coordinate trial, and new cycle.
 
 Search loop:
 
@@ -425,13 +427,15 @@ Search loop:
 residual
 → generate candidates
 → cheap shortlist <= 8
-→ exact append + joint refine
-→ rank complete paths
-→ retain main + eligible alternatives, max 3
+→ exact append all shortlisted candidates
+→ per-parent rank + retain eligible candidates, max 3
+→ joint refine staged survivors
+→ if zero improve, refine deferred candidates until first parent improvement
+→ global rank + retain main and eligible alternatives, max 3
 → repeat until no improving path, working cap, target-capable deliverable, or deadline
 ```
 
-`SearchResult` includes `peakWorkingFilterCount` for internal benchmark/tests only; it is not persisted in manifest/UI.
+`SearchResult` includes `peakWorkingFilterCount` and `jointRefinementCount` for internal benchmark/tests only; neither is persisted in manifest/UI.
 
 - [ ] **Step 6: Verify and commit Task 3**
 
@@ -457,11 +461,11 @@ git commit -m "feat(core): add bounded Standard v2 hybrid search"
 
 **Produces:** `cyclicDiscreteRefineV2()`, `buildDeliverableV2()`, `compressDeliverableV2()`, `runStandardAutoEqV2()`.
 
-**Approved pre-closeout amendment:** keep `standard-v2` and the exact manual grid, but replace Frequency's once-per-cycle movement with deterministic coordinate-local descent over consecutive `Fc ± 1 Hz` neighbors. Stay on Frequency after every accepted `1 Hz` move; leave it only at a local optimum, envelope boundary, or deadline. Gain/Q behavior and all approved constants remain unchanged. One-filter trials must reuse unchanged cached responses and apply `currentCascade - oldFilterResponse + newFilterResponse`. Tests must pin consecutive moves, Frequency-before-Gain/Q visitation, envelope handling, deterministic ranking/ties and repeats, cooperative deadline/checkpoint behavior, and unchanged-filter response reuse.
+**Approved pre-closeout amendment:** keep `standard-v2` and the exact manual grid, but replace Frequency's once-per-cycle movement with deterministic coordinate-local descent over consecutive `Fc ± 1 Hz` neighbors. Stay on Frequency after every accepted `1 Hz` move; leave it only at a local optimum, envelope boundary, or deadline. Gain/Q behavior and all approved constants remain unchanged. One-filter trials must reuse unchanged cached responses and apply `currentCascade - oldFilterResponse + newFilterResponse`. Compare violation/RMSE/maxAbs before computing cancellation audits; materialize audits only for exact primary ties and the final returned solution. Tests must pin consecutive moves, Frequency-before-Gain/Q visitation, envelope handling, deterministic ranking/ties and repeats, cooperative deadline/checkpoint behavior, unchanged-filter response reuse, lazy audit count, and exact final audit.
 
 - [ ] **Step 1: Write failing discrete/checkpoint/compression tests**
 
-Assert cyclic discrete refinement can improve beyond two cycles, stays on the existing manual grid (`1 Hz`, `0.1 dB`, `0.01 Q`), and never worsens the ranking tuple. Under the pre-closeout amendment, assert Frequency performs consecutive deterministic `±1 Hz` local descent to a coordinate-local optimum before Gain/Q, respects the effective envelope, checks the deadline before each trial and continuation step, preserves the last complete checkpoint, and recomputes only the changed filter response.
+Assert cyclic discrete refinement can improve beyond two cycles, stays on the existing manual grid (`1 Hz`, `0.1 dB`, `0.01 Q`), and never worsens the ranking tuple. Under the pre-closeout amendment, assert Frequency performs consecutive deterministic `±1 Hz` local descent to a coordinate-local optimum before Gain/Q, respects the effective envelope, checks the deadline before each trial and continuation step, preserves the last complete checkpoint, recomputes only the changed filter response, avoids cancellation audits when primary metrics decide a trial, and returns an exact final audit.
 
 Assert zero-filter checkpoint exists immediately and every checkpoint is quantized, valid, `filters.length <= settings.maxFilters`, and only replaced by an equal-or-better deliverable.
 
@@ -539,6 +543,8 @@ git commit -m "feat(core): add Standard AutoEQ v2 runner"
 
 **Produces:** unchanged `benchmark` for v1, plus `benchmark:v2` and `benchmark:v2:holdout`.
 
+**Approved pre-closeout geometry retry amendment:** preserve both approved candidate geometries. `runStandardAutoEqV2()` creates one deadline and attempts half-height-only, then sign-crossing-only, then one mixed-geometry fallback only if both coherent attempts converge outside the delivered target and time remains. All attempts share the monotonic best-deliverable checkpoint and stop immediately on delivered target achievement. Do not partition or reset the runtime budget, start a later attempt after expiration, add a tuning constant, or alter Standard v1.
+
 - [ ] **Step 1: Add exact known-solvable synthetic cases**
 
 Build source as the negative cascade response and target flat 0 dB. Use these quantized desired cascades:
@@ -589,7 +595,7 @@ holdout_stress: PK 2100 +3.2 Q2.0; PK 2900 -3.4 Q5.0; PK 3900 +3.3 Q5.5; PK 5200
 
 Each row records `caseId, algorithmVersion, elapsedMs, terminationReason, targetAchieved, maeDb, rmseDb, maxAbsDb, filterCount, maxQ, maxFilterBoostDb, preampDb, moderateCancellations, strongCancellations, filters`.
 
-`benchmark:v2` fails when a known-solvable default-30 s case misses `0.25/0.75`, any result exceeds Max Filters, deterministic non-timeout repeats differ, fake-clock timeout differs, or longer prefix-equivalent budget returns a worse best deliverable. Report typical/stress timing; do not hard-fail shared CI on the `<=3 s` typical / `<=10 s` stress targets.
+`benchmark:v2` fails when a known-solvable default-60 s case misses `0.25/0.75`, any result exceeds Max Filters, deterministic non-timeout repeats differ, fake-clock timeout differs, or longer prefix-equivalent budget returns a worse best deliverable. Report typical/stress timing; do not hard-fail shared CI on the `<=3 s` typical / `<=10 s` stress targets.
 
 Package scripts:
 
@@ -599,7 +605,33 @@ Package scripts:
 "benchmark:v2:holdout": "tsx benchmarks/runV2.ts --holdout"
 ```
 
-- [ ] **Step 4: Run v2 benchmark, then v1 drift check, and commit**
+- [ ] **Step 4: Add geometry-coherent retry via TDD**
+
+Add `V2CandidateBoundaryMode = 'sign-crossing' | 'half-height' | 'mixed'`. Require `CandidateInput.boundaryMode` and `SearchInput.boundaryMode`; `generateV2Candidates()` emits only the selected geometry for coherent attempts and both approved geometries for the final mixed fallback. Candidate ranking, shortlist size, per-geometry feature representatives, shelves, and approved constants remain unchanged.
+
+First add focused regressions that fail on the mixed implementation:
+
+```ts
+expect(generateV2Candidates({ ...input, boundaryMode: 'half-height' })
+  .filter(({ type }) => type === 'PK')
+  .every(({ boundaryMode }) => boundaryMode === 'half-height')).toBe(true)
+
+expect(generateV2Candidates({ ...input, boundaryMode: 'sign-crossing' })
+  .filter(({ type }) => type === 'PK')
+  .every(({ boundaryMode }) => boundaryMode === 'sign-crossing')).toBe(true)
+```
+
+Add runner/search regressions proving the fixed attempt order, one shared deadline, no second attempt after expiration, shared monotonic checkpoint, immediate target stop, and deterministic repeats. Run the named tests and observe the expected RED before production edits. Implement the minimum mode plumbing and orchestration, then rerun candidate/search/runner tests GREEN.
+
+Pin the final fallback with an `overlap` acceptance regression: neither coherent mode reaches `0.25/0.75`, while the mixed fallback does. The mixed attempt must remain last and conditional; it must not run when half-height or sign-crossing already reaches the target.
+
+Run the critical cases individually under the default 60-second budget. `dense_treble`, `alternating_2_8k`, and `near_budget` must each satisfy both precision thresholds. If any fails, report its exact metrics and termination evidence; do not change approved constants.
+
+- [ ] **Step 5: Restore exact Standard-v1 response math via TDD**
+
+Use the existing deterministic Standard-v1 output test as the RED regression. Keep the legacy real/imaginary calculation inside `biquadMagnitudeDb()` and use the algebraically optimized reusable-grid calculation only in `biquadMagnitudeDbOnGrid()` for v2 call sites. Rerun the named v1 test GREEN, then run focused response-cache and v2 response tests to prove the optimized path remains equivalent for its contract.
+
+- [ ] **Step 6: Run v2 benchmark, then v1 drift check, and commit only if requested**
 
 ```bash
 pnpm --filter @autoeq-workbench/core benchmark:v2
@@ -613,6 +645,8 @@ git add packages/core/benchmarks packages/core/package.json \
   packages/core/test/autoeq/benchmarkInvariants.test.ts packages/core/test/autoeq/v2/benchmarkCases.test.ts
 git commit -m "test(core): add Standard v2 benchmark corpus"
 ```
+
+The commit commands above are delivery guidance only and must not be run without explicit user authorization.
 
 ---
 
@@ -646,7 +680,7 @@ Pin:
 
 ```ts
 expect(migrated.schemaVersion).toBe(2)
-expect(migrated.autoeqSettings.timeLimitSeconds).toBe(30)
+expect(migrated.autoeqSettings.timeLimitSeconds).toBe(60)
 expect(migrated.autoEqRun?.manifest.schemaVersion).toBe(2)
 expect(migrated.autoEqRun?.manifest.algorithmVersion).toBe('standard-v1')
 expect('timeLimitSeconds' in migrated.autoEqRun!.manifest.autoeqSettings).toBe(false)
@@ -673,7 +707,7 @@ export interface WorkbenchSessionV2 {
 }
 ```
 
-Migration is exactly `{ ...session, schemaVersion: 2, autoeqSettings: { ...session.autoeqSettings, timeLimitSeconds: 30 } }` with cloned historical run record unchanged.
+Migration adds `timeLimitSeconds: 60` only when the field is absent, with the cloned historical run record unchanged. Any approved `timeLimitSeconds` value already persisted is preserved exactly and is never overwritten.
 
 - [ ] **Step 4: Add timeout to signature and stale tests in the existing controller test**
 
@@ -708,7 +742,7 @@ git commit -m "feat(web): migrate sessions for Standard v2"
 
 ```ts
 const select = screen.getByRole('combobox', { name: 'AutoEQ time limit' })
-expect(select).toHaveValue('30')
+expect(select).toHaveValue('60')
 expect(within(select).getAllByRole('option').map((option) => option.textContent)).toEqual([
   '5 s', '15 s', '30 s', '60 s', '120 s',
 ])
@@ -786,7 +820,7 @@ One synthetic flow must cover:
 ```text
 import FR + Target
 → open Equalizer
-→ Time Limit defaults to 30 s
+→ Time Limit defaults to 60 s
 → select 5 s
 → run AutoEQ and receive applied filters
 → export session and assert schemaVersion=2 + timeLimitSeconds=5

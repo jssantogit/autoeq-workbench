@@ -121,7 +121,7 @@ export interface AutoEqSettings {
 Default:
 
 ```text
-timeLimitSeconds = 30
+timeLimitSeconds = 60
 ```
 
 Only `5 | 15 | 30 | 60 | 120` is valid. Arbitrary timeout numbers are rejected, not clamped.
@@ -133,7 +133,7 @@ Only `5 | 15 | 30 | 60 | 120` is valid. Arbitrary timeout numbers are rejected, 
 Add one compact row below `Max Filters` in `AutoEQ Settings`:
 
 ```text
-Time Limit       [30 s ▾]
+Time Limit       [60 s ▾]
 ```
 
 Use the same native/select-style visual vocabulary as the existing Equalizer APO / Poweramp / Wavelet export selector. Options, in order, are `5 s`, `15 s`, `30 s`, `60 s`, `120 s`.
@@ -286,10 +286,12 @@ Maintain the current sum of per-filter dB responses and individual accepted-filt
 candidateCascade = currentCascade - oldFilterResponse + newFilterResponse
 ```
 
-Each search iteration has two stages:
+Candidate evaluation has two stages:
 
 1. cheap candidate ranking against the current residual;
-2. exact whole-cascade evaluation/refinement only for the best eight candidates.
+2. exact whole-cascade append evaluation only for the best eight candidates.
+
+Joint refinement occurs after the staged-retention boundary defined in Section 10.1; it is not performed for shortlisted candidates that fail that retention stage.
 
 Equal cheap scores resolve by stable frequency/type/parameter ordering.
 
@@ -316,6 +318,33 @@ maxActiveSearchPaths = 3
 That is one main path plus at most two alternatives. There is no unbounded queue or nested beam expansion.
 
 When pruning paths back to the cap, use the solution-ranking tuple from Section 5.
+
+### 10.1 Pre-closeout staged-retention amendment
+
+Standard v2 retains the approved shortlist, ranking tuple, alternate-retention ratio, active-path cap, joint-refinement scales, cycle cap, envelopes, and deadline. To avoid spending the bounded runtime refining candidates that cannot survive path retention, candidate acceptance occurs in two deterministic stages for each active parent path:
+
+1. generate and cheap-rank the existing shortlist of at most eight candidates;
+2. exact-append every shortlisted candidate to the parent cascade, without joint refinement;
+3. rank those complete appended cascades with the Section 5 tuple and retain at most `maxActiveSearchPaths` eligible candidates for that parent, using the existing alternate-retention rule;
+4. normally joint-refine only those retained appended cascades;
+5. accept a refined cascade only when it improves its own parent path;
+6. gather accepted refinements from all active parents and apply the existing global retention rule and three-path cap.
+
+Cheap score still chooses only the eight-candidate shortlist. The first retention stage uses exact whole-cascade metrics, never cheap score. Per-parent staging does not reserve a path unconditionally: a parent may contribute fewer than three candidates when the existing eligibility rule excludes the rest.
+
+Exact append ranking is not a bound on post-refinement ranking. If every staged survivor completes joint refinement without improving its parent, the search must not declare that parent stagnant while an untested appended candidate may still refine into an improvement. In that case only, process non-staged appended candidates in exact tuple order until the first completed parent improvement is accepted, a target-capable result is reached, the deadline expires, or the candidates are exhausted. Stop the fallback immediately after its first accepted improvement. Do not run fallback when any staged survivor already improved the parent.
+
+Deadline checks remain cooperative before every exact append, joint refinement, coordinate trial, and new cycle. A timeout during either stage returns the best completed working solution and best complete deliverable checkpoint already observed; it must not publish a partially evaluated candidate. Search diagnostics may expose an internal `jointRefinementCount` for benchmark/tests, but it is not persisted in the manifest or UI.
+
+This amendment changes only the placement of deterministic path pruning and adds a deterministic false-convergence fallback. It adds no tuning constant and does not alter candidate geometry, candidate shortlist size, ranking/tie-breaking, response math, joint-refinement behavior, delivery construction, or Standard v1.
+
+### 10.2 Pre-closeout geometry-coherent retry amendment
+
+Candidate geometry remains the approved sign-crossing and half-height geometry from Section 8.1, with the same three Q multipliers, shortlist cap, ranking, refinement, path cap, and deadline. A single search attempt must use exactly one boundary geometry throughout all of its layers; the two geometries must not compete inside one shortlist.
+
+The v2 runner creates one deadline and deterministically attempts `half-height` first. If that attempt converges without a target-achieved deliverable and time remains, it starts a fresh `sign-crossing` attempt under the same deadline. If both coherent attempts converge outside the delivered target and time still remains, it starts one final mixed-geometry fallback in which both approved geometries may compete inside the shortlist. All attempts update the same monotonic best-deliverable checkpoint. The runner stops immediately when any attempt produces a complete delivered cascade inside both precision thresholds. It never resets or partitions the selected Time Limit, and it starts no later attempt after expiration.
+
+The mixed attempt is a compatibility escape for residuals such as overlapping broad filters that neither coherent geometry can solve alone; it is never run before both coherent attempts fail. This is an adaptive retry order, not a new search constant or a larger runtime budget. Non-timeout determinism, fake-clock determinism, prefix-monotonic delivery, cancellation, termination reasons, and all approved numerical constants remain unchanged.
 
 ## 11. Working budget versus delivered Max Filters
 
@@ -402,6 +431,12 @@ Standard v2 retains the exact delivery grid (`1 Hz`, `0.1 dB`, `0.01 Q`, and `0.
 Gain and Q retain their existing coordinate behavior. Frequency descent must not skip grid points, use coarse-to-fine search, binary search, interpolation, a new step, or a new tuning constant. The superseded cyclic trajectory is not an equivalence authority; repeated runs under this amended contract must remain deterministic.
 
 The hard cooperative deadline is checked before every trial and before continuing another accepted local Frequency step. After expiration, no new expensive operation starts, and the last complete valid deliverable checkpoint remains authoritative.
+
+### 13.2 Pre-closeout lazy cancellation-audit amendment
+
+Discrete-refinement trial ranking keeps the exact Section 5 tuple but evaluates it lazily. Compare normalized violation, RMSE, and maxAbs first. When any of those fields differs, cancellation audit and later tie-break fields cannot change the ordering and must not be recomputed for that trial. Materialize cancellation audits only for an exact primary-metric tie and once for the final solution returned from discrete refinement.
+
+An internal solution may carry a previously valid audit while primary-only comparisons are in progress, but no such stale audit may escape `cyclicDiscreteRefineV2()`. Before a full tuple tie-break or return, recompute the audit from that solution's current filters. Trial order, accepted moves, final filters, metrics, cancellation score, deterministic tie-breaking, and deadline checks remain unchanged.
 
 ## 14. Precision-first compression
 
@@ -595,10 +630,12 @@ A valid Workbench Session v1 migrates deterministically:
 ```text
 v1 settings
    ↓
-add timeLimitSeconds = 30
+add timeLimitSeconds = 60 only when absent
    ↓
 WorkbenchSessionV2 in memory
 ```
+
+If an imported session already contains an approved persisted `timeLimitSeconds` value, migration preserves it exactly. Migration never overwrites a persisted value.
 
 Any embedded historical `standard-v1` run manifest stays a `RunManifestV1`. Do not inject a fake timeout, rewrite its schema, or relabel its algorithm.
 
@@ -629,7 +666,7 @@ Create synthetic/sanitized cases whose desired correction comes from a known val
 - quantization-sensitive structure;
 - a case requiring an over-complete working cascade before final-cap compression.
 
-These cases must reach the precision envelope with sufficient `Max Filters` under the default 30-second budget.
+These cases must reach the precision envelope with sufficient `Max Filters` under the default 60-second budget.
 
 ### 22.2 Adversarial/stress cases
 
@@ -662,7 +699,7 @@ final filters
 
 Acceptance:
 
-- known-solvable cases with adequate `Max Filters` pass `RMSE <= 0.25` and `maxAbs <= 0.75` at the default 30 s;
+- known-solvable cases with adequate `Max Filters` pass `RMSE <= 0.25` and `maxAbs <= 0.75` at the default 60 s;
 - every normal result, including timeout, satisfies `finalFilters.length <= settings.maxFilters`;
 - non-time-limited repeated runs are exactly reproducible;
 - fake-clock timeout runs are exactly reproducible;
@@ -673,7 +710,7 @@ Acceptance:
 
 ### 23.1 Performance target
 
-On a consistent project reference benchmark environment with default 30 s:
+On a consistent project reference benchmark environment with default 60 s:
 
 ```text
 typical cases: <= 3 s target
@@ -719,12 +756,12 @@ Core tests cover at least:
 Web tests cover at least:
 
 - Time Limit selector exactly `5/15/30/60/120 s`;
-- 30 s default;
+- 60 s default;
 - setting captured into Worker input;
 - timeout result applies normally;
 - Cancel still applies nothing partial;
 - obsolete-result rejection still works;
-- old session import migrates to 30 s;
+- old session import adds 60 s only when `timeLimitSeconds` is absent; any persisted approved value is preserved exactly;
 - new session export uses schema 2;
 - historical v1 provenance survives migration;
 - no v1/v2 selector or timeout warning is added.
@@ -794,9 +831,9 @@ V2:
 - compresses precision-first back to the hard delivered cap;
 - counts success only on the final quantized/discretely-refined deliverable;
 - keeps a monotonic valid deliverable checkpoint throughout the run;
-- exposes `5 / 15 / 30 / 60 / 120 s` Time Limit, default 30 s;
+- exposes `5 / 15 / 30 / 60 / 120 s` Time Limit, default 60 s;
 - returns the best valid checkpoint on timeout without a new UI warning;
 - preserves Cancel as no-partial-apply;
 - records versioned diagnostic provenance without timestamps or elapsed wall time;
-- migrates Workbench Session v1 to v2 with a 30-second default while preserving historical v1 manifests;
+- migrates Workbench Session v1 to v2 by adding 60 seconds only when absent while preserving persisted values and historical v1 manifests;
 - must pass known-solvable, adversarial, holdout, and real-world validation before closeout.

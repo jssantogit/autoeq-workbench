@@ -98,6 +98,13 @@ test('authoritative Workbench workflow survives export and Session restore', asy
   await page.getByLabel('Filter 1 Q').press('Enter')
   await expect(page.getByLabel('Filter 1 frequency Hz')).toHaveValue('750')
 
+  await page.getByRole('button', { name: 'Settings' }).click()
+  const timeLimit = page.getByRole('combobox', { name: 'AutoEQ time limit' })
+  await expect(timeLimit).toHaveValue('60')
+  await timeLimit.selectOption('5')
+  await expect(timeLimit).toHaveValue('5')
+  await page.getByRole('button', { name: 'Settings' }).click()
+
   const autoEq = page.getByRole('button', { name: 'AutoEQ', exact: true })
   await autoEq.click()
   await expect(page.getByRole('status', { name: 'AutoEQ running' })).toContainText(/^\d{2}:\d{2}$/)
@@ -108,7 +115,47 @@ test('authoritative Workbench workflow survives export and Session restore', asy
   const deliveredCount = await filterRows.count()
   expect(deliveredCount).toBeGreaterThan(0)
   expect(deliveredCount).toBeLessThanOrEqual(10)
+  await expect(page.locator('.autoeq-error')).toHaveCount(0)
 
+  await page.getByRole('tab', { name: 'Tools' }).click()
+  const autoEqSessionDownloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Export Session' }).click()
+  const autoEqSessionDownload = await autoEqSessionDownloadPromise
+  const autoEqSessionPath = await autoEqSessionDownload.path()
+  expect(autoEqSessionPath).not.toBeNull()
+  const autoEqSession = JSON.parse(await downloadText(autoEqSessionDownload)) as {
+    schemaVersion: number
+    autoeqSettings: { timeLimitSeconds: number }
+    filterProvenance: string | null
+    filters: unknown[]
+    autoEqRun: { manifest: { algorithmVersion: string } } | null
+  }
+  expect(autoEqSession).toMatchObject({
+    schemaVersion: 2,
+    autoeqSettings: { timeLimitSeconds: 5 },
+    filterProvenance: 'autoeq',
+    autoEqRun: { manifest: { algorithmVersion: 'standard-v2' } },
+  })
+  expect(autoEqSession.filters).toHaveLength(deliveredCount)
+
+  await page.getByRole('tab', { name: 'Equalizer' }).click()
+  await page.getByRole('button', { name: 'Settings' }).click()
+  await timeLimit.selectOption('15')
+  await page.getByRole('button', { name: 'Settings' }).click()
+  await page.getByRole('button', { name: 'Add filter' }).click()
+  await page.getByRole('tab', { name: 'Tools' }).click()
+  await page.getByLabel('Import Workbench session').setInputFiles(autoEqSessionPath!)
+  await page.getByRole('tab', { name: 'Equalizer' }).click()
+  await page.getByRole('button', { name: 'Settings' }).click()
+  await expect(timeLimit).toHaveValue('5')
+  await page.getByRole('button', { name: 'Settings' }).click()
+  await expect(filterRows).toHaveCount(deliveredCount)
+  await page.getByRole('tab', { name: 'Tools' }).click()
+  await page.getByText('Analysis', { exact: true }).click()
+  await expect(page.getByText('Clean', { exact: true })).toBeVisible()
+  await page.getByText('Analysis', { exact: true }).click()
+
+  await page.getByRole('tab', { name: 'Equalizer' }).click()
   await page.getByLabel('Filter 1 gain dB').fill('5.5')
   await page.getByLabel('Filter 1 gain dB').press('Enter')
   await page.getByRole('tab', { name: 'Tools' }).click()
@@ -156,6 +203,31 @@ test('authoritative Workbench workflow survives export and Session restore', asy
   await page.getByRole('tab', { name: 'Equalizer' }).click()
   await expect(page.getByRole('row', { name: 'Filter 1' })).toHaveAttribute('data-enabled', 'false')
   await expect(filterRows).toHaveCount(deliveredCount)
+})
+
+test('Cancel preserves the prior filters and applies no partial AutoEQ result', async ({ page }) => {
+  await page.goto('/')
+  await importCurve(page, 'FR', 'source.txt')
+  await importCurve(page, 'Target', 'target.csv')
+  await page.getByRole('tab', { name: 'Equalizer' }).click()
+  await page.getByRole('button', { name: 'Add filter' }).click()
+  await page.getByLabel('Filter 1 frequency Hz').fill('750')
+  await page.getByLabel('Filter 1 frequency Hz').press('Enter')
+  await page.getByLabel('Filter 1 gain dB').fill('2.5')
+  await page.getByLabel('Filter 1 gain dB').press('Enter')
+  await page.getByLabel('Filter 1 Q').fill('1.4')
+  await page.getByLabel('Filter 1 Q').press('Enter')
+
+  await page.getByRole('button', { name: 'AutoEQ', exact: true }).click()
+  await expect(page.getByRole('status', { name: 'AutoEQ running' })).toBeVisible()
+  await page.getByRole('button', { name: 'Cancel' }).click()
+
+  await expect(page.getByRole('status', { name: 'AutoEQ running' })).toHaveCount(0)
+  await expect(page.getByRole('row', { name: /^Filter \d+$/ })).toHaveCount(1)
+  await expect(page.getByLabel('Filter 1 frequency Hz')).toHaveValue('750')
+  await expect(page.getByLabel('Filter 1 gain dB')).toHaveValue('2.5')
+  await expect(page.getByLabel('Filter 1 Q')).toHaveValue('1.4')
+  await expect(page.locator('.autoeq-error')).toHaveCount(0)
 })
 
 for (const width of [360, 390, 1440]) {
