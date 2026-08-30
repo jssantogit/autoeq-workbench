@@ -6,6 +6,10 @@ import type { StandardAutoEqV2Config } from './config.js'
 import { cyclicDiscreteRefineV2 } from './discreteRefine.js'
 import { evaluateV2Solution, jointRefineV2, type V2EvaluatedSolution } from './jointRefine.js'
 import { compareV2Solutions, isV2TargetAchieved } from './ranking.js'
+import {
+  withResearchTracePhase,
+  type StandardV2ResearchTrace,
+} from './researchTrace.js'
 import type { StandardV2Deadline } from './runtime.js'
 
 export interface V2Deliverable extends V2EvaluatedSolution {
@@ -20,6 +24,7 @@ export interface BuildDeliverableV2Input {
   deadline: StandardV2Deadline
   responseGrid?: BiquadResponseGrid
   fallbackOnExpiration?: V2Deliverable
+  researchTrace?: StandardV2ResearchTrace
 }
 
 export interface CompressDeliverableV2Input extends Omit<BuildDeliverableV2Input, 'filters'> {
@@ -60,6 +65,7 @@ function constrainToCap(input: BuildDeliverableV2Input): Filter[] {
 }
 
 export function buildDeliverableV2(input: BuildDeliverableV2Input): V2Deliverable {
+  return withResearchTracePhase(input.researchTrace, 'deliverable', () => {
   if (input.fallbackOnExpiration && input.deadline.isExpired()) {
     return input.fallbackOnExpiration
   }
@@ -90,12 +96,16 @@ export function buildDeliverableV2(input: BuildDeliverableV2Input): V2Deliverabl
   if (input.fallbackOnExpiration && input.deadline.isExpired()) {
     return input.fallbackOnExpiration
   }
-  return withPreamp(evaluated, input.config.sampleRateHz)
+  const deliverable = withPreamp(evaluated, input.config.sampleRateHz)
+  input.researchTrace?.onDeliverableBuilt?.()
+  return deliverable
+  })
 }
 
 export function compressDeliverableV2(
   input: CompressDeliverableV2Input,
 ): CompressDeliverableV2Result {
+  return withResearchTracePhase(input.researchTrace, 'compression', () => {
   let deliverable = input.deliverable
   if (!isV2TargetAchieved(deliverable.metrics)) {
     return { deliverable, completed: true, expired: false }
@@ -107,6 +117,7 @@ export function compressDeliverableV2(
       if (input.deadline.isExpired()) {
         return { deliverable, completed: false, expired: true }
       }
+      input.researchTrace?.onCompressionRemovalTrial?.()
       removals.push({
         index,
         solution: evaluateV2Solution(
@@ -130,6 +141,7 @@ export function compressDeliverableV2(
         frequencies: input.frequencies,
         config: input.config,
         deadline: input.deadline,
+        researchTrace: input.researchTrace,
       })
       if (refined.expired) return { deliverable, completed: false, expired: true }
       const candidate = buildDeliverableV2({
@@ -153,4 +165,5 @@ export function compressDeliverableV2(
     deliverable = accepted
   }
   return { deliverable, completed: true, expired: false }
+  })
 }

@@ -10,6 +10,10 @@ import type { StandardAutoEqV2Config } from './config.js'
 import { evaluateV2Solution, jointRefineV2, type V2EvaluatedSolution } from './jointRefine.js'
 import { compareV2Solutions, type V2Solution } from './ranking.js'
 import { appendV2ResponseCacheFilter } from './responseCache.js'
+import {
+  withResearchTracePhase,
+  type StandardV2ResearchTrace,
+} from './researchTrace.js'
 import type { StandardV2Deadline } from './runtime.js'
 
 export interface SearchInput {
@@ -20,6 +24,7 @@ export interface SearchInput {
   boundaryMode: V2CandidateBoundaryMode
   isTargetCapable?: (solution: V2Solution) => boolean
   onWorkingSolution?: (solution: V2EvaluatedSolution) => void
+  researchTrace?: StandardV2ResearchTrace
 }
 
 export interface SearchResult {
@@ -124,12 +129,17 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
     for (let pathIndex = 0; pathIndex < active.length; pathIndex += 1) {
       const path = active[pathIndex]!
       if (path.filters.length >= input.config.workingMaxFilters) continue
-      const shortlist = rankV2CandidateShortlist(generateV2Candidates({
-        frequencies: input.frequencies,
-        residualDb: path.residualDb,
-        config: input.config,
-        boundaryMode: input.boundaryMode,
-      }))
+      const shortlist = withResearchTracePhase(
+        input.researchTrace,
+        'candidateScoring',
+        () => rankV2CandidateShortlist(generateV2Candidates({
+          frequencies: input.frequencies,
+          residualDb: path.residualDb,
+          config: input.config,
+          boundaryMode: input.boundaryMode,
+          researchTrace: input.researchTrace,
+        }), input.researchTrace),
+      )
       const appendedCandidates: V2EvaluatedSolution[] = []
       for (const candidate of shortlist) {
         if (input.deadline.isExpired()) {
@@ -164,6 +174,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
             frequencies: input.frequencies,
             config: input.config,
             deadline: input.deadline,
+            researchTrace: input.researchTrace,
           })
           if (refined.expired) {
             expired = true
@@ -171,10 +182,10 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
           }
           if (compareV2Solutions(refined.solution, path) < 0) {
             expanded.push(refined.solution)
-            peakWorkingFilterCount = Math.max(
-              peakWorkingFilterCount,
-              refined.solution.filters.length,
-            )
+            if (refined.solution.filters.length > peakWorkingFilterCount) {
+              peakWorkingFilterCount = refined.solution.filters.length
+              input.researchTrace?.onPeakWorkingFilterCount?.(peakWorkingFilterCount)
+            }
             if (pathIndex === 0) mainPathImproved = true
             if (compareV2Solutions(refined.solution, best) < 0) best = refined.solution
             if (phase === 'staged') stagedImproved = true
@@ -205,6 +216,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
     }
     active = retainV2NextActivePaths(active, expanded, mainPathImproved)
     for (const checkpoint of active) {
+      input.researchTrace?.onWorkingCheckpoint?.()
       input.onWorkingSolution?.(checkpoint)
       if (input.deadline.isExpired()) {
         return {

@@ -6,6 +6,10 @@ import { POWERAMP_MANUAL_ENTRY_POLICY } from '../quantize.js'
 import type { StandardAutoEqV2Config } from './config.js'
 import { compareV2PrimaryMetrics, compareV2Solutions } from './ranking.js'
 import { evaluateV2Solution, type V2EvaluatedSolution } from './jointRefine.js'
+import {
+  withResearchTracePhase,
+  type StandardV2ResearchTrace,
+} from './researchTrace.js'
 import type { StandardV2Deadline } from './runtime.js'
 import { replaceV2ResponseCacheFilter } from './responseCache.js'
 
@@ -16,6 +20,7 @@ export interface DiscreteRefineV2Input {
   config: StandardAutoEqV2Config
   deadline: StandardV2Deadline
   responseGrid?: BiquadResponseGrid
+  researchTrace?: StandardV2ResearchTrace
 }
 
 export interface DiscreteRefineV2Result {
@@ -87,6 +92,7 @@ export function cyclicDiscreteRefineV2(
   input: DiscreteRefineV2Input,
   trace?: DiscreteRefineTrace,
 ): DiscreteRefineV2Result {
+  return withResearchTracePhase(input.researchTrace, 'discreteRefine', () => {
   let solution = evaluateV2Solution(
     quantizeV2Filters(input.filters, input.config),
     input.desiredDb,
@@ -144,6 +150,7 @@ export function cyclicDiscreteRefineV2(
               from: current[coordinate],
               to: value,
             }
+            input.researchTrace?.onDiscreteTrial?.()
             trace?.onTrial?.(trial)
             let candidate: V2EvaluatedSolution
             if (previous?.value === value) {
@@ -193,6 +200,7 @@ export function cyclicDiscreteRefineV2(
             from: current[coordinate],
             to: accepted[coordinate],
           })
+          input.researchTrace?.onDiscreteAcceptedMove?.()
           previous = { value: current[coordinate], solution }
           solution = best
           continueCoordinate = coordinate === 'frequencyHz'
@@ -213,4 +221,5 @@ export function cyclicDiscreteRefineV2(
       }
     }
   }
+  })
 }

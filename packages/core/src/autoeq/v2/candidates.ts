@@ -5,6 +5,7 @@ import {
 } from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
 import type { StandardAutoEqV2Config } from './config.js'
+import type { StandardV2ResearchTrace } from './researchTrace.js'
 
 const TYPE_ORDER = { LS: 0, PK: 1, HS: 2 } as const
 
@@ -26,6 +27,7 @@ export interface CandidateInput {
   residualDb: readonly number[]
   config: StandardAutoEqV2Config
   boundaryMode: V2CandidateBoundaryMode
+  researchTrace?: StandardV2ResearchTrace
 }
 
 function clamp(value: number, minimum: number, maximum: number): number {
@@ -151,8 +153,12 @@ export function generateV2Candidates({
   residualDb,
   config,
   boundaryMode,
+  researchTrace,
 }: CandidateInput): V2FilterCandidate[] {
-  if (frequencies.length === 0 || frequencies.length !== residualDb.length) return []
+  if (frequencies.length === 0 || frequencies.length !== residualDb.length) {
+    researchTrace?.onCandidatesGenerated?.(0)
+    return []
+  }
   const effectiveFrequencies: number[] = []
   const effectiveResidualDb: number[] = []
   const originalIndices: number[] = []
@@ -164,7 +170,10 @@ export function generateV2Candidates({
       originalIndices.push(index)
     }
   }
-  if (effectiveFrequencies.length === 0) return []
+  if (effectiveFrequencies.length === 0) {
+    researchTrace?.onCandidatesGenerated?.(0)
+    return []
+  }
 
   const candidates: Array<Omit<V2FilterCandidate, 'cheapScore'>> = []
   for (let index = 1; index < effectiveResidualDb.length - 1; index += 1) {
@@ -224,7 +233,7 @@ export function generateV2Candidates({
     if (!deduplicated.has(key)) deduplicated.set(key, candidate)
   }
   const responseGrid = createBiquadResponseGrid(effectiveFrequencies, config.sampleRateHz)
-  return [...deduplicated.values()].map((candidate) => ({
+  const generated = [...deduplicated.values()].map((candidate) => ({
     ...candidate,
     cheapScore: candidateCheapScore(
       candidate,
@@ -232,10 +241,13 @@ export function generateV2Candidates({
       responseGrid,
     ),
   }))
+  researchTrace?.onCandidatesGenerated?.(generated.length)
+  return generated
 }
 
 export function rankV2CandidateShortlist(
   candidates: readonly V2FilterCandidate[],
+  researchTrace?: StandardV2ResearchTrace,
 ): V2FilterCandidate[] {
   const ranked = [...candidates].sort((left, right) =>
     right.cheapScore - left.cheapScore ||
@@ -267,7 +279,10 @@ export function rankV2CandidateShortlist(
     }
   }
   const shortlist = [...representatives.values()].slice(0, 8)
-  if (shortlist.length === 8) return shortlist
+  if (shortlist.length === 8) {
+    researchTrace?.onCandidatesShortlisted?.(shortlist.length)
+    return shortlist
+  }
 
   const admitted = new Set(shortlist)
   for (const candidate of deduplicated) {
@@ -275,5 +290,6 @@ export function rankV2CandidateShortlist(
     shortlist.push(candidate)
     if (shortlist.length === 8) break
   }
+  researchTrace?.onCandidatesShortlisted?.(shortlist.length)
   return shortlist
 }

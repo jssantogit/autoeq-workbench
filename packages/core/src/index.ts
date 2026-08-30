@@ -41,6 +41,11 @@ export { compareV2Solutions, isV2TargetAchieved } from './autoeq/v2/ranking.js'
 export type { V2Solution } from './autoeq/v2/ranking.js'
 export { createStandardV2Deadline } from './autoeq/v2/runtime.js'
 export type { StandardV2Deadline, StandardV2Runtime } from './autoeq/v2/runtime.js'
+export type {
+  StandardV2ResearchPhase,
+  StandardV2ResearchTrace,
+  StandardV2SafeCheckpoint,
+} from './autoeq/v2/researchTrace.js'
 export {
   appendV2ResponseCacheFilter,
   createV2ResponseCache,

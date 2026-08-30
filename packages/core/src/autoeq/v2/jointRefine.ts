@@ -9,6 +9,10 @@ import {
   replaceV2ResponseCacheFilter,
   type V2ResponseCache,
 } from './responseCache.js'
+import {
+  withResearchTracePhase,
+  type StandardV2ResearchTrace,
+} from './researchTrace.js'
 import type { StandardV2Deadline } from './runtime.js'
 
 export const JOINT_REFINEMENT_SCALES = Object.freeze([
@@ -29,6 +33,7 @@ export interface JointRefineInput {
   frequencies: readonly number[]
   config: StandardAutoEqV2Config
   deadline: StandardV2Deadline
+  researchTrace?: StandardV2ResearchTrace
 }
 
 export interface JointRefineResult {
@@ -115,6 +120,7 @@ export function jointRefineV2(
   input: JointRefineInput,
   trace?: JointRefineTrace,
 ): JointRefineResult {
+  return withResearchTracePhase(input.researchTrace, 'jointRefine', () => {
   let solution = 'responseCache' in input.solution
     ? input.solution as V2EvaluatedSolution
     : evaluateV2Solution(
@@ -140,6 +146,7 @@ export function jointRefineV2(
   }
   const finish = (expired: boolean): JointRefineResult => {
     solution = withCancellationAudit(solution)
+    input.researchTrace?.onJointRefineCompleted?.(coordinateTrials)
     return { solution, completedCycles, coordinateTrials, expired }
   }
   let completedCycles = 0
@@ -215,4 +222,5 @@ export function jointRefineV2(
     }
   }
   return finish(false)
+  })
 }

@@ -1,9 +1,11 @@
 import type { AutoEqTimeLimitSeconds } from '../../config/autoeqSettings.js'
 import type { V2CandidateBoundaryMode } from './candidates.js'
+import type { StandardV2ResearchTrace } from './researchTrace.js'
 
 export interface StandardV2Runtime {
   nowMs(): number
   onBoundaryModeAttempt?(mode: V2CandidateBoundaryMode): void
+  researchTrace?: StandardV2ResearchTrace
 }
 
 export interface StandardV2Deadline {
