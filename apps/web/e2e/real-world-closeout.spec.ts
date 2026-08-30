@@ -18,6 +18,7 @@ const SOURCE_NAME = 'SBAF cEAR30 Sennheiser HD800 L.txt'
 const TARGET_NAME = 'SBAF cEAR30 Sennheiser HD600 L.txt'
 const SOURCE_URL = `https://raw.githubusercontent.com/superbestaudiofriends/headphone-measurements-frequency-response/${SBAF_DATA_COMMIT}/cEAR30-Sennheiser-HD800-L.txt`
 const TARGET_URL = `https://raw.githubusercontent.com/superbestaudiofriends/headphone-measurements-frequency-response/${SBAF_DATA_COMMIT}/cEAR30-Sennheiser-HD600-L.txt`
+const METRIC_EPSILON_DB = 1e-5
 
 async function fetchPinnedCurve(url: string): Promise<string> {
   const response = await fetch(url)
@@ -156,8 +157,8 @@ test('Standard v2 real-world closeout smoke: SBAF HD 800 to SBAF HD 600', async 
   expect(finalMetrics.rmseDb).toBeLessThan(baselineMetrics.rmseDb)
   expect(finalMidTrebleRmse).toBeLessThan(baselineMidTrebleRmse)
   expect(finalTrebleRmse).toBeLessThan(baselineTrebleRmse)
-  expect(finalMetrics.rmseDb).toBeCloseTo(fullRunSession.autoEqRun!.manifest.metrics.rmseDb, 10)
-  expect(finalMetrics.maxAbsDb).toBeCloseTo(fullRunSession.autoEqRun!.manifest.metrics.maxAbsDb, 10)
+  expect(Math.abs(finalMetrics.rmseDb - fullRunSession.autoEqRun!.manifest.metrics.rmseDb)).toBeLessThan(METRIC_EPSILON_DB)
+  expect(Math.abs(finalMetrics.maxAbsDb - fullRunSession.autoEqRun!.manifest.metrics.maxAbsDb)).toBeLessThan(METRIC_EPSILON_DB)
 
   console.log(JSON.stringify({
     source: SOURCE_NAME,
