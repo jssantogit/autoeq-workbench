@@ -65,6 +65,16 @@ function row(
     },
     timeline: [],
     filters: [],
+    telemetryMode: 'light',
+    phaseTimingMs: {
+      prepare: 0,
+      candidateScoring: 0,
+      jointRefine: 0,
+      deliverable: 0,
+      discreteRefine: 0,
+      compression: 0,
+      other: 0,
+    },
     ...overrides,
   }
 }

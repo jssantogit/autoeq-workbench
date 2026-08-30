@@ -6,6 +6,7 @@ import {
   calculateErrorMetrics,
   DEFAULT_AUTOEQ_SETTINGS,
   isV2TargetAchieved,
+  MVP_NUMERIC_POLICY,
   runStandardAutoEqV2,
   type AutoEqResultV2,
   type StandardAutoEqInputV2,
@@ -18,8 +19,8 @@ import {
   RESEARCH_NORMALIZATION,
 } from './corpus.js'
 import { createResearchTelemetry } from './telemetry.js'
-import { calculateTimeToQuality, projectTimeline } from './timeline.js'
 import { RESEARCH_BANDS } from './telemetry.js'
+import { calculateTimeToQuality, projectTimeline } from './timeline.js'
 import type { ResearchCaseId, ResearchRunRow } from './types.js'
 
 export interface RunResearchCellOptions {
@@ -56,7 +57,11 @@ function verifyMetrics(
   desiredDb: readonly number[],
   frequenciesHz: readonly number[],
 ): { metrics: AutoEqResultV2['metrics']; bands: ResearchRunRow['bands'] } {
-  const cascadeDb = cascadeMagnitudeDb(result.filters, frequenciesHz, 48_000)
+  const cascadeDb = cascadeMagnitudeDb(
+    result.filters,
+    frequenciesHz,
+    MVP_NUMERIC_POLICY.sampleRateHz,
+  )
   const residualDb = desiredDb.map((desired, index) => desired - cascadeDb[index]!)
   const metrics = calculateErrorMetrics(residualDb, frequenciesHz)
   const differences = [
@@ -114,5 +119,7 @@ export async function runResearchCell(
     timeToQuality: calculateTimeToQuality(snapshot.checkpoints),
     timeline: projectTimeline(snapshot.checkpoints),
     filters: result.filters.map((filter) => ({ ...filter })),
+    telemetryMode: snapshot.mode,
+    phaseTimingMs: snapshot.phaseTimingMs,
   }
 }

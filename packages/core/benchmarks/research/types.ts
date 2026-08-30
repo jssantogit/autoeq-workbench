@@ -88,6 +88,8 @@ export interface ResearchRunRow {
   timeToQuality: ResearchTimeToQuality
   timeline: ResearchCheckpoint[]
   filters: Filter[]
+  telemetryMode: 'light' | 'deep'
+  phaseTimingMs: StandardV2ResearchPhaseTimingMs
 }
 
 export interface ResearchAggregateRow {
@@ -105,4 +107,76 @@ export interface ResearchAggregateRow {
   elapsedMs: { best: number; median: number; worst: number; spread: number }
   peakWorkingFilterCount: { best: number; median: number; worst: number; spread: number }
   jointRefinementCount: { best: number; median: number; worst: number; spread: number }
+}
+
+export interface ResearchBaselineIdentity {
+  schemaVersion: 1
+  implementationCommit: string
+  corpusSchemaVersion: 1
+  corpusHashes: Record<string, string>
+  parserPreparationSchemaVersion: 1
+  runnerSchemaVersion: 1
+}
+
+export interface ResearchBaselineFile {
+  identity: ResearchBaselineIdentity
+  runs?: ResearchRunRow[]
+  aggregates: ResearchAggregateRow[]
+}
+
+export interface ResearchMetricDelta {
+  candidate: number
+  baseline: number
+  delta: number
+  percentDelta: number | null
+}
+
+export interface ResearchNullableMetricDelta {
+  candidate: number | null
+  baseline: number | null
+  delta: number | null
+  percentDelta: number | null
+}
+
+export interface ResearchComparisonDelta {
+  caseId: ResearchCaseId
+  budgetSeconds: number
+  maxFilters: number
+  rmseDb: ResearchMetricDelta
+  maxAbsDb: ResearchMetricDelta
+  targetAchievedRate: ResearchMetricDelta
+  timeToRmse050Ms: ResearchNullableMetricDelta
+  timeToJointTargetMs: ResearchNullableMetricDelta
+  elapsedMs: ResearchMetricDelta
+  peakWorkingFilterCount: ResearchMetricDelta
+  jointRefinementCount: ResearchMetricDelta
+}
+
+export interface ResearchComparison {
+  compatible: boolean
+  reason?: 'baseline-incompatible'
+  deltas: ResearchComparisonDelta[]
+}
+
+export interface ResearchWarning {
+  type: 'practical-monotonicity'
+  caseId: ResearchCaseId
+  maxFilters: number
+  shorterBudgetSeconds: 15 | 30
+  longerBudgetSeconds: 30 | 60
+  rmseDb: { shorter: number; longer: number; delta: number; threshold: number }
+  maxAbsDb: { shorter: number; longer: number; delta: number; threshold: number }
+  triggers: Array<'rmse' | 'maxAbs'>
+  message: string
+}
+
+export interface ResearchRunMetadata {
+  schemaVersion: 1
+  candidateCommit: string
+  baselineCommit: string
+  runnerSchemaVersion: 1
+  fixtureHashes: Record<string, string>
+  preset: 'quick' | 'full'
+  requestedAtIso?: string
+  testMode?: boolean
 }
