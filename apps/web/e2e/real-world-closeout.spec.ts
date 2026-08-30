@@ -13,11 +13,11 @@ import {
 import { Buffer } from 'node:buffer'
 import { readFile } from 'node:fs/promises'
 
-const AUTOEQ_DATA_COMMIT = '7ae0f56d53074872b028649617a22bbb4232feb7'
-const SOURCE_NAME = 'Sennheiser HD 800 - oratory1990.csv'
-const TARGET_NAME = 'Harman over-ear 2018.csv'
-const SOURCE_URL = `https://raw.githubusercontent.com/jaakkopasanen/AutoEq/${AUTOEQ_DATA_COMMIT}/measurements/oratory1990/data/over-ear/Sennheiser%20HD%20800.csv`
-const TARGET_URL = `https://raw.githubusercontent.com/jaakkopasanen/AutoEq/${AUTOEQ_DATA_COMMIT}/targets/Harman%20over-ear%202018.csv`
+const SBAF_DATA_COMMIT = '7b33e41be47ccb57a59e1a88c48b367eb7329494'
+const SOURCE_NAME = 'SBAF cEAR30 Sennheiser HD800 L.txt'
+const TARGET_NAME = 'SBAF cEAR30 Sennheiser HD600 L.txt'
+const SOURCE_URL = `https://raw.githubusercontent.com/superbestaudiofriends/headphone-measurements-frequency-response/${SBAF_DATA_COMMIT}/cEAR30-Sennheiser-HD800-L.txt`
+const TARGET_URL = `https://raw.githubusercontent.com/superbestaudiofriends/headphone-measurements-frequency-response/${SBAF_DATA_COMMIT}/cEAR30-Sennheiser-HD600-L.txt`
 
 async function fetchPinnedCurve(url: string): Promise<string> {
   const response = await fetch(url)
@@ -38,7 +38,7 @@ async function importCurveText(
   await page.getByRole('group', { name: 'Curve type' }).getByRole('button', { name: kind }).click()
   await (await chooserPromise).setFiles({
     name: filename,
-    mimeType: 'text/csv',
+    mimeType: 'text/plain',
     buffer: Buffer.from(text, 'utf8'),
   })
   await expect(page.getByRole('row', { name: filename })).toBeVisible()
@@ -87,7 +87,7 @@ function bandRmse(
   return Math.sqrt(squared / count)
 }
 
-test('Standard v2 real-world closeout smoke: HD 800 to Harman target', async ({ page }) => {
+test('Standard v2 real-world closeout smoke: SBAF HD 800 to SBAF HD 600', async ({ page }) => {
   test.setTimeout(240_000)
 
   const [sourceText, targetText] = await Promise.all([
@@ -162,7 +162,7 @@ test('Standard v2 real-world closeout smoke: HD 800 to Harman target', async ({ 
   console.log(JSON.stringify({
     source: SOURCE_NAME,
     target: TARGET_NAME,
-    autoEqDataCommit: AUTOEQ_DATA_COMMIT,
+    sbafDataCommit: SBAF_DATA_COMMIT,
     baseline: {
       rmseDb: baselineMetrics.rmseDb,
       midTrebleRmseDb: baselineMidTrebleRmse,
