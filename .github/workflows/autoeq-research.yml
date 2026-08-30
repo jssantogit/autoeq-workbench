@@ -1,0 +1,98 @@
+name: AutoEQ Research Bench
+
+on:
+  workflow_dispatch:
+    inputs:
+      purpose:
+        description: Compare candidate or capture baseline
+        required: true
+        default: compare
+        type: choice
+        options: [compare, baseline]
+      preset:
+        description: Research preset
+        required: true
+        default: quick
+        type: choice
+        options: [quick, full]
+      repeats:
+        description: Override repeat count (0 = preset default)
+        required: true
+        default: '0'
+        type: string
+      include_capacity:
+        description: Include Max Filters 20 and 40 experiments
+        required: true
+        default: false
+        type: boolean
+      include_oracle_120:
+        description: Include optional 120 second diagnostic
+        required: true
+        default: false
+        type: boolean
+      profile_cell:
+        description: Optional case:budget, e.g. titan-to-storm:30
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2/research
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run AutoEQ Research Bench
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          RESEARCH_PURPOSE: ${{ inputs.purpose }}
+          RESEARCH_PRESET: ${{ inputs.preset }}
+          RESEARCH_REPEATS: ${{ inputs.repeats }}
+          RESEARCH_INCLUDE_CAPACITY: ${{ inputs.include_capacity }}
+          RESEARCH_INCLUDE_ORACLE: ${{ inputs.include_oracle_120 }}
+          RESEARCH_PROFILE_CELL: ${{ inputs.profile_cell }}
+        run: |
+          set -euo pipefail
+          args=(--output-dir autoeq-research)
+          if [[ "$RESEARCH_PURPOSE" == "baseline" ]]; then
+            args+=(
+              --preset full
+              --write-baseline
+              --baseline-implementation-commit 7c9ebbbe6eefeb131c6c698055c737b429f5b0c6
+            )
+          else
+            args+=(--preset "$RESEARCH_PRESET")
+            if [[ "$RESEARCH_REPEATS" != "0" ]]; then
+              args+=(--repeats "$RESEARCH_REPEATS")
+            fi
+            if [[ "$RESEARCH_INCLUDE_CAPACITY" == "true" ]]; then
+              args+=(--capacity 20,40)
+            fi
+            if [[ "$RESEARCH_INCLUDE_ORACLE" == "true" ]]; then
+              args+=(--oracle-120)
+            fi
+            if [[ -n "$RESEARCH_PROFILE_CELL" ]]; then
+              args+=(--profile "$RESEARCH_PROFILE_CELL")
+            fi
+          fi
+          pnpm --filter @autoeq-workbench/core research:v2 -- "${args[@]}"
+      - name: Upload AutoEQ Research artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autoeq-research-${{ github.run_id }}
+          path: autoeq-research
+          if-no-files-found: error
+          retention-days: 30

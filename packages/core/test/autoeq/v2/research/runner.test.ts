@@ -8,7 +8,11 @@ import {
 import { describe, expect, it } from 'vitest'
 
 import { prepareResearchDesired, loadResearchCases } from '../../../../benchmarks/research/corpus.js'
-import { runResearchCell } from '../../../../benchmarks/research/run.js'
+import {
+  createResearchCells,
+  parseResearchCliArgs,
+  runResearchCell,
+} from '../../../../benchmarks/research/run.js'
 
 function fakeResult(input: StandardAutoEqInputV2, caseId: 'titan-to-storm' | 'titan-to-u12t' | 'titan-to-trio'): AutoEqResultV2 {
   const prepared = prepareResearchDesired(caseId)
@@ -41,6 +45,52 @@ function fakeResult(input: StandardAutoEqInputV2, caseId: 'titan-to-storm' | 'ti
 }
 
 describe('research runner', () => {
+  it('parses the Quick and Full presets and their optional cells', () => {
+    const quick = parseResearchCliArgs(['--preset', 'quick'])
+    expect(quick).toMatchObject({
+      preset: 'quick',
+      budgets: [15, 30],
+      maxFilters: [10],
+      repeats: 1,
+      telemetryMode: 'light',
+    })
+    expect(createResearchCells(quick)).toHaveLength(6)
+
+    const full = parseResearchCliArgs([
+      '--preset', 'full',
+      '--capacity', '20,40',
+      '--oracle-120',
+      '--repeats', '2',
+      '--profile', 'titan-to-storm:30',
+    ])
+    const cells = createResearchCells(full)
+    expect(full).toMatchObject({
+      preset: 'full',
+      budgets: [5, 15, 30, 60],
+      maxFilters: [10, 20, 40],
+      repeats: 2,
+      includeOracle120: true,
+    })
+    expect(cells.some((cell) =>
+      cell.caseId === 'titan-to-storm' &&
+      cell.budgetSeconds === 30 &&
+      cell.maxFilters === 10 &&
+      cell.telemetryMode === 'deep',
+    )).toBe(true)
+    expect(cells.filter((cell) => cell.maxFilters === 20 || cell.maxFilters === 40)
+      .every((cell) => cell.budgetSeconds !== 120)).toBe(true)
+    expect(cells).toHaveLength(3 * (4 * 3 + 1))
+  })
+
+  it('rejects invalid CLI combinations and values', () => {
+    expect(() => parseResearchCliArgs(['--preset', 'slow'])).toThrow()
+    expect(() => parseResearchCliArgs(['--repeats', '0'])).toThrow()
+    expect(() => parseResearchCliArgs(['--capacity', '20,wat'])).toThrow()
+    expect(() => parseResearchCliArgs(['--profile', 'unknown:30'])).toThrow()
+    expect(() => parseResearchCliArgs(['--test-mode', '--write-baseline'])).toThrow()
+    expect(() => parseResearchCliArgs(['--write-baseline'])).toThrow()
+  })
+
   it('assembles a verified row from an injected trace-producing runner', async () => {
     const caseId = 'titan-to-storm' as const
     const expectedCases = loadResearchCases()
