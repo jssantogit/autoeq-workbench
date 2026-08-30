@@ -1,4 +1,4 @@
-import type { AutoEqResult, StandardAutoEqInput } from '@autoeq-workbench/core'
+import type { AutoEqResultV2, StandardAutoEqInputV2 } from '@autoeq-workbench/core'
 
 export interface AutoEqPublicError {
   category: 'validation' | 'optimization' | 'numeric'
@@ -8,11 +8,11 @@ export interface AutoEqPublicError {
 export interface AutoEqWorkerRequest {
   type: 'run'
   runId: string
-  input: StandardAutoEqInput
+  input: StandardAutoEqInputV2
 }
 
 export type AutoEqWorkerMessage =
-  | { type: 'result'; runId: string; result: AutoEqResult }
+  | { type: 'result'; runId: string; result: AutoEqResultV2 }
   | { type: 'error'; runId: string; error: AutoEqPublicError }
 
 export interface WorkerAdapter {
@@ -46,7 +46,7 @@ interface ActiveRun {
 }
 
 export interface AutoEqClient {
-  run(runId: string, input: StandardAutoEqInput): Promise<AutoEqResult>
+  run(runId: string, input: StandardAutoEqInputV2): Promise<AutoEqResultV2>
   cancel(runId?: string): void
 }
 
@@ -78,7 +78,7 @@ export function createAutoEqClient(
       cancel()
       const worker = createWorker()
 
-      return new Promise<AutoEqResult>((resolve, reject) => {
+      return new Promise<AutoEqResultV2>((resolve, reject) => {
         const run: ActiveRun = { runId, worker, reject }
         active = run
 

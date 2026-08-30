@@ -437,6 +437,7 @@ tbody.curves > tr > td.levels { order: 2; flex: 0 0 86px; padding-left: 16px; }
 .settings-row .number-field > span:first-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .settings-row .number-field input { min-width: 0; height: 28px; padding: 3px 5px; }
 .settings-row .number-field__control { min-width: 0; border-radius: 6px; }
+.settings-row select { min-width: 0; height: 28px; border: 1px solid var(--color-border); border-radius: 6px; padding: 3px 5px; color: var(--color-text); background: var(--color-input); font: inherit; font-size: 0.7rem; }
 .filter-io-actions { margin-top: 8px; }
 .filter-io-controls { display: grid; min-width: 0; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px; }
 .filter-io-controls .button,

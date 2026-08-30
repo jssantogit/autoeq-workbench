@@ -149,7 +149,12 @@ describe('EQ compare store', () => {
     expect(snapshot.autoEqRun).not.toBe(autoEqRun)
     expect(snapshot.autoEqRun!.manifest).not.toBe(autoEqRun.manifest)
     autoEqRun.manifest.algorithmParameters.deadbandDb = 9
-    expect(snapshot.autoEqRun!.manifest.algorithmParameters.deadbandDb).toBe(0.1)
+    const snapshotManifest = snapshot.autoEqRun!.manifest
+    expect(snapshotManifest.algorithmVersion).toBe('standard-v1')
+    if (snapshotManifest.algorithmVersion !== 'standard-v1') {
+      throw new Error('Expected historical Standard-v1 fixture')
+    }
+    expect(snapshotManifest.algorithmParameters.deadbandDb).toBe(0.1)
   })
 
   it('retains the 100 newest deep-copied snapshots and clears trimmed selections', () => {

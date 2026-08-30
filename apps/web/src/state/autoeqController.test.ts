@@ -1,14 +1,14 @@
 import {
   DEFAULT_AUTOEQ_SETTINGS,
-  type AutoEqResult,
+  type AutoEqResultV2,
   type AutoEqSettings,
   type Curve,
   type Filter,
-  type StandardAutoEqInput,
+  type StandardAutoEqInputV2,
 } from '@autoeq-workbench/core'
 import { describe, expect, it } from 'vitest'
 
-import { createAutoEqResult } from '../test/autoEqFixture'
+import { createAutoEqResultV2 } from '../test/autoEqFixture'
 import {
   AutoEqCancelledError,
   AutoEqWorkerError,
@@ -44,8 +44,8 @@ function syntheticCurve(id: string, kind: Curve['kind'], middleDb: number): Curv
 
 interface ControlledRun {
   runId: string
-  input: StandardAutoEqInput
-  resolve: (result: AutoEqResult) => void
+  input: StandardAutoEqInputV2
+  resolve: (result: AutoEqResultV2) => void
   reject: (cause: unknown) => void
 }
 
@@ -67,7 +67,7 @@ function createReadyWorkspace() {
   const workspace = createWorkspaceStore()
   workspace.getState().addCurve(syntheticCurve('fr-1', 'fr', 2))
   workspace.getState().addCurve(syntheticCurve('target-1', 'target', 0))
-  workspace.getState().applyAutoEqResult(createAutoEqResult(2))
+  workspace.getState().applyAutoEqResult(createAutoEqResultV2(2))
   return workspace
 }
 
@@ -150,7 +150,7 @@ describe('AutoEQ controller', () => {
 
     expect(statusWhenClientStarted).toBe('idle')
     expect(runStore.getState().status).toBe('running')
-    controlled.runs[0]!.resolve(createAutoEqResult())
+    controlled.runs[0]!.resolve(createAutoEqResultV2())
     await pending
   })
 
@@ -180,7 +180,7 @@ describe('AutoEQ controller', () => {
   it('applies a valid current result through canonical workspace state', async () => {
     const { workspace, runStore, controller, runs } = setup()
     const pending = controller.runAutoEq()
-    const result = createAutoEqResult(4)
+    const result = createAutoEqResultV2(4)
 
     runs[0]!.resolve(result)
     await pending
@@ -198,7 +198,7 @@ describe('AutoEQ controller', () => {
     const { workspace, runStore, controller, runs } = setup()
     const before = solutionSnapshot(workspace.getState())
     const pending = controller.runAutoEq()
-    const malformed = createAutoEqResult(4)
+    const malformed = createAutoEqResultV2(4)
     malformed.filters[0]!.gainDb = Number.POSITIVE_INFINITY
 
     runs[0]!.resolve(malformed)
@@ -213,29 +213,35 @@ describe('AutoEQ controller', () => {
   })
 
   it.each([
-    ['normalization mode', (result: AutoEqResult) => {
+    ['normalization mode', (result: AutoEqResultV2) => {
       result.manifest.normalization.mode = 'db'
     }],
-    ['normalization frequency', (result: AutoEqResult) => {
+    ['normalization frequency', (result: AutoEqResultV2) => {
       result.manifest.normalization.frequencyHz = 1_000
     }],
-    ['normalization level', (result: AutoEqResult) => {
+    ['normalization level', (result: AutoEqResultV2) => {
       result.manifest.normalization.levelDb = 65
     }],
-    ['settings', (result: AutoEqResult) => {
+    ['settings', (result: AutoEqResultV2) => {
       result.manifest.autoeqSettings.maxFilters = 8
     }],
-    ['sourceName', (result: AutoEqResult) => {
+    ['time limit', (result: AutoEqResultV2) => {
+      result.manifest.autoeqSettings.timeLimitSeconds = 30
+    }],
+    ['algorithm version', (result: AutoEqResultV2) => {
+      result.manifest.algorithmVersion = 'standard-v3' as 'standard-v2'
+    }],
+    ['sourceName', (result: AutoEqResultV2) => {
       result.manifest.sourceName = 'Mismatched Source'
     }],
-    ['targetName', (result: AutoEqResult) => {
+    ['targetName', (result: AutoEqResultV2) => {
       result.manifest.targetName = 'Mismatched Target'
     }],
   ] as const)('rejects Worker result with mismatched %s when workspace signature is unchanged', async (_label, mutateResult) => {
     const { workspace, runStore, controller, runs } = setup()
     const before = solutionSnapshot(workspace.getState())
     const pending = controller.runAutoEq()
-    const result = createAutoEqResult(4)
+    const result = createAutoEqResultV2(4)
     mutateResult(result)
 
     runs[0]!.resolve(result)
@@ -259,6 +265,49 @@ describe('AutoEQ controller', () => {
     await pending
 
     expect(solutionSnapshot(workspace.getState())).toEqual(before)
+    expect(runStore.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
+  })
+
+  it('rejects a Worker result above the captured Max Filters', async () => {
+    const { workspace, runStore, controller, runs } = setup()
+    workspace.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 1 })
+    const before = solutionSnapshot(workspace.getState())
+    const pending = controller.runAutoEq()
+    const result = createAutoEqResultV2(4, {
+      autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 1 },
+    })
+    const second = { ...result.filters[0]!, id: 'autoeq-2', frequencyHz: 2_000 }
+    result.filters.push(second)
+    result.manifest.finalFilters.push({ ...second })
+
+    runs[0]!.resolve(result)
+    await pending
+
+    expect(solutionSnapshot(workspace.getState())).toEqual(before)
+    expect(runStore.getState()).toMatchObject({
+      status: 'error',
+      error: { category: 'optimization', message: 'AutoEQ optimization failed.' },
+    })
+  })
+
+  it('applies a matching Standard-v2 time-limit result as a normal completion', async () => {
+    const { workspace, runStore, controller, runs } = setup()
+    const pending = controller.runAutoEq()
+    const result = createAutoEqResultV2(4, {
+      metrics: { maeDb: 0.25, rmseDb: 0.3, maxAbsDb: 0.8, maxAbsFrequencyHz: 1_000 },
+      terminationReason: 'time-limit',
+      targetAchieved: false,
+    })
+
+    runs[0]!.resolve(result)
+    await pending
+
+    expect(workspace.getState().autoEqRun?.manifest).toMatchObject({
+      algorithmVersion: 'standard-v2',
+      terminationReason: 'time-limit',
+      targetAchieved: false,
+    })
+    expect(workspace.getState().filters).toEqual(result.filters)
     expect(runStore.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
   })
 
@@ -337,12 +386,16 @@ describe('AutoEQ run-input signature', () => {
     ['minQ', DEFAULT_AUTOEQ_SETTINGS.minQ + 0.1],
     ['maxQ', DEFAULT_AUTOEQ_SETTINGS.maxQ - 1],
     ['maxFilters', DEFAULT_AUTOEQ_SETTINGS.maxFilters - 1],
+    ['timeLimitSeconds', 30],
   ] satisfies [keyof AutoEqSettings, number][])(
     'changes when AutoEqSettings.%s changes',
     (field, value) => {
       const base = numericalState(createReadyWorkspace().getState())
       const changed = numericalState(base)
-      changed.autoeqSettings[field] = value
+      changed.autoeqSettings = {
+        ...changed.autoeqSettings,
+        [field]: value,
+      } as AutoEqSettings
 
       expect(createAutoEqRunInputSignature(changed)).not.toBe(
         createAutoEqRunInputSignature(base),
@@ -388,6 +441,12 @@ describe('AutoEQ obsolete result rejection', () => {
         maxFilters: DEFAULT_AUTOEQ_SETTINGS.maxFilters - 1,
       })
     }],
+    ['time limit', (workspace: ReturnType<typeof createWorkspaceStore>) => {
+      workspace.getState().setAutoEqSettings({
+        ...DEFAULT_AUTOEQ_SETTINGS,
+        timeLimitSeconds: 30,
+      })
+    }],
   ] as const)('discards a result after %s changes', async (_label, changeWorkspace) => {
     const { workspace, runStore, controller, runs } = setup()
     expect(workspace.getState().autoEqRun).not.toBeNull()
@@ -395,7 +454,7 @@ describe('AutoEQ obsolete result rejection', () => {
 
     changeWorkspace(workspace)
     const beforeResolution = solutionSnapshot(workspace.getState())
-    runs[0]!.resolve(createAutoEqResult(8))
+    runs[0]!.resolve(createAutoEqResultV2(8))
     await pending
 
     expect(solutionSnapshot(workspace.getState())).toEqual(beforeResolution)
@@ -409,9 +468,9 @@ describe('AutoEQ obsolete result rejection', () => {
 
     uiStore.getState().setActiveDockTab('tools')
     uiStore.getState().setTheme('dark')
-    runs[0]!.resolve(createAutoEqResult(5))
+    runs[0]!.resolve(createAutoEqResultV2(5))
     await pending
 
-    expect(workspace.getState().filters).toEqual(createAutoEqResult(5).filters)
+    expect(workspace.getState().filters).toEqual(createAutoEqResultV2(5).filters)
   })
 })

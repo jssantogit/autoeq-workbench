@@ -1,8 +1,8 @@
-import type { StandardAutoEqInput } from '@autoeq-workbench/core'
+import type { StandardAutoEqInputV2 } from '@autoeq-workbench/core'
 import { DEFAULT_AUTOEQ_SETTINGS } from '@autoeq-workbench/core'
 import { describe, expect, it } from 'vitest'
 
-import { createAutoEqResult } from '../test/autoEqFixture'
+import { createAutoEqResultV2 } from '../test/autoEqFixture'
 import {
   AutoEqCancelledError,
   createAutoEqClient,
@@ -11,7 +11,7 @@ import {
   type WorkerAdapter,
 } from './autoeqClient'
 
-const input: StandardAutoEqInput = {
+const input: StandardAutoEqInputV2 = {
   source: {
     id: 'fr-1',
     name: 'Synthetic FR',
@@ -71,7 +71,7 @@ describe('AutoEQ Worker client', () => {
   it('resolves a matching result and disposes its Worker', async () => {
     const { client, workers } = setup()
     const run = client.run('run-1', input)
-    const result = createAutoEqResult()
+    const result = createAutoEqResultV2()
 
     expect(workers[0]!.posted).toEqual([{ type: 'run', runId: 'run-1', input }])
     workers[0]!.emit({ type: 'result', runId: 'run-1', result })
@@ -122,7 +122,7 @@ describe('AutoEQ Worker client', () => {
     const secondRun = client.run('run-2', input)
     expect(workers).toHaveLength(2)
     expect(workers[1]).not.toBe(workers[0])
-    workers[1]!.emit({ type: 'result', runId: 'run-2', result: createAutoEqResult(2) })
+    workers[1]!.emit({ type: 'result', runId: 'run-2', result: createAutoEqResultV2(2) })
     await expect(secondRun).resolves.toMatchObject({ filters: [{ gainDb: 2 }] })
   })
 
@@ -140,12 +140,12 @@ describe('AutoEQ Worker client', () => {
       () => { settled = true },
     )
 
-    workers[0]!.emit({ type: 'result', runId: 'run-1', result: createAutoEqResult(9) })
-    workers[1]!.emit({ type: 'result', runId: 'run-1', result: createAutoEqResult(8) })
+    workers[0]!.emit({ type: 'result', runId: 'run-1', result: createAutoEqResultV2(9) })
+    workers[1]!.emit({ type: 'result', runId: 'run-1', result: createAutoEqResultV2(8) })
     await Promise.resolve()
     expect(settled).toBe(false)
 
-    workers[1]!.emit({ type: 'result', runId: 'run-2', result: createAutoEqResult(1) })
+    workers[1]!.emit({ type: 'result', runId: 'run-2', result: createAutoEqResultV2(1) })
     await expect(secondRun).resolves.toMatchObject({ filters: [{ gainDb: 1 }] })
   })
 })

@@ -9,6 +9,7 @@ import {
   desiredCorrection,
   MVP_NUMERIC_POLICY,
   isValidAutoEqSettings,
+  isValidAutoEqSettingsV1,
   prepareCurve,
   residualError,
   type Curve,
@@ -173,17 +174,41 @@ function hasFiniteFields(value: unknown, fields: readonly string[]): boolean {
 
 function isValidRunManifest(manifest: RunManifest): boolean {
   if (typeof manifest !== 'object' || manifest === null) return false
-  const algorithmParametersAreFinite = hasFiniteFields(manifest.algorithmParameters, [
-    'deadbandDb',
-    'huberDeltaDb',
-    'candidateThresholdDb',
-    'minObjectiveImprovement',
-    'pruneTolerance',
-    'filterCountWeight',
-    'highQWeight',
-    'gainWeight',
-    'cancellationWeight',
-  ])
+  const versionFieldsAreValid = manifest.algorithmVersion === 'standard-v1'
+    ? manifest.schemaVersion === 2 &&
+      isValidAutoEqSettingsV1(manifest.autoeqSettings) &&
+      hasFiniteFields(manifest.algorithmParameters, [
+        'deadbandDb',
+        'huberDeltaDb',
+        'candidateThresholdDb',
+        'minObjectiveImprovement',
+        'pruneTolerance',
+        'filterCountWeight',
+        'highQWeight',
+        'gainWeight',
+        'cancellationWeight',
+      ])
+    : manifest.algorithmVersion === 'standard-v2' &&
+      manifest.schemaVersion === 3 &&
+      isValidAutoEqSettings(manifest.autoeqSettings) &&
+      manifest.algorithmParameters.targetRmseDb === 0.25 &&
+      manifest.algorithmParameters.targetMaxAbsDb === 0.75 &&
+      manifest.algorithmParameters.candidateResidualFloorDb === 0.15 &&
+      manifest.algorithmParameters.pkQScaleMultipliers.length === 3 &&
+      manifest.algorithmParameters.pkQScaleMultipliers[0] === 0.5 &&
+      manifest.algorithmParameters.pkQScaleMultipliers[1] === 1 &&
+      manifest.algorithmParameters.pkQScaleMultipliers[2] === 2 &&
+      manifest.algorithmParameters.maxExactCandidatesPerIteration === 8 &&
+      manifest.algorithmParameters.maxActiveSearchPaths === 3 &&
+      manifest.algorithmParameters.alternateRetentionRatio === 1.02 &&
+      manifest.algorithmParameters.maxJointRefinementCycles === 6 &&
+      (manifest.terminationReason === 'target-reached' ||
+        manifest.terminationReason === 'converged' ||
+        manifest.terminationReason === 'time-limit') &&
+      manifest.targetAchieved === (
+        manifest.metrics.rmseDb <= 0.25 && manifest.metrics.maxAbsDb <= 0.75
+      ) &&
+      (manifest.terminationReason !== 'target-reached' || manifest.targetAchieved)
   const normalizationIsValid =
     isRecord(manifest.normalization) &&
     (manifest.normalization.mode === 'hz' || manifest.normalization.mode === 'db') &&
@@ -208,20 +233,17 @@ function isValidRunManifest(manifest: RunManifest): boolean {
     )
 
   return (
-    manifest.schemaVersion === 2 &&
-    manifest.algorithmVersion === 'standard-v1' &&
+    versionFieldsAreValid &&
     manifest.profile === 'Standard' &&
     Number.isFinite(manifest.sampleRateHz) &&
     manifest.sampleRateHz > 0 &&
     Number.isInteger(manifest.fitPointsPerOctave) &&
     manifest.fitPointsPerOctave > 0 &&
-    isRecord(manifest.autoeqSettings) &&
-    isValidAutoEqSettings(manifest.autoeqSettings) &&
     normalizationIsValid &&
     typeof manifest.sourceName === 'string' &&
     typeof manifest.targetName === 'string' &&
-    algorithmParametersAreFinite &&
     Array.isArray(manifest.finalFilters) &&
+    manifest.finalFilters.length <= manifest.autoeqSettings.maxFilters &&
     manifest.finalFilters.every(validFilter) &&
     hasFiniteFields(manifest.metrics, [
       'maeDb',
@@ -240,7 +262,7 @@ function validAutoEqResult(result: AutoEqResult): boolean {
 
   return (
     Array.isArray(result.filters) &&
-    result.filters.length <= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters &&
+    result.filters.length <= manifest.autoeqSettings.maxFilters &&
     result.filters.every(validFilter) &&
     new Set(result.filters.map(({ id }) => id)).size === result.filters.length &&
     JSON.stringify(result.filters) === JSON.stringify(manifest.finalFilters) &&

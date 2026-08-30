@@ -1,8 +1,8 @@
 import {
   isValidAutoEqSettings,
-  type AutoEqResult,
+  type AutoEqResultV2,
   type Curve,
-  type StandardAutoEqInput,
+  type StandardAutoEqInputV2,
 } from '@autoeq-workbench/core'
 import type { StoreApi } from 'zustand/vanilla'
 
@@ -33,7 +33,7 @@ function cloneCurve(curve: Curve): Curve {
   }
 }
 
-function captureRunInput(state: WorkspaceState): StandardAutoEqInput | null {
+function captureRunInput(state: WorkspaceState): StandardAutoEqInputV2 | null {
   const selected = getSelectedAutoEqCurves(state)
   if (selected === null) return null
 
@@ -46,10 +46,11 @@ function captureRunInput(state: WorkspaceState): StandardAutoEqInput | null {
 }
 
 function matchesCapturedProvenance(
-  manifest: AutoEqResult['manifest'] | undefined,
-  input: StandardAutoEqInput,
+  manifest: AutoEqResultV2['manifest'] | undefined,
+  input: StandardAutoEqInputV2,
 ): boolean {
   if (!manifest || typeof manifest !== 'object') return false
+  if (manifest.schemaVersion !== 3 || manifest.algorithmVersion !== 'standard-v2') return false
   if (manifest.sourceName !== input.source.name || manifest.targetName !== input.target.name) {
     return false
   }
@@ -71,7 +72,8 @@ function matchesCapturedProvenance(
     settings.maxGainDb !== input.settings.maxGainDb ||
     settings.minQ !== input.settings.minQ ||
     settings.maxQ !== input.settings.maxQ ||
-    settings.maxFilters !== input.settings.maxFilters
+    settings.maxFilters !== input.settings.maxFilters ||
+    settings.timeLimitSeconds !== input.settings.timeLimitSeconds
   ) {
     return false
   }
@@ -124,7 +126,7 @@ export function createAutoEqController({
     if (priorRunId !== null) cancelAutoEq()
 
     const runId = createRunId()
-    let pending: Promise<AutoEqResult>
+    let pending: Promise<AutoEqResultV2>
     try {
       pending = client.run(runId, input)
     } catch {

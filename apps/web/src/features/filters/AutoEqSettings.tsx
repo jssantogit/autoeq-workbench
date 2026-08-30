@@ -1,7 +1,9 @@
 import {
   AUTOEQ_PRODUCT_LIMITS,
+  AUTOEQ_TIME_LIMIT_OPTIONS,
   isValidAutoEqSettings,
   type AutoEqSettings,
+  type AutoEqTimeLimitSeconds,
 } from '@autoeq-workbench/core'
 import { NumberField } from '../../components/ui/NumberField'
 import { useWorkspaceStore } from '../../state/workspaceStore'
@@ -105,6 +107,21 @@ export function AutoEqSettings() {
             validate={validates('maxFilters')}
             onValueChange={(maxFilters) => update({ maxFilters })}
           />
+        </div>
+        <div className="settings-row settings-row--time-limit" role="row" aria-label="AutoEQ time limit">
+          <span role="rowheader">Time Limit</span>
+          <span aria-hidden="true" />
+          <select
+            aria-label="AutoEQ time limit"
+            value={settings.timeLimitSeconds}
+            onChange={(event) => update({
+              timeLimitSeconds: Number(event.target.value) as AutoEqTimeLimitSeconds,
+            })}
+          >
+            {AUTOEQ_TIME_LIMIT_OPTIONS.map((seconds) => (
+              <option key={seconds} value={seconds}>{seconds} s</option>
+            ))}
+          </select>
         </div>
       </div>
     </section>

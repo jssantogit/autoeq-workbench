@@ -1,4 +1,9 @@
-import { CoreError, runStandardAutoEq } from '@autoeq-workbench/core'
+import {
+  CoreError,
+  runStandardAutoEqV2,
+  type AutoEqResultV2,
+  type StandardAutoEqInputV2,
+} from '@autoeq-workbench/core'
 
 import type {
   AutoEqPublicError,
@@ -25,6 +30,10 @@ export function sanitizeAutoEqError(cause: unknown): AutoEqPublicError {
   return { category: 'optimization', message: 'AutoEQ optimization failed.' }
 }
 
+export function runAutoEqWorkerInput(input: StandardAutoEqInputV2): AutoEqResultV2 {
+  return runStandardAutoEqV2(input)
+}
+
 workerScope.onmessage = ({ data }) => {
   if (data.type !== 'run') return
 
@@ -32,7 +41,7 @@ workerScope.onmessage = ({ data }) => {
     workerScope.postMessage({
       type: 'result',
       runId: data.runId,
-      result: runStandardAutoEq(data.input),
+      result: runAutoEqWorkerInput(data.input),
     })
   } catch (cause) {
     workerScope.postMessage({ type: 'error', runId: data.runId, error: sanitizeAutoEqError(cause) })

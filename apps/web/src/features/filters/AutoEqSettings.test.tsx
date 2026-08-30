@@ -2,7 +2,7 @@ import {
   AUTOEQ_PRODUCT_LIMITS,
   DEFAULT_AUTOEQ_SETTINGS,
 } from '@autoeq-workbench/core'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { workspaceStore } from '../../state/workspaceStore'
@@ -68,5 +68,23 @@ describe('AutoEqSettings', () => {
     fireEvent.blur(minimumFrequency)
     expect(minimumFrequency).toHaveAttribute('aria-invalid', 'true')
     expect(workspaceStore.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
+  })
+
+  it('offers the exact Time Limit options with a 60-second default', async () => {
+    const user = userEvent.setup()
+    render(<AutoEqSettings />)
+
+    const select = screen.getByRole('combobox', { name: 'AutoEQ time limit' })
+    expect(select).toHaveValue('60')
+    expect(within(select).getAllByRole('option').map((option) => option.textContent)).toEqual([
+      '5 s',
+      '15 s',
+      '30 s',
+      '60 s',
+      '120 s',
+    ])
+
+    await user.selectOptions(select, '30')
+    expect(workspaceStore.getState().autoeqSettings.timeLimitSeconds).toBe(30)
   })
 })
