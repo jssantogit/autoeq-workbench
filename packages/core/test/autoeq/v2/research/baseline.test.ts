@@ -4,7 +4,13 @@ import {
   createResearchBaselineIdentity,
   compareWithBaseline,
   findPracticalMonotonicityWarnings,
+  RESEARCH_RUNNER_SCHEMA_VERSION,
 } from '../../../../benchmarks/research/baseline.js'
+import { RESEARCH_CORPUS_SHA256 } from '../../../../benchmarks/research/corpus.js'
+import {
+  PUBLISHED_STANDARD_V2_COMMIT,
+  readCommittedBaseline,
+} from '../../../../benchmarks/research/run.js'
 import type {
   ResearchAggregateRow,
   ResearchBaselineFile,
@@ -50,6 +56,22 @@ function aggregate(
 }
 
 describe('research baseline compatibility', () => {
+  it('loads the committed published-v2 baseline with the approved identity', () => {
+    const baseline = readCommittedBaseline()
+
+    expect(baseline).toBeDefined()
+    expect(baseline?.identity).toEqual({
+      schemaVersion: 1,
+      implementationCommit: PUBLISHED_STANDARD_V2_COMMIT,
+      corpusSchemaVersion: 1,
+      corpusHashes: RESEARCH_CORPUS_SHA256,
+      parserPreparationSchemaVersion: 1,
+      runnerSchemaVersion: RESEARCH_RUNNER_SCHEMA_VERSION,
+    })
+    expect(baseline?.runs).toHaveLength(60)
+    expect(baseline?.aggregates).toHaveLength(12)
+  })
+
   it('compares aggregate cells only when the corpus and schemas match', () => {
     const identity = createResearchBaselineIdentity('7c9ebbbe6eefeb131c6c698055c737b429f5b0c6')
     const baseline: ResearchBaselineFile = {

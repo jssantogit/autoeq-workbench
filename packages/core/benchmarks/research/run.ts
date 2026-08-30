@@ -399,7 +399,7 @@ function createTestModeRunner(
   }
 }
 
-function readCommittedBaseline(): ResearchBaselineFile | undefined {
+export function readCommittedBaseline(): ResearchBaselineFile | undefined {
   const baselinePath = fileURLToPath(new URL('./baseline-standard-v2.json', import.meta.url))
   try {
     return JSON.parse(readFileSync(baselinePath, 'utf8')) as ResearchBaselineFile
