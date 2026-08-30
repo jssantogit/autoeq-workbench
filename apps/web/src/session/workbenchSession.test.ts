@@ -1,6 +1,7 @@
 import {
   AUTOEQ_PRODUCT_LIMITS,
   DEFAULT_AUTOEQ_SETTINGS,
+  DEFAULT_AUTOEQ_SETTINGS_V1,
   MVP_NUMERIC_POLICY,
   type Curve,
   type Filter,
@@ -8,7 +9,11 @@ import {
 } from '@autoeq-workbench/core'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createAutoEqResult, createAutoEqRunRecord } from '../test/autoEqFixture'
+import {
+  createAutoEqResult,
+  createAutoEqResultV2,
+  createAutoEqRunRecord,
+} from '../test/autoEqFixture'
 import {
   type AutoEqClient,
 } from '../workers/autoeqClient'
@@ -26,6 +31,7 @@ import {
   validateWorkbenchSession,
   WORKBENCH_SESSION_SCHEMA_VERSION,
   type WorkbenchSessionV1,
+  type WorkbenchSessionV2,
 } from './workbenchSession'
 
 function createSampleCurveFr(): Curve {
@@ -107,9 +113,87 @@ function createValidAutoEqSession(): WorkbenchSessionV1 {
   }
 }
 
+function createValidAutoEqSessionV2(): WorkbenchSessionV2 {
+  const fr = { ...createSampleCurveFr(), name: 'Source' }
+  const target = { ...createSampleCurveTarget(), name: 'Target' }
+  const result = createAutoEqResultV2(2.5, {
+    sourceName: 'Source',
+    targetName: 'Target',
+  })
+  return {
+    schemaVersion: 2,
+    curves: [fr, target],
+    activeFrId: fr.id,
+    activeTargetId: target.id,
+    normalization: { mode: 'hz', frequencyHz: 500, levelDb: 60 },
+    autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS },
+    filters: result.filters.map((filter) => ({ ...filter })),
+    filterProvenance: 'autoeq',
+    solutionState: 'clean',
+    autoEqRun: { manifest: result.manifest },
+  }
+}
+
 describe('Workbench Session V1 Serialization and Round-Trip', () => {
-  it('exposes WORKBENCH_SESSION_SCHEMA_VERSION as 1', () => {
-    expect(WORKBENCH_SESSION_SCHEMA_VERSION).toBe(1)
+  it('migrates schema 1 to schema 2 with 60 seconds only when timeout is absent', () => {
+    const legacyWithoutTimeout = {
+      ...createValidAutoEqSession(),
+      autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS_V1 },
+    }
+    const migrated = validateWorkbenchSession(legacyWithoutTimeout)
+
+    expect(migrated.schemaVersion).toBe(2)
+    expect(migrated.autoeqSettings.timeLimitSeconds).toBe(60)
+    expect(migrated.autoEqRun?.manifest.schemaVersion).toBe(2)
+    expect(migrated.autoEqRun?.manifest.algorithmVersion).toBe('standard-v1')
+    expect('timeLimitSeconds' in migrated.autoEqRun!.manifest.autoeqSettings).toBe(false)
+
+    const legacyWithTimeout = {
+      ...createValidManualSession(),
+      autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS, timeLimitSeconds: 30 as const },
+    }
+    expect(validateWorkbenchSession(legacyWithTimeout).autoeqSettings.timeLimitSeconds).toBe(30)
+  })
+
+  it('exports new sessions as schema 2 with the current timeout', () => {
+    const workspace = createWorkspaceStore()
+    const encoded = serializeWorkbenchSession({
+      ...createValidManualSession(),
+      schemaVersion: 2,
+    } as unknown as WorkbenchSessionV1)
+    const parsed = JSON.parse(encoded) as Record<string, unknown>
+
+    expect(parsed.schemaVersion).toBe(2)
+    expect((parsed.autoeqSettings as Record<string, unknown>).timeLimitSeconds).toBe(60)
+    expect(workspace.getState().autoeqSettings.timeLimitSeconds).toBe(60)
+  })
+
+  it('accepts valid schema-2 Standard-v2 runs and rejects invalid timeout contracts', () => {
+    const current = createValidAutoEqSessionV2()
+    expect(validateWorkbenchSession(current)).toEqual(current)
+
+    const missingTimeout = structuredClone(current) as unknown as Record<string, unknown>
+    delete (missingTimeout.autoeqSettings as Record<string, unknown>).timeLimitSeconds
+    expect(() => validateWorkbenchSession(missingTimeout)).toThrow()
+
+    const invalidTimeout = structuredClone(current) as unknown as Record<string, unknown>
+    ;(invalidTimeout.autoeqSettings as Record<string, unknown>).timeLimitSeconds = 10
+    expect(() => validateWorkbenchSession(invalidTimeout)).toThrow()
+  })
+
+  it('rejects fabricated schema-3 standard-v1 manifests', () => {
+    const current = createValidAutoEqSessionV2()
+    current.autoEqRun = {
+      manifest: {
+        ...createAutoEqResult().manifest,
+        schemaVersion: 3,
+      } as unknown as RunManifest,
+    }
+    expect(() => validateWorkbenchSession(current)).toThrow()
+  })
+
+  it('exposes WORKBENCH_SESSION_SCHEMA_VERSION as 2', () => {
+    expect(WORKBENCH_SESSION_SCHEMA_VERSION).toBe(2)
   })
 
   it('serializes deterministically with exact key order, 2 spaces, and trailing newline', () => {
@@ -141,7 +225,7 @@ describe('Workbench Session V1 Serialization and Round-Trip', () => {
     }
 
     const deserialized = deserializeWorkbenchSession(encoded1)
-    expect(deserialized).toEqual(fixture)
+    expect(deserialized).toEqual({ ...fixture, schemaVersion: 2 })
     expect(serializeWorkbenchSession(deserialized)).toBe(encoded1)
   })
 
@@ -161,13 +245,16 @@ describe('Workbench Session V1 Serialization and Round-Trip', () => {
 
     const encoded = serializeWorkbenchSession(emptySession)
     expect(encoded.endsWith('\n')).toBe(true)
-    expect(deserializeWorkbenchSession(encoded)).toEqual(emptySession)
+    expect(deserializeWorkbenchSession(encoded)).toEqual({ ...emptySession, schemaVersion: 2 })
   })
 
   it('round-trips clean, modified, and stale AutoEQ sessions while preserving IDs and points', () => {
     const autoEqSession = createValidAutoEqSession()
     const encodedClean = serializeWorkbenchSession(autoEqSession)
-    expect(deserializeWorkbenchSession(encodedClean)).toEqual(autoEqSession)
+    expect(deserializeWorkbenchSession(encodedClean)).toEqual({
+      ...autoEqSession,
+      schemaVersion: 2,
+    })
 
     // Modified AutoEQ session
     const modifiedSession: WorkbenchSessionV1 = {
@@ -176,7 +263,10 @@ describe('Workbench Session V1 Serialization and Round-Trip', () => {
       solutionState: 'modified',
     }
     const encodedModified = serializeWorkbenchSession(modifiedSession)
-    expect(deserializeWorkbenchSession(encodedModified)).toEqual(modifiedSession)
+    expect(deserializeWorkbenchSession(encodedModified)).toEqual({
+      ...modifiedSession,
+      schemaVersion: 2,
+    })
 
     // Stale AutoEQ session
     const staleSession: WorkbenchSessionV1 = {
@@ -184,7 +274,10 @@ describe('Workbench Session V1 Serialization and Round-Trip', () => {
       solutionState: 'stale',
     }
     const encodedStale = serializeWorkbenchSession(staleSession)
-    expect(deserializeWorkbenchSession(encodedStale)).toEqual(staleSession)
+    expect(deserializeWorkbenchSession(encodedStale)).toEqual({
+      ...staleSession,
+      schemaVersion: 2,
+    })
   })
 
   it('deep clones deserialized values and does not leak parser-owned or input references', () => {
@@ -312,7 +405,7 @@ describe('Workbench Session Deserialization Validation Matrix', () => {
 
   it.each([
     ['missing schemaVersion', (s: Record<string, unknown>) => { delete s.schemaVersion }],
-    ['schemaVersion 2', (s: Record<string, unknown>) => { s.schemaVersion = 2 }],
+    ['schemaVersion 3', (s: Record<string, unknown>) => { s.schemaVersion = 3 }],
     ['schemaVersion 0', (s: Record<string, unknown>) => { s.schemaVersion = 0 }],
     ['schemaVersion string "1"', (s: Record<string, unknown>) => { s.schemaVersion = '1' }],
     ['schemaVersion null', (s: Record<string, unknown>) => { s.schemaVersion = null }],
@@ -633,7 +726,7 @@ describe('Workbench Session Deserialization Validation Matrix', () => {
         ...session.autoEqRun!.manifest,
         schemaVersion: 1 as unknown as 2,
       }
-      session.autoEqRun = { manifest: badManifest }
+      session.autoEqRun = { manifest: badManifest as unknown as RunManifest }
       expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
     })
 
@@ -828,7 +921,7 @@ describe('Atomic Workspace Session Replacement & Import Coordinator', () => {
       cancelAutoEq: cancelSpy,
     })
 
-    expect(result).toEqual(validSession)
+    expect(result).toEqual({ ...validSession, schemaVersion: 2 })
 
     // Workspace assertions
     expect(workspace.getState().curves).toEqual(validSession.curves)
@@ -849,7 +942,7 @@ describe('Atomic Workspace Session Replacement & Import Coordinator', () => {
   })
 
   it('prevents a simulated late Worker result from overwriting an imported session', async () => {
-    let lateResolve: ((result: ReturnType<typeof createAutoEqResult>) => void) | null = null
+    let lateResolve: ((result: ReturnType<typeof createAutoEqResultV2>) => void) | null = null
     const client: AutoEqClient = {
       run: () =>
         new Promise((resolve) => {
@@ -917,7 +1010,7 @@ describe('Atomic Workspace Session Replacement & Import Coordinator', () => {
     expect(runStore.getState().status).toBe('idle')
 
     // Simulate late worker result resolving
-    const lateResult = createAutoEqResult(6)
+    const lateResult = createAutoEqResultV2(6)
     lateResolve!(lateResult)
     await pendingRun
 

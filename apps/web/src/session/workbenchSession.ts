@@ -1,13 +1,18 @@
 import {
   AUTOEQ_PRODUCT_LIMITS,
+  DEFAULT_AUTOEQ_SETTINGS,
   isValidAutoEqSettings,
+  isValidAutoEqSettingsV1,
   MVP_NUMERIC_POLICY,
   type AutoEqSettings,
+  type AutoEqSettingsV1,
   type Curve,
   type CurvePoint,
   type Filter,
   type Normalization,
   type RunManifest,
+  type RunManifestV1,
+  type RunManifestV2,
 } from '@autoeq-workbench/core'
 import type { StoreApi } from 'zustand/vanilla'
 
@@ -22,7 +27,7 @@ import {
   type WorkspaceState,
 } from '../state/workspaceStore'
 
-export const WORKBENCH_SESSION_SCHEMA_VERSION = 1 as const
+export const WORKBENCH_SESSION_SCHEMA_VERSION = 2 as const
 
 declare const ValidatedSessionBrand: unique symbol
 
@@ -40,6 +45,19 @@ export interface WorkbenchSessionV1 {
   activeFrId: string | null
   activeTargetId: string | null
   normalization: Normalization
+  autoeqSettings: AutoEqSettingsV1 | AutoEqSettings
+  filters: Filter[]
+  filterProvenance: FilterProvenance | null
+  solutionState: SolutionState
+  autoEqRun: AutoEqRunRecord | null
+}
+
+export interface WorkbenchSessionV2 {
+  schemaVersion: 2
+  curves: Curve[]
+  activeFrId: string | null
+  activeTargetId: string | null
+  normalization: Normalization
   autoeqSettings: AutoEqSettings
   filters: Filter[]
   filterProvenance: FilterProvenance | null
@@ -47,9 +65,11 @@ export interface WorkbenchSessionV1 {
   autoEqRun: AutoEqRunRecord | null
 }
 
-export type ValidatedWorkbenchSessionV1 = DeepReadonly<WorkbenchSessionV1> & {
+export type ValidatedWorkbenchSessionV2 = DeepReadonly<WorkbenchSessionV2> & {
   readonly [ValidatedSessionBrand]: true
 }
+
+export type ValidatedWorkbenchSessionV1 = ValidatedWorkbenchSessionV2
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
@@ -204,7 +224,13 @@ function isValidSettings(settings: unknown): settings is AutoEqSettings {
   return isRecord(settings) && isValidAutoEqSettings(settings as unknown as AutoEqSettings)
 }
 
-function isValidRunManifest(manifest: unknown): manifest is RunManifest {
+function isValidSettingsV1(settings: unknown): settings is AutoEqSettingsV1 {
+  return isRecord(settings) &&
+    !('timeLimitSeconds' in settings) &&
+    isValidAutoEqSettingsV1(settings as unknown as AutoEqSettingsV1)
+}
+
+function isValidRunManifestV1(manifest: unknown): manifest is RunManifestV1 {
   if (!isRecord(manifest)) return false
   const algorithmParametersAreFinite = hasFiniteFields(manifest.algorithmParameters, [
     'deadbandDb',
@@ -239,7 +265,7 @@ function isValidRunManifest(manifest: unknown): manifest is RunManifest {
     (manifest.sampleRateHz as number) > 0 &&
     Number.isInteger(manifest.fitPointsPerOctave) &&
     (manifest.fitPointsPerOctave as number) > 0 &&
-    isValidSettings(manifest.autoeqSettings) &&
+    isValidSettingsV1(manifest.autoeqSettings) &&
     isValidNormalization(manifest.normalization) &&
     typeof manifest.sourceName === 'string' &&
     typeof manifest.targetName === 'string' &&
@@ -259,9 +285,108 @@ function isValidRunManifest(manifest: unknown): manifest is RunManifest {
   )
 }
 
+function isValidRunManifestV2(manifest: unknown): manifest is RunManifestV2 {
+  if (!isRecord(manifest)) return false
+  const parameters = manifest.algorithmParameters
+  const algorithmParametersAreValid =
+    isRecord(parameters) &&
+    parameters.targetRmseDb === 0.25 &&
+    parameters.targetMaxAbsDb === 0.75 &&
+    parameters.candidateResidualFloorDb === 0.15 &&
+    Array.isArray(parameters.pkQScaleMultipliers) &&
+    parameters.pkQScaleMultipliers.length === 3 &&
+    parameters.pkQScaleMultipliers[0] === 0.5 &&
+    parameters.pkQScaleMultipliers[1] === 1 &&
+    parameters.pkQScaleMultipliers[2] === 2 &&
+    parameters.maxExactCandidatesPerIteration === 8 &&
+    parameters.maxActiveSearchPaths === 3 &&
+    parameters.alternateRetentionRatio === 1.02 &&
+    parameters.maxJointRefinementCycles === 6
+
+  const auditIsValid =
+    isRecord(manifest.cancellationAudit) &&
+    Number.isFinite(manifest.cancellationAudit.totalScore) &&
+    Array.isArray(manifest.cancellationAudit.pairs) &&
+    manifest.cancellationAudit.pairs.every(
+      (pair: unknown) =>
+        isRecord(pair) &&
+        typeof pair.filterAId === 'string' &&
+        typeof pair.filterBId === 'string' &&
+        Number.isFinite(pair.score) &&
+        (pair.severity === 'moderate' || pair.severity === 'strong'),
+    )
+  const metricsAreValid = hasFiniteFields(manifest.metrics, [
+    'maeDb',
+    'rmseDb',
+    'maxAbsDb',
+    'maxAbsFrequencyHz',
+  ])
+  const targetAchieved = metricsAreValid &&
+    (manifest.metrics as RunManifestV2['metrics']).rmseDb <= 0.25 &&
+    (manifest.metrics as RunManifestV2['metrics']).maxAbsDb <= 0.75
+
+  return (
+    manifest.schemaVersion === 3 &&
+    manifest.algorithmVersion === 'standard-v2' &&
+    manifest.profile === 'Standard' &&
+    Number.isFinite(manifest.sampleRateHz) &&
+    (manifest.sampleRateHz as number) > 0 &&
+    Number.isInteger(manifest.fitPointsPerOctave) &&
+    (manifest.fitPointsPerOctave as number) > 0 &&
+    isValidSettings(manifest.autoeqSettings) &&
+    isValidNormalization(manifest.normalization) &&
+    typeof manifest.sourceName === 'string' &&
+    typeof manifest.targetName === 'string' &&
+    algorithmParametersAreValid &&
+    Array.isArray(manifest.finalFilters) &&
+    manifest.finalFilters.length <= AUTOEQ_PRODUCT_LIMITS.hardMaxFilters &&
+    manifest.finalFilters.every(isValidFilter) &&
+    new Set(manifest.finalFilters.map(({ id }) => id)).size === manifest.finalFilters.length &&
+    metricsAreValid &&
+    Number.isFinite(manifest.preampDb) &&
+    auditIsValid &&
+    (manifest.terminationReason === 'target-reached' ||
+      manifest.terminationReason === 'converged' ||
+      manifest.terminationReason === 'time-limit') &&
+    typeof manifest.targetAchieved === 'boolean' &&
+    manifest.targetAchieved === targetAchieved &&
+    (manifest.terminationReason !== 'target-reached' || manifest.targetAchieved)
+  )
+}
+
+function isValidRunManifest(manifest: unknown): manifest is RunManifest {
+  return isValidRunManifestV1(manifest) || isValidRunManifestV2(manifest)
+}
+
 function canonicalizeRunManifest(
   manifest: DeepReadonly<RunManifest> | RunManifest,
 ): RunManifest {
+  if (manifest.algorithmVersion === 'standard-v2') {
+    return {
+      schemaVersion: 3,
+      algorithmVersion: 'standard-v2',
+      profile: 'Standard',
+      sampleRateHz: manifest.sampleRateHz,
+      fitPointsPerOctave: manifest.fitPointsPerOctave,
+      autoeqSettings: { ...manifest.autoeqSettings },
+      normalization: { ...manifest.normalization },
+      sourceName: manifest.sourceName,
+      targetName: manifest.targetName,
+      algorithmParameters: {
+        ...manifest.algorithmParameters,
+        pkQScaleMultipliers: [...manifest.algorithmParameters.pkQScaleMultipliers] as [0.5, 1, 2],
+      },
+      finalFilters: manifest.finalFilters.map(cloneFilter),
+      metrics: { ...manifest.metrics },
+      preampDb: manifest.preampDb,
+      cancellationAudit: {
+        pairs: manifest.cancellationAudit.pairs.map((pair) => ({ ...pair })),
+        totalScore: manifest.cancellationAudit.totalScore,
+      },
+      terminationReason: manifest.terminationReason,
+      targetAchieved: manifest.targetAchieved,
+    }
+  }
   return {
     schemaVersion: 2,
     algorithmVersion: 'standard-v1',
@@ -323,8 +448,11 @@ function areNormalizationsEqual(left: Normalization, right: Normalization): bool
   )
 }
 
-function areAutoEqSettingsEqual(left: AutoEqSettings, right: AutoEqSettings): boolean {
-  return (
+function areAutoEqSettingsEqual(
+  left: AutoEqSettings,
+  right: AutoEqSettings | AutoEqSettingsV1,
+): boolean {
+  const historicalFieldsEqual = (
     left.minFrequencyHz === right.minFrequencyHz &&
     left.maxFrequencyHz === right.maxFrequencyHz &&
     left.minGainDb === right.minGainDb &&
@@ -333,6 +461,8 @@ function areAutoEqSettingsEqual(left: AutoEqSettings, right: AutoEqSettings): bo
     left.maxQ === right.maxQ &&
     left.maxFilters === right.maxFilters
   )
+  return historicalFieldsEqual &&
+    (!('timeLimitSeconds' in right) || left.timeLimitSeconds === right.timeLimitSeconds)
 }
 
 function areFiltersEqual(
@@ -354,13 +484,36 @@ function areFiltersEqual(
   })
 }
 
-export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSessionV1 {
+export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSessionV2 {
   if (!isRecord(input)) {
     throw new Error('Invalid Workbench session: expected JSON object.')
   }
 
-  if (input.schemaVersion !== WORKBENCH_SESSION_SCHEMA_VERSION) {
+  if (input.schemaVersion !== 1 && input.schemaVersion !== WORKBENCH_SESSION_SCHEMA_VERSION) {
     throw new Error('Invalid Workbench session: unsupported schema version.')
+  }
+
+  let autoeqSettings: AutoEqSettings
+  if (input.schemaVersion === 1) {
+    if (isRecord(input.autoeqSettings) && 'timeLimitSeconds' in input.autoeqSettings) {
+      if (!isValidSettings(input.autoeqSettings)) {
+        throw new Error('Invalid Workbench session: invalid AutoEQ settings.')
+      }
+      autoeqSettings = { ...input.autoeqSettings }
+    } else {
+      if (!isValidSettingsV1(input.autoeqSettings)) {
+        throw new Error('Invalid Workbench session: invalid AutoEQ settings.')
+      }
+      autoeqSettings = {
+        ...input.autoeqSettings,
+        timeLimitSeconds: DEFAULT_AUTOEQ_SETTINGS.timeLimitSeconds,
+      }
+    }
+  } else {
+    if (!isValidSettings(input.autoeqSettings)) {
+      throw new Error('Invalid Workbench session: invalid AutoEQ settings.')
+    }
+    autoeqSettings = { ...input.autoeqSettings }
   }
 
   if (!Array.isArray(input.curves)) {
@@ -406,10 +559,6 @@ export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSess
     throw new Error('Invalid Workbench session: invalid normalization parameters.')
   }
 
-  if (!isValidSettings(input.autoeqSettings)) {
-    throw new Error('Invalid Workbench session: invalid AutoEQ settings.')
-  }
-
   if (!Array.isArray(input.filters)) {
     throw new Error('Invalid Workbench session: filters must be an array.')
   }
@@ -441,10 +590,19 @@ export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSess
 
   let autoEqRun: AutoEqRunRecord | null = null
   if (input.autoEqRun !== null) {
-    if (!isRecord(input.autoEqRun) || !isValidRunManifest(input.autoEqRun.manifest)) {
+    const manifestIsValid = isRecord(input.autoEqRun) && (
+      input.schemaVersion === 1
+        ? isValidRunManifestV1(input.autoEqRun.manifest)
+        : isValidRunManifest(input.autoEqRun.manifest)
+    )
+    if (!manifestIsValid) {
       throw new Error('Invalid Workbench session: invalid AutoEQ run record or manifest.')
     }
-    autoEqRun = { manifest: canonicalizeRunManifest(input.autoEqRun.manifest) }
+    autoEqRun = {
+      manifest: canonicalizeRunManifest(
+        (input.autoEqRun as { manifest: RunManifest }).manifest,
+      ),
+    }
   }
 
   if (provenance === null) {
@@ -479,7 +637,7 @@ export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSess
           'Invalid Workbench session: clean AutoEQ normalization does not match manifest normalization.',
         )
       }
-      if (!areAutoEqSettingsEqual(input.autoeqSettings as AutoEqSettings, autoEqRun.manifest.autoeqSettings)) {
+      if (!areAutoEqSettingsEqual(autoeqSettings, autoEqRun.manifest.autoeqSettings)) {
         throw new Error(
           'Invalid Workbench session: clean AutoEQ settings do not match manifest settings.',
         )
@@ -503,13 +661,7 @@ export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSess
       levelDb: input.normalization.levelDb,
     },
     autoeqSettings: {
-      minFrequencyHz: input.autoeqSettings.minFrequencyHz,
-      maxFrequencyHz: input.autoeqSettings.maxFrequencyHz,
-      minGainDb: input.autoeqSettings.minGainDb,
-      maxGainDb: input.autoeqSettings.maxGainDb,
-      minQ: input.autoeqSettings.minQ,
-      maxQ: input.autoeqSettings.maxQ,
-      maxFilters: input.autoeqSettings.maxFilters,
+      ...autoeqSettings,
     },
     filters: input.filters.map(cloneFilter),
     filterProvenance: provenance,
@@ -517,14 +669,14 @@ export function validateWorkbenchSession(input: unknown): ValidatedWorkbenchSess
     autoEqRun,
   }
 
-  return deepFreeze(session) as unknown as ValidatedWorkbenchSessionV1
+  return deepFreeze(session) as unknown as ValidatedWorkbenchSessionV2
 }
 
 export function serializeWorkbenchSession(
-  input: WorkbenchSessionV1 | ValidatedWorkbenchSessionV1,
+  input: WorkbenchSessionV1 | WorkbenchSessionV2 | ValidatedWorkbenchSessionV2,
 ): string {
   const validated = validateWorkbenchSession(input)
-  const stableObject: WorkbenchSessionV1 = {
+  const stableObject: WorkbenchSessionV2 = {
     schemaVersion: WORKBENCH_SESSION_SCHEMA_VERSION,
     curves: validated.curves.map(cloneCurve),
     activeFrId: validated.activeFrId,
@@ -541,7 +693,7 @@ export function serializeWorkbenchSession(
   return JSON.stringify(stableObject, null, 2) + '\n'
 }
 
-export function deserializeWorkbenchSession(text: string): ValidatedWorkbenchSessionV1 {
+export function deserializeWorkbenchSession(text: string): ValidatedWorkbenchSessionV2 {
   let parsed: unknown
   try {
     parsed = JSON.parse(text)
@@ -551,7 +703,7 @@ export function deserializeWorkbenchSession(text: string): ValidatedWorkbenchSes
   return validateWorkbenchSession(parsed)
 }
 
-export function createWorkbenchSessionFromWorkspace(state: WorkspaceState): ValidatedWorkbenchSessionV1 {
+export function createWorkbenchSessionFromWorkspace(state: WorkspaceState): ValidatedWorkbenchSessionV2 {
   return validateWorkbenchSession({
     schemaVersion: WORKBENCH_SESSION_SCHEMA_VERSION,
     curves: state.curves.map(cloneCurve),
@@ -574,9 +726,9 @@ export interface ImportSessionDependencies {
 }
 
 export function importWorkbenchSession(
-  input: string | WorkbenchSessionV1 | ValidatedWorkbenchSessionV1,
+  input: string | WorkbenchSessionV1 | WorkbenchSessionV2 | ValidatedWorkbenchSessionV2,
   deps: ImportSessionDependencies = {},
-): ValidatedWorkbenchSessionV1 {
+): ValidatedWorkbenchSessionV2 {
   const session = typeof input === 'string'
     ? deserializeWorkbenchSession(input)
     : validateWorkbenchSession(input)

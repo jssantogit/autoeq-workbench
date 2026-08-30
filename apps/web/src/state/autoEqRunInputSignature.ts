@@ -43,6 +43,7 @@ export function createAutoEqRunInputSignature(state: AutoEqRunSignatureState): s
       settings.minQ,
       settings.maxQ,
       settings.maxFilters,
+      settings.timeLimitSeconds,
     ],
   })
 }
