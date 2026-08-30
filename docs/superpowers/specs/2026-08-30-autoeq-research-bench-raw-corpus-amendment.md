@@ -120,3 +120,25 @@ Research Bench acceptance now requires:
 4. no separate sanitized desired-response file is required;
 5. the raw corpus is used only for research/benchmark code and is not shipped as a new product UI feature;
 6. the first implementation still does not retune or alter Standard v2 solver behavior.
+
+## 7. Current repository handoff state
+
+The four approved raw files are already committed on branch `research/autoeq-research-bench-design` under:
+
+```text
+packages/core/benchmarks/research/raw/Dunu Titan S2.txt
+packages/core/benchmarks/research/raw/Subtonic Storm [1].txt
+packages/core/benchmarks/research/raw/64 Audio U12t [1].txt
+packages/core/benchmarks/research/raw/64 Audio Trio [1].txt
+```
+
+Each file has 480 lines and was copied from the chat-uploaded source file without intentional numerical transformation.
+
+Implementation workers do **not** need access to the original chat VM or `/mnt/data`. Task 1 of the implementation plan should be interpreted as:
+
+1. verify the four already-committed raw files against the SHA-256 values above;
+2. rename/move them to the final repository-safe paths if desired;
+3. verify the same hashes again after any filename-only move;
+4. proceed to loader and research-case implementation.
+
+Do not replace the files with reconstructed, downloaded, interpolated, or hand-copied alternatives.
