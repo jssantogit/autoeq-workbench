@@ -1,7 +1,7 @@
 # AutoEQ Research Bench — Raw Corpus Amendment
 
-**Status:** approved amendment  
-**Date:** 2026-08-30  
+**Status:** approved amendment
+**Date:** 2026-08-30
 **Applies to:** `docs/superpowers/specs/2026-08-30-autoeq-research-bench-design.md`
 
 ## Authority

@@ -1,9 +1,9 @@
 # AutoEQ Workbench — Research Bench Design
 
-**Status:** approved design  
-**Date:** 2026-08-30  
-**Branch:** `research/autoeq-research-bench-design`  
-**Product baseline:** `7c9ebbbe6eefeb131c6c698055c737b429f5b0c6`  
+**Status:** approved design
+**Date:** 2026-08-30
+**Branch:** `research/autoeq-research-bench-design`
+**Product baseline:** `7c9ebbbe6eefeb131c6c698055c737b429f5b0c6`
 **Related design:** `docs/superpowers/specs/2026-08-29-autoeq-standard-v2-design.md`
 
 ## 1. Authority and scope
