@@ -15,7 +15,9 @@ export function isV2TargetAchieved(metrics: ErrorMetrics): boolean {
 }
 
 function normalizedViolation(metrics: ErrorMetrics): number {
-  return Math.max(metrics.rmseDb / 0.25, metrics.maxAbsDb / 0.75)
+  const normalizedRmse = metrics.rmseDb / 0.25
+  const normalizedMaxAbs = metrics.maxAbsDb / 0.75
+  return Math.hypot(normalizedRmse, normalizedMaxAbs)
 }
 
 function compareNumber(left: number, right: number): number {
