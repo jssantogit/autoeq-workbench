@@ -44,6 +44,7 @@ function bestCheckpointHistory(
 export function projectTimeline(
   checkpoints: readonly ResearchCheckpoint[],
   marksMs: readonly number[] = RESEARCH_TIMELINE_MARKS_MS,
+  maxElapsedMs = Number.POSITIVE_INFINITY,
 ): ResearchCheckpoint[] {
   const ordered = [...checkpoints].sort((left, right) => left.elapsedMs - right.elapsedMs)
   const projected: ResearchCheckpoint[] = []
@@ -51,6 +52,7 @@ export function projectTimeline(
   let best: ResearchCheckpoint | undefined
 
   for (const markMs of marksMs) {
+    if (markMs > maxElapsedMs) break
     while (checkpointIndex < ordered.length && ordered[checkpointIndex]!.elapsedMs <= markMs) {
       const candidate = ordered[checkpointIndex]!
       if (
