@@ -99,7 +99,7 @@ describe('research runner', () => {
 
     const row = await runResearchCell({
       caseId,
-      budgetSeconds: 15,
+      budgetSeconds: 5,
       maxFilters: 10,
       repeatIndex: 0,
       telemetryMode: 'light',
@@ -107,7 +107,7 @@ describe('research runner', () => {
       run: (input, runtime) => {
         expect(input.source).toEqual(expectedCases[0]!.source)
         expect(input.target).toEqual(expectedCases[0]!.target)
-        expect(input.settings).toMatchObject({ timeLimitSeconds: 15, maxFilters: 10 })
+        expect(input.settings).toMatchObject({ timeLimitSeconds: 5, maxFilters: 10 })
 
         const trace = runtime.researchTrace!
         trace.onBoundaryModeAttempt?.('half-height')
@@ -156,11 +156,12 @@ describe('research runner', () => {
       rmse075Ms: 1_800,
       jointTargetMs: 3_000,
     })
-    expect(row.timeline.slice(0, 4).map(({ elapsedMs, metrics }) => [elapsedMs, metrics.rmseDb])).toEqual([
+    expect(row.timeline.map(({ elapsedMs, metrics }) => [elapsedMs, metrics.rmseDb])).toEqual([
       [500, 1.2],
       [1_000, 0.8],
       [2_000, 0.4],
       [3_000, 0.2],
+      [5_000, 0.2],
     ])
   })
 })
