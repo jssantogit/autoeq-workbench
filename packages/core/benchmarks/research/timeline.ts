@@ -44,7 +44,7 @@ function bestCheckpointHistory(
 export function projectTimeline(
   checkpoints: readonly ResearchCheckpoint[],
   marksMs: readonly number[] = RESEARCH_TIMELINE_MARKS_MS,
-  maxElapsedMs = Number.POSITIVE_INFINITY,
+  maxElapsedMs = Math.max(0, ...checkpoints.map((checkpoint) => checkpoint.elapsedMs)),
 ): ResearchCheckpoint[] {
   const ordered = [...checkpoints].sort((left, right) => left.elapsedMs - right.elapsedMs)
   const projected: ResearchCheckpoint[] = []
