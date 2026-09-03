@@ -95,7 +95,7 @@ describe('research runner', () => {
     const caseId = 'titan-to-storm' as const
     const expectedCases = loadResearchCases()
     let clockIndex = 0
-    const clock = () => [0, 400, 900, 1_800, 3_000][clockIndex++] ?? 3_000
+    const clock = () => [0, 400, 900, 1_800, 3_000, 5_000][clockIndex++] ?? 5_000
 
     const row = await runResearchCell({
       caseId,
