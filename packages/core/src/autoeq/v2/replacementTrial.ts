@@ -1,4 +1,4 @@
-import type { ErrorMetrics } from '../../metrics/errorMetrics.js'
+import { calculateErrorMetrics, type ErrorMetrics } from '../../metrics/errorMetrics.js'
 import { CoreError } from '../../types/error.js'
 import type { Filter } from '../../types/filter.js'
 import type { V2EvaluatedSolution } from './jointRefine.js'
@@ -7,11 +7,16 @@ import {
   replaceV2ResponseCacheFilterWithResponse,
 } from './responseCache.js'
 
+export type V2ReplacementTrialMetrics = Pick<
+  ErrorMetrics,
+  'rmseDb' | 'maxAbsDb' | 'maxAbsFrequencyHz'
+>
+
 export interface V2ReplacementTrial {
   filterIndex: number
   replacement: Filter
   responseDb: number[]
-  metrics: ErrorMetrics
+  metrics: V2ReplacementTrialMetrics
 }
 
 export function evaluateV2ReplacementTrial(
@@ -31,7 +36,6 @@ export function evaluateV2ReplacementTrial(
     responseBuffer,
   )
   const oldResponse = solution.responseCache.filterResponsesDb[filterIndex]!
-  let absoluteSum = 0
   let squaredSum = 0
   let maxAbsDb = -1
   let maxAbsIndex = 0
@@ -44,7 +48,6 @@ export function evaluateV2ReplacementTrial(
       throw new CoreError('validation', 'Residual and frequency values must be finite')
     }
     const absolute = Math.abs(residualDb)
-    absoluteSum += absolute
     squaredSum += residualDb ** 2
     if (absolute > maxAbsDb) {
       maxAbsDb = absolute
@@ -52,9 +55,8 @@ export function evaluateV2ReplacementTrial(
     }
   }
 
-  const maeDb = absoluteSum / frequencies.length
   const rmseDb = Math.sqrt(squaredSum / frequencies.length)
-  if (![maeDb, rmseDb, maxAbsDb].every(Number.isFinite)) {
+  if (![rmseDb, maxAbsDb].every(Number.isFinite)) {
     throw new CoreError('numeric', 'Error metrics must be finite')
   }
 
@@ -63,7 +65,6 @@ export function evaluateV2ReplacementTrial(
     replacement,
     responseDb,
     metrics: {
-      maeDb,
       rmseDb,
       maxAbsDb,
       maxAbsFrequencyHz: frequencies[maxAbsIndex]!,
@@ -95,7 +96,7 @@ export function materializeV2ReplacementTrial(
     responseCache,
     cascadeDb: responseCache.cascadeDb,
     residualDb,
-    metrics: trial.metrics,
+    metrics: calculateErrorMetrics(residualDb, frequencies),
     cancellationAudit: solution.cancellationAudit,
   }
 }
