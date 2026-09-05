@@ -14,12 +14,8 @@ export function selectV2StagedContinuationCandidates<T extends V2Solution>(
 
   const bestViolation = normalizedViolation(sorted[0]!)
   const secondViolation = normalizedViolation(sorted[1]!)
-  const topTwoSpread = bestViolation > 0
-    ? secondViolation / bestViolation - 1
-    : 0
+  const keepThird = bestViolation > 0 &&
+    secondViolation >= bestViolation * (1 + V2_STAGED_THIRD_CONTINUATION_SPREAD)
 
-  return sorted.slice(
-    0,
-    topTwoSpread >= V2_STAGED_THIRD_CONTINUATION_SPREAD ? 3 : 2,
-  )
+  return sorted.slice(0, keepThird ? 3 : 2)
 }
