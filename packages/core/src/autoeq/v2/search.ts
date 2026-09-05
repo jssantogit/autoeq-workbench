@@ -15,6 +15,7 @@ import {
   type StandardV2ResearchTrace,
 } from './researchTrace.js'
 import type { StandardV2Deadline } from './runtime.js'
+import { selectV2StagedContinuationCandidates } from './stagedContinuation.js'
 
 export interface SearchInput {
   desiredDb: readonly number[]
@@ -202,7 +203,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       }
       if (expired) break
 
-      for (const fast of [...fastStaged].sort(compareV2Solutions).slice(0, 3)) {
+      for (const fast of selectV2StagedContinuationCandidates(fastStaged)) {
         if (input.deadline.isExpired()) {
           expired = true
           break
