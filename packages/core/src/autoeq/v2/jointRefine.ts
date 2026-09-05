@@ -3,7 +3,12 @@ import type { BiquadResponseGrid } from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
 import { auditCancellationsOnGrid } from '../cancellation.js'
 import type { StandardAutoEqV2Config } from './config.js'
-import { compareV2PrimaryMetrics, compareV2Solutions, type V2Solution } from './ranking.js'
+import {
+  calculateV2NormalizedViolation,
+  compareV2PrimaryMetrics,
+  compareV2Solutions,
+  type V2Solution,
+} from './ranking.js'
 import {
   createV2ResponseCache,
   type V2ResponseCache,
@@ -13,7 +18,10 @@ import {
   materializeV2ReplacementTrial,
 } from './replacementTrial.js'
 import {
+  createV2SolutionKey,
   withResearchTracePhase,
+  type StandardV2JointRefineContext,
+  type StandardV2JointRefineCycle,
   type StandardV2ResearchTrace,
 } from './researchTrace.js'
 import type { StandardV2Deadline } from './runtime.js'
@@ -37,6 +45,7 @@ export interface JointRefineInput {
   config: StandardAutoEqV2Config
   deadline: StandardV2Deadline
   researchTrace?: StandardV2ResearchTrace
+  researchContext?: StandardV2JointRefineContext
 }
 
 export interface JointRefineResult {
@@ -106,6 +115,9 @@ export function jointRefineV2(
       )
   const responseBuffer = new Array<number>(input.frequencies.length)
   const validAudits = new WeakSet<V2EvaluatedSolution>([solution])
+  const cycles: StandardV2JointRefineCycle[] = []
+  let cycleStartingSolution: V2EvaluatedSolution | undefined
+  let cycleTrialStart = 0
   const withCancellationAudit = (candidate: V2EvaluatedSolution): V2EvaluatedSolution => {
     if (validAudits.has(candidate)) return candidate
     trace?.onCancellationAuditComputed?.()
@@ -119,9 +131,44 @@ export function jointRefineV2(
     validAudits.add(audited)
     return audited
   }
+  const recordCycle = (completed: boolean): void => {
+    if (cycleStartingSolution === undefined) return
+    cycles.push({
+      cycleIndex: cycles.length + 1,
+      completed,
+      coordinateTrials: coordinateTrials - cycleTrialStart,
+      startMetrics: { ...cycleStartingSolution.metrics },
+      endMetrics: { ...solution.metrics },
+      normalizedViolationGain:
+        calculateV2NormalizedViolation(cycleStartingSolution.metrics) -
+        calculateV2NormalizedViolation(solution.metrics),
+    })
+    cycleStartingSolution = undefined
+  }
   const finish = (expired: boolean): JointRefineResult => {
+    recordCycle(false)
     solution = withCancellationAudit(solution)
     input.researchTrace?.onJointRefineCompleted?.(coordinateTrials)
+    if (input.researchTrace && input.researchContext) {
+      input.researchTrace.onJointRefineTrace?.({
+        ...input.researchContext,
+        parentMetrics: { ...input.researchContext.parentMetrics },
+        candidate: {
+          ...input.researchContext.candidate,
+          filter: { ...input.researchContext.candidate.filter },
+        },
+        resultKey: createV2SolutionKey(solution.filters),
+        resultMetrics: { ...solution.metrics },
+        cycles: cycles.map((cycle) => ({
+          ...cycle,
+          startMetrics: { ...cycle.startMetrics },
+          endMetrics: { ...cycle.endMetrics },
+        })),
+        completedCycles,
+        coordinateTrials,
+        expired,
+      })
+    }
     return { solution, completedCycles, coordinateTrials, expired }
   }
   let completedCycles = 0
@@ -131,7 +178,8 @@ export function jointRefineV2(
     if (input.deadline.isExpired()) {
       return finish(true)
     }
-    const cycleStart = solution
+    cycleStartingSolution = solution
+    cycleTrialStart = coordinateTrials
     for (const scale of JOINT_REFINEMENT_SCALES) {
       for (let filterIndex = 0; filterIndex < solution.filters.length; filterIndex += 1) {
         const startingFilter = solution.filters[filterIndex]!
@@ -202,12 +250,14 @@ export function jointRefineV2(
         }
       }
     }
+    const completedCycleStart = cycleStartingSolution
     completedCycles += 1
-    const primaryComparison = compareV2PrimaryMetrics(solution.metrics, cycleStart.metrics)
+    recordCycle(true)
+    const primaryComparison = compareV2PrimaryMetrics(solution.metrics, completedCycleStart!.metrics)
     if (primaryComparison > 0) break
     if (primaryComparison === 0) {
       solution = withCancellationAudit(solution)
-      if (compareV2Solutions(solution, withCancellationAudit(cycleStart)) >= 0) break
+      if (compareV2Solutions(solution, withCancellationAudit(completedCycleStart!)) >= 0) break
     }
   }
   return finish(false)

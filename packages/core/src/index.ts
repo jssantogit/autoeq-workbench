@@ -38,6 +38,7 @@ export {
 } from './autoeq/v2/config.js'
 export type { StandardAutoEqV2Config } from './autoeq/v2/config.js'
 export {
+  calculateV2NormalizedViolation,
   compareV2DeliverableQuality,
   compareV2Solutions,
   isV2TargetAchieved,
@@ -53,6 +54,13 @@ export type {
   StandardV2Runtime,
 } from './autoeq/v2/runtime.js'
 export type {
+  StandardV2JointRefineCandidate,
+  StandardV2JointRefineContext,
+  StandardV2JointRefineCycle,
+  StandardV2JointRefineOrigin,
+  StandardV2JointRefineRecord,
+  StandardV2JointRefineRetention,
+  StandardV2JointRefineRetentionStage,
   StandardV2ResearchPhase,
   StandardV2ResearchTrace,
   StandardV2SafeCheckpoint,

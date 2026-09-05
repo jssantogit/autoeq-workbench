@@ -8,10 +8,17 @@ import {
 } from './candidates.js'
 import type { StandardAutoEqV2Config } from './config.js'
 import { evaluateV2Solution, jointRefineV2, type V2EvaluatedSolution } from './jointRefine.js'
-import { compareV2Solutions, type V2Solution } from './ranking.js'
+import {
+  calculateV2NormalizedViolation,
+  compareV2Solutions,
+  type V2Solution,
+} from './ranking.js'
 import { appendV2ResponseCacheFilter } from './responseCache.js'
 import {
+  createV2FilterKey,
+  createV2SolutionKey,
   withResearchTracePhase,
+  type StandardV2JointRefineContext,
   type StandardV2ResearchTrace,
 } from './researchTrace.js'
 import type { StandardV2Deadline } from './runtime.js'
@@ -37,7 +44,7 @@ export interface SearchResult {
 }
 
 function violation(solution: V2Solution): number {
-  return Math.max(solution.metrics.rmseDb / 0.25, solution.metrics.maxAbsDb / 0.75)
+  return calculateV2NormalizedViolation(solution.metrics)
 }
 
 export function retainV2SearchPaths<T extends V2Solution>(
@@ -119,8 +126,28 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
   let best = zero
   let peakWorkingFilterCount = 0
   let jointRefinementCount = 0
+  let refinementSequence = 0
+  const hasDetailedJointTrace = input.researchTrace?.onJointRefineTrace !== undefined
+  const notifyActiveRetention = (
+    refinements: readonly { solution: V2EvaluatedSolution; traceId: string }[],
+    retainedSolutions: readonly V2EvaluatedSolution[],
+  ): void => {
+    if (!hasDetailedJointTrace) return
+    const retained = new Set(retainedSolutions)
+    for (const refinement of refinements) {
+      input.researchTrace?.onJointRefineRetention?.({
+        traceId: refinement.traceId,
+        stage: 'active',
+        retained: retained.has(refinement.solution),
+      })
+    }
+  }
   while (active.some((path) => path.filters.length < input.config.workingMaxFilters)) {
     const expanded: V2EvaluatedSolution[] = []
+    const refinedForRetention: Array<{
+      solution: V2EvaluatedSolution
+      traceId: string
+    }> = []
     let mainPathImproved = false
     let expired = false
     for (let pathIndex = 0; pathIndex < active.length; pathIndex += 1) {
@@ -138,21 +165,56 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
         }), input.researchTrace),
       )
       const appendedCandidates: V2EvaluatedSolution[] = []
+      const appendedContexts = new WeakMap<V2EvaluatedSolution, StandardV2JointRefineContext>()
       for (const candidate of shortlist) {
         if (input.deadline.isExpired()) {
           expired = true
           break
         }
-        appendedCandidates.push(appendCandidate(
+        const appended = appendCandidate(
           path,
           candidateFilter(candidate, path.filters.length),
           input,
-        ))
+        )
+        appendedCandidates.push(appended)
+        if (hasDetailedJointTrace) {
+          const appendedFilter = appended.filters.at(-1)!
+          appendedContexts.set(appended, {
+            traceId: `search:${input.boundaryMode}:${++refinementSequence}`,
+            origin: 'search',
+            boundaryMode: input.boundaryMode,
+            parentKey: createV2SolutionKey(path.filters),
+            parentFilterCount: path.filters.length,
+            parentMetrics: { ...path.metrics },
+            candidateKey: createV2FilterKey(appendedFilter),
+            candidate: {
+              filter: { ...appendedFilter },
+              featureIndex: candidate.featureIndex,
+              boundaryMode: candidate.boundaryMode ?? null,
+              qScale: candidate.qScale,
+              cheapScore: candidate.cheapScore,
+            },
+            refinementKey: createV2SolutionKey(appended.filters),
+          })
+        }
       }
       if (expired) break
 
       const rankedAppended = [...appendedCandidates].sort(compareV2Solutions)
       const staged = retainV2SearchPaths(rankedAppended, false)
+      if (hasDetailedJointTrace) {
+        const stagedSet = new Set(staged)
+        for (const appended of appendedCandidates) {
+          const context = appendedContexts.get(appended)
+          if (context !== undefined) {
+            input.researchTrace?.onJointRefineRetention?.({
+              traceId: context.traceId,
+              stage: 'parent',
+              retained: stagedSet.has(appended),
+            })
+          }
+        }
+      }
       const stagedSet = new Set(staged)
       const deferred = rankedAppended.filter((candidate) => !stagedSet.has(candidate))
       let stagedImproved = false
@@ -165,6 +227,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
             break
           }
           jointRefinementCount += 1
+          const researchContext = appendedContexts.get(appended)
           const refined = jointRefineV2({
             solution: appended,
             desiredDb: input.desiredDb,
@@ -172,7 +235,14 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
             config: input.config,
             deadline: input.deadline,
             researchTrace: input.researchTrace,
+            researchContext,
           })
+          if (researchContext !== undefined) {
+            refinedForRetention.push({
+              solution: refined.solution,
+              traceId: researchContext.traceId,
+            })
+          }
           if (compareV2Solutions(refined.solution, path) < 0) {
             expanded.push(refined.solution)
             if (refined.solution.filters.length > peakWorkingFilterCount) {
@@ -197,6 +267,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       if (expired) break
     }
     if (expired) {
+      notifyActiveRetention(refinedForRetention, [])
       return {
         bestSolution: best,
         activeSolutions: active,
@@ -206,6 +277,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       }
     }
     if (expanded.length === 0) {
+      notifyActiveRetention(refinedForRetention, [])
       return {
         bestSolution: best,
         activeSolutions: active,
@@ -215,6 +287,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       }
     }
     active = retainV2NextActivePaths(active, expanded, mainPathImproved)
+    notifyActiveRetention(refinedForRetention, active)
     for (const checkpoint of active) {
       input.researchTrace?.onWorkingCheckpoint?.()
       input.onWorkingSolution?.(checkpoint)

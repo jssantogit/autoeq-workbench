@@ -18,7 +18,7 @@ import {
   isV2TargetAchieved,
 } from './ranking.js'
 import { createStandardV2DeadlineWindow, type StandardV2Runtime } from './runtime.js'
-import { withResearchTracePhase } from './researchTrace.js'
+import { createV2SolutionKey, withResearchTracePhase } from './researchTrace.js'
 import {
   searchStandardV2WorkingSolutions,
   type SearchResult,
@@ -72,17 +72,22 @@ export function runStandardAutoEqV2(
     filters: [], desiredDb, frequencies, config, deadline: hardDeadline,
     researchTrace: runtime.researchTrace,
   })
-  const emitBestDeliverable = (): void => {
-    runtime.researchTrace?.onBestDeliverableUpdated?.({
+  const emitBestDeliverable = (sourceSolutionKey?: string): void => {
+    const checkpoint = {
       metrics: { ...bestDeliverable.metrics },
       filters: bestDeliverable.filters.map((filter) => ({ ...filter })),
       preampDb: bestDeliverable.preampDb,
-    })
+      ...(sourceSolutionKey === undefined ? {} : { sourceSolutionKey }),
+    }
+    runtime.researchTrace?.onBestDeliverableUpdated?.(checkpoint)
   }
-  const retainDeliverable = (candidate: V2Deliverable): void => {
+  const retainDeliverable = (
+    candidate: V2Deliverable,
+    sourceSolutionKey?: string,
+  ): void => {
     if (compareV2DeliverableQuality(candidate, bestDeliverable) < 0) {
       bestDeliverable = candidate
-      emitBestDeliverable()
+      emitBestDeliverable(sourceSolutionKey)
     }
   }
   emitBestDeliverable()
@@ -96,7 +101,9 @@ export function runStandardAutoEqV2(
     })
     const previous = bestDeliverable
     bestDeliverable = compressed.deliverable
-    if (compareV2Solutions(bestDeliverable, previous) < 0) emitBestDeliverable()
+    if (compareV2Solutions(bestDeliverable, previous) < 0) {
+      emitBestDeliverable(compressed.sourceSolutionKey)
+    }
     terminationReason = compressed.completed ? 'target-reached' : 'time-limit'
   } else {
     let searchTermination: SearchResult['termination'] = 'converged'
@@ -133,7 +140,7 @@ export function runStandardAutoEqV2(
           modeBestCheckpoint.deliverable = checkpoint
           modeBestCheckpoint.source = solution
         }
-        retainDeliverable(checkpoint)
+        retainDeliverable(checkpoint, createV2SolutionKey(solution.filters))
       }
 
       const search = searchStandardV2WorkingSolutions({
@@ -173,7 +180,7 @@ export function runStandardAutoEqV2(
             fallbackOnExpiration: bestDeliverable,
             researchTrace: runtime.researchTrace,
           })
-          retainDeliverable(deliverable)
+          retainDeliverable(deliverable, createV2SolutionKey(source.filters))
           if (isV2TargetAchieved(bestDeliverable.metrics)) break
         }
       }
@@ -191,7 +198,9 @@ export function runStandardAutoEqV2(
       })
       const previous = bestDeliverable
       bestDeliverable = compressed.deliverable
-      if (compareV2Solutions(bestDeliverable, previous) < 0) emitBestDeliverable()
+      if (compareV2Solutions(bestDeliverable, previous) < 0) {
+        emitBestDeliverable(compressed.sourceSolutionKey)
+      }
       terminationReason = compressed.completed ? 'target-reached' : 'time-limit'
     } else {
       terminationReason = searchTermination === 'time-limit' || hardDeadline.isExpired()

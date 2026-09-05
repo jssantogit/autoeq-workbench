@@ -164,6 +164,7 @@ export function renderResearchArtifacts(input: ResearchReportInput): ResearchArt
       repeatIndex: run.repeatIndex,
       counters: run.counters,
       phaseTimingMs: run.phaseTimingMs,
+      jointRefinements: run.jointRefinements ?? [],
     }))
 
   return {

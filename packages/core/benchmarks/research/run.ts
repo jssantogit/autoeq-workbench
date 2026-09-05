@@ -337,6 +337,7 @@ export async function runResearchCell(
     filters: result.filters.map((filter) => ({ ...filter })),
     telemetryMode: snapshot.mode,
     phaseTimingMs: snapshot.phaseTimingMs,
+    ...(snapshot.mode === 'deep' ? { jointRefinements: snapshot.jointRefinements } : {}),
   }
 }
 

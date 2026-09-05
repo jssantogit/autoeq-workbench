@@ -12,6 +12,7 @@ import {
   type Filter,
   type StandardAutoEqV2Config,
   type StandardV2Deadline,
+  type StandardV2JointRefineRecord,
 } from '../../../src/index.js'
 
 const frequencies = [100, 200, 400, 800, 1_000, 1_200, 1_600, 3_200, 6_400]
@@ -195,5 +196,62 @@ describe('Standard v2 joint refinement', () => {
     expect(result.expired).toBe(true)
     expect(result.coordinateTrials).toBe(2)
     expect(result.solution.filters).toEqual(start.filters)
+  })
+
+  it('traces the parent, candidate, cycles, and final refinement state', () => {
+    const desiredDb = evaluateV2Solution([desiredFilter], [], frequencies, config.sampleRateHz)
+      .cascadeDb
+    const start = evaluateV2Solution([
+      { ...desiredFilter, frequencyHz: 900, gainDb: 2.5 },
+    ], desiredDb, frequencies, config.sampleRateHz)
+    const records: StandardV2JointRefineRecord[] = []
+
+    const result = jointRefineV2({
+      solution: start,
+      desiredDb,
+      frequencies,
+      config: {
+        ...config,
+        algorithm: { ...config.algorithm, maxJointRefinementCycles: 1 },
+      } as unknown as StandardAutoEqV2Config,
+      deadline: { isExpired: () => false },
+      researchContext: {
+        traceId: 'search:1',
+        origin: 'search',
+        boundaryMode: 'sign-crossing',
+        parentKey: 'parent',
+        parentFilterCount: start.filters.length,
+        parentMetrics: { ...start.metrics },
+        candidateKey: 'candidate',
+        candidate: {
+          filter: { ...desiredFilter },
+          featureIndex: 2,
+          boundaryMode: 'sign-crossing',
+          qScale: 1,
+          cheapScore: 4,
+        },
+        refinementKey: 'state',
+      },
+      researchTrace: {
+        onJointRefineTrace: (record) => { records.push(record) },
+      },
+    })
+
+    expect(records).toHaveLength(1)
+    expect(records[0]).toMatchObject({
+      traceId: 'search:1',
+      origin: 'search',
+      parentKey: 'parent',
+      candidateKey: 'candidate',
+      refinementKey: 'state',
+      resultKey: expect.any(String),
+      completedCycles: result.completedCycles,
+      coordinateTrials: result.coordinateTrials,
+      expired: false,
+    })
+    expect(records[0]!.cycles).toHaveLength(result.completedCycles)
+    expect(records[0]!.cycles.reduce((sum, cycle) => sum + cycle.coordinateTrials, 0))
+      .toBe(result.coordinateTrials)
+    expect(records[0]!.cycles[0]!.normalizedViolationGain).toBeGreaterThanOrEqual(0)
   })
 })

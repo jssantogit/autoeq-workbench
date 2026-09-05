@@ -18,7 +18,10 @@ import {
   type V2ResponseCache,
 } from './responseCache.js'
 import {
+  createV2FilterKey,
+  createV2SolutionKey,
   withResearchTracePhase,
+  type StandardV2JointRefineContext,
   type StandardV2ResearchTrace,
 } from './researchTrace.js'
 import type { StandardV2Deadline } from './runtime.js'
@@ -46,6 +49,7 @@ export interface CompressDeliverableV2Result {
   deliverable: V2Deliverable
   completed: boolean
   expired: boolean
+  sourceSolutionKey?: string
 }
 
 type V2RemovalCandidate = Omit<V2EvaluatedSolution, 'cancellationAudit'> & {
@@ -244,15 +248,24 @@ export function compressDeliverableV2(
 ): CompressDeliverableV2Result {
   return withResearchTracePhase(input.researchTrace, 'compression', () => {
     let deliverable = input.deliverable
+    let sourceSolutionKey: string | undefined
+    let compressionRefinementSequence = 0
+    const hasDetailedJointTrace = input.researchTrace?.onJointRefineTrace !== undefined
+    const result = (completed: boolean, expired: boolean): CompressDeliverableV2Result => ({
+      deliverable,
+      completed,
+      expired,
+      ...(sourceSolutionKey === undefined ? {} : { sourceSolutionKey }),
+    })
     if (!isV2TargetAchieved(deliverable.metrics)) {
-      return { deliverable, completed: true, expired: false }
+      return result(true, false)
     }
 
     while (deliverable.filters.length > 0) {
       const removals: Array<{ index: number; solution: V2EvaluatedSolution }> = []
       for (let index = 0; index < deliverable.filters.length; index += 1) {
         if (input.deadline.isExpired()) {
-          return { deliverable, completed: false, expired: true }
+          return result(false, true)
         }
         input.researchTrace?.onCompressionRemovalTrial?.()
         removals.push({
@@ -271,8 +284,27 @@ export function compressDeliverableV2(
       let accepted: V2Deliverable | null = null
       for (const removal of removals) {
         if (input.deadline.isExpired()) {
-          return { deliverable, completed: false, expired: true }
+          return result(false, true)
         }
+        const removedFilter = deliverable.filters[removal.index]!
+        const researchContext: StandardV2JointRefineContext | undefined = hasDetailedJointTrace
+          ? {
+              traceId: `compression:${++compressionRefinementSequence}`,
+              origin: 'compression',
+              parentKey: createV2SolutionKey(deliverable.filters),
+              parentFilterCount: deliverable.filters.length,
+              parentMetrics: { ...deliverable.metrics },
+              candidateKey: createV2FilterKey(removedFilter),
+              candidate: {
+                filter: { ...removedFilter },
+                featureIndex: null,
+                boundaryMode: null,
+                qScale: null,
+                cheapScore: null,
+              },
+              refinementKey: createV2SolutionKey(removal.solution.filters),
+            }
+          : undefined
         const refined = jointRefineV2({
           solution: removal.solution,
           desiredDb: input.desiredDb,
@@ -280,8 +312,9 @@ export function compressDeliverableV2(
           config: input.config,
           deadline: input.deadline,
           researchTrace: input.researchTrace,
+          researchContext,
         })
-        if (refined.expired) return { deliverable, completed: false, expired: true }
+        if (refined.expired) return result(false, true)
         const candidate = buildDeliverableV2({
           filters: refined.solution.filters,
           desiredDb: input.desiredDb,
@@ -292,16 +325,19 @@ export function compressDeliverableV2(
           fallbackOnExpiration: deliverable,
         })
         if (input.deadline.isExpired()) {
-          return { deliverable, completed: false, expired: true }
+          return result(false, true)
         }
         if (isV2TargetAchieved(candidate.metrics)) {
           accepted = candidate
+          if (researchContext !== undefined) {
+            sourceSolutionKey = createV2SolutionKey(refined.solution.filters)
+          }
           break
         }
       }
-      if (accepted === null) return { deliverable, completed: true, expired: false }
+      if (accepted === null) return result(true, false)
       deliverable = accepted
     }
-    return { deliverable, completed: true, expired: false }
+    return result(true, false)
   })
 }

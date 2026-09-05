@@ -4,10 +4,15 @@ import {
   DEFAULT_AUTOEQ_SETTINGS,
   createEvaluationGrid,
   runStandardAutoEqV2,
+  type ErrorMetrics,
+  type Filter,
   type Curve,
   type StandardAutoEqInputV2,
+  type StandardV2JointRefineRecord,
   type StandardV2ResearchTrace,
 } from '../../../../src/index.js'
+
+import { createResearchTelemetry } from '../../../../benchmarks/research/telemetry.js'
 
 function researchInput(): StandardAutoEqInputV2 {
   const frequencies = createEvaluationGrid()
@@ -67,6 +72,14 @@ function createCountingTestTrace(): {
       onDeliverableBuilt: () => {
         deliverablesBuilt += 1
       },
+      onJointRefineTrace: (record) => {
+        record.parentMetrics.rmseDb = Number.POSITIVE_INFINITY
+        record.candidate.filter.gainDb = Number.POSITIVE_INFINITY
+        for (const cycle of record.cycles) {
+          cycle.startMetrics.maxAbsDb = Number.POSITIVE_INFINITY
+        }
+      },
+      onJointRefineRetention: () => {},
     },
     snapshot: () => ({
       bestDeliverableUpdates,
@@ -97,4 +110,100 @@ describe('Standard v2 research trace', () => {
     expect(counters.snapshot().workingCheckpoints).toBeGreaterThan(0)
     expect(counters.snapshot().deliverablesBuilt).toBeGreaterThan(0)
   }, 30_000)
+
+  it('records causal joint-refinement outcomes and exact duplicate states', () => {
+    const metrics = (rmseDb: number, maxAbsDb: number): ErrorMetrics => ({
+      maeDb: rmseDb / 2,
+      rmseDb,
+      maxAbsDb,
+      maxAbsFrequencyHz: 1_000,
+    })
+    const candidate: Filter = {
+      id: 'candidate',
+      enabled: true,
+      type: 'PK',
+      frequencyHz: 1_000,
+      gainDb: 2,
+      q: 1.5,
+    }
+    const cycle = {
+      cycleIndex: 1,
+      completed: true,
+      coordinateTrials: 3,
+      startMetrics: metrics(1, 2),
+      endMetrics: metrics(0.8, 1.6),
+      normalizedViolationGain: 0.4,
+    }
+    const record = (traceId: string, resultKey: string): StandardV2JointRefineRecord => ({
+      traceId,
+      origin: 'search',
+      boundaryMode: 'sign-crossing',
+      parentKey: 'parent',
+      parentFilterCount: 1,
+      parentMetrics: metrics(1.2, 2.4),
+      candidateKey: 'candidate',
+      candidate: {
+        filter: { ...candidate },
+        featureIndex: 4,
+        boundaryMode: 'sign-crossing',
+        qScale: 1,
+        cheapScore: 12,
+      },
+      refinementKey: 'same-state',
+      resultKey,
+      resultMetrics: metrics(0.8, 1.6),
+      cycles: [{
+        ...cycle,
+        startMetrics: { ...cycle.startMetrics },
+        endMetrics: { ...cycle.endMetrics },
+      }],
+      completedCycles: 1,
+      coordinateTrials: 3,
+      expired: false,
+    })
+
+    const telemetry = createResearchTelemetry({ mode: 'deep', nowMs: () => 0 })
+    const first = record('search:1', 'result')
+    telemetry.trace.onJointRefineTrace?.(first)
+    first.candidate.filter.gainDb = 999
+    telemetry.trace.onJointRefineRetention?.({
+      traceId: 'search:1', stage: 'parent', retained: true,
+    })
+    telemetry.trace.onJointRefineRetention?.({
+      traceId: 'search:1', stage: 'active', retained: true,
+    })
+    telemetry.trace.onBestDeliverableUpdated?.({
+      metrics: metrics(0.8, 1.6),
+      filters: [{ ...candidate }],
+      preampDb: 0,
+      sourceSolutionKey: 'result',
+    })
+    telemetry.trace.onJointRefineRetention?.({
+      traceId: 'search:3', stage: 'parent', retained: true,
+    })
+    telemetry.trace.onJointRefineTrace?.(record('search:2', 'result-2'))
+    telemetry.trace.onJointRefineTrace?.(record('search:3', 'result-3'))
+
+    const snapshot = telemetry.snapshot()
+    expect(snapshot.jointRefinements).toHaveLength(3)
+    expect(snapshot.jointRefinements[0]).toMatchObject({
+      traceId: 'search:1',
+      equivalentStateAlreadyPaid: false,
+      survivedParentRetention: true,
+      survivedActivePathRetention: true,
+      contributedToBestDeliverable: true,
+    })
+    expect(snapshot.jointRefinements[0]!.candidate.filter.gainDb).toBe(2)
+    expect(snapshot.jointRefinements[1]).toMatchObject({
+      traceId: 'search:2',
+      equivalentStateAlreadyPaid: true,
+      survivedParentRetention: false,
+      survivedActivePathRetention: false,
+      contributedToBestDeliverable: false,
+    })
+    expect(snapshot.jointRefinements[2]).toMatchObject({
+      traceId: 'search:3',
+      survivedParentRetention: true,
+    })
+  })
 })

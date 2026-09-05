@@ -2,7 +2,10 @@ import type { Curve } from '../../src/types/curve.js'
 import type { ErrorMetrics } from '../../src/metrics/errorMetrics.js'
 import type { BandMetric } from '../../src/metrics/bandMetrics.js'
 import type { Filter } from '../../src/types/filter.js'
-import type { StandardV2ResearchPhase } from '../../src/autoeq/v2/researchTrace.js'
+import type {
+  StandardV2JointRefineRecord,
+  StandardV2ResearchPhase,
+} from '../../src/autoeq/v2/researchTrace.js'
 
 export type ResearchCaseId = 'titan-to-storm' | 'titan-to-u12t' | 'titan-to-trio'
 
@@ -59,8 +62,16 @@ export interface ResearchTelemetrySnapshot {
   mode: 'light' | 'deep'
   counters: StandardV2ResearchCounters
   checkpoints: ResearchCheckpoint[]
+  jointRefinements: ResearchJointRefineRecord[]
   phaseTimingMs: StandardV2ResearchPhaseTimingMs
   phasesObserved: StandardV2ResearchPhase[]
+}
+
+export interface ResearchJointRefineRecord extends StandardV2JointRefineRecord {
+  equivalentStateAlreadyPaid: boolean
+  survivedParentRetention: boolean
+  survivedActivePathRetention: boolean
+  contributedToBestDeliverable: boolean
 }
 
 export type ResearchTerminationReason = 'target-reached' | 'converged' | 'time-limit'
@@ -90,6 +101,7 @@ export interface ResearchRunRow {
   filters: Filter[]
   telemetryMode: 'light' | 'deep'
   phaseTimingMs: StandardV2ResearchPhaseTimingMs
+  jointRefinements?: ResearchJointRefineRecord[]
 }
 
 export interface ResearchAggregateRow {

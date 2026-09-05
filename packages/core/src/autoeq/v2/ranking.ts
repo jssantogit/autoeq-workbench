@@ -14,7 +14,7 @@ export function isV2TargetAchieved(metrics: ErrorMetrics): boolean {
   return metrics.rmseDb <= 0.25 && metrics.maxAbsDb <= 0.75
 }
 
-function normalizedViolation(metrics: ErrorMetrics): number {
+export function calculateV2NormalizedViolation(metrics: ErrorMetrics): number {
   return Math.max(metrics.rmseDb / 0.25, metrics.maxAbsDb / 0.75)
 }
 
@@ -27,7 +27,7 @@ function compareNumber(left: number, right: number): number {
 }
 
 export function compareV2PrimaryMetrics(left: ErrorMetrics, right: ErrorMetrics): number {
-  return compareNumber(normalizedViolation(left), normalizedViolation(right)) ||
+  return compareNumber(calculateV2NormalizedViolation(left), calculateV2NormalizedViolation(right)) ||
     compareNumber(left.rmseDb, right.rmseDb) ||
     compareNumber(left.maxAbsDb, right.maxAbsDb)
 }

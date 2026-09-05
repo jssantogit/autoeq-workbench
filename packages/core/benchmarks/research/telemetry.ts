@@ -1,11 +1,15 @@
 import { performance } from 'node:perf_hooks'
 
 import { compareV2PrimaryMetrics } from '../../src/autoeq/v2/ranking.js'
-import type { StandardV2ResearchTrace } from '../../src/autoeq/v2/researchTrace.js'
+import type {
+  StandardV2JointRefineRecord,
+  StandardV2ResearchTrace,
+} from '../../src/autoeq/v2/researchTrace.js'
 import type { MetricBand } from '../../src/metrics/bandMetrics.js'
 
 import type {
   ResearchCheckpoint,
+  ResearchJointRefineRecord,
   ResearchTelemetrySnapshot,
   StandardV2ResearchCounters,
   StandardV2ResearchPhaseTimingMs,
@@ -63,6 +67,49 @@ function cloneCheckpoint(checkpoint: ResearchCheckpoint): ResearchCheckpoint {
   }
 }
 
+function cloneJointRefineRecord(
+  record: ResearchJointRefineRecord,
+): ResearchJointRefineRecord {
+  return {
+    ...record,
+    parentMetrics: { ...record.parentMetrics },
+    candidate: {
+      ...record.candidate,
+      filter: { ...record.candidate.filter },
+    },
+    resultMetrics: { ...record.resultMetrics },
+    cycles: record.cycles.map((cycle) => ({
+      ...cycle,
+      startMetrics: { ...cycle.startMetrics },
+      endMetrics: { ...cycle.endMetrics },
+    })),
+  }
+}
+
+function cloneCoreJointRefineRecord(
+  record: StandardV2JointRefineRecord,
+  equivalentStateAlreadyPaid: boolean,
+): ResearchJointRefineRecord {
+  return {
+    ...record,
+    parentMetrics: { ...record.parentMetrics },
+    candidate: {
+      ...record.candidate,
+      filter: { ...record.candidate.filter },
+    },
+    resultMetrics: { ...record.resultMetrics },
+    cycles: record.cycles.map((cycle) => ({
+      ...cycle,
+      startMetrics: { ...cycle.startMetrics },
+      endMetrics: { ...cycle.endMetrics },
+    })),
+    equivalentStateAlreadyPaid,
+    survivedParentRetention: false,
+    survivedActivePathRetention: false,
+    contributedToBestDeliverable: false,
+  }
+}
+
 export function createResearchTelemetry(options: {
   mode: 'light' | 'deep'
   nowMs?: () => number
@@ -74,6 +121,15 @@ export function createResearchTelemetry(options: {
   const startedAtMs = nowMs()
   const counters = createCounters()
   const checkpoints: ResearchCheckpoint[] = []
+  const jointRefinements: ResearchJointRefineRecord[] = []
+  const paidRefinementKeys = new Set<string>()
+  const recordsByTraceId = new Map<string, ResearchJointRefineRecord>()
+  const recordsByResultKey = new Map<string, ResearchJointRefineRecord[]>()
+  const pendingBestSolutionKeys = new Set<string>()
+  const pendingRetentions = new Map<string, {
+    parent?: boolean
+    active?: boolean
+  }>()
   const phaseTimingMs = createPhaseTiming()
   const phaseStarts = new Map<string, number[]>()
   const phasesObserved = new Set<(typeof PHASES)[number]>()
@@ -111,6 +167,13 @@ export function createResearchTelemetry(options: {
       ) {
         checkpoints.push(candidate)
       }
+      const sourceSolutionKey = checkpoint.sourceSolutionKey
+      if (sourceSolutionKey !== undefined) {
+        pendingBestSolutionKeys.add(sourceSolutionKey)
+        for (const record of recordsByResultKey.get(sourceSolutionKey) ?? []) {
+          record.contributedToBestDeliverable = true
+        }
+      }
     },
     onDiscreteTrial: () => {
       counters.discreteTrials += 1
@@ -124,6 +187,44 @@ export function createResearchTelemetry(options: {
     onPeakWorkingFilterCount: (count) => {
       counters.peakWorkingFilterCount = Math.max(counters.peakWorkingFilterCount, count)
     },
+  }
+
+  if (options.mode === 'deep') {
+    trace.onJointRefineTrace = (record) => {
+      const equivalentStateAlreadyPaid = paidRefinementKeys.has(record.refinementKey)
+      paidRefinementKeys.add(record.refinementKey)
+      const observed = cloneCoreJointRefineRecord(record, equivalentStateAlreadyPaid)
+      if (pendingBestSolutionKeys.has(observed.resultKey)) {
+        observed.contributedToBestDeliverable = true
+      }
+      const pendingRetention = pendingRetentions.get(observed.traceId)
+      if (pendingRetention?.parent !== undefined) {
+        observed.survivedParentRetention = pendingRetention.parent
+      }
+      if (pendingRetention?.active !== undefined) {
+        observed.survivedActivePathRetention = pendingRetention.active
+      }
+      pendingRetentions.delete(observed.traceId)
+      jointRefinements.push(observed)
+      recordsByTraceId.set(observed.traceId, observed)
+      const byResult = recordsByResultKey.get(observed.resultKey) ?? []
+      byResult.push(observed)
+      recordsByResultKey.set(observed.resultKey, byResult)
+    }
+    trace.onJointRefineRetention = (retention) => {
+      const record = recordsByTraceId.get(retention.traceId)
+      if (record === undefined) {
+        const pending = pendingRetentions.get(retention.traceId) ?? {}
+        pending[retention.stage] = retention.retained
+        pendingRetentions.set(retention.traceId, pending)
+        return
+      }
+      if (retention.stage === 'parent') {
+        record.survivedParentRetention = retention.retained
+      } else {
+        record.survivedActivePathRetention = retention.retained
+      }
+    }
   }
 
   if (options.mode === 'deep') {
@@ -159,6 +260,7 @@ export function createResearchTelemetry(options: {
         mode: options.mode,
         counters: { ...counters },
         checkpoints: snapshotCheckpoints,
+        jointRefinements: jointRefinements.map(cloneJointRefineRecord),
         phaseTimingMs: { ...phaseTimingMs },
         phasesObserved: [...phasesObserved],
       }
