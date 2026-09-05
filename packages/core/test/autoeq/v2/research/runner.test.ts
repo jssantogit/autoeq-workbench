@@ -163,7 +163,7 @@ describe('research runner', () => {
       [3_000, 0.2],
       [5_000, 0.2],
     ])
-    expect(row.stagedContinuationBatches).toEqual([])
+    expect(row.counters.stagedContinuationBatches).toEqual([])
   })
 
   it('serializes staged continuation batches only for deep telemetry rows', async () => {
@@ -196,8 +196,8 @@ describe('research runner', () => {
       },
     })
 
-    expect(row.stagedContinuationBatches).toHaveLength(1)
-    expect(row.stagedContinuationBatches[0]).toMatchObject({
+    expect(row.counters.stagedContinuationBatches).toHaveLength(1)
+    expect(row.counters.stagedContinuationBatches[0]).toMatchObject({
       boundaryMode: 'sign-crossing',
       parentFilterCount: 4,
       candidates: [
