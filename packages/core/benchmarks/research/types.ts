@@ -46,6 +46,7 @@ export interface StandardV2ResearchCounters {
   discreteTrials: number
   discreteAcceptedMoves: number
   compressionRemovalTrials: number
+  stagedContinuationBatches: StandardV2StagedContinuationBatchTrace[]
 }
 
 export interface StandardV2ResearchPhaseTimingMs {
@@ -64,7 +65,6 @@ export interface ResearchTelemetrySnapshot {
   checkpoints: ResearchCheckpoint[]
   phaseTimingMs: StandardV2ResearchPhaseTimingMs
   phasesObserved: StandardV2ResearchPhase[]
-  stagedContinuationBatches: StandardV2StagedContinuationBatchTrace[]
 }
 
 export type ResearchTerminationReason = 'target-reached' | 'converged' | 'time-limit'
@@ -94,7 +94,6 @@ export interface ResearchRunRow {
   filters: Filter[]
   telemetryMode: 'light' | 'deep'
   phaseTimingMs: StandardV2ResearchPhaseTimingMs
-  stagedContinuationBatches: StandardV2StagedContinuationBatchTrace[]
 }
 
 export interface ResearchAggregateRow {
