@@ -17,7 +17,7 @@ const filters: Filter[] = [
 ]
 
 describe('Standard v2 replacement trial view', () => {
-  it('matches the current materialized replacement metrics and arrays exactly', () => {
+  it('keeps only primary trial metrics while materialized metrics remain exact', () => {
     const solution = evaluateV2Solution(filters, desiredDb, frequencies, sampleRateHz)
     const replacement: Filter = {
       ...solution.filters[1]!,
@@ -46,7 +46,11 @@ describe('Standard v2 replacement trial view', () => {
       frequencies,
       sampleRateHz,
     )
-    expect(trial.metrics).toEqual(expectedMetrics)
+    expect(trial.metrics).toEqual({
+      rmseDb: expectedMetrics.rmseDb,
+      maxAbsDb: expectedMetrics.maxAbsDb,
+      maxAbsFrequencyHz: expectedMetrics.maxAbsFrequencyHz,
+    })
 
     const materialized = materializeV2ReplacementTrial(
       solution,
