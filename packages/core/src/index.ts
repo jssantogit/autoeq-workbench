@@ -90,6 +90,7 @@ export type {
   DiscreteTrial,
 } from './autoeq/v2/discreteRefine.js'
 export {
+  buildCheckpointDeliverableV2,
   buildDeliverableV2,
   compressDeliverableV2,
 } from './autoeq/v2/deliverable.js'
