@@ -117,12 +117,13 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
 
   let active = [zero]
   let best = zero
+  let publishedBest = zero
   let peakWorkingFilterCount = 0
   let jointRefinementCount = 0
   const fullCycleCount = input.config.algorithm.maxJointRefinementCycles
   const fastCycleCount = Math.min(1, fullCycleCount)
   const continuationCycleCount = fullCycleCount - fastCycleCount
-  const publishImprovement = (
+  const retainImprovement = (
     candidate: V2EvaluatedSolution,
     parent: V2EvaluatedSolution,
     pathIndex: number,
@@ -132,11 +133,13 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       peakWorkingFilterCount = candidate.filters.length
       input.researchTrace?.onPeakWorkingFilterCount?.(peakWorkingFilterCount)
     }
-    if (compareV2Solutions(candidate, best) < 0) {
-      best = candidate
-      input.onBestWorkingSolution?.(best)
-    }
+    if (compareV2Solutions(candidate, best) < 0) best = candidate
     return pathIndex === 0
+  }
+  const publishRetainedBest = (): void => {
+    if (compareV2Solutions(best, publishedBest) >= 0) return
+    publishedBest = best
+    input.onBestWorkingSolution?.(best)
   }
 
   while (active.some((path) => path.filters.length < input.config.workingMaxFilters)) {
@@ -180,6 +183,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       const fastStaged: V2EvaluatedSolution[] = []
       for (const appended of staged) {
         if (input.deadline.isExpired()) {
+          publishRetainedBest()
           expired = true
           break
         }
@@ -194,8 +198,9 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
           researchTrace: input.researchTrace,
         })
         fastStaged.push(fast.solution)
-        if (publishImprovement(fast.solution, path, pathIndex)) mainPathImproved = true
+        if (retainImprovement(fast.solution, path, pathIndex)) mainPathImproved = true
         if (fast.expired || input.deadline.isExpired()) {
+          publishRetainedBest()
           expired = true
           break
         }
@@ -204,6 +209,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
 
       for (const fast of [...fastStaged].sort(compareV2Solutions).slice(0, 3)) {
         if (input.deadline.isExpired()) {
+          publishRetainedBest()
           expired = true
           break
         }
@@ -223,7 +229,8 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
           refined = continued.solution
           refinementExpired = continued.expired
         }
-        if (publishImprovement(refined, path, pathIndex)) mainPathImproved = true
+        if (retainImprovement(refined, path, pathIndex)) mainPathImproved = true
+        publishRetainedBest()
         if (compareV2Solutions(refined, path) < 0) {
           expanded.push(refined)
           stagedImproved = true
@@ -238,6 +245,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       if (!stagedImproved) {
         for (const appended of deferred) {
           if (input.deadline.isExpired()) {
+            publishRetainedBest()
             expired = true
             break
           }
@@ -250,7 +258,8 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
             deadline: input.deadline,
             researchTrace: input.researchTrace,
           })
-          if (publishImprovement(refined.solution, path, pathIndex)) mainPathImproved = true
+          if (retainImprovement(refined.solution, path, pathIndex)) mainPathImproved = true
+          publishRetainedBest()
           if (compareV2Solutions(refined.solution, path) < 0) {
             expanded.push(refined.solution)
           }
@@ -264,6 +273,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       if (expired) break
     }
     if (expired) {
+      publishRetainedBest()
       return {
         bestSolution: best,
         activeSolutions: active,
@@ -273,6 +283,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       }
     }
     if (expanded.length === 0) {
+      publishRetainedBest()
       return {
         bestSolution: best,
         activeSolutions: active,
@@ -286,6 +297,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       input.researchTrace?.onWorkingCheckpoint?.()
       input.onWorkingSolution?.(checkpoint)
       if (input.deadline.isExpired()) {
+        publishRetainedBest()
         return {
           bestSolution: best,
           activeSolutions: active,
@@ -295,6 +307,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
         }
       }
       if (input.isTargetCapable?.(checkpoint)) {
+        publishRetainedBest()
         return {
           bestSolution: best,
           activeSolutions: [checkpoint],
@@ -305,6 +318,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       }
     }
   }
+  publishRetainedBest()
   return {
     bestSolution: best,
     activeSolutions: active,
