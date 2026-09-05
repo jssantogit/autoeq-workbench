@@ -22,6 +22,7 @@ export function evaluateV2ReplacementTrial(
   frequencies: readonly number[],
   sampleRateHz: number,
   responseBuffer?: number[],
+  gainFactorA?: number,
 ): V2ReplacementTrial {
   const responseDb = computeV2ResponseCacheFilterResponse(
     solution.responseCache,
@@ -29,6 +30,7 @@ export function evaluateV2ReplacementTrial(
     frequencies,
     sampleRateHz,
     responseBuffer,
+    gainFactorA,
   )
   const oldResponse = solution.responseCache.filterResponsesDb[filterIndex]!
   let absoluteSum = 0
