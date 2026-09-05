@@ -1,6 +1,6 @@
 import type { BiquadResponseGrid } from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
-import { auditCancellations } from '../cancellation.js'
+import { auditCancellationsOnGrid } from '../cancellation.js'
 import { POWERAMP_MANUAL_ENTRY_POLICY } from '../quantize.js'
 import type { StandardAutoEqV2Config } from './config.js'
 import { compareV2PrimaryMetrics, compareV2Solutions } from './ranking.js'
@@ -109,10 +109,9 @@ export function cyclicDiscreteRefineV2(
     trace?.onCancellationAuditComputed?.()
     const audited = {
       ...candidate,
-      cancellationAudit: auditCancellations(
+      cancellationAudit: auditCancellationsOnGrid(
         candidate.filters,
-        input.frequencies,
-        input.config.sampleRateHz,
+        candidate.responseCache.responseGrid,
       ),
     }
     validAudits.add(audited)
