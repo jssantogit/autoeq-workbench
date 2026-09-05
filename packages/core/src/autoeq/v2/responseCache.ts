@@ -17,6 +17,7 @@ function responseForFilter(
   filter: Filter,
   responseGrid: BiquadResponseGrid,
   output?: number[],
+  gainFactorA?: number,
 ): number[] {
   if (
     filter === null ||
@@ -30,7 +31,7 @@ function responseForFilter(
     throw new CoreError('validation', 'Response output buffer length must match the grid')
   }
   if (filter.enabled) {
-    return biquadMagnitudeDbOnGridInto(filter, responseGrid, response)
+    return biquadMagnitudeDbOnGridInto(filter, responseGrid, response, gainFactorA)
   }
   response.fill(0)
   return response
@@ -85,9 +86,10 @@ export function computeV2ResponseCacheFilterResponse(
   frequencies: readonly number[],
   sampleRateHz: number,
   output?: number[],
+  gainFactorA?: number,
 ): number[] {
   assertMatchingGrid(cache.responseGrid, frequencies, sampleRateHz)
-  return responseForFilter(replacement, cache.responseGrid, output)
+  return responseForFilter(replacement, cache.responseGrid, output, gainFactorA)
 }
 
 export function replaceV2ResponseCacheFilterWithResponse(
