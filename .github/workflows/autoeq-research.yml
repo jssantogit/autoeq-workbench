@@ -1,6 +1,9 @@
 name: AutoEQ Research Bench
 
 on:
+  push:
+    branches:
+      - experiment/v2-staged-joint-refine-k2
   workflow_dispatch:
     inputs:
       purpose:
@@ -57,12 +60,12 @@ jobs:
       - name: Run AutoEQ Research Bench
         env:
           GITHUB_SHA: ${{ github.sha }}
-          RESEARCH_PURPOSE: ${{ inputs.purpose }}
-          RESEARCH_PRESET: ${{ inputs.preset }}
-          RESEARCH_REPEATS: ${{ inputs.repeats }}
-          RESEARCH_INCLUDE_CAPACITY: ${{ inputs.include_capacity }}
-          RESEARCH_INCLUDE_ORACLE: ${{ inputs.include_oracle_120 }}
-          RESEARCH_PROFILE_CELL: ${{ inputs.profile_cell }}
+          RESEARCH_PURPOSE: compare
+          RESEARCH_PRESET: quick
+          RESEARCH_REPEATS: '1'
+          RESEARCH_INCLUDE_CAPACITY: 'false'
+          RESEARCH_INCLUDE_ORACLE: 'false'
+          RESEARCH_PROFILE_CELL: titan-to-storm:30
         run: |
           set -euo pipefail
           args=(--output-dir "$GITHUB_WORKSPACE/autoeq-research")

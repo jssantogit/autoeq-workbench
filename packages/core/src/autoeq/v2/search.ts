@@ -202,7 +202,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       }
       if (expired) break
 
-      for (const fast of [...fastStaged].sort(compareV2Solutions)) {
+      for (const fast of [...fastStaged].sort(compareV2Solutions).slice(0, 2)) {
         if (input.deadline.isExpired()) {
           expired = true
           break
@@ -232,7 +232,6 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
           expired = true
           break
         }
-        if (stagedImproved) break
       }
       if (expired) break
 
