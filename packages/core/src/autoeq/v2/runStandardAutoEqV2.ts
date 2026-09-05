@@ -157,7 +157,8 @@ export function runStandardAutoEqV2(
         config,
         deadline: explorationDeadline,
         boundaryMode,
-        warmStarts: runtime.geometryWarmStart ? priorDepths : undefined,
+        warmStarts: runtime.geometryWarmStart && boundaryMode === 'sign-crossing'
+          ? priorDepths : undefined,
         researchTrace: runtime.researchTrace,
         onBestWorkingSolution: checkpointWorkingSolution,
         onWorkingSolution: checkpointWorkingSolution,

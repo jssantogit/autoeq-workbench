@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import * as searchModule from '../../../src/autoeq/v2/search.js'
 
 import {
   DEFAULT_AUTOEQ_SETTINGS,
@@ -32,6 +33,25 @@ function input(): StandardAutoEqInputV2 {
 }
 
 describe('runStandardAutoEqV2', () => {
+  it('keeps mixed fallback cold when transferring coherent geometry checkpoints', () => {
+    const runInput = input()
+    runInput.settings = { ...runInput.settings, maxFilters: 0 }
+    runInput.source.rawPoints = runInput.source.rawPoints.map((point) => ({
+      ...point, db: point.frequencyHz >= 1000 ? -2 : 0,
+    }))
+    const spy = vi.spyOn(searchModule, 'searchStandardV2WorkingSolutions')
+    try {
+      runStandardAutoEqV2(runInput, { nowMs: () => 0, geometryWarmStart: true })
+      const attempts = spy.mock.calls.map(([attempt]) => attempt)
+      expect(attempts.map((attempt) => attempt.boundaryMode))
+        .toEqual(['half-height', 'sign-crossing', 'mixed'])
+      expect(attempts[1]!.warmStarts).toBeInstanceOf(Map)
+      expect(attempts[2]!.warmStarts).toBeUndefined()
+    } finally {
+      spy.mockRestore()
+    }
+  })
+
   it('returns a deterministic schema-3 quantized deliverable', () => {
     const runInput = input()
     const runtime = { nowMs: () => 0 }
