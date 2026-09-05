@@ -70,9 +70,8 @@ jobs:
           args=(--output-dir "$GITHUB_WORKSPACE/autoeq-research")
           if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
             args+=(
-              --preset quick
-              --repeats 1
-              --profile titan-to-storm:30
+              --preset full
+              --repeats 5
             )
           elif [[ "$RESEARCH_PURPOSE" == "baseline" ]]; then
             args+=(
