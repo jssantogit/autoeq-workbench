@@ -1,7 +1,10 @@
 import { performance } from 'node:perf_hooks'
 
 import { compareV2PrimaryMetrics } from '../../src/autoeq/v2/ranking.js'
-import type { StandardV2ResearchTrace } from '../../src/autoeq/v2/researchTrace.js'
+import type {
+  StandardV2ResearchTrace,
+  StandardV2StagedContinuationBatchTrace,
+} from '../../src/autoeq/v2/researchTrace.js'
 import type { MetricBand } from '../../src/metrics/bandMetrics.js'
 
 import type {
@@ -63,6 +66,21 @@ function cloneCheckpoint(checkpoint: ResearchCheckpoint): ResearchCheckpoint {
   }
 }
 
+function cloneStagedContinuationBatch(
+  batch: StandardV2StagedContinuationBatchTrace,
+): StandardV2StagedContinuationBatchTrace {
+  return {
+    boundaryMode: batch.boundaryMode,
+    parentFilterCount: batch.parentFilterCount,
+    parentMetrics: { ...batch.parentMetrics },
+    candidates: batch.candidates.map((candidate) => ({
+      fastRank: candidate.fastRank,
+      fastMetrics: { ...candidate.fastMetrics },
+      continuedMetrics: { ...candidate.continuedMetrics },
+    })),
+  }
+}
+
 export function createResearchTelemetry(options: {
   mode: 'light' | 'deep'
   nowMs?: () => number
@@ -74,6 +92,7 @@ export function createResearchTelemetry(options: {
   const startedAtMs = nowMs()
   const counters = createCounters()
   const checkpoints: ResearchCheckpoint[] = []
+  const stagedContinuationBatches: StandardV2StagedContinuationBatchTrace[] = []
   const phaseTimingMs = createPhaseTiming()
   const phaseStarts = new Map<string, number[]>()
   const phasesObserved = new Set<(typeof PHASES)[number]>()
@@ -127,6 +146,9 @@ export function createResearchTelemetry(options: {
   }
 
   if (options.mode === 'deep') {
+    trace.onStagedContinuationBatch = (batch) => {
+      stagedContinuationBatches.push(cloneStagedContinuationBatch(batch))
+    }
     trace.onPhaseStart = (phase) => {
       phasesObserved.add(phase)
       const starts = phaseStarts.get(phase) ?? []
@@ -161,6 +183,7 @@ export function createResearchTelemetry(options: {
         checkpoints: snapshotCheckpoints,
         phaseTimingMs: { ...phaseTimingMs },
         phasesObserved: [...phasesObserved],
+        stagedContinuationBatches: stagedContinuationBatches.map(cloneStagedContinuationBatch),
       }
     },
   }
