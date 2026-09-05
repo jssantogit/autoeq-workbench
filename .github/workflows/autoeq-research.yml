@@ -35,6 +35,9 @@ on:
         required: false
         default: ''
         type: string
+  push:
+    branches:
+      - research/run-staged-joint-refine-2026-09-05
 
 permissions:
   contents: read
@@ -57,12 +60,12 @@ jobs:
       - name: Run AutoEQ Research Bench
         env:
           GITHUB_SHA: ${{ github.sha }}
-          RESEARCH_PURPOSE: ${{ inputs.purpose }}
-          RESEARCH_PRESET: ${{ inputs.preset }}
-          RESEARCH_REPEATS: ${{ inputs.repeats }}
-          RESEARCH_INCLUDE_CAPACITY: ${{ inputs.include_capacity }}
-          RESEARCH_INCLUDE_ORACLE: ${{ inputs.include_oracle_120 }}
-          RESEARCH_PROFILE_CELL: ${{ inputs.profile_cell }}
+          RESEARCH_PURPOSE: ${{ github.event_name == 'push' && 'compare' || inputs.purpose }}
+          RESEARCH_PRESET: ${{ github.event_name == 'push' && 'quick' || inputs.preset }}
+          RESEARCH_REPEATS: ${{ github.event_name == 'push' && '1' || inputs.repeats }}
+          RESEARCH_INCLUDE_CAPACITY: ${{ github.event_name == 'push' && 'false' || inputs.include_capacity }}
+          RESEARCH_INCLUDE_ORACLE: ${{ github.event_name == 'push' && 'false' || inputs.include_oracle_120 }}
+          RESEARCH_PROFILE_CELL: ${{ github.event_name == 'push' && 'titan-to-storm:30' || inputs.profile_cell }}
         run: |
           set -euo pipefail
           args=(--output-dir "$GITHUB_WORKSPACE/autoeq-research")
