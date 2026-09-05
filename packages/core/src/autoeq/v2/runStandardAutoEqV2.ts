@@ -15,12 +15,16 @@ import {
   compareV2Solutions,
   isV2TargetAchieved,
 } from './ranking.js'
-import { createStandardV2Deadline, type StandardV2Runtime } from './runtime.js'
+import { createStandardV2DeadlineWindow, type StandardV2Runtime } from './runtime.js'
 import { withResearchTracePhase } from './researchTrace.js'
 import {
   searchStandardV2WorkingSolutions,
   type SearchResult,
 } from './search.js'
+
+function finalizationReserveMs(maxFilters: number): number {
+  return Math.min(400, Math.max(100, maxFilters * 10))
+}
 
 export function runStandardAutoEqV2(
   input: StandardAutoEqInputV2,
@@ -39,7 +43,11 @@ export function runStandardAutoEqV2(
   if (input.source.kind !== 'fr' || input.target.kind !== 'target') {
     throw new CoreError('validation', 'AutoEQ requires an FR source and Target curve')
   }
-  const deadline = createStandardV2Deadline(runtime, input.settings.timeLimitSeconds)
+  const { explorationDeadline, hardDeadline } = createStandardV2DeadlineWindow(
+    runtime,
+    input.settings.timeLimitSeconds,
+    finalizationReserveMs(config.maxFilters),
+  )
   const prepared = withResearchTracePhase(runtime.researchTrace, 'prepare', () => {
     const canonicalFrequencies = createEvaluationGrid()
     const source = prepareCurve(input.source, input.normalization, canonicalFrequencies)
@@ -59,7 +67,7 @@ export function runStandardAutoEqV2(
   const { frequencies, desiredDb } = prepared
 
   let bestDeliverable = buildDeliverableV2({
-    filters: [], desiredDb, frequencies, config, deadline,
+    filters: [], desiredDb, frequencies, config, deadline: hardDeadline,
     researchTrace: runtime.researchTrace,
   })
   const emitBestDeliverable = (): void => {
@@ -77,11 +85,11 @@ export function runStandardAutoEqV2(
   }
   emitBestDeliverable()
   let terminationReason: RunManifestV2['terminationReason']
-  if (deadline.isExpired()) {
+  if (hardDeadline.isExpired()) {
     terminationReason = 'time-limit'
   } else if (isV2TargetAchieved(bestDeliverable.metrics)) {
     const compressed = compressDeliverableV2({
-      deliverable: bestDeliverable, desiredDb, frequencies, config, deadline,
+      deliverable: bestDeliverable, desiredDb, frequencies, config, deadline: hardDeadline,
       researchTrace: runtime.researchTrace,
     })
     const previous = bestDeliverable
@@ -91,7 +99,7 @@ export function runStandardAutoEqV2(
   } else {
     let searchTermination: SearchResult['termination'] = 'converged'
     for (const boundaryMode of ['half-height', 'sign-crossing', 'mixed'] as const) {
-      if (deadline.isExpired()) {
+      if (explorationDeadline.isExpired()) {
         searchTermination = 'time-limit'
         break
       }
@@ -111,7 +119,7 @@ export function runStandardAutoEqV2(
           desiredDb,
           frequencies,
           config,
-          deadline,
+          deadline: hardDeadline,
           responseGrid: solution.responseCache.responseGrid,
           fallbackOnExpiration: bestDeliverable,
           researchTrace: runtime.researchTrace,
@@ -130,7 +138,7 @@ export function runStandardAutoEqV2(
         desiredDb,
         frequencies,
         config,
-        deadline,
+        deadline: explorationDeadline,
         boundaryMode,
         researchTrace: runtime.researchTrace,
         onBestWorkingSolution: checkpointWorkingSolution,
@@ -141,7 +149,7 @@ export function runStandardAutoEqV2(
 
       if (
         search.termination !== 'time-limit' &&
-        !deadline.isExpired() &&
+        !hardDeadline.isExpired() &&
         !isV2TargetAchieved(bestDeliverable.metrics)
       ) {
         const deepSources: V2EvaluatedSolution[] = [search.bestSolution]
@@ -152,13 +160,13 @@ export function runStandardAutoEqV2(
           deepSources.push(modeBestCheckpoint.source)
         }
         for (const source of deepSources) {
-          if (deadline.isExpired()) break
+          if (hardDeadline.isExpired()) break
           const deliverable = buildDeliverableV2({
             filters: source.filters,
             desiredDb,
             frequencies,
             config,
-            deadline,
+            deadline: hardDeadline,
             responseGrid: source.responseCache.responseGrid,
             fallbackOnExpiration: bestDeliverable,
             researchTrace: runtime.researchTrace,
@@ -171,12 +179,12 @@ export function runStandardAutoEqV2(
       if (
         isV2TargetAchieved(bestDeliverable.metrics) ||
         search.termination === 'time-limit' ||
-        deadline.isExpired()
+        hardDeadline.isExpired()
       ) break
     }
-    if (isV2TargetAchieved(bestDeliverable.metrics) && !deadline.isExpired()) {
+    if (isV2TargetAchieved(bestDeliverable.metrics) && !hardDeadline.isExpired()) {
       const compressed = compressDeliverableV2({
-        deliverable: bestDeliverable, desiredDb, frequencies, config, deadline,
+        deliverable: bestDeliverable, desiredDb, frequencies, config, deadline: hardDeadline,
         researchTrace: runtime.researchTrace,
       })
       const previous = bestDeliverable
@@ -184,7 +192,7 @@ export function runStandardAutoEqV2(
       if (compareV2Solutions(bestDeliverable, previous) < 0) emitBestDeliverable()
       terminationReason = compressed.completed ? 'target-reached' : 'time-limit'
     } else {
-      terminationReason = searchTermination === 'time-limit' || deadline.isExpired()
+      terminationReason = searchTermination === 'time-limit' || hardDeadline.isExpired()
         ? 'time-limit'
         : 'converged'
     }
