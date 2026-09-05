@@ -8,6 +8,7 @@ import {
   type Filter,
 } from '../../../src/index.js'
 import { createBiquadResponseGrid } from '../../../src/dsp/response.js'
+import { computeV2ResponseCacheFilterResponse } from '../../../src/autoeq/v2/responseCache.js'
 
 const frequencies = [40, 100, 1_000, 5_000, 15_000]
 const sampleRateHz = 48_000
@@ -45,6 +46,32 @@ describe('Standard v2 response cache', () => {
     expect(replaced.filterResponsesDb[0]).toBe(cache.filterResponsesDb[0])
     expect(replaced.filterResponsesDb[1]).not.toBe(cache.filterResponsesDb[1])
     expect(replaced.filterResponsesDb[2]).toBe(cache.filterResponsesDb[2])
+  })
+
+  it('reuses center-frequency trig for gain/Q replacements without changing response bits', () => {
+    const cache = createV2ResponseCache(filters, frequencies, sampleRateHz)
+    const replacement: Filter = {
+      ...filters[1]!,
+      gainDb: -3.5,
+      q: 1.8,
+    }
+    const expected = computeV2ResponseCacheFilterResponse(
+      cache,
+      replacement,
+      frequencies,
+      sampleRateHz,
+    )
+    const w0 = (2 * Math.PI * replacement.frequencyHz) / sampleRateHz
+    const actual = computeV2ResponseCacheFilterResponse(
+      cache,
+      replacement,
+      frequencies,
+      sampleRateHz,
+      new Array<number>(frequencies.length),
+      { cosW0: Math.cos(w0), sinW0: Math.sin(w0) },
+    )
+
+    expect(actual).toEqual(expected)
   })
 
   it('removes one cached response with the exact same summation result as rebuilding', () => {
