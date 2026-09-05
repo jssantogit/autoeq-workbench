@@ -157,6 +157,9 @@ export function jointRefineV2(
                   { ...currentFilter, q: clamp(currentFilter.q * 2 ** -scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
                   { ...currentFilter, q: clamp(currentFilter.q * 2 ** scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
                 )
+          const gainFactorA = coordinate === 'gainDb'
+            ? undefined
+            : 10 ** (currentFilter.gainDb / 40)
           let best = solution
           for (const replacement of trials) {
             if (input.deadline.isExpired()) {
@@ -171,6 +174,7 @@ export function jointRefineV2(
               input.frequencies,
               input.config.sampleRateHz,
               responseBuffer,
+              gainFactorA,
             )
             if (input.deadline.isExpired()) {
               return finish(true)
