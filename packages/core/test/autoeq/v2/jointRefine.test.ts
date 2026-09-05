@@ -65,6 +65,42 @@ describe('Standard v2 joint refinement', () => {
     expect(result.solution.filters[1]!.gainDb).not.toBe(-3.413619784726027)
   })
 
+  it('can split six refinement cycles into one fast cycle plus five continuation cycles', () => {
+    const desiredDb = evaluateV2Solution([desiredFilter], [], frequencies, config.sampleRateHz)
+      .cascadeDb
+    const start = evaluateV2Solution([
+      { ...desiredFilter, id: 'start', frequencyHz: 760, gainDb: 1.8, q: 0.9 },
+    ], desiredDb, frequencies, config.sampleRateHz)
+    const deadline = { isExpired: () => false }
+
+    const direct = jointRefineV2({
+      solution: start,
+      desiredDb,
+      frequencies,
+      config,
+      deadline,
+      maxCycles: 6,
+    })
+    const fast = jointRefineV2({
+      solution: start,
+      desiredDb,
+      frequencies,
+      config,
+      deadline,
+      maxCycles: 1,
+    })
+    const continued = jointRefineV2({
+      solution: fast.solution,
+      desiredDb,
+      frequencies,
+      config,
+      deadline,
+      maxCycles: 5,
+    })
+
+    expect(continued.solution).toEqual(direct.solution)
+  })
+
   it('uses the approved scales and never worsens a solution', () => {
     expect(JOINT_REFINEMENT_SCALES).toEqual([
       { fcOctaveStep: 1 / 6, gainStepDb: 1, qOctaveStep: 1 / 2 },

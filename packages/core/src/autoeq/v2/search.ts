@@ -1,6 +1,6 @@
 import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
 import type { Filter } from '../../types/filter.js'
-import { auditCancellations } from '../cancellation.js'
+import { auditCancellationsOnGrid } from '../cancellation.js'
 import {
   generateV2Candidates,
   rankV2CandidateShortlist,
@@ -23,6 +23,7 @@ export interface SearchInput {
   deadline: StandardV2Deadline
   boundaryMode: V2CandidateBoundaryMode
   isTargetCapable?: (solution: V2Solution) => boolean
+  onBestWorkingSolution?: (solution: V2EvaluatedSolution) => void
   onWorkingSolution?: (solution: V2EvaluatedSolution) => void
   researchTrace?: StandardV2ResearchTrace
 }
@@ -98,11 +99,7 @@ function appendCandidate(
     cascadeDb: responseCache.cascadeDb,
     residualDb,
     metrics: calculateErrorMetrics(residualDb, input.frequencies),
-    cancellationAudit: auditCancellations(
-      filters,
-      input.frequencies,
-      input.config.sampleRateHz,
-    ),
+    cancellationAudit: auditCancellationsOnGrid(filters, responseCache.responseGrid),
   }
 }
 
@@ -122,6 +119,26 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
   let best = zero
   let peakWorkingFilterCount = 0
   let jointRefinementCount = 0
+  const fullCycleCount = input.config.algorithm.maxJointRefinementCycles
+  const fastCycleCount = Math.min(1, fullCycleCount)
+  const continuationCycleCount = fullCycleCount - fastCycleCount
+  const publishImprovement = (
+    candidate: V2EvaluatedSolution,
+    parent: V2EvaluatedSolution,
+    pathIndex: number,
+  ): boolean => {
+    if (compareV2Solutions(candidate, parent) >= 0) return false
+    if (candidate.filters.length > peakWorkingFilterCount) {
+      peakWorkingFilterCount = candidate.filters.length
+      input.researchTrace?.onPeakWorkingFilterCount?.(peakWorkingFilterCount)
+    }
+    if (compareV2Solutions(candidate, best) < 0) {
+      best = candidate
+      input.onBestWorkingSolution?.(best)
+    }
+    return pathIndex === 0
+  }
+
   while (active.some((path) => path.filters.length < input.config.workingMaxFilters)) {
     const expanded: V2EvaluatedSolution[] = []
     let mainPathImproved = false
@@ -159,10 +176,68 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       const stagedSet = new Set(staged)
       const deferred = rankedAppended.filter((candidate) => !stagedSet.has(candidate))
       let stagedImproved = false
-      for (const phase of ['staged', 'fallback'] as const) {
-        if (phase === 'fallback' && stagedImproved) break
-        const candidates = phase === 'staged' ? staged : deferred
-        for (const appended of candidates) {
+
+      const fastStaged: V2EvaluatedSolution[] = []
+      for (const appended of staged) {
+        if (input.deadline.isExpired()) {
+          expired = true
+          break
+        }
+        jointRefinementCount += 1
+        const fast = jointRefineV2({
+          solution: appended,
+          desiredDb: input.desiredDb,
+          frequencies: input.frequencies,
+          config: input.config,
+          deadline: input.deadline,
+          maxCycles: fastCycleCount,
+          researchTrace: input.researchTrace,
+        })
+        fastStaged.push(fast.solution)
+        if (publishImprovement(fast.solution, path, pathIndex)) mainPathImproved = true
+        if (fast.expired || input.deadline.isExpired()) {
+          expired = true
+          break
+        }
+      }
+      if (expired) break
+
+      for (const fast of [...fastStaged].sort(compareV2Solutions)) {
+        if (input.deadline.isExpired()) {
+          expired = true
+          break
+        }
+        let refined = fast
+        let refinementExpired = false
+        if (continuationCycleCount > 0) {
+          jointRefinementCount += 1
+          const continued = jointRefineV2({
+            solution: fast,
+            desiredDb: input.desiredDb,
+            frequencies: input.frequencies,
+            config: input.config,
+            deadline: input.deadline,
+            maxCycles: continuationCycleCount,
+            researchTrace: input.researchTrace,
+          })
+          refined = continued.solution
+          refinementExpired = continued.expired
+        }
+        if (publishImprovement(refined, path, pathIndex)) mainPathImproved = true
+        if (compareV2Solutions(refined, path) < 0) {
+          expanded.push(refined)
+          stagedImproved = true
+        }
+        if (refinementExpired || input.deadline.isExpired()) {
+          expired = true
+          break
+        }
+        if (stagedImproved) break
+      }
+      if (expired) break
+
+      if (!stagedImproved) {
+        for (const appended of deferred) {
           if (input.deadline.isExpired()) {
             expired = true
             break
@@ -176,23 +251,16 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
             deadline: input.deadline,
             researchTrace: input.researchTrace,
           })
-          if (refined.expired) {
+          if (publishImprovement(refined.solution, path, pathIndex)) mainPathImproved = true
+          if (compareV2Solutions(refined.solution, path) < 0) {
+            expanded.push(refined.solution)
+          }
+          if (refined.expired || input.deadline.isExpired()) {
             expired = true
             break
           }
-          if (compareV2Solutions(refined.solution, path) < 0) {
-            expanded.push(refined.solution)
-            if (refined.solution.filters.length > peakWorkingFilterCount) {
-              peakWorkingFilterCount = refined.solution.filters.length
-              input.researchTrace?.onPeakWorkingFilterCount?.(peakWorkingFilterCount)
-            }
-            if (pathIndex === 0) mainPathImproved = true
-            if (compareV2Solutions(refined.solution, best) < 0) best = refined.solution
-            if (phase === 'staged') stagedImproved = true
-            else break
-          }
+          if (compareV2Solutions(refined.solution, path) < 0) break
         }
-        if (expired) break
       }
       if (expired) break
     }
