@@ -202,7 +202,14 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       }
       if (expired) break
 
-      for (const fast of [...fastStaged].sort(compareV2Solutions).slice(0, 3)) {
+      const rankedFastStaged = [...fastStaged].sort(compareV2Solutions).slice(0, 3)
+      const continuationTraceCandidates: Array<{
+        fastRank: number
+        fastMetrics: V2EvaluatedSolution['metrics']
+        continuedMetrics: V2EvaluatedSolution['metrics']
+      }> = []
+      for (let fastIndex = 0; fastIndex < rankedFastStaged.length; fastIndex += 1) {
+        const fast = rankedFastStaged[fastIndex]!
         if (input.deadline.isExpired()) {
           expired = true
           break
@@ -223,6 +230,11 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
           refined = continued.solution
           refinementExpired = continued.expired
         }
+        continuationTraceCandidates.push({
+          fastRank: fastIndex + 1,
+          fastMetrics: { ...fast.metrics },
+          continuedMetrics: { ...refined.metrics },
+        })
         if (publishImprovement(refined, path, pathIndex)) mainPathImproved = true
         if (compareV2Solutions(refined, path) < 0) {
           expanded.push(refined)
@@ -232,6 +244,14 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
           expired = true
           break
         }
+      }
+      if (continuationTraceCandidates.length > 0) {
+        input.researchTrace?.onStagedContinuationBatch?.({
+          boundaryMode: input.boundaryMode,
+          parentFilterCount: path.filters.length,
+          parentMetrics: { ...path.metrics },
+          candidates: continuationTraceCandidates,
+        })
       }
       if (expired) break
 
