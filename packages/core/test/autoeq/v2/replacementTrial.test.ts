@@ -96,4 +96,37 @@ describe('Standard v2 replacement trial view', () => {
     responseBuffer.fill(123)
     expect(materialized.responseCache.filterResponsesDb[1]).toEqual(snapshot)
   })
+
+  it.each([0, 1, 2])('matches canonical trial response and metrics with precomputed gain factor for filter %s', (filterIndex) => {
+    const solution = evaluateV2Solution(filters, desiredDb, frequencies, sampleRateHz)
+    const current = solution.filters[filterIndex]!
+    const replacement: Filter = {
+      ...current,
+      frequencyHz: current.frequencyHz * 1.05,
+    }
+    const canonicalBuffer = frequencies.map(() => Number.NaN)
+    const reusedBuffer = frequencies.map(() => Number.NaN)
+    const canonical = evaluateV2ReplacementTrial(
+      solution,
+      filterIndex,
+      replacement,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+      canonicalBuffer,
+    )
+    const reused = evaluateV2ReplacementTrial(
+      solution,
+      filterIndex,
+      replacement,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+      reusedBuffer,
+      10 ** (replacement.gainDb / 40),
+    )
+
+    expect(reused.responseDb).toEqual(canonical.responseDb)
+    expect(reused.metrics).toEqual(canonical.metrics)
+  })
 })
