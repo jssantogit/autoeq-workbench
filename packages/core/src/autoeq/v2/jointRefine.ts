@@ -9,7 +9,7 @@ import {
   type V2ResponseCache,
 } from './responseCache.js'
 import {
-  evaluateV2ReplacementTrial,
+  evaluateV2ReplacementTrialTrusted,
   materializeV2ReplacementTrial,
 } from './replacementTrial.js'
 import {
@@ -162,7 +162,7 @@ export function jointRefineV2(
               return finish(true)
             }
             coordinateTrials += 1
-            const trial = evaluateV2ReplacementTrial(
+            const trial = evaluateV2ReplacementTrialTrusted(
               solution,
               filterIndex,
               replacement,
