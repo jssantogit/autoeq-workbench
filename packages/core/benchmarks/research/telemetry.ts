@@ -56,6 +56,13 @@ function createPhaseTiming(): StandardV2ResearchPhaseTimingMs {
   }
 }
 
+function cloneCheckpoint(checkpoint: ResearchCheckpoint): ResearchCheckpoint {
+  return {
+    ...checkpoint,
+    metrics: { ...checkpoint.metrics },
+  }
+}
+
 export function createResearchTelemetry(options: {
   mode: 'light' | 'deep'
   nowMs?: () => number
@@ -136,15 +143,25 @@ export function createResearchTelemetry(options: {
 
   return {
     trace,
-    snapshot: () => ({
-      mode: options.mode,
-      counters: { ...counters },
-      checkpoints: checkpoints.map((checkpoint) => ({
-        ...checkpoint,
-        metrics: { ...checkpoint.metrics },
-      })),
-      phaseTimingMs: { ...phaseTimingMs },
-      phasesObserved: [...phasesObserved],
-    }),
+    snapshot: () => {
+      const snapshotCheckpoints = checkpoints.map(cloneCheckpoint)
+      const last = snapshotCheckpoints.at(-1)
+      if (last !== undefined) {
+        const terminalElapsedMs = Math.max(last.elapsedMs, nowMs() - startedAtMs)
+        if (terminalElapsedMs > last.elapsedMs) {
+          snapshotCheckpoints.push({
+            ...cloneCheckpoint(last),
+            elapsedMs: terminalElapsedMs,
+          })
+        }
+      }
+      return {
+        mode: options.mode,
+        counters: { ...counters },
+        checkpoints: snapshotCheckpoints,
+        phaseTimingMs: { ...phaseTimingMs },
+        phasesObserved: [...phasesObserved],
+      }
+    },
   }
 }
