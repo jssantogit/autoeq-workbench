@@ -1,5 +1,8 @@
 import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
-import type { BiquadResponseGrid } from '../../dsp/response.js'
+import type {
+  BiquadFrequencyTrig,
+  BiquadResponseGrid,
+} from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
 import { auditCancellationsOnGrid } from '../cancellation.js'
 import type { StandardAutoEqV2Config } from './config.js'
@@ -139,6 +142,8 @@ export function jointRefineV2(
         if (startingFilter.type === 'PK') {
           coordinates.push('q')
         }
+        let cachedFrequencyHz: number | null = null
+        let cachedFrequencyTrig: BiquadFrequencyTrig | undefined
 
         for (const coordinate of coordinates) {
           const currentFilter = solution.filters[filterIndex]!
@@ -156,6 +161,18 @@ export function jointRefineV2(
                   { ...currentFilter, q: clamp(currentFilter.q * 2 ** -scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
                   { ...currentFilter, q: clamp(currentFilter.q * 2 ** scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
                 ])
+          let frequencyTrig: BiquadFrequencyTrig | undefined
+          if (coordinate !== 'frequencyHz') {
+            if (cachedFrequencyTrig === undefined || cachedFrequencyHz !== currentFilter.frequencyHz) {
+              const w0 = (2 * Math.PI * currentFilter.frequencyHz) / input.config.sampleRateHz
+              cachedFrequencyHz = currentFilter.frequencyHz
+              cachedFrequencyTrig = {
+                cosW0: Math.cos(w0),
+                sinW0: Math.sin(w0),
+              }
+            }
+            frequencyTrig = cachedFrequencyTrig
+          }
           let best = solution
           for (const replacement of trials) {
             if (input.deadline.isExpired()) {
@@ -170,6 +187,7 @@ export function jointRefineV2(
               input.frequencies,
               input.config.sampleRateHz,
               responseBuffer,
+              frequencyTrig,
             )
             if (input.deadline.isExpired()) {
               return finish(true)
