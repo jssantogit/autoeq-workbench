@@ -44,7 +44,6 @@ function createCounters(): StandardV2ResearchCounters {
     discreteTrials: 0,
     discreteAcceptedMoves: 0,
     compressionRemovalTrials: 0,
-    stagedContinuationBatches: [],
   }
 }
 
@@ -93,6 +92,7 @@ export function createResearchTelemetry(options: {
   const startedAtMs = nowMs()
   const counters = createCounters()
   const checkpoints: ResearchCheckpoint[] = []
+  const stagedContinuationBatches: StandardV2StagedContinuationBatchTrace[] = []
   const phaseTimingMs = createPhaseTiming()
   const phaseStarts = new Map<string, number[]>()
   const phasesObserved = new Set<(typeof PHASES)[number]>()
@@ -147,7 +147,7 @@ export function createResearchTelemetry(options: {
 
   if (options.mode === 'deep') {
     trace.onStagedContinuationBatch = (batch) => {
-      counters.stagedContinuationBatches.push(cloneStagedContinuationBatch(batch))
+      stagedContinuationBatches.push(cloneStagedContinuationBatch(batch))
     }
     trace.onPhaseStart = (phase) => {
       phasesObserved.add(phase)
@@ -181,7 +181,7 @@ export function createResearchTelemetry(options: {
         mode: options.mode,
         counters: {
           ...counters,
-          stagedContinuationBatches: counters.stagedContinuationBatches.map(
+          stagedContinuationBatches: stagedContinuationBatches.map(
             cloneStagedContinuationBatch,
           ),
         },
