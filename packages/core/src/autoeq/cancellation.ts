@@ -1,4 +1,9 @@
-import { biquadMagnitudeDb, validateResponseInput } from '../dsp/response.js'
+import {
+  biquadMagnitudeDb,
+  biquadMagnitudeDbExactOnGrid,
+  validateResponseInput,
+  type BiquadResponseGrid,
+} from '../dsp/response.js'
 import type { Filter } from '../types/filter.js'
 import type { CancellationAudit, CancellationPair } from './types.js'
 
@@ -15,12 +20,10 @@ function cosineSimilarity(left: readonly number[], right: readonly number[]): nu
   return dotProduct / Math.sqrt(leftSquared * rightSquared)
 }
 
-export function auditCancellations(
+function auditCancellationsWithResponses(
   filters: readonly Filter[],
-  frequencies: readonly number[],
-  sampleRateHz: number,
+  responseForFilter: (filter: Filter) => number[],
 ): CancellationAudit {
-  validateResponseInput(frequencies, sampleRateHz)
   const qualifyingCount = filters.filter((filter) => filter.enabled && filter.gainDb !== 0).length
   if (qualifyingCount < 2) return { pairs: [], totalScore: 0 }
   const hasPotentialPair = filters.some((left, leftIndex) =>
@@ -35,7 +38,7 @@ export function auditCancellations(
 
   const responses = filters.map((filter) =>
     filter.enabled && filter.gainDb !== 0
-      ? biquadMagnitudeDb(filter, frequencies, sampleRateHz).map(Math.abs)
+      ? responseForFilter(filter).map(Math.abs)
       : null
   )
   const pairs: CancellationPair[] = []
@@ -70,4 +73,26 @@ export function auditCancellations(
     pairs,
     totalScore: pairs.reduce((sum, pair) => sum + pair.score, 0),
   }
+}
+
+export function auditCancellations(
+  filters: readonly Filter[],
+  frequencies: readonly number[],
+  sampleRateHz: number,
+): CancellationAudit {
+  validateResponseInput(frequencies, sampleRateHz)
+  return auditCancellationsWithResponses(
+    filters,
+    (filter) => biquadMagnitudeDb(filter, frequencies, sampleRateHz),
+  )
+}
+
+export function auditCancellationsOnGrid(
+  filters: readonly Filter[],
+  grid: BiquadResponseGrid,
+): CancellationAudit {
+  return auditCancellationsWithResponses(
+    filters,
+    (filter) => biquadMagnitudeDbExactOnGrid(filter, grid),
+  )
 }
