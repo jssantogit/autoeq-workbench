@@ -61,4 +61,39 @@ describe('Standard v2 replacement trial view', () => {
     expect(materialized.metrics).toEqual(expectedMetrics)
     expect(materialized.cancellationAudit).toBe(solution.cancellationAudit)
   })
+
+  it('can reuse one response buffer while materialized winners retain an owned snapshot', () => {
+    const solution = evaluateV2Solution(filters, desiredDb, frequencies, sampleRateHz)
+    const replacement: Filter = {
+      ...solution.filters[1]!,
+      frequencyHz: 1_250,
+      gainDb: -3.5,
+      q: 1.8,
+    }
+    const responseBuffer = frequencies.map(() => Number.NaN)
+    const trial = evaluateV2ReplacementTrial(
+      solution,
+      1,
+      replacement,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+      responseBuffer,
+    )
+    expect(trial.responseDb).toBe(responseBuffer)
+
+    const materialized = materializeV2ReplacementTrial(
+      solution,
+      trial,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+    )
+    const ownedResponse = materialized.responseCache.filterResponsesDb[1]!
+    const snapshot = [...ownedResponse]
+    expect(ownedResponse).not.toBe(responseBuffer)
+
+    responseBuffer.fill(123)
+    expect(materialized.responseCache.filterResponsesDb[1]).toEqual(snapshot)
+  })
 })
