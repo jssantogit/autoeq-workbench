@@ -151,7 +151,7 @@ export function findPracticalMonotonicityWarnings(
 
   for (const group of grouped.values()) {
     const first = group[0]!
-    for (const [shorterBudgetSeconds, longerBudgetSeconds] of [[15, 30], [30, 60]] as const) {
+    for (const [shorterBudgetSeconds, longerBudgetSeconds] of [[5, 15], [15, 30], [30, 60]] as const) {
       const shorter = cells.get(`${first.caseId}|${shorterBudgetSeconds}|${first.maxFilters}`)
       const longer = cells.get(`${first.caseId}|${longerBudgetSeconds}|${first.maxFilters}`)
       if (shorter === undefined || longer === undefined) continue

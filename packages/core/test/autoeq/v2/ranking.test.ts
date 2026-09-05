@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  compareV2DeliverableQuality,
   compareV2Solutions,
   isV2TargetAchieved,
   type ErrorMetrics,
@@ -34,6 +35,24 @@ describe('Standard v2 ranking', () => {
 
   it('ranks normalized violation before lower RMSE', () => {
     expect(compareV2Solutions(solution(0.24, 0.70), solution(0.10, 1.20))).toBeLessThan(0)
+  })
+
+  it('retains balanced delivered quality without changing search ranking', () => {
+    const stormEarly = solution(1.433, 5.405)
+    const stormLater = solution(1.640, 5.351)
+    expect(compareV2Solutions(stormLater, stormEarly)).toBeLessThan(0)
+    expect(compareV2DeliverableQuality(stormEarly, stormLater)).toBeLessThan(0)
+
+    const u12tEarly = solution(1.286, 4.965)
+    const u12tLater = solution(1.615, 4.846)
+    expect(compareV2Solutions(u12tLater, u12tEarly)).toBeLessThan(0)
+    expect(compareV2DeliverableQuality(u12tEarly, u12tLater)).toBeLessThan(0)
+  })
+
+  it('always ranks an achieved delivered target ahead of an outside-target solution', () => {
+    expect(
+      compareV2DeliverableQuality(solution(0.25, 0.75), solution(0.01, 0.76)),
+    ).toBeLessThan(0)
   })
 
   it('uses aggressiveness and stable filter coordinates as deterministic ties', () => {
