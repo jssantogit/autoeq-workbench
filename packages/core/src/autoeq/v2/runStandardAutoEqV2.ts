@@ -98,10 +98,10 @@ export function runStandardAutoEqV2(
       runtime.onBoundaryModeAttempt?.(boundaryMode)
       runtime.researchTrace?.onBoundaryModeAttempt?.(boundaryMode)
 
-      let modeBestCheckpoint: {
-        deliverable: V2Deliverable
-        source: V2EvaluatedSolution
-      } | null = null
+      const modeBestCheckpoint: {
+        deliverable: V2Deliverable | null
+        source: V2EvaluatedSolution | null
+      } = { deliverable: null, source: null }
       const checkpointedSources = new WeakSet<V2EvaluatedSolution>()
       const checkpointWorkingSolution = (solution: V2EvaluatedSolution): void => {
         if (checkpointedSources.has(solution)) return
@@ -117,10 +117,11 @@ export function runStandardAutoEqV2(
           researchTrace: runtime.researchTrace,
         })
         if (
-          modeBestCheckpoint === null ||
+          modeBestCheckpoint.deliverable === null ||
           compareV2DeliverableQuality(checkpoint, modeBestCheckpoint.deliverable) < 0
         ) {
-          modeBestCheckpoint = { deliverable: checkpoint, source: solution }
+          modeBestCheckpoint.deliverable = checkpoint
+          modeBestCheckpoint.source = solution
         }
         retainDeliverable(checkpoint)
       }
@@ -145,7 +146,7 @@ export function runStandardAutoEqV2(
       ) {
         const deepSources: V2EvaluatedSolution[] = [search.bestSolution]
         if (
-          modeBestCheckpoint !== null &&
+          modeBestCheckpoint.source !== null &&
           modeBestCheckpoint.source !== search.bestSolution
         ) {
           deepSources.push(modeBestCheckpoint.source)
