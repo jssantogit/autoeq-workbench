@@ -117,10 +117,14 @@ export function biquadMagnitudeDbExactOnGrid(
   })
 }
 
-export function biquadMagnitudeDbOnGrid(
+export function biquadMagnitudeDbOnGridInto(
   filter: Filter,
   grid: BiquadResponseGrid,
+  output: number[],
 ): number[] {
+  if (output.length !== grid.frequencies.length) {
+    throw new CoreError('validation', 'Response output buffer length must match the grid')
+  }
   const { b0, b1, b2, a0, a1, a2 } = biquadCoefficients(filter, grid.sampleRateHz)
   const numeratorConstant = b0 * b0 + b1 * b1 + b2 * b2
   const numeratorCosW = 2 * (b0 * b1 + b1 * b2)
@@ -128,7 +132,7 @@ export function biquadMagnitudeDbOnGrid(
   const denominatorConstant = a0 * a0 + a1 * a1 + a2 * a2
   const denominatorCosW = 2 * (a0 * a1 + a1 * a2)
   const denominatorCos2W = 2 * a0 * a2
-  return grid.frequencies.map((_, index) => {
+  for (let index = 0; index < grid.frequencies.length; index += 1) {
     const cosW = grid.cosW[index]!
     const cos2W = grid.cos2W[index]!
     const numeratorSquared =
@@ -143,6 +147,18 @@ export function biquadMagnitudeDbOnGrid(
     if (!Number.isFinite(magnitudeDb)) {
       throw new CoreError('numeric', 'Biquad magnitude must be finite')
     }
-    return magnitudeDb
-  })
+    output[index] = magnitudeDb
+  }
+  return output
+}
+
+export function biquadMagnitudeDbOnGrid(
+  filter: Filter,
+  grid: BiquadResponseGrid,
+): number[] {
+  return biquadMagnitudeDbOnGridInto(
+    filter,
+    grid,
+    new Array<number>(grid.frequencies.length),
+  )
 }
