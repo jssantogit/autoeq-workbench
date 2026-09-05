@@ -196,8 +196,9 @@ describe('research runner', () => {
       },
     })
 
-    expect(row.counters.stagedContinuationBatches).toHaveLength(1)
-    expect(row.counters.stagedContinuationBatches[0]).toMatchObject({
+    const batches = row.counters.stagedContinuationBatches ?? []
+    expect(batches).toHaveLength(1)
+    expect(batches[0]).toMatchObject({
       boundaryMode: 'sign-crossing',
       parentFilterCount: 4,
       candidates: [
