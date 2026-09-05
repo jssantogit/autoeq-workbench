@@ -1,5 +1,7 @@
 import { createEvaluationGrid } from '../../config/numericPolicy.js'
 import { desiredCorrection, prepareCurve } from '../../curves/derive.js'
+import { cascadeMagnitudeDb } from '../../dsp/cascade.js'
+import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
 import { CoreError } from '../../types/error.js'
 import type { AutoEqResultV2, RunManifestV2, StandardAutoEqInputV2 } from '../types.js'
 import { resolveStandardAutoEqV2Config } from './config.js'
@@ -198,7 +200,19 @@ export function runStandardAutoEqV2(
     }
   }
 
-  const targetAchieved = isV2TargetAchieved(bestDeliverable.metrics)
+  const canonicalCascadeDb = cascadeMagnitudeDb(
+    bestDeliverable.filters,
+    frequencies,
+    config.sampleRateHz,
+  )
+  const canonicalResidualDb = desiredDb.map((desired, index) =>
+    desired - canonicalCascadeDb[index]!)
+  const canonicalMetrics = calculateErrorMetrics(canonicalResidualDb, frequencies)
+  const targetAchieved = isV2TargetAchieved(canonicalMetrics)
+  if (terminationReason === 'target-reached' && !targetAchieved) {
+    terminationReason = 'converged'
+  }
+
   const manifest: RunManifestV2 = {
     schemaVersion: 3,
     algorithmVersion: 'standard-v2',
@@ -211,7 +225,7 @@ export function runStandardAutoEqV2(
     targetName: input.target.name,
     algorithmParameters: { ...config.algorithm },
     finalFilters: bestDeliverable.filters.map((filter) => ({ ...filter })),
-    metrics: { ...bestDeliverable.metrics },
+    metrics: { ...canonicalMetrics },
     preampDb: bestDeliverable.preampDb,
     cancellationAudit: {
       pairs: bestDeliverable.cancellationAudit.pairs.map((pair) => ({ ...pair })),
@@ -222,7 +236,7 @@ export function runStandardAutoEqV2(
   }
   return {
     filters: bestDeliverable.filters,
-    metrics: bestDeliverable.metrics,
+    metrics: canonicalMetrics,
     preampDb: bestDeliverable.preampDb,
     cancellationAudit: bestDeliverable.cancellationAudit,
     manifest,
