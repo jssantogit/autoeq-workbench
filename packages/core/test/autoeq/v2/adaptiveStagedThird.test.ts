@@ -1,12 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import type { ErrorMetrics } from '../../../src/metrics/errorMetrics.js'
-import {
-  selectV2StagedContinuationCandidates,
-  type V2EvaluatedSolution,
-} from '../../../src/autoeq/v2/search.js'
+import type { V2Solution } from '../../../src/autoeq/v2/ranking.js'
+import { selectV2StagedContinuationCandidates } from '../../../src/autoeq/v2/stagedContinuation.js'
 
-function staged(violation: number): V2EvaluatedSolution {
+function staged(violation: number): V2Solution {
   const metrics: ErrorMetrics = {
     maeDb: violation * 0.2,
     rmseDb: violation * 0.25,
@@ -17,9 +15,6 @@ function staged(violation: number): V2EvaluatedSolution {
     filters: [],
     metrics,
     cancellationAudit: { pairs: [], totalScore: 0 },
-    responseCache: { responseGrid: [], filterResponses: [], cascadeDb: [] },
-    cascadeDb: [],
-    residualDb: [],
   }
 }
 
