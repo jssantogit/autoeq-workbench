@@ -102,6 +102,7 @@ export function cyclicDiscreteRefineV2(
     input.config.sampleRateHz,
     input.responseGrid,
   )
+  const responseBuffer = new Array<number>(input.frequencies.length)
   let completedCycles = 0
   const validAudits = new WeakSet<V2EvaluatedSolution>([solution])
   const withCancellationAudit = (candidate: V2EvaluatedSolution): V2EvaluatedSolution => {
@@ -167,6 +168,7 @@ export function cyclicDiscreteRefineV2(
                 input.desiredDb,
                 input.frequencies,
                 input.config.sampleRateHz,
+                responseBuffer,
               )
             }
             if (input.deadline.isExpired()) {
