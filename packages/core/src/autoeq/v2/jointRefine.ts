@@ -1,7 +1,7 @@
 import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
 import type { BiquadResponseGrid } from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
-import { auditCancellations } from '../cancellation.js'
+import { auditCancellationsOnGrid } from '../cancellation.js'
 import type { StandardAutoEqV2Config } from './config.js'
 import { compareV2PrimaryMetrics, compareV2Solutions, type V2Solution } from './ranking.js'
 import {
@@ -77,7 +77,7 @@ export function evaluateV2Solution(
     cascadeDb: responseCache.cascadeDb,
     residualDb,
     metrics: calculateErrorMetrics(residualDb, frequencies),
-    cancellationAudit: auditCancellations(copiedFilters, frequencies, sampleRateHz),
+    cancellationAudit: auditCancellationsOnGrid(copiedFilters, responseCache.responseGrid),
   }
 }
 
@@ -110,10 +110,9 @@ export function jointRefineV2(
     trace?.onCancellationAuditComputed?.()
     const audited = {
       ...candidate,
-      cancellationAudit: auditCancellations(
+      cancellationAudit: auditCancellationsOnGrid(
         candidate.filters,
-        input.frequencies,
-        input.config.sampleRateHz,
+        candidate.responseCache.responseGrid,
       ),
     }
     validAudits.add(audited)
