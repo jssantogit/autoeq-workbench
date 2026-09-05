@@ -1,4 +1,7 @@
-import { biquadCoefficients } from './biquad.js'
+import {
+  biquadCoefficients,
+  biquadCoefficientsWithGainFactor,
+} from './biquad.js'
 import { CoreError } from '../types/error.js'
 import type { Filter } from '../types/filter.js'
 
@@ -121,11 +124,14 @@ export function biquadMagnitudeDbOnGridInto(
   filter: Filter,
   grid: BiquadResponseGrid,
   output: number[],
+  gainFactorA?: number,
 ): number[] {
   if (output.length !== grid.frequencies.length) {
     throw new CoreError('validation', 'Response output buffer length must match the grid')
   }
-  const { b0, b1, b2, a0, a1, a2 } = biquadCoefficients(filter, grid.sampleRateHz)
+  const { b0, b1, b2, a0, a1, a2 } = gainFactorA === undefined
+    ? biquadCoefficients(filter, grid.sampleRateHz)
+    : biquadCoefficientsWithGainFactor(filter, grid.sampleRateHz, gainFactorA)
   const numeratorConstant = b0 * b0 + b1 * b1 + b2 * b2
   const numeratorCosW = 2 * (b0 * b1 + b1 * b2)
   const numeratorCos2W = 2 * b0 * b2
