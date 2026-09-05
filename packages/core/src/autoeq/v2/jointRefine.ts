@@ -104,6 +104,7 @@ export function jointRefineV2(
         input.frequencies,
         input.config.sampleRateHz,
       )
+  const responseBuffer = new Array<number>(input.frequencies.length)
   const validAudits = new WeakSet<V2EvaluatedSolution>([solution])
   const withCancellationAudit = (candidate: V2EvaluatedSolution): V2EvaluatedSolution => {
     if (validAudits.has(candidate)) return candidate
@@ -168,6 +169,7 @@ export function jointRefineV2(
               input.desiredDb,
               input.frequencies,
               input.config.sampleRateHz,
+              responseBuffer,
             )
             if (input.deadline.isExpired()) {
               return finish(true)
