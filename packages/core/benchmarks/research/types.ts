@@ -46,7 +46,7 @@ export interface StandardV2ResearchCounters {
   discreteTrials: number
   discreteAcceptedMoves: number
   compressionRemovalTrials: number
-  stagedContinuationBatches: StandardV2StagedContinuationBatchTrace[]
+  stagedContinuationBatches?: StandardV2StagedContinuationBatchTrace[]
 }
 
 export interface StandardV2ResearchPhaseTimingMs {
