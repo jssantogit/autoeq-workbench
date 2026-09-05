@@ -6,6 +6,7 @@ import {
   biquadMagnitudeDb,
   type Filter,
 } from '../src/index.js'
+import { biquadCoefficientsWithFrequencyTrig } from '../src/dsp/biquad.js'
 
 const sampleRateHz = 192_000
 
@@ -37,6 +38,23 @@ describe('biquadCoefficients', () => {
 
     expect(coefficients.a0).toBe(1)
     expect(Object.values(coefficients).every(Number.isFinite)).toBe(true)
+  })
+
+  it.each([
+    ['PK gain trial', filter({ type: 'PK', frequencyHz: 1234.5, gainDb: -5.25, q: 3.7 })],
+    ['PK Q trial', filter({ type: 'PK', frequencyHz: 7452.944, gainDb: 8.4, q: 7.25 })],
+    ['low shelf', filter({ type: 'LS', frequencyHz: 87.25, gainDb: 4.75, q: 0.7 })],
+    ['high shelf', filter({ type: 'HS', frequencyHz: 12_345.67, gainDb: -6.5, q: 0.7 })],
+  ] as const)('reuses precomputed center-frequency trig bit-exactly for %s', (_name, candidate) => {
+    const w0 = (2 * Math.PI * candidate.frequencyHz) / sampleRateHz
+    expect(
+      biquadCoefficientsWithFrequencyTrig(
+        candidate,
+        sampleRateHz,
+        Math.cos(w0),
+        Math.sin(w0),
+      ),
+    ).toEqual(biquadCoefficients(candidate, sampleRateHz))
   })
 
   it.each([
