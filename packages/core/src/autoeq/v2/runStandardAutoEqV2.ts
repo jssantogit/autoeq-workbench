@@ -3,7 +3,13 @@ import { desiredCorrection, prepareCurve } from '../../curves/derive.js'
 import { CoreError } from '../../types/error.js'
 import type { AutoEqResultV2, RunManifestV2, StandardAutoEqInputV2 } from '../types.js'
 import { resolveStandardAutoEqV2Config } from './config.js'
-import { buildDeliverableV2, compressDeliverableV2 } from './deliverable.js'
+import {
+  buildCheckpointDeliverableV2,
+  buildDeliverableV2,
+  compressDeliverableV2,
+  type V2Deliverable,
+} from './deliverable.js'
+import type { V2EvaluatedSolution } from './jointRefine.js'
 import {
   compareV2DeliverableQuality,
   compareV2Solutions,
@@ -63,6 +69,12 @@ export function runStandardAutoEqV2(
       preampDb: bestDeliverable.preampDb,
     })
   }
+  const retainDeliverable = (candidate: V2Deliverable): void => {
+    if (compareV2DeliverableQuality(candidate, bestDeliverable) < 0) {
+      bestDeliverable = candidate
+      emitBestDeliverable()
+    }
+  }
   emitBestDeliverable()
   let terminationReason: RunManifestV2['terminationReason']
   if (deadline.isExpired()) {
@@ -85,6 +97,34 @@ export function runStandardAutoEqV2(
       }
       runtime.onBoundaryModeAttempt?.(boundaryMode)
       runtime.researchTrace?.onBoundaryModeAttempt?.(boundaryMode)
+
+      let modeBestCheckpoint: {
+        deliverable: V2Deliverable
+        source: V2EvaluatedSolution
+      } | null = null
+      const checkpointedSources = new WeakSet<V2EvaluatedSolution>()
+      const checkpointWorkingSolution = (solution: V2EvaluatedSolution): void => {
+        if (checkpointedSources.has(solution)) return
+        checkpointedSources.add(solution)
+        const checkpoint = buildCheckpointDeliverableV2({
+          filters: solution.filters,
+          desiredDb,
+          frequencies,
+          config,
+          deadline,
+          responseGrid: solution.responseCache.responseGrid,
+          fallbackOnExpiration: bestDeliverable,
+          researchTrace: runtime.researchTrace,
+        })
+        if (
+          modeBestCheckpoint === null ||
+          compareV2DeliverableQuality(checkpoint, modeBestCheckpoint.deliverable) < 0
+        ) {
+          modeBestCheckpoint = { deliverable: checkpoint, source: solution }
+        }
+        retainDeliverable(checkpoint)
+      }
+
       const search = searchStandardV2WorkingSolutions({
         desiredDb,
         frequencies,
@@ -92,25 +132,41 @@ export function runStandardAutoEqV2(
         deadline,
         boundaryMode,
         researchTrace: runtime.researchTrace,
-        onWorkingSolution: (solution) => {
+        onBestWorkingSolution: checkpointWorkingSolution,
+        onWorkingSolution: checkpointWorkingSolution,
+        isTargetCapable: () => isV2TargetAchieved(bestDeliverable.metrics),
+      })
+      searchTermination = search.termination
+
+      if (
+        search.termination !== 'time-limit' &&
+        !deadline.isExpired() &&
+        !isV2TargetAchieved(bestDeliverable.metrics)
+      ) {
+        const deepSources: V2EvaluatedSolution[] = [search.bestSolution]
+        if (
+          modeBestCheckpoint !== null &&
+          modeBestCheckpoint.source !== search.bestSolution
+        ) {
+          deepSources.push(modeBestCheckpoint.source)
+        }
+        for (const source of deepSources) {
+          if (deadline.isExpired()) break
           const deliverable = buildDeliverableV2({
-            filters: solution.filters,
+            filters: source.filters,
             desiredDb,
             frequencies,
             config,
             deadline,
-            responseGrid: solution.responseCache.responseGrid,
+            responseGrid: source.responseCache.responseGrid,
             fallbackOnExpiration: bestDeliverable,
             researchTrace: runtime.researchTrace,
           })
-          if (compareV2DeliverableQuality(deliverable, bestDeliverable) < 0) {
-            bestDeliverable = deliverable
-            emitBestDeliverable()
-          }
-        },
-        isTargetCapable: () => isV2TargetAchieved(bestDeliverable.metrics),
-      })
-      searchTermination = search.termination
+          retainDeliverable(deliverable)
+          if (isV2TargetAchieved(bestDeliverable.metrics)) break
+        }
+      }
+
       if (
         isV2TargetAchieved(bestDeliverable.metrics) ||
         search.termination === 'time-limit' ||
