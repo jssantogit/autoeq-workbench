@@ -35,6 +35,8 @@ on:
         required: false
         default: ''
         type: string
+  push:
+    branches: [research/trial-view-perf-2026-09-05]
 
 permissions:
   contents: read
@@ -52,7 +54,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2/research
+      - run: pnpm --filter @autoeq-workbench/core test
       - run: pnpm --filter @autoeq-workbench/core typecheck
       - name: Run AutoEQ Research Bench
         env:
@@ -66,7 +68,13 @@ jobs:
         run: |
           set -euo pipefail
           args=(--output-dir "$GITHUB_WORKSPACE/autoeq-research")
-          if [[ "$RESEARCH_PURPOSE" == "baseline" ]]; then
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            args+=(
+              --preset quick
+              --repeats 1
+              --profile titan-to-storm:30
+            )
+          elif [[ "$RESEARCH_PURPOSE" == "baseline" ]]; then
             args+=(
               --preset full
               --write-baseline
