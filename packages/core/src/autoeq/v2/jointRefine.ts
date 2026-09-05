@@ -81,14 +81,15 @@ export function evaluateV2Solution(
   }
 }
 
-function uniqueTrials(filters: readonly Filter[]): Filter[] {
-  const seen = new Set<string>()
-  return filters.filter((filter) => {
-    const key = `${filter.frequencyHz}|${filter.gainDb}|${filter.q}`
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
+export function dedupeV2TrialPair(first: Filter, second: Filter): Filter[] {
+  if (
+    first.frequencyHz === second.frequencyHz &&
+    first.gainDb === second.gainDb &&
+    first.q === second.q
+  ) {
+    return [first]
+  }
+  return [first, second]
 }
 
 export function jointRefineV2(
@@ -143,19 +144,19 @@ export function jointRefineV2(
         for (const coordinate of coordinates) {
           const currentFilter = solution.filters[filterIndex]!
           const trials = coordinate === 'frequencyHz'
-            ? uniqueTrials([
+            ? dedupeV2TrialPair(
                 { ...currentFilter, frequencyHz: clamp(currentFilter.frequencyHz * 2 ** -scale.fcOctaveStep, input.config.minFrequencyHz, input.config.maxFrequencyHz) },
                 { ...currentFilter, frequencyHz: clamp(currentFilter.frequencyHz * 2 ** scale.fcOctaveStep, input.config.minFrequencyHz, input.config.maxFrequencyHz) },
-              ])
+              )
             : coordinate === 'gainDb'
-              ? uniqueTrials([
+              ? dedupeV2TrialPair(
                   { ...currentFilter, gainDb: clamp(currentFilter.gainDb - scale.gainStepDb, input.config.minGainDb, input.config.maxGainDb) },
                   { ...currentFilter, gainDb: clamp(currentFilter.gainDb + scale.gainStepDb, input.config.minGainDb, input.config.maxGainDb) },
-                ])
-              : uniqueTrials([
+                )
+              : dedupeV2TrialPair(
                   { ...currentFilter, q: clamp(currentFilter.q * 2 ** -scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
                   { ...currentFilter, q: clamp(currentFilter.q * 2 ** scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
-                ])
+                )
           let best = solution
           for (const replacement of trials) {
             if (input.deadline.isExpired()) {
