@@ -49,6 +49,7 @@ export type {
 export {
   appendV2ResponseCacheFilter,
   createV2ResponseCache,
+  removeV2ResponseCacheFilter,
   replaceV2ResponseCacheFilter,
 } from './autoeq/v2/responseCache.js'
 export type { V2ResponseCache } from './autoeq/v2/responseCache.js'
