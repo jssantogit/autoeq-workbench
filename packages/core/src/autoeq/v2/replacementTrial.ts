@@ -1,4 +1,5 @@
 import type { ErrorMetrics } from '../../metrics/errorMetrics.js'
+import type { BiquadFrequencyTrig } from '../../dsp/response.js'
 import { CoreError } from '../../types/error.js'
 import type { Filter } from '../../types/filter.js'
 import type { V2EvaluatedSolution } from './jointRefine.js'
@@ -22,6 +23,7 @@ export function evaluateV2ReplacementTrial(
   frequencies: readonly number[],
   sampleRateHz: number,
   responseBuffer?: number[],
+  frequencyTrig?: BiquadFrequencyTrig,
 ): V2ReplacementTrial {
   const responseDb = computeV2ResponseCacheFilterResponse(
     solution.responseCache,
@@ -29,6 +31,7 @@ export function evaluateV2ReplacementTrial(
     frequencies,
     sampleRateHz,
     responseBuffer,
+    frequencyTrig,
   )
   const oldResponse = solution.responseCache.filterResponsesDb[filterIndex]!
   let absoluteSum = 0
