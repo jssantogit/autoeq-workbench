@@ -2,6 +2,7 @@ import {
   biquadMagnitudeDbOnGridInto,
   createBiquadResponseGrid,
   validateResponseInput,
+  type BiquadFrequencyTrig,
   type BiquadResponseGrid,
 } from '../../dsp/response.js'
 import { CoreError } from '../../types/error.js'
@@ -17,6 +18,7 @@ function responseForFilter(
   filter: Filter,
   responseGrid: BiquadResponseGrid,
   output?: number[],
+  frequencyTrig?: BiquadFrequencyTrig,
 ): number[] {
   if (
     filter === null ||
@@ -30,7 +32,7 @@ function responseForFilter(
     throw new CoreError('validation', 'Response output buffer length must match the grid')
   }
   if (filter.enabled) {
-    return biquadMagnitudeDbOnGridInto(filter, responseGrid, response)
+    return biquadMagnitudeDbOnGridInto(filter, responseGrid, response, frequencyTrig)
   }
   response.fill(0)
   return response
@@ -85,9 +87,10 @@ export function computeV2ResponseCacheFilterResponse(
   frequencies: readonly number[],
   sampleRateHz: number,
   output?: number[],
+  frequencyTrig?: BiquadFrequencyTrig,
 ): number[] {
   assertMatchingGrid(cache.responseGrid, frequencies, sampleRateHz)
-  return responseForFilter(replacement, cache.responseGrid, output)
+  return responseForFilter(replacement, cache.responseGrid, output, frequencyTrig)
 }
 
 export function replaceV2ResponseCacheFilterWithResponse(
