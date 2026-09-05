@@ -1,5 +1,5 @@
 import {
-  biquadMagnitudeDbOnGrid,
+  biquadMagnitudeDbOnGridInto,
   createBiquadResponseGrid,
   validateResponseInput,
   type BiquadResponseGrid,
@@ -16,6 +16,7 @@ export interface V2ResponseCache {
 function responseForFilter(
   filter: Filter,
   responseGrid: BiquadResponseGrid,
+  output?: number[],
 ): number[] {
   if (
     filter === null ||
@@ -24,9 +25,15 @@ function responseForFilter(
   ) {
     throw new CoreError('validation', 'Each filter must have a boolean enabled value')
   }
-  return filter.enabled
-    ? biquadMagnitudeDbOnGrid(filter, responseGrid)
-    : responseGrid.frequencies.map(() => 0)
+  const response = output ?? new Array<number>(responseGrid.frequencies.length)
+  if (response.length !== responseGrid.frequencies.length) {
+    throw new CoreError('validation', 'Response output buffer length must match the grid')
+  }
+  if (filter.enabled) {
+    return biquadMagnitudeDbOnGridInto(filter, responseGrid, response)
+  }
+  response.fill(0)
+  return response
 }
 
 function assertMatchingGrid(
@@ -77,9 +84,10 @@ export function computeV2ResponseCacheFilterResponse(
   replacement: Filter,
   frequencies: readonly number[],
   sampleRateHz: number,
+  output?: number[],
 ): number[] {
   assertMatchingGrid(cache.responseGrid, frequencies, sampleRateHz)
-  return responseForFilter(replacement, cache.responseGrid)
+  return responseForFilter(replacement, cache.responseGrid, output)
 }
 
 export function replaceV2ResponseCacheFilterWithResponse(
