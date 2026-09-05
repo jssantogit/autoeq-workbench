@@ -4,6 +4,8 @@ import type { CancellationAudit } from '../types.js'
 
 const TYPE_ORDER = { LS: 0, PK: 1, HS: 2 } as const
 
+type V2PrimaryMetricValues = Pick<ErrorMetrics, 'rmseDb' | 'maxAbsDb'>
+
 export interface V2Solution {
   filters: Filter[]
   metrics: ErrorMetrics
@@ -14,7 +16,7 @@ export function isV2TargetAchieved(metrics: ErrorMetrics): boolean {
   return metrics.rmseDb <= 0.25 && metrics.maxAbsDb <= 0.75
 }
 
-function normalizedViolation(metrics: ErrorMetrics): number {
+function normalizedViolation(metrics: V2PrimaryMetricValues): number {
   return Math.max(metrics.rmseDb / 0.25, metrics.maxAbsDb / 0.75)
 }
 
@@ -26,7 +28,10 @@ function compareNumber(left: number, right: number): number {
   return left < right ? -1 : left > right ? 1 : 0
 }
 
-export function compareV2PrimaryMetrics(left: ErrorMetrics, right: ErrorMetrics): number {
+export function compareV2PrimaryMetrics(
+  left: V2PrimaryMetricValues,
+  right: V2PrimaryMetricValues,
+): number {
   return compareNumber(normalizedViolation(left), normalizedViolation(right)) ||
     compareNumber(left.rmseDb, right.rmseDb) ||
     compareNumber(left.maxAbsDb, right.maxAbsDb)
