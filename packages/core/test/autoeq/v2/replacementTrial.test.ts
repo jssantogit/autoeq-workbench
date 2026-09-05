@@ -4,6 +4,7 @@ import { calculateErrorMetrics, evaluateV2Solution, type Filter } from '../../..
 import { replaceV2ResponseCacheFilter } from '../../../src/autoeq/v2/responseCache.js'
 import {
   evaluateV2ReplacementTrial,
+  evaluateV2ReplacementTrialTrusted,
   materializeV2ReplacementTrial,
 } from '../../../src/autoeq/v2/replacementTrial.js'
 
@@ -95,5 +96,54 @@ describe('Standard v2 replacement trial view', () => {
 
     responseBuffer.fill(123)
     expect(materialized.responseCache.filterResponsesDb[1]).toEqual(snapshot)
+  })
+
+  it('trusted evaluation is exactly equivalent for validated v2 inputs', () => {
+    const solution = evaluateV2Solution(filters, desiredDb, frequencies, sampleRateHz)
+    const replacement: Filter = {
+      ...solution.filters[1]!,
+      frequencyHz: 1_250,
+      gainDb: -3.5,
+      q: 1.8,
+    }
+    const checkedBuffer = frequencies.map(() => 0)
+    const trustedBuffer = frequencies.map(() => 0)
+
+    const checked = evaluateV2ReplacementTrial(
+      solution,
+      1,
+      replacement,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+      checkedBuffer,
+    )
+    const trusted = evaluateV2ReplacementTrialTrusted(
+      solution,
+      1,
+      replacement,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+      trustedBuffer,
+    )
+
+    expect(trusted).toEqual(checked)
+  })
+
+  it('keeps validation on the checked evaluator for non-finite input', () => {
+    const solution = evaluateV2Solution(filters, desiredDb, frequencies, sampleRateHz)
+    const replacement: Filter = { ...solution.filters[1]!, gainDb: -3.5 }
+    const invalidDesired = [...desiredDb]
+    invalidDesired[2] = Number.NaN
+
+    expect(() => evaluateV2ReplacementTrial(
+      solution,
+      1,
+      replacement,
+      invalidDesired,
+      frequencies,
+      sampleRateHz,
+    )).toThrow('Residual and frequency values must be finite')
   })
 })
