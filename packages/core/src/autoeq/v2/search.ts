@@ -23,6 +23,7 @@ export interface SearchInput {
   deadline: StandardV2Deadline
   boundaryMode: V2CandidateBoundaryMode
   isTargetCapable?: (solution: V2Solution) => boolean
+  onBestWorkingSolution?: (solution: V2EvaluatedSolution) => void
   onWorkingSolution?: (solution: V2EvaluatedSolution) => void
   researchTrace?: StandardV2ResearchTrace
 }
@@ -172,10 +173,6 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
             deadline: input.deadline,
             researchTrace: input.researchTrace,
           })
-          if (refined.expired) {
-            expired = true
-            break
-          }
           if (compareV2Solutions(refined.solution, path) < 0) {
             expanded.push(refined.solution)
             if (refined.solution.filters.length > peakWorkingFilterCount) {
@@ -183,9 +180,16 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
               input.researchTrace?.onPeakWorkingFilterCount?.(peakWorkingFilterCount)
             }
             if (pathIndex === 0) mainPathImproved = true
-            if (compareV2Solutions(refined.solution, best) < 0) best = refined.solution
+            if (compareV2Solutions(refined.solution, best) < 0) {
+              best = refined.solution
+              input.onBestWorkingSolution?.(best)
+            }
             if (phase === 'staged') stagedImproved = true
             else break
+          }
+          if (refined.expired || input.deadline.isExpired()) {
+            expired = true
+            break
           }
         }
         if (expired) break
