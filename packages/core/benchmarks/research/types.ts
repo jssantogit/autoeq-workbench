@@ -2,7 +2,10 @@ import type { Curve } from '../../src/types/curve.js'
 import type { ErrorMetrics } from '../../src/metrics/errorMetrics.js'
 import type { BandMetric } from '../../src/metrics/bandMetrics.js'
 import type { Filter } from '../../src/types/filter.js'
-import type { StandardV2ResearchPhase } from '../../src/autoeq/v2/researchTrace.js'
+import type {
+  StandardV2ResearchPhase,
+  StandardV2StagedContinuationBatchTrace,
+} from '../../src/autoeq/v2/researchTrace.js'
 
 export type ResearchCaseId = 'titan-to-storm' | 'titan-to-u12t' | 'titan-to-trio'
 
@@ -61,6 +64,7 @@ export interface ResearchTelemetrySnapshot {
   checkpoints: ResearchCheckpoint[]
   phaseTimingMs: StandardV2ResearchPhaseTimingMs
   phasesObserved: StandardV2ResearchPhase[]
+  stagedContinuationBatches: StandardV2StagedContinuationBatchTrace[]
 }
 
 export type ResearchTerminationReason = 'target-reached' | 'converged' | 'time-limit'
@@ -90,6 +94,7 @@ export interface ResearchRunRow {
   filters: Filter[]
   telemetryMode: 'light' | 'deep'
   phaseTimingMs: StandardV2ResearchPhaseTimingMs
+  stagedContinuationBatches: StandardV2StagedContinuationBatchTrace[]
 }
 
 export interface ResearchAggregateRow {
