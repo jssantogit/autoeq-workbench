@@ -5,7 +5,7 @@ import type { Filter } from '../../types/filter.js'
 import { auditCancellations } from '../cancellation.js'
 import { finalizeDeliveredFilters } from '../runStandardAutoEq.js'
 import type { StandardAutoEqV2Config } from './config.js'
-import { cyclicDiscreteRefineV2 } from './discreteRefine.js'
+import { cyclicDiscreteRefineV2, quantizeV2Filters } from './discreteRefine.js'
 import { evaluateV2Solution, jointRefineV2, type V2EvaluatedSolution } from './jointRefine.js'
 import { compareV2Solutions, isV2TargetAchieved } from './ranking.js'
 import {
@@ -111,41 +111,70 @@ function constrainToCap(input: BuildDeliverableV2Input): Filter[] {
   return filters
 }
 
-export function buildDeliverableV2(input: BuildDeliverableV2Input): V2Deliverable {
-  return withResearchTracePhase(input.researchTrace, 'deliverable', () => {
-  if (input.fallbackOnExpiration && input.deadline.isExpired()) {
-    return input.fallbackOnExpiration
-  }
-  const constrained = constrainToCap(input)
-  if (input.fallbackOnExpiration && input.deadline.isExpired()) {
-    return input.fallbackOnExpiration
-  }
-  const discrete = cyclicDiscreteRefineV2({
-    ...input,
-    filters: constrained,
-  })
-  if (
-    input.fallbackOnExpiration &&
-    (discrete.expired || input.deadline.isExpired())
-  ) {
-    return input.fallbackOnExpiration
-  }
-  const delivered = finalizeDeliveredFilters(
-    discrete.filters.filter((filter) => filter.gainDb !== 0),
-  )
+function finishDeliveredFilters(
+  filters: readonly Filter[],
+  input: BuildDeliverableV2Input,
+  responseGrid?: BiquadResponseGrid,
+): V2Deliverable {
+  const delivered = finalizeDeliveredFilters(filters.filter((filter) => filter.gainDb !== 0))
   const evaluated = evaluateV2Solution(
     delivered,
     input.desiredDb,
     input.frequencies,
     input.config.sampleRateHz,
-    discrete.solution.responseCache.responseGrid,
+    responseGrid ?? input.responseGrid,
   )
-  if (input.fallbackOnExpiration && input.deadline.isExpired()) {
-    return input.fallbackOnExpiration
-  }
-  const deliverable = withPreamp(evaluated, input.config.sampleRateHz)
-  input.researchTrace?.onDeliverableBuilt?.()
-  return deliverable
+  return withPreamp(evaluated, input.config.sampleRateHz)
+}
+
+export function buildCheckpointDeliverableV2(input: BuildDeliverableV2Input): V2Deliverable {
+  return withResearchTracePhase(input.researchTrace, 'deliverable', () => {
+    if (input.fallbackOnExpiration && input.deadline.isExpired()) {
+      return input.fallbackOnExpiration
+    }
+    const constrained = constrainToCap(input)
+    if (input.fallbackOnExpiration && input.deadline.isExpired()) {
+      return input.fallbackOnExpiration
+    }
+    const quantized = quantizeV2Filters(constrained, input.config)
+    const deliverable = finishDeliveredFilters(quantized, input, input.responseGrid)
+    if (input.fallbackOnExpiration && input.deadline.isExpired()) {
+      return input.fallbackOnExpiration
+    }
+    input.researchTrace?.onDeliverableBuilt?.()
+    return deliverable
+  })
+}
+
+export function buildDeliverableV2(input: BuildDeliverableV2Input): V2Deliverable {
+  return withResearchTracePhase(input.researchTrace, 'deliverable', () => {
+    if (input.fallbackOnExpiration && input.deadline.isExpired()) {
+      return input.fallbackOnExpiration
+    }
+    const constrained = constrainToCap(input)
+    if (input.fallbackOnExpiration && input.deadline.isExpired()) {
+      return input.fallbackOnExpiration
+    }
+    const discrete = cyclicDiscreteRefineV2({
+      ...input,
+      filters: constrained,
+    })
+    if (
+      input.fallbackOnExpiration &&
+      (discrete.expired || input.deadline.isExpired())
+    ) {
+      return input.fallbackOnExpiration
+    }
+    const deliverable = finishDeliveredFilters(
+      discrete.filters,
+      input,
+      discrete.solution.responseCache.responseGrid,
+    )
+    if (input.fallbackOnExpiration && input.deadline.isExpired()) {
+      return input.fallbackOnExpiration
+    }
+    input.researchTrace?.onDeliverableBuilt?.()
+    return deliverable
   })
 }
 
@@ -153,65 +182,65 @@ export function compressDeliverableV2(
   input: CompressDeliverableV2Input,
 ): CompressDeliverableV2Result {
   return withResearchTracePhase(input.researchTrace, 'compression', () => {
-  let deliverable = input.deliverable
-  if (!isV2TargetAchieved(deliverable.metrics)) {
-    return { deliverable, completed: true, expired: false }
-  }
+    let deliverable = input.deliverable
+    if (!isV2TargetAchieved(deliverable.metrics)) {
+      return { deliverable, completed: true, expired: false }
+    }
 
-  while (deliverable.filters.length > 0) {
-    const removals: Array<{ index: number; solution: V2EvaluatedSolution }> = []
-    for (let index = 0; index < deliverable.filters.length; index += 1) {
-      if (input.deadline.isExpired()) {
-        return { deliverable, completed: false, expired: true }
-      }
-      input.researchTrace?.onCompressionRemovalTrial?.()
-      removals.push({
-        index,
-        solution: evaluateCachedRemoval(
-          deliverable.filters,
-          deliverable.responseCache,
+    while (deliverable.filters.length > 0) {
+      const removals: Array<{ index: number; solution: V2EvaluatedSolution }> = []
+      for (let index = 0; index < deliverable.filters.length; index += 1) {
+        if (input.deadline.isExpired()) {
+          return { deliverable, completed: false, expired: true }
+        }
+        input.researchTrace?.onCompressionRemovalTrial?.()
+        removals.push({
           index,
-          input.desiredDb,
-          input.frequencies,
-          input.config.sampleRateHz,
-        ),
-      })
+          solution: evaluateCachedRemoval(
+            deliverable.filters,
+            deliverable.responseCache,
+            index,
+            input.desiredDb,
+            input.frequencies,
+            input.config.sampleRateHz,
+          ),
+        })
+      }
+      removals.sort((left, right) => compareV2Solutions(left.solution, right.solution))
+      let accepted: V2Deliverable | null = null
+      for (const removal of removals) {
+        if (input.deadline.isExpired()) {
+          return { deliverable, completed: false, expired: true }
+        }
+        const refined = jointRefineV2({
+          solution: removal.solution,
+          desiredDb: input.desiredDb,
+          frequencies: input.frequencies,
+          config: input.config,
+          deadline: input.deadline,
+          researchTrace: input.researchTrace,
+        })
+        if (refined.expired) return { deliverable, completed: false, expired: true }
+        const candidate = buildDeliverableV2({
+          filters: refined.solution.filters,
+          desiredDb: input.desiredDb,
+          frequencies: input.frequencies,
+          config: input.config,
+          deadline: input.deadline,
+          responseGrid: refined.solution.responseCache.responseGrid,
+          fallbackOnExpiration: deliverable,
+        })
+        if (input.deadline.isExpired()) {
+          return { deliverable, completed: false, expired: true }
+        }
+        if (isV2TargetAchieved(candidate.metrics)) {
+          accepted = candidate
+          break
+        }
+      }
+      if (accepted === null) return { deliverable, completed: true, expired: false }
+      deliverable = accepted
     }
-    removals.sort((left, right) => compareV2Solutions(left.solution, right.solution))
-    let accepted: V2Deliverable | null = null
-    for (const removal of removals) {
-      if (input.deadline.isExpired()) {
-        return { deliverable, completed: false, expired: true }
-      }
-      const refined = jointRefineV2({
-        solution: removal.solution,
-        desiredDb: input.desiredDb,
-        frequencies: input.frequencies,
-        config: input.config,
-        deadline: input.deadline,
-        researchTrace: input.researchTrace,
-      })
-      if (refined.expired) return { deliverable, completed: false, expired: true }
-      const candidate = buildDeliverableV2({
-        filters: refined.solution.filters,
-        desiredDb: input.desiredDb,
-        frequencies: input.frequencies,
-        config: input.config,
-        deadline: input.deadline,
-        responseGrid: refined.solution.responseCache.responseGrid,
-        fallbackOnExpiration: deliverable,
-      })
-      if (input.deadline.isExpired()) {
-        return { deliverable, completed: false, expired: true }
-      }
-      if (isV2TargetAchieved(candidate.metrics)) {
-        accepted = candidate
-        break
-      }
-    }
-    if (accepted === null) return { deliverable, completed: true, expired: false }
-    deliverable = accepted
-  }
-  return { deliverable, completed: true, expired: false }
+    return { deliverable, completed: true, expired: false }
   })
 }
