@@ -10,10 +10,7 @@ export interface BiquadCoefficients {
   a2: number
 }
 
-export function biquadCoefficients(
-  filter: Filter,
-  sampleRateHz: number,
-): BiquadCoefficients {
+function validateBiquadInput(filter: Filter, sampleRateHz: number): void {
   if (!Number.isFinite(sampleRateHz) || sampleRateHz <= 0) {
     throw new CoreError('validation', 'Sample rate must be finite and positive')
   }
@@ -39,8 +36,13 @@ export function biquadCoefficients(
   if (!Number.isFinite(filter.q) || filter.q <= 0) {
     throw new CoreError('validation', 'Filter Q must be finite and positive')
   }
+}
 
-  const A = 10 ** (filter.gainDb / 40)
+function coefficientsWithGainFactor(
+  filter: Filter,
+  sampleRateHz: number,
+  A: number,
+): BiquadCoefficients {
   const w0 = (2 * Math.PI * filter.frequencyHz) / sampleRateHz
   const cosW0 = Math.cos(w0)
   const alpha = Math.sin(w0) / (2 * filter.q)
@@ -95,4 +97,28 @@ export function biquadCoefficients(
     throw new CoreError('numeric', 'Biquad coefficients must be finite')
   }
   return coefficients
+}
+
+export function biquadCoefficients(
+  filter: Filter,
+  sampleRateHz: number,
+): BiquadCoefficients {
+  validateBiquadInput(filter, sampleRateHz)
+  return coefficientsWithGainFactor(
+    filter,
+    sampleRateHz,
+    10 ** (filter.gainDb / 40),
+  )
+}
+
+export function biquadCoefficientsWithGainFactor(
+  filter: Filter,
+  sampleRateHz: number,
+  gainFactorA: number,
+): BiquadCoefficients {
+  validateBiquadInput(filter, sampleRateHz)
+  if (!Number.isFinite(gainFactorA) || gainFactorA <= 0) {
+    throw new CoreError('validation', 'Biquad gain factor must be finite and positive')
+  }
+  return coefficientsWithGainFactor(filter, sampleRateHz, gainFactorA)
 }
