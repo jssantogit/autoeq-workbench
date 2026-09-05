@@ -1,4 +1,7 @@
-import { biquadCoefficients } from './biquad.js'
+import {
+  biquadCoefficients,
+  biquadCoefficientsWithFrequencyTrig,
+} from './biquad.js'
 import { CoreError } from '../types/error.js'
 import type { Filter } from '../types/filter.js'
 
@@ -10,6 +13,11 @@ export interface BiquadResponseGrid {
   sinW: number[]
   cos2W: number[]
   sin2W: number[]
+}
+
+export interface BiquadFrequencyTrig {
+  cosW0: number
+  sinW0: number
 }
 
 export function validateResponseInput(
@@ -121,11 +129,19 @@ export function biquadMagnitudeDbOnGridInto(
   filter: Filter,
   grid: BiquadResponseGrid,
   output: number[],
+  frequencyTrig?: BiquadFrequencyTrig,
 ): number[] {
   if (output.length !== grid.frequencies.length) {
     throw new CoreError('validation', 'Response output buffer length must match the grid')
   }
-  const { b0, b1, b2, a0, a1, a2 } = biquadCoefficients(filter, grid.sampleRateHz)
+  const { b0, b1, b2, a0, a1, a2 } = frequencyTrig === undefined
+    ? biquadCoefficients(filter, grid.sampleRateHz)
+    : biquadCoefficientsWithFrequencyTrig(
+        filter,
+        grid.sampleRateHz,
+        frequencyTrig.cosW0,
+        frequencyTrig.sinW0,
+      )
   const numeratorConstant = b0 * b0 + b1 * b1 + b2 * b2
   const numeratorCosW = 2 * (b0 * b1 + b1 * b2)
   const numeratorCos2W = 2 * b0 * b2
