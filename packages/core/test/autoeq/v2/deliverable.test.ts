@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DEFAULT_AUTOEQ_SETTINGS,
+  buildCheckpointDeliverableV2,
   buildDeliverableV2,
   compressDeliverableV2,
   evaluateV2Solution,
@@ -17,6 +18,30 @@ const filter = (id: string, frequencyHz: number, gainDb: number): Filter => ({
 })
 
 describe('Standard v2 deliverables', () => {
+  it('builds a safe checkpoint without discrete refinement', () => {
+    const config = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 1 })
+    let discreteTrials = 0
+    const result = buildCheckpointDeliverableV2({
+      filters: [filter('a', 1_000.4, 2.04), filter('b', 2_000.4, -1.96)],
+      desiredDb: frequencies.map(() => 0),
+      frequencies,
+      config,
+      deadline,
+      researchTrace: { onDiscreteTrial: () => { discreteTrials += 1 } },
+    })
+
+    expect(discreteTrials).toBe(0)
+    expect(result.filters.length).toBeLessThanOrEqual(1)
+    expect(result.filters.map(({ id }, index) => id === `autoeq-${index + 1}`))
+      .not.toContain(false)
+    for (const delivered of result.filters) {
+      expect(delivered.frequencyHz % 1).toBe(0)
+      expect(Number.isInteger(delivered.gainDb * 10)).toBe(true)
+    }
+    expect(result.metrics.rmseDb).toBeGreaterThanOrEqual(0)
+    expect(Number.isFinite(result.preampDb)).toBe(true)
+  })
+
   it('always builds a quantized checkpoint inside the delivered filter cap', () => {
     const config = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 1 })
     const result = buildDeliverableV2({
