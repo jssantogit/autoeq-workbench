@@ -2,7 +2,10 @@ import type { Curve } from '../../src/types/curve.js'
 import type { ErrorMetrics } from '../../src/metrics/errorMetrics.js'
 import type { BandMetric } from '../../src/metrics/bandMetrics.js'
 import type { Filter } from '../../src/types/filter.js'
-import type { StandardV2ResearchPhase } from '../../src/autoeq/v2/researchTrace.js'
+import type {
+  StandardV2ResearchPhase,
+  StandardV2StagedContinuationBatchTrace,
+} from '../../src/autoeq/v2/researchTrace.js'
 
 export type ResearchCaseId = 'titan-to-storm' | 'titan-to-u12t' | 'titan-to-trio'
 
@@ -43,6 +46,7 @@ export interface StandardV2ResearchCounters {
   discreteTrials: number
   discreteAcceptedMoves: number
   compressionRemovalTrials: number
+  stagedContinuationBatches?: StandardV2StagedContinuationBatchTrace[]
 }
 
 export interface StandardV2ResearchPhaseTimingMs {

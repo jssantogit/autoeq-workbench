@@ -163,5 +163,49 @@ describe('research runner', () => {
       [3_000, 0.2],
       [5_000, 0.2],
     ])
+    expect(row.counters.stagedContinuationBatches).toEqual([])
+  })
+
+  it('serializes staged continuation batches only for deep telemetry rows', async () => {
+    const caseId = 'titan-to-storm' as const
+    const metrics = {
+      maeDb: 0.5,
+      rmseDb: 1,
+      maxAbsDb: 2,
+      maxAbsFrequencyHz: 1_000,
+    }
+    const row = await runResearchCell({
+      caseId,
+      budgetSeconds: 5,
+      maxFilters: 10,
+      repeatIndex: 0,
+      telemetryMode: 'deep',
+      nowMs: () => 0,
+      run: (input, runtime) => {
+        runtime.researchTrace?.onStagedContinuationBatch?.({
+          boundaryMode: 'sign-crossing',
+          parentFilterCount: 4,
+          parentMetrics: metrics,
+          candidates: [
+            { fastRank: 1, fastMetrics: metrics, continuedMetrics: { ...metrics, rmseDb: 0.8 } },
+            { fastRank: 2, fastMetrics: { ...metrics, rmseDb: 1.1 }, continuedMetrics: { ...metrics, rmseDb: 0.7 } },
+            { fastRank: 3, fastMetrics: { ...metrics, rmseDb: 1.2 }, continuedMetrics: { ...metrics, rmseDb: 0.6 } },
+          ],
+        })
+        return fakeResult(input, caseId)
+      },
+    })
+
+    const batches = row.counters.stagedContinuationBatches ?? []
+    expect(batches).toHaveLength(1)
+    expect(batches[0]).toMatchObject({
+      boundaryMode: 'sign-crossing',
+      parentFilterCount: 4,
+      candidates: [
+        { fastRank: 1, continuedMetrics: { rmseDb: 0.8 } },
+        { fastRank: 2, continuedMetrics: { rmseDb: 0.7 } },
+        { fastRank: 3, continuedMetrics: { rmseDb: 0.6 } },
+      ],
+    })
   })
 })

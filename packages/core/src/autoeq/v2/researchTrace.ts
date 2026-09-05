@@ -16,6 +16,19 @@ export interface StandardV2SafeCheckpoint {
   preampDb: number
 }
 
+export interface StandardV2StagedContinuationCandidateTrace {
+  fastRank: number
+  fastMetrics: ErrorMetrics
+  continuedMetrics: ErrorMetrics
+}
+
+export interface StandardV2StagedContinuationBatchTrace {
+  boundaryMode: V2CandidateBoundaryMode
+  parentFilterCount: number
+  parentMetrics: ErrorMetrics
+  candidates: StandardV2StagedContinuationCandidateTrace[]
+}
+
 export interface StandardV2ResearchTrace {
   onPhaseStart?(phase: StandardV2ResearchPhase): void
   onPhaseEnd?(phase: StandardV2ResearchPhase): void
@@ -23,6 +36,7 @@ export interface StandardV2ResearchTrace {
   onCandidatesGenerated?(count: number): void
   onCandidatesShortlisted?(count: number): void
   onJointRefineCompleted?(coordinateTrials: number): void
+  onStagedContinuationBatch?(batch: StandardV2StagedContinuationBatchTrace): void
   onWorkingCheckpoint?(): void
   onDeliverableBuilt?(): void
   onBestDeliverableUpdated?(checkpoint: StandardV2SafeCheckpoint): void
