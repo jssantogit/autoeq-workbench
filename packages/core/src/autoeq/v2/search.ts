@@ -1,6 +1,6 @@
 import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
 import type { Filter } from '../../types/filter.js'
-import { auditCancellations } from '../cancellation.js'
+import { auditCancellationsOnGrid } from '../cancellation.js'
 import {
   generateV2Candidates,
   rankV2CandidateShortlist,
@@ -98,11 +98,7 @@ function appendCandidate(
     cascadeDb: responseCache.cascadeDb,
     residualDb,
     metrics: calculateErrorMetrics(residualDb, input.frequencies),
-    cancellationAudit: auditCancellations(
-      filters,
-      input.frequencies,
-      input.config.sampleRateHz,
-    ),
+    cancellationAudit: auditCancellationsOnGrid(filters, responseCache.responseGrid),
   }
 }
 

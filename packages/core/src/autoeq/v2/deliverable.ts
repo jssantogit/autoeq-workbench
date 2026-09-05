@@ -1,11 +1,18 @@
+import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
 import { calculatePreampDb } from '../../metrics/preamp.js'
 import type { BiquadResponseGrid } from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
+import { auditCancellations } from '../cancellation.js'
 import { finalizeDeliveredFilters } from '../runStandardAutoEq.js'
 import type { StandardAutoEqV2Config } from './config.js'
 import { cyclicDiscreteRefineV2 } from './discreteRefine.js'
 import { evaluateV2Solution, jointRefineV2, type V2EvaluatedSolution } from './jointRefine.js'
 import { compareV2Solutions, isV2TargetAchieved } from './ranking.js'
+import {
+  createV2ResponseCache,
+  removeV2ResponseCacheFilter,
+  type V2ResponseCache,
+} from './responseCache.js'
 import {
   withResearchTracePhase,
   type StandardV2ResearchTrace,
@@ -44,22 +51,62 @@ function withPreamp(solution: V2EvaluatedSolution, sampleRateHz: number): V2Deli
   }
 }
 
+function evaluateCachedRemoval(
+  filters: readonly Filter[],
+  responseCache: V2ResponseCache,
+  filterIndex: number,
+  desiredDb: readonly number[],
+  frequencies: readonly number[],
+  sampleRateHz: number,
+): V2EvaluatedSolution {
+  const candidateFilters = filters.filter((_, index) => index !== filterIndex)
+  const candidateCache = removeV2ResponseCacheFilter(
+    responseCache,
+    filterIndex,
+    frequencies,
+    sampleRateHz,
+  )
+  const residualDb = desiredDb.map((value, index) => value - candidateCache.cascadeDb[index]!)
+  return {
+    filters: candidateFilters,
+    responseCache: candidateCache,
+    cascadeDb: candidateCache.cascadeDb,
+    residualDb,
+    metrics: calculateErrorMetrics(residualDb, frequencies),
+    cancellationAudit: auditCancellations(candidateFilters, frequencies, sampleRateHz),
+  }
+}
+
 function constrainToCap(input: BuildDeliverableV2Input): Filter[] {
   let filters = input.filters.map((filter) => ({ ...filter }))
+  let responseCache: V2ResponseCache | undefined
   while (filters.length > input.config.maxFilters) {
     let best: V2EvaluatedSolution | null = null
     for (let index = 0; index < filters.length; index += 1) {
       if (input.deadline.isExpired()) break
-      const candidate = evaluateV2Solution(
-        filters.filter((_, candidateIndex) => candidateIndex !== index),
-        input.desiredDb,
+      responseCache ??= createV2ResponseCache(
+        filters,
         input.frequencies,
         input.config.sampleRateHz,
         input.responseGrid,
       )
+      const candidate = evaluateCachedRemoval(
+        filters,
+        responseCache,
+        index,
+        input.desiredDb,
+        input.frequencies,
+        input.config.sampleRateHz,
+      )
       if (best === null || compareV2Solutions(candidate, best) < 0) best = candidate
     }
-    filters = best?.filters ?? filters.slice(0, input.config.maxFilters)
+    if (best === null) {
+      filters = filters.slice(0, input.config.maxFilters)
+      responseCache = undefined
+    } else {
+      filters = best.filters
+      responseCache = best.responseCache
+    }
   }
   return filters
 }
@@ -120,12 +167,13 @@ export function compressDeliverableV2(
       input.researchTrace?.onCompressionRemovalTrial?.()
       removals.push({
         index,
-        solution: evaluateV2Solution(
-          deliverable.filters.filter((_, filterIndex) => filterIndex !== index),
+        solution: evaluateCachedRemoval(
+          deliverable.filters,
+          deliverable.responseCache,
+          index,
           input.desiredDb,
           input.frequencies,
           input.config.sampleRateHz,
-          deliverable.responseCache.responseGrid,
         ),
       })
     }

@@ -90,6 +90,33 @@ export function createBiquadResponseGrid(
   return grid
 }
 
+export function biquadMagnitudeDbExactOnGrid(
+  filter: Filter,
+  grid: BiquadResponseGrid,
+): number[] {
+  const { b0, b1, b2, a0, a1, a2 } = biquadCoefficients(filter, grid.sampleRateHz)
+  return grid.frequencies.map((_, index) => {
+    const cosW = grid.cosW[index]!
+    const sinW = grid.sinW[index]!
+    const cos2W = grid.cos2W[index]!
+    const sin2W = grid.sin2W[index]!
+    const numeratorRe = b0 + b1 * cosW + b2 * cos2W
+    const numeratorIm = -b1 * sinW - b2 * sin2W
+    const denominatorRe = a0 + a1 * cosW + a2 * cos2W
+    const denominatorIm = -a1 * sinW - a2 * sin2W
+    const magnitudeSquared =
+      (numeratorRe ** 2 + numeratorIm ** 2) /
+      (denominatorRe ** 2 + denominatorIm ** 2)
+    const magnitude = Math.sqrt(magnitudeSquared)
+    const magnitudeDb = 20 * Math.log10(Math.max(magnitude, 1e-300))
+
+    if (!Number.isFinite(magnitudeDb)) {
+      throw new CoreError('numeric', 'Biquad magnitude must be finite')
+    }
+    return magnitudeDb
+  })
+}
+
 export function biquadMagnitudeDbOnGrid(
   filter: Filter,
   grid: BiquadResponseGrid,

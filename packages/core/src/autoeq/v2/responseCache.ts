@@ -48,6 +48,14 @@ function assertMatchingGrid(
   }
 }
 
+function sumCachedResponses(
+  filterResponsesDb: readonly number[][],
+  frequencies: readonly number[],
+): number[] {
+  return frequencies.map((_, sampleIndex) =>
+    filterResponsesDb.reduce((sum, response) => sum + response[sampleIndex]!, 0))
+}
+
 export function createV2ResponseCache(
   filters: readonly Filter[],
   frequencies: readonly number[],
@@ -60,9 +68,37 @@ export function createV2ResponseCache(
   }
   const filterResponsesDb = filters.map((filter) =>
     responseForFilter(filter, responseGrid))
-  const cascadeDb = frequencies.map((_, sampleIndex) =>
-    filterResponsesDb.reduce((sum, response) => sum + response[sampleIndex]!, 0))
+  const cascadeDb = sumCachedResponses(filterResponsesDb, frequencies)
   return { filterResponsesDb, cascadeDb, responseGrid }
+}
+
+export function computeV2ResponseCacheFilterResponse(
+  cache: V2ResponseCache,
+  replacement: Filter,
+  frequencies: readonly number[],
+  sampleRateHz: number,
+): number[] {
+  assertMatchingGrid(cache.responseGrid, frequencies, sampleRateHz)
+  return responseForFilter(replacement, cache.responseGrid)
+}
+
+export function replaceV2ResponseCacheFilterWithResponse(
+  cache: V2ResponseCache,
+  filterIndex: number,
+  newResponse: number[],
+  frequencies: readonly number[],
+  sampleRateHz: number,
+): V2ResponseCache {
+  assertMatchingGrid(cache.responseGrid, frequencies, sampleRateHz)
+  const oldResponse = cache.filterResponsesDb[filterIndex]!
+  const filterResponsesDb = cache.filterResponsesDb.map((response, index) =>
+    index === filterIndex ? newResponse : response)
+  return {
+    filterResponsesDb,
+    cascadeDb: cache.cascadeDb.map((value, sampleIndex) =>
+      value - oldResponse[sampleIndex]! + newResponse[sampleIndex]!),
+    responseGrid: cache.responseGrid,
+  }
 }
 
 export function replaceV2ResponseCacheFilter(
@@ -72,15 +108,32 @@ export function replaceV2ResponseCacheFilter(
   frequencies: readonly number[],
   sampleRateHz: number,
 ): V2ResponseCache {
+  const newResponse = computeV2ResponseCacheFilterResponse(
+    cache,
+    replacement,
+    frequencies,
+    sampleRateHz,
+  )
+  return replaceV2ResponseCacheFilterWithResponse(
+    cache,
+    filterIndex,
+    newResponse,
+    frequencies,
+    sampleRateHz,
+  )
+}
+
+export function removeV2ResponseCacheFilter(
+  cache: V2ResponseCache,
+  filterIndex: number,
+  frequencies: readonly number[],
+  sampleRateHz: number,
+): V2ResponseCache {
   assertMatchingGrid(cache.responseGrid, frequencies, sampleRateHz)
-  const oldResponse = cache.filterResponsesDb[filterIndex]!
-  const newResponse = responseForFilter(replacement, cache.responseGrid)
-  const filterResponsesDb = cache.filterResponsesDb.map((response, index) =>
-    index === filterIndex ? newResponse : response)
+  const filterResponsesDb = cache.filterResponsesDb.filter((_, index) => index !== filterIndex)
   return {
     filterResponsesDb,
-    cascadeDb: cache.cascadeDb.map((value, sampleIndex) =>
-      value - oldResponse[sampleIndex]! + newResponse[sampleIndex]!),
+    cascadeDb: sumCachedResponses(filterResponsesDb, frequencies),
     responseGrid: cache.responseGrid,
   }
 }

@@ -1,14 +1,17 @@
 import { calculateErrorMetrics } from '../../metrics/errorMetrics.js'
 import type { BiquadResponseGrid } from '../../dsp/response.js'
 import type { Filter } from '../../types/filter.js'
-import { auditCancellations } from '../cancellation.js'
+import { auditCancellationsOnGrid } from '../cancellation.js'
 import type { StandardAutoEqV2Config } from './config.js'
 import { compareV2PrimaryMetrics, compareV2Solutions, type V2Solution } from './ranking.js'
 import {
   createV2ResponseCache,
-  replaceV2ResponseCacheFilter,
   type V2ResponseCache,
 } from './responseCache.js'
+import {
+  evaluateV2ReplacementTrial,
+  materializeV2ReplacementTrial,
+} from './replacementTrial.js'
 import {
   withResearchTracePhase,
   type StandardV2ResearchTrace,
@@ -74,35 +77,7 @@ export function evaluateV2Solution(
     cascadeDb: responseCache.cascadeDb,
     residualDb,
     metrics: calculateErrorMetrics(residualDb, frequencies),
-    cancellationAudit: auditCancellations(copiedFilters, frequencies, sampleRateHz),
-  }
-}
-
-function evaluatedReplacement(
-  solution: V2EvaluatedSolution,
-  filterIndex: number,
-  replacement: Filter,
-  desiredDb: readonly number[],
-  frequencies: readonly number[],
-  config: StandardAutoEqV2Config,
-): V2EvaluatedSolution {
-  const filters = solution.filters.map((filter, index) =>
-    index === filterIndex ? replacement : filter)
-  const responseCache = replaceV2ResponseCacheFilter(
-    solution.responseCache,
-    filterIndex,
-    replacement,
-    frequencies,
-    config.sampleRateHz,
-  )
-  const residualDb = desiredDb.map((value, index) => value - responseCache.cascadeDb[index]!)
-  return {
-    filters,
-    responseCache,
-    cascadeDb: responseCache.cascadeDb,
-    residualDb,
-    metrics: calculateErrorMetrics(residualDb, frequencies),
-    cancellationAudit: solution.cancellationAudit,
+    cancellationAudit: auditCancellationsOnGrid(copiedFilters, responseCache.responseGrid),
   }
 }
 
@@ -135,10 +110,9 @@ export function jointRefineV2(
     trace?.onCancellationAuditComputed?.()
     const audited = {
       ...candidate,
-      cancellationAudit: auditCancellations(
+      cancellationAudit: auditCancellationsOnGrid(
         candidate.filters,
-        input.frequencies,
-        input.config.sampleRateHz,
+        candidate.responseCache.responseGrid,
       ),
     }
     validAudits.add(audited)
@@ -182,26 +156,39 @@ export function jointRefineV2(
                   { ...currentFilter, q: clamp(currentFilter.q * 2 ** scale.qOctaveStep, input.config.minPkQ, input.config.maxPkQ) },
                 ])
           let best = solution
-          for (const trial of trials) {
+          for (const replacement of trials) {
             if (input.deadline.isExpired()) {
               return finish(true)
             }
             coordinateTrials += 1
-            const candidate = evaluatedReplacement(
+            const trial = evaluateV2ReplacementTrial(
               solution,
               filterIndex,
-              trial,
+              replacement,
               input.desiredDb,
               input.frequencies,
-              input.config,
+              input.config.sampleRateHz,
             )
             if (input.deadline.isExpired()) {
               return finish(true)
             }
-            const primaryComparison = compareV2PrimaryMetrics(candidate.metrics, best.metrics)
+            const primaryComparison = compareV2PrimaryMetrics(trial.metrics, best.metrics)
             if (primaryComparison < 0) {
-              best = candidate
+              best = materializeV2ReplacementTrial(
+                solution,
+                trial,
+                input.desiredDb,
+                input.frequencies,
+                input.config.sampleRateHz,
+              )
             } else if (primaryComparison === 0) {
+              const candidate = materializeV2ReplacementTrial(
+                solution,
+                trial,
+                input.desiredDb,
+                input.frequencies,
+                input.config.sampleRateHz,
+              )
               const auditedCandidate = withCancellationAudit(candidate)
               const auditedBest = withCancellationAudit(best)
               best = compareV2Solutions(auditedCandidate, auditedBest) < 0
