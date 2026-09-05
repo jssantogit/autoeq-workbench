@@ -21,12 +21,14 @@ export function evaluateV2ReplacementTrial(
   desiredDb: readonly number[],
   frequencies: readonly number[],
   sampleRateHz: number,
+  responseBuffer?: number[],
 ): V2ReplacementTrial {
   const responseDb = computeV2ResponseCacheFilterResponse(
     solution.responseCache,
     replacement,
     frequencies,
     sampleRateHz,
+    responseBuffer,
   )
   const oldResponse = solution.responseCache.filterResponsesDb[filterIndex]!
   let absoluteSum = 0
@@ -78,10 +80,11 @@ export function materializeV2ReplacementTrial(
 ): V2EvaluatedSolution {
   const filters = solution.filters.map((filter, index) =>
     index === trial.filterIndex ? trial.replacement : filter)
+  const ownedResponse = [...trial.responseDb]
   const responseCache = replaceV2ResponseCacheFilterWithResponse(
     solution.responseCache,
     trial.filterIndex,
-    trial.responseDb,
+    ownedResponse,
     frequencies,
     sampleRateHz,
   )
