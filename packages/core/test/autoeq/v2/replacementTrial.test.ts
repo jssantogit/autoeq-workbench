@@ -4,6 +4,7 @@ import { calculateErrorMetrics, evaluateV2Solution, type Filter } from '../../..
 import { replaceV2ResponseCacheFilter } from '../../../src/autoeq/v2/responseCache.js'
 import {
   evaluateV2ReplacementTrial,
+  evaluateV2ReplacementTrialSinglePass,
   materializeV2ReplacementTrial,
 } from '../../../src/autoeq/v2/replacementTrial.js'
 
@@ -60,6 +61,48 @@ describe('Standard v2 replacement trial view', () => {
     expect(materialized.residualDb).toEqual(expectedResidual)
     expect(materialized.metrics).toEqual(expectedMetrics)
     expect(materialized.cancellationAudit).toBe(solution.cancellationAudit)
+  })
+
+  it('single-pass evaluation matches the current evaluator exactly for LS, PK, and HS trials', () => {
+    const solution = evaluateV2Solution(filters, desiredDb, frequencies, sampleRateHz)
+    const replacements: Array<{ index: number; filter: Filter }> = [
+      {
+        index: 0,
+        filter: { ...solution.filters[0]!, frequencyHz: 125, gainDb: 2.5, q: 0.8 },
+      },
+      {
+        index: 1,
+        filter: { ...solution.filters[1]!, frequencyHz: 1_250, gainDb: -3.5, q: 1.8 },
+      },
+      {
+        index: 2,
+        filter: { ...solution.filters[2]!, frequencyHz: 9_000, gainDb: 1.5, q: 0.8 },
+      },
+    ]
+
+    for (const replacement of replacements) {
+      const expected = evaluateV2ReplacementTrial(
+        solution,
+        replacement.index,
+        replacement.filter,
+        desiredDb,
+        frequencies,
+        sampleRateHz,
+      )
+      const responseBuffer = new Array<number>(frequencies.length)
+      const actual = evaluateV2ReplacementTrialSinglePass(
+        solution,
+        replacement.index,
+        replacement.filter,
+        desiredDb,
+        frequencies,
+        sampleRateHz,
+        responseBuffer,
+      )
+
+      expect(actual).toEqual(expected)
+      expect(actual.responseDb).toBe(responseBuffer)
+    }
   })
 
   it('can reuse one response buffer while materialized winners retain an owned snapshot', () => {
