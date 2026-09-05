@@ -13,6 +13,7 @@ import {
   type StandardAutoEqV2Config,
   type StandardV2Deadline,
 } from '../../../src/index.js'
+import { dedupeV2TrialPair } from '../../../src/autoeq/v2/jointRefine.js'
 
 const frequencies = [100, 200, 400, 800, 1_000, 1_200, 1_600, 3_200, 6_400]
 const desiredFilter: Filter = {
@@ -21,6 +22,21 @@ const desiredFilter: Filter = {
 const config = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
 
 describe('Standard v2 joint refinement', () => {
+  it('deduplicates a two-trial pair by the same frequency, gain, and Q key', () => {
+    const first: Filter = {
+      id: 'first', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 2, q: 1.5,
+    }
+    const sameTrialKey: Filter = {
+      id: 'other', enabled: false, type: 'HS', frequencyHz: 1_000, gainDb: 2, q: 1.5,
+    }
+    const distinctTrialKey: Filter = {
+      ...first, id: 'distinct', q: 1.6,
+    }
+
+    expect(dedupeV2TrialPair(first, sameTrialKey)).toEqual([first])
+    expect(dedupeV2TrialPair(first, distinctTrialKey)).toEqual([first, distinctTrialKey])
+  })
+
   it('preserves an accepted Frequency update when Gain is accepted afterward', () => {
     const evaluationFrequencies = createEvaluationGrid()
     const targetFilters: Filter[] = [
