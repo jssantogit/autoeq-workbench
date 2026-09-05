@@ -1,0 +1,49 @@
+name: AutoEQ Staged Rank Telemetry
+
+on:
+  push:
+    branches:
+      - experiment/v2-staged-rank-telemetry
+    paths:
+      - .github/workflows/autoeq-staged-rank-telemetry.yml
+
+permissions:
+  contents: read
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - slug: storm
+            profile: titan-to-storm:30
+          - slug: u12t
+            profile: titan-to-u12t:30
+          - slug: trio
+            profile: titan-to-trio:30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run staged-rank research profile
+        run: >-
+          pnpm --filter @autoeq-workbench/core research:v2 --
+          --preset quick
+          --repeats 1
+          --profile "${{ matrix.profile }}"
+          --output-dir "$GITHUB_WORKSPACE/autoeq-rank-${{ matrix.slug }}"
+      - name: Upload staged-rank artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: autoeq-staged-rank-${{ matrix.slug }}-${{ github.run_id }}
+          path: autoeq-rank-${{ matrix.slug }}
+          if-no-files-found: error
+          retention-days: 7
