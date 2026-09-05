@@ -7,7 +7,11 @@ import { finalizeDeliveredFilters } from '../runStandardAutoEq.js'
 import type { StandardAutoEqV2Config } from './config.js'
 import { cyclicDiscreteRefineV2, quantizeV2Filters } from './discreteRefine.js'
 import { evaluateV2Solution, jointRefineV2, type V2EvaluatedSolution } from './jointRefine.js'
-import { compareV2Solutions, isV2TargetAchieved } from './ranking.js'
+import {
+  compareV2PrimaryMetrics,
+  compareV2Solutions,
+  isV2TargetAchieved,
+} from './ranking.js'
 import {
   createV2ResponseCache,
   removeV2ResponseCacheFilter,
@@ -44,6 +48,10 @@ export interface CompressDeliverableV2Result {
   expired: boolean
 }
 
+type V2RemovalCandidate = Omit<V2EvaluatedSolution, 'cancellationAudit'> & {
+  cancellationAudit?: V2EvaluatedSolution['cancellationAudit']
+}
+
 function withPreamp(solution: V2EvaluatedSolution, sampleRateHz: number): V2Deliverable {
   return {
     ...solution,
@@ -51,14 +59,14 @@ function withPreamp(solution: V2EvaluatedSolution, sampleRateHz: number): V2Deli
   }
 }
 
-function evaluateCachedRemoval(
+function evaluateCachedRemovalPrimary(
   filters: readonly Filter[],
   responseCache: V2ResponseCache,
   filterIndex: number,
   desiredDb: readonly number[],
   frequencies: readonly number[],
   sampleRateHz: number,
-): V2EvaluatedSolution {
+): V2RemovalCandidate {
   const candidateFilters = filters.filter((_, index) => index !== filterIndex)
   const candidateCache = removeV2ResponseCacheFilter(
     responseCache,
@@ -73,15 +81,49 @@ function evaluateCachedRemoval(
     cascadeDb: candidateCache.cascadeDb,
     residualDb,
     metrics: calculateErrorMetrics(residualDb, frequencies),
-    cancellationAudit: auditCancellations(candidateFilters, frequencies, sampleRateHz),
   }
+}
+
+function withRemovalCancellationAudit(
+  candidate: V2RemovalCandidate,
+  frequencies: readonly number[],
+  sampleRateHz: number,
+): V2EvaluatedSolution {
+  candidate.cancellationAudit ??= auditCancellations(
+    candidate.filters,
+    frequencies,
+    sampleRateHz,
+  )
+  return candidate as V2EvaluatedSolution
+}
+
+function evaluateCachedRemoval(
+  filters: readonly Filter[],
+  responseCache: V2ResponseCache,
+  filterIndex: number,
+  desiredDb: readonly number[],
+  frequencies: readonly number[],
+  sampleRateHz: number,
+): V2EvaluatedSolution {
+  return withRemovalCancellationAudit(
+    evaluateCachedRemovalPrimary(
+      filters,
+      responseCache,
+      filterIndex,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+    ),
+    frequencies,
+    sampleRateHz,
+  )
 }
 
 function constrainToCap(input: BuildDeliverableV2Input): Filter[] {
   let filters = input.filters.map((filter) => ({ ...filter }))
   let responseCache: V2ResponseCache | undefined
   while (filters.length > input.config.maxFilters) {
-    let best: V2EvaluatedSolution | null = null
+    let best: V2RemovalCandidate | null = null
     for (let index = 0; index < filters.length; index += 1) {
       if (input.deadline.isExpired()) break
       responseCache ??= createV2ResponseCache(
@@ -90,7 +132,7 @@ function constrainToCap(input: BuildDeliverableV2Input): Filter[] {
         input.config.sampleRateHz,
         input.responseGrid,
       )
-      const candidate = evaluateCachedRemoval(
+      const candidate = evaluateCachedRemovalPrimary(
         filters,
         responseCache,
         index,
@@ -98,7 +140,26 @@ function constrainToCap(input: BuildDeliverableV2Input): Filter[] {
         input.frequencies,
         input.config.sampleRateHz,
       )
-      if (best === null || compareV2Solutions(candidate, best) < 0) best = candidate
+      if (best === null) {
+        best = candidate
+        continue
+      }
+      const primaryComparison = compareV2PrimaryMetrics(candidate.metrics, best.metrics)
+      if (primaryComparison < 0) {
+        best = candidate
+      } else if (primaryComparison === 0) {
+        const auditedCandidate = withRemovalCancellationAudit(
+          candidate,
+          input.frequencies,
+          input.config.sampleRateHz,
+        )
+        const auditedBest = withRemovalCancellationAudit(
+          best,
+          input.frequencies,
+          input.config.sampleRateHz,
+        )
+        if (compareV2Solutions(auditedCandidate, auditedBest) < 0) best = candidate
+      }
     }
     if (best === null) {
       filters = filters.slice(0, input.config.maxFilters)
