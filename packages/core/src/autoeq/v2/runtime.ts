@@ -6,6 +6,7 @@ export interface StandardV2Runtime {
   nowMs(): number
   onBoundaryModeAttempt?(mode: V2CandidateBoundaryMode): void
   researchTrace?: StandardV2ResearchTrace
+  geometryWarmStart?: boolean
 }
 
 export interface StandardV2Deadline {

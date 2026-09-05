@@ -10,7 +10,7 @@
     "benchmark:v2": "tsx benchmarks/runV2.ts",
     "benchmark:v2:holdout": "tsx benchmarks/runV2.ts --holdout",
     "benchmark:update": "tsx benchmarks/run.ts --write-baseline",
-    "research:v2": "tsx benchmarks/research/run.ts",
+    "research:v2": "tsx benchmarks/research/warmStartExperiment.ts --matrix",
     "research:v2:quick": "tsx benchmarks/research/run.ts --preset quick",
     "research:v2:full": "tsx benchmarks/research/run.ts --preset full",
     "test": "vitest run",

@@ -107,6 +107,7 @@ export function runStandardAutoEqV2(
     terminationReason = compressed.completed ? 'target-reached' : 'time-limit'
   } else {
     let searchTermination: SearchResult['termination'] = 'converged'
+    let priorDepths = new Map<number, V2EvaluatedSolution>()
     for (const boundaryMode of ['half-height', 'sign-crossing', 'mixed'] as const) {
       if (explorationDeadline.isExpired()) {
         searchTermination = 'time-limit'
@@ -120,7 +121,14 @@ export function runStandardAutoEqV2(
         source: V2EvaluatedSolution | null
       } = { deliverable: null, source: null }
       const checkpointedSources = new WeakSet<V2EvaluatedSolution>()
+      const currentDepths = new Map<number, V2EvaluatedSolution>()
       const checkpointWorkingSolution = (solution: V2EvaluatedSolution): void => {
+        if (runtime.geometryWarmStart) {
+          const previous = currentDepths.get(solution.filters.length)
+          if (previous === undefined || compareV2Solutions(solution, previous) < 0) {
+            currentDepths.set(solution.filters.length, solution)
+          }
+        }
         if (checkpointedSources.has(solution)) return
         checkpointedSources.add(solution)
         const checkpoint = buildCheckpointDeliverableV2({
@@ -149,12 +157,14 @@ export function runStandardAutoEqV2(
         config,
         deadline: explorationDeadline,
         boundaryMode,
+        warmStarts: runtime.geometryWarmStart ? priorDepths : undefined,
         researchTrace: runtime.researchTrace,
         onBestWorkingSolution: checkpointWorkingSolution,
         onWorkingSolution: checkpointWorkingSolution,
         isTargetCapable: () => isV2TargetAchieved(bestDeliverable.metrics),
       })
       searchTermination = search.termination
+      priorDepths = currentDepths
 
       if (
         search.termination !== 'time-limit' &&

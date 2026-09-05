@@ -37,6 +37,25 @@ function pk(id: string, frequencyHz: number, gainDb: number, q: number): Filter 
 }
 
 describe('Standard v2 bounded search', () => {
+  it('admits a prior geometry checkpoint only at its matching depth', () => {
+    const frequencies = createEvaluationGrid()
+    const desired = [pk('seed', 1000, 4, 2)]
+    const desiredDb = evaluateV2Solution(desired, [], frequencies, 48000).cascadeDb
+    const seed = evaluateV2Solution(desired, desiredDb, frequencies, 48000)
+    const seen: number[] = []
+    const result = searchStandardV2WorkingSolutions({
+      desiredDb, frequencies,
+      config: { ...resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS), workingMaxFilters: 2 },
+      deadline: { isExpired: () => false }, boundaryMode: 'half-height',
+      warmStarts: new Map([[1, seed]]),
+      onWorkingSolution: (path) => { seen.push(path.filters.length) },
+      isTargetCapable: (path) => path.metrics.rmseDb === 0,
+    })
+    expect(result.bestSolution.metrics.rmseDb).toBe(0)
+    expect(result.activeSolutions).toContain(seed)
+    expect(seen).toEqual([1])
+  })
+
   it('falls back when staged candidates cannot improve their parent', () => {
     const frequencies = createEvaluationGrid()
     const desiredFilters = [

@@ -33,6 +33,7 @@ export interface SearchInput {
   onBestWorkingSolution?: (solution: V2EvaluatedSolution) => void
   onWorkingSolution?: (solution: V2EvaluatedSolution) => void
   researchTrace?: StandardV2ResearchTrace
+  warmStarts?: ReadonlyMap<number, V2EvaluatedSolution>
 }
 
 export interface SearchResult {
@@ -284,6 +285,14 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
         peakWorkingFilterCount,
         jointRefinementCount,
         termination: 'converged',
+      }
+    }
+    const warm = input.warmStarts?.get(expanded[0]!.filters.length)
+    if (warm !== undefined && !input.deadline.isExpired()) {
+      expanded.push(warm)
+      if (compareV2Solutions(warm, best) < 0) {
+        best = warm
+        input.onBestWorkingSolution?.(best)
       }
     }
     active = retainV2NextActivePaths(active, expanded, mainPathImproved)
