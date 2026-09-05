@@ -36,6 +36,7 @@ export interface JointRefineInput {
   frequencies: readonly number[]
   config: StandardAutoEqV2Config
   deadline: StandardV2Deadline
+  maxCycles?: number
   researchTrace?: StandardV2ResearchTrace
 }
 
@@ -104,6 +105,14 @@ export function jointRefineV2(
         input.frequencies,
         input.config.sampleRateHz,
       )
+  const maxCycles = input.maxCycles ?? input.config.algorithm.maxJointRefinementCycles
+  if (
+    !Number.isInteger(maxCycles) ||
+    maxCycles < 1 ||
+    maxCycles > input.config.algorithm.maxJointRefinementCycles
+  ) {
+    throw new RangeError('Joint refinement cycle limit is outside the configured range')
+  }
   const responseBuffer = new Array<number>(input.frequencies.length)
   const validAudits = new WeakSet<V2EvaluatedSolution>([solution])
   const withCancellationAudit = (candidate: V2EvaluatedSolution): V2EvaluatedSolution => {
@@ -127,7 +136,7 @@ export function jointRefineV2(
   let completedCycles = 0
   let coordinateTrials = 0
 
-  for (let cycle = 0; cycle < input.config.algorithm.maxJointRefinementCycles; cycle += 1) {
+  for (let cycle = 0; cycle < maxCycles; cycle += 1) {
     if (input.deadline.isExpired()) {
       return finish(true)
     }
