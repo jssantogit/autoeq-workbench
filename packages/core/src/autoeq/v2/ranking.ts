@@ -18,6 +18,10 @@ function normalizedViolation(metrics: ErrorMetrics): number {
   return Math.max(metrics.rmseDb / 0.25, metrics.maxAbsDb / 0.75)
 }
 
+function normalizedDeliveredDistance(metrics: ErrorMetrics): number {
+  return Math.hypot(metrics.rmseDb / 0.25, metrics.maxAbsDb / 0.75)
+}
+
 function compareNumber(left: number, right: number): number {
   return left < right ? -1 : left > right ? 1 : 0
 }
@@ -55,4 +59,14 @@ export function compareV2Solutions(left: V2Solution, right: V2Solution): number 
     if (filterComparison !== 0) return filterComparison
   }
   return 0
+}
+
+export function compareV2DeliverableQuality(left: V2Solution, right: V2Solution): number {
+  const leftAchieved = isV2TargetAchieved(left.metrics)
+  const rightAchieved = isV2TargetAchieved(right.metrics)
+  if (leftAchieved !== rightAchieved) return leftAchieved ? -1 : 1
+  return compareNumber(
+    normalizedDeliveredDistance(left.metrics),
+    normalizedDeliveredDistance(right.metrics),
+  ) || compareV2Solutions(left, right)
 }

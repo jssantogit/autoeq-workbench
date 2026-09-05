@@ -4,7 +4,11 @@ import { CoreError } from '../../types/error.js'
 import type { AutoEqResultV2, RunManifestV2, StandardAutoEqInputV2 } from '../types.js'
 import { resolveStandardAutoEqV2Config } from './config.js'
 import { buildDeliverableV2, compressDeliverableV2 } from './deliverable.js'
-import { compareV2Solutions, isV2TargetAchieved } from './ranking.js'
+import {
+  compareV2DeliverableQuality,
+  compareV2Solutions,
+  isV2TargetAchieved,
+} from './ranking.js'
 import { createStandardV2Deadline, type StandardV2Runtime } from './runtime.js'
 import { withResearchTracePhase } from './researchTrace.js'
 import {
@@ -99,7 +103,7 @@ export function runStandardAutoEqV2(
             fallbackOnExpiration: bestDeliverable,
             researchTrace: runtime.researchTrace,
           })
-          if (compareV2Solutions(deliverable, bestDeliverable) < 0) {
+          if (compareV2DeliverableQuality(deliverable, bestDeliverable) < 0) {
             bestDeliverable = deliverable
             emitBestDeliverable()
           }
