@@ -10,10 +10,7 @@ export interface BiquadCoefficients {
   a2: number
 }
 
-export function biquadCoefficients(
-  filter: Filter,
-  sampleRateHz: number,
-): BiquadCoefficients {
+function validateBiquadInput(filter: Filter, sampleRateHz: number): void {
   if (!Number.isFinite(sampleRateHz) || sampleRateHz <= 0) {
     throw new CoreError('validation', 'Sample rate must be finite and positive')
   }
@@ -39,11 +36,15 @@ export function biquadCoefficients(
   if (!Number.isFinite(filter.q) || filter.q <= 0) {
     throw new CoreError('validation', 'Filter Q must be finite and positive')
   }
+}
 
+function calculateBiquadCoefficients(
+  filter: Filter,
+  cosW0: number,
+  sinW0: number,
+): BiquadCoefficients {
   const A = 10 ** (filter.gainDb / 40)
-  const w0 = (2 * Math.PI * filter.frequencyHz) / sampleRateHz
-  const cosW0 = Math.cos(w0)
-  const alpha = Math.sin(w0) / (2 * filter.q)
+  const alpha = sinW0 / (2 * filter.q)
 
   let b0: number
   let b1: number
@@ -95,4 +96,26 @@ export function biquadCoefficients(
     throw new CoreError('numeric', 'Biquad coefficients must be finite')
   }
   return coefficients
+}
+
+export function biquadCoefficientsWithFrequencyTrig(
+  filter: Filter,
+  sampleRateHz: number,
+  cosW0: number,
+  sinW0: number,
+): BiquadCoefficients {
+  validateBiquadInput(filter, sampleRateHz)
+  if (!Number.isFinite(cosW0) || !Number.isFinite(sinW0)) {
+    throw new CoreError('numeric', 'Biquad center-frequency trigonometry must be finite')
+  }
+  return calculateBiquadCoefficients(filter, cosW0, sinW0)
+}
+
+export function biquadCoefficients(
+  filter: Filter,
+  sampleRateHz: number,
+): BiquadCoefficients {
+  validateBiquadInput(filter, sampleRateHz)
+  const w0 = (2 * Math.PI * filter.frequencyHz) / sampleRateHz
+  return calculateBiquadCoefficients(filter, Math.cos(w0), Math.sin(w0))
 }
