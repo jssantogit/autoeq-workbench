@@ -144,10 +144,17 @@ describe('Standard v2 bounded search', () => {
     expect(responseGrids.size).toBe(1)
   })
 
-  it('labels detailed retention events as staged candidates and active paths', () => {
+  it('correlates detailed retention events to refined result keys', () => {
     const frequencies = createEvaluationGrid()
     const desiredDb = evaluateV2Solution([
-      pk('target', 1_000, 3, 2),
+      pk('target-a', 90, 2, 1.2),
+      pk('target-b', 220, -2.4, 1.5),
+      pk('target-c', 520, 2.8, 1.8),
+      pk('target-d', 1_200, -3, 2),
+      pk('target-e', 2_600, 3.2, 2.4),
+      pk('target-f', 5_200, -3, 2.8),
+      pk('target-g', 9_000, 2.5, 3),
+      pk('target-h', 15_000, -2, 2.5),
     ], [], frequencies, 48_000).cascadeDb
     const config = resolveStandardAutoEqV2Config({
       ...DEFAULT_AUTOEQ_SETTINGS,
@@ -172,9 +179,19 @@ describe('Standard v2 bounded search', () => {
       },
     })
 
+    const refinedAwayFromAppended = records.find(
+      (record) => record.resultKey !== record.refinementKey,
+    )
+
     expect(records.length).toBeGreaterThan(0)
+    expect(refinedAwayFromAppended).toBeDefined()
     expect(retentions.map((retention) => retention.stage)).toContain('staged-candidate')
     expect(retentions.map((retention) => retention.stage)).toContain('active-path')
+    const stagedRetention = retentions.find(
+      (retention) => retention.traceId === refinedAwayFromAppended!.traceId &&
+        retention.stage === 'staged-candidate',
+    )
+    expect(stagedRetention?.retained).toBe(false)
   })
 
   it('retains ordinary alternatives through 1.02 and caps paths at three', () => {

@@ -204,19 +204,9 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
 
       const rankedAppended = [...appendedCandidates].sort(compareV2Solutions)
       const staged = retainV2SearchPaths(rankedAppended, false)
-      if (hasDetailedJointTrace) {
-        const stagedKeys = new Set(staged.map((solution) => createV2SolutionKey(solution.filters)))
-        for (const appended of appendedCandidates) {
-          const context = appendedContexts.get(appended)
-          if (context !== undefined) {
-            input.researchTrace?.onJointRefineRetention?.({
-              traceId: context.traceId,
-              stage: 'staged-candidate',
-              retained: stagedKeys.has(createV2SolutionKey(appended.filters)),
-            })
-          }
-        }
-      }
+      const stagedCandidateKeys = hasDetailedJointTrace
+        ? new Set(staged.map((solution) => createV2SolutionKey(solution.filters)))
+        : undefined
       const stagedSet = new Set(staged)
       const deferred = rankedAppended.filter((candidate) => !stagedSet.has(candidate))
       let stagedImproved = false
@@ -240,6 +230,11 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
             researchContext,
           })
           if (researchContext !== undefined) {
+            input.researchTrace?.onJointRefineRetention?.({
+              traceId: researchContext.traceId,
+              stage: 'staged-candidate',
+              retained: stagedCandidateKeys!.has(createV2SolutionKey(refined.solution.filters)),
+            })
             refinedForRetention.push({
               solution: refined.solution,
               traceId: researchContext.traceId,
