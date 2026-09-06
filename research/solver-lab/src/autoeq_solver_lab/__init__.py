@@ -3,6 +3,7 @@
 from .types import (
     CanonicalMetricSet,
     LabFilter,
+    ObjectivePoint,
     SolverLabCandidate,
     SolverLabEvaluation,
     SolverLabProblem,
@@ -11,6 +12,7 @@ from .types import (
 __all__ = [
     "CanonicalMetricSet",
     "LabFilter",
+    "ObjectivePoint",
     "SolverLabCandidate",
     "SolverLabEvaluation",
     "SolverLabProblem",

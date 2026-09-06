@@ -56,3 +56,11 @@ class SolverLabEvaluation:
     deliverable: CanonicalMetricSet | None
     deliverableFilters: tuple[LabFilter, ...]
     cancellationTotalScore: float | None
+
+
+@dataclass(frozen=True)
+class ObjectivePoint:
+    candidate_id: str
+    rmse_db: float
+    max_abs_db: float
+    filter_count: int
