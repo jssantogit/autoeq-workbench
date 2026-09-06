@@ -39,13 +39,20 @@ class PowellOptimizer(ContinuousOptimizer):
         initial_vector = encode_filters(problem, layout, initial_candidate.filters)
         tracker = ObjectiveTracker(
             lambda vector: scalarized_objective(
-                problem, layout, np.clip(vector, 0.0, 1.0), objective_weights[0], objective_weights[1]
+                problem, layout, vector, objective_weights[0], objective_weights[1]
             ),
             evaluation_budget,
         )
+
+        def bounded_objective(vector: np.ndarray) -> float:
+            raw_vector = np.asarray(vector, dtype=np.float64)
+            if not np.all(np.isfinite(raw_vector)):
+                return float("inf")
+            return tracker.evaluate(np.clip(raw_vector, 0.0, 1.0))
+
         try:
             minimize(
-                tracker.evaluate,
+                bounded_objective,
                 initial_vector,
                 method="Powell",
                 bounds=[(0.0, 1.0)] * initial_vector.size,
