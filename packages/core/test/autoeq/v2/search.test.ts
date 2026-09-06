@@ -17,6 +17,8 @@ import {
   type Normalization,
   type SearchResult,
   type StandardAutoEqV2Config,
+  type StandardV2JointRefineRecord,
+  type StandardV2JointRefineRetention,
   type V2EvaluatedSolution,
   type V2Solution,
 } from '../../../src/index.js'
@@ -140,6 +142,39 @@ describe('Standard v2 bounded search', () => {
     expect(result.activeSolutions.length).toBeLessThanOrEqual(3)
     expect(checkpoints).toEqual(result.activeSolutions)
     expect(responseGrids.size).toBe(1)
+  })
+
+  it('labels detailed retention events as staged candidates and active paths', () => {
+    const frequencies = createEvaluationGrid()
+    const desiredDb = evaluateV2Solution([
+      pk('target', 1_000, 3, 2),
+    ], [], frequencies, 48_000).cascadeDb
+    const config = resolveStandardAutoEqV2Config({
+      ...DEFAULT_AUTOEQ_SETTINGS,
+      maxFilters: 1,
+    })
+    const records: StandardV2JointRefineRecord[] = []
+    const retentions: StandardV2JointRefineRetention[] = []
+
+    searchStandardV2WorkingSolutions({
+      desiredDb,
+      frequencies,
+      config: {
+        ...config,
+        workingMaxFilters: 1,
+        algorithm: { ...config.algorithm, maxJointRefinementCycles: 1 },
+      } as unknown as StandardAutoEqV2Config,
+      deadline: { isExpired: () => false },
+      boundaryMode: 'sign-crossing',
+      researchTrace: {
+        onJointRefineTrace: (record) => { records.push(record) },
+        onJointRefineRetention: (retention) => { retentions.push(retention) },
+      },
+    })
+
+    expect(records.length).toBeGreaterThan(0)
+    expect(retentions.map((retention) => retention.stage)).toContain('staged-candidate')
+    expect(retentions.map((retention) => retention.stage)).toContain('active-path')
   })
 
   it('retains ordinary alternatives through 1.02 and caps paths at three', () => {

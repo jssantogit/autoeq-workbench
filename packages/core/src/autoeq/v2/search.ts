@@ -133,12 +133,14 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
     retainedSolutions: readonly V2EvaluatedSolution[],
   ): void => {
     if (!hasDetailedJointTrace) return
-    const retained = new Set(retainedSolutions)
+    const retainedKeys = new Set(
+      retainedSolutions.map((solution) => createV2SolutionKey(solution.filters)),
+    )
     for (const refinement of refinements) {
       input.researchTrace?.onJointRefineRetention?.({
         traceId: refinement.traceId,
-        stage: 'active',
-        retained: retained.has(refinement.solution),
+        stage: 'active-path',
+        retained: retainedKeys.has(createV2SolutionKey(refinement.solution.filters)),
       })
     }
   }
@@ -203,14 +205,14 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
       const rankedAppended = [...appendedCandidates].sort(compareV2Solutions)
       const staged = retainV2SearchPaths(rankedAppended, false)
       if (hasDetailedJointTrace) {
-        const stagedSet = new Set(staged)
+        const stagedKeys = new Set(staged.map((solution) => createV2SolutionKey(solution.filters)))
         for (const appended of appendedCandidates) {
           const context = appendedContexts.get(appended)
           if (context !== undefined) {
             input.researchTrace?.onJointRefineRetention?.({
               traceId: context.traceId,
-              stage: 'parent',
-              retained: stagedSet.has(appended),
+              stage: 'staged-candidate',
+              retained: stagedKeys.has(createV2SolutionKey(appended.filters)),
             })
           }
         }

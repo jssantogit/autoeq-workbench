@@ -111,7 +111,7 @@ describe('Standard v2 research trace', () => {
     expect(counters.snapshot().deliverablesBuilt).toBeGreaterThan(0)
   }, 30_000)
 
-  it('records causal joint-refinement outcomes and exact duplicate states', () => {
+  it('records causal joint-refinement outcomes with attempted and completed state history', () => {
     const metrics = (rmseDb: number, maxAbsDb: number): ErrorMetrics => ({
       maeDb: rmseDb / 2,
       rmseDb,
@@ -134,7 +134,11 @@ describe('Standard v2 research trace', () => {
       endMetrics: metrics(0.8, 1.6),
       normalizedViolationGain: 0.4,
     }
-    const record = (traceId: string, resultKey: string): StandardV2JointRefineRecord => ({
+    const record = (
+      traceId: string,
+      resultKey: string,
+      expired = false,
+    ): StandardV2JointRefineRecord => ({
       traceId,
       origin: 'search',
       boundaryMode: 'sign-crossing',
@@ -159,18 +163,18 @@ describe('Standard v2 research trace', () => {
       }],
       completedCycles: 1,
       coordinateTrials: 3,
-      expired: false,
+      expired,
     })
 
     const telemetry = createResearchTelemetry({ mode: 'deep', nowMs: () => 0 })
-    const first = record('search:1', 'result')
+    const first = record('search:1', 'result', true)
     telemetry.trace.onJointRefineTrace?.(first)
     first.candidate.filter.gainDb = 999
     telemetry.trace.onJointRefineRetention?.({
-      traceId: 'search:1', stage: 'parent', retained: true,
+      traceId: 'search:1', stage: 'staged-candidate', retained: true,
     })
     telemetry.trace.onJointRefineRetention?.({
-      traceId: 'search:1', stage: 'active', retained: true,
+      traceId: 'search:1', stage: 'active-path', retained: true,
     })
     telemetry.trace.onBestDeliverableUpdated?.({
       metrics: metrics(0.8, 1.6),
@@ -179,7 +183,7 @@ describe('Standard v2 research trace', () => {
       sourceSolutionKey: 'result',
     })
     telemetry.trace.onJointRefineRetention?.({
-      traceId: 'search:3', stage: 'parent', retained: true,
+      traceId: 'search:3', stage: 'staged-candidate', retained: true,
     })
     telemetry.trace.onJointRefineTrace?.(record('search:2', 'result-2'))
     telemetry.trace.onJointRefineTrace?.(record('search:3', 'result-3'))
@@ -188,22 +192,26 @@ describe('Standard v2 research trace', () => {
     expect(snapshot.jointRefinements).toHaveLength(3)
     expect(snapshot.jointRefinements[0]).toMatchObject({
       traceId: 'search:1',
-      equivalentStateAlreadyPaid: false,
-      survivedParentRetention: true,
+      equivalentStatePreviouslyAttempted: false,
+      equivalentStatePreviouslyCompleted: false,
+      survivedStagedCandidateRetention: true,
       survivedActivePathRetention: true,
       contributedToBestDeliverable: true,
     })
     expect(snapshot.jointRefinements[0]!.candidate.filter.gainDb).toBe(2)
     expect(snapshot.jointRefinements[1]).toMatchObject({
       traceId: 'search:2',
-      equivalentStateAlreadyPaid: true,
-      survivedParentRetention: false,
+      equivalentStatePreviouslyAttempted: true,
+      equivalentStatePreviouslyCompleted: false,
+      survivedStagedCandidateRetention: false,
       survivedActivePathRetention: false,
       contributedToBestDeliverable: false,
     })
     expect(snapshot.jointRefinements[2]).toMatchObject({
       traceId: 'search:3',
-      survivedParentRetention: true,
+      equivalentStatePreviouslyAttempted: true,
+      equivalentStatePreviouslyCompleted: true,
+      survivedStagedCandidateRetention: true,
     })
   })
 })

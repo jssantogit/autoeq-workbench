@@ -88,7 +88,8 @@ function cloneJointRefineRecord(
 
 function cloneCoreJointRefineRecord(
   record: StandardV2JointRefineRecord,
-  equivalentStateAlreadyPaid: boolean,
+  equivalentStatePreviouslyAttempted: boolean,
+  equivalentStatePreviouslyCompleted: boolean,
 ): ResearchJointRefineRecord {
   return {
     ...record,
@@ -103,8 +104,9 @@ function cloneCoreJointRefineRecord(
       startMetrics: { ...cycle.startMetrics },
       endMetrics: { ...cycle.endMetrics },
     })),
-    equivalentStateAlreadyPaid,
-    survivedParentRetention: false,
+    equivalentStatePreviouslyAttempted,
+    equivalentStatePreviouslyCompleted,
+    survivedStagedCandidateRetention: false,
     survivedActivePathRetention: false,
     contributedToBestDeliverable: false,
   }
@@ -122,13 +124,14 @@ export function createResearchTelemetry(options: {
   const counters = createCounters()
   const checkpoints: ResearchCheckpoint[] = []
   const jointRefinements: ResearchJointRefineRecord[] = []
-  const paidRefinementKeys = new Set<string>()
+  const attemptedRefinementKeys = new Set<string>()
+  const completedRefinementKeys = new Set<string>()
   const recordsByTraceId = new Map<string, ResearchJointRefineRecord>()
   const recordsByResultKey = new Map<string, ResearchJointRefineRecord[]>()
   const pendingBestSolutionKeys = new Set<string>()
   const pendingRetentions = new Map<string, {
-    parent?: boolean
-    active?: boolean
+    'staged-candidate'?: boolean
+    'active-path'?: boolean
   }>()
   const phaseTimingMs = createPhaseTiming()
   const phaseStarts = new Map<string, number[]>()
@@ -191,18 +194,24 @@ export function createResearchTelemetry(options: {
 
   if (options.mode === 'deep') {
     trace.onJointRefineTrace = (record) => {
-      const equivalentStateAlreadyPaid = paidRefinementKeys.has(record.refinementKey)
-      paidRefinementKeys.add(record.refinementKey)
-      const observed = cloneCoreJointRefineRecord(record, equivalentStateAlreadyPaid)
+      const previouslyAttempted = attemptedRefinementKeys.has(record.refinementKey)
+      const previouslyCompleted = completedRefinementKeys.has(record.refinementKey)
+      attemptedRefinementKeys.add(record.refinementKey)
+      if (!record.expired) completedRefinementKeys.add(record.refinementKey)
+      const observed = cloneCoreJointRefineRecord(
+        record,
+        previouslyAttempted,
+        previouslyCompleted,
+      )
       if (pendingBestSolutionKeys.has(observed.resultKey)) {
         observed.contributedToBestDeliverable = true
       }
       const pendingRetention = pendingRetentions.get(observed.traceId)
-      if (pendingRetention?.parent !== undefined) {
-        observed.survivedParentRetention = pendingRetention.parent
+      if (pendingRetention?.['staged-candidate'] !== undefined) {
+        observed.survivedStagedCandidateRetention = pendingRetention['staged-candidate']
       }
-      if (pendingRetention?.active !== undefined) {
-        observed.survivedActivePathRetention = pendingRetention.active
+      if (pendingRetention?.['active-path'] !== undefined) {
+        observed.survivedActivePathRetention = pendingRetention['active-path']
       }
       pendingRetentions.delete(observed.traceId)
       jointRefinements.push(observed)
@@ -219,8 +228,8 @@ export function createResearchTelemetry(options: {
         pendingRetentions.set(retention.traceId, pending)
         return
       }
-      if (retention.stage === 'parent') {
-        record.survivedParentRetention = retention.retained
+      if (retention.stage === 'staged-candidate') {
+        record.survivedStagedCandidateRetention = retention.retained
       } else {
         record.survivedActivePathRetention = retention.retained
       }

@@ -68,8 +68,9 @@ export interface ResearchTelemetrySnapshot {
 }
 
 export interface ResearchJointRefineRecord extends StandardV2JointRefineRecord {
-  equivalentStateAlreadyPaid: boolean
-  survivedParentRetention: boolean
+  equivalentStatePreviouslyAttempted: boolean
+  equivalentStatePreviouslyCompleted: boolean
+  survivedStagedCandidateRetention: boolean
   survivedActivePathRetention: boolean
   contributedToBestDeliverable: boolean
 }

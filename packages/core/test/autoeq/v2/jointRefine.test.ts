@@ -254,4 +254,51 @@ describe('Standard v2 joint refinement', () => {
       .toBe(result.coordinateTrials)
     expect(records[0]!.cycles[0]!.normalizedViolationGain).toBeGreaterThanOrEqual(0)
   })
+
+  it('keeps counter-only research tracing behavior-neutral without detailed records', () => {
+    const desiredDb = evaluateV2Solution([desiredFilter], [], frequencies, config.sampleRateHz)
+      .cascadeDb
+    const start = evaluateV2Solution([
+      { ...desiredFilter, frequencyHz: 900, gainDb: 2.5 },
+    ], desiredDb, frequencies, config.sampleRateHz)
+    const baseInput = {
+      solution: start,
+      desiredDb,
+      frequencies,
+      config,
+      deadline: { isExpired: () => false },
+      researchContext: {
+        traceId: 'search:counter-only',
+        origin: 'search' as const,
+        parentKey: 'parent',
+        parentFilterCount: 1,
+        parentMetrics: { ...start.metrics },
+        candidateKey: 'candidate',
+        candidate: {
+          filter: { ...desiredFilter },
+          featureIndex: null,
+          boundaryMode: null,
+          qScale: null,
+          cheapScore: null,
+        },
+        refinementKey: 'state',
+      },
+    }
+    let completed = 0
+    let auditComputations = 0
+
+    const plain = jointRefineV2(baseInput, {
+      onCancellationAuditComputed: () => { auditComputations += 1 },
+    })
+    const light = jointRefineV2({
+      ...baseInput,
+      researchTrace: { onJointRefineCompleted: () => { completed += 1 } },
+    })
+
+    expect(light.solution.filters).toEqual(plain.solution.filters)
+    expect(light.solution.metrics).toEqual(plain.solution.metrics)
+    expect(light.coordinateTrials).toBe(plain.coordinateTrials)
+    expect(completed).toBe(1)
+    expect(auditComputations).toBeGreaterThan(0)
+  })
 })

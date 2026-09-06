@@ -115,7 +115,10 @@ export function jointRefineV2(
       )
   const responseBuffer = new Array<number>(input.frequencies.length)
   const validAudits = new WeakSet<V2EvaluatedSolution>([solution])
-  const cycles: StandardV2JointRefineCycle[] = []
+  const detailedJointTrace =
+    input.researchContext !== undefined &&
+    input.researchTrace?.onJointRefineTrace !== undefined
+  const cycles: StandardV2JointRefineCycle[] | undefined = detailedJointTrace ? [] : undefined
   let cycleStartingSolution: V2EvaluatedSolution | undefined
   let cycleTrialStart = 0
   const withCancellationAudit = (candidate: V2EvaluatedSolution): V2EvaluatedSolution => {
@@ -132,7 +135,7 @@ export function jointRefineV2(
     return audited
   }
   const recordCycle = (completed: boolean): void => {
-    if (cycleStartingSolution === undefined) return
+    if (cycles === undefined || cycleStartingSolution === undefined) return
     cycles.push({
       cycleIndex: cycles.length + 1,
       completed,
@@ -149,13 +152,15 @@ export function jointRefineV2(
     recordCycle(false)
     solution = withCancellationAudit(solution)
     input.researchTrace?.onJointRefineCompleted?.(coordinateTrials)
-    if (input.researchTrace && input.researchContext) {
-      input.researchTrace.onJointRefineTrace?.({
-        ...input.researchContext,
-        parentMetrics: { ...input.researchContext.parentMetrics },
+    const researchContext = input.researchContext
+    const onJointRefineTrace = input.researchTrace?.onJointRefineTrace
+    if (cycles !== undefined && researchContext !== undefined && onJointRefineTrace !== undefined) {
+      onJointRefineTrace({
+        ...researchContext,
+        parentMetrics: { ...researchContext.parentMetrics },
         candidate: {
-          ...input.researchContext.candidate,
-          filter: { ...input.researchContext.candidate.filter },
+          ...researchContext.candidate,
+          filter: { ...researchContext.candidate.filter },
         },
         resultKey: createV2SolutionKey(solution.filters),
         resultMetrics: { ...solution.metrics },
@@ -178,8 +183,11 @@ export function jointRefineV2(
     if (input.deadline.isExpired()) {
       return finish(true)
     }
-    cycleStartingSolution = solution
-    cycleTrialStart = coordinateTrials
+    const cycleStartSolution = solution
+    if (cycles !== undefined) {
+      cycleStartingSolution = cycleStartSolution
+      cycleTrialStart = coordinateTrials
+    }
     for (const scale of JOINT_REFINEMENT_SCALES) {
       for (let filterIndex = 0; filterIndex < solution.filters.length; filterIndex += 1) {
         const startingFilter = solution.filters[filterIndex]!
@@ -250,10 +258,10 @@ export function jointRefineV2(
         }
       }
     }
-    const completedCycleStart = cycleStartingSolution
+    const completedCycleStart = cycleStartSolution
     completedCycles += 1
     recordCycle(true)
-    const primaryComparison = compareV2PrimaryMetrics(solution.metrics, completedCycleStart!.metrics)
+    const primaryComparison = compareV2PrimaryMetrics(solution.metrics, completedCycleStart.metrics)
     if (primaryComparison > 0) break
     if (primaryComparison === 0) {
       solution = withCancellationAudit(solution)

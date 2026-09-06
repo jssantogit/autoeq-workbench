@@ -250,7 +250,7 @@ export function compressDeliverableV2(
     let deliverable = input.deliverable
     let sourceSolutionKey: string | undefined
     let compressionRefinementSequence = 0
-    const hasDetailedJointTrace = input.researchTrace?.onJointRefineTrace !== undefined
+    const detailedJointTrace = input.researchTrace?.onJointRefineTrace !== undefined
     const result = (completed: boolean, expired: boolean): CompressDeliverableV2Result => ({
       deliverable,
       completed,
@@ -287,7 +287,7 @@ export function compressDeliverableV2(
           return result(false, true)
         }
         const removedFilter = deliverable.filters[removal.index]!
-        const researchContext: StandardV2JointRefineContext | undefined = hasDetailedJointTrace
+        const researchContext: StandardV2JointRefineContext | undefined = detailedJointTrace
           ? {
               traceId: `compression:${++compressionRefinementSequence}`,
               origin: 'compression',

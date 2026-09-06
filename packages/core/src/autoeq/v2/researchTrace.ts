@@ -19,7 +19,9 @@ export interface StandardV2SafeCheckpoint {
 
 export type StandardV2JointRefineOrigin = 'search' | 'compression'
 
-export type StandardV2JointRefineRetentionStage = 'parent' | 'active'
+export type StandardV2JointRefineRetentionStage =
+  | 'staged-candidate'
+  | 'active-path'
 
 export interface StandardV2JointRefineCandidate {
   filter: Filter
