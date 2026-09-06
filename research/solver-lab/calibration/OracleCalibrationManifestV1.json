@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "createdFromRepositorySha": "0aeaaceaac4cf6587f6723b9ff745a306c7ff546",
+  "corpusVersion": "research-corpus-v1",
+  "continuousOracleVersion": "continuous-v1",
+  "deliverableOracleVersion": "deliverable-v1",
+  "qualityTimeFormulaVersion": 1,
+  "materialImprovementThresholds": {
+    "minimumAggregateFrontierGainFraction": 0.0,
+    "maximumPerCaseQualityRegressionFraction": 1.0,
+    "maximumCatastrophicCaseRate": 0.8181818181818182
+  }
+}
