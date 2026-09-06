@@ -22,8 +22,12 @@ import {
   compareWithBaseline,
   createResearchBaselineIdentity,
   findPracticalMonotonicityWarnings,
-  RESEARCH_RUNNER_SCHEMA_VERSION,
 } from './baseline.js'
+import {
+  assertResearchProvenanceV2,
+  RESEARCH_ARTIFACT_SCHEMA_VERSION,
+  type ResearchProvenanceV2,
+} from './artifactSchema.js'
 import {
   loadResearchCases,
   prepareResearchDesired,
@@ -419,7 +423,7 @@ function currentCommit(): string {
 }
 
 export interface ResearchExecutionResult {
-  metadata: ResearchRunMetadata
+  provenance: ResearchProvenanceV2
   runs: ResearchRunRow[]
   aggregates: ResearchAggregateRow[]
   baseline?: ResearchBaselineFile
@@ -429,6 +433,7 @@ export interface ResearchExecutionResult {
 
 export async function executeResearchPlan(
   options: ResearchCliOptions,
+  metadata: ResearchRunMetadata,
   cellRunner: (options: RunResearchCellOptions) => Promise<ResearchRunRow> = runResearchCell,
 ): Promise<ResearchExecutionResult> {
   const runs: ResearchRunRow[] = []
@@ -447,20 +452,20 @@ export async function executeResearchPlan(
     ? undefined
     : compareWithBaseline(aggregates, baseline)
   const warnings = findPracticalMonotonicityWarnings(aggregates)
-  const metadata: ResearchRunMetadata = {
-    schemaVersion: 1,
-    candidateCommit: currentCommit(),
-    baselineCommit: options.baselineImplementationCommit ??
-      baseline?.identity.implementationCommit ??
-      PUBLISHED_STANDARD_V2_COMMIT,
-    runnerSchemaVersion: RESEARCH_RUNNER_SCHEMA_VERSION,
-    fixtureHashes: { ...RESEARCH_CORPUS_SHA256 },
-    preset: options.preset,
-    requestedAtIso: new Date().toISOString(),
-    testMode: options.testMode || undefined,
+  const firstRun = runs[0]
+  if (firstRun === undefined) throw new Error('Research execution produced no runs')
+  const provenance: ResearchProvenanceV2 = {
+    schemaVersion: RESEARCH_ARTIFACT_SCHEMA_VERSION,
+    ...metadata,
+    nodeVersion: process.version,
+    pythonVersion: metadata.pythonVersion ?? null,
+    runnerLabel: metadata.runnerLabel ?? null,
+    timeBudgetSeconds: firstRun.budgetSeconds,
+    maxFilters: firstRun.maxFilters,
   }
+  assertResearchProvenanceV2(provenance)
   const artifacts = writeResearchArtifacts(options.outputDir, {
-    metadata,
+    provenance,
     runs,
     aggregates,
     baseline,
@@ -480,12 +485,26 @@ export async function executeResearchPlan(
     )
   }
 
-  return { metadata, runs, aggregates, baseline, comparison, artifacts }
+  return { provenance, runs, aggregates, baseline, comparison, artifacts }
+}
+
+function createControlMetadata(): ResearchRunMetadata {
+  return {
+    repositorySha: currentCommit(),
+    algorithmId: 'standard-v2-control',
+    algorithmVersion: '5dafaa50410b9fa3157c28a1f7757d676b33152a',
+    configurationId: 'standard-v2-defaults',
+    seed: null,
+    corpusVersion: 'research-corpus-v1',
+    caseInputSha256: RESEARCH_CORPUS_SHA256['dunu-titan-s2.txt']!,
+    pythonVersion: null,
+    runnerLabel: 'autoeq-research-cli',
+  }
 }
 
 export async function main(args: readonly string[] = process.argv.slice(2)): Promise<void> {
   const options = parseResearchCliArgs(args)
-  const result = await executeResearchPlan(options)
+  const result = await executeResearchPlan(options, createControlMetadata())
   console.log(`AutoEQ Research Bench: ${result.runs.length} runs written to ${options.outputDir}`)
 }
 

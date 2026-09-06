@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import { RESEARCH_CORPUS_SHA256 } from '../../../../benchmarks/research/corpus.js'
+import type { ResearchProvenanceV2 } from '../../../../benchmarks/research/artifactSchema.js'
 import { renderResearchArtifacts } from '../../../../benchmarks/research/report.js'
 import type {
   ResearchAggregateRow,
-  ResearchRunMetadata,
   ResearchRunRow,
   ResearchTimeToQuality,
 } from '../../../../benchmarks/research/types.js'
@@ -85,27 +85,65 @@ const run: ResearchRunRow = {
 }
 
 describe('research artifact report', () => {
-  it('renders the five stable artifacts and an exact empty profile when deep mode is absent', () => {
-    const metadata: ResearchRunMetadata = {
-      schemaVersion: 1,
-      candidateCommit: 'candidate',
-      baselineCommit: 'baseline',
-      runnerSchemaVersion: 1,
-      fixtureHashes: { ...RESEARCH_CORPUS_SHA256 },
-      preset: 'quick',
+  it('serializes schema-v2 provenance and an ordered best-so-far trajectory', () => {
+    const provenance: ResearchProvenanceV2 = {
+      schemaVersion: 2,
+      repositorySha: 'research-head',
+      algorithmId: 'standard-v2-control',
+      algorithmVersion: '5dafaa50410b9fa3157c28a1f7757d676b33152a',
+      configurationId: 'standard-v2-defaults',
+      seed: null,
+      corpusVersion: 'research-corpus-v1',
+      caseInputSha256: RESEARCH_CORPUS_SHA256['dunu-titan-s2.txt']!,
+      nodeVersion: 'v22.0.0',
+      pythonVersion: null,
+      runnerLabel: null,
+      timeBudgetSeconds: 5,
+      maxFilters: 10,
     }
     const artifacts = renderResearchArtifacts({
-      metadata,
-      runs: [run],
+      provenance,
+      runs: [{
+        ...run,
+        budgetSeconds: 5,
+        timeline: [
+          { elapsedMs: 500, metrics: { maeDb: 0.4, rmseDb: 0.8, maxAbsDb: 1.7, maxAbsFrequencyHz: 1_000 }, filterCount: 1 },
+          { elapsedMs: 100, metrics: { maeDb: 0.6, rmseDb: 1.2, maxAbsDb: 2.5, maxAbsFrequencyHz: 1_000 }, filterCount: 0 },
+          { elapsedMs: 500, metrics: { maeDb: 0.2, rmseDb: 0.4, maxAbsDb: 1.2, maxAbsFrequencyHz: 1_000 }, filterCount: 2 },
+        ],
+      }],
       aggregates: [aggregate],
     })
+    const artifact = JSON.parse(artifacts.resultsJson)
 
     expect(Object.keys(artifacts).sort()).toEqual([
       'metadataJson', 'profileJson', 'resultsJson', 'summaryMd', 'timelineJson',
     ])
     expect(JSON.parse(artifacts.profileJson)).toEqual({ enabled: false, profiles: [] })
-    expect(JSON.parse(artifacts.metadataJson)).toMatchObject(metadata)
-    expect(JSON.parse(artifacts.resultsJson).runs).toHaveLength(1)
+    expect(JSON.parse(artifacts.metadataJson)).toMatchObject(provenance)
+    expect(artifact).toMatchObject({ schemaVersion: 2 })
+    expect(artifact.provenance).toMatchObject({
+      schemaVersion: 2,
+      algorithmId: 'standard-v2-control',
+      algorithmVersion: '5dafaa50410b9fa3157c28a1f7757d676b33152a',
+      configurationId: 'standard-v2-defaults',
+      seed: null,
+      corpusVersion: 'research-corpus-v1',
+      caseInputSha256: RESEARCH_CORPUS_SHA256['dunu-titan-s2.txt'],
+      nodeVersion: 'v22.0.0',
+      pythonVersion: null,
+      runnerLabel: null,
+      timeBudgetSeconds: 5,
+      maxFilters: 10,
+    })
+    expect(artifact.trajectory.every((point: { elapsedMs: number }, index: number, all: { elapsedMs: number }[]) =>
+      index === 0 || point.elapsedMs >= all[index - 1]!.elapsedMs,
+    )).toBe(true)
+    expect(artifact.trajectory).toEqual([
+      { elapsedMs: 100, rmseDb: 1.2, maxAbsDb: 2.5, filterCount: 0, sourceSolutionKey: null },
+      { elapsedMs: 500, rmseDb: 0.4, maxAbsDb: 1.2, filterCount: 2, sourceSolutionKey: null },
+    ])
+    expect(artifact.runs).toHaveLength(1)
     expect(JSON.parse(artifacts.timelineJson).timelines[0].caseId).toBe('titan-to-storm')
     expect(artifacts.summaryMd).toContain('Baseline')
     expect(artifacts.summaryMd).toContain('titan-to-storm')

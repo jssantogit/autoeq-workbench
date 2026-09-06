@@ -184,12 +184,13 @@ export interface ResearchWarning {
 }
 
 export interface ResearchRunMetadata {
-  schemaVersion: 1
-  candidateCommit: string
-  baselineCommit: string
-  runnerSchemaVersion: 1
-  fixtureHashes: Record<string, string>
-  preset: 'quick' | 'full'
-  requestedAtIso?: string
-  testMode?: boolean
+  repositorySha: string
+  algorithmId: string
+  algorithmVersion: string
+  configurationId: string
+  seed: number | null
+  corpusVersion: string
+  caseInputSha256: string
+  pythonVersion?: string | null
+  runnerLabel?: string | null
 }

@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest'
 import { prepareResearchDesired, loadResearchCases } from '../../../../benchmarks/research/corpus.js'
 import {
   createResearchCells,
+  executeResearchPlan,
   parseResearchCliArgs,
   runResearchCell,
 } from '../../../../benchmarks/research/run.js'
@@ -163,5 +164,36 @@ describe('research runner', () => {
       [3_000, 0.2],
       [5_000, 0.2],
     ])
+  })
+
+  it('accepts explicit metadata for schema-v2 provenance', async () => {
+    const options = parseResearchCliArgs(['--test-mode'])
+    options.cases = ['titan-to-storm']
+    options.budgets = [5]
+    options.maxFilters = [10]
+    const metadata = {
+      repositorySha: 'research-head',
+      algorithmId: 'standard-v2-control',
+      algorithmVersion: '5dafaa50410b9fa3157c28a1f7757d676b33152a',
+      configurationId: 'standard-v2-defaults',
+      seed: null,
+      corpusVersion: 'research-corpus-v1',
+      caseInputSha256: 'case-input-sha',
+      pythonVersion: null,
+      runnerLabel: null,
+    }
+
+    const result = await executeResearchPlan(options, metadata, async (cell) => runResearchCell({
+      ...cell,
+      repeatIndex: 0,
+      run: (input) => fakeResult(input, 'titan-to-storm'),
+    }))
+
+    expect(result.provenance).toMatchObject({
+      schemaVersion: 2,
+      ...metadata,
+      timeBudgetSeconds: 5,
+      maxFilters: 10,
+    })
   })
 })

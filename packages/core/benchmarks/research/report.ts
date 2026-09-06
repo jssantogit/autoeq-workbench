@@ -5,17 +5,23 @@ import {
   compareWithBaseline,
   findPracticalMonotonicityWarnings,
 } from './baseline.js'
+import {
+  assertResearchProvenanceV2,
+  normalizeBestSoFarTrajectory,
+  RESEARCH_ARTIFACT_SCHEMA_VERSION,
+  type ResearchProvenanceV2,
+  type ResearchTrajectoryPointV2,
+} from './artifactSchema.js'
 import type {
   ResearchBaselineFile,
   ResearchComparison,
-  ResearchRunMetadata,
   ResearchRunRow,
   ResearchAggregateRow,
   ResearchWarning,
 } from './types.js'
 
 export interface ResearchReportInput {
-  metadata: ResearchRunMetadata
+  provenance: ResearchProvenanceV2
   runs: readonly ResearchRunRow[]
   aggregates: readonly ResearchAggregateRow[]
   baseline?: ResearchBaselineFile
@@ -115,9 +121,9 @@ function renderSummary(
   return [
     '# AutoEQ Research Bench',
     '',
-    `- Candidate commit: \`${input.metadata.candidateCommit}\``,
-    `- Baseline commit: \`${input.metadata.baselineCommit}\``,
-    `- Preset: \`${input.metadata.preset}\``,
+    `- Repository: \`${input.provenance.repositorySha}\``,
+    `- Algorithm: \`${input.provenance.algorithmId}@${input.provenance.algorithmVersion}\``,
+    `- Configuration: \`${input.provenance.configurationId}\``,
     '',
     '## Baseline deltas',
     '',
@@ -149,6 +155,7 @@ function renderSummary(
 }
 
 export function renderResearchArtifacts(input: ResearchReportInput): ResearchArtifactFiles {
+  assertResearchProvenanceV2(input.provenance)
   const comparison = input.comparison ?? (
     input.baseline === undefined
       ? undefined
@@ -166,18 +173,31 @@ export function renderResearchArtifacts(input: ResearchReportInput): ResearchArt
       phaseTimingMs: run.phaseTimingMs,
       jointRefinements: run.jointRefinements ?? [],
     }))
+  const trajectory: ResearchTrajectoryPointV2[] = normalizeBestSoFarTrajectory(
+    input.runs.flatMap((run) => run.timeline.map((checkpoint) => ({
+      elapsedMs: checkpoint.elapsedMs,
+      rmseDb: checkpoint.metrics.rmseDb,
+      maxAbsDb: checkpoint.metrics.maxAbsDb,
+      filterCount: checkpoint.filterCount,
+      sourceSolutionKey: null,
+    }))),
+  )
 
   return {
     summaryMd: renderSummary(input, comparison, warnings),
     resultsJson: json({
-      schemaVersion: 1,
+      schemaVersion: RESEARCH_ARTIFACT_SCHEMA_VERSION,
+      provenance: input.provenance,
+      trajectory,
       runs: input.runs,
       aggregates: input.aggregates,
       comparison: comparison ?? null,
       warnings,
     }),
     timelineJson: json({
-      schemaVersion: 1,
+      schemaVersion: RESEARCH_ARTIFACT_SCHEMA_VERSION,
+      provenance: input.provenance,
+      trajectory,
       timelines: input.runs.map((run) => ({
         caseId: run.caseId,
         budgetSeconds: run.budgetSeconds,
@@ -190,7 +210,7 @@ export function renderResearchArtifacts(input: ResearchReportInput): ResearchArt
     profileJson: profileRows.length === 0
       ? JSON.stringify({ enabled: false, profiles: [] })
       : json({ enabled: true, profiles: profileRows }),
-    metadataJson: json(input.metadata),
+    metadataJson: json(input.provenance),
   }
 }
 
