@@ -10,6 +10,7 @@ import {
   normalizeBestSoFarTrajectory,
   RESEARCH_ARTIFACT_SCHEMA_VERSION,
   type ResearchProvenanceV2,
+  type ResearchRunArtifactV2,
   type ResearchTrajectoryPointV2,
 } from './artifactSchema.js'
 import type {
@@ -21,7 +22,7 @@ import type {
 } from './types.js'
 
 export interface ResearchReportInput {
-  provenance: ResearchProvenanceV2
+  runProvenance: readonly ResearchProvenanceV2[]
   runs: readonly ResearchRunRow[]
   aggregates: readonly ResearchAggregateRow[]
   baseline?: ResearchBaselineFile
@@ -117,13 +118,15 @@ function renderSummary(
   comparison: ResearchComparison | undefined,
   warnings: readonly ResearchWarning[],
 ): string {
+  const provenance = input.runProvenance[0]
+  if (provenance === undefined) throw new Error('Research artifacts require per-run provenance')
   const deepProfiles = input.runs.filter((run) => run.telemetryMode === 'deep')
   return [
     '# AutoEQ Research Bench',
     '',
-    `- Repository: \`${input.provenance.repositorySha}\``,
-    `- Algorithm: \`${input.provenance.algorithmId}@${input.provenance.algorithmVersion}\``,
-    `- Configuration: \`${input.provenance.configurationId}\``,
+    `- Repository: \`${provenance.repositorySha}\``,
+    `- Algorithm: \`${provenance.algorithmId}@${provenance.algorithmVersion}\``,
+    `- Configuration: \`${provenance.configurationId}\``,
     '',
     '## Baseline deltas',
     '',
@@ -155,7 +158,10 @@ function renderSummary(
 }
 
 export function renderResearchArtifacts(input: ResearchReportInput): ResearchArtifactFiles {
-  assertResearchProvenanceV2(input.provenance)
+  if (input.runProvenance.length !== input.runs.length) {
+    throw new Error('Research artifacts require exactly one provenance record per run')
+  }
+  input.runProvenance.forEach(assertResearchProvenanceV2)
   const comparison = input.comparison ?? (
     input.baseline === undefined
       ? undefined
@@ -173,22 +179,25 @@ export function renderResearchArtifacts(input: ResearchReportInput): ResearchArt
       phaseTimingMs: run.phaseTimingMs,
       jointRefinements: run.jointRefinements ?? [],
     }))
-  const trajectory: ResearchTrajectoryPointV2[] = normalizeBestSoFarTrajectory(
-    input.runs.flatMap((run) => run.timeline.map((checkpoint) => ({
+  const runArtifacts: ResearchRunArtifactV2[] = input.runs.map((run, index) => {
+    const sourceSolutionKey = `${run.caseId}:${run.budgetSeconds}:${run.maxFilters}:${run.repeatIndex}`
+    const trajectory: ResearchTrajectoryPointV2[] = normalizeBestSoFarTrajectory(
+      run.timeline.map((checkpoint) => ({
       elapsedMs: checkpoint.elapsedMs,
       rmseDb: checkpoint.metrics.rmseDb,
       maxAbsDb: checkpoint.metrics.maxAbsDb,
       filterCount: checkpoint.filterCount,
-      sourceSolutionKey: null,
-    }))),
-  )
+        sourceSolutionKey,
+      })),
+    )
+    return { sourceSolutionKey, provenance: input.runProvenance[index]!, trajectory }
+  })
 
   return {
     summaryMd: renderSummary(input, comparison, warnings),
     resultsJson: json({
       schemaVersion: RESEARCH_ARTIFACT_SCHEMA_VERSION,
-      provenance: input.provenance,
-      trajectory,
+      runArtifacts,
       runs: input.runs,
       aggregates: input.aggregates,
       comparison: comparison ?? null,
@@ -196,8 +205,7 @@ export function renderResearchArtifacts(input: ResearchReportInput): ResearchArt
     }),
     timelineJson: json({
       schemaVersion: RESEARCH_ARTIFACT_SCHEMA_VERSION,
-      provenance: input.provenance,
-      trajectory,
+      runArtifacts,
       timelines: input.runs.map((run) => ({
         caseId: run.caseId,
         budgetSeconds: run.budgetSeconds,
@@ -210,7 +218,10 @@ export function renderResearchArtifacts(input: ResearchReportInput): ResearchArt
     profileJson: profileRows.length === 0
       ? JSON.stringify({ enabled: false, profiles: [] })
       : json({ enabled: true, profiles: profileRows }),
-    metadataJson: json(input.provenance),
+    metadataJson: json({
+      schemaVersion: RESEARCH_ARTIFACT_SCHEMA_VERSION,
+      runProvenance: input.runProvenance,
+    }),
   }
 }
 

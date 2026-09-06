@@ -102,7 +102,7 @@ describe('research artifact report', () => {
       maxFilters: 10,
     }
     const artifacts = renderResearchArtifacts({
-      provenance,
+      runProvenance: [provenance],
       runs: [{
         ...run,
         budgetSeconds: 5,
@@ -120,9 +120,9 @@ describe('research artifact report', () => {
       'metadataJson', 'profileJson', 'resultsJson', 'summaryMd', 'timelineJson',
     ])
     expect(JSON.parse(artifacts.profileJson)).toEqual({ enabled: false, profiles: [] })
-    expect(JSON.parse(artifacts.metadataJson)).toMatchObject(provenance)
+    expect(JSON.parse(artifacts.metadataJson).runProvenance[0]).toMatchObject(provenance)
     expect(artifact).toMatchObject({ schemaVersion: 2 })
-    expect(artifact.provenance).toMatchObject({
+    expect(artifact.runArtifacts[0].provenance).toMatchObject({
       schemaVersion: 2,
       algorithmId: 'standard-v2-control',
       algorithmVersion: '5dafaa50410b9fa3157c28a1f7757d676b33152a',
@@ -136,17 +136,59 @@ describe('research artifact report', () => {
       timeBudgetSeconds: 5,
       maxFilters: 10,
     })
-    expect(artifact.trajectory.every((point: { elapsedMs: number }, index: number, all: { elapsedMs: number }[]) =>
+    expect(artifact.runArtifacts[0].trajectory.every((point: { elapsedMs: number }, index: number, all: { elapsedMs: number }[]) =>
       index === 0 || point.elapsedMs >= all[index - 1]!.elapsedMs,
     )).toBe(true)
-    expect(artifact.trajectory).toEqual([
-      { elapsedMs: 100, rmseDb: 1.2, maxAbsDb: 2.5, filterCount: 0, sourceSolutionKey: null },
-      { elapsedMs: 500, rmseDb: 0.4, maxAbsDb: 1.2, filterCount: 2, sourceSolutionKey: null },
+    expect(artifact.runArtifacts[0].trajectory).toEqual([
+      { elapsedMs: 100, rmseDb: 1.2, maxAbsDb: 2.5, filterCount: 0, sourceSolutionKey: 'titan-to-storm:5:10:0' },
+      { elapsedMs: 500, rmseDb: 0.4, maxAbsDb: 1.2, filterCount: 2, sourceSolutionKey: 'titan-to-storm:5:10:0' },
     ])
     expect(artifact.runs).toHaveLength(1)
     expect(JSON.parse(artifacts.timelineJson).timelines[0].caseId).toBe('titan-to-storm')
     expect(artifacts.summaryMd).toContain('Baseline')
     expect(artifacts.summaryMd).toContain('titan-to-storm')
     expect(artifacts.summaryMd).not.toContain('working-')
+  })
+
+  it('preserves independent trajectories and provenance for every grid run', () => {
+    const provenance: ResearchProvenanceV2 = {
+      schemaVersion: 2,
+      repositorySha: 'research-head',
+      algorithmId: 'standard-v2-control',
+      algorithmVersion: '5dafaa50410b9fa3157c28a1f7757d676b33152a',
+      configurationId: 'standard-v2-defaults',
+      seed: null,
+      corpusVersion: 'research-corpus-v1',
+      caseInputSha256: 'base-input',
+      nodeVersion: 'v22.0.0',
+      pythonVersion: null,
+      runnerLabel: null,
+      timeBudgetSeconds: 5,
+      maxFilters: 10,
+    }
+    const artifacts = renderResearchArtifacts({
+      runProvenance: [
+        { ...provenance, caseInputSha256: 'storm-input', timeBudgetSeconds: 5 },
+        { ...provenance, caseInputSha256: 'u12t-input', timeBudgetSeconds: 30 },
+      ],
+      runs: [
+        { ...run, budgetSeconds: 5, timeline: [{ elapsedMs: 100, metrics: run.final, filterCount: 1 }] },
+        { ...run, caseId: 'titan-to-u12t', budgetSeconds: 30, timeline: [{ elapsedMs: 100, metrics: { ...run.final, rmseDb: 0.7 }, filterCount: 2 }] },
+      ],
+      aggregates: [aggregate],
+    })
+    const artifact = JSON.parse(artifacts.resultsJson)
+
+    expect(artifact).not.toHaveProperty('provenance')
+    expect(artifact).not.toHaveProperty('trajectory')
+    expect(artifact.runArtifacts).toHaveLength(2)
+    expect(artifact.runArtifacts.map((entry: { provenance: { timeBudgetSeconds: number; caseInputSha256: string } }) => entry.provenance)).toEqual([
+      expect.objectContaining({ timeBudgetSeconds: 5, caseInputSha256: 'storm-input' }),
+      expect.objectContaining({ timeBudgetSeconds: 30, caseInputSha256: 'u12t-input' }),
+    ])
+    expect(artifact.runArtifacts.map((entry: { trajectory: { sourceSolutionKey: string; elapsedMs: number }[] }) => entry.trajectory)).toEqual([
+      [{ elapsedMs: 100, rmseDb: 0.4, maxAbsDb: 0.8, filterCount: 1, sourceSolutionKey: 'titan-to-storm:5:10:0' }],
+      [{ elapsedMs: 100, rmseDb: 0.7, maxAbsDb: 0.8, filterCount: 2, sourceSolutionKey: 'titan-to-u12t:30:10:0' }],
+    ])
   })
 })

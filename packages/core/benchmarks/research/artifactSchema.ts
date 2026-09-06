@@ -24,6 +24,12 @@ export interface ResearchTrajectoryPointV2 {
   sourceSolutionKey: string | null
 }
 
+export interface ResearchRunArtifactV2 {
+  sourceSolutionKey: string
+  provenance: ResearchProvenanceV2
+  trajectory: ResearchTrajectoryPointV2[]
+}
+
 export function assertResearchProvenanceV2(value: ResearchProvenanceV2): void {
   const textFields = [
     'repositorySha',

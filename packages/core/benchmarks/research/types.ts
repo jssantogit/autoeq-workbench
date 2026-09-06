@@ -191,6 +191,7 @@ export interface ResearchRunMetadata {
   seed: number | null
   corpusVersion: string
   caseInputSha256: string
+  caseInputSha256ByCase?: Partial<Record<ResearchCaseId, string>>
   pythonVersion?: string | null
   runnerLabel?: string | null
 }

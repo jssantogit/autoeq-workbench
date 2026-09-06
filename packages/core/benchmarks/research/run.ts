@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { performance } from 'node:perf_hooks'
 import { resolve } from 'node:path'
@@ -423,7 +424,7 @@ function currentCommit(): string {
 }
 
 export interface ResearchExecutionResult {
-  provenance: ResearchProvenanceV2
+  runProvenance: ResearchProvenanceV2[]
   runs: ResearchRunRow[]
   aggregates: ResearchAggregateRow[]
   baseline?: ResearchBaselineFile
@@ -436,8 +437,13 @@ export async function executeResearchPlan(
   metadata: ResearchRunMetadata,
   cellRunner: (options: RunResearchCellOptions) => Promise<ResearchRunRow> = runResearchCell,
 ): Promise<ResearchExecutionResult> {
+  const cells = createResearchCells(options)
+  const caseIds = [...new Set(cells.map((cell) => cell.caseId))]
+  if (caseIds.length > 1 && caseIds.some((caseId) => metadata.caseInputSha256ByCase?.[caseId] === undefined)) {
+    throw new Error('Multi-case research execution requires case-specific input hashes')
+  }
   const runs: ResearchRunRow[] = []
-  for (const cell of createResearchCells(options)) {
+  for (const cell of cells) {
     for (let repeatIndex = 0; repeatIndex < options.repeats; repeatIndex += 1) {
       runs.push(await cellRunner({
         ...cell,
@@ -452,20 +458,22 @@ export async function executeResearchPlan(
     ? undefined
     : compareWithBaseline(aggregates, baseline)
   const warnings = findPracticalMonotonicityWarnings(aggregates)
-  const firstRun = runs[0]
-  if (firstRun === undefined) throw new Error('Research execution produced no runs')
-  const provenance: ResearchProvenanceV2 = {
-    schemaVersion: RESEARCH_ARTIFACT_SCHEMA_VERSION,
-    ...metadata,
-    nodeVersion: process.version,
-    pythonVersion: metadata.pythonVersion ?? null,
-    runnerLabel: metadata.runnerLabel ?? null,
-    timeBudgetSeconds: firstRun.budgetSeconds,
-    maxFilters: firstRun.maxFilters,
-  }
-  assertResearchProvenanceV2(provenance)
+  const runProvenance = runs.map((run): ResearchProvenanceV2 => {
+    const provenance: ResearchProvenanceV2 = {
+      schemaVersion: RESEARCH_ARTIFACT_SCHEMA_VERSION,
+      ...metadata,
+      caseInputSha256: metadata.caseInputSha256ByCase?.[run.caseId] ?? metadata.caseInputSha256,
+      nodeVersion: process.version,
+      pythonVersion: metadata.pythonVersion ?? null,
+      runnerLabel: metadata.runnerLabel ?? null,
+      timeBudgetSeconds: run.budgetSeconds,
+      maxFilters: run.maxFilters,
+    }
+    assertResearchProvenanceV2(provenance)
+    return provenance
+  })
   const artifacts = writeResearchArtifacts(options.outputDir, {
-    provenance,
+    runProvenance,
     runs,
     aggregates,
     baseline,
@@ -485,7 +493,14 @@ export async function executeResearchPlan(
     )
   }
 
-  return { provenance, runs, aggregates, baseline, comparison, artifacts }
+  return { runProvenance, runs, aggregates, baseline, comparison, artifacts }
+}
+
+function createCaseInputSha256(targetFileName: keyof typeof RESEARCH_CORPUS_SHA256): string {
+  return createHash('sha256')
+    .update(RESEARCH_CORPUS_SHA256['dunu-titan-s2.txt']!)
+    .update(RESEARCH_CORPUS_SHA256[targetFileName]!)
+    .digest('hex')
 }
 
 function createControlMetadata(): ResearchRunMetadata {
@@ -496,7 +511,12 @@ function createControlMetadata(): ResearchRunMetadata {
     configurationId: 'standard-v2-defaults',
     seed: null,
     corpusVersion: 'research-corpus-v1',
-    caseInputSha256: RESEARCH_CORPUS_SHA256['dunu-titan-s2.txt']!,
+    caseInputSha256: createCaseInputSha256('subtonic-storm.txt'),
+    caseInputSha256ByCase: {
+      'titan-to-storm': createCaseInputSha256('subtonic-storm.txt'),
+      'titan-to-u12t': createCaseInputSha256('64-audio-u12t.txt'),
+      'titan-to-trio': createCaseInputSha256('64-audio-trio.txt'),
+    },
     pythonVersion: null,
     runnerLabel: 'autoeq-research-cli',
   }

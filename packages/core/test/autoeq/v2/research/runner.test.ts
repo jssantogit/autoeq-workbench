@@ -189,11 +189,66 @@ describe('research runner', () => {
       run: (input) => fakeResult(input, 'titan-to-storm'),
     }))
 
-    expect(result.provenance).toMatchObject({
+    expect(result.runProvenance[0]).toMatchObject({
       schemaVersion: 2,
       ...metadata,
       timeBudgetSeconds: 5,
       maxFilters: 10,
     })
+  })
+
+  it('emits case-aware provenance for every normal multi-cell run', async () => {
+    const options = parseResearchCliArgs(['--test-mode'])
+    options.cases = ['titan-to-storm', 'titan-to-u12t']
+    options.budgets = [5, 30]
+    options.maxFilters = [10]
+    const metadata = {
+      repositorySha: 'research-head',
+      algorithmId: 'standard-v2-control',
+      algorithmVersion: '5dafaa50410b9fa3157c28a1f7757d676b33152a',
+      configurationId: 'standard-v2-defaults',
+      seed: null,
+      corpusVersion: 'research-corpus-v1',
+      caseInputSha256: 'single-case-input',
+      caseInputSha256ByCase: {
+        'titan-to-storm': 'storm-input',
+        'titan-to-u12t': 'u12t-input',
+      },
+    }
+
+    const result = await executeResearchPlan(options, metadata, async (cell) => runResearchCell({
+      ...cell,
+      repeatIndex: 0,
+      run: (input) => fakeResult(input, cell.caseId),
+    }))
+
+    expect(result.runProvenance).toEqual(expect.arrayContaining([
+      expect.objectContaining({ caseInputSha256: 'storm-input', timeBudgetSeconds: 5, maxFilters: 10 }),
+      expect.objectContaining({ caseInputSha256: 'storm-input', timeBudgetSeconds: 30, maxFilters: 10 }),
+      expect.objectContaining({ caseInputSha256: 'u12t-input', timeBudgetSeconds: 5, maxFilters: 10 }),
+      expect.objectContaining({ caseInputSha256: 'u12t-input', timeBudgetSeconds: 30, maxFilters: 10 }),
+    ]))
+    expect(JSON.parse(result.artifacts.resultsJson).runArtifacts).toHaveLength(4)
+  })
+
+  it('requires case-specific hashes for multi-case execution', async () => {
+    const options = parseResearchCliArgs(['--test-mode'])
+    options.cases = ['titan-to-storm', 'titan-to-u12t']
+    options.budgets = [5]
+    options.maxFilters = [10]
+
+    await expect(executeResearchPlan(options, {
+      repositorySha: 'research-head',
+      algorithmId: 'standard-v2-control',
+      algorithmVersion: '5dafaa50410b9fa3157c28a1f7757d676b33152a',
+      configurationId: 'standard-v2-defaults',
+      seed: null,
+      corpusVersion: 'research-corpus-v1',
+      caseInputSha256: 'single-case-input',
+    }, async (cell) => runResearchCell({
+      ...cell,
+      repeatIndex: 0,
+      run: (input) => fakeResult(input, cell.caseId),
+    }))).rejects.toThrow('case-specific input hashes')
   })
 })
