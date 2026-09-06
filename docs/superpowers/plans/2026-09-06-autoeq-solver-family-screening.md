@@ -4,7 +4,7 @@
 
 **Goal:** Build a common solver-trajectory screening harness, run counterfactual diagnostics, prototype the approved algorithm families under comparable evaluation budgets, and select the small set of families that justify a later same-runtime adversarial/product-distillation plan.
 
-**Architecture:** Screening stays research-only. Python solver adapters share the parity-tested surrogate DSP, Pareto/oracle data, canonical batch evaluator, and a common trajectory artifact. Current-v2-specific scheduling experiments that require exact internal semantics live in TypeScript research modules and must prove equivalence when used as wrappers around existing refinement. Cross-language screening ranks algorithmic efficiency primarily by canonical quality versus evaluation count/oracle regret; wall-clock is diagnostic only until a surviving family is implemented in the same Node/TypeScript runtime for the later 5/15/30/60-second tournament.
+**Architecture:** Screening stays research-only. Python solver adapters share the parity-tested surrogate DSP, Pareto/oracle data, canonical batch evaluator, and one language-neutral trajectory artifact. Current-v2-specific scheduling experiments that require exact internal semantics live in TypeScript research modules and must prove equivalence when used as wrappers around existing refinement. Cross-language screening ranks algorithmic efficiency primarily by canonical quality versus evaluation count/oracle regret; wall-clock is diagnostic only until a surviving family is implemented in the same Node/TypeScript runtime for the later 5/15/30/60-second tournament.
 
 **Tech Stack:** Python 3.12, NumPy, SciPy, CMA-ES, pytest, TypeScript 6, Vitest 4, Node 22, tsx, pnpm.
 
@@ -31,36 +31,69 @@ Each numbered task is independently reviewable. Use focused tests and one cohere
 
 ---
 
-### Task 1: Define the common solver trajectory and screening result contract
+### Task 1: Define the common cross-language solver trajectory and screening result contract
 
 **Files:**
 - Create: `research/solver-lab/src/autoeq_solver_lab/trajectory.py`
 - Create: `research/solver-lab/src/autoeq_solver_lab/screening.py`
 - Create: `research/solver-lab/tests/test_trajectory.py`
 - Create: `research/solver-lab/tests/test_screening.py`
+- Create: `packages/core/benchmarks/research/solverRunArtifact.ts`
+- Create: `packages/core/test/autoeq/v2/research/solverRunArtifact.test.ts`
 
 **Interfaces:**
+
+Language-neutral schema version is exactly `1`:
 
 ```python
 @dataclass(frozen=True)
 class SolverTrajectoryPoint:
     evaluation_count: int
     elapsed_ms: float
-    candidate: SolverLabCandidate
+    candidate_id: str
     canonical_rmse_db: float
     canonical_max_abs_db: float
     oracle_regret: float
 
 @dataclass(frozen=True)
 class SolverRunResult:
+    schema_version: Literal[1]
     algorithm_id: str
     variant_id: str
     problem_id: str
+    input_sha256: str
     seed: int | None
     evaluation_budget: int
     trajectory: tuple[SolverTrajectoryPoint, ...]
     metadata: dict[str, str | int | float | bool]
+```
 
+Equivalent TypeScript artifact:
+
+```ts
+export interface SolverRunArtifactV1 {
+  schemaVersion: 1
+  algorithmId: string
+  variantId: string
+  problemId: string
+  inputSha256: string
+  seed: number | null
+  evaluationBudget: number
+  trajectory: Array<{
+    evaluationCount: number
+    elapsedMs: number
+    candidateId: string
+    canonicalRmseDb: number
+    canonicalMaxAbsDb: number
+    oracleRegret: number
+  }>
+  metadata: Record<string, string | number | boolean>
+}
+```
+
+Python adapter protocol:
+
+```python
 class SolverAdapter(Protocol):
     algorithm_id: str
     def run(
@@ -73,23 +106,43 @@ class SolverAdapter(Protocol):
     ) -> SolverRunResult: ...
 ```
 
-- [ ] **Step 1: Write RED trajectory invariant tests**
+- [ ] **Step 1: Write RED trajectory invariant tests in Python**
 
-Require nondecreasing `evaluation_count`, nondecreasing `elapsed_ms`, matching problem/hash, and best-so-far canonical trajectory: a new point is recorded only if it is non-dominated relative to prior recorded points or improves the frozen reference selector result.
+Require nondecreasing `evaluation_count`, nondecreasing `elapsed_ms`, matching problem/hash, finite canonical metrics/regret, and best-so-far trajectory: a new point is retained only when it is non-dominated relative to prior points or improves the frozen Reference Pareto Selector result.
 
-- [ ] **Step 2: Implement trajectory builder**
-
-Provide:
+- [ ] **Step 2: Implement Python trajectory builder and JSON reader/writer**
 
 ```python
 class TrajectoryBuilder:
-    def consider(self, evaluation_count: int, elapsed_ms: float, candidate: SolverLabCandidate, evaluation: SolverLabEvaluation, regret: float) -> None: ...
+    def consider(
+        self,
+        evaluation_count: int,
+        elapsed_ms: float,
+        candidate: SolverLabCandidate,
+        evaluation: SolverLabEvaluation,
+        regret: float,
+    ) -> None: ...
     def finish(self) -> tuple[SolverTrajectoryPoint, ...]: ...
 ```
 
-Candidate canonicalization is batched by adapters; the builder never evaluates DSP itself.
+Use the exact `SolverLabEvaluation` dataclass defined in the Oracles plan. Candidate canonicalization is batched by adapters; the builder never evaluates DSP itself.
 
-- [ ] **Step 3: Implement screening summary**
+- [ ] **Step 3: Write RED TypeScript artifact parity tests**
+
+Commit one small JSON fixture generated by Python and parse it in TypeScript. Re-serialize through `SolverRunArtifactV1` and require byte-stable canonical key ordering from the project helper.
+
+- [ ] **Step 4: Implement TypeScript artifact writer/validator**
+
+Provide:
+
+```ts
+export function assertSolverRunArtifactV1(value: unknown): asserts value is SolverRunArtifactV1
+export function serializeSolverRunArtifactV1(value: SolverRunArtifactV1): string
+```
+
+This is the bridge used by TypeScript-only Family A/F experiments.
+
+- [ ] **Step 5: Implement screening summary**
 
 ```python
 @dataclass(frozen=True)
@@ -99,18 +152,20 @@ class ScreeningSummary:
     median_final_regret: float
     median_auc_regret: float
     solved_fraction: float
-    catastrophic_regression_fraction: float
+    catastrophic_case_rate: float
 ```
 
 `median_auc_regret` integrates best-so-far normalized regret over log10 evaluation count, starting at evaluation 1. It is a screening metric only.
 
-- [ ] **Step 4: Verify and commit**
+- [ ] **Step 6: Verify and commit**
 
 ```bash
 pytest -q research/solver-lab/tests/test_trajectory.py research/solver-lab/tests/test_screening.py
+pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2/research/solverRunArtifact.test.ts
+pnpm --filter @autoeq-workbench/core typecheck
 git diff --check
-git add research/solver-lab
-git commit -m "feat(research): add solver family screening contract"
+git add research/solver-lab packages/core/benchmarks/research packages/core/test/autoeq/v2/research
+git commit -m "feat(research): add cross-language solver screening contract"
 ```
 
 ---
@@ -120,6 +175,7 @@ git commit -m "feat(research): add solver family screening contract"
 **Files:**
 - Create: `research/solver-lab/src/autoeq_solver_lab/selector.py`
 - Create: `research/solver-lab/tests/test_selector.py`
+- Create: `research/solver-lab/tests/fixtures/reference-selector-v1.json`
 - Create: `packages/core/benchmarks/research/referenceSelector.ts`
 - Create: `packages/core/test/autoeq/v2/research/referenceSelector.test.ts`
 
@@ -139,7 +195,7 @@ sqrt((rmse / 0.25)^2 + (maxAbs / 0.75)^2)
 
 - [ ] **Step 1: Write identical RED selector test vectors in TS and Python**
 
-Commit a small JSON fixture under `research/solver-lab/tests/fixtures/reference-selector-v1.json` with target-achieved, RMSE-heavy, maxAbs-heavy, and exact tie cases.
+Fixture groups cover target-achieved, RMSE-heavy, maxAbs-heavy, Pareto-incomparable, and exact tie cases.
 
 - [ ] **Step 2: Implement selector in both languages**
 
@@ -211,9 +267,9 @@ Do not change solver code. This task consumes the hardened deep telemetry from t
 
 CLI reads an existing deep artifact file and writes machine-readable summary plus a compact Markdown table.
 
-- [ ] **Step 4: Run against the frozen control deep trace**
+- [ ] **Step 4: Run against frozen control deep traces**
 
-Capture at least Storm Max10 and U12t Max10 deep traces. Record the fraction of joint coordinate trials spent on states that never become active and never contribute to best deliverable.
+Capture at least Storm Max10 and U12t Max10. Record the fraction of joint coordinate trials spent on states that never become active and never contribute to best deliverable.
 
 - [ ] **Step 5: Verify and commit**
 
@@ -281,7 +337,7 @@ git commit -m "feat(research): prototype matching pursuit solver"
 
 ---
 
-### Task 5: Prototype Family C — time-limited global continuous search as a runtime family
+### Task 5: Prototype Family C — bounded global continuous search as a runtime family
 
 **Files:**
 - Create: `research/solver-lab/src/autoeq_solver_lab/solvers/global_continuous.py`
@@ -344,8 +400,8 @@ class StructuralBeamSolver:
 Initial screen variants are exactly:
 
 ```text
-beam-4:  beam_width=4,  proposals_per_parent=8
-beam-12: beam_width=12, proposals_per_parent=8
+beam-4:  beam_width=4,  proposals_per_parent=8, local_polish_evaluations=120
+beam-12: beam_width=12, proposals_per_parent=8, local_polish_evaluations=120
 ```
 
 - [ ] **Step 1: Write RED beam retention tests**
@@ -354,7 +410,7 @@ Use synthetic candidate states where some proposals trade RMSE for maxAbs. Verif
 
 - [ ] **Step 2: Implement structural proposals using the Deliverable Oracle mutation library**
 
-No new mutation semantics are introduced here. Each retained state gets a bounded local polish budget and re-quantization before canonical checkpoint admission.
+No new mutation semantics are introduced here. Each retained state gets the exact local polish budget above and re-quantization before canonical checkpoint admission.
 
 - [ ] **Step 3: Verify and commit**
 
@@ -405,9 +461,9 @@ Stub/small synthetic cases must prove the exporter calls the existing frozen `ru
 
 Normalize IDs into lab candidate IDs while preserving exact v1 filter parameters as seed values.
 
-- [ ] **Step 3: Implement v1-seeded adapter**
+- [ ] **Step 3: Implement v1-seeded adapter and exact ablation**
 
-`V1SeededSolver` consumes a seed record, canonicalizes it at evaluation count 0, then applies bounded Powell polish and optional structural beam proposals within the declared budget. It must also run a no-v1-seed control with identical polish/proposal budget for ablation.
+`V1SeededSolver` consumes a seed record, canonicalizes it at evaluation count 0, then applies bounded Powell polish plus structural-beam proposals within the declared budget. The ablation starts from the same zero/default structural seed and receives exactly the same polish/proposal evaluation budget.
 
 - [ ] **Step 4: Verify and commit**
 
@@ -422,7 +478,7 @@ git commit -m "feat(research): add frozen v1 seed experiments"
 
 ---
 
-### Task 8: Prototype Family A/F together as resumable refinement plus separate state-bank scheduling
+### Task 8: Prototype Family A/F as resumable refinement plus separate state-bank scheduling
 
 **Files:**
 - Modify: `packages/core/src/autoeq/v2/jointRefine.ts`
@@ -453,7 +509,7 @@ export function advanceJointRefineContinuationV2(
 ): JointRefineResult & { continuation: JointRefineContinuationV2 }
 ```
 
-The existing `jointRefineV2()` becomes a compatibility wrapper that advances until the existing configured cycle limit/deadline and must remain bit-for-bit behavior equivalent on deterministic tests.
+The existing `jointRefineV2()` becomes a compatibility wrapper that advances until the existing configured cycle limit/deadline and must remain filter/metric/counter equivalent on deterministic tests.
 
 Research scheduler state:
 
@@ -464,10 +520,12 @@ export interface ScheduledResearchState {
   key: string
   origin: ResearchStateOrigin
   continuation: JointRefineContinuationV2
-  lastCanonicalScore: number
+  lastMetrics: ErrorMetrics
   slicesReceived: number
 }
 ```
+
+Scheduling comparisons use Pareto dominance plus the frozen TypeScript Reference Pareto Selector, not an invented scalar score.
 
 - [ ] **Step 1: Write RED equivalence test before refactoring**
 
@@ -493,17 +551,17 @@ Construct fake continuations where rank-3 becomes best after later slices. Verif
 
 - [ ] **Step 5: Implement two explicit policies**
 
-Policy `resumable-beam-v1`: every fresh state receives one cycle, then global allocation gives one additional cycle at a time to the best selector-ranked/Pareto-useful states.
+Policy `resumable-beam-v1`: every fresh state receives one cycle, then global allocation gives one additional cycle at a time to the best Pareto/selector-ranked states.
 
-Policy `state-bank-v1`: identical fresh queue plus a separate transferred bank with at most one transfer slice for every two fresh slices; state-bank states never displace fresh states merely by being inserted into the same bounded array.
+Policy `state-bank-v1`: identical fresh queue plus a separate transferred bank with at most one transfer slice for every two fresh slices; state-bank states never displace fresh states merely by insertion into the same bounded array.
 
-- [ ] **Step 6: Add research-only runner**
+- [ ] **Step 6: Add research-only runner that emits `SolverRunArtifactV1`**
 
 ```json
 "research:resumable": "tsx benchmarks/research/resumableRun.ts"
 ```
 
-The runner emits the same schema-v2 provenance/trajectory contract and never changes `runStandardAutoEqV2()` default behavior.
+The runner records coordinate-trial count as `evaluationCount`, canonical checkpoint metrics, origin metadata, and never changes `runStandardAutoEqV2()` default behavior.
 
 - [ ] **Step 7: Verify and commit**
 
@@ -600,18 +658,27 @@ Initial seeds:
 11, 29, 47, 71, 101
 ```
 
+A case is catastrophic for a variant when its final Reference Pareto Selector normalized quality is worse than the frozen control by more than `maximumPerCaseQualityRegressionFraction`. Catastrophic case rate is `catastrophic_cases / evaluated_cases`.
+
 - [ ] **Step 1: Write RED elimination tests**
 
-Feed synthetic result tables where one variant is strictly dominated and one has a catastrophic case. Verify survivor selection is deterministic and uses the frozen Oracle Calibration manifest.
+Feed synthetic result tables where one variant is strictly dominated and one exceeds the frozen catastrophic-case rate. Verify survivor selection is deterministic and uses the frozen Oracle Calibration manifest.
 
-- [ ] **Step 2: Implement screening gate**
+- [ ] **Step 2: Implement exact screening gate**
 
-At each round, eliminate a variant only when both are true:
+At each round, let `m` be the median AUC regret across active variants and `g = minimumAggregateFrontierGainFraction`. A variant is aggregate-dominated when:
 
-1. its median AUC regret is worse than the round median by at least the frozen `minimumAggregateFrontierGainFraction` margin in the wrong direction; and
-2. it has no unique case where it is the best variant by final oracle regret.
+```text
+variant_median_auc_regret > max(m, 1e-12) * (1 + g)
+```
 
-Any variant with catastrophic-regression fraction above the frozen allowed per-case regression threshold is also eliminated.
+Eliminate a variant for aggregate performance only when it is aggregate-dominated **and** has zero unique case wins by final oracle regret. Independently eliminate any variant with:
+
+```text
+catastrophic_case_rate > maximumCatastrophicCaseRate
+```
+
+Do not use holdout results or wall-clock to modify these rules.
 
 - [ ] **Step 3: Run development screening**
 
@@ -625,11 +692,11 @@ structural-beam-4
 structural-beam-12
 v1-seeded
 v1-seeded-ablation
-resumable-beam-v1   # imported TypeScript results into the common artifact schema
-state-bank-v1       # imported TypeScript results into the common artifact schema
+resumable-beam-v1   # TypeScript SolverRunArtifactV1 imported by Python
+state-bank-v1       # TypeScript SolverRunArtifactV1 imported by Python
 ```
 
-For TypeScript research variants, use their recorded evaluation/trial counts for screening; do not compare raw Python/Node wall-clock as primary evidence.
+For TypeScript research variants, use recorded coordinate-trial/evaluation counts for screening; do not compare raw Python/Node wall-clock as primary evidence.
 
 - [ ] **Step 4: Produce explicit elimination report**
 
@@ -640,7 +707,7 @@ round
 reason
 median AUC regret
 final regret distribution
-catastrophic count
+catastrophic case rate
 unique-win count
 artifact hashes
 ```
@@ -689,7 +756,7 @@ Select at most three families/components that satisfy both:
 1. materially different evidence of value on development cases, not merely a <1% noisy aggregate change;
 2. a plausible path to Node/TypeScript/browser implementation if later adversarial evidence remains positive.
 
-A family may survive as a component (for example matching-pursuit seeding) rather than as a complete solver.
+A family may survive as a component, such as matching-pursuit seeding, rather than as a complete solver.
 
 - [ ] **Step 3: Commit the results document**
 
@@ -718,12 +785,12 @@ This stop is mandatory; inventing the winner in advance would invalidate the res
 
 This plan is complete only when:
 
-1. all solver variants emit one common canonical trajectory contract;
+1. all Python and TypeScript solver variants emit one common validated `SolverRunArtifactV1` trajectory contract;
 2. the Reference Pareto Selector is frozen and parity-tested in Python/TypeScript;
 3. current-v2 wasted-work/counterfactual diagnostics are quantified before scheduler changes;
 4. sparse matching pursuit, bounded global search, structural beam, v1 seeding, resumable scheduling/state bank, and oracle-distillation evidence have been produced or explicitly eliminated by the defined gate;
 5. screening uses comparable evaluation budgets rather than misleading cross-language timing claims;
-6. every elimination is artifact-backed and reproducible;
+6. every elimination is artifact-backed and reproducible under the frozen calibration thresholds;
 7. at most three families/components are selected for the later same-runtime adversarial tournament;
 8. no holdout is opened and no production behavior is promoted.
 
