@@ -13,6 +13,10 @@ import {
 } from '../../../../src/index.js'
 
 import { createResearchTelemetry } from '../../../../benchmarks/research/telemetry.js'
+import {
+  compareV2DeliverableQuality,
+  compareV2PrimaryMetrics,
+} from '../../../../src/autoeq/v2/ranking.js'
 
 function researchInput(): StandardAutoEqInputV2 {
   const frequencies = createEvaluationGrid()
@@ -213,5 +217,46 @@ describe('Standard v2 research trace', () => {
       equivalentStatePreviouslyCompleted: true,
       survivedStagedCandidateRetention: true,
     })
+  })
+
+  it('preserves every best-deliverable transition in checkpoint history', () => {
+    const firstMetrics: ErrorMetrics = {
+      maeDb: 0.05,
+      rmseDb: 0.1,
+      maxAbsDb: 0.6,
+      maxAbsFrequencyHz: 1_000,
+    }
+    const secondMetrics: ErrorMetrics = {
+      maeDb: 0.005,
+      rmseDb: 0.01,
+      maxAbsDb: 0.61,
+      maxAbsFrequencyHz: 1_000,
+    }
+
+    expect(compareV2DeliverableQuality(
+      { filters: [], metrics: secondMetrics, cancellationAudit: { pairs: [], totalScore: 0 } },
+      { filters: [], metrics: firstMetrics, cancellationAudit: { pairs: [], totalScore: 0 } },
+    )).toBeLessThan(0)
+    expect(compareV2PrimaryMetrics(secondMetrics, firstMetrics)).toBeGreaterThan(0)
+
+    const telemetry = createResearchTelemetry({ mode: 'light', nowMs: () => 0 })
+    telemetry.trace.onBestDeliverableUpdated?.({
+      metrics: firstMetrics,
+      filters: [],
+      preampDb: 0,
+    })
+    telemetry.trace.onBestDeliverableUpdated?.({
+      metrics: secondMetrics,
+      filters: [{
+        id: 'deliverable-2', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 1, q: 1,
+      }],
+      preampDb: 0,
+    })
+
+    expect(telemetry.snapshot().checkpoints).toHaveLength(2)
+    expect(telemetry.snapshot().checkpoints.map((checkpoint) => checkpoint.metrics)).toEqual([
+      firstMetrics,
+      secondMetrics,
+    ])
   })
 })

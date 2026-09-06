@@ -1,6 +1,5 @@
 import { performance } from 'node:perf_hooks'
 
-import { compareV2PrimaryMetrics } from '../../src/autoeq/v2/ranking.js'
 import type {
   StandardV2JointRefineRecord,
   StandardV2ResearchTrace,
@@ -163,13 +162,7 @@ export function createResearchTelemetry(options: {
         metrics: { ...checkpoint.metrics },
         filterCount: checkpoint.filters.length,
       }
-      const previous = checkpoints.at(-1)
-      if (
-        previous === undefined ||
-        compareV2PrimaryMetrics(candidate.metrics, previous.metrics) < 0
-      ) {
-        checkpoints.push(candidate)
-      }
+      checkpoints.push(candidate)
       const sourceSolutionKey = checkpoint.sourceSolutionKey
       if (sourceSolutionKey !== undefined) {
         pendingBestSolutionKeys.add(sourceSolutionKey)
