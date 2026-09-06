@@ -15,6 +15,9 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest>=8,<9"]
 
+[project.scripts]
+autoeq-continuous-oracle = "autoeq_solver_lab.continuous_oracle:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
