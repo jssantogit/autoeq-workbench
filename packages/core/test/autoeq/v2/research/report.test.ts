@@ -135,9 +135,9 @@ describe('research artifact report', () => {
         ...run,
         budgetSeconds: 5,
         timeline: [
-          { elapsedMs: 500, metrics: { maeDb: 0.4, rmseDb: 0.8, maxAbsDb: 1.7, maxAbsFrequencyHz: 1_000 }, filterCount: 1 },
-          { elapsedMs: 100, metrics: { maeDb: 0.6, rmseDb: 1.2, maxAbsDb: 2.5, maxAbsFrequencyHz: 1_000 }, filterCount: 0 },
-          { elapsedMs: 500, metrics: { maeDb: 0.2, rmseDb: 0.4, maxAbsDb: 1.2, maxAbsFrequencyHz: 1_000 }, filterCount: 2 },
+          { elapsedMs: 500, metrics: { maeDb: 0.4, rmseDb: 0.8, maxAbsDb: 1.7, maxAbsFrequencyHz: 1_000 }, filterCount: 1, sourceSolutionKey: 'solution-a' },
+          { elapsedMs: 100, metrics: { maeDb: 0.6, rmseDb: 1.2, maxAbsDb: 2.5, maxAbsFrequencyHz: 1_000 }, filterCount: 0, sourceSolutionKey: null },
+          { elapsedMs: 500, metrics: { maeDb: 0.2, rmseDb: 0.4, maxAbsDb: 1.2, maxAbsFrequencyHz: 1_000 }, filterCount: 2, sourceSolutionKey: 'solution-b' },
         ],
       }],
       aggregates: [aggregate],
@@ -150,6 +150,8 @@ describe('research artifact report', () => {
     expect(JSON.parse(artifacts.profileJson)).toEqual({ enabled: false, profiles: [] })
     expect(JSON.parse(artifacts.metadataJson).runProvenance[0]).toMatchObject(provenance)
     expect(artifact).toMatchObject({ schemaVersion: 2 })
+    expect(artifact.runArtifacts[0].runId).toBe('titan-to-storm:5:10:0')
+    expect(artifact.runArtifacts[0]).not.toHaveProperty('sourceSolutionKey')
     expect(artifact.runArtifacts[0].provenance).toMatchObject({
       schemaVersion: 2,
       algorithmId: 'standard-v2-control',
@@ -168,8 +170,8 @@ describe('research artifact report', () => {
       index === 0 || point.elapsedMs >= all[index - 1]!.elapsedMs,
     )).toBe(true)
     expect(artifact.runArtifacts[0].trajectory).toEqual([
-      { elapsedMs: 100, rmseDb: 1.2, maxAbsDb: 2.5, filterCount: 0, sourceSolutionKey: 'titan-to-storm:5:10:0' },
-      { elapsedMs: 500, rmseDb: 0.4, maxAbsDb: 1.2, filterCount: 2, sourceSolutionKey: 'titan-to-storm:5:10:0' },
+      { elapsedMs: 100, rmseDb: 1.2, maxAbsDb: 2.5, filterCount: 0, sourceSolutionKey: null },
+      { elapsedMs: 500, rmseDb: 0.4, maxAbsDb: 1.2, filterCount: 2, sourceSolutionKey: 'solution-b' },
     ])
     expect(artifact.runs).toHaveLength(1)
     expect(JSON.parse(artifacts.timelineJson).timelines[0].caseId).toBe('titan-to-storm')
@@ -201,8 +203,8 @@ describe('research artifact report', () => {
         { ...provenance, caseInputSha256: 'u12t-input', timeBudgetSeconds: 30 },
       ],
       runs: [
-        { ...run, budgetSeconds: 5, timeline: [{ elapsedMs: 100, metrics: run.final, filterCount: 1 }] },
-        { ...run, caseId: 'titan-to-u12t', budgetSeconds: 30, timeline: [{ elapsedMs: 100, metrics: { ...run.final, rmseDb: 0.7 }, filterCount: 2 }] },
+        { ...run, budgetSeconds: 5, timeline: [{ elapsedMs: 100, metrics: run.final, filterCount: 1, sourceSolutionKey: 'storm-solution' }] },
+        { ...run, caseId: 'titan-to-u12t', budgetSeconds: 30, timeline: [{ elapsedMs: 100, metrics: { ...run.final, rmseDb: 0.7 }, filterCount: 2, sourceSolutionKey: 'u12t-solution' }] },
       ],
       aggregates: [aggregate],
     })
@@ -211,13 +213,17 @@ describe('research artifact report', () => {
     expect(artifact).not.toHaveProperty('provenance')
     expect(artifact).not.toHaveProperty('trajectory')
     expect(artifact.runArtifacts).toHaveLength(2)
+    expect(artifact.runArtifacts.map((entry: { runId: string }) => entry.runId)).toEqual([
+      'titan-to-storm:5:10:0',
+      'titan-to-u12t:30:10:0',
+    ])
     expect(artifact.runArtifacts.map((entry: { provenance: { timeBudgetSeconds: number; caseInputSha256: string } }) => entry.provenance)).toEqual([
       expect.objectContaining({ timeBudgetSeconds: 5, caseInputSha256: 'storm-input' }),
       expect.objectContaining({ timeBudgetSeconds: 30, caseInputSha256: 'u12t-input' }),
     ])
-    expect(artifact.runArtifacts.map((entry: { trajectory: { sourceSolutionKey: string; elapsedMs: number }[] }) => entry.trajectory)).toEqual([
-      [{ elapsedMs: 100, rmseDb: 0.4, maxAbsDb: 0.8, filterCount: 1, sourceSolutionKey: 'titan-to-storm:5:10:0' }],
-      [{ elapsedMs: 100, rmseDb: 0.7, maxAbsDb: 0.8, filterCount: 2, sourceSolutionKey: 'titan-to-u12t:30:10:0' }],
+    expect(artifact.runArtifacts.map((entry: { trajectory: { sourceSolutionKey: string | null; elapsedMs: number }[] }) => entry.trajectory)).toEqual([
+      [{ elapsedMs: 100, rmseDb: 0.4, maxAbsDb: 0.8, filterCount: 1, sourceSolutionKey: 'storm-solution' }],
+      [{ elapsedMs: 100, rmseDb: 0.7, maxAbsDb: 0.8, filterCount: 2, sourceSolutionKey: 'u12t-solution' }],
     ])
   })
 })

@@ -12,6 +12,8 @@ import {
 } from '../../../../benchmarks/research/timeline.js'
 import type { ResearchCheckpoint } from '../../../../benchmarks/research/types.js'
 
+type CheckpointWithSource = ResearchCheckpoint & { sourceSolutionKey: string | null }
+
 function checkpoint(
   elapsedMs: number,
   rmseDb: number,
@@ -27,6 +29,7 @@ function checkpoint(
       maxAbsFrequencyHz: 1_000,
     },
     filterCount,
+    sourceSolutionKey: null,
   }
 }
 
@@ -108,6 +111,18 @@ describe('research quality timeline', () => {
       [2_000, 0.8],
       [3_000, 0.8],
     ])
+  })
+
+  it('preserves distinct source solution keys through timeline projection', () => {
+    const projected = projectTimeline([
+      { ...checkpoint(400, 1.2, 2.5), sourceSolutionKey: null },
+      { ...checkpoint(900, 0.8, 1.7), sourceSolutionKey: 'solution-a' },
+      { ...checkpoint(1_800, 0.4, 1.2), sourceSolutionKey: 'solution-b' },
+    ] as CheckpointWithSource[], [500, 1_000, 2_000], 2_000)
+
+    expect(projected.map((entry) =>
+      (entry as CheckpointWithSource).sourceSolutionKey,
+    )).toEqual([null, 'solution-a', 'solution-b'])
   })
 
   it('keeps light timing separate from deep phase profiling and records run termination', () => {

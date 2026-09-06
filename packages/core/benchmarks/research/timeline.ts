@@ -26,6 +26,7 @@ function copyCheckpoint(
     elapsedMs,
     metrics: { ...checkpoint.metrics },
     filterCount: checkpoint.filterCount,
+    sourceSolutionKey: checkpoint.sourceSolutionKey,
   }
 }
 

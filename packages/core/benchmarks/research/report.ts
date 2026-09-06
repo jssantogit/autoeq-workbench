@@ -197,19 +197,19 @@ export function renderResearchArtifacts(input: ResearchReportInput): ResearchArt
       phaseTimingMs: run.phaseTimingMs,
       workEfficiency: run.workEfficiency,
       jointRefinements: run.jointRefinements ?? [],
-    }))
+  }))
   const runArtifacts: ResearchRunArtifactV2[] = input.runs.map((run, index) => {
-    const sourceSolutionKey = `${run.caseId}:${run.budgetSeconds}:${run.maxFilters}:${run.repeatIndex}`
+    const runId = `${run.caseId}:${run.budgetSeconds}:${run.maxFilters}:${run.repeatIndex}`
     const trajectory: ResearchTrajectoryPointV2[] = normalizeBestSoFarTrajectory(
       run.timeline.map((checkpoint) => ({
-      elapsedMs: checkpoint.elapsedMs,
-      rmseDb: checkpoint.metrics.rmseDb,
-      maxAbsDb: checkpoint.metrics.maxAbsDb,
-      filterCount: checkpoint.filterCount,
-        sourceSolutionKey,
+        elapsedMs: checkpoint.elapsedMs,
+        rmseDb: checkpoint.metrics.rmseDb,
+        maxAbsDb: checkpoint.metrics.maxAbsDb,
+        filterCount: checkpoint.filterCount,
+        sourceSolutionKey: checkpoint.sourceSolutionKey,
       })),
     )
-    return { sourceSolutionKey, provenance: input.runProvenance[index]!, trajectory }
+    return { runId, provenance: input.runProvenance[index]!, trajectory }
   })
 
   return {

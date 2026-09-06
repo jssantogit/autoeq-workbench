@@ -87,10 +87,10 @@ function jointRecord(
 }
 
 const efficiencyCheckpoints = (): ResearchCheckpoint[] => [
-  { elapsedMs: 0, metrics: { maeDb: 1, rmseDb: 1, maxAbsDb: 2, maxAbsFrequencyHz: 1_000 }, filterCount: 0 },
-  { elapsedMs: 500, metrics: { maeDb: 0.8, rmseDb: 0.8, maxAbsDb: 1.5, maxAbsFrequencyHz: 1_000 }, filterCount: 1 },
-  { elapsedMs: 1_000, metrics: { maeDb: 0.7, rmseDb: 0.7, maxAbsDb: 1.4, maxAbsFrequencyHz: 1_000 }, filterCount: 1 },
-  { elapsedMs: 2_000, metrics: { maeDb: 0.4, rmseDb: 0.4, maxAbsDb: 1, maxAbsFrequencyHz: 1_000 }, filterCount: 2 },
+  { elapsedMs: 0, metrics: { maeDb: 1, rmseDb: 1, maxAbsDb: 2, maxAbsFrequencyHz: 1_000 }, filterCount: 0, sourceSolutionKey: null },
+  { elapsedMs: 500, metrics: { maeDb: 0.8, rmseDb: 0.8, maxAbsDb: 1.5, maxAbsFrequencyHz: 1_000 }, filterCount: 1, sourceSolutionKey: 'solution-a' },
+  { elapsedMs: 1_000, metrics: { maeDb: 0.7, rmseDb: 0.7, maxAbsDb: 1.4, maxAbsFrequencyHz: 1_000 }, filterCount: 1, sourceSolutionKey: 'solution-b' },
+  { elapsedMs: 2_000, metrics: { maeDb: 0.4, rmseDb: 0.4, maxAbsDb: 1, maxAbsFrequencyHz: 1_000 }, filterCount: 2, sourceSolutionKey: 'solution-c' },
 ]
 
 function row(

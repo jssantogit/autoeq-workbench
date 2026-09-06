@@ -31,6 +31,7 @@ export interface ResearchCheckpoint {
   elapsedMs: number
   metrics: ErrorMetrics
   filterCount: number
+  sourceSolutionKey: string | null
 }
 
 export interface ResearchTimeToQuality {

@@ -17,6 +17,7 @@ import {
   compareV2DeliverableQuality,
   compareV2PrimaryMetrics,
 } from '../../../../src/autoeq/v2/ranking.js'
+import { createV2SolutionKey } from '../../../../src/autoeq/v2/researchTrace.js'
 
 function researchInput(): StandardAutoEqInputV2 {
   const frequencies = createEvaluationGrid()
@@ -251,12 +252,22 @@ describe('Standard v2 research trace', () => {
         id: 'deliverable-2', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 1, q: 1,
       }],
       preampDb: 0,
+      sourceSolutionKey: createV2SolutionKey([{
+        id: 'deliverable-2', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 1, q: 1,
+      }]),
     })
 
-    expect(telemetry.snapshot().checkpoints).toHaveLength(2)
-    expect(telemetry.snapshot().checkpoints.map((checkpoint) => checkpoint.metrics)).toEqual([
+    const checkpoints = telemetry.snapshot().checkpoints
+    expect(checkpoints).toHaveLength(2)
+    expect(checkpoints.map((checkpoint) => checkpoint.metrics)).toEqual([
       firstMetrics,
       secondMetrics,
+    ])
+    expect(checkpoints.map((checkpoint) => checkpoint.sourceSolutionKey)).toEqual([
+      null,
+      createV2SolutionKey([{
+        id: 'deliverable-2', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 1, q: 1,
+      }]),
     ])
   })
 })

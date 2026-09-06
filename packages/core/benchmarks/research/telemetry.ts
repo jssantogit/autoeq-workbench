@@ -63,6 +63,7 @@ function cloneCheckpoint(checkpoint: ResearchCheckpoint): ResearchCheckpoint {
   return {
     ...checkpoint,
     metrics: { ...checkpoint.metrics },
+    sourceSolutionKey: checkpoint.sourceSolutionKey,
   }
 }
 
@@ -161,6 +162,7 @@ export function createResearchTelemetry(options: {
         elapsedMs: Math.max(0, nowMs() - startedAtMs),
         metrics: { ...checkpoint.metrics },
         filterCount: checkpoint.filters.length,
+        sourceSolutionKey: checkpoint.sourceSolutionKey ?? null,
       }
       checkpoints.push(candidate)
       const sourceSolutionKey = checkpoint.sourceSolutionKey

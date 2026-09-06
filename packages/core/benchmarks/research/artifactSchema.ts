@@ -25,7 +25,7 @@ export interface ResearchTrajectoryPointV2 {
 }
 
 export interface ResearchRunArtifactV2 {
-  sourceSolutionKey: string
+  runId: string
   provenance: ResearchProvenanceV2
   trajectory: ResearchTrajectoryPointV2[]
 }
