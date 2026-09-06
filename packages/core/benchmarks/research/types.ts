@@ -15,6 +15,18 @@ export interface ResearchCase {
   target: Curve
 }
 
+export type ResearchCorpusLayer = 'development' | 'adversarial' | 'holdout'
+
+export interface ResearchCaseDescriptor {
+  id: string
+  layer: ResearchCorpusLayer
+  kind: 'real' | 'synthetic'
+  source: Curve
+  target: Curve
+  inputSha256: string
+  tags: readonly string[]
+}
+
 export interface ResearchCheckpoint {
   elapsedMs: number
   metrics: ErrorMetrics

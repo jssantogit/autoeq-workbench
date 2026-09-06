@@ -8,6 +8,7 @@ import {
 } from '../../../../src/index.js'
 import {
   loadResearchCases,
+  loadLayeredResearchCases,
   prepareResearchDesired,
   RESEARCH_CORPUS_SHA256,
 } from '../../../../benchmarks/research/corpus.js'
@@ -62,5 +63,41 @@ describe('research corpus', () => {
     for (const [name, url] of Object.entries(rawFiles)) {
       expect(sha256(url)).toBe(RESEARCH_CORPUS_SHA256[name])
     }
+  })
+
+  it('loads deterministic development descriptors with stable case input hashes', () => {
+    const first = loadLayeredResearchCases('development')
+    const second = loadLayeredResearchCases('development')
+
+    expect(second).toEqual(first)
+    expect(first.map((entry) => entry.id)).toEqual([
+      'titan-to-storm',
+      'synthetic-narrow-peak',
+      'synthetic-strong-shelf',
+      'synthetic-alternating-sign',
+    ])
+    expect(first.every((entry) => entry.layer === 'development')).toBe(true)
+    expect(first.every((entry) => /^[a-f0-9]{64}$/.test(entry.inputSha256))).toBe(true)
+  })
+
+  it('registers approved real and synthetic stress cases in the adversarial layer', () => {
+    const cases = loadLayeredResearchCases('adversarial')
+
+    expect(cases.map((entry) => entry.id)).toEqual([
+      'titan-to-storm',
+      'titan-to-u12t',
+      'titan-to-trio',
+      'synthetic-narrow-peak',
+      'synthetic-strong-shelf',
+      'synthetic-resonance-cluster',
+      'synthetic-alternating-sign',
+      'synthetic-irregular-hf',
+      'synthetic-boundary-pressure',
+      'synthetic-filter-saturation',
+      'synthetic-quantization-sensitive',
+    ])
+    expect(cases.every((entry) => entry.layer === 'adversarial')).toBe(true)
+    expect(cases.slice(0, 3).every((entry) => entry.kind === 'real')).toBe(true)
+    expect(cases.slice(3).every((entry) => entry.kind === 'synthetic')).toBe(true)
   })
 })

@@ -1,11 +1,18 @@
 import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 
 import { createEvaluationGrid } from '../../src/config/numericPolicy.js'
 import { desiredCorrection, prepareCurve } from '../../src/curves/derive.js'
 import { parseCurveText } from '../../src/io/parseCurve.js'
 import type { Curve, Normalization } from '../../src/types/curve.js'
 
-import type { ResearchCase, ResearchCaseId } from './types.js'
+import { loadSyntheticResearchCases } from './syntheticCorpus.js'
+import type {
+  ResearchCase,
+  ResearchCaseDescriptor,
+  ResearchCaseId,
+  ResearchCorpusLayer,
+} from './types.js'
 
 export const RESEARCH_NORMALIZATION = {
   mode: 'hz',
@@ -83,6 +90,72 @@ export function loadResearchCases(): ResearchCase[] {
       metadata: { ...target.metadata },
     },
   }))
+}
+
+function cloneCurve(curve: Curve): Curve {
+  return {
+    ...curve,
+    rawPoints: curve.rawPoints.map((point) => ({ ...point })),
+    metadata: { ...curve.metadata },
+  }
+}
+
+function createCaseInputSha256(id: string, source: Curve, target: Curve): string {
+  return createHash('sha256')
+    .update(JSON.stringify({ id, source, target }))
+    .digest('hex')
+}
+
+function createDescriptor(
+  id: string,
+  layer: Exclude<ResearchCorpusLayer, 'holdout'>,
+  kind: ResearchCaseDescriptor['kind'],
+  source: Curve,
+  target: Curve,
+  tags: readonly string[],
+): ResearchCaseDescriptor {
+  return {
+    id,
+    layer,
+    kind,
+    source: cloneCurve(source),
+    target: cloneCurve(target),
+    inputSha256: createCaseInputSha256(id, source, target),
+    tags: [...tags],
+  }
+}
+
+export function loadLayeredResearchCases(
+  layer: Exclude<ResearchCorpusLayer, 'holdout'>,
+): ResearchCaseDescriptor[] {
+  const realCases = loadResearchCases()
+  const realDescriptors = realCases.map((researchCase) => createDescriptor(
+    researchCase.id,
+    layer,
+    'real',
+    researchCase.source,
+    researchCase.target,
+    ['approved-real', 'titan-diagnostic'],
+  ))
+  const syntheticDescriptors = loadSyntheticResearchCases().map((researchCase) => createDescriptor(
+    researchCase.id,
+    layer,
+    'synthetic',
+    researchCase.source,
+    researchCase.target,
+    researchCase.tags,
+  ))
+
+  if (layer === 'development') {
+    return [
+      realDescriptors[0]!,
+      syntheticDescriptors[0]!,
+      syntheticDescriptors[1]!,
+      syntheticDescriptors[3]!,
+    ]
+  }
+
+  return [...realDescriptors, ...syntheticDescriptors]
 }
 
 export function prepareResearchDesired(caseId: ResearchCaseId): {
