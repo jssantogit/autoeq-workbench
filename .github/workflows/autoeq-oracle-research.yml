@@ -1,0 +1,175 @@
+name: AutoEQ Solver Oracle Research
+
+on:
+  workflow_dispatch:
+    inputs:
+      corpus_layer:
+        description: Approved corpus layer to calibrate
+        required: true
+        default: development
+        type: choice
+        options: [development, adversarial]
+      max_filters:
+        description: Maximum product filter capacity
+        required: true
+        default: '10'
+        type: choice
+        options: ['10', '20', '40']
+      seeds:
+        description: Comma-separated explicit optimizer seeds
+        required: true
+        default: '11,29,47,83,101,131,167,197'
+        type: string
+      continuous_eval_budget:
+        description: Continuous optimizer evaluations per run
+        required: true
+        default: '60'
+        type: string
+      mixed_generations:
+        description: Deliverable Oracle mixed-search generations
+        required: true
+        default: '10'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  oracle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - name: Prepare oracle artifact directory
+        run: mkdir -p oracle-artifacts
+      - name: Verify research TypeScript tests
+        run: pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2/research
+      - name: Verify core typecheck
+        run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Install research solver lab
+        run: python -m pip install --upgrade pip && python -m pip install -e 'research/solver-lab[test]'
+      - name: Verify Python solver lab tests
+        run: python -m pytest -q research/solver-lab/tests
+      - name: Export approved solver lab problems
+        env:
+          CORPUS_LAYER: ${{ inputs.corpus_layer }}
+          MAX_FILTERS: ${{ inputs.max_filters }}
+        run: pnpm --filter @autoeq-workbench/core research:lab -- export-problems --layer "$CORPUS_LAYER" --max-filters "$MAX_FILTERS" --out "$GITHUB_WORKSPACE/oracle-artifacts/problems.jsonl"
+      - name: Run Standard v2 control reference
+        env:
+          CORPUS_LAYER: ${{ inputs.corpus_layer }}
+          MAX_FILTERS: ${{ inputs.max_filters }}
+          REPOSITORY_SHA: ${{ github.sha }}
+        run: pnpm --filter @autoeq-workbench/core research:oracle-report -- --layer "$CORPUS_LAYER" --max-filters "$MAX_FILTERS" --budget-seconds 30 --repository-sha "$REPOSITORY_SHA" --out "$GITHUB_WORKSPACE/oracle-artifacts/control.json"
+      - name: Run Continuous Oracle
+        env:
+          SEEDS: ${{ inputs.seeds }}
+          MAX_FILTERS: ${{ inputs.max_filters }}
+          CONTINUOUS_EVAL_BUDGET: ${{ inputs.continuous_eval_budget }}
+        run: |
+          set -euo pipefail
+          filter_counts="$(seq -s, 1 "$MAX_FILTERS")"
+          python -m autoeq_solver_lab.continuous_oracle \
+            --problems "$GITHUB_WORKSPACE/oracle-artifacts/problems.jsonl" \
+            --out "$GITHUB_WORKSPACE/oracle-artifacts/continuous.json" \
+            --seeds "$SEEDS" \
+            --filter-counts "$filter_counts" \
+            --eval-budget "$CONTINUOUS_EVAL_BUDGET" \
+            --canonical-command 'pnpm --filter @autoeq-workbench/core research:lab --'
+      - name: Run Deliverable Oracle
+        env:
+          MIXED_GENERATIONS: ${{ inputs.mixed_generations }}
+        run: |
+          set -euo pipefail
+          python -m autoeq_solver_lab.deliverable_oracle \
+            --problems "$GITHUB_WORKSPACE/oracle-artifacts/problems.jsonl" \
+            --continuous-frontier "$GITHUB_WORKSPACE/oracle-artifacts/continuous.json" \
+            --out "$GITHUB_WORKSPACE/oracle-artifacts/deliverable.json" \
+            --seed 41 \
+            --generations "$MIXED_GENERATIONS" \
+            --eval-budget "${{ inputs.continuous_eval_budget }}" \
+            --canonical-command 'pnpm --filter @autoeq-workbench/core research:lab --'
+      - name: Report oracle calibration
+        env:
+          REPOSITORY_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          calibration_args=(
+            --control "$GITHUB_WORKSPACE/oracle-artifacts/control.json"
+            --continuous "$GITHUB_WORKSPACE/oracle-artifacts/continuous.json"
+            --deliverable "$GITHUB_WORKSPACE/oracle-artifacts/deliverable.json"
+            --out "$GITHUB_WORKSPACE/oracle-artifacts/calibration-report.json"
+            --repository-sha "$REPOSITORY_SHA"
+          )
+          manifest_path="research/solver-lab/calibration/OracleCalibrationManifestV1.json"
+          if [[ -f "$manifest_path" ]]; then
+            mapfile -t thresholds < <(python - "$manifest_path" <<'PY'
+          import json
+          import sys
+
+          thresholds = json.loads(open(sys.argv[1], encoding="utf-8").read())["materialImprovementThresholds"]
+          print(thresholds["minimumAggregateFrontierGainFraction"])
+          print(thresholds["maximumPerCaseQualityRegressionFraction"])
+          print(thresholds["maximumCatastrophicCaseRate"])
+          PY
+            )
+            calibration_args+=(
+              --minimum-aggregate-frontier-gain-fraction "${thresholds[0]}"
+              --maximum-per-case-quality-regression-fraction "${thresholds[1]}"
+              --maximum-catastrophic-case-rate "${thresholds[2]}"
+            )
+          else
+            calibration_args+=(--recommend-only)
+          fi
+          python -m autoeq_solver_lab.calibration "${calibration_args[@]}"
+      - name: Write oracle environment metadata
+        if: always()
+        env:
+          CORPUS_LAYER: ${{ inputs.corpus_layer }}
+          MAX_FILTERS: ${{ inputs.max_filters }}
+          SEEDS: ${{ inputs.seeds }}
+          CONTINUOUS_EVAL_BUDGET: ${{ inputs.continuous_eval_budget }}
+          MIXED_GENERATIONS: ${{ inputs.mixed_generations }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import platform
+          import subprocess
+          from pathlib import Path
+
+          workspace = Path(os.environ["GITHUB_WORKSPACE"])
+          metadata = {
+              "schemaVersion": 1,
+              "repositorySha": os.environ["GITHUB_SHA"],
+              "checkedOutSha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+              "workflowRunId": os.environ.get("GITHUB_RUN_ID"),
+              "nodeVersion": subprocess.check_output(["node", "--version"], text=True).strip(),
+              "pythonVersion": platform.python_version(),
+              "corpusLayer": os.environ["CORPUS_LAYER"],
+              "maxFilters": int(os.environ["MAX_FILTERS"]),
+              "seeds": [int(seed) for seed in os.environ["SEEDS"].split(",")],
+              "continuousEvaluationBudget": int(os.environ["CONTINUOUS_EVAL_BUDGET"]),
+              "mixedGenerations": int(os.environ["MIXED_GENERATIONS"]),
+          }
+          output = workspace / "oracle-artifacts" / "environment.json"
+          output.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+      - name: Upload Solver Oracle artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autoeq-oracle-research-${{ github.run_id }}-${{ inputs.corpus_layer }}-max${{ inputs.max_filters }}
+          path: oracle-artifacts
+          if-no-files-found: error
+          retention-days: 30

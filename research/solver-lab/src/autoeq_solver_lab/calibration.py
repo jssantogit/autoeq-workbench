@@ -225,9 +225,9 @@ def build_calibration_report(
     control: Sequence[CalibrationPoint],
     continuous: Sequence[CalibrationPoint],
     deliverable: Sequence[CalibrationPoint],
-    manifest: Mapping[str, object],
+    manifest: Mapping[str, object] | None,
 ) -> dict[str, object]:
-    validated_manifest = validate_manifest(manifest)
+    validated_manifest = None if manifest is None else validate_manifest(manifest)
     control_by_cell: dict[tuple[str, int], CalibrationPoint] = {}
     for point in _sorted_points(control):
         control_by_cell.setdefault((point.problem_id, point.filter_count), point)
@@ -276,7 +276,7 @@ def build_calibration_report(
     report = {
         "version": 1,
         "report": ORACLE_CALIBRATION_VERSION,
-        "corpusVersion": validated_manifest["corpusVersion"],
+        "corpusVersion": "research-corpus-v1" if validated_manifest is None else validated_manifest["corpusVersion"],
         "manifest": validated_manifest,
         "cells": cells,
         "recommendations": {
@@ -371,23 +371,36 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--corpus-version", default="research-corpus-v1")
     parser.add_argument("--continuous-version", default="continuous-oracle-v1")
     parser.add_argument("--deliverable-version", default="deliverable-oracle-v1")
-    parser.add_argument("--minimum-aggregate-frontier-gain-fraction", required=True, type=float)
-    parser.add_argument("--maximum-per-case-quality-regression-fraction", required=True, type=float)
-    parser.add_argument("--maximum-catastrophic-case-rate", required=True, type=float)
+    parser.add_argument("--minimum-aggregate-frontier-gain-fraction", type=float)
+    parser.add_argument("--maximum-per-case-quality-regression-fraction", type=float)
+    parser.add_argument("--maximum-catastrophic-case-rate", type=float)
+    parser.add_argument("--recommend-only", action="store_true")
     args = parser.parse_args(argv)
-    manifest = {
-        "version": 1,
-        "createdFromRepositorySha": args.repository_sha,
-        "corpusVersion": args.corpus_version,
-        "continuousOracleVersion": args.continuous_version,
-        "deliverableOracleVersion": args.deliverable_version,
-        "qualityTimeFormulaVersion": 1,
-        "materialImprovementThresholds": {
-            "minimumAggregateFrontierGainFraction": args.minimum_aggregate_frontier_gain_fraction,
-            "maximumPerCaseQualityRegressionFraction": args.maximum_per_case_quality_regression_fraction,
-            "maximumCatastrophicCaseRate": args.maximum_catastrophic_case_rate,
-        },
-    }
+    threshold_values = (
+        args.minimum_aggregate_frontier_gain_fraction,
+        args.maximum_per_case_quality_regression_fraction,
+        args.maximum_catastrophic_case_rate,
+    )
+    if args.recommend_only:
+        if any(value is not None for value in threshold_values):
+            parser.error("--recommend-only cannot be combined with manifest thresholds")
+        manifest = None
+    elif any(value is None for value in threshold_values):
+        parser.error("manifest thresholds are required unless --recommend-only is used")
+    else:
+        manifest = {
+            "version": 1,
+            "createdFromRepositorySha": args.repository_sha,
+            "corpusVersion": args.corpus_version,
+            "continuousOracleVersion": args.continuous_version,
+            "deliverableOracleVersion": args.deliverable_version,
+            "qualityTimeFormulaVersion": 1,
+            "materialImprovementThresholds": {
+                "minimumAggregateFrontierGainFraction": args.minimum_aggregate_frontier_gain_fraction,
+                "maximumPerCaseQualityRegressionFraction": args.maximum_per_case_quality_regression_fraction,
+                "maximumCatastrophicCaseRate": args.maximum_catastrophic_case_rate,
+            },
+        }
     report = build_calibration_report(
         load_control_points(_read_json(args.control)),
         load_oracle_points(_read_json(args.continuous), "continuous"),
