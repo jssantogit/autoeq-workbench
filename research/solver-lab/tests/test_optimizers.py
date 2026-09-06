@@ -75,3 +75,13 @@ def test_powell_polishes_an_explicit_seed_candidate_with_a_budget():
 
     assert candidate_rmse(lab_problem, polished) < baseline
     assert polished.filters[0].type == target_filter.type
+
+
+def test_cma_accepts_a_small_explicit_budget_without_a_single_member_population():
+    lab_problem, _ = one_peak_problem()
+    layout = enumerate_oracle_layouts(1)[0]
+
+    first = CmaEsOptimizer().optimize(lab_problem, layout, 17, (1.0, 0.0), 5)
+    second = CmaEsOptimizer().optimize(lab_problem, layout, 17, (1.0, 0.0), 5)
+
+    assert first == second

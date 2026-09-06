@@ -40,7 +40,11 @@ class CmaEsOptimizer(ContinuousOptimizer):
             evaluation_budget,
         )
         dimension = layout.filter_count * 3
-        population_size = max(1, min(8, evaluation_budget // max(1, dimension)))
+        if evaluation_budget < 2:
+            return candidate_from_vector(
+                problem, layout, midpoint_vector(layout), self.algorithm_id, seed, self.run_index
+            )
+        population_size = max(2, min(8, evaluation_budget // max(1, dimension)))
         strategy = cma.CMAEvolutionStrategy(
             midpoint_vector(layout).tolist(),
             0.25,
