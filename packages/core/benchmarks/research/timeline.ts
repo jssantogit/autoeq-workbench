@@ -1,5 +1,3 @@
-import { compareV2PrimaryMetrics } from '../../src/autoeq/v2/ranking.js'
-
 import type {
   ResearchCheckpoint,
   ResearchTimeToQuality,
@@ -30,24 +28,15 @@ function copyCheckpoint(
   }
 }
 
-function bestCheckpointHistory(
+function chronologicalCheckpoints(
   checkpoints: readonly ResearchCheckpoint[],
 ): ResearchCheckpoint[] {
-  const ordered = [...checkpoints].sort((left, right) => left.elapsedMs - right.elapsedMs)
-  const best: ResearchCheckpoint[] = []
-  let current: ResearchCheckpoint | undefined
-
-  for (const checkpoint of ordered) {
-    if (
-      current === undefined ||
-      compareV2PrimaryMetrics(checkpoint.metrics, current.metrics) < 0
-    ) {
-      current = checkpoint
-      best.push(copyCheckpoint(checkpoint))
-    }
-  }
-
-  return best
+  return checkpoints
+    .map((checkpoint, index) => ({ checkpoint, index }))
+    .sort((left, right) =>
+      left.checkpoint.elapsedMs - right.checkpoint.elapsedMs || left.index - right.index,
+    )
+    .map(({ checkpoint }) => checkpoint)
 }
 
 export function projectTimeline(
@@ -55,24 +44,18 @@ export function projectTimeline(
   marksMs: readonly number[] = RESEARCH_TIMELINE_MARKS_MS,
   maxElapsedMs = Math.max(0, ...checkpoints.map((checkpoint) => checkpoint.elapsedMs)),
 ): ResearchCheckpoint[] {
-  const ordered = [...checkpoints].sort((left, right) => left.elapsedMs - right.elapsedMs)
+  const ordered = chronologicalCheckpoints(checkpoints)
   const projected: ResearchCheckpoint[] = []
   let checkpointIndex = 0
-  let best: ResearchCheckpoint | undefined
+  let latest: ResearchCheckpoint | undefined
 
   for (const markMs of marksMs) {
     if (markMs > maxElapsedMs) break
     while (checkpointIndex < ordered.length && ordered[checkpointIndex]!.elapsedMs <= markMs) {
-      const candidate = ordered[checkpointIndex]!
-      if (
-        best === undefined ||
-        compareV2PrimaryMetrics(candidate.metrics, best.metrics) < 0
-      ) {
-        best = candidate
-      }
+      latest = ordered[checkpointIndex]!
       checkpointIndex += 1
     }
-    if (best !== undefined) projected.push(copyCheckpoint(best, markMs))
+    if (latest !== undefined) projected.push(copyCheckpoint(latest, markMs))
   }
 
   return projected
@@ -88,7 +71,7 @@ function firstCrossing(
 export function calculateTimeToQuality(
   checkpoints: readonly ResearchCheckpoint[],
 ): ResearchTimeToQuality {
-  const history = bestCheckpointHistory(checkpoints)
+  const history = chronologicalCheckpoints(checkpoints)
   return {
     rmse100Ms: firstCrossing(history, (checkpoint) => checkpoint.metrics.rmseDb <= 1.00),
     rmse075Ms: firstCrossing(history, (checkpoint) => checkpoint.metrics.rmseDb <= 0.75),

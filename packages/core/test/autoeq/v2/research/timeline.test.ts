@@ -5,6 +5,10 @@ import {
   RESEARCH_BANDS,
 } from '../../../../benchmarks/research/telemetry.js'
 import {
+  compareV2DeliverableQuality,
+  compareV2PrimaryMetrics,
+} from '../../../../src/autoeq/v2/ranking.js'
+import {
   calculateTimeToQuality,
   projectTimeline,
   RESEARCH_FINE_CHECKPOINTS_SECONDS,
@@ -44,7 +48,7 @@ describe('research quality timeline', () => {
     ])
   })
 
-  it('projects monotonic best-safe checkpoints onto fixed observation marks', () => {
+  it('projects the latest authoritative checkpoint onto fixed observation marks', () => {
     expect(RESEARCH_TIMELINE_MARKS_MS).toEqual([
       500, 1_000, 2_000, 3_000, 5_000, 10_000,
       15_000, 20_000, 30_000, 45_000, 60_000,
@@ -55,11 +59,35 @@ describe('research quality timeline', () => {
       checkpoint(900, 0.8, 1.7),
       checkpoint(950, 1.1, 2.1),
       checkpoint(1_800, 0.4, 1.2),
-    ], [500, 1_000, 2_000])
+    ], [500, 1_000, 2_000], 2_000)
 
     expect(projected).toEqual([
       checkpoint(500, 1.2, 2.5),
-      checkpoint(1_000, 0.8, 1.7),
+      checkpoint(1_000, 1.1, 2.1),
+      checkpoint(2_000, 0.4, 1.2),
+    ])
+  })
+
+  it('carries forward a product-selected transition despite primary comparator divergence', () => {
+    const first = {
+      ...checkpoint(100, 0.1, 0.6),
+      sourceSolutionKey: 'solution-first',
+    }
+    const second = {
+      ...checkpoint(200, 0.01, 0.61),
+      sourceSolutionKey: 'solution-second',
+    }
+
+    expect(compareV2DeliverableQuality(
+      { filters: [], metrics: second.metrics, cancellationAudit: { pairs: [], totalScore: 0 } },
+      { filters: [], metrics: first.metrics, cancellationAudit: { pairs: [], totalScore: 0 } },
+    )).toBeLessThan(0)
+    expect(compareV2PrimaryMetrics(second.metrics, first.metrics)).toBeGreaterThan(0)
+
+    expect(projectTimeline([first, second], [100, 200, 300], 300)).toEqual([
+      { ...first, elapsedMs: 100 },
+      { ...second, elapsedMs: 200 },
+      { ...second, elapsedMs: 300 },
     ])
   })
 
@@ -90,6 +118,17 @@ describe('research quality timeline', () => {
     ])).toMatchObject({
       rmse025Ms: null,
       maxAbs075Ms: null,
+      jointTargetMs: null,
+    })
+  })
+
+  it('evaluates threshold crossings from every authoritative transition', () => {
+    const first = checkpoint(100, 0.3, 0.6)
+    const second = checkpoint(200, 0.01, 1.0)
+
+    expect(compareV2PrimaryMetrics(second.metrics, first.metrics)).toBeGreaterThan(0)
+    expect(calculateTimeToQuality([first, second])).toMatchObject({
+      rmse025Ms: 200,
       jointTargetMs: null,
     })
   })

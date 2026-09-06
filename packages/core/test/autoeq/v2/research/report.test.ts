@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
 import { RESEARCH_CORPUS_SHA256 } from '../../../../benchmarks/research/corpus.js'
+import { createResearchTelemetry } from '../../../../benchmarks/research/telemetry.js'
+import { projectTimeline } from '../../../../benchmarks/research/timeline.js'
 import type { ResearchProvenanceV2 } from '../../../../benchmarks/research/artifactSchema.js'
 import { renderResearchArtifacts } from '../../../../benchmarks/research/report.js'
+import { createV2SolutionKey } from '../../../../src/autoeq/v2/researchTrace.js'
 import type {
   ResearchAggregateRow,
   ResearchRunRow,
   ResearchTimeToQuality,
 } from '../../../../benchmarks/research/types.js'
+import type { Filter } from '../../../../src/types/filter.js'
 
 const emptyTimeToQuality = (): ResearchTimeToQuality => ({
   rmse100Ms: null,
@@ -224,6 +228,87 @@ describe('research artifact report', () => {
     expect(artifact.runArtifacts.map((entry: { trajectory: { sourceSolutionKey: string | null; elapsedMs: number }[] }) => entry.trajectory)).toEqual([
       [{ elapsedMs: 100, rmseDb: 0.4, maxAbsDb: 0.8, filterCount: 1, sourceSolutionKey: 'storm-solution' }],
       [{ elapsedMs: 100, rmseDb: 0.7, maxAbsDb: 0.8, filterCount: 2, sourceSolutionKey: 'u12t-solution' }],
+    ])
+  })
+
+  it('preserves the authoritative source key through telemetry, timeline, and results.json', () => {
+    const firstMetrics = {
+      maeDb: 0.05,
+      rmseDb: 0.1,
+      maxAbsDb: 0.6,
+      maxAbsFrequencyHz: 1_000,
+    }
+    const laterFilter: Filter = {
+      id: 'later-deliverable',
+      enabled: true,
+      type: 'PK',
+      frequencyHz: 1_000,
+      gainDb: 1,
+      q: 1,
+    }
+    const secondMetrics = {
+      maeDb: 0.005,
+      rmseDb: 0.01,
+      maxAbsDb: 0.61,
+      maxAbsFrequencyHz: 1_000,
+    }
+    const laterSourceSolutionKey = createV2SolutionKey([laterFilter])
+    let clockMs = 0
+    const telemetry = createResearchTelemetry({
+      mode: 'light',
+      nowMs: () => clockMs,
+    })
+
+    clockMs = 100
+    telemetry.trace.onBestDeliverableUpdated?.({
+      metrics: firstMetrics,
+      filters: [],
+      preampDb: 0,
+    })
+    clockMs = 200
+    telemetry.trace.onBestDeliverableUpdated?.({
+      metrics: secondMetrics,
+      filters: [laterFilter],
+      preampDb: 0,
+      sourceSolutionKey: laterSourceSolutionKey,
+    })
+
+    const snapshot = telemetry.snapshot()
+    const timeline = projectTimeline(snapshot.checkpoints, [100, 200], 200)
+    const artifacts = renderResearchArtifacts({
+      runProvenance: [{
+        schemaVersion: 2,
+        repositorySha: 'research-head',
+        algorithmId: 'standard-v2-control',
+        algorithmVersion: '5dafaa50410b9fa3157c28a1f7757d676b33152a',
+        configurationId: 'standard-v2-defaults',
+        seed: null,
+        corpusVersion: 'research-corpus-v1',
+        caseInputSha256: RESEARCH_CORPUS_SHA256['dunu-titan-s2.txt']!,
+        nodeVersion: 'v22.0.0',
+        pythonVersion: null,
+        runnerLabel: null,
+        timeBudgetSeconds: 5,
+        maxFilters: 10,
+      }],
+      runs: [{ ...run, budgetSeconds: 5, timeline }],
+      aggregates: [aggregate],
+    })
+    const results = JSON.parse(artifacts.resultsJson) as {
+      runArtifacts: Array<{ trajectory: Array<{ sourceSolutionKey: string | null }> }>
+    }
+
+    expect(snapshot.checkpoints.map((entry) => entry.sourceSolutionKey)).toEqual([
+      null,
+      laterSourceSolutionKey,
+    ])
+    expect(timeline.map((entry) => entry.sourceSolutionKey)).toEqual([
+      null,
+      laterSourceSolutionKey,
+    ])
+    expect(results.runArtifacts[0]!.trajectory.map((entry) => entry.sourceSolutionKey)).toEqual([
+      null,
+      laterSourceSolutionKey,
     ])
   })
 })
