@@ -50,6 +50,7 @@ describe('oracle control report', () => {
       'synthetic-strong-shelf',
       'titan-to-storm',
     ])
-    expect(first.points.every((point) => point.filterCount === 10)).toBe(true)
+    expect(first.points.every((point) => point.maxFilters === 10)).toBe(true)
+    expect(first.points.every((point) => !('filterCount' in point))).toBe(true)
   })
 })

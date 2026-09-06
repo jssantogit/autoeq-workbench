@@ -4,6 +4,8 @@ from pathlib import Path
 import pytest
 
 from autoeq_solver_lab.io import (
+    load_control_candidates,
+    parse_problem,
     read_candidates,
     read_evaluations,
     read_problems,
@@ -177,3 +179,33 @@ def test_serialization_is_deterministic_and_evaluations_are_strict(tmp_path: Pat
     evaluation_path.write_text(json.dumps(invalid) + "\n", encoding="utf-8")
     with pytest.raises(ValueError, match="unknown field"):
         list(read_evaluations(evaluation_path))
+
+
+def test_control_loader_creates_canonical_candidate_with_cap_provenance():
+    problem = parse_problem(problem_payload())
+    control = {
+        "version": 1,
+        "oracle": "standard-v2-control",
+        "maxFilters": 10,
+        "points": [{
+            "candidateId": "standard-v2-control:synthetic-narrow-peak:10:30",
+            "problemId": problem.problemId,
+            "inputSha256": problem.inputSha256,
+            "maxFilters": 10,
+            "rmseDb": 0.2,
+            "maxAbsDb": 0.4,
+            "maeDb": 0.1,
+            "maxAbsFrequencyHz": 1000.0,
+            "targetAchieved": False,
+            "deliveredFilterCount": 1,
+            "terminationReason": "converged",
+            "filters": [filter_payload()],
+        }],
+    }
+
+    candidates = load_control_candidates(control, problem, 10)
+
+    assert len(candidates) == 1
+    assert candidates[0].algorithmId == "standard-v2-control"
+    assert candidates[0].seed is None
+    assert len(candidates[0].filters) == 1

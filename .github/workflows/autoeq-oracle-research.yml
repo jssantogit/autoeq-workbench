@@ -9,6 +9,12 @@ on:
         default: development
         type: choice
         options: [development, adversarial]
+      calibration_mode:
+        description: Calibration uses real compute; smoke is orchestration-only
+        required: true
+        default: calibration
+        type: choice
+        options: [calibration, orchestration-smoke]
       max_filters:
         description: Maximum product filter capacity
         required: true
@@ -23,7 +29,12 @@ on:
       continuous_eval_budget:
         description: Continuous optimizer evaluations per run
         required: true
-        default: '60'
+        default: '600'
+        type: string
+      convergence_pilot_budgets:
+        description: Comma-separated simple-case convergence pilot budgets
+        required: true
+        default: '60,120,240,480'
         type: string
       mixed_generations:
         description: Deliverable Oracle mixed-search generations
@@ -52,6 +63,31 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Prepare oracle artifact directory
         run: mkdir -p oracle-artifacts
+      - name: Validate oracle campaign inputs
+        env:
+          CALIBRATION_MODE: ${{ inputs.calibration_mode }}
+          MAX_FILTERS: ${{ inputs.max_filters }}
+          SEEDS: ${{ inputs.seeds }}
+          CONTINUOUS_EVAL_BUDGET: ${{ inputs.continuous_eval_budget }}
+        run: |
+          set -euo pipefail
+          seed_count="$(tr ',' '\n' <<< "$SEEDS" | sed '/^$/d' | sort -n -u | wc -l)"
+          if [[ "$seed_count" -lt 8 ]]; then
+            echo "calibration requires at least 8 distinct explicit seeds" >&2
+            exit 1
+          fi
+          if [[ "$CALIBRATION_MODE" == "calibration" && "$MAX_FILTERS" != "10" ]]; then
+            echo "official calibration waves are MaxFilters=10; use orchestration-smoke for another cap" >&2
+            exit 1
+          fi
+          if [[ "$CALIBRATION_MODE" == "calibration" && "$CONTINUOUS_EVAL_BUDGET" -le 60 ]]; then
+            echo "60 evaluations is smoke-only; calibration requires a larger real budget" >&2
+            exit 1
+          fi
+          if [[ "$CALIBRATION_MODE" == "orchestration-smoke" && "$CONTINUOUS_EVAL_BUDGET" != "60" ]]; then
+            echo "orchestration-smoke must use the explicit 60-evaluation smoke budget" >&2
+            exit 1
+          fi
       - name: Verify research TypeScript tests
         run: pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2/research
       - name: Verify core typecheck
@@ -84,7 +120,23 @@ jobs:
             --out "$GITHUB_WORKSPACE/oracle-artifacts/continuous.json" \
             --seeds "$SEEDS" \
             --filter-counts "$filter_counts" \
+            --max-filters "$MAX_FILTERS" \
+            --control "$GITHUB_WORKSPACE/oracle-artifacts/control.json" \
             --eval-budget "$CONTINUOUS_EVAL_BUDGET" \
+            --canonical-command 'pnpm --filter @autoeq-workbench/core research:lab --'
+      - name: Run simple-case convergence pilots
+        env:
+          SEEDS: ${{ inputs.seeds }}
+          PILOT_BUDGETS: ${{ inputs.convergence_pilot_budgets }}
+        run: |
+          set -euo pipefail
+          python -m autoeq_solver_lab.convergence_pilot \
+            --problems "$GITHUB_WORKSPACE/oracle-artifacts/problems.jsonl" \
+            --out "$GITHUB_WORKSPACE/oracle-artifacts/convergence-pilot.json" \
+            --case-ids synthetic-narrow-peak,synthetic-strong-shelf \
+            --seeds "$SEEDS" \
+            --budgets "$PILOT_BUDGETS" \
+            --filter-count 1 \
             --canonical-command 'pnpm --filter @autoeq-workbench/core research:lab --'
       - name: Run Deliverable Oracle
         env:
@@ -98,7 +150,9 @@ jobs:
             --seed 41 \
             --generations "$MIXED_GENERATIONS" \
             --eval-budget "${{ inputs.continuous_eval_budget }}" \
-            --canonical-command 'pnpm --filter @autoeq-workbench/core research:lab --'
+            --canonical-command 'pnpm --filter @autoeq-workbench/core research:lab --' \
+            --max-filters "${{ inputs.max_filters }}" \
+            --control "$GITHUB_WORKSPACE/oracle-artifacts/control.json"
       - name: Report oracle calibration
         env:
           REPOSITORY_SHA: ${{ github.sha }}
@@ -111,26 +165,9 @@ jobs:
             --out "$GITHUB_WORKSPACE/oracle-artifacts/calibration-report.json"
             --repository-sha "$REPOSITORY_SHA"
           )
-          manifest_path="research/solver-lab/calibration/OracleCalibrationManifestV1.json"
-          if [[ -f "$manifest_path" ]]; then
-            mapfile -t thresholds < <(python - "$manifest_path" <<'PY'
-          import json
-          import sys
-
-          thresholds = json.loads(open(sys.argv[1], encoding="utf-8").read())["materialImprovementThresholds"]
-          print(thresholds["minimumAggregateFrontierGainFraction"])
-          print(thresholds["maximumPerCaseQualityRegressionFraction"])
-          print(thresholds["maximumCatastrophicCaseRate"])
-          PY
-            )
-            calibration_args+=(
-              --minimum-aggregate-frontier-gain-fraction "${thresholds[0]}"
-              --maximum-per-case-quality-regression-fraction "${thresholds[1]}"
-              --maximum-catastrophic-case-rate "${thresholds[2]}"
-            )
-          else
-            calibration_args+=(--recommend-only)
-          fi
+          calibration_args+=(
+            --recommend-only
+          )
           python -m autoeq_solver_lab.calibration "${calibration_args[@]}"
       - name: Write oracle environment metadata
         if: always()
@@ -140,6 +177,8 @@ jobs:
           SEEDS: ${{ inputs.seeds }}
           CONTINUOUS_EVAL_BUDGET: ${{ inputs.continuous_eval_budget }}
           MIXED_GENERATIONS: ${{ inputs.mixed_generations }}
+          CALIBRATION_MODE: ${{ inputs.calibration_mode }}
+          PILOT_BUDGETS: ${{ inputs.convergence_pilot_budgets }}
         run: |
           python - <<'PY'
           import json
@@ -157,9 +196,11 @@ jobs:
               "nodeVersion": subprocess.check_output(["node", "--version"], text=True).strip(),
               "pythonVersion": platform.python_version(),
               "corpusLayer": os.environ["CORPUS_LAYER"],
+              "calibrationMode": os.environ["CALIBRATION_MODE"],
               "maxFilters": int(os.environ["MAX_FILTERS"]),
               "seeds": [int(seed) for seed in os.environ["SEEDS"].split(",")],
               "continuousEvaluationBudget": int(os.environ["CONTINUOUS_EVAL_BUDGET"]),
+              "convergencePilotBudgets": [int(budget) for budget in os.environ["PILOT_BUDGETS"].split(",")],
               "mixedGenerations": int(os.environ["MIXED_GENERATIONS"]),
           }
           output = workspace / "oracle-artifacts" / "environment.json"

@@ -12,7 +12,7 @@ from autoeq_solver_lab.calibration import (
 def point(
     candidate_id: str,
     problem_id: str,
-    filter_count: int,
+    max_filters: int,
     rmse_db: float,
     max_abs_db: float,
     algorithm_id: str,
@@ -20,7 +20,9 @@ def point(
     return CalibrationPoint(
         candidate_id=candidate_id,
         problem_id=problem_id,
-        filter_count=filter_count,
+        max_filters=max_filters,
+        actual_filter_count=max_filters,
+        actual_delivered_filter_count=max_filters,
         rmse_db=rmse_db,
         max_abs_db=max_abs_db,
         algorithm_id=algorithm_id,
@@ -29,7 +31,7 @@ def point(
 
 
 def manifest(**thresholds: float) -> dict:
-    return {
+    value = {
         "version": 1,
         "createdFromRepositorySha": "a" * 64,
         "corpusVersion": "research-corpus-v1",
@@ -42,6 +44,9 @@ def manifest(**thresholds: float) -> dict:
             "maximumCatastrophicCaseRate": thresholds.get("catastrophic", 0.25),
         },
     }
+    if "campaignEvidence" in thresholds:
+        value["campaignEvidence"] = thresholds["campaignEvidence"]
+    return value
 
 
 def test_report_has_directional_regret_gap_and_stable_cell_order():
@@ -56,7 +61,7 @@ def test_report_has_directional_regret_gap_and_stable_cell_order():
     )
 
     cell = report["cells"][0]
-    assert [(entry["problemId"], entry["filterCount"]) for entry in report["cells"]] == [
+    assert [(entry["problemId"], entry["maxFilters"]) for entry in report["cells"]] == [
         ("case-a", 10),
     ]
     assert cell["controlToContinuous"]["regret"] == 0.0
@@ -68,6 +73,9 @@ def test_report_has_directional_regret_gap_and_stable_cell_order():
         "differential-evolution",
     ]
     assert cell["continuousFrontier"][0]["candidateId"] == "cma-a"
+    assert cell["continuousFrontier"][0]["maxFilters"] == 10
+    assert cell["continuousFrontier"][0]["actualFilterCount"] == 10
+    assert cell["continuousFrontier"][0]["actualDeliveredFilterCount"] == 10
 
 
 @pytest.mark.parametrize("value", [-0.01, 1.01, math.nan, math.inf])
@@ -91,3 +99,33 @@ def test_manifest_rejects_unknown_version_and_accepts_explicit_values():
     invalid["version"] = 2
     with pytest.raises(ValueError, match="version"):
         validate_manifest(invalid)
+
+
+def test_calibration_marks_control_only_evidence_insufficient():
+    control = point("control-a", "case-a", 10, 0.1, 0.6, "standard-v2-control")
+    report = build_calibration_report(
+        control=(control,),
+        continuous=(point("control-a", "case-a", 10, 0.1, 0.6, "standard-v2-control"),),
+        deliverable=(point("control-a", "case-a", 10, 0.1, 0.6, "standard-v2-control"),),
+        manifest=None,
+    )
+
+    assert report["status"] == "insufficient"
+    assert "oracle-does-not-strictly-improve-control" in report["insufficiencyReasons"]
+
+
+def test_manifest_rejects_vacuous_promotion_policy():
+    with pytest.raises(ValueError, match="insufficient"):
+        validate_manifest(manifest(gain=0.0, regression=1.0, catastrophic=0.8181818181818182))
+
+
+def test_manifest_preserves_explicit_campaign_evidence():
+    evidence = {
+        "campaignArtifactIds": ["run-1/control", "run-1/oracle"],
+        "repositorySha": "b" * 40,
+        "maxFilters": 10,
+        "seeds": [11, 29, 47, 83, 101, 131, 167, 197],
+        "cases": ["case-a"],
+    }
+    accepted = validate_manifest(manifest(campaignEvidence=evidence))
+    assert accepted["campaignEvidence"] == evidence

@@ -1,8 +1,14 @@
 from dataclasses import replace
 
 import numpy as np
+import pytest
 
-from autoeq_solver_lab.continuous_oracle import OracleRunConfig, build_continuous_frontier
+from autoeq_solver_lab.continuous_oracle import (
+    OracleRunConfig,
+    build_continuous_cap_frontier,
+    build_continuous_frontier,
+    validate_exact_filter_counts,
+)
 from autoeq_solver_lab.objectives import ContinuousVectorLayout
 from autoeq_solver_lab.types import (
     CanonicalMetricSet,
@@ -45,6 +51,33 @@ def fake_candidate(problem: SolverLabProblem, algorithm_id: str, frequency: floa
         algorithmId=algorithm_id,
         seed=11,
         filters=(LabFilter(f"{algorithm_id}-filter", True, "PK", frequency, 1.0, 1.0),),
+    )
+
+
+def multi_filter_candidate(
+    problem: SolverLabProblem,
+    candidate_id: str,
+    algorithm_id: str,
+    count: int,
+) -> SolverLabCandidate:
+    return SolverLabCandidate(
+        protocolVersion=1,
+        problemId=problem.problemId,
+        inputSha256=problem.inputSha256,
+        candidateId=candidate_id,
+        algorithmId=algorithm_id,
+        seed=11,
+        filters=tuple(
+            LabFilter(
+                f"{candidate_id}-filter-{index}",
+                True,
+                "PK",
+                100.0 + index * 100.0,
+                1.0,
+                1.0,
+            )
+            for index in range(count)
+        ),
     )
 
 
@@ -115,3 +148,58 @@ def test_continuous_frontier_keeps_only_canonically_validated_nondominated_point
     }
     assert len(evaluator.calls) == 1
     assert len(evaluator.calls[0]) == 3
+
+
+class CapEvaluator:
+    def __init__(self, values):
+        self.values = values
+        self.calls = []
+
+    def evaluate(self, problem, candidates):
+        del problem
+        self.calls.append(tuple(candidate.candidateId for candidate in candidates))
+        return tuple(
+            SolverLabEvaluation(
+                protocolVersion=1,
+                candidateId=candidate.candidateId,
+                valid=True,
+                rejectionReason=None,
+                continuous=CanonicalMetricSet(*self.values[candidate.candidateId], {}),
+                deliverable=CanonicalMetricSet(*self.values[candidate.candidateId], {}),
+                deliverableFilters=candidate.filters,
+                cancellationTotalScore=0.0,
+            )
+            for candidate in candidates
+        )
+
+
+def test_continuous_cap_frontier_aggregates_exact_n_fronts_and_control():
+    base_problem = problem()
+    lab_problem = replace(base_problem, bounds={**base_problem.bounds, "maxFilters": 2})
+    one_filter = multi_filter_candidate(lab_problem, "exact-1", "differential-evolution", 1)
+    two_filters = multi_filter_candidate(lab_problem, "exact-2", "cma-es", 2)
+    control = multi_filter_candidate(lab_problem, "control", "standard-v2-control", 1)
+    evaluator = CapEvaluator({
+        "exact-1": (0.4, 0.8),
+        "exact-2": (0.2, 0.8),
+        "control": (0.3, 0.7),
+    })
+
+    frontier = build_continuous_cap_frontier(
+        lab_problem,
+        ((one_filter,), (two_filters,)),
+        2,
+        evaluator,
+        known_candidates=(control,),
+    )
+
+    assert {candidate.candidateId for candidate in frontier} == {"exact-2", "control"}
+    assert all(len(candidate.filters) <= 2 for candidate in frontier)
+    assert len(evaluator.calls) == 1
+    assert set(evaluator.calls[0]) == {"exact-2", "control"}
+
+
+def test_official_cap_requires_every_diagnostic_exact_n_front():
+    assert validate_exact_filter_counts((1, 2, 3), 3) == (1, 2, 3)
+    with pytest.raises(ValueError, match="exact filter counts"):
+        validate_exact_filter_counts((1, 3), 3)

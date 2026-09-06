@@ -24,7 +24,7 @@ export interface OracleControlPointV1 {
   candidateId: string
   problemId: string
   inputSha256: string
-  filterCount: number
+  maxFilters: number
   rmseDb: number
   maxAbsDb: number
   maeDb: number
@@ -113,7 +113,7 @@ export function createOracleControlArtifact(
       candidateId: `standard-v2-control:${researchCase.id}:${options.maxFilters}:${options.budgetSeconds}`,
       problemId: researchCase.id,
       inputSha256: researchCase.inputSha256,
-      filterCount: options.maxFilters,
+      maxFilters: options.maxFilters,
       rmseDb: execution.metrics.rmseDb,
       maxAbsDb: execution.metrics.maxAbsDb,
       maeDb: execution.metrics.maeDb,

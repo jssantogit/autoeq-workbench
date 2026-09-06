@@ -332,3 +332,80 @@ def write_candidates(path: str | Path, candidates: Sequence[SolverLabCandidate])
 
 def write_evaluations(path: str | Path, evaluations: Sequence[SolverLabEvaluation]) -> None:
     _write_jsonl(path, evaluations, serialize_evaluation)
+
+
+def load_control_candidates(
+    value: Mapping[str, Any],
+    problem: SolverLabProblem,
+    max_filters: int,
+) -> tuple[SolverLabCandidate, ...]:
+    if not isinstance(value, Mapping) or value.get("oracle") != "standard-v2-control":
+        raise ValueError("control artifact oracle must be standard-v2-control")
+    if isinstance(max_filters, bool) or not isinstance(max_filters, int) or max_filters <= 0:
+        raise ValueError("control maxFilters must be a positive integer")
+    artifact_max_filters = value.get("maxFilters")
+    if artifact_max_filters != max_filters:
+        raise ValueError("control artifact maxFilters does not match requested cap")
+    raw_points = value.get("points")
+    if not isinstance(raw_points, Sequence) or isinstance(raw_points, (str, bytes)):
+        raise ValueError("control artifact points are required")
+
+    candidates: list[SolverLabCandidate] = []
+    seen_ids: set[str] = set()
+    for index, raw_point in enumerate(raw_points):
+        point = _record(raw_point, f"control.points[{index}]")
+        required = {
+            "candidateId",
+            "problemId",
+            "inputSha256",
+            "maxFilters",
+            "rmseDb",
+            "maxAbsDb",
+            "maeDb",
+            "maxAbsFrequencyHz",
+            "targetAchieved",
+            "deliveredFilterCount",
+            "terminationReason",
+            "filters",
+        }
+        _strict_keys(point, required, f"control.points[{index}]")
+        point_problem_id = _string(point["problemId"], f"control.points[{index}].problemId")
+        point_hash = _sha(point["inputSha256"], f"control.points[{index}].inputSha256")
+        point_max_filters = _integer(point["maxFilters"], f"control.points[{index}].maxFilters")
+        if point_problem_id != problem.problemId or point_hash != problem.inputSha256:
+            continue
+        if point_max_filters != max_filters:
+            raise ValueError("control point maxFilters does not match requested cap")
+        candidate_id = _string(point["candidateId"], f"control.points[{index}].candidateId")
+        if candidate_id in seen_ids:
+            raise ValueError("control artifact contains duplicate candidate IDs")
+        filters_value = point["filters"]
+        if not isinstance(filters_value, Sequence) or isinstance(filters_value, (str, bytes)):
+            raise ValueError(f"control.points[{index}].filters must be an array")
+        filters = tuple(
+            parse_filter(filter_value, f"control.points[{index}].filters[{filter_index}]")
+            for filter_index, filter_value in enumerate(filters_value)
+        )
+        delivered_count = _integer(
+            point["deliveredFilterCount"],
+            f"control.points[{index}].deliveredFilterCount",
+        )
+        if len(filters) > max_filters:
+            raise ValueError("control candidate exceeds maxFilters")
+        if delivered_count != len(filters):
+            raise ValueError("control deliveredFilterCount does not match filters")
+        candidate = SolverLabCandidate(
+            protocolVersion=1,
+            problemId=point_problem_id,
+            inputSha256=point_hash,
+            candidateId=candidate_id,
+            algorithmId="standard-v2-control",
+            seed=None,
+            filters=filters,
+        )
+        parse_candidate(asdict(candidate))
+        seen_ids.add(candidate_id)
+        candidates.append(candidate)
+    if not candidates:
+        raise ValueError(f"control artifact has no point for problem {problem.problemId}")
+    return tuple(candidates)
