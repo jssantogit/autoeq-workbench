@@ -54,9 +54,12 @@ def _log_interpolate(value: float, minimum: float, maximum: float) -> float:
         return minimum
     if value >= 1:
         return maximum
-    return 10 ** (
+    interpolated = 10 ** (
         math.log10(minimum) + value * (math.log10(maximum) - math.log10(minimum))
     )
+    # Exponentiation can round a coordinate just below an endpoint outside the
+    # physical bound. Keep decoded candidates valid for subsequent polishing.
+    return min(maximum, max(minimum, interpolated))
 
 
 def decode_vector(

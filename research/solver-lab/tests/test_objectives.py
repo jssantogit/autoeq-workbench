@@ -68,6 +68,21 @@ def test_decode_vector_uses_log_frequency_and_log_pk_q_with_bounded_gain():
     assert all(np.isfinite([filter_.frequencyHz, filter_.gainDb, filter_.q]).all() for filter_ in filters)
 
 
+def test_decode_vector_clamps_log_interpolation_rounding_at_physical_bounds():
+    lab_problem = problem(1)
+    layout = enumerate_oracle_layouts(1)[0]
+
+    filters = decode_vector(
+        lab_problem,
+        layout,
+        np.asarray([0.9999999999999999, 0.9999999999999999, 0.9999999999999999]),
+    )
+
+    assert filters[0].frequencyHz == lab_problem.bounds["maxFrequencyHz"]
+    assert np.isclose(filters[0].gainDb, lab_problem.bounds["maxGainDb"])
+    assert np.isclose(filters[0].q, lab_problem.bounds["maxPkQ"])
+
+
 def test_scalarized_objective_is_zero_for_a_matching_zero_response():
     lab_problem = problem(1)
     layout = enumerate_oracle_layouts(1)[0]
