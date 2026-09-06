@@ -67,12 +67,21 @@ def test_deliverable_oracle_retains_plain_quantization_in_canonical_archive():
         seed=11,
         filters=(LabFilter("seed-filter", True, "PK", 1000.24, 1.24, 1.236),),
     )
+    second_seed = SolverLabCandidate(
+        protocolVersion=1,
+        problemId=lab_problem.problemId,
+        inputSha256=lab_problem.inputSha256,
+        candidateId="continuous-seed-2",
+        algorithmId="continuous",
+        seed=29,
+        filters=(LabFilter("seed-filter-2", True, "PK", 1500.24, 1.24, 1.236),),
+    )
     evaluator = FakeCanonicalEvaluator()
 
     frontier = build_deliverable_frontier(
         lab_problem,
-        (continuous_seed,),
-        DeliverableOracleConfig(seed=41, generations=1, evaluation_budget=20),
+        (continuous_seed, second_seed),
+        DeliverableOracleConfig(seed=41, generations=1, evaluation_budget=20, max_parents=2),
         evaluator,
     )
 
@@ -84,3 +93,4 @@ def test_deliverable_oracle_retains_plain_quantization_in_canonical_archive():
         for candidate in frontier
     )
     assert evaluator.calls
+    assert all(len(call) == len(set(call)) for call in evaluator.calls)

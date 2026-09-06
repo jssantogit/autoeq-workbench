@@ -129,7 +129,7 @@ def _local_neighbors(
                     problem,
                     quantize_filters(tuple(filters), quantization_bounds),
                     parent.seed if parent.seed is not None else 0,
-                    "local",
+                    f"local:{parent.candidateId}",
                     proposal_index,
                 ))
                 proposal_index += 1
@@ -152,7 +152,7 @@ def _structural_neighbors(
         problem,
         quantize_filters(proposal.filters, quantization_bounds),
         parent.seed if parent.seed is not None else 0,
-        label,
+        f"{label}:{parent.candidateId}",
         index,
     ) for index, proposal in enumerate(proposals))
 
@@ -212,10 +212,9 @@ def build_deliverable_frontier(
     for generation in range(1, config.generations + 1):
         if not archive:
             break
-        parents = tuple(
-            archive[int(rng.integers(0, len(archive)))]
-            for _ in range(min(config.max_parents, max(1, len(archive))))
-        )
+        parent_count = min(config.max_parents, len(archive))
+        parent_indices = rng.choice(len(archive), size=parent_count, replace=False)
+        parents = tuple(archive[int(index)] for index in parent_indices)
         for entry in parents:
             pending.extend(_local_neighbors(problem, entry.candidate))
             pending.extend(_structural_neighbors(problem, entry.candidate, rng, "structural"))
@@ -278,6 +277,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         evaluations = evaluator.evaluate(problem, frontier)
         frontiers.append({
             "problemId": problem.problemId,
+            "filterCount": frontier_artifact.get("filterCount", problem.bounds["maxFilters"]),
             "points": [
                 {"candidate": asdict(candidate), "evaluation": asdict(evaluation)}
                 for candidate, evaluation in zip(frontier, evaluations, strict=True)

@@ -1,5 +1,5 @@
 from collections.abc import Callable, Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 import argparse
 import json
 from pathlib import Path
@@ -152,10 +152,12 @@ def _artifact_for_frontier(
     problem: SolverLabProblem,
     candidates: Sequence[SolverLabCandidate],
     evaluations: Sequence[SolverLabEvaluation],
+    filter_count: int,
 ) -> dict:
     evaluation_by_id = {evaluation.candidateId: evaluation for evaluation in evaluations}
     return {
         "problemId": problem.problemId,
+        "filterCount": filter_count,
         "points": [
             {
                 "candidate": asdict(candidate),
@@ -187,10 +189,17 @@ def main(argv: Sequence[str] | None = None) -> None:
     frontiers: list[dict] = []
     all_candidates: list[SolverLabCandidate] = []
     for problem in problems:
-        frontier = build_continuous_frontier(problem, config, evaluator)
-        evaluations = evaluator.evaluate(problem, frontier)
-        frontiers.append(_artifact_for_frontier(problem, frontier, evaluations))
-        all_candidates.extend(frontier)
+        for filter_count in config.filter_counts:
+            single_count_config = replace(config, filter_counts=(filter_count,))
+            frontier = build_continuous_frontier(problem, single_count_config, evaluator)
+            evaluations = evaluator.evaluate(problem, frontier)
+            frontiers.append(_artifact_for_frontier(
+                problem,
+                frontier,
+                evaluations,
+                filter_count,
+            ))
+            all_candidates.extend(frontier)
     output = Path(args.out)
     candidate_path = Path(f"{args.out}.candidates.jsonl")
     write_candidates(candidate_path, all_candidates)
