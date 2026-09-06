@@ -23,6 +23,7 @@ import {
   type V2Solution,
 } from '../../../src/index.js'
 import { retainV2NextActivePaths } from '../../../src/autoeq/v2/search.js'
+import { createV2SolutionKey } from '../../../src/autoeq/v2/researchTrace.js'
 
 function solution(violation: number): V2Solution {
   const metrics: ErrorMetrics = {
@@ -144,7 +145,7 @@ describe('Standard v2 bounded search', () => {
     expect(responseGrids.size).toBe(1)
   })
 
-  it('correlates detailed retention events to refined result keys', () => {
+  it('reports staged retention by execution phase and uses refined keys for active retention', () => {
     const frequencies = createEvaluationGrid()
     const desiredDb = evaluateV2Solution([
       pk('target-a', 90, 2, 1.2),
@@ -163,7 +164,7 @@ describe('Standard v2 bounded search', () => {
     const records: StandardV2JointRefineRecord[] = []
     const retentions: StandardV2JointRefineRetention[] = []
 
-    searchStandardV2WorkingSolutions({
+    const result = searchStandardV2WorkingSolutions({
       desiredDb,
       frequencies,
       config: {
@@ -191,7 +192,51 @@ describe('Standard v2 bounded search', () => {
       (retention) => retention.traceId === refinedAwayFromAppended!.traceId &&
         retention.stage === 'staged-candidate',
     )
-    expect(stagedRetention?.retained).toBe(false)
+    expect(stagedRetention?.retained).toBe(true)
+
+    const activeRetention = retentions.find(
+      (retention) => retention.traceId === refinedAwayFromAppended!.traceId &&
+        retention.stage === 'active-path',
+    )
+    expect(activeRetention?.retained).toBe(
+      result.activeSolutions.some((solution) =>
+        createV2SolutionKey(solution.filters) === refinedAwayFromAppended!.resultKey,
+      ),
+    )
+  })
+
+  it('reports deferred candidates as not retained at staged-candidate', () => {
+    const frequencies = createEvaluationGrid()
+    const desiredDb = frequencies.map((_, index) => index % 2 === 0 ? -1 : 1)
+    const config = resolveStandardAutoEqV2Config({
+      ...DEFAULT_AUTOEQ_SETTINGS,
+      maxFilters: 1,
+    })
+    const retentions: StandardV2JointRefineRetention[] = []
+
+    searchStandardV2WorkingSolutions({
+      desiredDb,
+      frequencies,
+      config: {
+        ...config,
+        workingMaxFilters: 1,
+        algorithm: { ...config.algorithm, maxJointRefinementCycles: 1 },
+      } as unknown as StandardAutoEqV2Config,
+      deadline: { isExpired: () => false },
+      boundaryMode: 'sign-crossing',
+      researchTrace: {
+        onJointRefineTrace: () => {},
+        onJointRefineRetention: (retention) => { retentions.push(retention) },
+      },
+    })
+
+    const stagedRetentions = retentions.filter(
+      (retention) => retention.stage === 'staged-candidate',
+    )
+    expect(stagedRetentions).toHaveLength(8)
+    expect(stagedRetentions.slice(0, 3).map((retention) => retention.retained))
+      .toEqual([true, true, true])
+    expect(stagedRetentions.slice(3).every((retention) => !retention.retained)).toBe(true)
   })
 
   it('retains ordinary alternatives through 1.02 and caps paths at three', () => {

@@ -204,9 +204,6 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
 
       const rankedAppended = [...appendedCandidates].sort(compareV2Solutions)
       const staged = retainV2SearchPaths(rankedAppended, false)
-      const stagedCandidateKeys = hasDetailedJointTrace
-        ? new Set(staged.map((solution) => createV2SolutionKey(solution.filters)))
-        : undefined
       const stagedSet = new Set(staged)
       const deferred = rankedAppended.filter((candidate) => !stagedSet.has(candidate))
       let stagedImproved = false
@@ -233,7 +230,7 @@ export function searchStandardV2WorkingSolutions(input: SearchInput): SearchResu
             input.researchTrace?.onJointRefineRetention?.({
               traceId: researchContext.traceId,
               stage: 'staged-candidate',
-              retained: stagedCandidateKeys!.has(createV2SolutionKey(refined.solution.filters)),
+              retained: phase === 'staged',
             })
             refinedForRetention.push({
               solution: refined.solution,
