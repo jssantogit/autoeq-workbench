@@ -15,6 +15,7 @@
     "research:v2:full": "tsx benchmarks/research/run.ts --preset full",
     "research:lab": "tsx benchmarks/research/labCli.ts",
     "research:parity-fixture": "tsx benchmarks/research/parityFixture.ts",
+    "research:quantization-fixture": "tsx benchmarks/research/quantizationFixture.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",

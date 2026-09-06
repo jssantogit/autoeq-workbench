@@ -1,0 +1,235 @@
+{
+  "version": 1,
+  "sampleRateHz": 48000,
+  "policy": {
+    "frequencyStepHz": 1,
+    "gainStepDb": 0.1,
+    "qStep": 0.01
+  },
+  "cases": [
+    {
+      "id": "half-step-ties",
+      "bounds": {
+        "minFrequencyHz": 20,
+        "maxFrequencyHz": 20000,
+        "minGainDb": -15,
+        "maxGainDb": 15,
+        "minQ": 0.1,
+        "maxQ": 12,
+        "shelfQ": 0.7
+      },
+      "filters": [
+        {
+          "id": "tie",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 1000.5,
+          "gainDb": 0.05,
+          "q": 1.005
+        }
+      ],
+      "quantizedFilters": [
+        {
+          "id": "tie",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 1000,
+          "gainDb": 0,
+          "q": 1
+        }
+      ]
+    },
+    {
+      "id": "signed-grid-values",
+      "bounds": {
+        "minFrequencyHz": 20,
+        "maxFrequencyHz": 20000,
+        "minGainDb": -15,
+        "maxGainDb": 15,
+        "minQ": 0.1,
+        "maxQ": 12,
+        "shelfQ": 0.7
+      },
+      "filters": [
+        {
+          "id": "negative",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 1000.6,
+          "gainDb": -2.26,
+          "q": 1.236
+        },
+        {
+          "id": "positive",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2000.4,
+          "gainDb": 2.24,
+          "q": 2.234
+        }
+      ],
+      "quantizedFilters": [
+        {
+          "id": "negative",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 1001,
+          "gainDb": -2.3,
+          "q": 1.24
+        },
+        {
+          "id": "positive",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2000,
+          "gainDb": 2.2,
+          "q": 2.23
+        }
+      ]
+    },
+    {
+      "id": "product-boundaries",
+      "bounds": {
+        "minFrequencyHz": 20,
+        "maxFrequencyHz": 20000,
+        "minGainDb": -15,
+        "maxGainDb": 15,
+        "minQ": 0.1,
+        "maxQ": 12,
+        "shelfQ": 0.7
+      },
+      "filters": [
+        {
+          "id": "minimums",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 20,
+          "gainDb": -15,
+          "q": 0.1
+        },
+        {
+          "id": "maximums",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 20000,
+          "gainDb": 15,
+          "q": 12
+        }
+      ],
+      "quantizedFilters": [
+        {
+          "id": "minimums",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 20,
+          "gainDb": -15,
+          "q": 0.1
+        },
+        {
+          "id": "maximums",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 20000,
+          "gainDb": 15,
+          "q": 12
+        }
+      ]
+    },
+    {
+      "id": "decimal-envelope",
+      "bounds": {
+        "minFrequencyHz": 1000.1,
+        "maxFrequencyHz": 1001.1,
+        "minGainDb": 0.04,
+        "maxGainDb": 0.24,
+        "minQ": 0.104,
+        "maxQ": 0.126,
+        "shelfQ": 0.7
+      },
+      "filters": [
+        {
+          "id": "inside",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 1000.2,
+          "gainDb": 0.14,
+          "q": 0.106
+        },
+        {
+          "id": "outside",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 1002.2,
+          "gainDb": 0.3,
+          "q": 0.2
+        }
+      ],
+      "quantizedFilters": [
+        {
+          "id": "inside",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 1001,
+          "gainDb": 0.1,
+          "q": 0.11
+        },
+        {
+          "id": "outside",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 1001,
+          "gainDb": 0.2,
+          "q": 0.12
+        }
+      ]
+    },
+    {
+      "id": "shelf-q-fixed",
+      "bounds": {
+        "minFrequencyHz": 20,
+        "maxFrequencyHz": 20000,
+        "minGainDb": -15,
+        "maxGainDb": 15,
+        "minQ": 0.1,
+        "maxQ": 12,
+        "shelfQ": 0.7
+      },
+      "filters": [
+        {
+          "id": "low-shelf",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 250.6,
+          "gainDb": -2.26,
+          "q": 5
+        },
+        {
+          "id": "high-shelf",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 8000.4,
+          "gainDb": 2.24,
+          "q": 5
+        }
+      ],
+      "quantizedFilters": [
+        {
+          "id": "low-shelf",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 251,
+          "gainDb": -2.3,
+          "q": 0.7
+        },
+        {
+          "id": "high-shelf",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 8000,
+          "gainDb": 2.2,
+          "q": 0.7
+        }
+      ]
+    }
+  ]
+}
