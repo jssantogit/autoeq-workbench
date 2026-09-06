@@ -1,7 +1,12 @@
+import { compareV2PrimaryMetrics } from '../../src/autoeq/v2/ranking.js'
+
 import type {
+  ResearchCheckpoint,
   ResearchAggregateRow,
+  ResearchJointRefineRecord,
   ResearchRunRow,
   ResearchTimeToQuality,
+  ResearchWorkEfficiencySummary,
 } from './types.js'
 
 type NumericSummary = { best: number; median: number; worst: number; spread: number }
@@ -31,6 +36,109 @@ function summarize(values: readonly number[]): NumericSummary {
   const best = Math.min(...values)
   const worst = Math.max(...values)
   return { best, median: median(values), worst, spread: worst - best }
+}
+
+function medianOrNull(values: readonly number[]): number | null {
+  return values.length === 0 ? null : median(values)
+}
+
+function bestCheckpointHistory(
+  checkpoints: readonly ResearchCheckpoint[],
+): ResearchCheckpoint[] {
+  const ordered = [...checkpoints].sort((left, right) => left.elapsedMs - right.elapsedMs)
+  const history: ResearchCheckpoint[] = []
+  let best: ResearchCheckpoint | undefined
+  for (const checkpoint of ordered) {
+    if (
+      best === undefined ||
+      compareV2PrimaryMetrics(checkpoint.metrics, best.metrics) < 0
+    ) {
+      best = checkpoint
+      history.push(checkpoint)
+    }
+  }
+  return history
+}
+
+export function summarizeResearchWorkEfficiency(
+  records: readonly ResearchJointRefineRecord[],
+  checkpoints: readonly ResearchCheckpoint[] = [],
+  elapsedMs?: number,
+): ResearchWorkEfficiencySummary {
+  const completedCycleGains = records.flatMap((record) =>
+    record.cycles
+      .filter((cycle) => cycle.completed && Number.isFinite(cycle.normalizedViolationGain))
+      .map((cycle) => cycle.normalizedViolationGain),
+  )
+  const history = bestCheckpointHistory(checkpoints)
+  const timeToBestMs = history.at(-1)?.elapsedMs ?? null
+  return {
+    jointRefineRecords: records.length,
+    expiredJointRefines: records.filter((record) => record.expired).length,
+    previouslyAttemptedEquivalent: records.filter((record) => record.equivalentStatePreviouslyAttempted).length,
+    previouslyCompletedEquivalent: records.filter((record) => record.equivalentStatePreviouslyCompleted).length,
+    retainedAfterStaging: records.filter((record) => record.survivedStagedCandidateRetention).length,
+    retainedAsActivePath: records.filter((record) => record.survivedActivePathRetention).length,
+    contributedToBestDeliverable: records.filter((record) => record.contributedToBestDeliverable).length,
+    coordinateTrials: records.reduce((sum, record) => sum + record.coordinateTrials, 0),
+    coordinateTrialsContributingToBest: records.reduce(
+      (sum, record) => sum + (record.contributedToBestDeliverable ? record.coordinateTrials : 0),
+      0,
+    ),
+    medianNormalizedViolationGainPerCompletedCycle: medianOrNull(completedCycleGains),
+    timeToBestMs,
+    timeSinceLastImprovementMs: timeToBestMs === null || elapsedMs === undefined
+      ? null
+      : Math.max(0, elapsedMs - timeToBestMs),
+  }
+}
+
+function workEfficiencyForRow(row: ResearchRunRow): ResearchWorkEfficiencySummary {
+  return summarizeResearchWorkEfficiency(
+    row.jointRefinements ?? [],
+    row.timeline,
+    row.elapsedMs,
+  )
+}
+
+export function aggregateResearchWorkEfficiency(
+  rows: readonly ResearchRunRow[],
+): ResearchWorkEfficiencySummary {
+  const summaries = rows.map(workEfficiencyForRow)
+  const records = rows.flatMap((row) => row.jointRefinements ?? [])
+  const cycleGains = records.flatMap((record) =>
+    record.cycles
+      .filter((cycle) => cycle.completed && Number.isFinite(cycle.normalizedViolationGain))
+      .map((cycle) => cycle.normalizedViolationGain),
+  )
+  const timeToBest = summaries
+    .map((summary) => summary.timeToBestMs)
+    .filter((value): value is number => value !== null)
+  const timeSinceLastImprovement = summaries
+    .map((summary) => summary.timeSinceLastImprovementMs)
+    .filter((value): value is number => value !== null)
+  const sum = (selector: (summary: ResearchWorkEfficiencySummary) => number): number =>
+    summaries.reduce((total, summary) => total + selector(summary), 0)
+  return {
+    jointRefineRecords: sum((summary) => summary.jointRefineRecords),
+    expiredJointRefines: sum((summary) => summary.expiredJointRefines),
+    previouslyAttemptedEquivalent: sum((summary) => summary.previouslyAttemptedEquivalent),
+    previouslyCompletedEquivalent: sum((summary) => summary.previouslyCompletedEquivalent),
+    retainedAfterStaging: sum((summary) => summary.retainedAfterStaging),
+    retainedAsActivePath: sum((summary) => summary.retainedAsActivePath),
+    contributedToBestDeliverable: sum((summary) => summary.contributedToBestDeliverable),
+    coordinateTrials: sum((summary) => summary.coordinateTrials),
+    coordinateTrialsContributingToBest: sum((summary) => summary.coordinateTrialsContributingToBest),
+    medianNormalizedViolationGainPerCompletedCycle: medianOrNull(
+      cycleGains.length > 0
+        ? cycleGains
+        : summaries
+          .map((summary) => summary.medianNormalizedViolationGainPerCompletedCycle)
+          .filter((value): value is number => value !== null),
+    ),
+    timeToBestMs: medianOrNull(timeToBest),
+    timeSinceLastImprovementMs: medianOrNull(timeSinceLastImprovement),
+  }
 }
 
 function aggregateTimeToQuality(
@@ -86,6 +194,7 @@ export function aggregateResearchRuns(
       jointRefinementCount: summarize(
         group.map((row) => row.counters.jointRefinementCount),
       ),
+      workEfficiency: aggregateResearchWorkEfficiency(group),
     }
   })
 }

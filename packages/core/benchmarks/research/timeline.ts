@@ -5,6 +5,14 @@ import type {
   ResearchTimeToQuality,
 } from './types.js'
 
+export const RESEARCH_FINE_CHECKPOINTS_SECONDS = [
+  0.5, 1, 2, 3, 5, 10, 15, 30, 60,
+] as const
+
+export const RESEARCH_FINE_CHECKPOINTS_MS: readonly number[] = Object.freeze(
+  RESEARCH_FINE_CHECKPOINTS_SECONDS.map((seconds) => seconds * 1_000),
+)
+
 export const RESEARCH_TIMELINE_MARKS_MS: readonly number[] = Object.freeze([
   500, 1_000, 2_000, 3_000, 5_000, 10_000,
   15_000, 20_000, 30_000, 45_000, 60_000,

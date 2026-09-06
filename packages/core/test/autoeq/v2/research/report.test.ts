@@ -37,6 +37,20 @@ const aggregate: ResearchAggregateRow = {
   elapsedMs: { best: 100, median: 100, worst: 100, spread: 0 },
   peakWorkingFilterCount: { best: 2, median: 2, worst: 2, spread: 0 },
   jointRefinementCount: { best: 3, median: 3, worst: 3, spread: 0 },
+  workEfficiency: {
+    jointRefineRecords: 0,
+    expiredJointRefines: 0,
+    previouslyAttemptedEquivalent: 0,
+    previouslyCompletedEquivalent: 0,
+    retainedAfterStaging: 0,
+    retainedAsActivePath: 0,
+    contributedToBestDeliverable: 0,
+    coordinateTrials: 0,
+    coordinateTrialsContributingToBest: 0,
+    medianNormalizedViolationGainPerCompletedCycle: null,
+    timeToBestMs: null,
+    timeSinceLastImprovementMs: null,
+  },
 }
 
 const run: ResearchRunRow = {
@@ -81,6 +95,20 @@ const run: ResearchRunRow = {
     discreteRefine: 0,
     compression: 0,
     other: 0,
+  },
+  workEfficiency: {
+    jointRefineRecords: 0,
+    expiredJointRefines: 0,
+    previouslyAttemptedEquivalent: 0,
+    previouslyCompletedEquivalent: 0,
+    retainedAfterStaging: 0,
+    retainedAsActivePath: 0,
+    contributedToBestDeliverable: 0,
+    coordinateTrials: 0,
+    coordinateTrialsContributingToBest: 0,
+    medianNormalizedViolationGainPerCompletedCycle: null,
+    timeToBestMs: null,
+    timeSinceLastImprovementMs: null,
   },
 }
 
@@ -147,6 +175,7 @@ describe('research artifact report', () => {
     expect(JSON.parse(artifacts.timelineJson).timelines[0].caseId).toBe('titan-to-storm')
     expect(artifacts.summaryMd).toContain('Baseline')
     expect(artifacts.summaryMd).toContain('titan-to-storm')
+    expect(artifacts.summaryMd).toContain('Work efficiency')
     expect(artifacts.summaryMd).not.toContain('working-')
   })
 

@@ -108,6 +108,20 @@ function renderStability(aggregates: readonly ResearchAggregateRow[]): string {
   return `${lines.join('\n')}\n`
 }
 
+function renderWorkEfficiency(aggregates: readonly ResearchAggregateRow[]): string {
+  const lines = [
+    '| Case | Budget | Joint records | Expired | Attempted equivalent | Completed equivalent | Staged | Active path | Best contribution | Coordinate trials | Contributing trials | Median cycle gain | Time to best ms | Stale ms |',
+    '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |',
+  ]
+  for (const aggregate of aggregates) {
+    const efficiency = aggregate.workEfficiency
+    lines.push(
+      `| ${aggregate.caseId} | ${aggregate.budgetSeconds}s | ${efficiency.jointRefineRecords} | ${efficiency.expiredJointRefines} | ${efficiency.previouslyAttemptedEquivalent} | ${efficiency.previouslyCompletedEquivalent} | ${efficiency.retainedAfterStaging} | ${efficiency.retainedAsActivePath} | ${efficiency.contributedToBestDeliverable} | ${efficiency.coordinateTrials} | ${efficiency.coordinateTrialsContributingToBest} | ${efficiency.medianNormalizedViolationGainPerCompletedCycle ?? 'null'} | ${efficiency.timeToBestMs ?? 'null'} | ${efficiency.timeSinceLastImprovementMs ?? 'null'} |`,
+    )
+  }
+  return `${lines.join('\n')}\n`
+}
+
 function renderWarnings(warnings: readonly ResearchWarning[]): string {
   if (warnings.length === 0) return 'No practical monotonicity warnings.\n'
   return `${warnings.map((warning) => `- **Warning:** ${warning.message}; RMSE Δ=${number(warning.rmseDb.delta)} dB, maxAbs Δ=${number(warning.maxAbsDb.delta)} dB.`).join('\n')}\n`
@@ -144,6 +158,10 @@ function renderSummary(
     '',
     renderStability(input.aggregates).trimEnd(),
     '',
+    '## Work efficiency',
+    '',
+    renderWorkEfficiency(input.aggregates).trimEnd(),
+    '',
     '## Monotonicity warnings',
     '',
     renderWarnings(warnings).trimEnd(),
@@ -177,6 +195,7 @@ export function renderResearchArtifacts(input: ResearchReportInput): ResearchArt
       repeatIndex: run.repeatIndex,
       counters: run.counters,
       phaseTimingMs: run.phaseTimingMs,
+      workEfficiency: run.workEfficiency,
       jointRefinements: run.jointRefinements ?? [],
     }))
   const runArtifacts: ResearchRunArtifactV2[] = input.runs.map((run, index) => {

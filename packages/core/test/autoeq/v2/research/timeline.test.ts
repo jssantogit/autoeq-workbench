@@ -7,6 +7,7 @@ import {
 import {
   calculateTimeToQuality,
   projectTimeline,
+  RESEARCH_FINE_CHECKPOINTS_SECONDS,
   RESEARCH_TIMELINE_MARKS_MS,
 } from '../../../../benchmarks/research/timeline.js'
 import type { ResearchCheckpoint } from '../../../../benchmarks/research/types.js'
@@ -88,6 +89,25 @@ describe('research quality timeline', () => {
       maxAbs075Ms: null,
       jointTargetMs: null,
     })
+  })
+
+  it('exposes the fine diagnostic checkpoint schedule', () => {
+    expect(RESEARCH_FINE_CHECKPOINTS_SECONDS).toEqual([
+      0.5, 1, 2, 3, 5, 10, 15, 30, 60,
+    ])
+
+    const projected = projectTimeline([
+      checkpoint(400, 1.2, 2.5),
+      checkpoint(1_700, 0.8, 1.7),
+      checkpoint(3_200, 0.4, 1.2),
+    ], RESEARCH_FINE_CHECKPOINTS_SECONDS.map((seconds) => seconds * 1_000))
+
+    expect(projected.map(({ elapsedMs, metrics }) => [elapsedMs, metrics.rmseDb])).toEqual([
+      [500, 1.2],
+      [1_000, 1.2],
+      [2_000, 0.8],
+      [3_000, 0.8],
+    ])
   })
 
   it('keeps light timing separate from deep phase profiling and records run termination', () => {

@@ -35,13 +35,17 @@ import {
   RESEARCH_CORPUS_SHA256,
   RESEARCH_NORMALIZATION,
 } from './corpus.js'
-import { aggregateResearchRuns } from './aggregate.js'
+import { aggregateResearchRuns, summarizeResearchWorkEfficiency } from './aggregate.js'
 import {
   type ResearchArtifactFiles,
   writeResearchArtifacts,
 } from './report.js'
 import { RESEARCH_BANDS, createResearchTelemetry } from './telemetry.js'
-import { calculateTimeToQuality, projectTimeline } from './timeline.js'
+import {
+  calculateTimeToQuality,
+  projectTimeline,
+  RESEARCH_FINE_CHECKPOINTS_MS,
+} from './timeline.js'
 import type {
   ResearchAggregateRow,
   ResearchBaselineFile,
@@ -321,6 +325,12 @@ export async function runResearchCell(
   const elapsedMs = performance.now() - startedAt
   const verified = verifyMetrics(result, prepared.desiredDb, prepared.frequenciesHz)
   const snapshot = telemetry.snapshot()
+  const timeline = projectTimeline(snapshot.checkpoints, RESEARCH_FINE_CHECKPOINTS_MS)
+  const workEfficiency = summarizeResearchWorkEfficiency(
+    snapshot.jointRefinements,
+    timeline,
+    elapsedMs,
+  )
 
   return {
     caseId: options.caseId,
@@ -338,10 +348,11 @@ export async function runResearchCell(
     bands: verified.bands,
     counters: snapshot.counters,
     timeToQuality: calculateTimeToQuality(snapshot.checkpoints),
-    timeline: projectTimeline(snapshot.checkpoints),
+    timeline,
     filters: result.filters.map((filter) => ({ ...filter })),
     telemetryMode: snapshot.mode,
     phaseTimingMs: snapshot.phaseTimingMs,
+    workEfficiency,
     ...(snapshot.mode === 'deep' ? { jointRefinements: snapshot.jointRefinements } : {}),
   }
 }

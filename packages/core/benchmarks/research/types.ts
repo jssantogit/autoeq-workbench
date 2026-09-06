@@ -79,6 +79,21 @@ export interface ResearchTelemetrySnapshot {
   phasesObserved: StandardV2ResearchPhase[]
 }
 
+export interface ResearchWorkEfficiencySummary {
+  jointRefineRecords: number
+  expiredJointRefines: number
+  previouslyAttemptedEquivalent: number
+  previouslyCompletedEquivalent: number
+  retainedAfterStaging: number
+  retainedAsActivePath: number
+  contributedToBestDeliverable: number
+  coordinateTrials: number
+  coordinateTrialsContributingToBest: number
+  medianNormalizedViolationGainPerCompletedCycle: number | null
+  timeToBestMs: number | null
+  timeSinceLastImprovementMs: number | null
+}
+
 export interface ResearchJointRefineRecord extends StandardV2JointRefineRecord {
   equivalentStatePreviouslyAttempted: boolean
   equivalentStatePreviouslyCompleted: boolean
@@ -114,6 +129,7 @@ export interface ResearchRunRow {
   filters: Filter[]
   telemetryMode: 'light' | 'deep'
   phaseTimingMs: StandardV2ResearchPhaseTimingMs
+  workEfficiency: ResearchWorkEfficiencySummary
   jointRefinements?: ResearchJointRefineRecord[]
 }
 
@@ -132,6 +148,7 @@ export interface ResearchAggregateRow {
   elapsedMs: { best: number; median: number; worst: number; spread: number }
   peakWorkingFilterCount: { best: number; median: number; worst: number; spread: number }
   jointRefinementCount: { best: number; median: number; worst: number; spread: number }
+  workEfficiency: ResearchWorkEfficiencySummary
 }
 
 export interface ResearchBaselineIdentity {
