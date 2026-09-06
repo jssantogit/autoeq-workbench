@@ -8,3 +8,6 @@ coverage/
 *.log
 *.tsbuildinfo
 .worktrees/
+research/solver-lab/.venv/
+research/solver-lab/.artifacts/
+research/solver-lab/.cache/
