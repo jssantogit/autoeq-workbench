@@ -13,6 +13,7 @@
     "research:v2": "tsx benchmarks/research/run.ts",
     "research:v2:quick": "tsx benchmarks/research/run.ts --preset quick",
     "research:v2:full": "tsx benchmarks/research/run.ts --preset full",
+    "research:lab": "tsx benchmarks/research/labCli.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
