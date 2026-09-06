@@ -31,7 +31,7 @@ Each task uses one coherent branch/worktree, TDD first, focused verification, on
 
 ---
 
-### Task 1: Create the isolated Python solver-lab package and deterministic configuration contract
+### Task 1: Create the isolated Python solver-lab package and deterministic protocol types
 
 **Files:**
 - Create: `research/solver-lab/pyproject.toml`
@@ -76,6 +76,23 @@ class SolverLabCandidate:
     algorithmId: str
     seed: int | None
     filters: tuple[LabFilter, ...]
+
+@dataclass(frozen=True)
+class CanonicalMetricSet:
+    rmseDb: float
+    maxAbsDb: float
+    bandRmseDb: dict[str, float]
+
+@dataclass(frozen=True)
+class SolverLabEvaluation:
+    protocolVersion: Literal[1]
+    candidateId: str
+    valid: bool
+    rejectionReason: str | None
+    continuous: CanonicalMetricSet | None
+    deliverable: CanonicalMetricSet | None
+    deliverableFilters: tuple[LabFilter, ...]
+    cancellationTotalScore: float | None
 ```
 
 - [ ] **Step 1: Write RED parser tests**
@@ -88,7 +105,7 @@ def test_problem_round_trip_rejects_wrong_protocol(tmp_path):
         list(read_problems(path))
 ```
 
-Also test finite numeric arrays, SHA-256 shape, filter-type validation, deterministic JSON output ordering, and seed preservation.
+Also test finite numeric arrays, SHA-256 shape, filter-type validation, deterministic JSON output ordering, seed preservation, and parsing of valid/invalid canonical evaluations.
 
 - [ ] **Step 2: Run RED**
 
@@ -127,7 +144,7 @@ Do not add Jupyter, pandas, plotting, ML, or workflow libraries in this task.
 
 - [ ] **Step 4: Implement strict typed readers/writers**
 
-Unknown required enum values and malformed non-finite numeric data raise `ValueError`. Extra metadata fields may be preserved only inside a dedicated `metadata` dictionary introduced by a later protocol version; protocol v1 stays strict.
+Unknown required enum values and malformed non-finite numeric data raise `ValueError`. Protocol v1 stays strict; do not silently preserve unknown fields.
 
 - [ ] **Step 5: Ignore local heavy artifacts**
 
@@ -318,6 +335,8 @@ class ContinuousVectorLayout:
     filter_types: tuple[str, ...]
 
 
+def enumerate_oracle_layouts(filter_count: int) -> tuple[ContinuousVectorLayout, ...]: ...
+
 def decode_vector(problem: SolverLabProblem, layout: ContinuousVectorLayout, x: np.ndarray) -> tuple[LabFilter, ...]
 
 def scalarized_objective(
@@ -333,9 +352,20 @@ class ContinuousOptimizer(Protocol):
     def optimize(self, problem: SolverLabProblem, layout: ContinuousVectorLayout, seed: int, objective_weights: tuple[float, float], evaluation_budget: int) -> SolverLabCandidate: ...
 ```
 
-- [ ] **Step 1: Write RED vector-decoding tests**
+Exact outer topology ensemble for every `filter_count = N`:
 
-Use log-frequency coordinates for frequency, bounded linear gain coordinates, and log-Q coordinates for PK. Shelves always decode with `problem.bounds["shelfQ"]`.
+```text
+N PK
+1 LS + (N-1) PK
+(N-1) PK + 1 HS
+1 LS + (N-2) PK + 1 HS   # only when N >= 2
+```
+
+Filter order is canonicalized as LS first, then PK ordered by frequency, then HS. The Continuous Oracle is explicitly best-known rather than a proof of all possible repeated-shelf topologies; Deliverable Oracle structural mutation is responsible for testing additional type structure.
+
+- [ ] **Step 1: Write RED vector-decoding and topology tests**
+
+Require exactly the four layouts above where legal, no duplicate layout for `N=1`, log-frequency coordinates, bounded linear gain coordinates, and log-Q coordinates for PK. Shelves always decode with `problem.bounds["shelfQ"]`.
 
 - [ ] **Step 2: Implement vector layout/decoding**
 
@@ -351,15 +381,15 @@ Use a tiny synthetic one-peak problem and `evaluation_budget=200`; require each 
 
 - [ ] **Step 4: Implement Differential Evolution adapter**
 
-Use SciPy `differential_evolution`, explicit `seed`, `workers=1`, `updating="immediate"`, `polish=False`; enforce the evaluation budget through `maxiter/popsize` calculation and an objective-call counter that aborts when exhausted.
+Use SciPy `differential_evolution`, explicit `seed`, `workers=1`, `updating="immediate"`, `polish=False`; enforce the evaluation budget through an objective-call counter and terminate cleanly when exhausted.
 
 - [ ] **Step 5: Implement CMA-ES adapter**
 
-Use `cma.CMAEvolutionStrategy` with explicit `seed`, fixed bounds `[0, 1]` for normalized vectors, `verbose=-9`, and stop when the shared evaluation counter reaches budget.
+Use `cma.CMAEvolutionStrategy` with explicit `seed`, fixed normalized bounds `[0, 1]`, `verbose=-9`, and stop when the shared evaluation counter reaches budget.
 
 - [ ] **Step 6: Implement Powell polishing adapter**
 
-Powell is local polish only: it consumes an explicit seed candidate and cannot initialize itself from zero. Use SciPy `minimize(method="Powell")` with bounded normalized coordinates and remaining evaluation budget.
+Powell is local polish only: it consumes an explicit seed candidate and cannot initialize itself from zero. Use SciPy `minimize(method="Powell")` with bounded normalized coordinates and the remaining evaluation budget.
 
 - [ ] **Step 7: Verify and commit**
 
@@ -391,11 +421,13 @@ class OracleRunConfig:
     objective_weights: tuple[tuple[float, float], ...]
     evaluation_budget_per_run: int
 
+class CanonicalEvaluator:
+    def evaluate(self, problem: SolverLabProblem, candidates: Sequence[SolverLabCandidate]) -> tuple[SolverLabEvaluation, ...]: ...
 
 def build_continuous_frontier(
     problem: SolverLabProblem,
     config: OracleRunConfig,
-    canonical_evaluator: "CanonicalEvaluator",
+    canonical_evaluator: CanonicalEvaluator,
 ) -> tuple[SolverLabCandidate, ...]
 ```
 
@@ -407,7 +439,7 @@ Use a fake executable/script in tests to verify request grouping, deterministic 
 
 - [ ] **Step 2: Implement batch evaluator**
 
-Write candidates to a temporary JSONL file, call the canonical CLI once per batch, parse results, and require `candidateId` set equality. Any missing/extra ID fails the batch.
+Write candidates to a temporary JSONL file, call the canonical CLI once per batch, parse `SolverLabEvaluation`, and require candidate-ID set equality. Any missing/extra ID fails the batch.
 
 - [ ] **Step 3: Write RED ensemble test**
 
@@ -415,7 +447,7 @@ Stub optimizers with overlapping points and prove only canonically validated non
 
 - [ ] **Step 4: Implement ensemble schedule**
 
-For each `filter_count`, seed, objective weight pair, run DE and CMA-ES independently, then Powell-polish each result. Canonically evaluate all unique candidate filter vectors after deduplication. Preserve optimizer/seed provenance for every frontier point.
+For each configured `filter_count`, each exact layout from `enumerate_oracle_layouts`, each seed, and each objective-weight pair, run DE and CMA-ES independently, then Powell-polish each result. Canonically evaluate all unique candidate filter vectors after deduplication. Preserve optimizer/seed/layout provenance for every frontier point.
 
 Default calibration weights are exact:
 
@@ -490,21 +522,21 @@ Every mutation must preserve supported filter types, max filter count, finite pa
 
 - [ ] **Step 4: Implement structural neighborhood generation**
 
-Generate bounded proposal sets using residual-feature locations from the surrogate response. Split duplicates one filter into two nearby log-frequency centers with half initial gain; merge combines nearby same-type filters into weighted center/gain then reprojects.
+Generate bounded proposal sets using local extrema of the current residual on log frequency. Split duplicates one filter into two centers offset by `±1/24` octave with half initial gain; merge applies only to same-type filters within `1/12` octave and uses gain-magnitude-weighted log-frequency center plus summed gain before projection.
 
 - [ ] **Step 5: Write RED Deliverable Oracle test**
 
-On a small synthetic case, start from a continuous seed, quantize it, run a small deterministic mixed search, and assert the best canonically validated deliverable is no worse than the plain one-shot quantization in both axes unless the candidates are Pareto-incomparable; in that case require the final archive to contain the one-shot point.
+On a small synthetic case, start from a Continuous Oracle seed, quantize it, run a small deterministic mixed search, and assert the final canonical Pareto archive still contains the plain one-shot quantization unless another point dominates it.
 
 - [ ] **Step 6: Implement mixed search**
 
 Use an explicit archive plus three proposal mechanisms per generation:
 
 1. quantized local ±1 grid-step parameter neighbors;
-2. structural mutations;
+2. structural mutations from Step 4;
 3. continuous Powell polish around selected archive points followed by re-quantization.
 
-Use seeded stochastic selection only for choosing among proposal parents, record the seed, and periodically canonically validate the current non-dominated surrogate archive in batches.
+Use seeded stochastic selection only for choosing among proposal parents, record the seed, and canonically validate the current surrogate non-dominated archive in batches after every 10 generations and at the final generation.
 
 - [ ] **Step 7: Add console entry point**
 
@@ -564,18 +596,19 @@ export interface OracleCalibrationManifestV1 {
   qualityTimeFormulaVersion: 1
   materialImprovementThresholds: {
     minimumAggregateFrontierGainFraction: number
-    maximumPerCaseRegressionFraction: number
+    maximumPerCaseQualityRegressionFraction: number
+    maximumCatastrophicCaseRate: number
   }
 }
 ```
 
 - [ ] **Step 1: Write RED calibration tests**
 
-Use small synthetic frontiers and assert correct regret/gap direction, stable ordering, and explicit rejection of a manifest with negative/NaN thresholds.
+Use small synthetic frontiers and assert correct regret/gap direction, stable ordering, and explicit rejection of a manifest with negative, NaN, or >1 fractional thresholds.
 
 - [ ] **Step 2: Implement reports without inventing unavailable holdout thresholds**
 
-Calibration derives candidate threshold recommendations from development/adversarial distributions, but the final manifest values are supplied explicitly to the command after review. The command must not auto-open holdout or mutate the manifest later.
+Calibration derives threshold recommendations from development/adversarial distributions, but final manifest values are supplied explicitly to the command after review. The command must not auto-open holdout or mutate the manifest later.
 
 - [ ] **Step 3: Add CLI/report scripts**
 
@@ -612,7 +645,7 @@ git commit -m "feat(research): add oracle calibration reports"
 
 **Files:**
 - Create: `.github/workflows/autoeq-oracle-research.yml`
-- Modify only if needed: `research/solver-lab/pyproject.toml`
+- Modify only if required by the tested entry points: `research/solver-lab/pyproject.toml`
 
 **Interfaces:**
 - Manual `workflow_dispatch` inputs:
@@ -665,7 +698,7 @@ Do not choose numerical promotion thresholds until these artifacts are reviewed.
 
 - [ ] **Step 6: Freeze Oracle Calibration manifest**
 
-After reviewing development/adversarial results, write the explicit `OracleCalibrationManifestV1` values to the artifact set and record its SHA-256. This frozen manifest becomes a prerequisite input to the algorithm-family screening plan.
+After reviewing development/adversarial results, write explicit values for all three `materialImprovementThresholds` fields, store the manifest with the calibration artifacts, and record its SHA-256. This frozen manifest becomes a prerequisite input to the algorithm-family screening plan.
 
 ---
 
@@ -675,11 +708,11 @@ This plan is complete only when:
 
 1. Python surrogate DSP and quantization pass committed canonical parity fixtures;
 2. DE, CMA-ES, and Powell adapters are deterministic from recorded seeds/configuration;
-3. Continuous Oracle stores only canonically validated non-dominated points;
+3. Continuous Oracle explores the exact documented topology ensemble and stores only canonically validated non-dominated points;
 4. Deliverable Oracle uses the real product quantization/bounds contract and canonically validates its frontier;
 5. search/product/deliverability gaps are reported per case and filter cap;
 6. independent optimizer provenance is preserved for every frontier point;
-7. a versioned Oracle Calibration manifest is frozen before algorithm-family holdout work;
+7. a versioned Oracle Calibration manifest with all three acceptance-threshold fields is frozen before algorithm-family screening;
 8. no production solver/UI/session/export behavior has changed.
 
 The next plan may use the oracle frontiers and frozen calibration manifest for algorithm-family screening. Do not create a product solver rewrite directly from this plan.
