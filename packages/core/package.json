@@ -15,6 +15,7 @@
     "research:v2:full": "tsx benchmarks/research/run.ts --preset full",
     "research:lab": "tsx benchmarks/research/labCli.ts",
     "research:resumable": "tsx benchmarks/research/resumableRun.ts",
+    "research:capacity-tournament": "tsx benchmarks/research/capacityTournamentRun.ts",
     "research:parity-fixture": "tsx benchmarks/research/parityFixture.ts",
     "research:quantization-fixture": "tsx benchmarks/research/quantizationFixture.ts",
     "research:oracle-report": "tsx benchmarks/research/oracleReport.ts",
