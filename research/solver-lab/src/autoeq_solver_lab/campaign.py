@@ -134,6 +134,47 @@ def build_case_matrix(case_ids: Sequence[str], max_parallel: int = 8) -> dict[st
     return {"caseIds": list(normalized), "maxParallel": max_parallel}
 
 
+def select_campaign_case_ids(
+    available_case_ids: Sequence[str],
+    requested_case_ids: str | Sequence[str],
+    mode: CampaignMode,
+    previous_campaign_manifest: Mapping[str, Any] | None = None,
+) -> tuple[str, ...]:
+    available = tuple(sorted(available_case_ids))
+    if not available or len(set(available)) != len(available):
+        raise ValueError("selected corpus layer must contain unique approved cases")
+    if mode not in DEFAULT_STAGE_BUDGETS:
+        raise ValueError(f"unknown campaign mode {mode}")
+    if isinstance(requested_case_ids, str):
+        requested = tuple(case_id.strip() for case_id in requested_case_ids.split(",") if case_id.strip())
+    else:
+        requested = tuple(requested_case_ids)
+    if len(set(requested)) != len(requested):
+        raise ValueError("case_ids contains duplicates")
+    unknown = sorted(set(requested) - set(available))
+    if unknown:
+        raise ValueError(f"case IDs are not approved for the selected layer: {', '.join(unknown)}")
+    if requested:
+        return tuple(sorted(requested))
+    if mode in {"confirm", "deep"}:
+        if previous_campaign_manifest is None:
+            raise ValueError(f"{mode} campaign requires a previous aggregate or explicit case_ids")
+        if previous_campaign_manifest.get("complete") is not True:
+            raise ValueError("previous campaign is incomplete; adaptive escalation is unavailable")
+        convergence = previous_campaign_manifest.get("convergence")
+        if not isinstance(convergence, Mapping):
+            raise ValueError("previous campaign has no convergence assessments")
+        selected = tuple(sorted(
+            case_id
+            for case_id in available
+            if isinstance(convergence.get(case_id), Mapping) and convergence[case_id].get("unresolved") is True
+        ))
+        if not selected:
+            raise ValueError(f"previous campaign has no unresolved cases eligible for {mode}")
+        return selected
+    return available
+
+
 def _frontier_regret(source: Sequence[ObjectivePoint], target: Sequence[ObjectivePoint]) -> float:
     if not source:
         return 0.0
@@ -169,7 +210,9 @@ def decide_escalation(
     optimizer_regions_differ: bool,
 ) -> dict[str, Any]:
     reasons: list[str] = []
-    if frontier_comparison.get("materialChange") is True:
+    if frontier_comparison.get("comparisonAvailable") is False:
+        reasons.append("previous-stage-frontier-comparison-unavailable")
+    elif frontier_comparison.get("materialChange") is True:
         reasons.append("canonical-frontier-still-changing")
     if family_agreement_fraction is None or family_agreement_fraction < CONVERGENCE_FAMILY_AGREEMENT:
         reasons.append("independent-optimizer-frontiers-disagree")
@@ -446,11 +489,12 @@ def _case_convergence(
     *,
     diagnostic_family_agreement: float | None,
     optimizer_regions_differ: bool,
+    frontier_comparison: Mapping[str, Any],
 ) -> dict[str, Any]:
     cells = report.get("cells", [])
     if not isinstance(cells, Sequence):
         return decide_escalation(
-            frontier_comparison={"materialChange": False},
+            frontier_comparison=frontier_comparison,
             family_agreement_fraction=diagnostic_family_agreement,
             continuous_deliverable_gap=None,
             optimizer_regions_differ=optimizer_regions_differ,
@@ -458,7 +502,7 @@ def _case_convergence(
     cell = next((entry for entry in cells if isinstance(entry, Mapping) and entry.get("problemId") == case_id), None)
     if cell is None:
         return decide_escalation(
-            frontier_comparison={"materialChange": False},
+            frontier_comparison=frontier_comparison,
             family_agreement_fraction=diagnostic_family_agreement,
             continuous_deliverable_gap=None,
             optimizer_regions_differ=optimizer_regions_differ,
@@ -468,7 +512,7 @@ def _case_convergence(
     family_fraction = agreement.get("agreementFraction") if isinstance(agreement, Mapping) else None
     gap_value = gap.get("mean") if isinstance(gap, Mapping) else None
     return decide_escalation(
-        frontier_comparison={"materialChange": False},
+        frontier_comparison=frontier_comparison,
         family_agreement_fraction=(
             diagnostic_family_agreement
             if diagnostic_family_agreement is not None
@@ -492,6 +536,8 @@ def aggregate_case_artifacts(
     aggregate_artifact_name: str | None = None,
     pilot_artifact_name: str | None = None,
     pilot_artifact: Mapping[str, Any] | None = None,
+    previous_aggregate_dir: str | Path | None = None,
+    previous_run_id: str | None = None,
 ) -> dict[str, Any]:
     expected = tuple(sorted(expected_case_ids))
     if not expected or len(set(expected)) != len(expected):
@@ -645,14 +691,76 @@ def aggregate_case_artifacts(
         report["insufficiencyReasons"] = list(dict.fromkeys(reasons))
         report["manifest"] = None
 
+    previous_campaign: dict[str, Any] | None = None
+    previous_frontiers: dict[str, tuple[Any, ...]] = {}
+    frontier_comparisons: dict[str, dict[str, Any]] = {}
+    if previous_aggregate_dir is not None:
+        previous_root = Path(previous_aggregate_dir)
+        previous_manifest = _read_object(_require_file(previous_root, "campaign-manifest.json"))
+        if previous_manifest.get("complete") is not True:
+            raise ValueError("previous campaign aggregate is incomplete")
+        if previous_manifest.get("repositorySha") != repository_sha:
+            raise ValueError("previous campaign repository SHA does not match current campaign")
+        if previous_manifest.get("corpusLayer") != corpus_layer or previous_manifest.get("maxFilters") != max_filters:
+            raise ValueError("previous campaign corpus layer or maxFilters does not match")
+        previous_completed = set(previous_manifest.get("completedCaseIds", ()))
+        if not set(completed).issubset(previous_completed):
+            raise ValueError("previous campaign is missing a current case")
+        previous_control = _read_object(_require_file(previous_root, "control-aggregate.json"))
+        previous_continuous = _read_object(_require_file(previous_root, "continuous-aggregate.json"))
+        previous_deliverable = _read_object(_require_file(previous_root, "deliverable-aggregate.json"))
+        previous_validation = validate_oracle_campaign(
+            previous_control,
+            previous_continuous,
+            previous_deliverable,
+        )
+        if previous_validation.get("valid") is not True:
+            raise ValueError("previous campaign aggregate failed Oracle validity validation")
+        previous_frontier_points = load_oracle_points(previous_continuous, "continuous")
+        previous_frontiers = {
+            case_id: tuple(point.objective() for point in previous_frontier_points if point.problem_id == case_id)
+            for case_id in previous_manifest.get("completedCaseIds", ())
+        }
+        previous_campaign = {
+            "runId": previous_run_id,
+            "repositorySha": previous_manifest.get("repositorySha"),
+            "campaignMode": previous_manifest.get("campaignMode"),
+            "aggregateArtifactName": previous_manifest.get("aggregateArtifactName"),
+            "completedCaseIds": previous_manifest.get("completedCaseIds", []),
+        }
+
     convergence = {}
+    current_frontier_points = load_oracle_points(continuous, "continuous") if records else ()
     for case_id in completed:
         family_agreement, regions_differ = _diagnostic_family_agreement(records[case_id])
+        if previous_campaign is None:
+            frontier_comparison = {
+                "criterionVersion": CONVERGENCE_CRITERION_VERSION,
+                "comparisonAvailable": False,
+                "materialRegretThreshold": CONVERGENCE_MATERIAL_REGRET,
+                "previousPointCount": 0,
+                "currentPointCount": sum(point.problem_id == case_id for point in current_frontier_points),
+                "previousToCurrentNormalizedRegret": None,
+                "currentToPreviousNormalizedRegret": None,
+                "maxBidirectionalNormalizedRegret": None,
+                "materialChange": False,
+            }
+        else:
+            current_points = tuple(
+                point.objective() for point in current_frontier_points if point.problem_id == case_id
+            )
+            frontier_comparison = compare_canonical_frontiers(
+                previous_frontiers.get(case_id, ()),
+                current_points,
+            )
+            frontier_comparison = {"comparisonAvailable": True, **frontier_comparison}
+        frontier_comparisons[case_id] = frontier_comparison
         convergence[case_id] = _case_convergence(
             report,
             case_id,
             diagnostic_family_agreement=family_agreement,
             optimizer_regions_differ=regions_differ,
+            frontier_comparison=frontier_comparison,
         )
     if pilot_artifact is not None:
         report["convergencePilot"] = dict(pilot_artifact)
@@ -679,6 +787,8 @@ def aggregate_case_artifacts(
         "pilotArtifactName": pilot_artifact_name,
         "convergenceCriterionVersion": CONVERGENCE_CRITERION_VERSION,
         "convergence": convergence,
+        "frontierComparisons": frontier_comparisons,
+        "previousCampaign": previous_campaign,
         "campaignValidation": validation,
         "calibrationStatus": report.get("status"),
         "calibrationFrozen": False,
@@ -691,6 +801,8 @@ def aggregate_case_artifacts(
             "objectiveWeightsVersion": first["continuous"].get("config", {}).get("objectiveWeightsVersion", "continuous-objectives-v1"),
         })
     report["campaignEvidence"] = campaign_manifest
+    report["convergence"] = convergence
+    report["frontierComparisons"] = frontier_comparisons
     _write_json(output / "calibration-report.json", report)
     _write_json(output / "campaign-manifest.json", campaign_manifest)
     return campaign_manifest
@@ -784,6 +896,8 @@ def _main(argv: Sequence[str] | None = None) -> None:
     aggregate_parser.add_argument("--aggregate-artifact-name")
     aggregate_parser.add_argument("--pilot-artifact-name")
     aggregate_parser.add_argument("--pilot")
+    aggregate_parser.add_argument("--previous-aggregate-dir")
+    aggregate_parser.add_argument("--previous-run-id")
 
     manifest_parser = subparsers.add_parser("case-manifest")
     manifest_parser.add_argument("--artifact-dir", required=True)
@@ -834,6 +948,8 @@ def _main(argv: Sequence[str] | None = None) -> None:
         aggregate_artifact_name=args.aggregate_artifact_name,
         pilot_artifact_name=args.pilot_artifact_name,
         pilot_artifact=pilot,
+        previous_aggregate_dir=args.previous_aggregate_dir,
+        previous_run_id=args.previous_run_id,
     )
 
 

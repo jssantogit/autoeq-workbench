@@ -20,6 +20,11 @@ on:
         required: false
         default: ''
         type: string
+      previous_run_id:
+        description: Previous same-SHA campaign run used for adaptive frontier comparison
+        required: false
+        default: ''
+        type: string
       max_filters:
         description: Maximum product filter capacity
         required: true
@@ -49,6 +54,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   prepare:
@@ -75,6 +81,21 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Install research solver lab
         run: python -m pip install --upgrade pip && python -m pip install -e 'research/solver-lab[test]'
+      - name: Download previous aggregate for adaptive planning
+        if: ${{ inputs.previous_run_id != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS_RUN_ID: ${{ inputs.previous_run_id }}
+          CORPUS_LAYER: ${{ inputs.corpus_layer }}
+          MAX_FILTERS: ${{ inputs.max_filters }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/previous-campaign"
+          artifact_name="autoeq-oracle-${PREVIOUS_RUN_ID}-${CORPUS_LAYER}-max${MAX_FILTERS}-aggregate"
+          gh run download "$PREVIOUS_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$artifact_name" \
+            --dir "$GITHUB_WORKSPACE/previous-campaign"
       - name: Export approved case plan
         env:
           CORPUS_LAYER: ${{ inputs.corpus_layer }}
@@ -83,6 +104,7 @@ jobs:
           CAMPAIGN_MODE: ${{ inputs.campaign_mode }}
           SEED_POOL: ${{ inputs.seeds }}
           BUDGET_OVERRIDE: ${{ inputs.continuous_eval_budget }}
+          REPOSITORY_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           mkdir -p campaign-plan
@@ -96,29 +118,26 @@ jobs:
           fi
           PYTHONPATH=research/solver-lab/src python -m autoeq_solver_lab.campaign \
             stage-config "${stage_args[@]}" --out "$GITHUB_WORKSPACE/campaign-plan/stage-config.json"
-          python - "$CASE_SELECTION" "$GITHUB_WORKSPACE/campaign-plan/problems.jsonl" "$GITHUB_WORKSPACE/campaign-plan/case-ids.json" <<'PY'
+          PYTHONPATH=research/solver-lab/src python - "$CASE_SELECTION" "$CAMPAIGN_MODE" "$GITHUB_WORKSPACE/campaign-plan/problems.jsonl" "$GITHUB_WORKSPACE/previous-campaign/oracle-aggregate/campaign-manifest.json" "$GITHUB_WORKSPACE/campaign-plan/case-ids.json" <<'PY'
           import json
+          import os
           import sys
           from pathlib import Path
 
-          selection = tuple(case_id for case_id in sys.argv[1].split(',') if case_id)
           available = sorted(
               json.loads(line)["problemId"]
               for line in Path(sys.argv[2]).read_text(encoding="utf-8").splitlines()
               if line.strip()
           )
-          if selection:
-              unknown = sorted(set(selection) - set(available))
-              if unknown:
-                  raise SystemExit(f"case IDs are not approved for the selected layer: {', '.join(unknown)}")
-              if len(set(selection)) != len(selection):
-                  raise SystemExit("case_ids contains duplicates")
-              selected = sorted(selection)
-          else:
-              selected = available
-          if not selected:
-              raise SystemExit("selected corpus layer has no approved cases")
-          Path(sys.argv[3]).write_text(json.dumps(selected, separators=(',', ':')) + "\n", encoding="utf-8")
+          previous_path = Path(sys.argv[4])
+          previous = None
+          if previous_path.is_file():
+              previous = json.loads(previous_path.read_text(encoding="utf-8"))
+              if previous.get("repositorySha") != os.environ["REPOSITORY_SHA"]:
+                  raise SystemExit("previous campaign repository SHA does not match current campaign")
+          from autoeq_solver_lab.campaign import select_campaign_case_ids
+          selected = select_campaign_case_ids(available, sys.argv[1], sys.argv[2], previous)
+          Path(sys.argv[5]).write_text(json.dumps(selected, separators=(',', ':')) + "\n", encoding="utf-8")
           PY
       - name: Publish deterministic campaign plan
         id: plan
@@ -357,9 +376,24 @@ jobs:
           pattern: ${{ needs.prepare.outputs.artifact_prefix }}-*
           path: case-artifacts
           merge-multiple: false
+      - name: Download previous aggregate for frontier comparison
+        if: ${{ inputs.previous_run_id != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS_RUN_ID: ${{ inputs.previous_run_id }}
+          CORPUS_LAYER: ${{ inputs.corpus_layer }}
+          MAX_FILTERS: ${{ inputs.max_filters }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/previous-campaign"
+          artifact_name="autoeq-oracle-${PREVIOUS_RUN_ID}-${CORPUS_LAYER}-max${MAX_FILTERS}-aggregate"
+          gh run download "$PREVIOUS_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$artifact_name" \
+            --dir "$GITHUB_WORKSPACE/previous-campaign"
       - name: Download convergence pilot
+        if: ${{ inputs.campaign_mode == 'deep' || inputs.campaign_mode == 'full' }}
         uses: actions/download-artifact@v4
-        continue-on-error: true
         with:
           name: ${{ needs.prepare.outputs.artifact_prefix }}-pilot
           path: pilot
@@ -373,6 +407,7 @@ jobs:
           STAGE_CONFIG: ${{ needs.prepare.outputs.stage_config }}
           AGGREGATE_ARTIFACT_NAME: ${{ needs.prepare.outputs.artifact_prefix }}-aggregate
           PILOT_ARTIFACT_NAME: ${{ needs.prepare.outputs.artifact_prefix }}-pilot
+          PREVIOUS_RUN_ID: ${{ inputs.previous_run_id }}
         run: |
           set +e
           mkdir -p oracle-aggregate
@@ -391,6 +426,12 @@ jobs:
           )
           if [[ -f pilot/convergence-pilot.json ]]; then
             aggregate_args+=(--pilot pilot/convergence-pilot.json)
+          fi
+          if [[ -n "$PREVIOUS_RUN_ID" ]]; then
+            aggregate_args+=(
+              --previous-aggregate-dir previous-campaign/oracle-aggregate
+              --previous-run-id "$PREVIOUS_RUN_ID"
+            )
           fi
           PYTHONPATH=research/solver-lab/src python -m autoeq_solver_lab.campaign "${aggregate_args[@]}"
           status=$?

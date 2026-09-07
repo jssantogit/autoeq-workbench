@@ -11,6 +11,7 @@ from autoeq_solver_lab.campaign import (
     build_stage_config,
     compare_canonical_frontiers,
     decide_escalation,
+    select_campaign_case_ids,
     stable_seed_prefix,
     aggregate_case_artifacts,
     write_case_manifest,
@@ -61,6 +62,26 @@ def test_case_matrix_is_sorted_and_has_bounded_parallelism():
         build_case_matrix(("case-a",), max_parallel=0)
 
 
+def test_adaptive_case_selection_uses_only_previous_unresolved_cases():
+    available = ("case-a", "case-b", "case-c")
+    previous = {
+        "complete": True,
+        "convergence": {
+            "case-a": {"unresolved": False},
+            "case-b": {"unresolved": True},
+            "case-c": {"unresolved": True},
+        },
+    }
+
+    assert select_campaign_case_ids(available, "", "screen") == available
+    assert select_campaign_case_ids(available, "", "confirm", previous) == ("case-b", "case-c")
+    assert select_campaign_case_ids(available, "case-a", "deep", previous) == ("case-a",)
+    with pytest.raises(ValueError, match="previous aggregate"):
+        select_campaign_case_ids(available, "", "confirm")
+    with pytest.raises(ValueError, match="not approved"):
+        select_campaign_case_ids(available, "case-x", "screen")
+
+
 def test_workflow_declares_case_matrix_and_deterministic_aggregation():
     workflow = Path(__file__).parents[3] / ".github" / "workflows" / "autoeq-oracle-research.yml"
     text = workflow.read_text(encoding="utf-8")
@@ -75,6 +96,9 @@ def test_workflow_declares_case_matrix_and_deterministic_aggregation():
     assert '--out "$GITHUB_WORKSPACE/campaign-plan/problems.jsonl"' in text
     assert '--out "$GITHUB_WORKSPACE/oracle-artifacts/problems.jsonl"' in text
     assert 'aggregate_args+=(--pilot pilot/convergence-pilot.json)' in text
+    assert "previous_run_id:" in text
+    assert "--previous-aggregate-dir previous-campaign/oracle-aggregate" in text
+    assert "inputs.campaign_mode == 'deep' || inputs.campaign_mode == 'full'" in text
 
 
 def test_convergence_comparison_reports_material_frontier_change():
@@ -349,6 +373,52 @@ def test_case_aggregation_marks_missing_cases_incomplete(tmp_path: Path):
     report = json.loads((tmp_path / "aggregate" / "calibration-report.json").read_text(encoding="utf-8"))
     assert report["status"] == "insufficient"
     assert any("missing" in error for error in report["campaignValidation"]["errors"])
+
+
+def test_case_aggregation_records_previous_stage_frontier_delta(tmp_path: Path):
+    screen = build_stage_config("screen", SEED_POOL)
+    confirm = build_stage_config("confirm", SEED_POOL)
+    previous_case = tmp_path / "previous-case"
+    current_case = tmp_path / "current-case"
+    _make_case_artifact(previous_case, "case-a", screen)
+    _make_case_artifact(current_case, "case-a", confirm)
+
+    aggregate_case_artifacts(
+        [previous_case],
+        expected_case_ids=("case-a",),
+        repository_sha="a" * 40,
+        corpus_layer="adversarial",
+        max_filters=1,
+        output_dir=tmp_path / "previous-aggregate",
+        stage_config=screen,
+        aggregate_artifact_name="screen-aggregate",
+    )
+    current_manifest = aggregate_case_artifacts(
+        [current_case],
+        expected_case_ids=("case-a",),
+        repository_sha="a" * 40,
+        corpus_layer="adversarial",
+        max_filters=1,
+        output_dir=tmp_path / "current-aggregate",
+        stage_config=confirm,
+        aggregate_artifact_name="confirm-aggregate",
+        previous_aggregate_dir=tmp_path / "previous-aggregate",
+        previous_run_id="screen-run",
+    )
+
+    comparison = current_manifest["convergence"]["case-a"]["measured"]["frontierComparison"]
+    assert current_manifest["previousCampaign"] == {
+        "runId": "screen-run",
+        "repositorySha": "a" * 40,
+        "campaignMode": "screen",
+        "aggregateArtifactName": "screen-aggregate",
+        "completedCaseIds": ["case-a"],
+    }
+    assert comparison["comparisonAvailable"] is True
+    assert comparison["materialChange"] is False
+    assert comparison["maxBidirectionalNormalizedRegret"] == 0.0
+    report = json.loads((tmp_path / "current-aggregate" / "calibration-report.json").read_text(encoding="utf-8"))
+    assert report["frontierComparisons"]["case-a"] == comparison
 
 
 def test_case_aggregation_rejects_sha_mismatch(tmp_path: Path):
