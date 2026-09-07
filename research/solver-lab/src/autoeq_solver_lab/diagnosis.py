@@ -35,6 +35,10 @@ def _positive_int(value: object, label: str) -> int:
     return value
 
 
+def _optional_metric_for_sort(value: object, label: str) -> float:
+    return float("inf") if value is None else _finite_number(value, label)
+
+
 def load_warm_start_candidates(
     artifact: object,
     problems: Sequence[SolverLabProblem],
@@ -90,8 +94,8 @@ def load_warm_start_candidates(
             seed=None,
             filters=filters,
         )
-        rmse = _finite_number(final.get("rmseDb", float("inf")), "warm-start final.rmseDb")
-        max_abs = _finite_number(final.get("maxAbsDb", float("inf")), "warm-start final.maxAbsDb")
+        rmse = _optional_metric_for_sort(final.get("rmseDb"), "warm-start final.rmseDb")
+        max_abs = _optional_metric_for_sort(final.get("maxAbsDb"), "warm-start final.maxAbsDb")
         repeat_index = raw_row.get("repeatIndex", 0)
         if isinstance(repeat_index, bool) or not isinstance(repeat_index, int):
             raise ValueError("warm-start repeatIndex must be an integer")
