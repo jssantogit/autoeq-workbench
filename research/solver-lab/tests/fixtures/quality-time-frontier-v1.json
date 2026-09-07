@@ -1,0 +1,50 @@
+[
+  {
+    "id": "constant-zero",
+    "points": [
+      { "elapsedSeconds": 0.0, "regret": 0.0 },
+      { "elapsedSeconds": 60.0, "regret": 0.0 }
+    ],
+    "score": 1.0
+  },
+  {
+    "id": "constant-one",
+    "points": [
+      { "elapsedSeconds": 0.0, "regret": 1.0 }
+    ],
+    "score": 0.36787944117144233
+  },
+  {
+    "id": "improvement-at-five",
+    "points": [
+      { "elapsedSeconds": 0.0, "regret": 1.0 },
+      { "elapsedSeconds": 5.0, "regret": 0.0 }
+    ],
+    "score": 0.6959762117755853
+  },
+  {
+    "id": "duplicate-timestamp-keep-last",
+    "points": [
+      { "elapsedSeconds": 0.0, "regret": 1.0 },
+      { "elapsedSeconds": 5.0, "regret": 0.0 },
+      { "elapsedSeconds": 5.0, "regret": 1.0 }
+    ],
+    "score": 0.3678794411714424
+  },
+  {
+    "id": "update-at-sixty",
+    "points": [
+      { "elapsedSeconds": 0.0, "regret": 1.0 },
+      { "elapsedSeconds": 60.0, "regret": 0.0 }
+    ],
+    "score": 0.36787944117144233
+  },
+  {
+    "id": "early-finish-held",
+    "points": [
+      { "elapsedSeconds": 0.0, "regret": 0.3 },
+      { "elapsedSeconds": 10.0, "regret": 0.2 }
+    ],
+    "score": 0.7699776480380188
+  }
+]
