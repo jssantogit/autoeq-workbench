@@ -11,12 +11,19 @@ on:
 
 permissions:
   contents: read
+  actions: read
+
+env:
+  FROZEN_CONTROL_SHA: 5dafaa50410b9fa3157c28a1f7757d676b33152a
+  DIAGNOSIS_MARKER: '[oracle-diagnosis]'
 
 jobs:
   verify-diagnosis:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
       - uses: pnpm/action-setup@v4
         with:
           version: 10.34.5
@@ -31,10 +38,164 @@ jobs:
       - name: Install research solver lab
         run: python -m pip install --upgrade pip && python -m pip install -e 'research/solver-lab[test]'
       - name: Run diagnosis-focused Python tests
-        run: python -m pytest -q research/solver-lab/tests/test_diagnostics.py
+        run: python -m pytest -q research/solver-lab/tests/test_diagnostics.py research/solver-lab/tests/test_oracle_diagnosis.py
       - name: Run full Python solver-lab tests
         run: python -m pytest -q research/solver-lab/tests
       - name: Verify research TypeScript tests
         run: pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2/research
       - name: Verify core typecheck
         run: pnpm --filter @autoeq-workbench/core typecheck
+
+  prepare-diagnosis-inputs:
+    needs: verify-diagnosis
+    if: contains(github.event.head_commit.message, '[oracle-diagnosis]')
+    runs-on: ubuntu-latest
+    outputs:
+      case_matrix: ${{ steps.matrix.outputs.case_matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Download SCREEN aggregate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 34110098435 --repo "$GITHUB_REPOSITORY" --name autoeq-oracle-34110098435-adversarial-max10-aggregate --dir inputs/screen
+      - name: Download CONFIRM aggregate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 34110901484 --repo "$GITHUB_REPOSITORY" --name autoeq-oracle-34110901484-adversarial-max10-aggregate --dir inputs/confirm
+      - name: Download DEEP aggregate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 34112286380 --repo "$GITHUB_REPOSITORY" --name autoeq-oracle-34112286380-adversarial-max10-aggregate --dir inputs/deep
+      - name: Download coherent warm-start artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 33987922969 --repo "$GITHUB_REPOSITORY" --name autoeq-research-33987922969 --dir inputs/historical-coherent
+      - name: Download general warm-start artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 33987602951 --repo "$GITHUB_REPOSITORY" --name autoeq-research-33987602951 --dir inputs/historical-general
+      - name: Download Standard-v1 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 33960904540 --repo "$GITHUB_REPOSITORY" --name autoeq-research-33960904540 --dir inputs/historical-v1
+      - name: Record Standard-v1 run provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/33960904540" --jq '{sha: .head_sha, runId: (.id | tostring)}' > inputs/historical-v1/metadata.json
+      - name: Set diagnosis case matrix
+        id: matrix
+        run: echo 'case_matrix={"case":["synthetic-narrow-peak","titan-to-storm","titan-to-u12t","titan-to-trio"]}' >> "$GITHUB_OUTPUT"
+      - name: Upload diagnosis inputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle-diagnosis-inputs-${{ github.sha }}
+          path: inputs
+          if-no-files-found: error
+          retention-days: 14
+
+  diagnosis-case:
+    needs: prepare-diagnosis-inputs
+    if: contains(github.event.head_commit.message, '[oracle-diagnosis]')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.prepare-diagnosis-inputs.outputs.case_matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - name: Install research solver lab
+        run: python -m pip install --upgrade pip && python -m pip install -e 'research/solver-lab[test]'
+      - name: Download diagnosis inputs
+        uses: actions/download-artifact@v4
+        with:
+          name: oracle-diagnosis-inputs-${{ github.sha }}
+          path: inputs
+      - name: Export exact current problem
+        run: pnpm --filter @autoeq-workbench/core research:lab -- export-problems --layer adversarial --case-id '${{ matrix.case }}' --max-filters 10 --out "inputs/${{ matrix.case }}-problems.jsonl"
+      - name: Generate CAP20/CAP40 current product controls
+        if: matrix.case != 'synthetic-narrow-peak'
+        run: |
+          pnpm --filter @autoeq-workbench/core research:oracle-report -- --layer adversarial --case-id '${{ matrix.case }}' --max-filters 20 --budget-seconds 30 --repository-sha "$GITHUB_SHA" --out "inputs/cap20-${{ matrix.case }}.json"
+          pnpm --filter @autoeq-workbench/core research:oracle-report -- --layer adversarial --case-id '${{ matrix.case }}' --max-filters 40 --budget-seconds 30 --repository-sha "$GITHUB_SHA" --out "inputs/cap40-${{ matrix.case }}.json"
+      - name: Run selective diagnosis case
+        run: |
+          extra_capacity=""
+          if [ '${{ matrix.case }}' != 'synthetic-narrow-peak' ]; then
+            extra_capacity="--capacity-control-20 inputs/cap20-${{ matrix.case }}.json --capacity-control-40 inputs/cap40-${{ matrix.case }}.json"
+          fi
+          python -m autoeq_solver_lab.oracle_diagnosis case \
+            --problems "inputs/${{ matrix.case }}-problems.jsonl" \
+            --case-id '${{ matrix.case }}' \
+            --control inputs/deep/oracle-aggregate/control-aggregate.json \
+            --screen inputs/screen/oracle-aggregate/continuous-aggregate.json \
+            --confirm inputs/confirm/oracle-aggregate/continuous-aggregate.json \
+            --deep inputs/deep/oracle-aggregate/continuous-aggregate.json \
+            --historical-coherent inputs/historical-coherent/results.json \
+            --historical-general inputs/historical-general/results.json \
+            --historical-v1 inputs/historical-v1/v1-probe.json \
+            --historical-coherent-metadata inputs/historical-coherent/metadata.json \
+            --historical-general-metadata inputs/historical-general/metadata.json \
+            --historical-v1-metadata inputs/historical-v1/metadata.json \
+            --existing-calibration inputs/deep/oracle-aggregate/calibration-report.json \
+            --repository-sha "$GITHUB_SHA" \
+            --frozen-control-sha "$FROZEN_CONTROL_SHA" \
+            $extra_capacity \
+            --out "diagnosis-${{ matrix.case }}.json"
+      - name: Upload diagnosis case report
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnosis-case-${{ matrix.case }}
+          path: diagnosis-${{ matrix.case }}.json
+          if-no-files-found: error
+          retention-days: 14
+
+  aggregate-diagnosis:
+    needs: diagnosis-case
+    if: always() && contains(github.event.head_commit.message, '[oracle-diagnosis]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install research solver lab
+        run: python -m pip install --upgrade pip && python -m pip install -e 'research/solver-lab[test]'
+      - name: Download case reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: diagnosis-case-*
+          path: reports
+          merge-multiple: true
+      - name: Aggregate deterministic diagnosis report
+        run: |
+          python -m autoeq_solver_lab.oracle_diagnosis aggregate \
+            --reports reports/diagnosis-*.json \
+            --expected-case-ids synthetic-narrow-peak titan-to-storm titan-to-u12t titan-to-trio \
+            --repository-sha "$GITHUB_SHA" \
+            --frozen-control-sha "$FROZEN_CONTROL_SHA" \
+            --out oracle-diagnosis-report-v1.json
+      - name: Upload diagnosis report
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle-diagnosis-report-v1-${{ github.sha }}
+          path: oracle-diagnosis-report-v1.json
+          if-no-files-found: error
+          retention-days: 30

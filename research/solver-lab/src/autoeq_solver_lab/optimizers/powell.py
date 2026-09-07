@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import numpy as np
 from scipy.optimize import minimize
 
@@ -30,6 +32,7 @@ class PowellOptimizer(ContinuousOptimizer):
         objective_weights: tuple[float, float],
         evaluation_budget: int,
         initial_candidate: SolverLabCandidate | None = None,
+        objective: Callable[[np.ndarray], float] | None = None,
     ) -> SolverLabCandidate:
         validate_optimizer_inputs(problem, layout, seed, objective_weights, evaluation_budget)
         if initial_candidate is None:
@@ -38,9 +41,9 @@ class PowellOptimizer(ContinuousOptimizer):
             raise ValueError("Powell initial candidate does not belong to the problem")
         initial_vector = encode_filters(problem, layout, initial_candidate.filters)
         tracker = ObjectiveTracker(
-            lambda vector: scalarized_objective(
+            objective if objective is not None else (lambda vector: scalarized_objective(
                 problem, layout, vector, objective_weights[0], objective_weights[1]
-            ),
+            )),
             evaluation_budget,
         )
 
@@ -60,6 +63,7 @@ class PowellOptimizer(ContinuousOptimizer):
             )
         except EvaluationBudgetExhausted:
             pass
+        self.last_evaluation_count = tracker.evaluations
         vector = tracker.best_vector if tracker.best_vector is not None else initial_vector
         return candidate_from_vector(
             problem, layout, vector, self.algorithm_id, seed, self.run_index

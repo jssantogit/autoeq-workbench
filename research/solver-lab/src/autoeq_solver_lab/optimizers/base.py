@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Protocol
+from typing import Protocol
 
 import numpy as np
 
@@ -41,6 +42,7 @@ class ContinuousOptimizer(Protocol):
         objective_weights: tuple[float, float],
         evaluation_budget: int,
         initial_candidate: SolverLabCandidate | None = None,
+        objective: Callable[[np.ndarray], float] | None = None,
     ) -> SolverLabCandidate:
         ...
 

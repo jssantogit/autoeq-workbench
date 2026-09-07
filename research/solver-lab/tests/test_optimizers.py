@@ -1,12 +1,17 @@
+import autoeq_solver_lab.optimizers.powell as powell_module
 import numpy as np
-
+from autoeq_solver_lab.diagnostics import (
+    DiagnosticObjective,
+    diagnostic_objective_callable,
+)
 from autoeq_solver_lab.dsp import cascade_response_db
 from autoeq_solver_lab.metrics import error_metrics
 from autoeq_solver_lab.objectives import encode_filters, enumerate_oracle_layouts
 from autoeq_solver_lab.optimizers.cma_es import CmaEsOptimizer
-from autoeq_solver_lab.optimizers.differential_evolution import DifferentialEvolutionOptimizer
+from autoeq_solver_lab.optimizers.differential_evolution import (
+    DifferentialEvolutionOptimizer,
+)
 from autoeq_solver_lab.optimizers.powell import PowellOptimizer
-import autoeq_solver_lab.optimizers.powell as powell_module
 from autoeq_solver_lab.types import LabFilter, SolverLabCandidate, SolverLabProblem
 
 
@@ -141,3 +146,56 @@ def test_cma_uses_explicit_initial_candidate_as_the_neighborhood_center():
     expected = encode_filters(lab_problem, layout, initial.filters)
     actual = encode_filters(lab_problem, layout, seeded.filters)
     assert np.allclose(actual, expected, rtol=0.0, atol=1e-12)
+
+
+def test_global_optimizers_accept_a_diagnostic_objective_callable():
+    lab_problem, _ = one_peak_problem()
+    layout = enumerate_oracle_layouts(1)[0]
+    spec = DiagnosticObjective(
+        kind="tchebycheff",
+        rmse_weight=0.5,
+        max_abs_weight=0.5,
+        rmse_scale=1.0,
+        max_abs_scale=1.0,
+    )
+    diagnostic_objective = diagnostic_objective_callable(lab_problem, layout, spec)
+    calls: list[np.ndarray] = []
+
+    def tracked(vector: np.ndarray) -> float:
+        calls.append(np.asarray(vector, dtype=np.float64).copy())
+        return diagnostic_objective(vector)
+
+    for optimizer in (DifferentialEvolutionOptimizer(), CmaEsOptimizer()):
+        optimizer.optimize(
+            lab_problem,
+            layout,
+            11,
+            (1.0, 0.0),
+            20,
+            objective=tracked,
+        )
+
+    assert len(calls) > 0
+    assert all(np.all((call >= 0.0) & (call <= 1.0)) for call in calls)
+
+
+def test_optimizers_record_the_actual_objective_evaluation_count():
+    lab_problem, _ = one_peak_problem()
+    layout = enumerate_oracle_layouts(1)[0]
+    initial = SolverLabCandidate(
+        protocolVersion=1,
+        problemId=lab_problem.problemId,
+        inputSha256=lab_problem.inputSha256,
+        candidateId="seed",
+        algorithmId="seed",
+        seed=None,
+        filters=(LabFilter("seed-filter", True, "PK", 850.0, 3.0, 1.0),),
+    )
+
+    for optimizer, kwargs in (
+        (DifferentialEvolutionOptimizer(), {}),
+        (CmaEsOptimizer(), {}),
+        (PowellOptimizer(), {"initial_candidate": initial}),
+    ):
+        optimizer.optimize(lab_problem, layout, 11, (1.0, 0.0), 5, **kwargs)
+        assert 0 < optimizer.last_evaluation_count <= 5

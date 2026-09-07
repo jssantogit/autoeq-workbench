@@ -2,15 +2,27 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
+import pytest
 from autoeq_solver_lab.diagnostics import (
     DiagnosticObjective,
     build_reference_candidate,
+    classify_causal_mechanisms,
+    classify_practical_convergence,
+    compare_frontier_snapshots,
+    diagnostic_objective_callable,
     infer_layout_from_filters,
     objective_value,
     reference_candidates_from_artifact,
     summarize_capacity_gap,
 )
-from autoeq_solver_lab.types import CanonicalMetricSet, LabFilter, SolverLabEvaluation, SolverLabProblem
+from autoeq_solver_lab.types import (
+    CanonicalMetricSet,
+    LabFilter,
+    ObjectivePoint,
+    SolverLabEvaluation,
+    SolverLabProblem,
+)
 
 
 def _problem(max_filters: int = 10) -> SolverLabProblem:
@@ -174,3 +186,92 @@ def test_capacity_gap_summary_separates_quality_gain_from_filter_count() -> None
     assert summary["bestCap"] == 40
     assert summary["cap10To20GainFraction"] > 0.2
     assert summary["cap20To40GainFraction"] < 0.05
+
+
+def test_diagnostic_objective_callable_evaluates_normalized_axes() -> None:
+    problem = _problem()
+    layout = infer_layout_from_filters((_filter("pk", "PK", 1000.0),))
+    spec = DiagnosticObjective(
+        kind="weighted-sum",
+        rmse_weight=0.75,
+        max_abs_weight=0.25,
+        rmse_scale=2.0,
+        max_abs_scale=4.0,
+    )
+
+    value = diagnostic_objective_callable(problem, layout, spec)(np.full(3, 0.5))
+
+    assert math.isfinite(value)
+    assert value >= 0.0
+
+
+def test_reference_artifact_rejects_source_sha_and_artifact_mismatch() -> None:
+    problem = _problem()
+    artifact = {
+        "version": 1,
+        "oracle": "reference-seeds",
+        "sourceAlgorithm": "coherent-warm-start",
+        "repositorySha": "historical-sha",
+        "sourceRunId": "33987922969",
+        "sourceArtifactId": "9975764396",
+        "points": [],
+    }
+
+    with pytest.raises(ValueError, match="source artifact ID"):
+        reference_candidates_from_artifact(
+            problem,
+            artifact,
+            expected_repository_sha="historical-sha",
+            expected_run_id="33987922969",
+            expected_artifact_id="different-artifact",
+        )
+
+
+def test_frontier_snapshot_reports_movement_and_domination_changes() -> None:
+    control = ObjectivePoint("control", 1.0, 1.0, 10)
+    previous = (control, ObjectivePoint("old", 0.8, 1.2, 10))
+    current = (control, ObjectivePoint("new", 0.7, 0.9, 10))
+
+    comparison = compare_frontier_snapshots(previous, current, control=control)
+
+    assert comparison["newNondominatedPointIds"] == ["new"]
+    assert set(comparison["removedThroughDominationPointIds"]) == {"control", "old"}
+    assert math.isclose(comparison["bestRmseGainDb"], 0.1, rel_tol=0.0, abs_tol=1e-12)
+    assert math.isclose(comparison["bestMaxAbsGainDb"], 0.1, rel_tol=0.0, abs_tol=1e-12)
+    assert comparison["controlDominationStatus"]["current"] == "dominated"
+    assert comparison["maxBidirectionalNormalizedRegret"] > 0.05
+
+
+def test_practical_convergence_uses_frontier_movement_before_family_agreement() -> None:
+    converged = classify_practical_convergence({
+        "comparisonAvailable": True,
+        "maxBidirectionalNormalizedRegret": 0.0,
+        "materialRegretThreshold": 0.05,
+    })
+    moving = classify_practical_convergence({
+        "comparisonAvailable": True,
+        "maxBidirectionalNormalizedRegret": 0.2,
+        "materialRegretThreshold": 0.05,
+    })
+    ambiguous = classify_practical_convergence({
+        "comparisonAvailable": False,
+        "maxBidirectionalNormalizedRegret": None,
+        "materialRegretThreshold": 0.05,
+    })
+
+    assert converged == "converged"
+    assert moving == "still-moving"
+    assert ambiguous == "ambiguous"
+
+
+def test_causal_classification_can_report_multiple_numeric_mechanisms() -> None:
+    classification = classify_causal_mechanisms(
+        local_search={"material": True, "normalizedGain": 0.21},
+        discovery_seeding={"material": True, "frontierGain": 0.34},
+        objective_scalarization={"material": False, "frontierGain": 0.0},
+        capacity={"material": False, "cap20To40GainFraction": 0.01},
+    )
+
+    assert classification["labels"] == ["local-search-gap", "discovery-seeding-gap"]
+    assert classification["confidence"] == "strong"
+    assert classification["evidence"]["local-search-gap"]["normalizedGain"] == 0.21

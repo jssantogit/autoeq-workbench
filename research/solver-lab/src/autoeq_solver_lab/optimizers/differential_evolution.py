@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Callable
 
 import numpy as np
 from scipy.optimize import differential_evolution
@@ -10,9 +10,9 @@ from ..objectives import (
 )
 from ..types import SolverLabCandidate, SolverLabProblem
 from .base import (
+    ContinuousOptimizer,
     EvaluationBudgetExhausted,
     ObjectiveTracker,
-    ContinuousOptimizer,
     midpoint_vector,
     validate_optimizer_inputs,
 )
@@ -32,13 +32,14 @@ class DifferentialEvolutionOptimizer(ContinuousOptimizer):
         objective_weights: tuple[float, float],
         evaluation_budget: int,
         initial_candidate: SolverLabCandidate | None = None,
+        objective: Callable[[np.ndarray], float] | None = None,
     ) -> SolverLabCandidate:
         del initial_candidate
         validate_optimizer_inputs(problem, layout, seed, objective_weights, evaluation_budget)
         tracker = ObjectiveTracker(
-            lambda vector: scalarized_objective(
+            objective if objective is not None else (lambda vector: scalarized_objective(
                 problem, layout, vector, objective_weights[0], objective_weights[1]
-            ),
+            )),
             evaluation_budget,
         )
         dimension = layout.filter_count * 3
@@ -59,6 +60,7 @@ class DifferentialEvolutionOptimizer(ContinuousOptimizer):
             )
         except EvaluationBudgetExhausted:
             pass
+        self.last_evaluation_count = tracker.evaluations
         vector = tracker.best_vector if tracker.best_vector is not None else midpoint_vector(layout)
         return candidate_from_vector(
             problem, layout, vector, self.algorithm_id, seed, self.run_index

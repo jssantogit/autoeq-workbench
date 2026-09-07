@@ -1,15 +1,22 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
 import hashlib
 import json
 import math
-from typing import Any, Literal, Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass, replace
+from typing import Any, Literal
 
+import numpy as np
+
+from .calibration import FAMILY_MATCH_TOLERANCE, MAX_ABS_SCALE_DB, RMSE_SCALE_DB
+from .campaign import CONVERGENCE_CRITERION_VERSION, CONVERGENCE_MATERIAL_REGRET
+from .dsp import cascade_response_db
 from .io import parse_filter
-from .objectives import ContinuousVectorLayout
+from .metrics import error_metrics
+from .objectives import ContinuousVectorLayout, decode_vector
+from .pareto import dominates, nondominated, normalized_regret
 from .types import LabFilter, SolverLabCandidate, SolverLabEvaluation, SolverLabProblem
-
 
 DiagnosticObjectiveKind = Literal[
     "weighted-sum",
@@ -17,6 +24,13 @@ DiagnosticObjectiveKind = Literal[
     "epsilon-maxabs",
     "epsilon-rmse",
 ]
+
+DIAGNOSTIC_FRONTIER_CRITERION_VERSION = CONVERGENCE_CRITERION_VERSION
+DIAGNOSTIC_FRONTIER_MATERIAL_REGRET = CONVERGENCE_MATERIAL_REGRET
+DIAGNOSTIC_FRONTIER_MATCH_TOLERANCE = FAMILY_MATCH_TOLERANCE
+DIAGNOSTIC_CAPACITY_MATERIAL_GAIN_FRACTION = CONVERGENCE_MATERIAL_REGRET
+
+DiagnosticObjectiveCallable = Callable[[np.ndarray], float]
 
 
 @dataclass(frozen=True)
@@ -77,6 +91,23 @@ def objective_value(rmse_db: float, max_abs_db: float, spec: DiagnosticObjective
         violation = max(0.0, rmse - float(spec.epsilon))
         return max_abs + spec.penalty * violation * violation
     raise AssertionError(f"unreachable diagnostic objective kind {spec.kind}")
+
+
+def diagnostic_objective_callable(
+    problem: SolverLabProblem,
+    layout: ContinuousVectorLayout,
+    spec: DiagnosticObjective,
+) -> DiagnosticObjectiveCallable:
+    frequencies = np.asarray(problem.frequenciesHz, dtype=np.float64)
+    desired = np.asarray(problem.desiredDb, dtype=np.float64)
+
+    def evaluate(vector: np.ndarray) -> float:
+        filters = decode_vector(problem, layout, np.asarray(vector, dtype=np.float64))
+        actual = cascade_response_db(frequencies, problem.sampleRateHz, filters)
+        rmse, max_abs = error_metrics(desired, actual)
+        return objective_value(rmse, max_abs, spec)
+
+    return evaluate
 
 
 def infer_layout_from_filters(filters: Sequence[LabFilter]) -> ContinuousVectorLayout:
@@ -148,6 +179,10 @@ def _record(value: Any, label: str) -> Mapping[str, Any]:
 def reference_candidates_from_artifact(
     problem: SolverLabProblem,
     artifact: Mapping[str, Any],
+    *,
+    expected_repository_sha: str | None = None,
+    expected_run_id: str | None = None,
+    expected_artifact_id: str | None = None,
 ) -> tuple[SolverLabCandidate, ...]:
     if artifact.get("version") != 1 or artifact.get("oracle") != "reference-seeds":
         raise ValueError("reference artifact must be reference-seeds version 1")
@@ -157,6 +192,14 @@ def reference_candidates_from_artifact(
     repository_sha = artifact.get("repositorySha")
     if not isinstance(repository_sha, str) or not repository_sha:
         raise ValueError("reference artifact requires repositorySha")
+    expected_provenance = (
+        ("repository SHA", expected_repository_sha, repository_sha),
+        ("run ID", expected_run_id, artifact.get("sourceRunId")),
+        ("artifact ID", expected_artifact_id, artifact.get("sourceArtifactId")),
+    )
+    for label, expected, actual in expected_provenance:
+        if expected is not None and actual != expected:
+            raise ValueError(f"reference source {label} mismatch")
     raw_points = artifact.get("points")
     if not isinstance(raw_points, Sequence) or isinstance(raw_points, (str, bytes)):
         raise ValueError("reference artifact requires points")
@@ -174,6 +217,18 @@ def reference_candidates_from_artifact(
             source_id = f"{repository_sha}:{problem.problemId}:{index}"
         if not isinstance(source_id, str) or not source_id:
             raise ValueError("reference point sourceId must be a non-empty string")
+        for label, expected, point_key in (
+            ("repository SHA", expected_repository_sha, "sourceSha"),
+            ("run ID", expected_run_id, "sourceRunId"),
+            ("artifact ID", expected_artifact_id, "sourceArtifactId"),
+        ):
+            point_value = point.get(point_key, artifact.get({
+                "sourceSha": "repositorySha",
+                "sourceRunId": "sourceRunId",
+                "sourceArtifactId": "sourceArtifactId",
+            }[point_key]))
+            if expected is not None and point_value != expected:
+                raise ValueError(f"reference point source {label} mismatch")
         raw_filters = point.get("filters")
         if not isinstance(raw_filters, Sequence) or isinstance(raw_filters, (str, bytes)):
             raise ValueError("reference point requires filters")
@@ -188,6 +243,211 @@ def reference_candidates_from_artifact(
             filters=filters,
         ))
     return tuple(candidates)
+
+
+def _point_distance(left: Any, right: Any) -> float:
+    return normalized_regret(left, (right,))
+
+
+def _frontier_regret(source: Sequence[Any], target: Sequence[Any]) -> float:
+    if not source:
+        return 0.0
+    if not target:
+        return math.inf
+    return max(normalized_regret(point, target) for point in source)
+
+
+def _matched_point(point: Any, frontier: Sequence[Any]) -> bool:
+    return any(
+        point.candidate_id == other.candidate_id or
+        _point_distance(point, other) <= DIAGNOSTIC_FRONTIER_MATCH_TOLERANCE
+        for other in frontier
+    )
+
+
+def _domination_status(control: Any | None, frontier: Sequence[Any]) -> str:
+    if control is None:
+        return "unavailable"
+    if any(dominates(point, control) for point in frontier):
+        return "dominated"
+    if any(
+        point.candidate_id == control.candidate_id or
+        (
+            abs(point.rmse_db - control.rmse_db) <= 1e-12 and
+            abs(point.max_abs_db - control.max_abs_db) <= 1e-12
+        )
+        for point in frontier
+    ):
+        return "frontier"
+    return "not-dominated"
+
+
+def compare_frontier_snapshots(
+    previous: Sequence[Any],
+    current: Sequence[Any],
+    *,
+    control: Any | None = None,
+) -> dict[str, Any]:
+    previous_frontier = nondominated(tuple(previous))
+    current_frontier = nondominated(tuple(current))
+    previous_to_current = _frontier_regret(previous_frontier, current_frontier)
+    current_to_previous = _frontier_regret(current_frontier, previous_frontier)
+    max_regret = max(previous_to_current, current_to_previous)
+
+    union_frontier = nondominated((*previous_frontier, *current_frontier))
+    union_ids = {point.candidate_id for point in union_frontier}
+    new_points = tuple(
+        point for point in current_frontier
+        if point.candidate_id in union_ids and not _matched_point(point, previous_frontier)
+    )
+    removed_points = tuple(
+        point for point in previous_frontier
+        if not _matched_point(point, current_frontier) and any(
+            dominates(other, point) for other in current_frontier
+        )
+    )
+
+    previous_best_rmse = min((point.rmse_db for point in previous_frontier), default=None)
+    current_best_rmse = min((point.rmse_db for point in current_frontier), default=None)
+    previous_best_max_abs = min((point.max_abs_db for point in previous_frontier), default=None)
+    current_best_max_abs = min((point.max_abs_db for point in current_frontier), default=None)
+
+    def gain(current_value: float | None, previous_value: float | None) -> float | None:
+        if current_value is None or previous_value is None:
+            return None
+        return previous_value - current_value
+
+    return {
+        "criterionVersion": DIAGNOSTIC_FRONTIER_CRITERION_VERSION,
+        "materialRegretThreshold": DIAGNOSTIC_FRONTIER_MATERIAL_REGRET,
+        "materialRegretThresholdSource": "campaign.CONVERGENCE_MATERIAL_REGRET",
+        "pointMatchTolerance": DIAGNOSTIC_FRONTIER_MATCH_TOLERANCE,
+        "pointMatchToleranceSource": "calibration.FAMILY_MATCH_TOLERANCE",
+        "comparisonAvailable": bool(previous_frontier and current_frontier),
+        "previousPointCount": len(previous_frontier),
+        "currentPointCount": len(current_frontier),
+        "previousToCurrentNormalizedRegret": previous_to_current,
+        "currentToPreviousNormalizedRegret": current_to_previous,
+        "maxBidirectionalNormalizedRegret": max_regret,
+        "materialChange": max_regret > DIAGNOSTIC_FRONTIER_MATERIAL_REGRET,
+        "newNondominatedPointIds": [point.candidate_id for point in new_points],
+        "removedThroughDominationPointIds": [point.candidate_id for point in removed_points],
+        "bestRmsePreviousDb": previous_best_rmse,
+        "bestRmseCurrentDb": current_best_rmse,
+        "bestRmseMovementDb": None if gain(current_best_rmse, previous_best_rmse) is None else -gain(current_best_rmse, previous_best_rmse),
+        "bestRmseGainDb": gain(current_best_rmse, previous_best_rmse),
+        "bestMaxAbsPreviousDb": previous_best_max_abs,
+        "bestMaxAbsCurrentDb": current_best_max_abs,
+        "bestMaxAbsMovementDb": None if gain(current_best_max_abs, previous_best_max_abs) is None else -gain(current_best_max_abs, previous_best_max_abs),
+        "bestMaxAbsGainDb": gain(current_best_max_abs, previous_best_max_abs),
+        "controlDominationStatus": {
+            "previous": _domination_status(control, previous_frontier),
+            "current": _domination_status(control, current_frontier),
+        },
+    }
+
+
+def classify_practical_convergence(comparison: Mapping[str, Any]) -> Literal[
+    "converged", "still-moving", "ambiguous"
+]:
+    if comparison.get("comparisonAvailable") is not True:
+        return "ambiguous"
+    movement = comparison.get("maxBidirectionalNormalizedRegret")
+    threshold = comparison.get("materialRegretThreshold", DIAGNOSTIC_FRONTIER_MATERIAL_REGRET)
+    if (
+        isinstance(movement, bool) or not isinstance(movement, (int, float)) or
+        not math.isfinite(float(movement)) or
+        isinstance(threshold, bool) or not isinstance(threshold, (int, float)) or
+        not math.isfinite(float(threshold)) or float(threshold) < 0
+    ):
+        return "ambiguous"
+    return "still-moving" if float(movement) > float(threshold) else "converged"
+
+
+def summarize_optimizer_family_agreement(
+    points: Sequence[Mapping[str, Any]],
+    *,
+    families: tuple[str, str] = ("differential-evolution", "cma-es"),
+    rmse_scale: float = RMSE_SCALE_DB,
+    max_abs_scale: float = MAX_ABS_SCALE_DB,
+    tolerance: float = DIAGNOSTIC_FRONTIER_MATCH_TOLERANCE,
+) -> dict[str, Any]:
+    by_family: dict[str, list[tuple[float, float]]] = {family: [] for family in families}
+    for point in points:
+        algorithm_id = point.get("algorithmId")
+        metrics = point.get("metrics")
+        if algorithm_id not in by_family or not isinstance(metrics, Mapping):
+            continue
+        rmse = metrics.get("rmseDb")
+        max_abs = metrics.get("maxAbsDb")
+        if (
+            isinstance(rmse, bool) or not isinstance(rmse, (int, float)) or not math.isfinite(float(rmse)) or
+            isinstance(max_abs, bool) or not isinstance(max_abs, (int, float)) or not math.isfinite(float(max_abs))
+        ):
+            raise ValueError("optimizer family metrics must be finite numbers")
+        by_family[algorithm_id].append((float(rmse), float(max_abs)))
+    left, right = (by_family[families[0]], by_family[families[1]])
+    if not left or not right:
+        return {
+            "families": [families[0], families[1]],
+            "pointCounts": {family: len(by_family[family]) for family in families},
+            "matchedPointCounts": {},
+            "agreementFraction": None,
+            "regionsDiffer": False,
+            "matchTolerance": tolerance,
+        }
+
+    def distance(first: tuple[float, float], second: tuple[float, float]) -> float:
+        return math.hypot(
+            (first[0] - second[0]) / rmse_scale,
+            (first[1] - second[1]) / max_abs_scale,
+        )
+
+    matches = {
+        families[0]: sum(any(distance(point, other) <= tolerance for other in right) for point in left),
+        families[1]: sum(any(distance(point, other) <= tolerance for other in left) for point in right),
+    }
+    total = len(left) + len(right)
+    agreement = (sum(matches.values()) / total) if total else None
+    return {
+        "families": [families[0], families[1]],
+        "pointCounts": {family: len(by_family[family]) for family in families},
+        "matchedPointCounts": matches,
+        "agreementFraction": agreement,
+        "regionsDiffer": bool(agreement is not None and agreement < 1.0),
+        "matchTolerance": tolerance,
+    }
+
+
+def classify_causal_mechanisms(
+    *,
+    local_search: Mapping[str, Any],
+    discovery_seeding: Mapping[str, Any],
+    objective_scalarization: Mapping[str, Any],
+    capacity: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    evidence_by_label = {
+        "local-search-gap": dict(local_search),
+        "discovery-seeding-gap": dict(discovery_seeding),
+        "objective-scalarization-gap": dict(objective_scalarization),
+    }
+    if capacity is not None:
+        evidence_by_label["capacity-gap"] = dict(capacity)
+    labels = [
+        label for label, evidence in evidence_by_label.items()
+        if evidence.get("material") is True
+    ]
+    if not labels:
+        labels = ["no-material-gap-found"]
+    all_measured = all(evidence.get("available", True) is True for evidence in evidence_by_label.values())
+    confidence = "strong" if all_measured else "moderate" if any(
+        evidence.get("available", True) is True for evidence in evidence_by_label.values()
+    ) else "weak"
+    return {
+        "labels": labels,
+        "confidence": confidence,
+        "evidence": evidence_by_label,
+    }
 
 
 def _deliverable_quality(evaluation: SolverLabEvaluation) -> float:
