@@ -68,6 +68,13 @@ def test_stable_resolved_high_cap_can_support_cap_limited():
     assert classify_case(inputs(check)) == "cap-limited"
 
 
+def test_present_but_unresolved_max64_observation_blocks_cap_limited():
+    check = evaluate_high_cap_solvability((observation(40), observation(64, solvability="insufficient-evidence")))
+
+    assert check.conclusion == "insufficient-evidence"
+    assert check.blocks_cap_limited is True
+
+
 def test_compression_and_search_override_capacity_classification():
     check = evaluate_high_cap_solvability((observation(40),))
     assert classify_case(CaseClassificationInputs(

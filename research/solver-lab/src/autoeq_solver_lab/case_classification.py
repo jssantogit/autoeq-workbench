@@ -131,6 +131,11 @@ def evaluate_high_cap_solvability(
         for observation in ordered
     ):
         conclusion: HighCapSolvabilityConclusion = "unresolved-search-or-representation"
+    elif any(
+        observation.available and observation.solvability_conclusion != "resolved"
+        for observation in ordered
+    ):
+        conclusion = "insufficient-evidence"
     elif any(observation.reference_still_moving for observation in ordered):
         conclusion = "insufficient-evidence"
     elif (
