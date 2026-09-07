@@ -7,6 +7,7 @@ from autoeq_solver_lab.diagnostics import (
     build_reference_candidate,
     infer_layout_from_filters,
     objective_value,
+    reference_candidates_from_artifact,
     summarize_capacity_gap,
 )
 from autoeq_solver_lab.types import CanonicalMetricSet, LabFilter, SolverLabEvaluation, SolverLabProblem
@@ -96,6 +97,40 @@ def test_build_reference_candidate_uses_current_problem_identity_and_provenance(
     assert candidate.seed is None
     assert candidate.candidateId.startswith("reference:coherent-warm-start:diagnostic-case:")
     assert [filter_.id for filter_ in candidate.filters] == ["reference-1", "reference-2"]
+
+
+def test_reference_artifact_rebinds_historical_seed_to_current_problem_for_canonical_recheck() -> None:
+    problem = _problem()
+    artifact = {
+        "version": 1,
+        "oracle": "reference-seeds",
+        "sourceAlgorithm": "coherent-warm-start",
+        "repositorySha": "historical-sha",
+        "corpusLayer": "adversarial",
+        "maxFilters": 10,
+        "points": [{
+            "problemId": "diagnostic-case",
+            "inputSha256": "historical-input-hash",
+            "provenance": "coherent-warm-start",
+            "sourceId": "artifact-9975764396:diagnostic-case:30:max10",
+            "filters": [{
+                "id": "historical-1",
+                "enabled": True,
+                "type": "PK",
+                "frequencyHz": 5000.0,
+                "gainDb": -4.0,
+                "q": 3.0,
+            }],
+        }],
+    }
+
+    candidates = reference_candidates_from_artifact(problem, artifact)
+
+    assert len(candidates) == 1
+    assert candidates[0].problemId == problem.problemId
+    assert candidates[0].inputSha256 == problem.inputSha256
+    assert candidates[0].algorithmId == "reference:coherent-warm-start"
+    assert candidates[0].filters[0].id == "reference-1"
 
 
 def test_tchebycheff_objective_uses_both_normalized_axes() -> None:
