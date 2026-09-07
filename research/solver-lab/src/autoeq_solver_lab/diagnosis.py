@@ -3,9 +3,19 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping, Sequence
 
+import numpy as np
+from scipy.optimize import differential_evolution
+
+from .dsp import cascade_response_db
 from .io import parse_filter
-from .objectives import ContinuousVectorLayout
-from .types import SolverLabCandidate, SolverLabProblem
+from .metrics import error_metrics
+from .objectives import (
+    ContinuousVectorLayout,
+    candidate_from_vector,
+    decode_vector,
+)
+from .optimizers.base import EvaluationBudgetExhausted, ObjectiveTracker, midpoint_vector
+from .types import SolverLabCandidate, SolverLabEvaluation, SolverLabProblem
 
 
 _TYPE_ORDER = {"LS": 0, "PK": 1, "HS": 2}
@@ -192,3 +202,125 @@ def epsilon_constraint_score(
         raise ValueError("penalty must be positive")
     violation = max(0.0, max_abs_db - epsilon) / scales[1]
     return rmse_norm + penalty_value * violation * violation
+
+
+def _deliverable_dominates(
+    first: SolverLabEvaluation,
+    second: SolverLabEvaluation,
+    eps: float = 1e-12,
+) -> bool:
+    if first.deliverable is None or second.deliverable is None:
+        return False
+    first_rmse = first.deliverable.rmseDb
+    first_max = first.deliverable.maxAbsDb
+    second_rmse = second.deliverable.rmseDb
+    second_max = second.deliverable.maxAbsDb
+    no_worse = first_rmse <= second_rmse + eps and first_max <= second_max + eps
+    strict = first_rmse < second_rmse - eps or first_max < second_max - eps
+    return no_worse and strict
+
+
+def select_deliverable_frontier(
+    candidates: Sequence[SolverLabCandidate],
+    evaluations: Sequence[SolverLabEvaluation],
+) -> tuple[SolverLabCandidate, ...]:
+    evaluation_by_id = {evaluation.candidateId: evaluation for evaluation in evaluations}
+    eligible: list[tuple[SolverLabCandidate, SolverLabEvaluation]] = []
+    for candidate in candidates:
+        evaluation = evaluation_by_id.get(candidate.candidateId)
+        if (
+            evaluation is None or
+            not evaluation.valid or
+            evaluation.deliverable is None or
+            not math.isfinite(evaluation.deliverable.rmseDb) or
+            not math.isfinite(evaluation.deliverable.maxAbsDb)
+        ):
+            continue
+        eligible.append((candidate, evaluation))
+    return tuple(
+        candidate
+        for candidate, evaluation in eligible
+        if not any(
+            other_candidate.candidateId != candidate.candidateId and
+            _deliverable_dominates(other_evaluation, evaluation)
+            for other_candidate, other_evaluation in eligible
+        )
+    )
+
+
+def alternative_de_search(
+    problem: SolverLabProblem,
+    layout: ContinuousVectorLayout,
+    *,
+    seed: int,
+    evaluation_budget: int,
+    objective_family: str,
+    objective_parameter: tuple[float, float] | float,
+    run_index: int = 0,
+) -> SolverLabCandidate:
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise ValueError("seed must be an integer")
+    _positive_int(evaluation_budget, "evaluation_budget")
+    if layout.filter_count > problem.bounds["maxFilters"]:
+        raise ValueError("layout exceeds problem maxFilters")
+    if objective_family == "tchebycheff":
+        if not isinstance(objective_parameter, tuple) or len(objective_parameter) != 2:
+            raise ValueError("tchebycheff objective requires two weights")
+        weights = (
+            _finite_number(objective_parameter[0], "tchebycheff rmse weight"),
+            _finite_number(objective_parameter[1], "tchebycheff maxAbs weight"),
+        )
+        if weights[0] <= 0 or weights[1] <= 0:
+            raise ValueError("tchebycheff weights must be positive")
+
+        def score(rmse: float, max_abs: float) -> float:
+            return augmented_tchebycheff_score(rmse, max_abs, weights)
+
+    elif objective_family == "epsilon":
+        epsilon = _finite_number(objective_parameter, "epsilon objective parameter")
+        if epsilon < 0:
+            raise ValueError("epsilon objective parameter must be non-negative")
+
+        def score(rmse: float, max_abs: float) -> float:
+            return epsilon_constraint_score(rmse, max_abs, epsilon_max_abs_db=epsilon)
+
+    else:
+        raise ValueError("objective_family must be tchebycheff or epsilon")
+
+    frequencies = np.asarray(problem.frequenciesHz, dtype=np.float64)
+    desired = np.asarray(problem.desiredDb, dtype=np.float64)
+
+    def objective(vector: np.ndarray) -> float:
+        filters = decode_vector(problem, layout, np.asarray(vector, dtype=np.float64))
+        actual = cascade_response_db(frequencies, problem.sampleRateHz, filters)
+        rmse, max_abs = error_metrics(desired, actual)
+        return score(rmse, max_abs)
+
+    tracker = ObjectiveTracker(objective, evaluation_budget)
+    dimension = layout.filter_count * 3
+    population_size = max(1, min(8, evaluation_budget // max(1, dimension)))
+    max_iterations = max(1, evaluation_budget // (population_size * dimension) + 1)
+    try:
+        differential_evolution(
+            tracker.evaluate,
+            [(0.0, 1.0)] * dimension,
+            seed=seed,
+            workers=1,
+            updating="immediate",
+            polish=False,
+            popsize=population_size,
+            maxiter=max_iterations,
+            tol=0.0,
+            atol=0.0,
+        )
+    except EvaluationBudgetExhausted:
+        pass
+    vector = tracker.best_vector if tracker.best_vector is not None else midpoint_vector(layout)
+    return candidate_from_vector(
+        problem,
+        layout,
+        vector,
+        f"diagnosis-de-{objective_family}",
+        seed,
+        run_index,
+    )
