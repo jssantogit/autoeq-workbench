@@ -72,6 +72,9 @@ def test_workflow_declares_case_matrix_and_deterministic_aggregation():
     assert "case_id: ${{ fromJSON(needs.prepare.outputs.case_ids) }}" in text
     assert "  aggregate:" in text
     assert "campaign-manifest.json" in text
+    assert '--out "$GITHUB_WORKSPACE/campaign-plan/problems.jsonl"' in text
+    assert '--out "$GITHUB_WORKSPACE/oracle-artifacts/problems.jsonl"' in text
+    assert 'aggregate_args+=(--pilot pilot/convergence-pilot.json)' in text
 
 
 def test_convergence_comparison_reports_material_frontier_change():
