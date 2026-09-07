@@ -9,6 +9,7 @@ import re
 from .io import parse_candidate, parse_evaluation, parse_filter
 from .pareto import dominates, nondominated, normalized_regret
 from .reference_regret import directed_reference_regret
+from .quality_time import QUALITY_TIME_FORMULA_VERSION, quality_time_formula_sha256
 from .types import ObjectivePoint
 
 
@@ -82,8 +83,13 @@ def validate_manifest(value: Mapping[str, object]) -> dict[str, object]:
     for field in ("corpusVersion", "continuousOracleVersion", "deliverableOracleVersion"):
         if not isinstance(value.get(field), str) or not value[field]:
             raise ValueError(f"calibration manifest {field} is required")
-    if value.get("qualityTimeFormulaVersion") != 1:
+    if value.get("qualityTimeFormulaVersion") != QUALITY_TIME_FORMULA_VERSION:
         raise ValueError("calibration manifest quality-time formula version must be 1")
+    formula_hash = value.get("qualityTimeFormulaSha256")
+    if not isinstance(formula_hash, str) or not re.fullmatch(r"[a-f0-9]{64}", formula_hash):
+        raise ValueError("calibration manifest quality-time formula hash must be a SHA-256 hex digest")
+    if formula_hash != quality_time_formula_sha256():
+        raise ValueError("calibration manifest quality-time formula hash does not match local implementation")
     thresholds = value.get("materialImprovementThresholds")
     if not isinstance(thresholds, Mapping):
         raise ValueError("calibration manifest thresholds are required")
@@ -101,7 +107,8 @@ def validate_manifest(value: Mapping[str, object]) -> dict[str, object]:
         "corpusVersion": value["corpusVersion"],
         "continuousOracleVersion": value["continuousOracleVersion"],
         "deliverableOracleVersion": value["deliverableOracleVersion"],
-        "qualityTimeFormulaVersion": 1,
+        "qualityTimeFormulaVersion": QUALITY_TIME_FORMULA_VERSION,
+        "qualityTimeFormulaSha256": formula_hash,
         "materialImprovementThresholds": normalized_thresholds,
     }
     campaign_evidence = value.get("campaignEvidence")
@@ -1009,7 +1016,8 @@ def main(argv: Sequence[str] | None = None) -> None:
             "corpusVersion": args.corpus_version,
             "continuousOracleVersion": args.continuous_version,
             "deliverableOracleVersion": args.deliverable_version,
-            "qualityTimeFormulaVersion": 1,
+            "qualityTimeFormulaVersion": QUALITY_TIME_FORMULA_VERSION,
+            "qualityTimeFormulaSha256": quality_time_formula_sha256(),
             "materialImprovementThresholds": selected_thresholds,
         }
         if campaign_evidence is not None:

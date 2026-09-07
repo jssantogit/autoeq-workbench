@@ -7,6 +7,7 @@ from autoeq_solver_lab.calibration import (
     build_calibration_report,
     validate_manifest,
 )
+from autoeq_solver_lab.quality_time import quality_time_formula_sha256
 
 
 def point(
@@ -38,6 +39,7 @@ def manifest(**thresholds: float) -> dict:
         "continuousOracleVersion": "continuous-v1",
         "deliverableOracleVersion": "deliverable-v1",
         "qualityTimeFormulaVersion": 1,
+        "qualityTimeFormulaSha256": quality_time_formula_sha256(),
         "materialImprovementThresholds": {
             "minimumAggregateFrontierGainFraction": thresholds.get("gain", 0.1),
             "maximumPerCaseQualityRegressionFraction": thresholds.get("regression", 0.2),
@@ -117,6 +119,18 @@ def test_calibration_marks_control_only_evidence_insufficient():
 def test_manifest_rejects_vacuous_promotion_policy():
     with pytest.raises(ValueError, match="insufficient"):
         validate_manifest(manifest(gain=0.0, regression=1.0, catastrophic=0.8181818181818182))
+
+
+def test_manifest_rejects_missing_or_mismatched_quality_time_formula_hash():
+    missing = manifest()
+    del missing["qualityTimeFormulaSha256"]
+    with pytest.raises(ValueError, match="quality-time formula hash"):
+        validate_manifest(missing)
+
+    mismatched = manifest()
+    mismatched["qualityTimeFormulaSha256"] = "0" * 64
+    with pytest.raises(ValueError, match="quality-time formula hash"):
+        validate_manifest(mismatched)
 
 
 def test_manifest_preserves_explicit_campaign_evidence():
