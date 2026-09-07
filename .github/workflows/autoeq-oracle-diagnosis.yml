@@ -127,12 +127,12 @@ jobs:
           name: oracle-diagnosis-inputs-${{ github.sha }}
           path: inputs
       - name: Export exact current problem
-        run: pnpm --filter @autoeq-workbench/core research:lab -- export-problems --layer adversarial --case-id '${{ matrix.case }}' --max-filters 10 --out "inputs/${{ matrix.case }}-problems.jsonl"
+        run: pnpm --filter @autoeq-workbench/core research:lab -- export-problems --layer adversarial --case-id '${{ matrix.case }}' --max-filters 10 --out "$GITHUB_WORKSPACE/inputs/${{ matrix.case }}-problems.jsonl"
       - name: Generate CAP20/CAP40 current product controls
         if: matrix.case != 'synthetic-narrow-peak'
         run: |
-          pnpm --filter @autoeq-workbench/core research:oracle-report -- --layer adversarial --case-id '${{ matrix.case }}' --max-filters 20 --budget-seconds 30 --repository-sha "$GITHUB_SHA" --out "inputs/cap20-${{ matrix.case }}.json"
-          pnpm --filter @autoeq-workbench/core research:oracle-report -- --layer adversarial --case-id '${{ matrix.case }}' --max-filters 40 --budget-seconds 30 --repository-sha "$GITHUB_SHA" --out "inputs/cap40-${{ matrix.case }}.json"
+          pnpm --filter @autoeq-workbench/core research:oracle-report -- --layer adversarial --case-id '${{ matrix.case }}' --max-filters 20 --budget-seconds 30 --repository-sha "$GITHUB_SHA" --out "$GITHUB_WORKSPACE/inputs/cap20-${{ matrix.case }}.json"
+          pnpm --filter @autoeq-workbench/core research:oracle-report -- --layer adversarial --case-id '${{ matrix.case }}' --max-filters 40 --budget-seconds 30 --repository-sha "$GITHUB_SHA" --out "$GITHUB_WORKSPACE/inputs/cap40-${{ matrix.case }}.json"
       - name: Run selective diagnosis case
         run: |
           extra_capacity=""
