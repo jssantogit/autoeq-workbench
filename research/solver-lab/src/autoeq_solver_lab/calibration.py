@@ -8,6 +8,7 @@ import re
 
 from .io import parse_candidate, parse_evaluation, parse_filter
 from .pareto import dominates, nondominated, normalized_regret
+from .reference_regret import directed_reference_regret
 from .types import ObjectivePoint
 
 
@@ -125,13 +126,12 @@ def directed_regret(
 ) -> float | None:
     if not frontier:
         return None
-    return min(
-        math.hypot(
-            max(0.0, point.rmse_db - frontier_point.rmse_db) / RMSE_SCALE_DB,
-            max(0.0, point.max_abs_db - frontier_point.max_abs_db) / MAX_ABS_SCALE_DB,
-        )
-        for frontier_point in frontier
-    )
+    return directed_reference_regret(
+        point.objective(),
+        tuple(frontier_point.objective() for frontier_point in frontier),
+        rmse_scale=RMSE_SCALE_DB,
+        max_abs_scale=MAX_ABS_SCALE_DB,
+    ).regret
 
 
 def _sorted_points(points: Sequence[CalibrationPoint]) -> tuple[CalibrationPoint, ...]:

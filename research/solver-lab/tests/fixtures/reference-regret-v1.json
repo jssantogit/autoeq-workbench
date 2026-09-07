@@ -1,0 +1,58 @@
+[
+  {
+    "id": "worse-both",
+    "point": { "candidateId": "candidate", "rmseDb": 0.75, "maxAbsDb": 1.25, "filterCount": 1 },
+    "frontier": [
+      { "candidateId": "reference", "rmseDb": 0.25, "maxAbsDb": 0.5, "filterCount": 1 }
+    ],
+    "regret": 2.23606797749979,
+    "referenceImproved": false
+  },
+  {
+    "id": "rmse-only-regression",
+    "point": { "candidateId": "candidate", "rmseDb": 0.5, "maxAbsDb": 0.5, "filterCount": 1 },
+    "frontier": [
+      { "candidateId": "reference", "rmseDb": 0.25, "maxAbsDb": 0.5, "filterCount": 1 }
+    ],
+    "regret": 1.0,
+    "referenceImproved": false
+  },
+  {
+    "id": "max-abs-only-regression",
+    "point": { "candidateId": "candidate", "rmseDb": 0.25, "maxAbsDb": 1.25, "filterCount": 1 },
+    "frontier": [
+      { "candidateId": "reference", "rmseDb": 0.25, "maxAbsDb": 0.5, "filterCount": 1 }
+    ],
+    "regret": 1.0,
+    "referenceImproved": false
+  },
+  {
+    "id": "equality",
+    "point": { "candidateId": "candidate", "rmseDb": 0.25, "maxAbsDb": 0.5, "filterCount": 1 },
+    "frontier": [
+      { "candidateId": "reference", "rmseDb": 0.25, "maxAbsDb": 0.5, "filterCount": 1 }
+    ],
+    "regret": 0.0,
+    "referenceImproved": false
+  },
+  {
+    "id": "dominates-one-reference",
+    "point": { "candidateId": "candidate", "rmseDb": 0.2, "maxAbsDb": 0.4, "filterCount": 1 },
+    "frontier": [
+      { "candidateId": "dominated", "rmseDb": 0.25, "maxAbsDb": 0.5, "filterCount": 1 },
+      { "candidateId": "incomparable", "rmseDb": 0.1, "maxAbsDb": 0.8, "filterCount": 1 }
+    ],
+    "regret": 0.0,
+    "referenceImproved": true
+  },
+  {
+    "id": "incomparable-frontier",
+    "point": { "candidateId": "candidate", "rmseDb": 0.5, "maxAbsDb": 0.5, "filterCount": 1 },
+    "frontier": [
+      { "candidateId": "rmse-reference", "rmseDb": 0.25, "maxAbsDb": 0.75, "filterCount": 1 },
+      { "candidateId": "max-reference", "rmseDb": 0.75, "maxAbsDb": 0.25, "filterCount": 1 }
+    ],
+    "regret": 0.3333333333333333,
+    "referenceImproved": false
+  }
+]
