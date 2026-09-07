@@ -4,6 +4,7 @@ import cma
 from ..objectives import (
     ContinuousVectorLayout,
     candidate_from_vector,
+    encode_filters,
     scalarized_objective,
 )
 from ..types import SolverLabCandidate, SolverLabProblem
@@ -31,8 +32,17 @@ class CmaEsOptimizer(ContinuousOptimizer):
         evaluation_budget: int,
         initial_candidate: SolverLabCandidate | None = None,
     ) -> SolverLabCandidate:
-        del initial_candidate
         validate_optimizer_inputs(problem, layout, seed, objective_weights, evaluation_budget)
+        if initial_candidate is not None:
+            if initial_candidate.problemId != problem.problemId:
+                raise ValueError("initial candidate problemId does not match problem")
+            if initial_candidate.inputSha256 != problem.inputSha256:
+                raise ValueError("initial candidate inputSha256 does not match problem")
+            initial_vector = encode_filters(problem, layout, initial_candidate.filters)
+            sigma = 0.08
+        else:
+            initial_vector = midpoint_vector(layout)
+            sigma = 0.25
         tracker = ObjectiveTracker(
             lambda vector: scalarized_objective(
                 problem, layout, vector, objective_weights[0], objective_weights[1]
@@ -42,12 +52,12 @@ class CmaEsOptimizer(ContinuousOptimizer):
         dimension = layout.filter_count * 3
         if evaluation_budget < 2:
             return candidate_from_vector(
-                problem, layout, midpoint_vector(layout), self.algorithm_id, seed, self.run_index
+                problem, layout, initial_vector, self.algorithm_id, seed, self.run_index
             )
         population_size = max(2, min(8, evaluation_budget // max(1, dimension)))
         strategy = cma.CMAEvolutionStrategy(
-            midpoint_vector(layout).tolist(),
-            0.25,
+            initial_vector.tolist(),
+            sigma,
             {
                 "bounds": [0.0, 1.0],
                 "seed": seed,
@@ -61,7 +71,7 @@ class CmaEsOptimizer(ContinuousOptimizer):
             vectors = strategy.ask()
             values = [tracker.evaluate(np.asarray(vector, dtype=np.float64)) for vector in vectors]
             strategy.tell(vectors, values)
-        vector = tracker.best_vector if tracker.best_vector is not None else midpoint_vector(layout)
+        vector = tracker.best_vector if tracker.best_vector is not None else initial_vector
         return candidate_from_vector(
             problem, layout, vector, self.algorithm_id, seed, self.run_index
         )
