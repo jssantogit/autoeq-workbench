@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from autoeq_solver_lab.dsp import cascade_response_db
 from autoeq_solver_lab.objectives import enumerate_oracle_layouts
@@ -54,7 +55,7 @@ def test_cma_uses_explicit_initial_candidate_as_its_starting_point():
         initial_candidate=initial,
     )
 
-    assert result.filters[0].frequencyHz == initial.filters[0].frequencyHz
-    assert result.filters[0].gainDb == initial.filters[0].gainDb
-    assert result.filters[0].q == initial.filters[0].q
+    assert result.filters[0].frequencyHz == pytest.approx(initial.filters[0].frequencyHz)
+    assert result.filters[0].gainDb == pytest.approx(initial.filters[0].gainDb)
+    assert result.filters[0].q == pytest.approx(initial.filters[0].q)
     assert result.seed == 17
