@@ -1,0 +1,33 @@
+{
+  "canonicalEvaluatorVersion": "standard-v2-canonical-v1",
+  "cells": [
+    {
+      "candidates": [
+        {
+          "actualDeliveredFilterCount": 0,
+          "algorithmId": "standard-v2-control",
+          "candidateId": "fixture-control",
+          "canonicalMaxAbsDb": 0.0,
+          "canonicalRmseDb": 0.0,
+          "filters": [],
+          "inputSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "maxFilters": 10,
+          "problemId": "synthetic-reference",
+          "provenance": "synthetic-fixture",
+          "seed": null
+        }
+      ],
+      "continuousDiagnosticFrontier": [],
+      "controlCandidateId": "fixture-control",
+      "deliverableFrontierCandidateIds": ["fixture-control"],
+      "inputSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "maxFilters": 10,
+      "problemId": "synthetic-reference",
+      "referenceState": "stable-under-current-search"
+    }
+  ],
+  "contentSha256": "55a47f9faad2dcf7ba46c8ec3911b6939ccb4a05bfd26beed6e4001627fac15c",
+  "corpusVersion": "autoeq-research-corpus-v1",
+  "createdFromRepositorySha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "version": 1
+}

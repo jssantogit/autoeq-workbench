@@ -19,6 +19,7 @@ test = ["pytest>=8,<9"]
 autoeq-continuous-oracle = "autoeq_solver_lab.continuous_oracle:main"
 autoeq-deliverable-oracle = "autoeq_solver_lab.deliverable_oracle:main"
 autoeq-oracle-calibrate = "autoeq_solver_lab.calibration:main"
+autoeq-reference-snapshot = "autoeq_solver_lab.reference_snapshot:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
