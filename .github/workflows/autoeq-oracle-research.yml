@@ -89,14 +89,14 @@ jobs:
           pnpm --silent --filter @autoeq-workbench/core research:lab -- export-problems \
             --layer "$CORPUS_LAYER" \
             --max-filters "$MAX_FILTERS" \
-            --out campaign-plan/problems.jsonl
+            --out "$GITHUB_WORKSPACE/campaign-plan/problems.jsonl"
           stage_args=(--mode "$CAMPAIGN_MODE" --seed-pool "$SEED_POOL")
           if [[ "$BUDGET_OVERRIDE" != "0" ]]; then
             stage_args+=(--evaluation-budget "$BUDGET_OVERRIDE")
           fi
           PYTHONPATH=research/solver-lab/src python -m autoeq_solver_lab.campaign \
-            stage-config "${stage_args[@]}" --out campaign-plan/stage-config.json
-          python - "$CASE_SELECTION" campaign-plan/problems.jsonl campaign-plan/case-ids.json <<'PY'
+            stage-config "${stage_args[@]}" --out "$GITHUB_WORKSPACE/campaign-plan/stage-config.json"
+          python - "$CASE_SELECTION" "$GITHUB_WORKSPACE/campaign-plan/problems.jsonl" "$GITHUB_WORKSPACE/campaign-plan/case-ids.json" <<'PY'
           import json
           import sys
           from pathlib import Path
@@ -187,10 +187,10 @@ jobs:
           set -euo pipefail
           mkdir -p pilot
           pnpm --silent --filter @autoeq-workbench/core research:lab -- export-problems \
-            --layer "$CORPUS_LAYER" --max-filters "$MAX_FILTERS" --out pilot/problems.jsonl
+            --layer "$CORPUS_LAYER" --max-filters "$MAX_FILTERS" --out "$GITHUB_WORKSPACE/pilot/problems.jsonl"
           PYTHONPATH=research/solver-lab/src python -m autoeq_solver_lab.convergence_pilot \
-            --problems pilot/problems.jsonl \
-            --out pilot/convergence-pilot.json \
+            --problems "$GITHUB_WORKSPACE/pilot/problems.jsonl" \
+            --out "$GITHUB_WORKSPACE/pilot/convergence-pilot.json" \
             --case-ids synthetic-narrow-peak,synthetic-strong-shelf \
             --seeds "$SEEDS" \
             --budgets "$PILOT_BUDGETS" \
@@ -249,14 +249,14 @@ jobs:
           CORPUS_LAYER: ${{ inputs.corpus_layer }}
           MAX_FILTERS: ${{ inputs.max_filters }}
           CASE_ID: ${{ matrix.case_id }}
-        run: pnpm --silent --filter @autoeq-workbench/core research:lab -- export-problems --layer "$CORPUS_LAYER" --case-id "$CASE_ID" --max-filters "$MAX_FILTERS" --out oracle-artifacts/problems.jsonl
+        run: pnpm --silent --filter @autoeq-workbench/core research:lab -- export-problems --layer "$CORPUS_LAYER" --case-id "$CASE_ID" --max-filters "$MAX_FILTERS" --out "$GITHUB_WORKSPACE/oracle-artifacts/problems.jsonl"
       - name: Run one Standard v2 control case
         env:
           CORPUS_LAYER: ${{ inputs.corpus_layer }}
           MAX_FILTERS: ${{ inputs.max_filters }}
           CASE_ID: ${{ matrix.case_id }}
           REPOSITORY_SHA: ${{ github.sha }}
-        run: pnpm --silent --filter @autoeq-workbench/core research:oracle-report -- --layer "$CORPUS_LAYER" --case-id "$CASE_ID" --max-filters "$MAX_FILTERS" --budget-seconds 30 --repository-sha "$REPOSITORY_SHA" --out oracle-artifacts/control.json
+        run: pnpm --silent --filter @autoeq-workbench/core research:oracle-report -- --layer "$CORPUS_LAYER" --case-id "$CASE_ID" --max-filters "$MAX_FILTERS" --budget-seconds 30 --repository-sha "$REPOSITORY_SHA" --out "$GITHUB_WORKSPACE/oracle-artifacts/control.json"
       - name: Run one Continuous Oracle case
         env:
           SEEDS: ${{ needs.prepare.outputs.stage_seeds }}
@@ -377,31 +377,22 @@ jobs:
           set +e
           mkdir -p oracle-aggregate
           printf '%s\n' "$STAGE_CONFIG" > oracle-aggregate/stage-config.json
-          PYTHONPATH=research/solver-lab/src python -m autoeq_solver_lab.campaign \
-            aggregate \
-            --case-artifacts-dir case-artifacts \
-            --expected-case-ids "$CASE_IDS" \
-            --repository-sha "$REPOSITORY_SHA" \
-            --corpus-layer "$CORPUS_LAYER" \
-            --max-filters "$MAX_FILTERS" \
-            --stage-config oracle-aggregate/stage-config.json \
-            --out-dir oracle-aggregate \
-            --aggregate-artifact-name "$AGGREGATE_ARTIFACT_NAME" \
+          aggregate_args=(
+            aggregate
+            --case-artifacts-dir case-artifacts
+            --expected-case-ids "$CASE_IDS"
+            --repository-sha "$REPOSITORY_SHA"
+            --corpus-layer "$CORPUS_LAYER"
+            --max-filters "$MAX_FILTERS"
+            --stage-config oracle-aggregate/stage-config.json
+            --out-dir oracle-aggregate
+            --aggregate-artifact-name "$AGGREGATE_ARTIFACT_NAME"
             --pilot-artifact-name "$PILOT_ARTIFACT_NAME"
+          )
           if [[ -f pilot/convergence-pilot.json ]]; then
-            PYTHONPATH=research/solver-lab/src python -m autoeq_solver_lab.campaign \
-              aggregate \
-              --case-artifacts-dir case-artifacts \
-              --expected-case-ids "$CASE_IDS" \
-              --repository-sha "$REPOSITORY_SHA" \
-              --corpus-layer "$CORPUS_LAYER" \
-              --max-filters "$MAX_FILTERS" \
-              --stage-config oracle-aggregate/stage-config.json \
-              --out-dir oracle-aggregate \
-              --aggregate-artifact-name "$AGGREGATE_ARTIFACT_NAME" \
-              --pilot-artifact-name "$PILOT_ARTIFACT_NAME" \
-              --pilot pilot/convergence-pilot.json
+            aggregate_args+=(--pilot pilot/convergence-pilot.json)
           fi
+          PYTHONPATH=research/solver-lab/src python -m autoeq_solver_lab.campaign "${aggregate_args[@]}"
           status=$?
           if [[ "$status" -ne 0 && ! -f oracle-aggregate/campaign-manifest.json ]]; then
             python - "$status" "$CASE_IDS" "$REPOSITORY_SHA" "$CORPUS_LAYER" "$MAX_FILTERS" > oracle-aggregate/campaign-manifest.json <<'PY'
