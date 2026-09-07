@@ -675,15 +675,38 @@ def validate_oracle_campaign(
     ):
         errors.append("continuous config exact filter counts must contain every N from 1 through maxFilters")
     seeds = continuous_config.get("seeds")
+    campaign_mode = continuous_config.get("campaignMode")
+    staged_seed_requirements = {
+        "smoke": 2,
+        "screen": 2,
+        "confirm": 4,
+        "deep": 8,
+        "full": 8,
+    }
+    required_seed_count = (
+        staged_seed_requirements.get(campaign_mode, MIN_CALIBRATION_SEED_COUNT)
+        if isinstance(campaign_mode, str)
+        else MIN_CALIBRATION_SEED_COUNT
+    )
+    configured_minimum_seed_count = continuous_config.get("minimumIndependentSeedCount")
+    if configured_minimum_seed_count is not None:
+        if (
+            isinstance(configured_minimum_seed_count, bool) or
+            not isinstance(configured_minimum_seed_count, int) or
+            configured_minimum_seed_count != required_seed_count
+        ):
+            errors.append("continuous config minimumIndependentSeedCount does not match campaign mode")
+    elif isinstance(campaign_mode, str) and campaign_mode in staged_seed_requirements:
+        errors.append("staged continuous config must record minimumIndependentSeedCount")
     if not isinstance(seeds, Sequence) or isinstance(seeds, (str, bytes)):
         errors.append("continuous config seeds must be an explicit array")
     else:
-        if len(seeds) < MIN_CALIBRATION_SEED_COUNT:
-            errors.append(f"continuous config requires at least {MIN_CALIBRATION_SEED_COUNT} explicit seeds")
+        if len(seeds) < required_seed_count:
+            errors.append(f"continuous config requires at least {required_seed_count} explicit seeds")
         if any(isinstance(seed, bool) or not isinstance(seed, int) for seed in seeds):
             errors.append("continuous config seeds must be integers")
-        elif len(set(seeds)) < MIN_CALIBRATION_SEED_COUNT:
-            errors.append(f"continuous config requires {MIN_CALIBRATION_SEED_COUNT} independent seeds")
+        elif len(set(seeds)) < required_seed_count:
+            errors.append(f"continuous config requires {required_seed_count} independent seeds")
     optimizer_configs = continuous_config.get("optimizerConfigs")
     if not isinstance(optimizer_configs, Mapping):
         errors.append("continuous optimizer config records are required")

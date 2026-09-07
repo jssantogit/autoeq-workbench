@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 import shlex
+from typing import Literal
 
 from .canonical import CanonicalEvaluator, DEFAULT_CANONICAL_COMMAND
 from .io import (
@@ -18,7 +19,7 @@ from .optimizers.base import ContinuousOptimizer
 from .optimizers.cma_es import CmaEsOptimizer
 from .optimizers.differential_evolution import DifferentialEvolutionOptimizer
 from .optimizers.powell import PowellOptimizer
-from .pareto import nondominated
+from .pareto import nondominated, normalized_regret
 from .types import ObjectivePoint, SolverLabCandidate, SolverLabEvaluation, SolverLabProblem
 
 
@@ -29,9 +30,11 @@ DEFAULT_OBJECTIVE_WEIGHTS: tuple[tuple[float, float], ...] = (
     (0.25, 0.75),
     (0.0, 1.0),
 )
+CONTINUOUS_ORACLE_VERSION = "continuous-oracle-v2-staged"
 
 OPTIMIZER_CONFIGS: dict[str, dict[str, object]] = {
     "differential-evolution": {
+        "optimizerVersion": "differential-evolution-v1",
         "bounds": [[0.0, 1.0]],
         "workers": 1,
         "updating": "immediate",
@@ -40,6 +43,7 @@ OPTIMIZER_CONFIGS: dict[str, dict[str, object]] = {
         "seedSource": "candidate.seed",
     },
     "cma-es": {
+        "optimizerVersion": "cma-es-v1",
         "bounds": [0.0, 1.0],
         "sigma": 0.25,
         "verbose": -9,
@@ -47,12 +51,17 @@ OPTIMIZER_CONFIGS: dict[str, dict[str, object]] = {
         "seedSource": "candidate.seed",
     },
     "powell": {
+        "optimizerVersion": "powell-v2-shortlist",
         "method": "Powell",
         "bounds": [[0.0, 1.0]],
         "polishOnly": True,
+        "screening": "canonical-pareto-shortlist",
+        "nearParetoRegretThreshold": 0.05,
         "seedSource": "parent.seed",
     },
 }
+
+POWELL_NEAR_PARETO_REGRET_THRESHOLD = 0.05
 
 
 @dataclass(frozen=True)
@@ -61,6 +70,7 @@ class OracleRunConfig:
     filter_counts: tuple[int, ...]
     objective_weights: tuple[tuple[float, float], ...]
     evaluation_budget_per_run: int
+    polish_strategy: Literal["shortlist", "all"] = "shortlist"
 
     def __post_init__(self) -> None:
         if not self.seeds or any(not isinstance(seed, int) or isinstance(seed, bool) for seed in self.seeds):
@@ -74,6 +84,8 @@ class OracleRunConfig:
             raise ValueError("oracle config requires objective weights")
         if self.evaluation_budget_per_run <= 0:
             raise ValueError("oracle config evaluation budget must be positive")
+        if self.polish_strategy not in {"shortlist", "all"}:
+            raise ValueError("oracle config polish_strategy must be shortlist or all")
 
 
 OptimizerFactory = Callable[[str, int], ContinuousOptimizer]
@@ -169,19 +181,60 @@ def _validated_frontier_candidates_for_problem(
     return tuple(by_id[point.candidate_id] for point in selected)
 
 
+def _powell_shortlist(
+    problem: SolverLabProblem,
+    candidates: Sequence[SolverLabCandidate],
+    evaluations: Sequence[SolverLabEvaluation],
+    exact_filter_count: int,
+) -> tuple[SolverLabCandidate, ...]:
+    by_id = {candidate.candidateId: candidate for candidate in candidates}
+    evaluation_by_id = {evaluation.candidateId: evaluation for evaluation in evaluations}
+    points = tuple(
+        ObjectivePoint(
+            candidate_id=candidate.candidateId,
+            rmse_db=evaluation.continuous.rmseDb,
+            max_abs_db=evaluation.continuous.maxAbsDb,
+            filter_count=len(candidate.filters),
+        )
+        for candidate in candidates
+        if (
+            (evaluation := evaluation_by_id.get(candidate.candidateId)) is not None and
+            evaluation.valid and
+            evaluation.continuous is not None and
+            len(candidate.filters) == exact_filter_count
+        )
+    )
+    if not points:
+        return ()
+    pareto_points = nondominated(points)
+    selected_ids = {point.candidate_id for point in pareto_points}
+    for point in points:
+        if point.candidate_id in selected_ids:
+            continue
+        if normalized_regret(point, pareto_points) <= POWELL_NEAR_PARETO_REGRET_THRESHOLD:
+            selected_ids.add(point.candidate_id)
+    return tuple(
+        candidate
+        for candidate in candidates
+        if candidate.candidateId in selected_ids and candidate.candidateId in by_id
+    )
+
+
 def build_continuous_exact_frontier(
     problem: SolverLabProblem,
     filter_count: int,
     config: OracleRunConfig,
     canonical_evaluator: CanonicalEvaluator,
     optimizer_factory: OptimizerFactory | None = None,
+    stats: dict[str, int] | None = None,
 ) -> tuple[SolverLabCandidate, ...]:
     if isinstance(filter_count, bool) or not isinstance(filter_count, int) or filter_count <= 0:
         raise ValueError("exact filter count must be a positive integer")
     if filter_count > problem.bounds["maxFilters"]:
         raise ValueError("exact filter count exceeds problem maxFilters")
     factory = optimizer_factory or _default_optimizer_factory
-    candidates: list[SolverLabCandidate] = []
+    global_candidates: list[SolverLabCandidate] = []
+    global_metadata: dict[str, tuple[ContinuousVectorLayout, int, tuple[float, float]]] = {}
     run_index = 0
     for layout in enumerate_oracle_layouts(filter_count):
         for seed in config.seeds:
@@ -199,26 +252,64 @@ def build_continuous_exact_frontier(
                         objective_weights,
                         config.evaluation_budget_per_run,
                     )
-                    candidates.append(candidate)
-                    polish = factory("powell", run_index)
-                    run_index += 1
-                    candidates.append(polish.optimize(
-                        problem,
-                        layout,
-                        seed,
-                        objective_weights,
-                        config.evaluation_budget_per_run,
-                        initial_candidate=candidate,
-                    ))
-    unique_candidates = _unique_candidates(candidates)
-    evaluations = canonical_evaluator.evaluate(problem, unique_candidates)
-    return _validated_frontier_candidates_for_problem(
+                    global_candidates.append(candidate)
+                    global_metadata.setdefault(
+                        candidate.candidateId,
+                        (layout, seed, objective_weights),
+                    )
+    unique_global_candidates = _unique_candidates(global_candidates)
+    global_evaluations = canonical_evaluator.evaluate(problem, unique_global_candidates)
+    if config.polish_strategy == "all":
+        shortlist = unique_global_candidates
+    else:
+        shortlist = _powell_shortlist(
+            problem,
+            unique_global_candidates,
+            global_evaluations,
+            filter_count,
+        )
+    polished_candidates: list[SolverLabCandidate] = []
+    for candidate in shortlist:
+        polish = factory("powell", run_index)
+        run_index += 1
+        layout, seed, objective_weights = global_metadata[candidate.candidateId]
+        polished_candidates.append(polish.optimize(
+            problem,
+            layout,
+            seed,
+            objective_weights,
+            config.evaluation_budget_per_run,
+            initial_candidate=candidate,
+        ))
+    all_candidates = _unique_candidates((*unique_global_candidates, *polished_candidates))
+    global_ids = {evaluation.candidateId for evaluation in global_evaluations}
+    new_polished_candidates = tuple(
+        candidate for candidate in all_candidates
+        if candidate.candidateId not in global_ids
+    )
+    polished_evaluations = canonical_evaluator.evaluate(problem, new_polished_candidates) if new_polished_candidates else ()
+    evaluations_by_id = {
+        evaluation.candidateId: evaluation
+        for evaluation in (*global_evaluations, *polished_evaluations)
+    }
+    evaluations = tuple(evaluations_by_id[candidate.candidateId] for candidate in all_candidates)
+    frontier = _validated_frontier_candidates_for_problem(
         problem,
-        unique_candidates,
+        all_candidates,
         evaluations,
         max_filters=filter_count,
         exact_filter_count=filter_count,
     )
+    if stats is not None:
+        stats.update({
+            "generatedCount": len(global_candidates) + len(polished_candidates),
+            "deduplicatedCount": len(all_candidates),
+            "canonicallyEvaluatedCount": len(global_evaluations) + len(polished_evaluations),
+            "powellShortlistedCount": len(shortlist),
+            "polishedCount": len(polished_candidates),
+            "admittedCount": len(frontier),
+        })
+    return frontier
 
 
 def build_continuous_frontier(
@@ -226,6 +317,7 @@ def build_continuous_frontier(
     config: OracleRunConfig,
     canonical_evaluator: CanonicalEvaluator,
     optimizer_factory: OptimizerFactory | None = None,
+    stats: dict[str, int] | None = None,
 ) -> tuple[SolverLabCandidate, ...]:
     if len(config.filter_counts) != 1:
         raise ValueError("build_continuous_frontier requires exactly one exact filter count")
@@ -235,6 +327,7 @@ def build_continuous_frontier(
         config,
         canonical_evaluator,
         optimizer_factory,
+        stats,
     )
 
 
@@ -318,6 +411,7 @@ def _artifact_for_frontier(
                 "evaluation": json.loads(serialize_evaluation(evaluation_by_id[candidate.candidateId])),
                 "actualFilterCount": len(candidate.filters),
                 "actualDeliveredFilterCount": len(evaluation_by_id[candidate.candidateId].deliverableFilters),
+                "provenance": candidate.algorithmId,
             }
             for candidate in candidates
             if candidate.candidateId in evaluation_by_id
@@ -334,6 +428,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--max-filters", type=int)
     parser.add_argument("--control", required=True)
     parser.add_argument("--eval-budget", required=True, type=int)
+    parser.add_argument("--case-id")
+    parser.add_argument("--campaign-mode", choices=("smoke", "screen", "confirm", "deep", "full"))
+    parser.add_argument("--polish-strategy", choices=("shortlist", "all"), default="shortlist")
     parser.add_argument("--canonical-command", default=" ".join(DEFAULT_CANONICAL_COMMAND))
     args = parser.parse_args(argv)
     config = OracleRunConfig(
@@ -341,6 +438,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         filter_counts=_parse_int_list(args.filter_counts, "--filter-counts"),
         objective_weights=DEFAULT_OBJECTIVE_WEIGHTS,
         evaluation_budget_per_run=args.eval_budget,
+        polish_strategy=args.polish_strategy,
     )
     max_filters = args.max_filters if args.max_filters is not None else max(config.filter_counts)
     try:
@@ -350,19 +448,28 @@ def main(argv: Sequence[str] | None = None) -> None:
     config = replace(config, filter_counts=exact_filter_counts)
     evaluator = CanonicalEvaluator(shlex.split(args.canonical_command))
     problems = read_problems(args.problems)
+    if args.case_id is not None:
+        problems = tuple(problem for problem in problems if problem.problemId == args.case_id)
+        if not problems:
+            parser.error(f"case ID {args.case_id} is not present in the problem artifact")
     control_artifact = json.loads(Path(args.control).read_text(encoding="utf-8"))
     frontiers: list[dict] = []
     all_candidates: list[SolverLabCandidate] = []
+    continuous_stats: dict[str, dict[str, int]] = {}
     for problem in problems:
         exact_frontiers: list[tuple[SolverLabCandidate, ...]] = []
+        continuous_stats[problem.problemId] = {}
         for filter_count in config.filter_counts:
             single_count_config = replace(config, filter_counts=(filter_count,))
+            exact_stats: dict[str, int] = {}
             frontier = build_continuous_exact_frontier(
                 problem,
                 filter_count,
                 single_count_config,
                 evaluator,
+                stats=exact_stats,
             )
+            continuous_stats[problem.problemId][str(filter_count)] = exact_stats
             evaluations = evaluator.evaluate(problem, frontier)
             frontiers.append(_artifact_for_frontier(
                 problem,
@@ -399,6 +506,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     output.write_text(json.dumps({
         "version": 1,
         "oracle": "continuous",
+        "oracleVersion": CONTINUOUS_ORACLE_VERSION,
         "config": {
             "seeds": list(config.seeds),
             "filterCounts": list(config.filter_counts),
@@ -406,9 +514,14 @@ def main(argv: Sequence[str] | None = None) -> None:
             "caps": [max_filters],
             "objectiveWeights": [list(weights) for weights in config.objective_weights],
             "evaluationBudgetPerRun": config.evaluation_budget_per_run,
+            "polishStrategy": config.polish_strategy,
+            "campaignMode": args.campaign_mode,
+            "minimumIndependentSeedCount": len(config.seeds),
+            "objectiveWeightsVersion": "continuous-objectives-v1",
             "optimizerConfigs": OPTIMIZER_CONFIGS,
             "canonicalCommand": list(evaluator.command),
         },
+        "computeStats": continuous_stats,
         "candidatePath": str(candidate_path),
         "frontiers": frontiers,
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")

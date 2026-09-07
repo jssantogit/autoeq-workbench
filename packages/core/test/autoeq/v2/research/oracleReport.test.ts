@@ -14,6 +14,39 @@ describe('oracle control report', () => {
     ])).toMatchObject({ layer: 'development', maxFilters: 10, budgetSeconds: 15 })
   })
 
+  it('parses a case-scoped control request', () => {
+    expect(parseOracleControlArgs([
+      '--layer', 'adversarial', '--case-id', 'titan-to-storm', '--max-filters', '10',
+      '--budget-seconds', '15', '--repository-sha', 'b'.repeat(40), '--out', '/tmp/control.json',
+    ])).toMatchObject({
+      layer: 'adversarial',
+      caseId: 'titan-to-storm',
+      maxFilters: 10,
+    })
+  })
+
+  it('keeps a case-scoped control artifact to one approved point', () => {
+    const artifact = createOracleControlArtifact({
+      layer: 'adversarial',
+      caseId: 'titan-to-storm',
+      maxFilters: 10,
+      budgetSeconds: 15,
+      repositorySha: 'b'.repeat(40),
+      run: (input) => ({
+        metrics: {
+          maeDb: 0.2,
+          rmseDb: input.settings.maxFilters / 100,
+          maxAbsDb: 0.6,
+          maxAbsFrequencyHz: 1_000,
+        },
+        filters: [],
+        terminationReason: 'converged',
+      }),
+    })
+
+    expect(artifact.points.map((point) => point.problemId)).toEqual(['titan-to-storm'])
+  })
+
   it('serializes a deterministic development control artifact with the frozen control identity', () => {
     const create = () => createOracleControlArtifact({
       layer: 'development',

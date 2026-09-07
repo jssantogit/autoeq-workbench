@@ -26,6 +26,7 @@ import { loadLayeredResearchCases } from './corpus.js'
 type ExportOptions = {
   command: 'export-problems'
   layer: 'development' | 'adversarial'
+  caseId?: string
   maxFilters: number
   out: string
 }
@@ -86,7 +87,7 @@ export function parseSolverLabCliArgs(args: readonly string[]): LabCliOptions {
     throw new Error(`Unknown command ${command ?? '(missing)'}`)
   }
   if (command === 'export-problems') {
-    const values = parseOptionValues(normalizedArgs.slice(1), ['--layer', '--max-filters', '--out'])
+    const values = parseOptionValues(normalizedArgs.slice(1), ['--layer', '--case-id', '--max-filters', '--out'])
     const layer = requireOption(values, '--layer')
     if (layer !== 'development' && layer !== 'adversarial') {
       throw new Error('--layer must be development or adversarial')
@@ -94,6 +95,7 @@ export function parseSolverLabCliArgs(args: readonly string[]): LabCliOptions {
     return {
       command,
       layer,
+      caseId: values.get('--case-id'),
       maxFilters: parseMaxFilters(requireOption(values, '--max-filters')),
       out: requireOption(values, '--out'),
     }
@@ -165,7 +167,14 @@ function unknownProblemEvaluation(candidateId: string): SolverLabEvaluationV1 {
 }
 
 function exportProblems(options: ExportOptions): void {
-  const problems = loadLayeredResearchCases(options.layer)
+  const cases = loadLayeredResearchCases(options.layer)
+  const selectedCases = options.caseId === undefined
+    ? cases
+    : cases.filter((researchCase) => researchCase.id === options.caseId)
+  if (selectedCases.length === 0) {
+    throw new Error(`Case ${options.caseId} is not approved for layer ${options.layer}`)
+  }
+  const problems = selectedCases
     .map((researchCase) => createSolverLabProblem(researchCase, options.maxFilters))
     .sort((left, right) => left.problemId.localeCompare(right.problemId))
   writeAtomically(options.out, problems.map(serializeSolverLabProblem).join('\n') + '\n')

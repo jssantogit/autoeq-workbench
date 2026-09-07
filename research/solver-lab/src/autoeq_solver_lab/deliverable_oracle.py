@@ -24,6 +24,9 @@ from .structural import generate_structural_mutations
 from .types import ObjectivePoint, SolverLabCandidate, SolverLabEvaluation, SolverLabProblem
 
 
+DELIVERABLE_ORACLE_VERSION = "deliverable-oracle-v2-staged"
+
+
 @dataclass(frozen=True)
 class DeliverableOracleConfig:
     seed: int
@@ -349,9 +352,15 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--generations", required=True, type=int)
     parser.add_argument("--eval-budget", required=True, type=int)
     parser.add_argument("--max-filters", type=int)
+    parser.add_argument("--case-id")
+    parser.add_argument("--campaign-mode", choices=("smoke", "screen", "confirm", "deep", "full"))
     parser.add_argument("--canonical-command", required=True)
     args = parser.parse_args(argv)
     problems = {problem.problemId: problem for problem in read_problems(args.problems)}
+    if args.case_id is not None:
+        if args.case_id not in problems:
+            raise ValueError(f"case ID {args.case_id} is not present in the problem artifact")
+        problems = {args.case_id: problems[args.case_id]}
     continuous_artifact = json.loads(Path(args.continuous_frontier).read_text(encoding="utf-8"))
     max_filters = continuous_artifact.get("config", {}).get("maxFilters")
     if isinstance(max_filters, bool) or not isinstance(max_filters, int) or max_filters <= 0:
@@ -398,6 +407,7 @@ def main(argv: Sequence[str] | None = None) -> None:
                     "evaluation": json.loads(serialize_evaluation(evaluation)),
                     "actualFilterCount": len(candidate.filters),
                     "actualDeliveredFilterCount": len(evaluation.deliverableFilters),
+                    "provenance": candidate.algorithmId,
                 }
                 for candidate, evaluation in zip(frontier, evaluations, strict=True)
             ],
@@ -412,11 +422,13 @@ def main(argv: Sequence[str] | None = None) -> None:
     output.write_text(json.dumps({
         "version": 1,
         "oracle": "deliverable",
+        "oracleVersion": DELIVERABLE_ORACLE_VERSION,
         "config": {
             "seed": args.seed,
             "generations": args.generations,
             "evaluationBudget": args.eval_budget,
             "maxFilters": max_filters,
+            "campaignMode": args.campaign_mode,
             "canonicalCommand": args.canonical_command,
         },
         "candidatePath": str(candidate_path),

@@ -56,6 +56,7 @@ export type OracleControlRunner = (input: StandardAutoEqInputV2) => OracleContro
 
 export interface OracleControlOptions {
   layer: Exclude<ResearchCorpusLayer, 'holdout'>
+  caseId?: string
   maxFilters: number
   budgetSeconds: OracleControlArtifactV1['budgetSeconds']
   repositorySha: string
@@ -106,7 +107,11 @@ export function createOracleControlArtifact(
   const run = options.run ?? defaultRun
   const cases = [...(options.cases ?? loadLayeredResearchCases(options.layer))]
     .filter((researchCase) => researchCase.layer === options.layer)
+    .filter((researchCase) => options.caseId === undefined || researchCase.id === options.caseId)
     .sort((left, right) => left.id.localeCompare(right.id))
+  if (cases.length === 0) {
+    throw new Error(`Case ${options.caseId} is not approved for layer ${options.layer}`)
+  }
   const points = cases.map((researchCase): OracleControlPointV1 => {
     const execution = run(inputForCase(researchCase, options.maxFilters, options.budgetSeconds))
     return {
@@ -168,6 +173,7 @@ export function parseOracleControlArgs(args: readonly string[]): OracleControlOp
   }
   return {
     layer,
+    caseId: values.get('--case-id'),
     maxFilters,
     budgetSeconds: budgetSeconds as OracleControlArtifactV1['budgetSeconds'],
     repositorySha: required('--repository-sha'),

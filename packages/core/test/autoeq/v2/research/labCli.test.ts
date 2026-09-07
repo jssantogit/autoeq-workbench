@@ -122,6 +122,38 @@ describe('solver lab CLI', () => {
     })
   }, 30_000)
 
+  it('exports exactly one approved case when case-id is supplied', () => {
+    const directory = createTemporaryDirectory()
+    const problemsPath = join(directory, 'problems.jsonl')
+
+    const result = runCli([
+      'export-problems',
+      '--layer', 'adversarial',
+      '--case-id', 'titan-to-storm',
+      '--max-filters', '10',
+      '--out', problemsPath,
+    ])
+
+    expect(result.status).toBe(0)
+    expect(readFileSync(problemsPath, 'utf8').trim().split('\n')).toHaveLength(1)
+    expect(parseSolverLabProblem(readFileSync(problemsPath, 'utf8').trim()).problemId)
+      .toBe('titan-to-storm')
+  }, 30_000)
+
+  it('rejects a case id that is not approved for the selected layer', () => {
+    const directory = createTemporaryDirectory()
+    const result = runCli([
+      'export-problems',
+      '--layer', 'development',
+      '--case-id', 'titan-to-u12t',
+      '--max-filters', '10',
+      '--out', join(directory, 'problems.jsonl'),
+    ])
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('not approved for layer development')
+  }, 30_000)
+
   it('rejects unknown options with a nonzero exit code', () => {
     const result = runCli(['export-problems', '--layer', 'development', '--unknown'])
 

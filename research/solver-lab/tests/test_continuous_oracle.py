@@ -146,8 +146,82 @@ def test_continuous_frontier_keeps_only_canonically_validated_nondominated_point
     assert {candidate.algorithmId for candidate in frontier} == {
         "differential-evolution", "cma-es"
     }
-    assert len(evaluator.calls) == 1
-    assert len(evaluator.calls[0]) == 3
+    assert len(evaluator.calls) == 2
+    assert len(evaluator.calls[0]) == 2
+    assert len(evaluator.calls[1]) == 1
+
+
+class DominanceOptimizer(StubOptimizer):
+    def __init__(self, algorithm_id: str, run_index: int, counters: dict[str, int]):
+        super().__init__(algorithm_id, run_index)
+        self.counters = counters
+
+    def optimize(self, problem, layout, seed, objective_weights, evaluation_budget, initial_candidate=None):
+        del layout, seed, objective_weights, evaluation_budget
+        self.counters[self.algorithm_id] = self.counters.get(self.algorithm_id, 0) + 1
+        if self.algorithm_id == "differential-evolution":
+            return replace(fake_candidate(problem, self.algorithm_id, 100.0), candidateId="de-dominant")
+        if self.algorithm_id == "cma-es":
+            return replace(fake_candidate(problem, self.algorithm_id, 200.0), candidateId="cma-dominated")
+        assert initial_candidate is not None
+        return replace(
+            initial_candidate,
+            algorithmId="powell",
+            candidateId=f"powell:{self.run_index}",
+            filters=(LabFilter("powell-filter", True, "PK", 300.0, 1.0, 1.0),),
+        )
+
+
+class DominanceEvaluator(FakeCanonicalEvaluator):
+    def evaluate(self, problem, candidates):
+        self.calls.append(tuple(candidate.candidateId for candidate in candidates))
+        values = {
+            "de-dominant": (0.1, 0.2),
+            "cma-dominated": (0.2, 0.3),
+        }
+        results = []
+        for candidate in candidates:
+            rmse, max_abs = values.get(candidate.candidateId, (0.08, 0.25))
+            metric = CanonicalMetricSet(rmse, max_abs, {})
+            results.append(SolverLabEvaluation(
+                protocolVersion=1,
+                candidateId=candidate.candidateId,
+                valid=True,
+                rejectionReason=None,
+                continuous=metric,
+                deliverable=metric,
+                deliverableFilters=candidate.filters,
+                cancellationTotalScore=0.0,
+            ))
+        return tuple(results)
+
+
+def test_continuous_oracle_powell_polishes_only_canonical_shortlist():
+    counters: dict[str, int] = {}
+    evaluator = DominanceEvaluator()
+    frontier = build_continuous_frontier(
+        problem(),
+        OracleRunConfig(
+            seeds=(11,),
+            filter_counts=(1,),
+            objective_weights=((1.0, 0.0),),
+            evaluation_budget_per_run=10,
+            polish_strategy="shortlist",
+        ),
+        evaluator,
+        optimizer_factory=lambda algorithm_id, run_index: DominanceOptimizer(
+            algorithm_id, run_index, counters
+        ),
+    )
+
+    assert counters == {
+        "differential-evolution": 3,
+        "cma-es": 3,
+        "powell": 1,
+    }
+    assert evaluator.calls[0] == ("de-dominant", "cma-dominated")
+    assert evaluator.calls[1] == ("powell:6",)
+    assert all(candidate.candidateId != "cma-dominated" for candidate in frontier)
 
 
 class CapEvaluator:
