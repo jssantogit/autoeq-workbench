@@ -4,8 +4,9 @@ from dataclasses import dataclass, replace
 import hashlib
 import json
 import math
-from typing import Literal, Mapping, Sequence
+from typing import Any, Literal, Mapping, Sequence
 
+from .io import parse_filter
 from .objectives import ContinuousVectorLayout
 from .types import LabFilter, SolverLabCandidate, SolverLabEvaluation, SolverLabProblem
 
@@ -136,6 +137,57 @@ def build_reference_candidate(
         seed=None,
         filters=tuple(normalized),
     )
+
+
+def _record(value: Any, label: str) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        raise ValueError(f"{label} must be an object")
+    return value
+
+
+def reference_candidates_from_artifact(
+    problem: SolverLabProblem,
+    artifact: Mapping[str, Any],
+) -> tuple[SolverLabCandidate, ...]:
+    if artifact.get("version") != 1 or artifact.get("oracle") != "reference-seeds":
+        raise ValueError("reference artifact must be reference-seeds version 1")
+    source_algorithm = artifact.get("sourceAlgorithm")
+    if not isinstance(source_algorithm, str) or not source_algorithm:
+        raise ValueError("reference artifact requires sourceAlgorithm")
+    repository_sha = artifact.get("repositorySha")
+    if not isinstance(repository_sha, str) or not repository_sha:
+        raise ValueError("reference artifact requires repositorySha")
+    raw_points = artifact.get("points")
+    if not isinstance(raw_points, Sequence) or isinstance(raw_points, (str, bytes)):
+        raise ValueError("reference artifact requires points")
+
+    candidates: list[SolverLabCandidate] = []
+    for index, raw_point in enumerate(raw_points):
+        point = _record(raw_point, f"reference.points[{index}]")
+        if point.get("problemId") != problem.problemId:
+            continue
+        provenance = point.get("provenance", source_algorithm)
+        if not isinstance(provenance, str) or not provenance:
+            raise ValueError("reference point requires provenance")
+        source_id = point.get("sourceId")
+        if source_id is None:
+            source_id = f"{repository_sha}:{problem.problemId}:{index}"
+        if not isinstance(source_id, str) or not source_id:
+            raise ValueError("reference point sourceId must be a non-empty string")
+        raw_filters = point.get("filters")
+        if not isinstance(raw_filters, Sequence) or isinstance(raw_filters, (str, bytes)):
+            raise ValueError("reference point requires filters")
+        filters = tuple(
+            parse_filter(raw_filter, f"reference.points[{index}].filters[{filter_index}]")
+            for filter_index, raw_filter in enumerate(raw_filters)
+        )
+        candidates.append(build_reference_candidate(
+            problem,
+            provenance=provenance,
+            source_id=source_id,
+            filters=filters,
+        ))
+    return tuple(candidates)
 
 
 def _deliverable_quality(evaluation: SolverLabEvaluation) -> float:
