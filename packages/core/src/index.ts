@@ -89,8 +89,14 @@ export {
 export type {
   JointRefineInput,
   JointRefineResult,
+  JointRefineTrace,
   V2EvaluatedSolution,
 } from './autoeq/v2/jointRefine.js'
+export {
+  advanceJointRefineContinuationV2,
+  createJointRefineContinuationV2,
+} from './autoeq/v2/jointRefineContinuation.js'
+export type { JointRefineContinuationV2 } from './autoeq/v2/jointRefineContinuation.js'
 export {
   retainV2SearchPaths,
   searchStandardV2WorkingSolutions,
