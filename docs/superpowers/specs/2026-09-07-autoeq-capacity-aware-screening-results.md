@@ -11,6 +11,8 @@ record, not a calibration or production-promotion decision.
 - Required architectural baseline: `f14b8cd0a44fa05a7313d2b6d9b31ce077f597da`.
 - Approved implementation plan baseline: `b6ee1bb6433733bd5346acfecdc20f1abe2ae531`.
 - Task 11 implementation: `b8d08606dbc70b0d2444c69cb50a72cf7dcac0f7`.
+- High-cap gate follow-up: `87122ac` additionally blocks a `cap-limited`
+  classification when an already-present Max64 observation is unresolved.
 - Corrected Oracle evidence variable: `AUTOEQ_ORACLE_EVIDENCE_DIR` was not
   set in the execution environment. The required corrected campaign root was
   therefore not available.
