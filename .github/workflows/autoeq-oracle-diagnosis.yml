@@ -6,6 +6,7 @@ on:
     paths:
       - 'research/solver-lab/**'
       - 'packages/core/benchmarks/research/**'
+      - 'packages/core/test/autoeq/v2/research/**'
       - '.github/workflows/autoeq-oracle-diagnosis.yml'
 
 permissions:
