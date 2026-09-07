@@ -1,0 +1,39 @@
+name: AutoEQ Oracle Diagnosis
+
+on:
+  push:
+    branches: [research/solver-oracles-2026-09-06]
+    paths:
+      - 'research/solver-lab/**'
+      - 'packages/core/benchmarks/research/**'
+      - '.github/workflows/autoeq-oracle-diagnosis.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-diagnosis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pnpm install --frozen-lockfile
+      - name: Install research solver lab
+        run: python -m pip install --upgrade pip && python -m pip install -e 'research/solver-lab[test]'
+      - name: Run diagnosis-focused Python tests
+        run: python -m pytest -q research/solver-lab/tests/test_diagnostics.py
+      - name: Run full Python solver-lab tests
+        run: python -m pytest -q research/solver-lab/tests
+      - name: Verify research TypeScript tests
+        run: pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2/research
+      - name: Verify core typecheck
+        run: pnpm --filter @autoeq-workbench/core typecheck
