@@ -2,7 +2,7 @@ import numpy as np
 
 from autoeq_solver_lab.dsp import cascade_response_db
 from autoeq_solver_lab.metrics import error_metrics
-from autoeq_solver_lab.objectives import enumerate_oracle_layouts
+from autoeq_solver_lab.objectives import encode_filters, enumerate_oracle_layouts
 from autoeq_solver_lab.optimizers.cma_es import CmaEsOptimizer
 from autoeq_solver_lab.optimizers.differential_evolution import DifferentialEvolutionOptimizer
 from autoeq_solver_lab.optimizers.powell import PowellOptimizer
@@ -119,3 +119,25 @@ def test_cma_accepts_a_small_explicit_budget_without_a_single_member_population(
     second = CmaEsOptimizer().optimize(lab_problem, layout, 17, (1.0, 0.0), 5)
 
     assert first == second
+
+
+def test_cma_uses_explicit_initial_candidate_as_the_neighborhood_center():
+    lab_problem, _ = one_peak_problem()
+    layout = enumerate_oracle_layouts(1)[0]
+    initial = SolverLabCandidate(
+        protocolVersion=1,
+        problemId=lab_problem.problemId,
+        inputSha256=lab_problem.inputSha256,
+        candidateId="known-good",
+        algorithmId="known-good",
+        seed=None,
+        filters=(LabFilter("seed-filter", True, "PK", 850.0, 3.0, 1.0),),
+    )
+
+    seeded = CmaEsOptimizer().optimize(
+        lab_problem, layout, 17, (1.0, 0.0), 1, initial_candidate=initial
+    )
+
+    expected = encode_filters(lab_problem, layout, initial.filters)
+    actual = encode_filters(lab_problem, layout, seeded.filters)
+    assert np.allclose(actual, expected, rtol=0.0, atol=1e-12)
