@@ -266,8 +266,15 @@ def compute_quality_time(trajectory: Sequence[SolverTrajectoryPoint]) -> float:
 class MatchingPursuitSolver:
     algorithm_id = "matching-pursuit-v1"
 
-    def __init__(self, config: MatchingPursuitConfig) -> None:
+    def __init__(
+        self,
+        config: MatchingPursuitConfig,
+        preferred_frequencies: Sequence[float] = (),
+    ) -> None:
         self.config = config
+        if any(not math.isfinite(frequency) or frequency <= 0 for frequency in preferred_frequencies):
+            raise ValueError("preferred_frequencies must contain finite positive values")
+        self.preferred_frequencies = tuple(float(frequency) for frequency in preferred_frequencies)
         self.last_selected_atoms: tuple[DictionaryAtom, ...] = ()
         self.last_candidate_sequence: tuple[SolverLabCandidate, ...] = ()
 
@@ -339,6 +346,16 @@ class MatchingPursuitSolver:
             raise ValueError("matching pursuit max_filters exceeds problem maxFilters")
 
         atoms = build_dictionary(problem, self.config.dictionary)
+        if self.preferred_frequencies:
+            atoms = tuple(
+                atom for _, atom in sorted(
+                    enumerate(atoms),
+                    key=lambda item: (
+                        min(abs(math.log2(item[1].frequencyHz / frequency)) for frequency in self.preferred_frequencies),
+                        item[0],
+                    ),
+                )
+            )
         matrix = build_unit_response_matrix(problem, atoms)
         desired = np.asarray(problem.desiredDb, dtype=np.float64)
         if desired.ndim != 1 or desired.size != matrix.shape[0] or not np.all(np.isfinite(desired)):
