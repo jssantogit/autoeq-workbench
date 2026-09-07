@@ -126,7 +126,7 @@ jobs:
 
           available = sorted(
               json.loads(line)["problemId"]
-              for line in Path(sys.argv[2]).read_text(encoding="utf-8").splitlines()
+              for line in Path(sys.argv[3]).read_text(encoding="utf-8").splitlines()
               if line.strip()
           )
           previous_path = Path(sys.argv[4])
