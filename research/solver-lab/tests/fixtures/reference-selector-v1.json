@@ -1,0 +1,42 @@
+[
+  {
+    "id": "target-achieved-filter-count",
+    "points": [
+      { "candidateId": "many", "rmseDb": 0.1, "maxAbsDb": 0.2, "filterCount": 5, "cancellationScore": 0.1 },
+      { "candidateId": "compact", "rmseDb": 0.2, "maxAbsDb": 0.7, "filterCount": 3, "cancellationScore": 0.9 }
+    ],
+    "winner": "compact"
+  },
+  {
+    "id": "rmse-heavy-outside-target",
+    "points": [
+      { "candidateId": "balanced", "rmseDb": 0.3, "maxAbsDb": 1.0, "filterCount": 2, "cancellationScore": 0.1 },
+      { "candidateId": "rmse-poor", "rmseDb": 0.6, "maxAbsDb": 0.75, "filterCount": 1, "cancellationScore": 0.0 }
+    ],
+    "winner": "balanced"
+  },
+  {
+    "id": "max-abs-heavy-outside-target",
+    "points": [
+      { "candidateId": "max-abs-poor", "rmseDb": 0.25, "maxAbsDb": 1.5, "filterCount": 1, "cancellationScore": 0.0 },
+      { "candidateId": "rmse-poor", "rmseDb": 0.8, "maxAbsDb": 0.75, "filterCount": 1, "cancellationScore": 0.0 }
+    ],
+    "winner": "max-abs-poor"
+  },
+  {
+    "id": "cancellation-tie-break",
+    "points": [
+      { "candidateId": "high-cancellation", "rmseDb": 0.8, "maxAbsDb": 0.8, "filterCount": 2, "cancellationScore": 0.4 },
+      { "candidateId": "low-cancellation", "rmseDb": 0.8, "maxAbsDb": 0.8, "filterCount": 2, "cancellationScore": 0.1 }
+    ],
+    "winner": "low-cancellation"
+  },
+  {
+    "id": "candidate-id-tie-break",
+    "points": [
+      { "candidateId": "candidate-b", "rmseDb": 0.8, "maxAbsDb": 0.8, "filterCount": 2, "cancellationScore": 0.1 },
+      { "candidateId": "candidate-a", "rmseDb": 0.8, "maxAbsDb": 0.8, "filterCount": 2, "cancellationScore": 0.1 }
+    ],
+    "winner": "candidate-a"
+  }
+]
