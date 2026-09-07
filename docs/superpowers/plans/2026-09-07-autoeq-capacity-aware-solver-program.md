@@ -1,10 +1,10 @@
 # AutoEQ Capacity-Aware Solver Program Implementation Plan
 
-> **For OpenCode:** REQUIRED EXECUTION MODE: execute this plan inline/directly, task-by-task, in one development session or resumed session state. Do **not** use subagent-driven development. If Superpowers skills are available, use `superpowers:executing-plans`, not `superpowers:subagent-driven-development`. Track progress with the `- [ ]` checkboxes in this file.
+> **For OpenCode:** REQUIRED EXECUTION MODE: execute this plan inline/directly, task-by-task. Do **not** use subagent-driven development. If Superpowers skills are available, use `superpowers:executing-plans`, not `superpowers:subagent-driven-development`. Track progress with the `- [ ]` checkboxes in this file.
 
 **Goal:** Implement the approved Capacity-Aware Solver Program: freeze a best-known deliverable reference snapshot, define directed reference regret and corrected QTF, recover fixed-cap Max10 quality with resumable/state-bank search plus sparse/structural methods, test Max20/40 teacher-to-Max10 compression, classify capacity/search failure modes, and run an evidence-backed same-runtime 5/15/30/60-second tournament without changing production behavior.
 
-**Architecture:** Research evidence is split into two contracts: `OracleReferenceSnapshotV1` is the immutable scientific reference used by QTF, screening, and teacher selection; `OracleCalibrationManifestV1` remains a later, stricter promotion-threshold artifact. The runtime-relevant program is narrowed to three mechanisms/components: resumable/state-bank search with known-good/transfer proposals, sparse matching pursuit with teacher compression, and structural beam search. Python remains the laboratory for structural discovery and compression; TypeScript remains the canonical delivered evaluator and the authority for the final same-runtime tournament.
+**Architecture:** Research evidence is split into two contracts. `OracleReferenceSnapshotV1` is the immutable scientific reference used by QTF, screening, capacity-gap measurement, and teacher selection. `OracleCalibrationManifestV1` remains a later, stricter promotion-threshold artifact. The runtime-relevant program is narrowed to three mechanisms/components: resumable/state-bank search with known-good/transfer proposals, sparse matching pursuit with teacher compression, and structural beam search. Python remains the laboratory for structural discovery and compression; TypeScript remains the canonical delivered evaluator and the authority for the final same-runtime tournament.
 
 **Tech Stack:** Python 3.12, NumPy 2.x, SciPy 1.14+, pytest 8, TypeScript 6, Vitest 4, Node 22, tsx, pnpm, SHA-256.
 
@@ -24,22 +24,22 @@
 - Max Filters 10 is the primary product problem. Max20/40 are offline teachers/capacity probes only.
 - QTF and runtime regret use the best-known **deliverable** reference frontier, never a continuous-only frontier.
 - A valid Reference Snapshot may have zero control regret. Do not weaken `OracleCalibrationManifestV1` to manufacture a freeze.
-- Directed Reference Regret v1 uses positive-part deltas and must return zero when a candidate dominates a reference point. Report that case separately as `referenceImproved=true`.
+- Directed Reference Regret v1 uses positive-part deltas and returns zero when a candidate dominates a reference point. Report that case separately as `referenceImproved=true`.
 - QTF is a screening/ranking summary only. Raw canonical RMSE, maxAbs, Pareto/frontier evidence, and 5/15/30/60-second checkpoints remain primary evidence.
 - Cross-language screening uses canonical quality versus evaluation/work count. Do not claim product speed from Python-vs-Node wall-clock.
 - The final speed comparison is same-runtime Node/TypeScript, same runner/process, with monotonic best-so-far delivery at 5/15/30/60 seconds.
 - No new raw/private/user curves may be added. Use only the already approved real corpus plus synthetic cases.
 - Use focused TDD. Each numbered task ends in one coherent commit after `git diff --check`.
 - Generated large research artifacts stay outside Git history unless repository policy already marks them as approved small fixtures. Commit only small deterministic fixtures, code, manifests/hashes, and results/spec documents.
-- Required external evidence input is the existing corrected Oracle campaign directory. At execution start export:
+- Required external evidence input is the existing corrected Oracle campaign directory. At execution start run exactly:
 
 ```bash
-export AUTOEQ_ORACLE_EVIDENCE_DIR="${AUTOEQ_ORACLE_EVIDENCE_DIR:?point this at the existing corrected Oracle campaign root}"
+export AUTOEQ_ORACLE_EVIDENCE_DIR="${AUTOEQ_ORACLE_EVIDENCE_DIR:?set AUTOEQ_ORACLE_EVIDENCE_DIR to the existing corrected Oracle campaign root}"
 export AUTOEQ_CAPACITY_OUT_DIR="${AUTOEQ_CAPACITY_OUT_DIR:-$PWD/.research-artifacts/capacity-aware}"
 mkdir -p "$AUTOEQ_CAPACITY_OUT_DIR"
 ```
 
-If `AUTOEQ_ORACLE_EVIDENCE_DIR` is unavailable, do not rerun a broad Oracle campaign merely to satisfy this plan. Implement/test the contracts first and record the missing-evidence blocker before experiment tasks.
+If the evidence directory is unavailable, do not rerun a broad Oracle campaign merely to satisfy this plan. Complete the code/test tasks that do not require campaign evidence and record the missing-evidence blocker before experiment tasks.
 
 ---
 
@@ -47,31 +47,32 @@ If `AUTOEQ_ORACLE_EVIDENCE_DIR` is unavailable, do not rerun a broad Oracle camp
 
 ### Python solver lab
 
-- `research/solver-lab/src/autoeq_solver_lab/reference_snapshot.py` — `OracleReferenceSnapshotV1` schema, validation, canonical serialization/hash, freeze from existing case artifacts.
-- `research/solver-lab/src/autoeq_solver_lab/reference_regret.py` — Directed Reference Regret v1 plus `reference_improved` detection.
+- `research/solver-lab/src/autoeq_solver_lab/reference_snapshot.py` — snapshot schema, validation, canonical hash, aggregate discovery, and freeze.
+- `research/solver-lab/src/autoeq_solver_lab/reference_regret.py` — Directed Reference Regret v1 and reference-improvement detection.
 - `research/solver-lab/src/autoeq_solver_lab/quality_time.py` — QTF v1 formula/hash and exact log-time integration.
-- `research/solver-lab/src/autoeq_solver_lab/selector.py` — frozen Reference Pareto Selector used for deterministic trimming only.
-- `research/solver-lab/src/autoeq_solver_lab/trajectory.py` — language-neutral best-so-far run artifact model.
-- `research/solver-lab/src/autoeq_solver_lab/screening.py` — research summaries by evaluation count/reference regret/QTF.
-- `research/solver-lab/src/autoeq_solver_lab/solvers/matching_pursuit.py` — fixed-cap sparse structure discovery.
-- `research/solver-lab/src/autoeq_solver_lab/teacher_compression.py` — high-cap teacher to <=10-filter student compression.
-- `research/solver-lab/src/autoeq_solver_lab/solvers/structural_beam.py` — structural beam using existing mutation primitives.
-- `research/solver-lab/src/autoeq_solver_lab/run_capacity_study.py` — case-focused Max10/high-cap study orchestration.
-- `research/solver-lab/src/autoeq_solver_lab/case_classification.py` — evidence-based case classification support.
+- `research/solver-lab/src/autoeq_solver_lab/selector.py` — frozen Reference Pareto Selector.
+- `research/solver-lab/src/autoeq_solver_lab/trajectory.py` — common best-so-far run artifact model.
+- `research/solver-lab/src/autoeq_solver_lab/screening.py` — evaluation-count/reference-regret/QTF summaries.
+- `research/solver-lab/src/autoeq_solver_lab/solvers/matching_pursuit.py` — fixed-cap sparse discovery.
+- `research/solver-lab/src/autoeq_solver_lab/teacher_compression.py` — high-cap teacher to at-most-10-filter compression.
+- `research/solver-lab/src/autoeq_solver_lab/solvers/structural_beam.py` — structural beam using the existing mutation library.
+- `research/solver-lab/src/autoeq_solver_lab/run_capacity_study.py` — case-focused study orchestration.
+- `research/solver-lab/src/autoeq_solver_lab/case_classification.py` — evidence-backed case classification.
 
 ### TypeScript research/core
 
-- `packages/core/benchmarks/research/referenceSnapshot.ts` — TS validation/lookup for snapshot cells.
-- `packages/core/benchmarks/research/referenceRegret.ts` — TS Directed Reference Regret v1 parity implementation.
-- `packages/core/benchmarks/research/qualityTime.ts` — TS QTF v1 parity implementation.
-- `packages/core/benchmarks/research/referenceSelector.ts` — TS selector parity implementation.
+- `packages/core/benchmarks/research/referenceSnapshot.ts` — TS snapshot validator and cell lookup.
+- `packages/core/benchmarks/research/referenceRegret.ts` — TS Directed Reference Regret v1.
+- `packages/core/benchmarks/research/qualityTime.ts` — TS QTF v1.
+- `packages/core/benchmarks/research/referenceSelector.ts` — TS selector parity.
 - `packages/core/benchmarks/research/solverRunArtifact.ts` — TS run artifact validator/serializer.
 - `packages/core/src/autoeq/v2/jointRefineContinuation.ts` — compatibility-preserving resumable joint refinement.
 - `packages/core/benchmarks/research/resumableScheduler.ts` — research-only resumable/state-bank policies.
+- `packages/core/benchmarks/research/proposalSeeds.ts` — validated transfer/known-good/v1 proposal import.
 - `packages/core/benchmarks/research/resumableRun.ts` — state-bank runner emitting the common run artifact.
 - `packages/core/benchmarks/research/capacityTournament.ts` — same-runtime 5/15/30/60 tournament orchestration.
-- `packages/core/benchmarks/research/capacityTournamentRun.ts` — CLI for final adversarial tournament.
-- Conditional survivor ports: `matchingPursuit.ts` and/or `structuralBeam.ts` under `packages/core/benchmarks/research/` only if their Python evidence survives Task 11.
+- `packages/core/benchmarks/research/capacityTournamentRun.ts` — tournament CLI.
+- Conditional survivor ports: `matchingPursuit.ts` and/or `structuralBeam.ts` under `packages/core/benchmarks/research/` only when Task 12 evidence shortlists them.
 
 ---
 
@@ -83,7 +84,9 @@ If `AUTOEQ_ORACLE_EVIDENCE_DIR` is unavailable, do not rerun a broad Oracle camp
 - Create: `research/solver-lab/tests/fixtures/oracle-reference-snapshot-v1.json`
 - Modify: `research/solver-lab/pyproject.toml`
 
-**Interfaces:**
+**Produces:** `OracleReferenceSnapshotV1`, deterministic JSON serialization, content SHA-256, and CLI `autoeq-reference-snapshot`.
+
+The public dataclasses are exactly:
 
 ```python
 ReferenceState = Literal["stable-under-current-search", "still-moving"]
@@ -125,9 +128,7 @@ class OracleReferenceSnapshotV1:
 
 - [ ] **Step 1: Write RED schema/hash tests**
 
-Test exact rejection of duplicate cells, duplicate candidate IDs inside a cell, mismatched problem/hash/cap, delivered counts above cap, non-finite metrics, invalid SHA-256, invalid `reference_state`, and frontier IDs that do not exist in `candidates`.
-
-Use a synthetic control plus two deliverable candidates where one candidate dominates control. Assert the builder admits control to the union, then emits only nondominated frontier IDs while retaining the control candidate in `candidates`.
+Test rejection of duplicate cells, duplicate candidate IDs, problem/hash/cap mismatches, delivered counts above cap, non-finite metrics, invalid SHA-256 strings, invalid reference states, and frontier IDs absent from `candidates`. Add a synthetic control plus two deliverable candidates where one candidate dominates control; assert control stays in `candidates` but may disappear from the final nondominated frontier.
 
 - [ ] **Step 2: Run RED**
 
@@ -135,62 +136,65 @@ Use a synthetic control plus two deliverable candidates where one candidate domi
 python -m pytest -q research/solver-lab/tests/test_reference_snapshot.py
 ```
 
-Expected: FAIL because `reference_snapshot.py` does not exist.
+Expected: import failure for `autoeq_solver_lab.reference_snapshot`.
 
-- [ ] **Step 3: Implement canonical payload hashing**
+- [ ] **Step 3: Implement canonical snapshot payload/hash**
 
-Canonical serialization is UTF-8 JSON with sorted keys and compact separators. `content_sha256` is computed over the full snapshot payload with `contentSha256` omitted, then stored as lowercase hex.
+Use exactly:
 
 ```python
-def canonical_snapshot_payload(snapshot_without_hash: Mapping[str, Any]) -> str:
+def canonical_snapshot_payload(value: Mapping[str, Any]) -> str:
     return json.dumps(
-        snapshot_without_hash,
+        value,
         sort_keys=True,
         separators=(",", ":"),
         ensure_ascii=False,
         allow_nan=False,
     )
+
+
+def snapshot_content_sha256(value_without_content_hash: Mapping[str, Any]) -> str:
+    return hashlib.sha256(
+        canonical_snapshot_payload(value_without_content_hash).encode("utf-8")
+    ).hexdigest()
 ```
 
-- [ ] **Step 4: Build cells from existing corrected campaign case artifacts**
+The hash input excludes only the top-level `contentSha256` field.
 
-Reuse `campaign.validate_case_artifact()` and existing `io.py` candidate/evaluation parsers. Do not invent a second Oracle artifact parser.
+- [ ] **Step 4: Implement aggregate discovery and best-known union**
 
-For deliverable reference points, use each case artifact's `deliverable.json` MaxFilters frontier plus the frozen control from `control.json`; canonical metrics and delivered filter arrays come from the stored canonical evaluations. Continuous fronts are copied only into `continuous_diagnostic_frontier`.
+Recursively discover directories under `AUTOEQ_ORACLE_EVIDENCE_DIR` containing all of:
 
-Reference state rule is conservative:
+```text
+campaign-manifest.json
+control-aggregate.json
+continuous-aggregate.json
+deliverable-aggregate.json
+continuous-aggregate.json.candidates.jsonl
+deliverable-aggregate.json.candidates.jsonl
+```
+
+Validate aggregate artifacts with the existing campaign/calibration/io helpers rather than defining a second parser. For each `problemId × maxFilters`, union every valid deliverable frontier candidate from every discovered aggregate plus the frozen control candidate before calling `nondominated()`. Retain every union candidate with provenance and source aggregate hash; store only the nondominated candidate IDs in `deliverable_frontier_candidate_ids`.
+
+- [ ] **Step 5: Implement conservative reference-state selection**
+
+For each cell, sort aggregate evidence by campaign stage rank:
 
 ```python
-if latest_aggregate_convergence_for_cell is explicitly resolved:
-    state = "stable-under-current-search"
-else:
-    state = "still-moving"
+stage_rank = {"smoke": 0, "screen": 1, "confirm": 2, "deep": 3, "full": 4}
 ```
 
-Absence of convergence evidence must never be upgraded to stable.
+Among the highest-rank complete aggregates containing the case/cap, set `stable-under-current-search` only when `campaign-manifest.json["convergence"][problemId]["unresolved"] is False`. Otherwise set `still-moving`. Missing convergence evidence never implies stability.
 
-- [ ] **Step 5: Add CLI**
+- [ ] **Step 6: Add CLI and GREEN test**
 
-Add:
+Add to `pyproject.toml`:
 
 ```toml
 autoeq-reference-snapshot = "autoeq_solver_lab.reference_snapshot:main"
 ```
 
-CLI contract:
-
-```text
-autoeq-reference-snapshot \
-  --campaign-root <existing corrected campaign root> \
-  --repository-sha <git SHA> \
-  --corpus-version autoeq-research-corpus-v1 \
-  --canonical-evaluator-version standard-v2-canonical-v1 \
-  --out <OracleReferenceSnapshotV1.json>
-```
-
-The CLI recursively discovers `case-manifest.json`, validates every selected case artifact, keeps the latest valid evidence per `problemId × maxFilters`, and includes every available Max10/20/40 cell for `titan-to-storm`, `titan-to-u12t`, and `titan-to-trio`. Require Max10 for all three cases and at least one of Max20/Max40 per case.
-
-- [ ] **Step 6: Run GREEN and freeze current snapshot**
+Run exactly:
 
 ```bash
 python -m pytest -q research/solver-lab/tests/test_reference_snapshot.py
@@ -202,12 +206,14 @@ python -m autoeq_solver_lab.reference_snapshot \
   --out "$AUTOEQ_CAPACITY_OUT_DIR/OracleReferenceSnapshotV1.json"
 python -m autoeq_solver_lab.reference_snapshot \
   --validate "$AUTOEQ_CAPACITY_OUT_DIR/OracleReferenceSnapshotV1.json"
-git diff --check
 ```
+
+The freeze command must require Max10 for `titan-to-storm`, `titan-to-u12t`, and `titan-to-trio`, plus at least one available high-cap cell from Max20/Max40 for each case. It includes all additional valid cells it discovers.
 
 - [ ] **Step 7: Commit**
 
 ```bash
+git diff --check
 git add research/solver-lab/src/autoeq_solver_lab/reference_snapshot.py \
   research/solver-lab/tests/test_reference_snapshot.py \
   research/solver-lab/tests/fixtures/oracle-reference-snapshot-v1.json \
@@ -227,68 +233,43 @@ git commit -m "feat(research): add best-known reference snapshots"
 - Create: `packages/core/test/autoeq/v2/research/referenceRegret.test.ts`
 - Modify: `research/solver-lab/src/autoeq_solver_lab/calibration.py`
 
-**Interfaces:**
+**Produces:** Python function `directed_reference_regret(...) -> ReferenceRegretResult` and TypeScript function `directedReferenceRegret(...) -> ReferenceRegretResult`.
 
 ```python
 @dataclass(frozen=True)
 class ReferenceRegretResult:
     regret: float
     reference_improved: bool
-
-
-def directed_reference_regret(
-    point: ObjectivePoint,
-    frontier: Sequence[ObjectivePoint],
-    rmse_scale: float = 0.25,
-    max_abs_scale: float = 0.75,
-) -> ReferenceRegretResult: ...
-```
-
-TypeScript:
-
-```ts
-export interface ReferenceObjectivePoint {
-  candidateId: string
-  rmseDb: number
-  maxAbsDb: number
-  filterCount: number
-}
-
-export interface ReferenceRegretResult {
-  regret: number
-  referenceImproved: boolean
-}
-
-export function directedReferenceRegret(
-  point: ReferenceObjectivePoint,
-  frontier: readonly ReferenceObjectivePoint[],
-): ReferenceRegretResult
 ```
 
 - [ ] **Step 1: Write RED parity vectors**
 
-Fixture cases must cover: worse in both dimensions, worse in RMSE only, worse in maxAbs only, equal to a frontier point, candidate dominating one frontier point, and a multi-point incomparable frontier.
+Fixture cases cover worse in both dimensions, RMSE-only regression, maxAbs-only regression, equality, domination of one frontier point, and a multi-point incomparable frontier.
 
-The normative formula is exactly:
+- [ ] **Step 2: Implement exact formula in Python**
 
-```text
-min_r sqrt(
-  (max(0, candidate.rmse - r.rmse) / 0.25)^2 +
-  (max(0, candidate.maxAbs - r.maxAbs) / 0.75)^2
+```python
+regret = min(
+    math.hypot(
+        max(0.0, point.rmse_db - ref.rmse_db) / rmse_scale,
+        max(0.0, point.max_abs_db - ref.max_abs_db) / max_abs_scale,
+    )
+    for ref in frontier
 )
+reference_improved = any(dominates(point, ref) for ref in frontier)
 ```
 
-`referenceImproved=true` iff the candidate strictly Pareto-dominates at least one stored nondominated reference point under the existing epsilon semantics.
+Default scales are `0.25` and `0.75`; input validation matches `pareto.py` finite/positive rules.
 
-- [ ] **Step 2: Implement Python helper and reuse it in calibration**
+- [ ] **Step 3: Reuse the helper from calibration without changing calibration policy**
 
-Replace duplicate directed-distance arithmetic inside `calibration.py` with an import from `reference_regret.py`, but do not change calibration validity/freeze rules.
+Replace duplicate directed-distance arithmetic in `calibration.py` with `directed_reference_regret(...).regret`. Keep every existing `valid`/`insufficient`, strict-control-improvement, and non-vacuous-threshold rule unchanged.
 
-- [ ] **Step 3: Implement TypeScript parity helper**
+- [ ] **Step 4: Implement TypeScript parity**
 
-Use the same epsilon `1e-12` and finite-input validation. Do not use the old symmetric `normalized_regret` semantics.
+Use epsilon `1e-12` for dominance and the same positive-part distance. Validate nonempty frontier and finite metrics/scales.
 
-- [ ] **Step 4: Verify parity and commit**
+- [ ] **Step 5: Verify and commit**
 
 ```bash
 python -m pytest -q research/solver-lab/tests/test_reference_regret.py research/solver-lab/tests/test_calibration.py
@@ -311,34 +292,23 @@ git commit -m "feat(research): add directed reference regret"
 **Files:**
 - Create: `packages/core/benchmarks/research/referenceSnapshot.ts`
 - Create: `packages/core/test/autoeq/v2/research/referenceSnapshot.test.ts`
-- Read fixture: `research/solver-lab/tests/fixtures/oracle-reference-snapshot-v1.json`
+- Read: `research/solver-lab/tests/fixtures/oracle-reference-snapshot-v1.json`
 
-**Interfaces:**
+**Produces:** TypeScript interfaces mirroring every Task 1 JSON field, `assertOracleReferenceSnapshotV1(value)`, and `getReferenceCell(snapshot, problemId, inputSha256, maxFilters)`.
 
-```ts
-export interface OracleReferenceSnapshotV1 { /* exact JSON contract from Task 1 */ }
+- [ ] **Step 1: Write RED tests against the Python fixture**
 
-export function assertOracleReferenceSnapshotV1(
-  value: unknown,
-): asserts value is OracleReferenceSnapshotV1
+Reject wrong version/hash, duplicate cells, invalid candidate/frontier references, and lookup with mismatched problem/hash/cap.
 
-export function getReferenceCell(
-  snapshot: OracleReferenceSnapshotV1,
-  problemId: string,
-  inputSha256: string,
-  maxFilters: number,
-): OracleReferenceSnapshotV1['cells'][number]
-```
+- [ ] **Step 2: Implement full TypeScript interfaces**
 
-- [ ] **Step 1: Write RED tests against the shared Python fixture**
+Mirror `ReferenceCandidateV1`, `ReferenceCellV1`, and `OracleReferenceSnapshotV1` field-for-field using JSON camelCase names. No `any` in public interfaces.
 
-Require exact rejection of unknown version, invalid hash, duplicate cells, bad frontier IDs, and wrong cap/hash lookup.
+- [ ] **Step 3: Verify content hash**
 
-- [ ] **Step 2: Implement validator and lookup**
+Canonicalize with recursively sorted object keys and compact JSON. Remove only top-level `contentSha256` before SHA-256 comparison. Keep Node crypto confined to `benchmarks/research`.
 
-Keep this module research-only. It may use Node crypto for SHA verification because it is under `benchmarks/research`, not shipping runtime.
-
-- [ ] **Step 3: Verify and commit**
+- [ ] **Step 4: Verify and commit**
 
 ```bash
 pnpm --filter @autoeq-workbench/core test -- \
@@ -362,38 +332,39 @@ git commit -m "feat(research): validate reference snapshots in TypeScript"
 - Create: `packages/core/benchmarks/research/qualityTime.ts`
 - Create: `packages/core/test/autoeq/v2/research/qualityTime.test.ts`
 
-**Interfaces:**
+**Produces:** `quality_from_regret`, `compute_quality_time_frontier`, `quality_time_formula_sha256` and exact TypeScript equivalents.
+
+Constants:
 
 ```python
 QUALITY_TIME_FORMULA_VERSION = 1
 QUALITY_TIME_T_MIN_SECONDS = 0.5
 QUALITY_TIME_T_MAX_SECONDS = 60.0
-
-@dataclass(frozen=True)
-class RegretTimelinePoint:
-    elapsed_seconds: float
-    regret: float
-
-
-def quality_from_regret(regret: float) -> float: ...
-def quality_time_formula_sha256() -> str: ...
-def compute_quality_time_frontier(points: Sequence[RegretTimelinePoint]) -> float: ...
 ```
 
-Canonical descriptor is exactly:
+Canonical formula descriptor is exactly:
 
 ```json
 {"integration":"left-continuous-piecewise-constant-log-time","qualityTransform":"exp(-max(0,regret))","reference":"oracle-reference-snapshot-v1:deliverable-frontier","regret":"directed-reference-regret-v1","tMaxSeconds":60,"tMinSeconds":0.5,"version":1}
 ```
 
-- [ ] **Step 1: Write RED fixture/tests**
+- [ ] **Step 1: Write RED shared fixture**
 
-Cases: constant regret 0 -> score 1; constant regret 1 -> `exp(-1)`; improvement from regret 1 to 0 at 5 seconds; duplicate timestamps keep last; update at exactly 60 seconds contributes no prior area; final value is held to 60 seconds; invalid timestamps/regrets reject.
+Cases: constant regret 0, constant regret 1, improvement from 1 to 0 at 5 seconds, duplicate timestamp keep-last, update at exactly 60 seconds, early finish held through 60 seconds, and invalid timestamp/regret inputs.
 
-- [ ] **Step 2: Implement exact piecewise log-time integration in Python**
+- [ ] **Step 2: Implement Python quality transform**
 
 ```python
-active_q = quality_from_regret(last_point_at_or_before_0_5.regret)
+def quality_from_regret(regret: float) -> float:
+    if not math.isfinite(regret) or regret < 0:
+        raise ValueError("regret must be finite and non-negative")
+    return math.exp(-regret)
+```
+
+- [ ] **Step 3: Implement exact piecewise log-time integration**
+
+```python
+active_q = quality_from_regret(last_point_at_or_before_t_min.regret)
 left = 0.5
 area = 0.0
 for point in points_strictly_inside_window:
@@ -401,14 +372,16 @@ for point in points_strictly_inside_window:
     left = point.elapsed_seconds
     active_q = quality_from_regret(point.regret)
 area += active_q * math.log(60.0 / left)
-return area / math.log(60.0 / 0.5)
+score = area / math.log(60.0 / 0.5)
 ```
 
-- [ ] **Step 3: Implement identical TypeScript behavior and formula hash**
+Stable-sort by timestamp plus original index and collapse equal timestamps by keeping the later original item.
 
-Use the exact descriptor string above; hash UTF-8 bytes with SHA-256. The shared fixture stores the expected hash after Python generates it.
+- [ ] **Step 4: Implement identical TypeScript behavior/hash**
 
-- [ ] **Step 4: Verify parity and commit**
+Use the exact one-line descriptor above and Node SHA-256. Read the same JSON fixture and require score parity to `1e-12` absolute error and exact formula-hash equality.
+
+- [ ] **Step 5: Verify and commit**
 
 ```bash
 python -m pytest -q research/solver-lab/tests/test_quality_time.py
@@ -440,16 +413,14 @@ git commit -m "feat(research): define reference-based QTF v1"
 - Create: `packages/core/test/autoeq/v2/research/referenceSelector.test.ts`
 - Create: `packages/core/test/autoeq/v2/research/solverRunArtifact.test.ts`
 
-**Interfaces:**
+**Selector policy:**
 
-Selector policy is frozen as:
-
-1. target-achieved (`rmse <= 0.25`, `maxAbs <= 0.75`) beats not achieved;
-2. among target-achieved: lower delivered filter count, then lower RMSE, then lower maxAbs;
-3. outside target: minimize `sqrt((rmse/0.25)^2 + (maxAbs/0.75)^2)`;
+1. target achieved (`rmse <= 0.25`, `maxAbs <= 0.75`) beats not achieved;
+2. among target-achieved points: lower delivered filter count, lower RMSE, lower maxAbs;
+3. outside target: minimize `sqrt((rmse / 0.25)^2 + (maxAbs / 0.75)^2)`;
 4. tie-break lower RMSE, lower maxAbs, lower cancellation score, lower delivered filter count, stable candidate ID.
 
-Run artifact:
+**Run artifact dataclasses:**
 
 ```python
 @dataclass(frozen=True)
@@ -479,15 +450,19 @@ class SolverRunResult:
     metadata: dict[str, str | int | float | bool]
 ```
 
-- [ ] **Step 1: Write RED selector parity tests**
+- [ ] **Step 1: Write RED selector parity vectors**
 
-Use the same JSON vectors in Python/TS and require identical winner IDs.
+Cover target-achieved, RMSE-heavy, maxAbs-heavy, Pareto-incomparable, filter-count preference, cancellation tie, and exact candidate-ID tie-break.
 
-- [ ] **Step 2: Write RED trajectory invariants**
+- [ ] **Step 2: Implement selector in both languages**
 
-Require nondecreasing evaluation count/time, exact problem/hash/cap/snapshot identity, finite metrics/regret, and monotonic best-so-far selection. `reference_improved` is informational and never causes a point to be discarded.
+Require identical winner candidate IDs for every shared fixture group.
 
-- [ ] **Step 3: Implement Python builder and screening summary**
+- [ ] **Step 3: Write RED trajectory invariants**
+
+Require nondecreasing evaluation count/time, exact problem/hash/cap/snapshot identity, finite metrics/regret, and monotonic best-so-far selection. A later point may replace the stored best only when it Pareto-dominates the current best or wins the frozen selector among nondominated candidates.
+
+- [ ] **Step 4: Implement screening summary without calibration thresholds**
 
 ```python
 @dataclass(frozen=True)
@@ -500,13 +475,13 @@ class ScreeningSummary:
     unique_case_win_count: int
 ```
 
-Do not add an acceptance threshold from `OracleCalibrationManifestV1` here.
+Do not consult `OracleCalibrationManifestV1` in this module.
 
-- [ ] **Step 4: Implement TS validator/serializer**
+- [ ] **Step 5: Implement TypeScript artifact validator/serializer**
 
-Require canonical key ordering and byte-stable serialization for one shared fixture.
+Mirror the Python schema in camelCase, reject unknown version and non-finite numeric fields, and serialize with deterministic recursively sorted keys.
 
-- [ ] **Step 5: Verify and commit**
+- [ ] **Step 6: Verify and commit**
 
 ```bash
 python -m pytest -q research/solver-lab/tests/test_selector.py \
@@ -540,7 +515,7 @@ git commit -m "feat(research): add capacity screening trajectory contract"
 - Create: `packages/core/src/autoeq/v2/jointRefineContinuation.ts`
 - Create: `packages/core/test/autoeq/v2/jointRefineContinuation.test.ts`
 
-**Interfaces:**
+**Produces:** `JointRefineContinuationV2`, `createJointRefineContinuationV2`, and `advanceJointRefineContinuationV2`; `jointRefineV2` remains the compatibility wrapper.
 
 ```ts
 export interface JointRefineContinuationV2 {
@@ -551,31 +526,21 @@ export interface JointRefineContinuationV2 {
   done: boolean
   expired: boolean
 }
-
-export function createJointRefineContinuationV2(
-  input: JointRefineInput,
-): JointRefineContinuationV2
-
-export function advanceJointRefineContinuationV2(
-  continuation: JointRefineContinuationV2,
-  input: Omit<JointRefineInput, 'solution'>,
-  maxAdditionalCycles: number,
-): JointRefineResult & { continuation: JointRefineContinuationV2 }
 ```
 
 - [ ] **Step 1: Write RED equivalence tests before refactor**
 
-Capture current `jointRefineV2()` outputs for PK-only, shelf-only, and mixed solutions at 1, 2, and 6 configured cycles. Assert exact filters, canonical metrics, completed cycles, coordinate trials, expiration, and cancellation-audit behavior.
+Capture current `jointRefineV2()` outputs for PK-only, shelf-only, and mixed solutions at 1, 2, and 6 configured cycles. Assert filters, metrics, completed cycles, coordinate trials, expiration, and cancellation-audit counts exactly.
 
-- [ ] **Step 2: Extract one completed-cycle unit**
+- [ ] **Step 2: Move one completed-cycle execution into continuation code**
 
-Move cycle state into `JointRefineContinuationV2` without changing `JOINT_REFINEMENT_SCALES`, coordinate order, tie-breaks, deadline checks, lazy cancellation audit, or research trace semantics.
+Preserve `JOINT_REFINEMENT_SCALES`, filter order, coordinate order, tie-breaks, deadline checks, replacement-trial materialization, cancellation-audit laziness, and research trace cycle accounting.
 
-- [ ] **Step 3: Keep `jointRefineV2()` as compatibility wrapper**
+- [ ] **Step 3: Implement compatibility wrapper**
 
-The wrapper repeatedly advances until the pre-existing cycle/deadline stop rule. It must not expose new behavior to `runStandardAutoEqV2()`.
+`jointRefineV2(input, trace)` creates a continuation and repeatedly advances by one cycle until `done`, `expired`, or the original configured maximum cycle count is reached. Return the same `JointRefineResult` shape as before.
 
-- [ ] **Step 4: Verify exact compatibility and commit**
+- [ ] **Step 4: Verify exact compatibility**
 
 ```bash
 pnpm --filter @autoeq-workbench/core test -- \
@@ -584,6 +549,13 @@ pnpm --filter @autoeq-workbench/core test -- \
   test/autoeq/v2/runStandardAutoEqV2.test.ts \
   test/autoeq/v2/progressiveDelivery.test.ts
 pnpm --filter @autoeq-workbench/core typecheck
+```
+
+Any deterministic result/counter drift is a blocker.
+
+- [ ] **Step 5: Commit**
+
+```bash
 git diff --check
 git add packages/core/src/autoeq/v2/jointRefine.ts \
   packages/core/src/autoeq/v2/jointRefineContinuation.ts \
@@ -591,21 +563,19 @@ git add packages/core/src/autoeq/v2/jointRefine.ts \
 git commit -m "refactor(core): expose resumable v2 joint refinement"
 ```
 
-Any compatibility drift is a blocker; do not continue to scheduler work until this task is green.
-
 ---
 
-### Task 7: Implement resumable/state-bank research scheduling and proposal sources
+### Task 7: Implement resumable/state-bank scheduling and proposal sources
 
 **Files:**
 - Create: `packages/core/benchmarks/research/resumableScheduler.ts`
-- Create: `packages/core/benchmarks/research/resumableRun.ts`
 - Create: `packages/core/benchmarks/research/proposalSeeds.ts`
+- Create: `packages/core/benchmarks/research/resumableRun.ts`
 - Create: `packages/core/test/autoeq/v2/research/resumableScheduler.test.ts`
 - Create: `packages/core/test/autoeq/v2/research/proposalSeeds.test.ts`
 - Modify: `packages/core/package.json`
 
-**Interfaces:**
+**State contract:**
 
 ```ts
 export type ResearchStateOrigin =
@@ -632,25 +602,25 @@ export interface ScheduledResearchState {
 }
 ```
 
-- [ ] **Step 1: Write RED scheduler tests**
+- [ ] **Step 1: Write RED pause/resume tests**
 
-Use fake continuations where a lower-ranked fresh state becomes best after a later slice. Verify pause/resume works. Verify transferred/known-good states are stored in a separate bank and do not reduce the configured fresh-state capacity merely by insertion.
+Use fake continuations where a state ranked third after one slice becomes best after a later slice. Require the scheduler to preserve and resume it rather than recreate it.
 
-- [ ] **Step 2: Implement two exact policies**
+- [ ] **Step 2: Write RED fresh-vs-bank capacity tests**
 
-`resumable-beam-v1`: every fresh state receives one completed refinement cycle before additional cycles are allocated one-at-a-time by Pareto/Reference Selector order.
+Insert more proposal-bank states than fresh capacity. Assert the fresh queue size/order is unchanged and bank states never displace fresh states merely by insertion.
 
-`state-bank-v1`: same fresh queue plus a separate proposal bank. Allocate at most one proposal-bank slice for every two fresh slices while fresh runnable states exist. Proposal-bank states never displace fresh states by array capacity alone.
+- [ ] **Step 3: Implement exact policies**
 
-- [ ] **Step 3: Implement proposal seed import**
+`resumable-beam-v1`: every fresh state receives one completed cycle, then runnable states receive one additional cycle at a time in Pareto/Reference Selector order.
 
-The importer accepts already approved known-good/warm-start/v1-derived filter records and validates problem/hash/bounds before scheduling. It does not execute or modify frozen v1.
+`state-bank-v1`: same fresh queue plus separate proposal bank. While fresh runnable states exist, schedule no more than one proposal-bank slice after every two fresh slices. When fresh states are exhausted, proposal-bank states may consume remaining budget.
 
-- [ ] **Step 4: Emit `SolverRunArtifactV1`**
+- [ ] **Step 4: Implement proposal-seed validation**
 
-`resumableRun.ts` records coordinate trials as `evaluationCount`, canonical delivered metrics, Directed Reference Regret v1, reference-improvement flag, origin metadata, and snapshot hash. It computes QTF only when an elapsed-time trajectory has a valid point active by 0.5 seconds.
+Reject wrong version/problem/hash, unsupported filter type, out-of-bound frequency/gain/Q, or more than the active Max10 cap. Import only filter state; do not execute or modify v1.
 
-- [ ] **Step 5: Add script and verify**
+- [ ] **Step 5: Implement exact research CLI**
 
 Add:
 
@@ -658,7 +628,9 @@ Add:
 "research:resumable": "tsx benchmarks/research/resumableRun.ts"
 ```
 
-Run:
+CLI flags are `--snapshot`, `--case`, `--policy`, `--max-filters`, `--evaluation-budget`, `--seed`, `--proposal-seeds`, and `--out`. `--proposal-seeds` may be omitted. The runner emits `SolverRunArtifactV1` with coordinate trials as evaluation count, canonical delivered metrics, directed regret, reference-improvement flag, origin counts, and snapshot hash.
+
+- [ ] **Step 6: Verify and commit**
 
 ```bash
 pnpm --filter @autoeq-workbench/core test -- \
@@ -668,8 +640,8 @@ pnpm --filter @autoeq-workbench/core test -- \
 pnpm --filter @autoeq-workbench/core typecheck
 git diff --check
 git add packages/core/benchmarks/research/resumableScheduler.ts \
-  packages/core/benchmarks/research/resumableRun.ts \
   packages/core/benchmarks/research/proposalSeeds.ts \
+  packages/core/benchmarks/research/resumableRun.ts \
   packages/core/test/autoeq/v2/research/resumableScheduler.test.ts \
   packages/core/test/autoeq/v2/research/proposalSeeds.test.ts \
   packages/core/package.json
@@ -685,7 +657,7 @@ git commit -m "feat(research): add resumable state-bank search"
 - Create: `research/solver-lab/src/autoeq_solver_lab/solvers/matching_pursuit.py`
 - Create: `research/solver-lab/tests/test_matching_pursuit.py`
 
-**Interfaces:**
+**Config:**
 
 ```python
 @dataclass(frozen=True)
@@ -700,29 +672,31 @@ class MatchingPursuitConfig:
     max_filters: int
     checkpoint_every_evaluations: int
     nonlinear_polish_evaluations: int
-
-class MatchingPursuitSolver:
-    algorithm_id = "matching-pursuit"
-    def run(...) -> SolverRunResult: ...
 ```
+
+Public solver method signature is `MatchingPursuitSolver.run(problem, seed, evaluation_budget, reference_frontier, reference_snapshot_sha256, canonical_evaluator) -> SolverRunResult`.
 
 - [ ] **Step 1: Write RED dictionary/determinism tests**
 
-Require frequencies remain inside problem bounds, PK Q values remain inside bounds, shelf Q equals product shelf Q, atom order is deterministic, and repeated runs with identical input/seed/budget emit the same candidate IDs and filter sequences.
+Require 24 log-spaced frequency positions per octave inside bounds, canonical PK-Q order filtered to product bounds, one LS and one HS atom per frequency when shelves are enabled, fixed shelf Q, and byte-identical candidate sequence for repeated same-seed runs.
 
-- [ ] **Step 2: Implement cached unit-response dictionary**
+- [ ] **Step 2: Build cached unit-response matrix**
 
-Use the existing parity-tested lab DSP. Select atoms by deterministic residual correlation; after each structural selection solve bounded gains with `scipy.optimize.lsq_linear`.
+Use the existing parity-tested lab DSP. Store one unit-gain response column per atom and calculate deterministic correlation `abs(dot(atom, residual)) / max(dot(atom, atom), 1e-30)`.
 
-- [ ] **Step 3: Implement bounded nonlinear polish and canonical checkpoints**
+- [ ] **Step 3: Select one atom and solve bounded gains**
 
-After sparse selection, use bounded Powell only as a polish primitive. Every admitted checkpoint is passed through the existing canonical evaluator; laboratory surrogate metrics never become official evidence directly.
+After each selected atom, solve all selected gains with `scipy.optimize.lsq_linear(A, desired_db, bounds=(minGainDb, maxGainDb), method="trf", lsmr_tol="auto")`. Keep atom order stable when correlations tie by dictionary index.
 
-- [ ] **Step 4: Add synthetic quality tests**
+- [ ] **Step 4: Add bounded nonlinear polish**
 
-For a one-peak case, select a PK center within one dictionary step and reduce canonical RMSE versus zero filters. For a two-feature case, require two selected atoms reduce both RMSE and maxAbs versus one atom under the fixed test budget.
+Use existing bounded Powell primitives on selected filter parameters for exactly `nonlinear_polish_evaluations`; then quantize/deliver and evaluate canonically before adding a trajectory point.
 
-- [ ] **Step 5: Verify and commit**
+- [ ] **Step 5: Add synthetic quality tests**
+
+One-peak: selected center within one dictionary step and canonical RMSE below zero-filter RMSE. Two-feature: two selected atoms must reduce both canonical RMSE and maxAbs relative to the first selected-atom checkpoint.
+
+- [ ] **Step 6: Verify and commit**
 
 ```bash
 python -m pytest -q research/solver-lab/tests/test_matching_pursuit.py
@@ -734,21 +708,21 @@ git commit -m "feat(research): add sparse matching pursuit"
 
 ---
 
-### Task 9: Implement Max20/40 teacher to <=10-filter student compression
+### Task 9: Implement Max20/40 teacher to at-most-10-filter student compression
 
 **Files:**
 - Create: `research/solver-lab/src/autoeq_solver_lab/teacher_compression.py`
 - Create: `research/solver-lab/tests/test_teacher_compression.py`
 
-**Interfaces:**
+**Config/result:**
 
 ```python
 @dataclass(frozen=True)
 class TeacherCompressionConfig:
-    max_student_filters: int = 10
+    max_student_filters: int
     matching_pursuit_config: MatchingPursuitConfig
-    nonlinear_polish_evaluations: int = 1200
-    structural_rounds: int = 3
+    nonlinear_polish_evaluations: int
+    structural_rounds: int
 
 @dataclass(frozen=True)
 class CompressionResult:
@@ -764,38 +738,29 @@ class CompressionResult:
     operations: tuple[str, ...]
 ```
 
+The production study config is exactly `max_student_filters=10`, `nonlinear_polish_evaluations=1200`, `structural_rounds=3`, using Task 8's default dictionary.
+
 - [ ] **Step 1: Write RED teacher eligibility tests**
 
-Official teacher must come from a deliverable Max20 or Max40 reference frontier in the same snapshot/problem/hash. Reject continuous-only candidates, wrong-case teachers, and Max10 teachers passed as high-cap teachers.
+Accept only candidates whose IDs belong to the same snapshot/problem/hash deliverable Max20/Max40 frontier. Reject continuous-only candidates, wrong-case/hash candidates, and Max10 candidates passed as high-cap teachers.
 
-- [ ] **Step 2: Implement teacher-guided proposal extraction**
+- [ ] **Step 2: Extract teacher structural regions**
 
-Teacher response/filter regions may seed atom frequency/Q/type proposals, but final optimization residual is always the original `problem.desiredDb`.
+For each enabled teacher filter, emit one proposal region containing type, center frequency, Q, and gain sign. Add response-residual extrema not already within `1/24` octave of a teacher region. Sort regions by descending absolute teacher contribution, then frequency, then filter ID.
 
-- [ ] **Step 3: Implement compression sequence**
+- [ ] **Step 3: Build student against the original target**
 
-Use this order:
+Run matching pursuit with region-biased atom ordering but calculate correlations and bounded gains against `problem.desiredDb`, not teacher response.
 
-```text
-teacher structural regions
--> matching-pursuit atom proposal
--> bounded least-squares gains
--> prune/remove low-value atoms
--> merge nearby redundant same-type atoms
--> split/reallocate only when original-target canonical metrics improve
--> deterministic dedupe
--> bounded nonlinear polish
--> product quantization/delivery
--> canonical evaluation against original target
-```
+- [ ] **Step 4: Apply deterministic compression operations**
 
-Never admit a student with more than 10 delivered filters.
+After sparse selection: remove the lowest absolute-gain filter if more than 10; merge same-type filters within `1/12` octave using the existing structural merge rule; test existing split proposals only when filter count remains at most 10; accept remove/merge/split only when canonical original-target metrics Pareto-improve or win the Reference Selector. Run three structural rounds, then bounded nonlinear polish and final delivery.
 
-- [ ] **Step 4: Add tests proving teacher imitation is not the objective**
+- [ ] **Step 5: Prove teacher imitation is diagnostic only**
 
-Construct a synthetic teacher with a deliberate small error. Create two <=10 students where one matches the teacher response better but is worse against the original target. Assert the original-target-better student wins.
+Construct two synthetic students where student A matches teacher response more closely but student B has better original-target canonical metrics. Assert student B is selected.
 
-- [ ] **Step 5: Verify and commit**
+- [ ] **Step 6: Verify and commit**
 
 ```bash
 python -m pytest -q research/solver-lab/tests/test_teacher_compression.py \
@@ -813,9 +778,9 @@ git commit -m "feat(research): add high-cap teacher compression"
 **Files:**
 - Create: `research/solver-lab/src/autoeq_solver_lab/solvers/structural_beam.py`
 - Create: `research/solver-lab/tests/test_structural_beam.py`
-- Reuse: `research/solver-lab/src/autoeq_solver_lab/structural.py`
+- Reuse unchanged mutation definitions from: `research/solver-lab/src/autoeq_solver_lab/structural.py`
 
-**Interfaces:**
+**Config:**
 
 ```python
 @dataclass(frozen=True)
@@ -824,32 +789,32 @@ class StructuralBeamConfig:
     proposals_per_parent: int
     local_polish_evaluations: int
     max_filters: int
-
-class StructuralBeamSolver:
-    algorithm_id = "structural-beam"
-    def run(...) -> SolverRunResult: ...
 ```
 
-Initial variants:
+Variants are exactly:
 
 ```text
-beam-4:  beam_width=4, proposals_per_parent=8, local_polish_evaluations=120
+beam-4: beam_width=4, proposals_per_parent=8, local_polish_evaluations=120
 beam-12: beam_width=12, proposals_per_parent=8, local_polish_evaluations=120
 ```
 
-- [ ] **Step 1: Write RED beam retention tests**
+- [ ] **Step 1: Write RED Pareto-retention tests**
 
-Use synthetic Pareto-incomparable proposals and prove retention applies nondomination first, then Reference Pareto Selector only to trim beyond beam width.
+Create proposals trading RMSE against maxAbs; assert nondominated proposals survive before selector trimming.
 
-- [ ] **Step 2: Reuse exact existing structural mutations**
+- [ ] **Step 2: Generate proposals only through `generate_structural_mutations()`**
 
-Use `generate_structural_mutations()` for add PK/LS/HS, remove, type mutation, split, and merge. Do not introduce a second mutation library.
+Use existing add PK/LS/HS, remove, type mutation, split, and merge semantics. Stable-sort by mutation enum value plus canonical filter tuple before applying `proposals_per_parent`.
 
-- [ ] **Step 3: Add seed injection**
+- [ ] **Step 3: Polish and deliver each retained proposal**
 
-Allow initial seeds from matching pursuit and teacher-compression students so the same beam implementation can test B+C hybrids later without hiding their origin.
+Allocate exactly `local_polish_evaluations` surrogate evaluations, re-quantize, then call the canonical evaluator before Pareto admission.
 
-- [ ] **Step 4: Verify and commit**
+- [ ] **Step 4: Add seed injection**
+
+Accept zero/default seeds plus matching-pursuit and teacher-compression seeds with explicit origin metadata. Never erase seed origin in run artifacts.
+
+- [ ] **Step 5: Verify and commit**
 
 ```bash
 python -m pytest -q research/solver-lab/tests/test_structural_beam.py \
@@ -862,7 +827,7 @@ git commit -m "feat(research): add structural beam solver"
 
 ---
 
-### Task 11: Run case-focused Fixed-Cap and compression studies before broad tournament
+### Task 11: Run case-focused Fixed-Cap and compression studies
 
 **Files:**
 - Create: `research/solver-lab/src/autoeq_solver_lab/run_capacity_study.py`
@@ -871,86 +836,69 @@ git commit -m "feat(research): add structural beam solver"
 - Create: `research/solver-lab/tests/test_case_classification.py`
 - Modify: `research/solver-lab/pyproject.toml`
 
-**Interfaces:**
+**Cases:** `titan-to-storm`, `titan-to-u12t`, `titan-to-trio`.
 
-```python
-CaseClassification = Literal[
-    "search-recoverable",
-    "mixed",
-    "capacity-suspected",
-    "cap-limited",
-]
+**Evaluation rounds:** `2000`, `10000`, `50000`.
 
-@dataclass(frozen=True)
-class CaseClassificationEvidence:
-    problem_id: str
-    max10_reference_state: ReferenceState
-    high_cap_reference_state: ReferenceState
-    high_cap_strict_advantage: bool
-    max10_reference_improved_by_fixed_cap_search: bool
-    max10_reference_improved_by_compression: bool
-    compression_attempt_count: int
-    compression_best_reference_regret: float
-    classification: CaseClassification
-```
+**Randomized Python seeds:** `11`, `29`, `47`, `71`, `101`.
+
+**Classifications:** `search-recoverable`, `mixed`, `capacity-suspected`, `cap-limited`.
 
 - [ ] **Step 1: Write RED orchestration tests**
 
-Require exact cases:
+Reject any case outside the explicit case list for the real-case study mode, any evaluation budget outside the three configured rounds, or a run whose snapshot cell hash/cap differs from the problem.
 
-```text
-titan-to-storm
-titan-to-u12t
-titan-to-trio
+- [ ] **Step 2: Generate TypeScript state-bank artifacts at equal work budgets**
+
+For each case and evaluation budget run both policies with seed `0`:
+
+```bash
+for case_id in titan-to-storm titan-to-u12t titan-to-trio; do
+  for budget in 2000 10000 50000; do
+    for policy in resumable-beam-v1 state-bank-v1; do
+      pnpm --filter @autoeq-workbench/core research:resumable -- \
+        --snapshot "$AUTOEQ_CAPACITY_OUT_DIR/OracleReferenceSnapshotV1.json" \
+        --case "$case_id" \
+        --policy "$policy" \
+        --max-filters 10 \
+        --evaluation-budget "$budget" \
+        --seed 0 \
+        --out "$AUTOEQ_CAPACITY_OUT_DIR/resumable/${case_id}-${policy}-${budget}.json"
+    done
+  done
+done
 ```
 
-and exact evaluation rounds:
+When known-good/transfer proposal artifacts already exist from the diagnosis branch, run an additional `state-bank-v1` variant with `--proposal-seeds` and record its source artifact hash. Absence of such an artifact is recorded as `proposal-seed-evidence-unavailable`, not recreated by changing v1.
 
-```text
-2,000
-10,000
-50,000
-```
+- [ ] **Step 3: Implement Python fixed-cap study matrix**
 
-Use seeds `11, 29, 47, 71, 101` for randomized Python adapters; deterministic adapters may repeat with a single declared seed while preserving the same budget accounting.
+At each evaluation round run `matching-pursuit`, `structural-beam-4`, `structural-beam-12`, and `matching-pursuit -> structural-beam-4`, importing Task 7 artifacts into the same `ScreeningSummary` table.
 
-- [ ] **Step 2: Implement fixed-cap study runner**
+- [ ] **Step 4: Implement official teacher loop**
 
-For Max10 run:
+For each case, select every candidate ID on every available deliverable Max20/Max40 frontier in the frozen snapshot. Attempt Task 9 compression with the frozen production study config and record teacher/student metrics, delivered counts, operations, directed Max10 regret, reference-improvement flag, and artifact hash.
 
-```text
-matching-pursuit
-structural-beam-4
-structural-beam-12
-matching-pursuit -> structural-beam-4
-```
+- [ ] **Step 5: Implement conservative classification rules**
 
-Import TypeScript `resumable-beam-v1` and `state-bank-v1` artifacts into the same screening summaries. Known-good/transfer/v1 seed sources remain variants of those state-bank mechanisms, not separate families.
-
-- [ ] **Step 3: Implement high-cap teacher selection/compression loop**
-
-For each case choose every nondominated deliverable teacher from the best available stable-or-moving Max20/Max40 snapshot cell and attempt <=10 compression under the same declared compression configuration. Record teacher/student canonical metrics and snapshot hashes.
-
-- [ ] **Step 4: Implement conservative classification rules**
-
-Use:
+Compute `high_cap_strict_advantage` only when a high-cap deliverable candidate strictly dominates at least one stable/moving Max10 frontier point by existing Pareto epsilon. Then classify exactly:
 
 ```python
-if high_cap_reference_state == "still-moving" or max10_reference_state == "still-moving":
-    classification = "capacity-suspected" if high_cap_strict_advantage else "search-recoverable"
+if max10_reference_state == "still-moving" or high_cap_reference_state == "still-moving":
+    classification = "capacity-suspected"
 elif max10_reference_improved_by_compression:
     classification = "mixed"
 elif max10_reference_improved_by_fixed_cap_search:
     classification = "search-recoverable"
-elif high_cap_strict_advantage and compression_attempt_count > 0:
+elif high_cap_strict_advantage and all_official_teachers_attempted and compression_attempt_count > 0:
     classification = "cap-limited"
 else:
-    classification = "search-recoverable"
+    classification = "capacity-suspected"
 ```
 
-A `cap-limited` result is valid only after the runner confirms all official high-cap teachers were attempted under the frozen compression configuration and no <=10 student improved the stable Max10 reference. Reports must include raw high-cap-vs-Max10 metric deltas so a tiny numerical dominance is not described textually as a material product claim.
+A textual claim of “material high-cap advantage” must include raw RMSE/maxAbs deltas; strict numerical dominance alone is not described as materially important.
 
-- [ ] **Step 5: Add CLI and run studies**
+- [ ] **Step 6: Add CLI and run**
 
 Add:
 
@@ -958,23 +906,24 @@ Add:
 autoeq-capacity-study = "autoeq_solver_lab.run_capacity_study:main"
 ```
 
-Run:
+Run exactly:
 
 ```bash
 python -m autoeq_solver_lab.run_capacity_study \
   --snapshot "$AUTOEQ_CAPACITY_OUT_DIR/OracleReferenceSnapshotV1.json" \
+  --typescript-run-dir "$AUTOEQ_CAPACITY_OUT_DIR/resumable" \
   --cases titan-to-storm,titan-to-u12t,titan-to-trio \
   --evaluation-budgets 2000,10000,50000 \
   --seeds 11,29,47,71,101 \
   --out "$AUTOEQ_CAPACITY_OUT_DIR/case-study"
 ```
 
-- [ ] **Step 6: Verify and commit runner code**
+- [ ] **Step 7: Verify and commit code**
 
 ```bash
 python -m pytest -q research/solver-lab/tests/test_run_capacity_study.py \
-  research/solver-lab/tests/test_case_classification.py
-python -m pytest -q research/solver-lab/tests/test_matching_pursuit.py \
+  research/solver-lab/tests/test_case_classification.py \
+  research/solver-lab/tests/test_matching_pursuit.py \
   research/solver-lab/tests/test_teacher_compression.py \
   research/solver-lab/tests/test_structural_beam.py
 git diff --check
@@ -988,50 +937,32 @@ git commit -m "feat(research): add capacity-aware case studies"
 
 ---
 
-### Task 12: Record evidence, classifications, and shortlist at most three mechanisms
+### Task 12: Record classifications and shortlist at most three mechanisms
 
 **Files:**
 - Create: `docs/superpowers/specs/2026-09-07-autoeq-capacity-aware-screening-results.md`
 
-**Evidence table must contain for each case/mechanism:**
+- [ ] **Step 1: Build the evidence table**
 
-```text
-snapshot SHA
-reference state
-algorithm/variant
-seed(s)
-evaluation budget
-final canonical RMSE
-final canonical maxAbs
-final directed reference regret
-referenceImproved
-QTF when same-runtime elapsed trajectory is available
-teacher ID/cap when applicable
-student delivered filter count when applicable
-artifact SHA-256
-```
+For each case/mechanism include snapshot SHA, reference state, algorithm/variant, seed set, evaluation budget, final canonical RMSE/maxAbs, delivered filter count, final directed regret, reference-improvement flag, QTF when elapsed-time data is comparable, teacher ID/cap for compression, and source artifact SHA-256.
 
-- [ ] **Step 1: Review Fixed-Cap evidence**
+- [ ] **Step 2: Record case classifications**
 
-For Storm, U12t, Trio report which of resumable/state-bank, matching pursuit, and structural beam produces unique strict Max10 reference improvements or unique case wins by final directed regret.
-
-- [ ] **Step 2: Review compression evidence**
-
-For each case state whether high-cap advantage exists, whether the reference is stable or moving, how many official teachers were compressed, best <=10 student metrics, and the resulting classification.
+For each of Storm/U12t/Trio include high-cap-vs-Max10 raw metric deltas, all official teacher attempts, best at-most-10 student, and the exact Task 11 classification inputs/output.
 
 - [ ] **Step 3: Apply shortlist rule**
 
-At most three mechanisms/components proceed. Keep a mechanism if it has at least one of:
+Keep a mechanism/component only if it has at least one of:
 
 ```text
-- a strict canonical improvement of the frozen Max10 reference;
-- a unique case win in final directed reference regret at an equal evaluation budget;
-- a compression result that recovers a Max10 state not found by the other mechanisms.
+strict canonical improvement of the frozen Max10 reference
+unique case win in final directed reference regret at equal evaluation budget
+compression result that finds a Max10 state not found by the other mechanisms
 ```
 
-If none of those apply, eliminate the mechanism and record the artifact-backed reason. Do not retain a mechanism solely because of Python wall-clock.
+Eliminate mechanisms that satisfy none of these. Do not retain a mechanism solely because of Python wall-clock. Keep no more than three mechanisms/components.
 
-- [ ] **Step 4: Commit the results document**
+- [ ] **Step 4: Commit results**
 
 ```bash
 git add docs/superpowers/specs/2026-09-07-autoeq-capacity-aware-screening-results.md
@@ -1042,21 +973,36 @@ git commit -m "docs: record capacity-aware solver screening"
 
 ### Task 13A: Port matching pursuit to TypeScript only if shortlisted
 
-**Execute this task only when Task 12 shortlists matching pursuit as a runtime mechanism/component. If it is eliminated, mark every checkbox in this task as skipped in the execution log and cite the Task 12 evidence; do not create these files.**
+**Execute only if Task 12 shortlists matching pursuit. Otherwise record this task as skipped in the execution log with the Task 12 evidence hash and create no matching-pursuit TypeScript files.**
 
-**Files:**
+**Files when executed:**
 - Create: `packages/core/benchmarks/research/matchingPursuit.ts`
 - Create: `packages/core/test/autoeq/v2/research/matchingPursuit.test.ts`
 
-- [ ] **Step 1: Write parity fixture from Python survivor**
+- [ ] **Step 1: Freeze Python survivor parity fixture**
 
-Commit one synthetic problem with exact first-N atom choices, bounded gain solution, and canonical delivered checkpoint metrics.
+Use one synthetic problem and record exact dictionary atom order, first three selected atom IDs, bounded gain vector, and canonical delivered checkpoint metrics.
 
-- [ ] **Step 2: Implement deterministic TS dictionary/correlation path**
+- [ ] **Step 2: Implement deterministic TS dictionary/correlation**
 
-Use existing core biquad response math and product bounds. Do not port SciPy; use the smallest bounded least-squares routine needed for the selected atom count, with deterministic active-set/clamping tests.
+Use core biquad response math, 24 frequencies/octave, the Task 8 PK-Q list, shelves, stable dictionary ordering, and the same normalized correlation formula.
 
-- [ ] **Step 3: Prove canonical parity and commit**
+- [ ] **Step 3: Implement deterministic bounded gain solver**
+
+Use cyclic projected coordinate least squares for at most 10 selected atoms. Initialize all gains to zero. Perform at most 32 sweeps in atom order. For each atom `j`, calculate the target residual excluding atom `j`, update:
+
+```ts
+const unconstrained = denominator === 0 ? 0 : numerator / denominator
+const next = Math.min(maxGainDb, Math.max(minGainDb, unconstrained))
+```
+
+where `numerator = dot(columnJ, residualWithoutJ)` and `denominator = dot(columnJ, columnJ)`. Stop early only when the maximum absolute gain change in one complete sweep is at most `1e-10`. Test bounds and deterministic convergence explicitly.
+
+- [ ] **Step 4: Prove structural/canonical parity**
+
+Require the same first three atom IDs as Python. Gain values may differ from SciPy but must satisfy bounds and produce canonical metrics no worse than the parity fixture by more than `1e-6 dB` RMSE and `1e-6 dB` maxAbs on the synthetic fixture.
+
+- [ ] **Step 5: Verify and commit**
 
 ```bash
 pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2/research/matchingPursuit.test.ts
@@ -1071,21 +1017,25 @@ git commit -m "feat(research): port shortlisted matching pursuit"
 
 ### Task 13B: Port structural beam to TypeScript only if shortlisted
 
-**Execute this task only when Task 12 shortlists structural beam as a runtime mechanism/component. If it is eliminated, mark every checkbox in this task as skipped in the execution log and cite the Task 12 evidence; do not create these files.**
+**Execute only if Task 12 shortlists structural beam. Otherwise record this task as skipped in the execution log with the Task 12 evidence hash and create no structural-beam TypeScript files.**
 
-**Files:**
+**Files when executed:**
 - Create: `packages/core/benchmarks/research/structuralBeam.ts`
 - Create: `packages/core/test/autoeq/v2/research/structuralBeam.test.ts`
 
-- [ ] **Step 1: Freeze structural proposal parity vectors**
+- [ ] **Step 1: Freeze structural proposal parity fixture**
 
-Use exact add/remove/split/merge/type-mutation vectors derived from the Python `structural.py` semantics and product bounds.
+Record one input filter set plus exact add-PK/LS/HS, remove, type-mutation, split, and merge proposals from Python `structural.py`.
 
-- [ ] **Step 2: Implement TS research structural proposals and beam retention**
+- [ ] **Step 2: Implement exact TS proposal rules**
 
-Retain Pareto-first/Reference Selector trimming and exact max-filter enforcement. Do not alter production candidate generation.
+Mirror bounds projection, `1/24`-octave split ratio, same-type merge threshold of `1/12` octave, gain-weighted log-frequency merge center, summed merge gain, and averaged Q.
 
-- [ ] **Step 3: Verify and commit**
+- [ ] **Step 3: Implement beam retention**
+
+Apply Pareto nondomination first and Reference Selector trimming second. Enforce Max10 before local polish and after delivery.
+
+- [ ] **Step 4: Verify and commit**
 
 ```bash
 pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2/research/structuralBeam.test.ts
@@ -1107,49 +1057,29 @@ git commit -m "feat(research): port shortlisted structural beam"
 - Modify: `packages/core/package.json`
 - Create: `docs/superpowers/specs/2026-09-07-autoeq-capacity-aware-tournament-results.md`
 
-**Interfaces:**
+**Checkpoints:**
 
 ```ts
 export const CAPACITY_TOURNAMENT_CHECKPOINTS_MS = [5000, 15000, 30000, 60000] as const
-
-export interface CapacityTournamentVariant {
-  id: string
-  run(input: CapacityTournamentInput): Promise<SolverRunArtifactV1>
-}
 ```
 
-- [ ] **Step 1: Write RED hard-deadline/monotonicity tests**
+- [ ] **Step 1: Write RED hard-deadline and monotonicity tests**
 
-Use fake variants to prove one run emits best-so-far checkpoints at all four budgets and that later checkpoints cannot select a delivered preset worse than an earlier selected preset under Pareto/Reference Selector semantics.
+Use fake variants to prove checkpoint capture at 5/15/30/60 seconds and that the selected delivered best-so-far never regresses under Pareto/Reference Selector semantics.
 
 - [ ] **Step 2: Register only Task 12 survivors**
 
-The registry may include:
+Eligible IDs are `resumable-beam-v1`, `state-bank-v1`, `matching-pursuit-v1` when Task 13A ran, and `structural-beam-v1` when Task 13B ran. If a justified hybrid is included, include each component ablation in the same tournament.
 
-```text
-resumable-beam-v1
-state-bank-v1
-matching-pursuit-v1        # only if Task 13A executed
-structural-beam-v1         # only if Task 13B executed
-```
+- [ ] **Step 3: Run only Max10 real adversarial cases**
 
-If two entries are components of one justified hybrid, include the hybrid only with an ablation for each component.
+Use `titan-to-storm`, `titan-to-u12t`, and `titan-to-trio`. Max20/40 teachers do not enter the runtime tournament.
 
-- [ ] **Step 3: Use the exact real adversarial cases**
+- [ ] **Step 4: Emit complete canonical checkpoint evidence**
 
-```text
-titan-to-storm
-titan-to-u12t
-titan-to-trio
-```
+Every checkpoint stores filters, canonical RMSE/maxAbs, delivered filter count, Directed Reference Regret v1, `referenceImproved`, snapshot hash, termination/deadline metadata, and machine/runner metadata. Compute QTF from the same run trajectory.
 
-Use Max10 only for the product-facing tournament. High-cap teachers are not runtime contestants.
-
-- [ ] **Step 4: Emit canonical evidence**
-
-Every checkpoint stores filters, canonical RMSE/maxAbs, delivered filter count, Directed Reference Regret v1, `referenceImproved`, snapshot hash, QTF v1, termination/deadline metadata, and machine/runner metadata. Run candidates in the same Node process/runner configuration where practical.
-
-- [ ] **Step 5: Add script and execute**
+- [ ] **Step 5: Add CLI and run**
 
 Add:
 
@@ -1157,7 +1087,7 @@ Add:
 "research:capacity-tournament": "tsx benchmarks/research/capacityTournamentRun.ts"
 ```
 
-Run:
+Run exactly:
 
 ```bash
 pnpm --filter @autoeq-workbench/core research:capacity-tournament -- \
@@ -1167,9 +1097,9 @@ pnpm --filter @autoeq-workbench/core research:capacity-tournament -- \
   --out "$AUTOEQ_CAPACITY_OUT_DIR/same-runtime-tournament"
 ```
 
-- [ ] **Step 6: Write tournament results document**
+- [ ] **Step 6: Write results document**
 
-Report per case/budget raw RMSE/maxAbs, delivered filter count, directed regret, QTF, reference improvements, control deltas, monotonicity, deadline correctness, and which candidate/component is preferred. Do not call a candidate promotable yet.
+For every case/budget report raw RMSE/maxAbs, delivered filter count, directed regret, QTF, reference improvements, control deltas, monotonicity, and deadline correctness. Do not label a winner product-ready.
 
 - [ ] **Step 7: Verify and commit**
 
@@ -1191,29 +1121,24 @@ git commit -m "feat(research): run capacity-aware same-runtime tournament"
 
 ---
 
-### Task 15: Re-enter the strict Calibration Manifest gate without deadlocking research
+### Task 15: Re-enter the strict Calibration Manifest gate
 
 **Files:**
-- Modify only if required by corrected QTF hash/reference metadata: `research/solver-lab/src/autoeq_solver_lab/calibration.py`
-- Modify corresponding tests: `research/solver-lab/tests/test_calibration.py`
+- Modify only when tests demonstrate corrected QTF/reference metadata requires code change: `research/solver-lab/src/autoeq_solver_lab/calibration.py`
+- Modify when source changes: `research/solver-lab/tests/test_calibration.py`
 - Create: `docs/superpowers/specs/2026-09-07-autoeq-capacity-aware-calibration-decision.md`
 
-- [ ] **Step 1: Write/confirm RED tests for the corrected boundary**
+- [ ] **Step 1: Confirm strict calibration tests**
 
-Require calibration to remain `insufficient` when there is no strict aggregate control improvement or thresholds would be vacuous. Require any valid manifest to carry the implemented QTF formula version/hash but not to be a prerequisite for prior Tasks 1-14.
+Require `insufficient` when there is no strict aggregate control improvement or thresholds would be vacuous. Require any valid manifest to carry the implemented QTF formula version/hash. Confirm Tasks 1-14 do not require a manifest.
 
-- [ ] **Step 2: Feed same-runtime tournament evidence into calibration**
+- [ ] **Step 2: Run calibration from same-runtime development/adversarial evidence**
 
-Use only development/adversarial evidence. Do not inspect/open holdout.
+Do not inspect/open holdout. Preserve current calibration formula/threshold derivation except for metadata needed to identify the implemented QTF formula.
 
-- [ ] **Step 3: Record one of two legitimate outcomes**
+- [ ] **Step 3: Record exactly one outcome**
 
-```text
-A. valid non-vacuous OracleCalibrationManifestV1 frozen for the next promotion gate
-B. calibration remains insufficient; no manifest is manufactured
-```
-
-The decision document records exact artifact hashes and reasons.
+Outcome A: a valid non-vacuous `OracleCalibrationManifestV1` is frozen for the next promotion gate. Outcome B: calibration remains insufficient and no manifest is manufactured. Record artifact hashes and reasons in the decision document.
 
 - [ ] **Step 4: Verify and commit**
 
@@ -1222,28 +1147,35 @@ python -m pytest -q research/solver-lab/tests/test_calibration.py \
   research/solver-lab/tests/test_reference_regret.py \
   research/solver-lab/tests/test_quality_time.py
 git diff --check
+```
+
+If `calibration.py` changed:
+
+```bash
 git add research/solver-lab/src/autoeq_solver_lab/calibration.py \
   research/solver-lab/tests/test_calibration.py \
   docs/superpowers/specs/2026-09-07-autoeq-capacity-aware-calibration-decision.md
-git commit -m "docs(research): record capacity-aware calibration decision"
+git commit -m "feat(research): align capacity-aware calibration metadata"
 ```
 
-If `calibration.py` requires no source change, commit only the decision document; do not create an empty source edit.
+If no source change was needed:
+
+```bash
+git add docs/superpowers/specs/2026-09-07-autoeq-capacity-aware-calibration-decision.md
+git commit -m "docs(research): record capacity-aware calibration decision"
+```
 
 ---
 
 ### Task 16: Coherent endpoint verification and stop before holdout/product promotion
 
-**Files:**
-- No source changes expected.
+**Files:** no source changes expected.
 
 - [ ] **Step 1: Run full solver-lab tests**
 
 ```bash
 python -m pytest -q research/solver-lab/tests
 ```
-
-Expected: PASS.
 
 - [ ] **Step 2: Run focused core research/v2 tests**
 
@@ -1253,9 +1185,7 @@ pnpm --filter @autoeq-workbench/core test -- test/autoeq/v2
 pnpm --filter @autoeq-workbench/core typecheck
 ```
 
-Expected: PASS.
-
-- [ ] **Step 3: Run repository gates once the diff is coherent**
+- [ ] **Step 3: Run repository gates once**
 
 ```bash
 pnpm test
@@ -1266,45 +1196,43 @@ pnpm --filter @autoeq-workbench/core benchmark
 git diff --check
 ```
 
-Expected: PASS.
-
 - [ ] **Step 4: Inspect production/default equivalence**
 
-Confirm no default filter cap changed, no UI/session/export behavior changed, no Standard v1 source changed, and `runStandardAutoEqV2()` still follows the compatibility path unless a research-only runner explicitly selects a new mechanism.
+Confirm no default Max Filters value changed, no UI/session/export behavior changed, no Standard v1 source changed, and `runStandardAutoEqV2()` still uses the compatibility path unless a research-only runner explicitly selects a research mechanism.
 
-- [ ] **Step 5: Stop at the promotion boundary**
+- [ ] **Step 5: Stop at promotion boundary**
 
-Do not open holdout, merge, deploy, release, publish, or convert a research winner into default production behavior under this plan. The next step, if evidence warrants it, is a separate product-distillation design/plan based on the actual tournament and calibration decision.
+Do not open holdout, merge, deploy, release, publish, or make a research winner the default solver under this plan. If evidence warrants promotion, write a separate product-distillation design/plan from the actual tournament and calibration decision.
 
 ---
 
 ## Plan Completion Gate
 
-This plan is complete only when all of the following are true:
+This plan is complete only when:
 
-1. `OracleReferenceSnapshotV1` is implemented, validated, content-hashed, and frozen from the existing corrected Oracle evidence for the declared real-case cells.
-2. Directed Reference Regret v1 is parity-tested in Python/TypeScript and does not penalize reference domination.
-3. QTF v1 is parity-tested, references `OracleReferenceSnapshotV1` deliverable fronts, and has no Calibration Manifest prerequisite.
-4. Reference Pareto Selector and the common solver trajectory artifact are parity-tested.
+1. `OracleReferenceSnapshotV1` is implemented, validated, content-hashed, and frozen from existing corrected Oracle evidence for the declared real-case cells.
+2. Directed Reference Regret v1 is parity-tested in Python/TypeScript and never penalizes reference domination.
+3. QTF v1 is parity-tested, references deliverable snapshot fronts, and has no Calibration Manifest prerequisite.
+4. Reference Pareto Selector and common run artifact are parity-tested.
 5. `jointRefineV2()` behavior remains exactly compatible after continuation extraction.
-6. Resumable/state-bank search is implemented research-only with fresh capacity separate from transfer/known-good capacity.
+6. Resumable/state-bank search is research-only and keeps fresh capacity separate from proposal-bank capacity.
 7. Matching pursuit is implemented and canonically evaluated.
-8. High-cap teacher-to-<=10 student compression is implemented and scores students against the original target.
+8. High-cap teacher-to-Max10 compression scores students against the original target.
 9. Structural beam reuses the existing mutation library and preserves Pareto-first retention.
-10. Storm, U12t, and Trio have reproducible Fixed-Cap and teacher-compression evidence plus explicit classifications.
+10. Storm, U12t, and Trio have reproducible fixed-cap/compression evidence and explicit classifications.
 11. No more than three evidence-backed mechanisms/components enter the same-runtime tournament.
-12. The final tournament reports canonical 5/15/30/60-second monotonic trajectories in the same TypeScript/Node runtime.
-13. Calibration either freezes a non-vacuous manifest or explicitly remains insufficient; zero-regret/reference success never forces a fake freeze.
+12. Final tournament evidence contains canonical monotonic 5/15/30/60-second trajectories in TypeScript/Node.
+13. Calibration either freezes a non-vacuous manifest or explicitly remains insufficient.
 14. Full repository verification is green at the coherent endpoint.
 15. Holdout and production promotion remain unopened/unmodified.
 
 ## OpenCode Execution Handoff
 
-Execute this plan directly and sequentially. Do not spawn subagents. Maintain the checkbox state in this file or an equivalent local execution log. At every task boundary:
+Execute sequentially and directly; do not spawn subagents. At each task boundary run:
 
 ```bash
 git status --short
 git diff --check
 ```
 
-Preserve exact artifact hashes and commit SHAs in the screening/tournament/calibration result documents. When a task contains an evidence-dependent conditional port (Task 13A/13B), follow the Task 12 shortlist rather than implementing eliminated mechanisms “just in case”.
+Preserve exact artifact hashes and commit SHAs in the screening, tournament, and calibration decision documents. For Tasks 13A/13B, follow the Task 12 shortlist and do not implement eliminated mechanisms “just in case”.
