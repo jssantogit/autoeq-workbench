@@ -90,6 +90,28 @@ describe('Standard v2 joint refinement', () => {
     expect(result.completedCycles).toBeLessThanOrEqual(6)
   })
 
+  it('preserves the joint refinement research phase around the compatibility wrapper', () => {
+    const desiredDb = evaluateV2Solution([desiredFilter], [], frequencies, config.sampleRateHz)
+      .cascadeDb
+    const events: string[] = []
+
+    jointRefineV2({
+      solution: evaluateV2Solution([
+        { ...desiredFilter, id: 'start', frequencyHz: 900, gainDb: 2.5, q: 1.4 },
+      ], desiredDb, frequencies, config.sampleRateHz),
+      desiredDb,
+      frequencies,
+      config,
+      deadline: { isExpired: () => false },
+      researchTrace: {
+        onPhaseStart: (phase) => events.push(`start:${phase}`),
+        onPhaseEnd: (phase) => events.push(`end:${phase}`),
+      },
+    })
+
+    expect(events).toEqual(['start:jointRefine', 'end:jointRefine'])
+  })
+
   it('reuses an already evaluated starting response grid', () => {
     const desiredDb = evaluateV2Solution([desiredFilter], [], frequencies, config.sampleRateHz)
       .cascadeDb

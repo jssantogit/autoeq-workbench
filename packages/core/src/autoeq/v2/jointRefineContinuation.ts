@@ -19,6 +19,7 @@ import {
 } from './replacementTrial.js'
 import {
   createV2SolutionKey,
+  withResearchTracePhase,
   type StandardV2JointRefineContext,
   type StandardV2JointRefineCycle,
   type StandardV2ResearchTrace,
@@ -335,12 +336,14 @@ export function jointRefineV2(
   input: JointRefineInput,
   trace?: JointRefineTrace,
 ): JointRefineResult {
-  const continuation = createJointRefineContinuationV2(input, trace)
-  while (!continuation.done) advanceJointRefineContinuationV2(continuation)
-  return {
-    solution: continuation.solution,
-    completedCycles: continuation.completedCycles,
-    coordinateTrials: continuation.coordinateTrials,
-    expired: continuation.expired,
-  }
+  return withResearchTracePhase(input.researchTrace, 'jointRefine', () => {
+    const continuation = createJointRefineContinuationV2(input, trace)
+    while (!continuation.done) advanceJointRefineContinuationV2(continuation)
+    return {
+      solution: continuation.solution,
+      completedCycles: continuation.completedCycles,
+      coordinateTrials: continuation.coordinateTrials,
+      expired: continuation.expired,
+    }
+  })
 }
