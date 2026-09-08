@@ -210,9 +210,9 @@ Commits produced after the original branch head:
 Focused TypeScript research tests passed: 18 tests across six research
 suites. Core typecheck passed, and `git diff --check` passed. The independent
 Python validator accepted all four directed aggregate campaigns and the
-12-cell snapshot. The existing full-root verification still has the known
-Standard-v1 last-bit metric drift and the pre-existing V2 test timeout; those
-are kept separate from this research and no Standard-v1 fixture was changed.
+12-cell snapshot. The final full-root verification has only the known
+Standard-v1 last-bit metric drift; it was kept separate from this research
+and no Standard-v1 fixture was changed.
 
 Remaining blockers are scientific, not missing artifacts: the three
 high-cap reference cells remain `still-moving`, so no case can be promoted to
