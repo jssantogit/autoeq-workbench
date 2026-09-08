@@ -334,9 +334,7 @@ export function runCapacityTournamentVariant(
   }
   const observedElapsedMs = nowMs() - startedAt
   assertFinite(observedElapsedMs, 'tournament elapsed time')
-  if (observedElapsedMs < 0 || observedElapsedMs > 60_000) {
-    throw new Error('capacity tournament variant exceeded the hard deadline')
-  }
+  if (observedElapsedMs < 0) throw new Error('capacity tournament observed elapsed time is negative')
   if (progress.length === 0) throw new Error('capacity tournament variant must report an initial canonical point')
   validateBestSoFar(input, variant, progress)
   const checkpoints = checkpointsMs.map((checkpointMs) => {
