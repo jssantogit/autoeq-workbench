@@ -1,5 +1,9 @@
 # AutoEQ Capacity-Aware Solver Screening Results
 
+> Historical blocked endpoint. The directed campaign completed afterward;
+> see `2026-09-08-autoeq-capacity-aware-directed-results.md` for the current
+> evidence and classification.
+
 Status: blocked pending the existing corrected Oracle campaign evidence.
 
 This document records the Task 11 endpoint on branch

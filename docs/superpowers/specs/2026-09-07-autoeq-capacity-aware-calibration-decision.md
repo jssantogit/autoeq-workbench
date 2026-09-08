@@ -1,5 +1,9 @@
 # AutoEQ Capacity-Aware Calibration Decision
 
+> Historical blocked endpoint. The directed campaign and runtime tournament
+> completed afterward; the current insufficient calibration outcome is
+> recorded in `2026-09-08-autoeq-capacity-aware-directed-results.md`.
+
 Outcome B: calibration remains insufficient; no `OracleCalibrationManifestV1`
 is frozen or manufactured.
 

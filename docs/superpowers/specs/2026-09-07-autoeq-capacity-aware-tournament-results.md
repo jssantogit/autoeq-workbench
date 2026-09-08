@@ -1,5 +1,9 @@
 # AutoEQ Capacity-Aware Same-Runtime Tournament Results
 
+> Historical blocked endpoint. The same-runtime tournament completed
+> afterward; see `2026-09-08-autoeq-capacity-aware-directed-results.md` for the
+> current artifact and results.
+
 Status: blocked before runtime execution.
 
 The Task 14 harness and CLI are implemented on branch
