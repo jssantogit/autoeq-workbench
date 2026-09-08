@@ -83,12 +83,14 @@ Raw deltas use the paired lowest-RMSE points in the first table:
 
 The RMSE-best delivered point in every cell is
 `deliverable-oracle:<case>:41:powell:0`. The Max40/64 minimum-maxAbs
-provenance is `...:titan-to-storm:0:local:standard-v2-control:<case>:40|64:30:122`
-for Storm, `...:titan-to-u12t:0:local:standard-v2-control:<case>:40|64:30:171`
-for U12t, and
-`...:titan-to-trio:0:structural:standard-v2-control:<case>:40|64:30:65`
-for Trio. All official references are delivered/canonicalized; the old
-diagnosis report was not copied into this evidence.
+provenance is, respectively:
+
+- Storm: `deliverable-oracle:titan-to-storm:0:local:standard-v2-control:titan-to-storm:40:30:122` and `deliverable-oracle:titan-to-storm:0:local:standard-v2-control:titan-to-storm:64:30:122`;
+- U12t: `deliverable-oracle:titan-to-u12t:0:local:standard-v2-control:titan-to-u12t:40:30:171` and `deliverable-oracle:titan-to-u12t:0:local:standard-v2-control:titan-to-u12t:64:30:171`;
+- Trio: `deliverable-oracle:titan-to-trio:0:structural:standard-v2-control:titan-to-trio:40:30:65` and `deliverable-oracle:titan-to-trio:0:structural:standard-v2-control:titan-to-trio:64:30:65`.
+
+All official references are delivered/canonicalized; the old diagnosis report
+was not copied into this evidence.
 
 ## Fixed-Cap Max10
 
