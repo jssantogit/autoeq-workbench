@@ -1,10 +1,12 @@
+import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 import {
-  assertOracleReferenceSnapshotV1,
-  getReferenceCell,
-  type OracleReferenceSnapshotV1,
+	assertOracleReferenceSnapshotV1,
+	canonicalSnapshotPayload,
+	getReferenceCell,
+	type OracleReferenceSnapshotV1,
 } from '../../../../benchmarks/research/referenceSnapshot.js'
 
 const fixturePath = new URL(
@@ -29,15 +31,43 @@ describe('OracleReferenceSnapshotV1', () => {
     )).toBe(snapshot.cells[0])
   })
 
-  it('rejects wrong version or content hash', () => {
-    const wrongVersion = { ...fixture(), version: 2 }
-    expect(() => assertOracleReferenceSnapshotV1(wrongVersion)).toThrow(/version/)
+	it('rejects wrong version or content hash', () => {
+		const wrongVersion = { ...fixture(), version: 2 }
+		expect(() => assertOracleReferenceSnapshotV1(wrongVersion)).toThrow(/version/)
 
     const wrongHash = { ...fixture(), contentSha256: '0'.repeat(64) }
-    expect(() => assertOracleReferenceSnapshotV1(wrongHash)).toThrow(/contentSha256/)
-  })
+		expect(() => assertOracleReferenceSnapshotV1(wrongHash)).toThrow(/contentSha256/)
+	})
 
-  it('rejects duplicate cells and invalid candidate/frontier references', () => {
+	it('allows candidate ID reuse across distinct capacity cells', () => {
+		const snapshot = fixture()
+		const secondCell = JSON.parse(JSON.stringify(snapshot.cells[0])) as typeof snapshot.cells[number]
+		secondCell.maxFilters = 20
+		secondCell.candidates = secondCell.candidates.map((candidate) => ({
+			...candidate,
+			maxFilters: 20,
+		}))
+		const withoutHash = {
+			...snapshot,
+			cells: [snapshot.cells[0]!, secondCell],
+		}
+		const { contentSha256: _contentSha256, ...payload } = withoutHash
+		const multiCapacitySnapshot = {
+			...withoutHash,
+			contentSha256: createHash('sha256')
+				.update(canonicalSnapshotPayload(payload))
+				.digest('hex'),
+		}
+
+		assertOracleReferenceSnapshotV1(multiCapacitySnapshot)
+		expect(multiCapacitySnapshot.cells.map((cell) => cell.maxFilters)).toEqual([10, 20])
+	})
+
+	it('keeps integer seed canonicalization interoperable with Python snapshots', () => {
+		expect(canonicalSnapshotPayload({ seed: 41 })).toBe('{"seed":41}')
+	})
+
+	it('rejects duplicate cells and invalid candidate/frontier references', () => {
     const snapshot = fixture()
     const duplicateCells = { ...snapshot, cells: [...snapshot.cells, snapshot.cells[0]] }
     expect(() => assertOracleReferenceSnapshotV1(duplicateCells)).toThrow(/duplicate/)

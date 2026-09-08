@@ -253,7 +253,6 @@ def _validate_snapshot(snapshot: OracleReferenceSnapshotV1) -> None:
     if not snapshot.cells:
         raise ValueError("snapshot must contain at least one cell")
     cell_keys: set[tuple[str, str, int]] = set()
-    candidate_ids: set[str] = set()
     for cell_index, cell in enumerate(snapshot.cells):
         label = f"cells[{cell_index}]"
         key = (cell.problem_id, cell.input_sha256, cell.max_filters)
@@ -269,9 +268,8 @@ def _validate_snapshot(snapshot: OracleReferenceSnapshotV1) -> None:
         cell_candidate_ids: set[str] = set()
         for candidate_index, candidate in enumerate(cell.candidates):
             candidate_label = f"{label}.candidates[{candidate_index}]"
-            if candidate.candidate_id in candidate_ids:
+            if candidate.candidate_id in cell_candidate_ids:
                 raise ValueError(f"duplicate candidate ID {candidate.candidate_id}")
-            candidate_ids.add(candidate.candidate_id)
             cell_candidate_ids.add(candidate.candidate_id)
             if candidate.problem_id != cell.problem_id:
                 raise ValueError(f"{candidate_label}.problem_id does not match cell")

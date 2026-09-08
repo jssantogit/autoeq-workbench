@@ -152,7 +152,7 @@ function objectivePointValue(value: unknown, label: string): ReferenceObjectiveP
 }
 
 function canonicalNumber(value: number, key: string): string {
-  const integerKeys = new Set(['version', 'maxFilters', 'actualDeliveredFilterCount', 'filterCount'])
+  const integerKeys = new Set(['version', 'maxFilters', 'actualDeliveredFilterCount', 'filterCount', 'seed'])
   if (integerKeys.has(key)) return String(value)
   if (Number.isInteger(value)) return String(value) + '.0'
   return JSON.stringify(value)
@@ -204,7 +204,6 @@ export function assertOracleReferenceSnapshotV1(
     throw new Error('snapshot cells must be a non-empty array')
   }
   const cellKeys = new Set<string>()
-  const candidateIds = new Set<string>()
   value.cells.forEach((rawCell, cellIndex) => {
     const label = 'snapshot.cells[' + cellIndex + ']'
     if (!isRecord(rawCell)) throw new Error(label + ' must be an object')
@@ -232,8 +231,7 @@ export function assertOracleReferenceSnapshotV1(
     const cellCandidateIds = new Set<string>()
     rawCell.candidates.forEach((rawCandidate, candidateIndex) => {
       const candidate = candidateValue(rawCandidate, label + '.candidates[' + candidateIndex + ']')
-      if (candidateIds.has(candidate.candidateId)) throw new Error('duplicate candidate ID ' + candidate.candidateId)
-      candidateIds.add(candidate.candidateId)
+      if (cellCandidateIds.has(candidate.candidateId)) throw new Error('duplicate candidate ID ' + candidate.candidateId)
       cellCandidateIds.add(candidate.candidateId)
       if (candidate.problemId !== problemId) throw new Error('candidate problemId does not match cell')
       if (candidate.inputSha256 !== inputSha) throw new Error('candidate inputSha256 does not match cell')

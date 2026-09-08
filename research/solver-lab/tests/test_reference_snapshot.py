@@ -109,6 +109,25 @@ def test_reference_snapshot_serialization_is_canonical_and_hash_excludes_only_to
     ).hexdigest()
 
 
+def test_reference_snapshot_allows_candidate_id_reuse_across_distinct_capacity_cells():
+    value = _mapping()
+    second_cell = deepcopy(value["cells"][0])
+    second_cell["maxFilters"] = 20
+    for candidate in second_cell["candidates"]:
+        candidate["maxFilters"] = 20
+    value["cells"].append(second_cell)
+    value["contentSha256"] = snapshot_content_sha256({
+        key: item for key, item in value.items() if key != "contentSha256"
+    })
+
+    snapshot = parse_reference_snapshot(value)
+
+    assert {(cell.problem_id, cell.max_filters) for cell in snapshot.cells} == {
+        ("titan-to-storm", 10),
+        ("titan-to-storm", 20),
+    }
+
+
 @pytest.mark.parametrize(
     ("label", "mutate"),
     [

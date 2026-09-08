@@ -117,30 +117,72 @@ def validate_teacher_candidate(
     if not evaluation.valid or evaluation.deliverable is None:
         raise ValueError("teacher candidate must have canonical delivered metrics; continuous-only candidates are ineligible")
     cells = _snapshot_cells(snapshot, problem)
-    if any(
+    max10_membership = any(
         candidate.candidateId in cell.deliverable_frontier_candidate_ids
         for cell in cells if cell.max_filters == 10
-    ):
-        raise ValueError("Max10 candidates cannot be passed as high-cap teachers")
+    )
     high_cells = [
         cell for cell in cells
         if cell.max_filters in (20, 40) and
         candidate.candidateId in cell.deliverable_frontier_candidate_ids
     ]
+    if max10_membership and high_cells:
+        max10_references = [
+            (cell, next(
+                (reference for reference in cell.candidates if reference.candidate_id == candidate.candidateId),
+                None,
+            ))
+            for cell in cells if cell.max_filters == 10
+        ]
+        delivered_count = len(evaluation.deliverableFilters)
+        is_max10_evaluation = any(
+            reference is not None and
+            reference.actual_delivered_filter_count == delivered_count and
+            math.isclose(evaluation.deliverable.rmseDb, reference.canonical_rmse_db, rel_tol=0.0, abs_tol=1e-12) and
+            math.isclose(evaluation.deliverable.maxAbsDb, reference.canonical_max_abs_db, rel_tol=0.0, abs_tol=1e-12)
+            for _, reference in max10_references
+        )
+        if is_max10_evaluation:
+            raise ValueError("Max10 candidates cannot be passed as high-cap teachers")
     if not high_cells:
+        if max10_membership:
+            raise ValueError("Max10 candidates cannot be passed as high-cap teachers")
         raise ValueError("teacher candidate is not in the delivered Max20/Max40 reference frontier")
-    cell = max(high_cells, key=lambda value: value.max_filters)
-    if len(evaluation.deliverableFilters) > cell.max_filters:
-        raise ValueError("teacher delivered filter count exceeds the reference cell cap")
-    reference_by_id = {
-        reference.candidate_id: reference
-        for reference in cell.candidates
-    }
-    reference = reference_by_id.get(candidate.candidateId)
-    if reference is None:
+    references_by_cell = [
+        (cell, next(
+            (reference for reference in cell.candidates if reference.candidate_id == candidate.candidateId),
+            None,
+        ))
+        for cell in high_cells
+    ]
+    references_by_cell = [
+        (cell, reference)
+        for cell, reference in references_by_cell
+        if reference is not None
+    ]
+    if not references_by_cell:
         raise ValueError("teacher candidate is absent from the reference cell")
-    if len(evaluation.deliverableFilters) != reference.actual_delivered_filter_count:
+    delivered_count = len(evaluation.deliverableFilters)
+    count_matches = [
+        (cell, reference)
+        for cell, reference in references_by_cell
+        if reference.actual_delivered_filter_count == delivered_count
+    ]
+    metric_matches = [
+        (cell, reference)
+        for cell, reference in count_matches
+        if evaluation.deliverable is not None and
+        math.isclose(evaluation.deliverable.rmseDb, reference.canonical_rmse_db, rel_tol=0.0, abs_tol=1e-12) and
+        math.isclose(evaluation.deliverable.maxAbsDb, reference.canonical_max_abs_db, rel_tol=0.0, abs_tol=1e-12)
+    ]
+    matching = metric_matches or count_matches
+    if not matching:
+        if any(delivered_count > cell.max_filters for cell, _ in references_by_cell):
+            raise ValueError("teacher delivered filter count exceeds the reference cell cap")
         raise ValueError("teacher delivered filter count does not match snapshot")
+    cell, reference = max(matching, key=lambda item: item[0].max_filters)
+    if delivered_count > cell.max_filters:
+        raise ValueError("teacher delivered filter count exceeds the reference cell cap")
     normalized_candidate = replace(candidate, filters=tuple(evaluation.deliverableFilters))
     return EligibleTeacher(
         candidate=normalized_candidate,

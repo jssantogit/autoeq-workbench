@@ -220,6 +220,34 @@ def test_teacher_eligibility_requires_high_cap_delivered_frontier_identity():
         )
 
 
+def test_teacher_eligibility_uses_matching_high_cap_cell_when_id_is_reused():
+    active_problem = make_problem()
+    high = candidate(active_problem, "teacher-reused", filters(11))
+    high_eval = evaluation(high.candidateId, high.filters)
+    base_snapshot = snapshot(active_problem, high.candidateId, high.candidateId)
+    higher_reference = replace(
+        base_snapshot.cells[0].candidates[0],
+        max_filters=40,
+        actual_delivered_filter_count=12,
+        filters=filters(12),
+    )
+    higher_cell = replace(
+        base_snapshot.cells[0],
+        max_filters=40,
+        candidates=(higher_reference,),
+        deliverable_frontier_candidate_ids=(high.candidateId,),
+    )
+    active_snapshot = replace(
+        base_snapshot,
+        cells=(base_snapshot.cells[0], higher_cell, base_snapshot.cells[1]),
+    )
+
+    eligible = validate_teacher_candidate(active_problem, active_snapshot, high, high_eval)
+
+    assert eligible.max_filters == 20
+    assert eligible.reference_candidate.actual_delivered_filter_count == 11
+
+
 def test_teacher_regions_include_filters_and_uncovered_residual_extrema():
     active_problem = make_problem()
     teacher_filters = (

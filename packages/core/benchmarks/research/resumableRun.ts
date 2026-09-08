@@ -10,6 +10,7 @@ import {
   type Filter,
 } from '../../src/index.js'
 import {
+  advanceJointRefineContinuationV2,
   createJointRefineContinuationV2,
   type JointRefineContinuationV2,
 } from '../../src/autoeq/v2/jointRefineContinuation.js'
