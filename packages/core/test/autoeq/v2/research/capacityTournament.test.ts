@@ -29,6 +29,9 @@ function progressPoint(
     referenceImproved: false,
     filters: [],
     metricSource: 'canonical-delivered-v1',
+    cumulativeCandidateCount: evaluationCount + 1,
+    structuralOperationCount: evaluationCount,
+    bestOrigin: 'synthetic',
   }
 }
 
@@ -41,7 +44,7 @@ function variant(
     run: ({ report }) => {
       points.forEach(report)
       return {
-        terminationReason: 'time-limit',
+        terminationReason: 'deadline',
         metadata: { runner: 'synthetic-test' },
       }
     },
@@ -136,5 +139,31 @@ describe('capacity-aware same-runtime tournament', () => {
       }],
       shortlistedVariantIds: ['resumable-beam-v1'],
     })).toThrow(/approved Task 12 survivor/)
+  })
+
+  it('preserves cumulative work at checkpoints even while best-so-far is unchanged', () => {
+    const unchanged = [
+      progressPoint('best', 0, 0, 1, 2),
+      progressPoint('best', 5_000, 10, 1, 2),
+      progressPoint('best', 15_000, 30, 1, 2),
+      progressPoint('best', 30_000, 60, 1, 2),
+      progressPoint('best', 60_000, 120, 1, 2),
+    ]
+    const result = runCapacityTournament({
+      cases: [{
+        problemId: 'titan-to-storm',
+        inputSha256,
+        referenceSnapshotSha256,
+        maxFilters: 10,
+        seed: 0,
+      }],
+      variants: [variant(unchanged)],
+      shortlistedVariantIds: ['resumable-beam-v1'],
+    })
+
+    expect(result.runs[0]!.checkpoints.map((point) => point.cumulativeCandidateCount))
+      .toEqual([11, 31, 61, 121])
+    expect(result.runs[0]!.checkpoints.map((point) => point.structuralOperationCount))
+      .toEqual([10, 30, 60, 120])
   })
 })

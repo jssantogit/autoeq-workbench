@@ -35,6 +35,7 @@ class DeliverableOracleConfig:
     generations: int
     evaluation_budget: int
     max_parents: int = 4
+    polish_evaluation_budget: int | None = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.seed, int) or isinstance(self.seed, bool):
@@ -45,6 +46,15 @@ class DeliverableOracleConfig:
             raise ValueError("deliverable oracle evaluation budget must be positive")
         if not isinstance(self.max_parents, int) or isinstance(self.max_parents, bool) or self.max_parents <= 0:
             raise ValueError("deliverable oracle max_parents must be positive")
+        if (
+            self.polish_evaluation_budget is not None and
+            (
+                not isinstance(self.polish_evaluation_budget, int) or
+                isinstance(self.polish_evaluation_budget, bool) or
+                self.polish_evaluation_budget <= 0
+            )
+        ):
+            raise ValueError("deliverable oracle polish_evaluation_budget must be positive")
 
 
 @dataclass(frozen=True)
@@ -276,7 +286,7 @@ def _powell_neighbor(
         layout,
         config.seed,
         (0.5, 0.5),
-        config.evaluation_budget,
+        config.polish_evaluation_budget or config.evaluation_budget,
         initial_candidate=parent,
     )
     return _candidate(
@@ -378,6 +388,7 @@ def _initialise_audit(
         "slices": 0,
         "refinementRounds": 0,
         "evaluationBudgetConfigured": config.evaluation_budget,
+        "polishEvaluationBudgetPerCall": config.polish_evaluation_budget or config.evaluation_budget,
         "evaluationBudgetRemaining": config.evaluation_budget,
         "timeBudgetConfiguredMs": None,
         "timeBudgetRemainingMs": None,
@@ -530,7 +541,7 @@ def _build_recovery_frontier(
                 audit["refinementRounds"] += 1
                 if polished is not None:
                     audit["polishCalls"] += 1
-                    audit["polishEvaluationBudgetUpperBound"] += config.evaluation_budget
+                    audit["polishEvaluationBudgetUpperBound"] += config.polish_evaluation_budget or config.evaluation_budget
                 local_and_polished = (*(("local", candidate) for candidate in local),)
                 if polished is not None:
                     local_and_polished = (*local_and_polished, ("polish", polished))
@@ -541,9 +552,9 @@ def _build_recovery_frontier(
                     )
             polish_proposals: tuple[tuple[str, SolverLabCandidate], ...] = () if polished is None else (("polish", polished),)
             proposals: tuple[tuple[str, SolverLabCandidate], ...] = tuple(
-                [("local", candidate) for candidate in local] +
                 list(structural) +
                 list(polish_proposals)
+                + [("local", candidate) for candidate in local]
             )
             for mutation, candidate in proposals:
                 is_add = mutation in {"add-pk", "add-ls", "add-hs"}
@@ -740,7 +751,7 @@ def build_deliverable_frontier(
                 audit["refinementRounds"] += 1
                 if polished is not None:
                     audit["polishCalls"] += 1
-                    audit["polishEvaluationBudgetUpperBound"] += config.evaluation_budget
+                    audit["polishEvaluationBudgetUpperBound"] += config.polish_evaluation_budget or config.evaluation_budget
             if polished is not None:
                 pending.append(("polish", polished))
                 if audit is not None:
@@ -831,15 +842,36 @@ def _parse_int_list(value: str) -> tuple[int, ...]:
     return values
 
 
+def _load_known_deliverable_candidates(
+    paths: Sequence[str],
+    problem: SolverLabProblem,
+    max_filters: int,
+) -> tuple[SolverLabCandidate, ...]:
+    candidates: list[SolverLabCandidate] = []
+    for path in paths:
+        artifact = json.loads(Path(path).read_text(encoding="utf-8"))
+        for frontier in artifact.get("frontiers", []):
+            if (
+                frontier.get("problemId") != problem.problemId or
+                frontier.get("frontierType") != "maxFilters" or
+                frontier.get("maxFilters") != max_filters
+            ):
+                continue
+            candidates.extend(parse_candidate(point["candidate"]) for point in frontier.get("points", []))
+    return _unique_candidates(candidates)
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Run the research-only Deliverable Oracle")
     parser.add_argument("--problems", required=True)
     parser.add_argument("--continuous-frontier", required=True)
     parser.add_argument("--control", required=True)
+    parser.add_argument("--known-deliverable", action="append", default=[])
     parser.add_argument("--out", required=True)
     parser.add_argument("--seed", required=True, type=int)
     parser.add_argument("--generations", required=True, type=int)
     parser.add_argument("--eval-budget", required=True, type=int)
+    parser.add_argument("--polish-eval-budget", type=int)
     parser.add_argument("--max-filters", type=int)
     parser.add_argument("--case-id")
     parser.add_argument("--campaign-mode", choices=("smoke", "screen", "confirm", "deep", "full"))
@@ -880,13 +912,23 @@ def main(argv: Sequence[str] | None = None) -> None:
             for point in frontier_artifact["points"]
         )
         known_control = load_control_candidates(control_artifact, problem, max_filters)
+        known_deliverable = _load_known_deliverable_candidates(
+            args.known_deliverable,
+            problem,
+            max_filters,
+        )
         audit: dict[str, Any] = {}
         frontier = build_deliverable_frontier(
             problem,
             candidates,
-            DeliverableOracleConfig(args.seed, args.generations, args.eval_budget),
+            DeliverableOracleConfig(
+                args.seed,
+                args.generations,
+                args.eval_budget,
+                polish_evaluation_budget=args.polish_eval_budget,
+            ),
             evaluator,
-            known_deliverable_candidates=known_control,
+            known_deliverable_candidates=(*known_control, *known_deliverable),
             max_filters=max_filters,
             search_mode=args.search_mode,
             audit=audit,
@@ -923,10 +965,12 @@ def main(argv: Sequence[str] | None = None) -> None:
             "seed": args.seed,
             "generations": args.generations,
             "evaluationBudget": args.eval_budget,
+            "polishEvaluationBudget": args.polish_eval_budget or args.eval_budget,
             "maxFilters": max_filters,
             "campaignMode": args.campaign_mode,
             "canonicalCommand": args.canonical_command,
             "searchMode": args.search_mode,
+            "knownDeliverableArtifacts": list(args.known_deliverable),
         },
         "candidatePath": str(candidate_path),
         "searchAudits": search_audits,

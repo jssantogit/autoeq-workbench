@@ -1,8 +1,10 @@
 from dataclasses import replace
+import json
 import pytest
 
 from autoeq_solver_lab.deliverable_oracle import (
     DeliverableOracleConfig,
+    _load_known_deliverable_candidates,
     _powell_neighbor,
     build_deliverable_frontier,
 )
@@ -256,15 +258,24 @@ def test_powell_neighbor_returns_the_quantized_polished_candidate(monkeypatch):
         algorithmId="powell",
         filters=(replace(seed.filters[0], frequencyHz=1000.6, gainDb=1.26, q=1.236),),
     )
+    budgets = []
+    def fake_optimize(*args, **kwargs):
+        budgets.append(args[5] if len(args) > 5 else kwargs["evaluation_budget"])
+        return polished
     monkeypatch.setattr(
         "autoeq_solver_lab.deliverable_oracle.PowellOptimizer.optimize",
-        lambda *args, **kwargs: polished,
+        fake_optimize,
     )
 
     candidate = _powell_neighbor(
         lab_problem,
         seed,
-        DeliverableOracleConfig(seed=41, generations=1, evaluation_budget=20),
+        DeliverableOracleConfig(
+            seed=41,
+            generations=1,
+            evaluation_budget=20,
+            polish_evaluation_budget=7,
+        ),
         3,
     )
 
@@ -273,6 +284,57 @@ def test_powell_neighbor_returns_the_quantized_polished_candidate(monkeypatch):
     assert candidate.filters[0].frequencyHz == 1001
     assert candidate.filters[0].gainDb == 1.3
     assert candidate.filters[0].q == 1.24
+    assert budgets == [7]
+
+
+def test_recovery_prioritizes_residual_structural_growth_when_candidate_budget_is_tight():
+    lab_problem = replace(problem(), bounds={**problem().bounds, "maxFilters": 4})
+    seed = control_candidate(lab_problem)
+
+    frontier = build_deliverable_frontier(
+        lab_problem,
+        (seed,),
+        DeliverableOracleConfig(
+            seed=41,
+            generations=1,
+            evaluation_budget=2,
+            max_parents=1,
+            polish_evaluation_budget=5,
+        ),
+        FilterCountEvaluator(improving=True),
+        search_mode="recovery",
+    )
+
+    assert max(len(candidate.filters) for candidate in frontier) == 2
+
+
+def test_known_deliverable_loader_selects_only_the_exact_case_and_cap(tmp_path):
+    lab_problem = replace(problem(), bounds={**problem().bounds, "maxFilters": 20})
+    known = control_candidate(lab_problem, "known-delivered")
+    artifact = tmp_path / "deliverable.json"
+    artifact.write_text(json.dumps({
+        "frontiers": [
+            {
+                "problemId": lab_problem.problemId,
+                "frontierType": "maxFilters",
+                "maxFilters": 20,
+                "points": [{"candidate": {
+                    "protocolVersion": known.protocolVersion,
+                    "problemId": known.problemId,
+                    "inputSha256": known.inputSha256,
+                    "candidateId": known.candidateId,
+                    "algorithmId": known.algorithmId,
+                    "seed": known.seed,
+                    "filters": [vars(filter_) for filter_ in known.filters],
+                }}],
+            },
+            {"problemId": lab_problem.problemId, "frontierType": "maxFilters", "maxFilters": 40, "points": []},
+        ],
+    }))
+
+    loaded = _load_known_deliverable_candidates((str(artifact),), lab_problem, 20)
+
+    assert [candidate.candidateId for candidate in loaded] == ["known-delivered"]
 
 
 def test_recovery_mode_continues_residual_growth_after_the_first_expansion():

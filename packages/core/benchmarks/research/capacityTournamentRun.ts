@@ -21,6 +21,7 @@ import {
   runCapacityTournament,
   type CapacityTournamentCaseInput,
   type CapacityTournamentExecutionContext,
+  type CapacityTournamentExecutionResult,
   type CapacityTournamentProgressPointV1,
   type CapacityTournamentResultV1,
   type CapacityTournamentVariant,
@@ -218,9 +219,15 @@ function progressPoint(
     referenceImproved: boolean
   },
   filters: readonly Filter[],
+  work: {
+    cumulativeCandidateCount: number
+    structuralOperationCount: number
+    bestOrigin: string
+  },
 ): CapacityTournamentProgressPointV1 {
   return {
     ...point,
+    ...work,
     filters: filters.map((filter) => ({ ...filter })),
     metricSource: 'canonical-delivered-v1',
   }
@@ -282,7 +289,7 @@ function makeContinuation(
 function runStateBank(
   context: CapacityTournamentExecutionContext,
   data: TournamentCaseData,
-): { terminationReason: 'converged' | 'time-limit'; metadata: Record<string, string | number | boolean> } {
+): CapacityTournamentExecutionResult {
   const startedAt = context.nowMs()
   const freshStates: ScheduledResearchState[] = [{
     key: 'fresh:zero',
@@ -332,12 +339,22 @@ function runStateBank(
       canonicalMaxAbsDb: delivered.maxAbsDb,
       referenceRegret: regret.regret,
       referenceImproved: regret.referenceImproved,
-    }, delivered.filters)
+    }, delivered.filters, {
+      cumulativeCandidateCount: evaluationCount + 1,
+      structuralOperationCount: 0,
+      bestOrigin: state.origin,
+    })
     evaluationCount += 1
     if (shouldReport(best, point)) {
-      context.report(point)
       best = point
     }
+    if (best !== undefined) context.report({
+      ...best,
+      evaluationCount: point.evaluationCount,
+      elapsedMs: point.elapsedMs,
+      cumulativeCandidateCount: evaluationCount,
+      structuralOperationCount: 0,
+    })
   }
 
   reportState(freshStates[0]!)
@@ -346,6 +363,7 @@ function runStateBank(
     maxSlices: Number.MAX_SAFE_INTEGER,
     freshStates,
     proposalBankStates,
+    isExpired: context.isExpired,
     advance: (state) => {
       if (context.isExpired()) {
         state.continuation.done = true
@@ -361,7 +379,13 @@ function runStateBank(
     },
   })
   return {
-    terminationReason: context.isExpired() ? 'time-limit' : 'converged',
+    terminationReason: context.isExpired()
+      ? 'deadline'
+      : result.stopReason === 'no-admissible-proposals'
+        ? 'search-space-exhausted-under-current-mechanism'
+        : result.stopReason === 'slice-budget'
+          ? 'evaluation-budget'
+          : result.stopReason,
     metadata: {
       searchComponent: 'resumable-refinement-plus-state-bank',
       policy: 'state-bank-v1',
@@ -370,6 +394,9 @@ function runStateBank(
       freshSlices: result.slices.filter((slice) => slice.source === 'fresh').length,
       proposalBankSlices: result.slices.filter((slice) => slice.source === 'proposal-bank').length,
       teacherSeedCount: data.proposalSeeds.length,
+      stopReason: result.stopReason,
+      cumulativeCandidateCount: evaluationCount,
+      structuralOperationCount: 0,
       nodeVersion: process.version,
     },
   }
@@ -378,8 +405,10 @@ function runStateBank(
 function runMatchingPursuitVariant(
   context: CapacityTournamentExecutionContext,
   data: TournamentCaseData,
-): { terminationReason: 'converged' | 'time-limit'; metadata: Record<string, string | number | boolean> } {
+): CapacityTournamentExecutionResult {
   let best: CapacityTournamentProgressPointV1 | undefined
+  let candidateCount = 0
+  let structuralOperationCount = 0
   const result = runMatchingPursuit({
     problem: data.problem,
     seed: context.seed ?? 0,
@@ -389,20 +418,39 @@ function runMatchingPursuitVariant(
     isExpired: context.isExpired,
     nowMs: context.nowMs,
     onPoint: (point, filters) => {
-      const candidate = progressPoint(point, filters)
+      candidateCount += 1
+      if (point.candidateId.includes(':replacement-')) structuralOperationCount += 1
+      const origin = point.candidateId.includes(':replacement-')
+        ? 'matching-pursuit-replacement'
+        : point.candidateId.includes(':sparse-')
+          ? 'matching-pursuit-greedy'
+          : 'matching-pursuit-baseline'
+      const candidate = progressPoint(point, filters, {
+        cumulativeCandidateCount: candidateCount,
+        structuralOperationCount,
+        bestOrigin: origin,
+      })
       if (shouldReport(best, candidate)) {
-        context.report(candidate)
         best = candidate
       }
+      if (best !== undefined) context.report({
+        ...best,
+        evaluationCount: candidate.evaluationCount,
+        elapsedMs: candidate.elapsedMs,
+        cumulativeCandidateCount: candidateCount,
+        structuralOperationCount,
+      })
     },
   })
   return {
-    terminationReason: context.isExpired() ? 'time-limit' : 'converged',
+    terminationReason: result.stopReason,
     metadata: {
       searchComponent: 'matching-pursuit-v1',
       dictionaryAtoms: result.metadata.dictionaryAtoms,
       selectedAtoms: result.selectedAtoms.length,
       candidateCount: result.candidates.length,
+      structuralOperationCount,
+      stopReason: result.stopReason,
       teacherSeedCount: 0,
       nodeVersion: process.version,
     },
@@ -412,8 +460,10 @@ function runMatchingPursuitVariant(
 function runStructuralBeamVariant(
   context: CapacityTournamentExecutionContext,
   data: TournamentCaseData,
-): { terminationReason: 'converged' | 'time-limit'; metadata: Record<string, string | number | boolean> } {
+): CapacityTournamentExecutionResult {
   let best: CapacityTournamentProgressPointV1 | undefined
+  let candidateCount = 0
+  let structuralOperationCount = 0
   const seeds: StructuralBeamSeed[] = data.proposalSeeds.map((seed) => ({
     seedId: seed.sourceId,
     origin: seed.sourceKind === 'transfer'
@@ -439,15 +489,34 @@ function runStructuralBeamVariant(
     isExpired: context.isExpired,
     nowMs: context.nowMs,
     onPoint: (point, filters) => {
-      const candidate = progressPoint(point, filters)
+      candidateCount += 1
+      if (point.candidateId.includes(':proposal-')) structuralOperationCount += 1
+      const origin = point.candidateId.includes(':proposal-')
+        ? 'structural-beam-proposal'
+        : point.candidateId.includes(':matching-pursuit:')
+          ? 'matching-pursuit-seed'
+          : point.candidateId.includes(':teacher-compression:')
+            ? 'teacher-compression-seed'
+            : 'zero-seed'
+      const candidate = progressPoint(point, filters, {
+        cumulativeCandidateCount: candidateCount,
+        structuralOperationCount,
+        bestOrigin: origin,
+      })
       if (shouldReport(best, candidate)) {
-        context.report(candidate)
         best = candidate
       }
+      if (best !== undefined) context.report({
+        ...best,
+        evaluationCount: candidate.evaluationCount,
+        elapsedMs: candidate.elapsedMs,
+        cumulativeCandidateCount: candidateCount,
+        structuralOperationCount,
+      })
     },
   })
   return {
-    terminationReason: context.isExpired() ? 'time-limit' : 'converged',
+    terminationReason: result.stopReason,
     metadata: {
       searchComponent: 'structural-beam-v1',
       beamWidth: 4,
@@ -455,6 +524,8 @@ function runStructuralBeamVariant(
       localPolishEvaluations: 120,
       evaluatedStateCount: result.candidates.length,
       paretoRetained: result.paretoRetained,
+      structuralOperationCount,
+      stopReason: result.stopReason,
       teacherSeedCount: data.proposalSeeds.length,
       nodeVersion: process.version,
     },

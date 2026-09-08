@@ -25,7 +25,13 @@ export const CAPACITY_TOURNAMENT_SCHEMA_VERSION = 1 as const
 
 export type CapacityTournamentCaseId = (typeof CAPACITY_TOURNAMENT_CASES)[number]
 export type CapacityTournamentVariantId = (typeof CAPACITY_TOURNAMENT_APPROVED_VARIANT_IDS)[number]
-export type CapacityTournamentTerminationReason = 'target-reached' | 'converged' | 'time-limit'
+export type CapacityTournamentTerminationReason =
+  | 'deadline'
+  | 'evaluation-budget'
+  | 'search-space-exhausted-under-current-mechanism'
+  | 'no-admissible-proposals'
+  | 'target-reached'
+  | 'cancelled'
 
 export interface CapacityTournamentCaseInput {
   problemId: CapacityTournamentCaseId
@@ -38,6 +44,9 @@ export interface CapacityTournamentCaseInput {
 export interface CapacityTournamentProgressPointV1 extends SolverTrajectoryPointV1 {
   filters: Filter[]
   metricSource: 'canonical-delivered-v1'
+  cumulativeCandidateCount: number
+  structuralOperationCount: number
+  bestOrigin: string
 }
 
 export interface CapacityTournamentExecutionContext {
@@ -68,6 +77,10 @@ export interface CapacityTournamentCheckpointV1 extends SolverTrajectoryPointV1 
   checkpointMs: number
   filters: Filter[]
   metricSource: 'canonical-delivered-v1'
+  cumulativeCandidateCount: number
+  structuralOperationCount: number
+  bestOrigin: string
+  stopReason: CapacityTournamentTerminationReason | null
 }
 
 export interface CapacityTournamentRunV1 {
@@ -181,6 +194,11 @@ function assertProgressPoint(
     throw new Error(`${label}.candidateId is required`)
   }
   assertInteger(point.evaluationCount, `${label}.evaluationCount`)
+  assertInteger(point.cumulativeCandidateCount, `${label}.cumulativeCandidateCount`, 1)
+  assertInteger(point.structuralOperationCount, `${label}.structuralOperationCount`)
+  if (typeof point.bestOrigin !== 'string' || point.bestOrigin.length === 0) {
+    throw new Error(`${label}.bestOrigin is required`)
+  }
   assertFinite(point.elapsedMs, `${label}.elapsedMs`)
   if (point.elapsedMs < 0 || point.elapsedMs > 60_000) {
     throw new Error(`${label}.elapsedMs exceeds the hard deadline`)
@@ -236,6 +254,7 @@ function validateBestSoFar(
 function checkpointFromPoint(
   point: CapacityTournamentProgressPointV1,
   checkpointMs: number,
+  stopReason: CapacityTournamentTerminationReason | null,
 ): CapacityTournamentCheckpointV1 {
   return {
     checkpointMs,
@@ -249,6 +268,10 @@ function checkpointFromPoint(
     referenceImproved: point.referenceImproved,
     filters: point.filters.map((filter) => ({ ...filter })),
     metricSource: point.metricSource,
+    cumulativeCandidateCount: point.cumulativeCandidateCount,
+    structuralOperationCount: point.structuralOperationCount,
+    bestOrigin: point.bestOrigin,
+    stopReason,
   }
 }
 
@@ -284,6 +307,12 @@ export function runCapacityTournamentVariant(
         if (point.elapsedMs < previous.elapsedMs) {
           throw new Error('capacity tournament elapsed time must be nondecreasing')
         }
+        if (point.cumulativeCandidateCount < previous.cumulativeCandidateCount) {
+          throw new Error('capacity tournament candidate count must be nondecreasing')
+        }
+        if (point.structuralOperationCount < previous.structuralOperationCount) {
+          throw new Error('capacity tournament structural operation count must be nondecreasing')
+        }
       }
       progress.push({
         ...point,
@@ -293,11 +322,14 @@ export function runCapacityTournamentVariant(
   }
   const execution = variant.run(context)
   assertMetadata(execution.metadata)
-  if (
-    execution.terminationReason !== 'target-reached' &&
-    execution.terminationReason !== 'converged' &&
-    execution.terminationReason !== 'time-limit'
-  ) {
+  if (![
+    'deadline',
+    'evaluation-budget',
+    'search-space-exhausted-under-current-mechanism',
+    'no-admissible-proposals',
+    'target-reached',
+    'cancelled',
+  ].includes(execution.terminationReason)) {
     throw new Error('capacity tournament termination reason is invalid')
   }
   const observedElapsedMs = nowMs() - startedAt
@@ -312,7 +344,14 @@ export function runCapacityTournamentVariant(
     if (point === undefined) {
       throw new Error(`capacity tournament has no point at or before ${checkpointMs} ms checkpoint`)
     }
-    return checkpointFromPoint(point, checkpointMs)
+    const terminationElapsedMs = execution.terminationReason === 'deadline'
+      ? 60_000
+      : observedElapsedMs
+    return checkpointFromPoint(
+      point,
+      checkpointMs,
+      terminationElapsedMs <= checkpointMs ? execution.terminationReason : null,
+    )
   })
   const qualityTimeFrontierV1 = computeQualityTimeFrontier(progress.map((point) => ({
     elapsedSeconds: point.elapsedMs / 1_000,
