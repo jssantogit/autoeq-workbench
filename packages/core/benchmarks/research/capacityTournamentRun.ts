@@ -1,37 +1,91 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import {
+  DEFAULT_AUTOEQ_SETTINGS,
+  evaluateV2Solution,
+  resolveStandardAutoEqV2Config,
+  type Filter,
+} from '../../src/index.js'
+import {
+  advanceJointRefineContinuationV2,
+  createJointRefineContinuationV2,
+  type JointRefineContinuationV2,
+} from '../../src/autoeq/v2/jointRefineContinuation.js'
+
+import {
+  CAPACITY_TOURNAMENT_APPROVED_VARIANT_IDS,
+  CAPACITY_TOURNAMENT_CASES,
+  CAPACITY_TOURNAMENT_CHECKPOINTS_MS,
+  runCapacityTournament,
+  type CapacityTournamentCaseInput,
+  type CapacityTournamentExecutionContext,
+  type CapacityTournamentProgressPointV1,
+  type CapacityTournamentResultV1,
+  type CapacityTournamentVariant,
+} from './capacityTournament.js'
+import { loadLayeredResearchCases } from './corpus.js'
+import {
+  createSolverLabProblem,
+  evaluateSolverLabCandidate,
+  type SolverLabCandidateV1,
+  type SolverLabProblemV1,
+} from './labProtocol.js'
+import { runMatchingPursuit } from './matchingPursuit.js'
+import {
+  loadProposalSeeds,
+  type ProposalSeedV1,
+} from './proposalSeeds.js'
+import {
+  getReferenceCell,
   assertOracleReferenceSnapshotV1,
   type OracleReferenceSnapshotV1,
 } from './referenceSnapshot.js'
 import {
-  CAPACITY_TOURNAMENT_CASES,
-  CAPACITY_TOURNAMENT_CHECKPOINTS_MS,
-} from './capacityTournament.js'
+  directedReferenceRegret,
+  type ReferenceRegretPoint,
+} from './referenceRegret.js'
+import {
+  selectReferencePoint,
+  type SelectorPoint,
+} from './referenceSelector.js'
+import { runStructuralBeam, type StructuralBeamSeed } from './structuralBeam.js'
+import {
+  runResumableScheduler,
+  type ScheduledResearchState,
+} from './resumableScheduler.js'
+
+interface TournamentCaseData {
+  input: CapacityTournamentCaseInput
+  problem: SolverLabProblemV1
+  references: ReferenceRegretPoint[]
+  proposalSeeds: ProposalSeedV1[]
+}
 
 interface CapacityTournamentCliOptions {
   snapshot: string
   cases: typeof CAPACITY_TOURNAMENT_CASES[number][]
   checkpointsMs: typeof CAPACITY_TOURNAMENT_CHECKPOINTS_MS[number][]
   out: string
+  proposalSeedsDir?: string
 }
 
-interface CapacityTournamentBlockedReport {
+interface CapacityTournamentCompleteReport {
   schemaVersion: 1
   program: 'autoeq-capacity-aware-solver'
-  status: 'blocked'
+  status: 'complete'
   snapshot: {
     path: string
-    contentSha256: string | null
+    contentSha256: string
   }
   cases: typeof CAPACITY_TOURNAMENT_CASES[number][]
   checkpointsMs: typeof CAPACITY_TOURNAMENT_CHECKPOINTS_MS[number][]
   maxFilters: 10
-  registeredVariantIds: []
-  runs: []
-  blockers: string[]
+  registeredVariantIds: string[]
+  runs: CapacityTournamentResultV1['runs']
+  tournament: CapacityTournamentResultV1
+  blockers: []
   excludedFromRuntimeTournament: [20, 40, 64]
   holdout: { executed: false }
   productionPromotion: { executed: false }
@@ -66,50 +120,413 @@ function parseOptions(args: readonly string[]): CapacityTournamentCliOptions {
   if (JSON.stringify(checkpointsMs) !== JSON.stringify([...CAPACITY_TOURNAMENT_CHECKPOINTS_MS])) {
     throw new Error('--checkpoints-ms must be exactly 5000,15000,30000,60000')
   }
-  const known = new Set(['--snapshot', '--cases', '--checkpoints-ms', '--out'])
+  const known = new Set(['--snapshot', '--cases', '--checkpoints-ms', '--out', '--proposal-seeds-dir'])
   for (const key of values.keys()) if (!known.has(key)) throw new Error(`Unknown option ${key}`)
   return {
     snapshot: requiredOption(values, '--snapshot'),
     cases: cases as CapacityTournamentCliOptions['cases'],
     checkpointsMs: checkpointsMs as CapacityTournamentCliOptions['checkpointsMs'],
     out: requiredOption(values, '--out'),
+    proposalSeedsDir: values.get('--proposal-seeds-dir'),
   }
 }
 
-function loadSnapshot(path: string): { snapshot: OracleReferenceSnapshotV1 | null; blocker: string | null } {
-  try {
-    const snapshot: unknown = JSON.parse(readFileSync(resolve(path), 'utf8'))
-    assertOracleReferenceSnapshotV1(snapshot)
-    return { snapshot, blocker: null }
-  } catch (error) {
+function readSnapshot(path: string): OracleReferenceSnapshotV1 {
+  const value: unknown = JSON.parse(readFileSync(resolve(path), 'utf8'))
+  assertOracleReferenceSnapshotV1(value)
+  return value
+}
+
+function referencePoints(snapshot: OracleReferenceSnapshotV1, problem: SolverLabProblemV1): ReferenceRegretPoint[] {
+  const cell = getReferenceCell(snapshot, problem.problemId, problem.inputSha256, 10)
+  const byId = new Map(cell.candidates.map((candidate) => [candidate.candidateId, candidate]))
+  return cell.deliverableFrontierCandidateIds.map((candidateId) => {
+    const candidate = byId.get(candidateId)
+    if (candidate === undefined) throw new Error(`reference frontier candidate is absent: ${candidateId}`)
     return {
-      snapshot: null,
-      blocker: `oracle-reference-snapshot-unavailable-or-invalid:${path}:${error instanceof Error ? error.message : String(error)}`,
+      candidateId: candidate.candidateId,
+      rmseDb: candidate.canonicalRmseDb,
+      maxAbsDb: candidate.canonicalMaxAbsDb,
+      filterCount: candidate.actualDeliveredFilterCount,
+    }
+  })
+}
+
+function caseData(
+  snapshot: OracleReferenceSnapshotV1,
+  caseId: typeof CAPACITY_TOURNAMENT_CASES[number],
+  proposalSeedsDir: string,
+): TournamentCaseData {
+  const researchCase = loadLayeredResearchCases('adversarial').find((candidate) => candidate.id === caseId)
+  if (researchCase === undefined) throw new Error(`Unknown approved research case: ${caseId}`)
+  const problem = createSolverLabProblem(researchCase, 10)
+  const references = referencePoints(snapshot, problem)
+  const seedPath = join(proposalSeedsDir, `${caseId}-teacher-student.json`)
+  const proposalSeeds = existsSync(seedPath)
+    ? loadProposalSeeds(seedPath, problem, 10)
+    : []
+  return {
+    input: {
+      problemId: caseId,
+      inputSha256: problem.inputSha256,
+      maxFilters: 10,
+      referenceSnapshotSha256: snapshot.contentSha256,
+      seed: 0,
+    },
+    problem,
+    references,
+    proposalSeeds,
+  }
+}
+
+function selectorPoint(point: CapacityTournamentProgressPointV1): SelectorPoint {
+  return {
+    candidateId: point.candidateId,
+    rmseDb: point.canonicalRmseDb,
+    maxAbsDb: point.canonicalMaxAbsDb,
+    filterCount: point.actualDeliveredFilterCount,
+    cancellationScore: 0,
+  }
+}
+
+function dominates(left: CapacityTournamentProgressPointV1, right: CapacityTournamentProgressPointV1): boolean {
+  const epsilon = 1e-12
+  return left.canonicalRmseDb <= right.canonicalRmseDb + epsilon &&
+    left.canonicalMaxAbsDb <= right.canonicalMaxAbsDb + epsilon &&
+    (left.canonicalRmseDb < right.canonicalRmseDb - epsilon ||
+      left.canonicalMaxAbsDb < right.canonicalMaxAbsDb - epsilon)
+}
+
+function shouldReport(
+  previous: CapacityTournamentProgressPointV1 | undefined,
+  candidate: CapacityTournamentProgressPointV1,
+): boolean {
+  if (previous === undefined || dominates(candidate, previous)) return true
+  if (dominates(previous, candidate)) return false
+  return selectReferencePoint([selectorPoint(previous), selectorPoint(candidate)]).candidateId === candidate.candidateId
+}
+
+function progressPoint(
+  point: {
+    evaluationCount: number
+    elapsedMs: number
+    candidateId: string
+    actualDeliveredFilterCount: number
+    canonicalRmseDb: number
+    canonicalMaxAbsDb: number
+    referenceRegret: number
+    referenceImproved: boolean
+  },
+  filters: readonly Filter[],
+): CapacityTournamentProgressPointV1 {
+  return {
+    ...point,
+    filters: filters.map((filter) => ({ ...filter })),
+    metricSource: 'canonical-delivered-v1',
+  }
+}
+
+function candidateForState(
+  problem: SolverLabProblemV1,
+  policy: 'state-bank-v1',
+  key: string,
+  slicesReceived: number,
+  seed: number,
+  filters: readonly Filter[],
+): SolverLabCandidateV1 {
+  return {
+    protocolVersion: 1,
+    problemId: problem.problemId,
+    inputSha256: problem.inputSha256,
+    candidateId: `${policy}:${key}:${slicesReceived}`,
+    algorithmId: policy,
+    seed,
+    filters: filters.map((filter) => ({ ...filter })),
+  }
+}
+
+function configForProblem(problem: SolverLabProblemV1) {
+  return resolveStandardAutoEqV2Config({
+    ...DEFAULT_AUTOEQ_SETTINGS,
+    minFrequencyHz: problem.bounds.minFrequencyHz,
+    maxFrequencyHz: problem.bounds.maxFrequencyHz,
+    minGainDb: problem.bounds.minGainDb,
+    maxGainDb: problem.bounds.maxGainDb,
+    minQ: problem.bounds.minPkQ,
+    maxQ: problem.bounds.maxPkQ,
+    maxFilters: 10,
+  })
+}
+
+function makeContinuation(
+  problem: SolverLabProblemV1,
+  filters: readonly Filter[],
+  context: CapacityTournamentExecutionContext,
+): JointRefineContinuationV2 {
+  const config = configForProblem(problem)
+  const solution = evaluateV2Solution(
+    filters,
+    problem.desiredDb,
+    problem.frequenciesHz,
+    problem.sampleRateHz,
+  )
+  return createJointRefineContinuationV2({
+    solution,
+    desiredDb: problem.desiredDb,
+    frequencies: problem.frequenciesHz,
+    config,
+    deadline: { isExpired: context.isExpired },
+  })
+}
+
+function runStateBank(
+  context: CapacityTournamentExecutionContext,
+  data: TournamentCaseData,
+): { terminationReason: 'converged' | 'time-limit'; metadata: Record<string, string | number | boolean> } {
+  const startedAt = context.nowMs()
+  const freshStates: ScheduledResearchState[] = [{
+    key: 'fresh:zero',
+    origin: 'fresh',
+    continuation: makeContinuation(data.problem, [], context),
+    slicesReceived: 0,
+  }]
+  const proposalBankStates: ScheduledResearchState[] = data.proposalSeeds.map((seed, index) => ({
+    key: `${seed.sourceKind}:${seed.sourceId}:${index}`,
+    origin: seed.sourceKind === 'transfer'
+      ? 'transferred'
+      : seed.sourceKind === 'known-good'
+        ? 'known-good'
+        : 'v1-seeded',
+    continuation: makeContinuation(data.problem, seed.filters, context),
+    slicesReceived: 0,
+  }))
+  let best: CapacityTournamentProgressPointV1 | undefined
+  let evaluationCount = 0
+  const reportState = (state: ScheduledResearchState): void => {
+    if (context.isExpired()) return
+    const candidate = candidateForState(
+      data.problem,
+      'state-bank-v1',
+      state.key,
+      state.slicesReceived,
+      context.seed ?? 0,
+      state.continuation.solution.filters,
+    )
+    const evaluation = evaluateSolverLabCandidate(data.problem, candidate)
+    if (!evaluation.valid || evaluation.deliverable === null) {
+      throw new Error(`state-bank candidate rejected: ${evaluation.rejectionReason}`)
+    }
+    const delivered = evaluation.deliverable
+    const regret = directedReferenceRegret({
+      candidateId: candidate.candidateId,
+      rmseDb: delivered.rmseDb,
+      maxAbsDb: delivered.maxAbsDb,
+      filterCount: delivered.filters.length,
+    }, data.references)
+    const point = progressPoint({
+      evaluationCount,
+      elapsedMs: Math.min(60_000, Math.max(0, context.nowMs() - startedAt)),
+      candidateId: candidate.candidateId,
+      actualDeliveredFilterCount: delivered.filters.length,
+      canonicalRmseDb: delivered.rmseDb,
+      canonicalMaxAbsDb: delivered.maxAbsDb,
+      referenceRegret: regret.regret,
+      referenceImproved: regret.referenceImproved,
+    }, delivered.filters)
+    evaluationCount += 1
+    if (shouldReport(best, point)) {
+      context.report(point)
+      best = point
     }
   }
+
+  reportState(freshStates[0]!)
+  const result = runResumableScheduler({
+    policy: 'state-bank-v1',
+    maxSlices: Number.MAX_SAFE_INTEGER,
+    freshStates,
+    proposalBankStates,
+    advance: (state) => {
+      if (context.isExpired()) {
+        state.continuation.done = true
+        return state
+      }
+      const next = {
+        ...state,
+        continuation: advanceJointRefineContinuationV2(state.continuation),
+      }
+      if (!context.isExpired()) reportState(next)
+      if (context.isExpired()) next.continuation.done = true
+      return next
+    },
+  })
+  return {
+    terminationReason: context.isExpired() ? 'time-limit' : 'converged',
+    metadata: {
+      searchComponent: 'resumable-refinement-plus-state-bank',
+      policy: 'state-bank-v1',
+      freshStateCount: result.freshStates.length,
+      proposalBankStateCount: result.proposalBankStates.length,
+      freshSlices: result.slices.filter((slice) => slice.source === 'fresh').length,
+      proposalBankSlices: result.slices.filter((slice) => slice.source === 'proposal-bank').length,
+      teacherSeedCount: data.proposalSeeds.length,
+      nodeVersion: process.version,
+    },
+  }
 }
 
-function blockedReport(options: CapacityTournamentCliOptions): CapacityTournamentBlockedReport {
-  const loaded = loadSnapshot(options.snapshot)
-  const blockers = [
-    ...(loaded.blocker === null ? [] : [loaded.blocker]),
-    'task12-shortlist-empty:no evidence-backed runtime survivor is registered',
-    'capacity-tournament-not-run:canonical Max10 adversarial run artifacts are unavailable',
+function runMatchingPursuitVariant(
+  context: CapacityTournamentExecutionContext,
+  data: TournamentCaseData,
+): { terminationReason: 'converged' | 'time-limit'; metadata: Record<string, string | number | boolean> } {
+  let best: CapacityTournamentProgressPointV1 | undefined
+  const result = runMatchingPursuit({
+    problem: data.problem,
+    seed: context.seed ?? 0,
+    evaluationBudget: 1_000_000,
+    referenceFrontier: data.references,
+    referenceSnapshotSha256: context.referenceSnapshotSha256,
+    isExpired: context.isExpired,
+    nowMs: context.nowMs,
+    onPoint: (point, filters) => {
+      const candidate = progressPoint(point, filters)
+      if (shouldReport(best, candidate)) {
+        context.report(candidate)
+        best = candidate
+      }
+    },
+  })
+  return {
+    terminationReason: context.isExpired() ? 'time-limit' : 'converged',
+    metadata: {
+      searchComponent: 'matching-pursuit-v1',
+      dictionaryAtoms: result.metadata.dictionaryAtoms,
+      selectedAtoms: result.selectedAtoms.length,
+      candidateCount: result.candidates.length,
+      teacherSeedCount: 0,
+      nodeVersion: process.version,
+    },
+  }
+}
+
+function runStructuralBeamVariant(
+  context: CapacityTournamentExecutionContext,
+  data: TournamentCaseData,
+): { terminationReason: 'converged' | 'time-limit'; metadata: Record<string, string | number | boolean> } {
+  let best: CapacityTournamentProgressPointV1 | undefined
+  const seeds: StructuralBeamSeed[] = data.proposalSeeds.map((seed) => ({
+    seedId: seed.sourceId,
+    origin: seed.sourceKind === 'transfer'
+      ? 'matching-pursuit'
+      : seed.sourceKind === 'known-good'
+        ? 'teacher-compression'
+        : 'zero',
+    filters: seed.filters,
+  }))
+  const result = runStructuralBeam({
+    problem: data.problem,
+    seed: context.seed ?? 0,
+    evaluationBudget: 1_000_000,
+    referenceFrontier: data.references,
+    referenceSnapshotSha256: context.referenceSnapshotSha256,
+    config: {
+      beamWidth: 4,
+      proposalsPerParent: 8,
+      localPolishEvaluations: 120,
+      maxFilters: 10,
+    },
+    seeds,
+    isExpired: context.isExpired,
+    nowMs: context.nowMs,
+    onPoint: (point, filters) => {
+      const candidate = progressPoint(point, filters)
+      if (shouldReport(best, candidate)) {
+        context.report(candidate)
+        best = candidate
+      }
+    },
+  })
+  return {
+    terminationReason: context.isExpired() ? 'time-limit' : 'converged',
+    metadata: {
+      searchComponent: 'structural-beam-v1',
+      beamWidth: 4,
+      proposalsPerParent: 8,
+      localPolishEvaluations: 120,
+      evaluatedStateCount: result.candidates.length,
+      paretoRetained: result.paretoRetained,
+      teacherSeedCount: data.proposalSeeds.length,
+      nodeVersion: process.version,
+    },
+  }
+}
+
+function createVariants(
+  dataByCase: ReadonlyMap<string, TournamentCaseData>,
+): CapacityTournamentVariant[] {
+  return [
+    {
+      algorithmId: 'state-bank-v1',
+      variantId: 'state-bank-v1',
+      run: (context) => {
+        const data = dataByCase.get(context.problemId)
+        if (data === undefined) throw new Error(`missing tournament case data: ${context.problemId}`)
+        return runStateBank(context, data)
+      },
+    },
+    {
+      algorithmId: 'matching-pursuit-v1',
+      variantId: 'matching-pursuit-v1',
+      run: (context) => {
+        const data = dataByCase.get(context.problemId)
+        if (data === undefined) throw new Error(`missing tournament case data: ${context.problemId}`)
+        return runMatchingPursuitVariant(context, data)
+      },
+    },
+    {
+      algorithmId: 'structural-beam-v1',
+      variantId: 'structural-beam-v1',
+      run: (context) => {
+        const data = dataByCase.get(context.problemId)
+        if (data === undefined) throw new Error(`missing tournament case data: ${context.problemId}`)
+        return runStructuralBeamVariant(context, data)
+      },
+    },
   ]
+}
+
+function execute(options: CapacityTournamentCliOptions): CapacityTournamentCompleteReport {
+  const snapshotPath = resolve(options.snapshot)
+  const snapshot = readSnapshot(snapshotPath)
+  const proposalSeedsDir = resolve(
+    options.proposalSeedsDir ?? join(dirname(snapshotPath), 'proposal-seeds'),
+  )
+  const dataByCase = new Map<string, TournamentCaseData>()
+  const inputs: CapacityTournamentCaseInput[] = []
+  for (const caseId of options.cases) {
+    const data = caseData(snapshot, caseId, proposalSeedsDir)
+    dataByCase.set(caseId, data)
+    inputs.push(data.input)
+  }
+  const variants = createVariants(dataByCase)
+  const tournament = runCapacityTournament({
+    cases: inputs,
+    variants,
+    shortlistedVariantIds: variants.map((variant) => variant.variantId),
+    checkpointsMs: options.checkpointsMs,
+  })
   return {
     schemaVersion: 1,
     program: 'autoeq-capacity-aware-solver',
-    status: 'blocked',
-    snapshot: {
-      path: options.snapshot,
-      contentSha256: loaded.snapshot?.contentSha256 ?? null,
-    },
+    status: 'complete',
+    snapshot: { path: snapshotPath, contentSha256: snapshot.contentSha256 },
     cases: options.cases,
     checkpointsMs: options.checkpointsMs,
     maxFilters: 10,
-    registeredVariantIds: [],
-    runs: [],
-    blockers,
+    registeredVariantIds: variants.map((variant) => variant.variantId),
+    runs: tournament.runs,
+    tournament,
+    blockers: [],
     excludedFromRuntimeTournament: [20, 40, 64],
     holdout: { executed: false },
     productionPromotion: { executed: false },
@@ -118,7 +535,7 @@ function blockedReport(options: CapacityTournamentCliOptions): CapacityTournamen
 
 export function main(args: readonly string[] = process.argv.slice(2)): void {
   const options = parseOptions(args)
-  const report = blockedReport(options)
+  const report = execute(options)
   const output = resolve(options.out)
   mkdirSync(output, { recursive: true })
   writeFileSync(`${output}/tournament-report.json`, JSON.stringify(report, null, 2) + '\n')
