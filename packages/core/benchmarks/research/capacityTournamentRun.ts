@@ -70,6 +70,18 @@ interface CapacityTournamentCliOptions {
   checkpointsMs: typeof CAPACITY_TOURNAMENT_CHECKPOINTS_MS[number][]
   out: string
   proposalSeedsDir?: string
+  variants: ('state-bank-v1' | 'matching-pursuit-v1' | 'structural-beam-v1')[]
+  stateBankSeeds: AblationSeedPolicy
+  structuralSeeds: AblationSeedPolicy
+}
+
+export type AblationSeedPolicy = 'none' | 'proposal'
+
+export function selectAblationSeeds(
+  seeds: readonly ProposalSeedV1[],
+  policy: AblationSeedPolicy,
+): ProposalSeedV1[] {
+  return policy === 'proposal' ? [...seeds] : []
 }
 
 interface CapacityTournamentCompleteReport {
@@ -121,7 +133,23 @@ function parseOptions(args: readonly string[]): CapacityTournamentCliOptions {
   if (JSON.stringify(checkpointsMs) !== JSON.stringify([...CAPACITY_TOURNAMENT_CHECKPOINTS_MS])) {
     throw new Error('--checkpoints-ms must be exactly 5000,15000,30000,60000')
   }
-  const known = new Set(['--snapshot', '--cases', '--checkpoints-ms', '--out', '--proposal-seeds-dir'])
+  const variants = (values.get('--variants') ?? 'state-bank-v1,matching-pursuit-v1,structural-beam-v1')
+    .split(',')
+  const allowedVariants = new Set(['state-bank-v1', 'matching-pursuit-v1', 'structural-beam-v1'])
+  if (variants.length === 0 || new Set(variants).size !== variants.length ||
+    variants.some((variant) => !allowedVariants.has(variant))) {
+    throw new Error('--variants must contain unique approved component IDs')
+  }
+  const stateBankSeeds = values.get('--state-bank-seeds') ?? 'proposal'
+  const structuralSeeds = values.get('--structural-seeds') ?? 'proposal'
+  if ((stateBankSeeds !== 'none' && stateBankSeeds !== 'proposal') ||
+    (structuralSeeds !== 'none' && structuralSeeds !== 'proposal')) {
+    throw new Error('seed policies must be none or proposal')
+  }
+  const known = new Set([
+    '--snapshot', '--cases', '--checkpoints-ms', '--out', '--proposal-seeds-dir',
+    '--variants', '--state-bank-seeds', '--structural-seeds',
+  ])
   for (const key of values.keys()) if (!known.has(key)) throw new Error(`Unknown option ${key}`)
   return {
     snapshot: requiredOption(values, '--snapshot'),
@@ -129,6 +157,9 @@ function parseOptions(args: readonly string[]): CapacityTournamentCliOptions {
     checkpointsMs: checkpointsMs as CapacityTournamentCliOptions['checkpointsMs'],
     out: requiredOption(values, '--out'),
     proposalSeedsDir: values.get('--proposal-seeds-dir'),
+    variants: variants as CapacityTournamentCliOptions['variants'],
+    stateBankSeeds,
+    structuralSeeds,
   }
 }
 
@@ -289,6 +320,7 @@ function makeContinuation(
 function runStateBank(
   context: CapacityTournamentExecutionContext,
   data: TournamentCaseData,
+  seedPolicy: AblationSeedPolicy,
 ): CapacityTournamentExecutionResult {
   const startedAt = context.nowMs()
   const freshStates: ScheduledResearchState[] = [{
@@ -394,6 +426,7 @@ function runStateBank(
       freshSlices: result.slices.filter((slice) => slice.source === 'fresh').length,
       proposalBankSlices: result.slices.filter((slice) => slice.source === 'proposal-bank').length,
       teacherSeedCount: data.proposalSeeds.length,
+      seedPolicy,
       stopReason: result.stopReason,
       cumulativeCandidateCount: evaluationCount,
       structuralOperationCount: 0,
@@ -460,6 +493,7 @@ function runMatchingPursuitVariant(
 function runStructuralBeamVariant(
   context: CapacityTournamentExecutionContext,
   data: TournamentCaseData,
+  seedPolicy: AblationSeedPolicy,
 ): CapacityTournamentExecutionResult {
   let best: CapacityTournamentProgressPointV1 | undefined
   let candidateCount = 0
@@ -467,7 +501,9 @@ function runStructuralBeamVariant(
   const seeds: StructuralBeamSeed[] = data.proposalSeeds.map((seed) => ({
     seedId: seed.sourceId,
     origin: seed.sourceKind === 'transfer'
-      ? 'matching-pursuit'
+      ? seed.sourceId.startsWith('matching-pursuit-v1:')
+        ? 'matching-pursuit'
+        : 'teacher-compression'
       : seed.sourceKind === 'known-good'
         ? 'teacher-compression'
         : 'zero',
@@ -527,6 +563,7 @@ function runStructuralBeamVariant(
       structuralOperationCount,
       stopReason: result.stopReason,
       teacherSeedCount: data.proposalSeeds.length,
+      seedPolicy,
       nodeVersion: process.version,
     },
   }
@@ -534,15 +571,19 @@ function runStructuralBeamVariant(
 
 function createVariants(
   dataByCase: ReadonlyMap<string, TournamentCaseData>,
+  options: Pick<CapacityTournamentCliOptions, 'variants' | 'stateBankSeeds' | 'structuralSeeds'>,
 ): CapacityTournamentVariant[] {
-  return [
+  const variants: CapacityTournamentVariant[] = [
     {
       algorithmId: 'state-bank-v1',
       variantId: 'state-bank-v1',
       run: (context) => {
         const data = dataByCase.get(context.problemId)
         if (data === undefined) throw new Error(`missing tournament case data: ${context.problemId}`)
-        return runStateBank(context, data)
+        return runStateBank(context, {
+          ...data,
+          proposalSeeds: selectAblationSeeds(data.proposalSeeds, options.stateBankSeeds),
+        }, options.stateBankSeeds)
       },
     },
     {
@@ -560,10 +601,15 @@ function createVariants(
       run: (context) => {
         const data = dataByCase.get(context.problemId)
         if (data === undefined) throw new Error(`missing tournament case data: ${context.problemId}`)
-        return runStructuralBeamVariant(context, data)
+        return runStructuralBeamVariant(context, {
+          ...data,
+          proposalSeeds: selectAblationSeeds(data.proposalSeeds, options.structuralSeeds),
+        }, options.structuralSeeds)
       },
     },
   ]
+  return variants.filter((variant) =>
+    options.variants.includes(variant.variantId as CapacityTournamentCliOptions['variants'][number]))
 }
 
 function execute(options: CapacityTournamentCliOptions): CapacityTournamentCompleteReport {
@@ -579,7 +625,7 @@ function execute(options: CapacityTournamentCliOptions): CapacityTournamentCompl
     dataByCase.set(caseId, data)
     inputs.push(data.input)
   }
-  const variants = createVariants(dataByCase)
+  const variants = createVariants(dataByCase, options)
   const tournament = runCapacityTournament({
     cases: inputs,
     variants,

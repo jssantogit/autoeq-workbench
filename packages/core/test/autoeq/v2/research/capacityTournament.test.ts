@@ -7,6 +7,10 @@ import {
   type CapacityTournamentVariant,
   type CapacityTournamentVariantId,
 } from '../../../../benchmarks/research/capacityTournament.js'
+import {
+  selectAblationSeeds,
+} from '../../../../benchmarks/research/capacityTournamentRun.js'
+import type { ProposalSeedV1 } from '../../../../benchmarks/research/proposalSeeds.js'
 
 const inputSha256 = 'a'.repeat(64)
 const referenceSnapshotSha256 = 'b'.repeat(64)
@@ -52,6 +56,20 @@ function variant(
 }
 
 describe('capacity-aware same-runtime tournament', () => {
+  it('keeps pure and seeded ablations distinct without changing the component shortlist', () => {
+    const seeds: ProposalSeedV1[] = [{
+      version: 1,
+      problemId: 'titan-to-storm',
+      inputSha256,
+      sourceKind: 'transfer',
+      sourceId: 'teacher',
+      filters: [],
+    }]
+
+    expect(selectAblationSeeds(seeds, 'none')).toEqual([])
+    expect(selectAblationSeeds(seeds, 'proposal')).toEqual(seeds)
+  })
+
   it('captures the exact 5/15/30/60 second checkpoints from canonical best-so-far points', () => {
     const result = runCapacityTournament({
       cases: [{
