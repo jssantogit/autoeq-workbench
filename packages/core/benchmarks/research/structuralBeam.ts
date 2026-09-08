@@ -114,6 +114,8 @@ export interface StructuralBeamRunResult {
   states: StructuralBeamState[]
   proposalsConsidered: number
   paretoRetained: number
+  stopReason: 'deadline' | 'evaluation-budget' | 'no-admissible-proposals'
+  structuralOperationCounts: Record<StructuralMutation, number>
   metadata: Record<string, string | number | boolean>
 }
 
@@ -324,6 +326,18 @@ function filterKey(filters: readonly Filter[]): string {
       left.id.localeCompare(right.id)))
 }
 
+function semanticFilterKey(filters: readonly Filter[]): string {
+  const order: Record<Filter['type'], number> = { LS: 0, PK: 1, HS: 2 }
+  return JSON.stringify(filters
+    .map(({ id: _id, ...filter }) => filter)
+    .sort((left, right) =>
+      order[left.type] - order[right.type] ||
+      left.frequencyHz - right.frequencyHz ||
+      left.gainDb - right.gainDb ||
+      left.q - right.q ||
+      Number(left.enabled) - Number(right.enabled)))
+}
+
 export function orderStructuralProposals(
   proposals: readonly StructuralProposal[],
 ): StructuralProposal[] {
@@ -513,7 +527,22 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
   const states: StructuralBeamState[] = []
   let evaluationsUsed = 0
   let proposalsConsidered = 0
+  let layersExecuted = 0
+  let deduplicatedProposals = 0
+  let maxObservedFilterCount = 0
+  let stopReason: StructuralBeamRunResult['stopReason'] = 'no-admissible-proposals'
+  const visited = new Set<string>()
+  const structuralOperationCounts: Record<StructuralMutation, number> = {
+    'add-pk': 0,
+    'add-ls': 0,
+    'add-hs': 0,
+    remove: 0,
+    'type-mutation': 0,
+    split: 0,
+    merge: 0,
+  }
   const record = (filters: readonly Filter[], origin: string, seedId: string): StructuralBeamState => {
+    const canonicalFilters = canonical(filters)
     const candidate: SolverLabCandidateV1 = {
       protocolVersion: 1,
       problemId: input.problem.problemId,
@@ -521,7 +550,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       candidateId: `structural-beam-v1:${input.problem.problemId}:${input.seed}:${origin}:${seedId}:${String(candidates.length).padStart(4, '0')}`,
       algorithmId: 'structural-beam-v1',
       seed: input.seed,
-      filters: canonical(filters),
+      filters: canonicalFilters,
     }
     const evaluation = evaluate(candidate)
     const point = candidatePoint(
@@ -537,6 +566,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
     appendBest(trajectory, point)
     input.onPoint?.(point, evaluation.deliverable?.filters ?? [])
     evaluationsUsed += 1
+    maxObservedFilterCount = Math.max(maxObservedFilterCount, canonicalFilters.length)
     return states.at(-1)!
   }
 
@@ -548,11 +578,23 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
     if (seed.filters.length > config.maxFilters) throw new Error('structural beam seed exceeds maxFilters')
     if (input.isExpired?.()) break
     if (evaluationsUsed >= input.evaluationBudget) break
-    record(quantizeV2Filters(seed.filters, quantizationConfig(input.problem)), seed.origin, seed.seedId)
+    const filters = quantizeV2Filters(seed.filters, quantizationConfig(input.problem))
+    const key = semanticFilterKey(filters)
+    if (visited.has(key)) {
+      deduplicatedProposals += 1
+      continue
+    }
+    visited.add(key)
+    record(filters, seed.origin, seed.seedId)
   }
   let beam = retainParetoBeam(states, config.beamWidth)
-  if (evaluationsUsed < input.evaluationBudget) {
-    const generated: StructuralBeamState[] = [...beam]
+  while (evaluationsUsed < input.evaluationBudget) {
+    if (input.isExpired?.()) {
+      stopReason = 'deadline'
+      break
+    }
+    layersExecuted += 1
+    const generated: StructuralBeamState[] = []
     for (const parent of beam) {
       if (input.isExpired?.()) break
       if (evaluationsUsed >= input.evaluationBudget) break
@@ -567,8 +609,9 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       const proposals = orderStructuralProposals(
         generateStructuralMutations(input.problem, parent.candidate.filters, residual),
       ).slice(0, config.proposalsPerParent)
-      proposalsConsidered += proposals.length
       for (const proposal of proposals) {
+        proposalsConsidered += 1
+        structuralOperationCounts[proposal.mutation] += 1
         if (input.isExpired?.()) break
         if (evaluationsUsed >= input.evaluationBudget) break
         if (proposal.filters.length > config.maxFilters) continue
@@ -578,14 +621,33 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
           config.localPolishEvaluations,
           input.isExpired ?? (() => false),
         )
+        const quantized = quantizeV2Filters(polished, quantizationConfig(input.problem))
+        const key = semanticFilterKey(quantized)
+        if (visited.has(key)) {
+          deduplicatedProposals += 1
+          continue
+        }
+        visited.add(key)
         generated.push(record(
-          quantizeV2Filters(polished, quantizationConfig(input.problem)),
+          quantized,
           parent.origin,
           `proposal-${proposalsConsidered}-${proposal.mutation}`,
         ))
       }
     }
-    beam = retainParetoBeam(generated, config.beamWidth)
+    if (input.isExpired?.()) {
+      stopReason = 'deadline'
+      break
+    }
+    if (generated.length === 0) {
+      stopReason = 'no-admissible-proposals'
+      break
+    }
+    beam = retainParetoBeam([...beam, ...generated], config.beamWidth)
+    if (evaluationsUsed >= input.evaluationBudget) {
+      stopReason = 'evaluation-budget'
+      break
+    }
   }
   const qualityTimePoints: QualityTimePoint[] = trajectory.map((point) => ({
     elapsedSeconds: point.elapsedMs / 1_000,
@@ -603,6 +665,8 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
     states: beam,
     proposalsConsidered,
     paretoRetained: beam.length,
+    stopReason,
+    structuralOperationCounts,
     metadata: {
       beamWidth: config.beamWidth,
       proposalsPerParent: config.proposalsPerParent,
@@ -610,6 +674,10 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       maxFilters: config.maxFilters,
       initialStateCount: initialSeeds.length,
       evaluatedStateCount: evaluationsUsed,
+      layersExecuted,
+      deduplicatedProposals,
+      maxObservedFilterCount,
+      capacityUnused: Math.max(0, config.maxFilters - maxObservedFilterCount),
       timingBasis: input.nowMs === undefined ? 'synthetic-evaluation-count' : 'injected-clock',
     },
   }

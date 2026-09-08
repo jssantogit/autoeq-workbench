@@ -68,6 +68,7 @@ export interface MatchingPursuitRunResult {
   candidates: SolverLabCandidateV1[]
   evaluations: SolverLabEvaluationV1[]
   selectedAtoms: DictionaryAtom[]
+  stopReason: 'deadline' | 'evaluation-budget' | 'search-space-exhausted-under-current-mechanism'
   metadata: Record<string, string | number | boolean>
 }
 
@@ -295,7 +296,7 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
   const trajectory: SolverTrajectoryPointV1[] = []
   const selectedIndices: number[] = []
   let residual = [...input.problem.desiredDb]
-  const record = (filters: readonly Filter[], label: string, work: number): void => {
+  const record = (filters: readonly Filter[], label: string, work: number): SolverTrajectoryPointV1 => {
     const candidate: SolverLabCandidateV1 = {
       protocolVersion: 1,
       problemId: input.problem.problemId,
@@ -317,13 +318,25 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
     evaluations.push(evaluation)
     appendBest(trajectory, point)
     input.onPoint?.(point, evaluation.deliverable?.filters ?? [])
+    return point
   }
 
   record([], 'baseline', 0)
+  const visitedSelections = new Set<string>([''])
+  let stopReason: MatchingPursuitRunResult['stopReason'] = 'search-space-exhausted-under-current-mechanism'
+  let replacementCandidates = 0
+  let searchPasses = 1
+  let work = 0
   while (selectedIndices.length < Math.min(10, input.problem.bounds.maxFilters, dictionary.length)) {
-    if (input.isExpired?.()) break
-    const work = (selectedIndices.length + 1) * checkpointEvery
-    if (work > input.evaluationBudget) break
+    if (input.isExpired?.()) {
+      stopReason = 'deadline'
+      break
+    }
+    work += checkpointEvery
+    if (work > input.evaluationBudget) {
+      stopReason = 'evaluation-budget'
+      break
+    }
     const selected = new Set(selectedIndices)
     let selectedIndex = -1
     let selectedScore = -Infinity
@@ -344,6 +357,7 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
     }
     if (selectedIndex < 0 || !Number.isFinite(selectedScore) || selectedScore <= 1e-12) break
     selectedIndices.push(selectedIndex)
+    visitedSelections.add([...selectedIndices].sort((left, right) => left - right).join(','))
     const gains = solveBoundedCoordinateGains(
       selectedIndices.map((index) => matrix[index]!),
       input.problem.desiredDb,
@@ -360,6 +374,63 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
     record(filters, 'sparse', work)
   }
 
+
+  let bestSelectedIndices = [...selectedIndices]
+  while (
+    stopReason !== 'deadline' &&
+    stopReason !== 'evaluation-budget' &&
+    bestSelectedIndices.length > 0
+  ) {
+    if (input.isExpired?.()) {
+      stopReason = 'deadline'
+      break
+    }
+    searchPasses += 1
+    const base = [...bestSelectedIndices]
+    let nextBest = [...base]
+    let generatedThisPass = 0
+    outer: for (let dropPosition = 0; dropPosition < base.length; dropPosition += 1) {
+      const retained = base.filter((_, position) => position !== dropPosition)
+      const retainedSet = new Set(retained)
+      for (let replacementIndex = 0; replacementIndex < dictionary.length; replacementIndex += 1) {
+        if (input.isExpired?.()) {
+          stopReason = 'deadline'
+          break outer
+        }
+        if (retainedSet.has(replacementIndex)) continue
+        const trial = [...retained, replacementIndex]
+        const key = [...trial].sort((left, right) => left - right).join(',')
+        if (visitedSelections.has(key)) continue
+        work += checkpointEvery
+        if (work > input.evaluationBudget) {
+          stopReason = 'evaluation-budget'
+          break outer
+        }
+        visitedSelections.add(key)
+        generatedThisPass += 1
+        replacementCandidates += 1
+        const gains = solveBoundedCoordinateGains(
+          trial.map((index) => matrix[index]!),
+          input.problem.desiredDb,
+          input.problem.bounds.minGainDb,
+          input.problem.bounds.maxGainDb,
+        )
+        const filters = quantizeV2Filters(
+          trial.map((index, position) => filterForAtom(dictionary[index]!, gains[position]!)),
+          config,
+        )
+        const point = record(filters, `replacement-${searchPasses}`, work)
+        if (trajectory.at(-1)?.candidateId === point.candidateId) nextBest = trial
+      }
+    }
+    if (stopReason === 'deadline' || stopReason === 'evaluation-budget') break
+    if (generatedThisPass === 0) {
+      stopReason = 'search-space-exhausted-under-current-mechanism'
+      break
+    }
+    bestSelectedIndices = nextBest
+  }
+
   const points: QualityTimePoint[] = trajectory.map((point) => ({
     elapsedSeconds: point.elapsedMs / 1_000,
     regret: point.referenceRegret,
@@ -373,10 +444,15 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
     qualityTimeFrontierV1: computeQualityTimeFrontier(points),
     candidates,
     evaluations,
-    selectedAtoms: selectedIndices.map((index) => dictionary[index]!),
+    selectedAtoms: bestSelectedIndices.map((index) => dictionary[index]!),
+    stopReason,
     metadata: {
       dictionaryAtoms: dictionary.length,
-      selectedAtoms: selectedIndices.length,
+      selectedAtoms: bestSelectedIndices.length,
+      greedySelectedAtoms: selectedIndices.length,
+      replacementCandidates,
+      searchPasses,
+      visitedSelections: visitedSelections.size,
       checkpointEveryEvaluations: checkpointEvery,
       maxFilters: Math.min(10, input.problem.bounds.maxFilters),
       timingBasis: input.nowMs === undefined ? 'synthetic-evaluation-count' : 'injected-clock',

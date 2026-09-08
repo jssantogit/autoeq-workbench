@@ -53,6 +53,17 @@ function fakeAdvance(current: ScheduledResearchState): ScheduledResearchState {
   return { ...current, continuation: nextContinuation }
 }
 
+function completingAdvance(current: ScheduledResearchState): ScheduledResearchState {
+  const next = fakeAdvance(current)
+  return {
+    ...next,
+    continuation: {
+      ...next.continuation,
+      done: true,
+    },
+  }
+}
+
 describe('resumable research scheduler', () => {
   it('preserves and resumes a state whose later slice becomes best', () => {
     const lateWinner = state('late-winner', 3)
@@ -92,5 +103,94 @@ describe('resumable research scheduler', () => {
     expect(result.freshStates.map((item) => item.key)).toEqual(['fresh-a', 'fresh-b'])
     expect(result.proposalBankStates.map((item) => item.key)).toEqual(['bank-a', 'bank-b', 'bank-c'])
     expect(result.sliceOrder.indexOf('bank-a')).toBeGreaterThanOrEqual(2)
+  })
+
+  it('generates another admissible state instead of stopping on an empty local queue', () => {
+    let replenishments = 0
+    const result = runResumableScheduler({
+      policy: 'resumable-beam-v1',
+      maxSlices: 2,
+      freshStates: [state('first', 1)],
+      advance: completingAdvance,
+      replenish: () => {
+        replenishments += 1
+        return replenishments === 1 ? { freshStates: [state('residual-growth', 0.5)] } : {}
+      },
+    })
+
+    expect(result.sliceOrder).toEqual(['first', 'residual-growth'])
+    expect(result.generatedStateCount).toBe(1)
+    expect(result.stopReason).toBe('slice-budget')
+  })
+
+  it('reports no admissible proposals after one empty replenishment without a busy loop', () => {
+    let replenishments = 0
+    const result = runResumableScheduler({
+      policy: 'resumable-beam-v1',
+      maxSlices: 10,
+      freshStates: [state('first', 1)],
+      advance: completingAdvance,
+      replenish: () => {
+        replenishments += 1
+        return {}
+      },
+    })
+
+    expect(replenishments).toBe(1)
+    expect(result.sliceOrder).toEqual(['first'])
+    expect(result.stopReason).toBe('no-admissible-proposals')
+    expect(result.runnableStateCount).toBe(0)
+  })
+
+  it('keeps deadline and cancellation checks lazy at work-unit boundaries', () => {
+    let advances = 0
+    const deadline = runResumableScheduler({
+      policy: 'resumable-beam-v1',
+      maxSlices: 10,
+      freshStates: [state('first', 1)],
+      isExpired: () => true,
+      advance: (current) => {
+        advances += 1
+        return fakeAdvance(current)
+      },
+    })
+    const cancelled = runResumableScheduler({
+      policy: 'resumable-beam-v1',
+      maxSlices: 10,
+      freshStates: [state('first', 1)],
+      isCancelled: () => true,
+      advance: (current) => {
+        advances += 1
+        return fakeAdvance(current)
+      },
+    })
+
+    expect(advances).toBe(0)
+    expect(deadline.stopReason).toBe('deadline')
+    expect(cancelled.stopReason).toBe('cancelled')
+  })
+
+  it('resumes deterministically with the same ordering and work units as a continuous run', () => {
+    const makeInput = (): ResumableSchedulerInput => ({
+      policy: 'state-bank-v1',
+      maxSlices: 4,
+      freshStates: [state('fresh-a', 1), state('fresh-b', 2)],
+      proposalBankStates: [state('bank-a', 0.5, 'transferred')],
+      advance: fakeAdvance,
+    })
+    const continuous = runResumableScheduler(makeInput())
+    const first = runResumableScheduler({ ...makeInput(), maxSlices: 2 })
+    const resumed = runResumableScheduler({
+      ...makeInput(),
+      maxSlices: 2,
+      freshStates: first.freshStates,
+      proposalBankStates: first.proposalBankStates,
+      continuation: first.continuation,
+    })
+
+    expect([...first.sliceOrder, ...resumed.sliceOrder]).toEqual(continuous.sliceOrder)
+    expect(resumed.freshStates).toEqual(continuous.freshStates)
+    expect(resumed.proposalBankStates).toEqual(continuous.proposalBankStates)
+    expect(resumed.continuation.totalSlices).toBe(continuous.continuation.totalSlices)
   })
 })

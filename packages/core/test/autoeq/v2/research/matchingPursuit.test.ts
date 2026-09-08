@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildDictionary,
+  runMatchingPursuit,
   solveBoundedCoordinateGains,
   type MatchingPursuitProblem,
 } from '../../../../benchmarks/research/matchingPursuit.js'
@@ -18,7 +19,7 @@ const problem: MatchingPursuitProblem = {
     minGainDb: -15,
     maxGainDb: 15,
     minPkQ: 0.1,
-    maxPkQ: 16,
+    maxPkQ: 12,
     shelfQ: 0.7,
     maxFilters: 10,
   },
@@ -52,5 +53,40 @@ describe('TypeScript matching pursuit research component', () => {
 
     expect(solveBoundedCoordinateGains(columns, [2, -2, 0.5], -1, 1))
       .toEqual([1, -1])
+  })
+
+  it('continues with deterministic residual substitutions after the greedy pass', () => {
+    const result = runMatchingPursuit({
+      problem,
+      seed: 0,
+      evaluationBudget: 30,
+      checkpointEveryEvaluations: 1,
+      dictionary: { frequenciesPerOctave: 1, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      evaluate: (candidate) => {
+        const metric = 10 - candidate.filters.length
+        return {
+          protocolVersion: 1,
+          candidateId: candidate.candidateId,
+          valid: true,
+          rejectionReason: null,
+          continuous: { rmseDb: metric, maxAbsDb: metric, bandRmseDb: {} },
+          deliverable: {
+            filters: candidate.filters.map((filter) => ({ ...filter })),
+            rmseDb: metric,
+            maxAbsDb: metric,
+            bandRmseDb: {},
+            cancellationTotalScore: 0,
+          },
+        }
+      },
+    })
+
+    expect(result.metadata.replacementCandidates).toBeGreaterThan(0)
+    expect(result.metadata.searchPasses).toBeGreaterThan(1)
+    expect(result.candidates.map((candidate) => candidate.filters.map((filter) => filter.id).join(',')))
+      .toEqual([...new Set(result.candidates.map((candidate) => candidate.filters.map((filter) => filter.id).join(',')))])
+    expect(result.stopReason).toMatch(/evaluation-budget|search-space-exhausted-under-current-mechanism/)
   })
 })

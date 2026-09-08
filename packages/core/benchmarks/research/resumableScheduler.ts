@@ -36,7 +36,34 @@ export interface ResumableSchedulerInput {
   maxSlices?: number
   sliceBudget?: number
   advance?: (state: ScheduledResearchState) => ScheduledResearchState
+  continuation?: ResumableSchedulerContinuation
+  replenish?: (states: {
+    freshStates: readonly ScheduledResearchState[]
+    proposalBankStates: readonly ScheduledResearchState[]
+    totalSlices: number
+  }) => {
+    freshStates?: readonly ScheduledResearchState[]
+    proposalBankStates?: readonly ScheduledResearchState[]
+  }
+  isExpired?: () => boolean
+  isCancelled?: () => boolean
 }
+
+export interface ResumableSchedulerContinuation {
+  policy: ResumableSchedulerPolicy
+  freshBootstrapIndex: number
+  freshSinceBank: number
+  freshRoundKeys: string[]
+  bankRoundKeys: string[]
+  totalSlices: number
+  replenishmentAttempts: number
+}
+
+export type ResumableSchedulerStopReason =
+  | 'slice-budget'
+  | 'deadline'
+  | 'cancelled'
+  | 'no-admissible-proposals'
 
 export interface SchedulerSliceRecord {
   key: string
@@ -51,6 +78,10 @@ export interface ResumableSchedulerResult {
   slices: SchedulerSliceRecord[]
   sliceOrder: string[]
   exhaustedBudget: boolean
+  stopReason: ResumableSchedulerStopReason
+  runnableStateCount: number
+  generatedStateCount: number
+  continuation: ResumableSchedulerContinuation
 }
 
 function compareKeys(
@@ -178,10 +209,18 @@ export function runResumableScheduler(input: ResumableSchedulerInput): Resumable
   validateUniqueKeys(freshStates, proposalBankStates)
 
   const slices: SchedulerSliceRecord[] = []
-  let freshBootstrapIndex = 0
-  let freshSinceBank = 0
-  let freshRoundKeys: string[] = []
-  let bankRoundKeys: string[] = []
+  const resumed = input.continuation
+  if (resumed !== undefined && resumed.policy !== input.policy) {
+    throw new Error('scheduler continuation policy does not match input policy')
+  }
+  let freshBootstrapIndex = resumed?.freshBootstrapIndex ?? 0
+  let freshSinceBank = resumed?.freshSinceBank ?? 0
+  let freshRoundKeys: string[] = [...(resumed?.freshRoundKeys ?? [])]
+  let bankRoundKeys: string[] = [...(resumed?.bankRoundKeys ?? [])]
+  let totalSlices = resumed?.totalSlices ?? 0
+  let replenishmentAttempts = resumed?.replenishmentAttempts ?? 0
+  let generatedStateCount = 0
+  let stopReason: ResumableSchedulerStopReason = 'slice-budget'
 
   const stateForKey = (key: string, source: 'fresh' | 'proposal-bank'): ScheduledResearchState | undefined =>
     (source === 'fresh' ? freshStates : proposalBankStates).find((state) => state.key === key)
@@ -201,9 +240,39 @@ export function runResumableScheduler(input: ResumableSchedulerInput): Resumable
       slicesReceived: next.slicesReceived,
     })
     if (source === 'fresh') freshSinceBank += 1
+    totalSlices += 1
+  }
+
+  const addGeneratedStates = (
+    generated: ReturnType<NonNullable<ResumableSchedulerInput['replenish']>>,
+  ): number => {
+    const known = new Set([...freshStates, ...proposalBankStates].map((state) => state.key))
+    let added = 0
+    for (const [label, target, additions] of [
+      ['freshStates', freshStates, generated.freshStates ?? []],
+      ['proposalBankStates', proposalBankStates, generated.proposalBankStates ?? []],
+    ] as const) {
+      additions.forEach((state, index) => {
+        validateState(state, `replenish.${label}[${index}]`)
+        if (known.has(state.key)) throw new Error(`duplicate scheduled state key: ${state.key}`)
+        known.add(state.key)
+        target.push({ ...state })
+        added += 1
+      })
+    }
+    generatedStateCount += added
+    return added
   }
 
   while (slices.length < budget) {
+    if (input.isCancelled?.()) {
+      stopReason = 'cancelled'
+      break
+    }
+    if (input.isExpired?.()) {
+      stopReason = 'deadline'
+      break
+    }
     if (freshBootstrapIndex < freshStates.length) {
       const state = freshStates[freshBootstrapIndex++]!
       if (!state.continuation.done) scheduleOne('fresh', state.key)
@@ -212,7 +281,23 @@ export function runResumableScheduler(input: ResumableSchedulerInput): Resumable
 
     const freshRunnable = runnableFresh()
     const bankRunnable = runnableBank()
-    if (freshRunnable.length === 0 && bankRunnable.length === 0) break
+    if (freshRunnable.length === 0 && bankRunnable.length === 0) {
+      if (input.replenish === undefined) {
+        stopReason = 'no-admissible-proposals'
+        break
+      }
+      replenishmentAttempts += 1
+      const added = addGeneratedStates(input.replenish({
+        freshStates,
+        proposalBankStates,
+        totalSlices,
+      }))
+      if (added === 0 || (runnableFresh().length === 0 && runnableBank().length === 0)) {
+        stopReason = 'no-admissible-proposals'
+        break
+      }
+      continue
+    }
 
     const bankMayRun = input.policy === STATE_BANK_POLICY &&
       freshRunnable.length > 0 &&
@@ -251,12 +336,27 @@ export function runResumableScheduler(input: ResumableSchedulerInput): Resumable
     }
   }
 
+  const runnableStateCount = runnableFresh().length + runnableBank().length
+  const continuation: ResumableSchedulerContinuation = {
+    policy: input.policy,
+    freshBootstrapIndex,
+    freshSinceBank,
+    freshRoundKeys,
+    bankRoundKeys,
+    totalSlices,
+    replenishmentAttempts,
+  }
+
   return {
     freshStates,
     proposalBankStates,
     slices,
     sliceOrder: slices.map((slice) => slice.key),
     exhaustedBudget: slices.length >= budget,
+    stopReason,
+    runnableStateCount,
+    generatedStateCount,
+    continuation,
   }
 }
 
