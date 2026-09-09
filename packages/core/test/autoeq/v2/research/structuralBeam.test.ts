@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   generateStructuralMutations,
+  retainParetoBeam,
   runStructuralBeam,
+  type StructuralBeamState,
   type StructuralBeamProblem,
 } from '../../../../benchmarks/research/structuralBeam.js'
 import type { SolverLabCandidateV1, SolverLabEvaluationV1 } from '../../../../benchmarks/research/labProtocol.js'
@@ -111,7 +113,45 @@ describe('TypeScript structural beam research component', () => {
     expect(result.candidates).toHaveLength(1)
     expect(result.candidates[0]!.filters).toHaveLength(1)
   })
+
+  it('retains two non-dominated tradeoffs at width two and discards a dominated parent before selector trimming', () => {
+    const states = [
+      stateWithMetrics('rmse-tradeoff', 1, 4),
+      stateWithMetrics('peak-tradeoff', 4, 1),
+      stateWithMetrics('dominated', 5, 5),
+    ]
+
+    expect(retainParetoBeam(states, 2).map((state) => state.candidate.candidateId))
+      .toEqual(['rmse-tradeoff', 'peak-tradeoff'])
+    expect(retainParetoBeam(states, 1).map((state) => state.candidate.candidateId))
+      .toHaveLength(1)
+    expect(retainParetoBeam(states, 1)[0]!.candidate.candidateId).not.toBe('dominated')
+  })
 })
+
+function stateWithMetrics(candidateId: string, rmseDb: number, maxAbsDb: number): StructuralBeamState {
+  const candidate: SolverLabCandidateV1 = {
+    protocolVersion: 1,
+    problemId: problem.problemId,
+    inputSha256: problem.inputSha256,
+    candidateId,
+    algorithmId: 'structural-beam-v1',
+    seed: 0,
+    filters: [],
+  }
+  return {
+    candidate,
+    origin: 'zero',
+    evaluation: {
+      protocolVersion: 1,
+      candidateId,
+      valid: true,
+      rejectionReason: null,
+      continuous: { rmseDb, maxAbsDb, bandRmseDb: {} },
+      deliverable: { filters: [], rmseDb, maxAbsDb, bandRmseDb: {}, cancellationTotalScore: 0 },
+    },
+  }
+}
 
 function filterCountEvaluator(improving: boolean, counts: number[] = []) {
   return (candidate: SolverLabCandidateV1): SolverLabEvaluationV1 => {

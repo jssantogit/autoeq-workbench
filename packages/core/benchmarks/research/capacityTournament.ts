@@ -80,7 +80,7 @@ export interface CapacityTournamentExecutionContext {
 
 export interface CapacityTournamentExecutionResult {
   terminationReason: CapacityTournamentTerminationReason
-  metadata: Record<string, string | number | boolean>
+  metadata: Record<string, string | number | boolean | null>
   researchTrace?: readonly Record<string, unknown>[]
 }
 
@@ -124,7 +124,7 @@ export interface CapacityTournamentRunV1 {
     overshootMs: number
     deadlineRespected: boolean
   }
-  metadata: Record<string, string | number | boolean>
+  metadata: Record<string, string | number | boolean | null>
   progressTrace: CapacityTournamentProgressPointV1[]
   researchTrace: Record<string, unknown>[]
 }
@@ -181,13 +181,14 @@ function assertCase(input: CapacityTournamentCaseInput): void {
   if (input.seed !== null) assertInteger(input.seed, 'seed')
 }
 
-function assertMetadata(metadata: unknown): asserts metadata is Record<string, string | number | boolean> {
+function assertMetadata(metadata: unknown): asserts metadata is Record<string, string | number | boolean | null> {
   if (!isRecord(metadata)) throw new Error('capacity tournament metadata must be an object')
   for (const [key, value] of Object.entries(metadata)) {
     if (key.length === 0 || (
       typeof value !== 'string' &&
       typeof value !== 'number' &&
-      typeof value !== 'boolean'
+      typeof value !== 'boolean' &&
+      value !== null
     ) || (typeof value === 'number' && !Number.isFinite(value))) {
       throw new Error('capacity tournament metadata values must be finite scalar values')
     }

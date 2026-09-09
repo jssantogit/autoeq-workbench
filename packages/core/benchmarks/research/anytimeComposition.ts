@@ -10,25 +10,26 @@ export interface AnytimeFeedbackWork {
   workUnits: number
   structuralCandidateEvaluations: number
   configuredStructuralBudget: number
-  polishWork: number
+  configuredPolishAllowance: number
+  /** Present only when measured by the structural component. */
   observedPolishWork?: number
   descendantsProduced?: number
   seedImprovements?: number
   globalSelectedBestImprovements?: number
   referenceImprovements?: number
-  /** @deprecated Useful handoffs are derived from seedImprovements. */
-  useful: boolean
 }
 
 export interface AnytimeFeedbackScheduleResult {
   rounds: number
   mpSlices: number
-  handoffs: number
+  feedbackSeedsConsumed: number
+  structuralHandoffsExecuted: number
+  handoffsProducingDescendants: number
   workUnits: number
   structuralCandidateEvaluations: number
   configuredStructuralBudget: number
-  polishWork: number
-  observedPolishWork: number
+  configuredPolishAllowance: number
+  observedPolishWork: number | null
   descendantsProduced: number
   seedImprovements: number
   globalSelectedBestImprovements: number
@@ -42,21 +43,30 @@ export function runAnytimeFeedbackSchedule<T>(
 ): AnytimeFeedbackScheduleResult {
   let rounds = 0
   let mpSlices = 0
-  let handoffs = 0
+  let feedbackSeedsConsumed = 0
+  let structuralHandoffsExecuted = 0
+  let handoffsProducingDescendants = 0
   let workUnits = 0
   let structuralCandidateEvaluations = 0
   let configuredStructuralBudget = 0
-  let polishWork = 0
-  let observedPolishWork = 0
+  let configuredPolishAllowance = 0
+  let observedPolishWork: number | null = null
+  let observedPolishMeasurementIncomplete = false
   let descendantsProduced = 0
   let seedImprovements = 0
   let globalSelectedBestImprovements = 0
   let referenceImprovements = 0
   let usefulHandoffs = 0
+  const result = (stopReason: AnytimeFeedbackScheduleResult['stopReason']): AnytimeFeedbackScheduleResult => ({
+    rounds, mpSlices, feedbackSeedsConsumed, structuralHandoffsExecuted, handoffsProducingDescendants,
+    workUnits, structuralCandidateEvaluations, configuredStructuralBudget, configuredPolishAllowance,
+    observedPolishWork, descendantsProduced, seedImprovements, globalSelectedBestImprovements,
+    referenceImprovements, usefulHandoffs, stopReason,
+  })
   while (true) {
     rounds += 1
     if (input.isExpired()) {
-      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, observedPolishWork, descendantsProduced, seedImprovements, globalSelectedBestImprovements, referenceImprovements, usefulHandoffs, stopReason: 'deadline' }
+      return result('deadline')
     }
     let roundWork = 0
     if (!input.mpDone()) {
@@ -69,7 +79,7 @@ export function runAnytimeFeedbackSchedule<T>(
       workUnits += mpWork
     }
     if (input.isExpired()) {
-      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, observedPolishWork, descendantsProduced, seedImprovements, globalSelectedBestImprovements, referenceImprovements, usefulHandoffs, stopReason: 'deadline' }
+      return result('deadline')
     }
     const feedback = input.takeFeedback()
     let consumedFeedback = false
@@ -80,25 +90,32 @@ export function runAnytimeFeedbackSchedule<T>(
       if (!Number.isSafeInteger(feedbackWork) || feedbackWork < 0) {
         throw new Error('anytime feedback work must be a non-negative integer')
       }
-      handoffs += 1
+      feedbackSeedsConsumed += 1
       roundWork += feedbackWork
       workUnits += feedbackWork
       if (typeof feedbackResult !== 'number') {
         structuralCandidateEvaluations += feedbackResult.structuralCandidateEvaluations
         configuredStructuralBudget += feedbackResult.configuredStructuralBudget
-        polishWork += feedbackResult.polishWork
-        observedPolishWork += feedbackResult.observedPolishWork ?? 0
+        configuredPolishAllowance += feedbackResult.configuredPolishAllowance
+        if (feedbackResult.observedPolishWork === undefined) {
+          observedPolishMeasurementIncomplete = true
+          observedPolishWork = null
+        } else if (!observedPolishMeasurementIncomplete) {
+          observedPolishWork = (observedPolishWork ?? 0) + feedbackResult.observedPolishWork
+        }
         descendantsProduced += feedbackResult.descendantsProduced ?? 0
         seedImprovements += feedbackResult.seedImprovements ?? 0
         globalSelectedBestImprovements += feedbackResult.globalSelectedBestImprovements ?? 0
         referenceImprovements += feedbackResult.referenceImprovements ?? 0
+        if (feedbackResult.structuralCandidateEvaluations > 0) structuralHandoffsExecuted += 1
+        if ((feedbackResult.descendantsProduced ?? 0) > 0) handoffsProducingDescendants += 1
         if ((feedbackResult.seedImprovements ?? 0) > 0) usefulHandoffs += 1
       }
     } else if (input.mpDone()) {
-      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, observedPolishWork, descendantsProduced, seedImprovements, globalSelectedBestImprovements, referenceImprovements, usefulHandoffs, stopReason: 'exhausted' }
+      return result('exhausted')
     }
     if (roundWork === 0 && !consumedFeedback) {
-      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, observedPolishWork, descendantsProduced, seedImprovements, globalSelectedBestImprovements, referenceImprovements, usefulHandoffs, stopReason: 'no-progress' }
+      return result('no-progress')
     }
   }
 }

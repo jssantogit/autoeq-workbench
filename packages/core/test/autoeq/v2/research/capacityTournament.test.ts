@@ -10,8 +10,13 @@ import {
 import {
   accountCapacityNovelty,
   createCapacityNoveltyAccounting,
+  isCanonicalSeedImprovement,
+  runAnytimeComposition,
   selectAblationSeeds,
+  type TournamentCaseData,
 } from '../../../../benchmarks/research/capacityTournamentRun.js'
+import { createSolverLabProblem } from '../../../../benchmarks/research/labProtocol.js'
+import { loadLayeredResearchCases } from '../../../../benchmarks/research/corpus.js'
 import type { ProposalSeedV1 } from '../../../../benchmarks/research/proposalSeeds.js'
 
 const inputSha256 = 'a'.repeat(64)
@@ -244,4 +249,56 @@ describe('capacity-aware same-runtime tournament', () => {
 
     expect(accounting).toMatchObject({ paretoNovel: 1, dominated: 1, equivalent: 1 })
   })
+
+  it('requires a real canonical metric change for a seed improvement while retaining selector-preferred tradeoffs', () => {
+    const seed = progressPoint('seed', 0, 0, 3, 1)
+    const equivalentWithTieBreakIdentity = progressPoint('a-tie-break', 1, 1, 3, 1)
+    const selectorPreferredTradeoff = progressPoint('tradeoff', 2, 2, 2, 3)
+
+    expect(isCanonicalSeedImprovement(seed, equivalentWithTieBreakIdentity)).toBe(false)
+    expect(isCanonicalSeedImprovement(seed, selectorPreferredTradeoff)).toBe(true)
+  })
+
+  it('reports real feedback-composition accounting without classifying MP replacement or seed-only work as structural improvement', () => {
+    const researchCase = loadLayeredResearchCases('adversarial').find((candidate) => candidate.id === 'titan-to-storm')!
+    const problem = createSolverLabProblem(researchCase, 10)
+    const data: TournamentCaseData = {
+      input: {
+        problemId: 'titan-to-storm',
+        inputSha256: problem.inputSha256,
+        referenceSnapshotSha256,
+        maxFilters: 10,
+        seed: 0,
+      },
+      problem,
+      references: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      proposalSeeds: [],
+    }
+    let workUnitsStarted = 0
+    const result = runAnytimeComposition({
+      ...data.input,
+      checkpointsMs: [5_000, 15_000, 30_000, 60_000],
+      deadlineMs: 60_000,
+      nowMs: () => 0,
+      elapsedMs: () => 0,
+      isExpired: () => workUnitsStarted >= 200,
+      startWorkUnit: () => { workUnitsStarted += 1 },
+      report: () => undefined,
+    }, data, 'dictionary-drop-major-v1', true)
+
+    expect(result.metadata).toMatchObject({
+      observedPolishWork: null,
+      mpReplacementOperations: expect.any(Number),
+      structuralBeamCandidateEvaluations: expect.any(Number),
+      feedbackSeedsConsumed: expect.any(Number),
+      structuralHandoffsExecuted: expect.any(Number),
+      handoffsProducingDescendants: expect.any(Number),
+    })
+    expect(result.metadata.mpReplacementOperations).toBeGreaterThan(0)
+    expect(result.metadata.feedbackSeedsConsumed).toBeGreaterThan(0)
+    expect(result.metadata.structuralHandoffsExecuted).toBeGreaterThan(0)
+    expect(result.metadata.structuralBeamCandidateEvaluations).toBeLessThanOrEqual(120)
+    expect(result.metadata.structuralHandoffsExecuted).toBeLessThanOrEqual(result.metadata.feedbackSeedsConsumed as number)
+    expect(result.metadata.usefulHandoffs).toBeLessThanOrEqual(result.metadata.handoffsProducingDescendants as number)
+  }, 15_000)
 })

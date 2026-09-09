@@ -107,7 +107,7 @@ describe('capacity-aware anytime feedback schedule', () => {
     expect(processed.length).toBeGreaterThan(0)
     expect(new Set(processed).size).toBe(processed.length)
     expect(result.mpSlices).toBeGreaterThan(1)
-    expect(result.handoffs).toBe(processed.length)
+    expect(result.feedbackSeedsConsumed).toBe(processed.length)
     expect(result.stopReason).toBe('exhausted')
   })
 
@@ -143,7 +143,7 @@ describe('capacity-aware anytime feedback schedule', () => {
     })
 
     expect(processed).toEqual(['duplicate', 'useful'])
-    expect(result).toMatchObject({ handoffs: 2, workUnits: 2, stopReason: 'exhausted' })
+    expect(result).toMatchObject({ feedbackSeedsConsumed: 2, workUnits: 2, stopReason: 'exhausted' })
   })
 
   it('separates observed structural evaluations from nominal budget and polish work', () => {
@@ -156,8 +156,7 @@ describe('capacity-aware anytime feedback schedule', () => {
         workUnits: 3,
         structuralCandidateEvaluations: 2,
         configuredStructuralBudget: 12,
-        polishWork: 24,
-        useful: true,
+        configuredPolishAllowance: 24,
         descendantsProduced: 1,
         seedImprovements: 1,
         globalSelectedBestImprovements: 1,
@@ -165,11 +164,11 @@ describe('capacity-aware anytime feedback schedule', () => {
       }),
     })
     expect(result).toMatchObject({
-      handoffs: 1,
+      feedbackSeedsConsumed: 1,
       workUnits: 3,
       structuralCandidateEvaluations: 2,
       configuredStructuralBudget: 12,
-      polishWork: 24,
+      configuredPolishAllowance: 24,
       usefulHandoffs: 1,
       descendantsProduced: 1,
       seedImprovements: 1,
@@ -186,8 +185,7 @@ describe('capacity-aware anytime feedback schedule', () => {
         workUnits: 2,
         structuralCandidateEvaluations: 2,
         configuredStructuralBudget: 12,
-        polishWork: 24,
-        useful: true,
+        configuredPolishAllowance: 24,
         descendantsProduced: 1,
         seedImprovements: 0,
         globalSelectedBestImprovements: 0,
@@ -196,11 +194,51 @@ describe('capacity-aware anytime feedback schedule', () => {
     })
 
     expect(result).toMatchObject({
-      handoffs: 1,
+      feedbackSeedsConsumed: 1,
       structuralCandidateEvaluations: 2,
       usefulHandoffs: 0,
       seedImprovements: 0,
       descendantsProduced: 1,
+    })
+  })
+
+  it('keeps unmeasured polish work null and distinguishes consumed feedback from executed structural handoffs', () => {
+    const queue = ['unexecutable', 'executed']
+    const result = runAnytimeFeedbackSchedule({
+      isExpired: () => false,
+      mpDone: () => true,
+      advanceMpSlice: () => 0,
+      takeFeedback: () => queue.shift(),
+      processFeedback: (seed) => seed === 'unexecutable'
+        ? {
+            workUnits: 0,
+            structuralCandidateEvaluations: 0,
+            configuredStructuralBudget: 0,
+            configuredPolishAllowance: 0,
+            descendantsProduced: 0,
+            seedImprovements: 0,
+            globalSelectedBestImprovements: 0,
+            referenceImprovements: 0,
+          }
+        : {
+            workUnits: 2,
+            structuralCandidateEvaluations: 2,
+            configuredStructuralBudget: 12,
+            configuredPolishAllowance: 24,
+            descendantsProduced: 1,
+            seedImprovements: 1,
+            globalSelectedBestImprovements: 0,
+            referenceImprovements: 0,
+          },
+    })
+
+    expect(result).toMatchObject({
+      feedbackSeedsConsumed: 2,
+      structuralHandoffsExecuted: 1,
+      handoffsProducingDescendants: 1,
+      usefulHandoffs: 1,
+      configuredPolishAllowance: 24,
+      observedPolishWork: null,
     })
   })
 })

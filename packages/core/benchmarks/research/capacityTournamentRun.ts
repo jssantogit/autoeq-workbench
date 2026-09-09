@@ -64,7 +64,7 @@ import {
   type ScheduledResearchState,
 } from './resumableScheduler.js'
 
-interface TournamentCaseData {
+export interface TournamentCaseData {
   input: CapacityTournamentCaseInput
   problem: SolverLabProblemV1
   references: ReferenceRegretPoint[]
@@ -255,6 +255,16 @@ function shouldReport(
   if (previous === undefined || dominates(candidate, previous)) return true
   if (dominates(previous, candidate)) return false
   return selectReferencePoint([selectorPoint(previous), selectorPoint(candidate)]).candidateId === candidate.candidateId
+}
+
+export function isCanonicalSeedImprovement(
+  left: CapacityTournamentProgressPointV1,
+  right: CapacityTournamentProgressPointV1,
+): boolean {
+  const epsilon = 1e-12
+  const distinctMetrics = Math.abs(left.canonicalRmseDb - right.canonicalRmseDb) > epsilon ||
+    Math.abs(left.canonicalMaxAbsDb - right.canonicalMaxAbsDb) > epsilon
+  return distinctMetrics && shouldReport(left, right)
 }
 
 export interface NoveltyAccounting {
@@ -880,7 +890,7 @@ interface FeedbackSeed {
   filters: Filter[]
 }
 
-function runAnytimeComposition(
+export function runAnytimeComposition(
   context: CapacityTournamentExecutionContext,
   data: TournamentCaseData,
   replacementOrdering: MatchingPursuitReplacementOrdering,
@@ -962,8 +972,8 @@ function runAnytimeComposition(
       const remainingStructuralAllowance = structuralEvaluationAllowance - observedStructuralCandidateEvaluations
       if (remainingStructuralAllowance <= 0) {
         return {
-          workUnits: 0, structuralCandidateEvaluations: 0, configuredStructuralBudget: 0, polishWork: 0,
-          useful: false, descendantsProduced: 0, seedImprovements: 0,
+          workUnits: 0, structuralCandidateEvaluations: 0, configuredStructuralBudget: 0,
+          configuredPolishAllowance: 0, descendantsProduced: 0, seedImprovements: 0,
           globalSelectedBestImprovements: 0, referenceImprovements: 0,
         }
       }
@@ -1001,7 +1011,9 @@ function runAnytimeComposition(
               structuralOperationCount: Math.max(0, point.evaluationCount),
               bestOrigin: 'matching-pursuit-seed→structural',
             })
-            if (seedPoint !== undefined && shouldReport(seedPoint, candidateSeedComparison)) seedImprovements += 1
+            if (seedPoint !== undefined && isCanonicalSeedImprovement(seedPoint, candidateSeedComparison)) {
+              seedImprovements += 1
+            }
             if (candidateSeedComparison.referenceImproved) referenceImprovements += 1
           }
           const candidate = progressPoint(point, filters, {
@@ -1035,13 +1047,11 @@ function runAnytimeComposition(
         workUnits: structural.candidates.length + stateBankWork,
       structuralCandidateEvaluations: structural.candidates.length,
         configuredStructuralBudget: Math.min(12, remainingStructuralAllowance),
-        polishWork: 24,
-        observedPolishWork: 0,
+        configuredPolishAllowance: 24,
         descendantsProduced,
         seedImprovements,
         globalSelectedBestImprovements,
         referenceImprovements,
-        useful: seedImprovements > 0,
       }
     },
   })
@@ -1057,11 +1067,13 @@ function runAnytimeComposition(
       mpSliceCandidates: 64,
       scheduleRounds: schedule.rounds,
       mpSlices: schedule.mpSlices,
-      handoffs: schedule.handoffs,
+      feedbackSeedsConsumed: schedule.feedbackSeedsConsumed,
+      structuralHandoffsExecuted: schedule.structuralHandoffsExecuted,
+      handoffsProducingDescendants: schedule.handoffsProducingDescendants,
       workUnits: schedule.workUnits,
       structuralCandidateEvaluations: schedule.structuralCandidateEvaluations,
       configuredStructuralBudget: schedule.configuredStructuralBudget,
-      configuredPolishAllowance: schedule.polishWork,
+      configuredPolishAllowance: schedule.configuredPolishAllowance,
       observedPolishWork: schedule.observedPolishWork,
       descendantsProduced: schedule.descendantsProduced,
       seedImprovements: schedule.seedImprovements,
