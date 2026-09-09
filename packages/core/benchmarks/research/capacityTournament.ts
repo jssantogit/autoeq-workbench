@@ -20,6 +20,13 @@ export const CAPACITY_TOURNAMENT_APPROVED_VARIANT_IDS = [
   'state-bank-v1',
   'matching-pursuit-v1',
   'structural-beam-v1',
+  'state-bank-pure-v2',
+  'state-bank-teacher-v2',
+  'structural-pure-v2',
+  'teacher-structural-v2',
+  'mp-structural-v2',
+  'anytime-no-feedback-v2',
+  'anytime-feedback-v2',
 ] as const
 export const CAPACITY_TOURNAMENT_SCHEMA_VERSION = 1 as const
 
@@ -28,6 +35,7 @@ export type CapacityTournamentVariantId = (typeof CAPACITY_TOURNAMENT_APPROVED_V
 export type CapacityTournamentTerminationReason =
   | 'deadline'
   | 'evaluation-budget'
+  | 'phase-budget'
   | 'search-space-exhausted-under-current-mechanism'
   | 'no-admissible-proposals'
   | 'target-reached'
@@ -46,6 +54,9 @@ export interface CapacityTournamentProgressPointV1 extends SolverTrajectoryPoint
   metricSource: 'canonical-delivered-v1'
   cumulativeCandidateCount: number
   structuralOperationCount: number
+  cumulativeParetoNovelCount: number
+  cumulativeDominatedCount: number
+  cumulativeEquivalentMetricCount: number
   bestOrigin: string
 }
 
@@ -58,13 +69,16 @@ export interface CapacityTournamentExecutionContext {
   checkpointsMs: readonly number[]
   deadlineMs: 60_000
   nowMs: () => number
+  elapsedMs: () => number
   isExpired: () => boolean
+  startWorkUnit: () => void
   report: (point: CapacityTournamentProgressPointV1) => void
 }
 
 export interface CapacityTournamentExecutionResult {
   terminationReason: CapacityTournamentTerminationReason
   metadata: Record<string, string | number | boolean>
+  researchTrace?: readonly Record<string, unknown>[]
 }
 
 export interface CapacityTournamentVariant {
@@ -79,6 +93,9 @@ export interface CapacityTournamentCheckpointV1 extends SolverTrajectoryPointV1 
   metricSource: 'canonical-delivered-v1'
   cumulativeCandidateCount: number
   structuralOperationCount: number
+  cumulativeParetoNovelCount: number
+  cumulativeDominatedCount: number
+  cumulativeEquivalentMetricCount: number
   bestOrigin: string
   stopReason: CapacityTournamentTerminationReason | null
 }
@@ -96,11 +113,17 @@ export interface CapacityTournamentRunV1 {
   qualityTimeFrontierV1: number
   termination: {
     reason: CapacityTournamentTerminationReason
+    deadlineMode: 'cooperative'
     deadlineMs: 60_000
+    lastProgressElapsedMs: number
+    lastWorkUnitStartedElapsedMs: number | null
     observedElapsedMs: number
-    deadlineRespected: true
+    overshootMs: number
+    deadlineRespected: boolean
   }
   metadata: Record<string, string | number | boolean>
+  progressTrace: CapacityTournamentProgressPointV1[]
+  researchTrace: Record<string, unknown>[]
 }
 
 export interface CapacityTournamentResultV1 {
@@ -196,6 +219,9 @@ function assertProgressPoint(
   assertInteger(point.evaluationCount, `${label}.evaluationCount`)
   assertInteger(point.cumulativeCandidateCount, `${label}.cumulativeCandidateCount`, 1)
   assertInteger(point.structuralOperationCount, `${label}.structuralOperationCount`)
+  assertInteger(point.cumulativeParetoNovelCount, `${label}.cumulativeParetoNovelCount`)
+  assertInteger(point.cumulativeDominatedCount, `${label}.cumulativeDominatedCount`)
+  assertInteger(point.cumulativeEquivalentMetricCount, `${label}.cumulativeEquivalentMetricCount`)
   if (typeof point.bestOrigin !== 'string' || point.bestOrigin.length === 0) {
     throw new Error(`${label}.bestOrigin is required`)
   }
@@ -270,6 +296,9 @@ function checkpointFromPoint(
     metricSource: point.metricSource,
     cumulativeCandidateCount: point.cumulativeCandidateCount,
     structuralOperationCount: point.structuralOperationCount,
+    cumulativeParetoNovelCount: point.cumulativeParetoNovelCount,
+    cumulativeDominatedCount: point.cumulativeDominatedCount,
+    cumulativeEquivalentMetricCount: point.cumulativeEquivalentMetricCount,
     bestOrigin: point.bestOrigin,
     stopReason,
   }
@@ -291,12 +320,20 @@ export function runCapacityTournamentVariant(
   const startedAt = nowMs()
   assertFinite(startedAt, 'tournament start time')
   const progress: CapacityTournamentProgressPointV1[] = []
+  let lastWorkUnitStartedElapsedMs: number | null = null
   const context: CapacityTournamentExecutionContext = {
     ...input,
     checkpointsMs,
     deadlineMs: 60_000,
     nowMs,
+    elapsedMs: () => nowMs() - startedAt,
     isExpired: () => nowMs() - startedAt >= 60_000,
+    startWorkUnit: () => {
+      const elapsedMs = nowMs() - startedAt
+      assertFinite(elapsedMs, 'work unit start elapsed time')
+      if (elapsedMs < 0) throw new Error('work unit start elapsed time is negative')
+      lastWorkUnitStartedElapsedMs = elapsedMs
+    },
     report: (point) => {
       assertProgressPoint(point, progress.length)
       const previous = progress.at(-1)
@@ -313,6 +350,11 @@ export function runCapacityTournamentVariant(
         if (point.structuralOperationCount < previous.structuralOperationCount) {
           throw new Error('capacity tournament structural operation count must be nondecreasing')
         }
+        if (point.cumulativeParetoNovelCount < previous.cumulativeParetoNovelCount ||
+          point.cumulativeDominatedCount < previous.cumulativeDominatedCount ||
+          point.cumulativeEquivalentMetricCount < previous.cumulativeEquivalentMetricCount) {
+          throw new Error('capacity tournament novelty accounting must be nondecreasing')
+        }
       }
       progress.push({
         ...point,
@@ -325,6 +367,7 @@ export function runCapacityTournamentVariant(
   if (![
     'deadline',
     'evaluation-budget',
+    'phase-budget',
     'search-space-exhausted-under-current-mechanism',
     'no-admissible-proposals',
     'target-reached',
@@ -368,9 +411,13 @@ export function runCapacityTournamentVariant(
     qualityTimeFrontierV1,
     termination: {
       reason: execution.terminationReason,
+      deadlineMode: 'cooperative',
       deadlineMs: 60_000,
+      lastProgressElapsedMs: progress.at(-1)!.elapsedMs,
+      lastWorkUnitStartedElapsedMs,
       observedElapsedMs,
-      deadlineRespected: true,
+      overshootMs: Math.max(0, observedElapsedMs - 60_000),
+      deadlineRespected: observedElapsedMs <= 60_000,
     },
     metadata: {
       ...execution.metadata,
@@ -378,6 +425,11 @@ export function runCapacityTournamentVariant(
       metricSource: 'canonical-delivered-v1',
       checkpointCount: checkpoints.length,
     },
+    progressTrace: progress.map((point) => ({
+      ...point,
+      filters: point.filters.map((filter) => ({ ...filter })),
+    })),
+    researchTrace: (execution.researchTrace ?? []).map((event) => ({ ...event })),
   }
 }
 

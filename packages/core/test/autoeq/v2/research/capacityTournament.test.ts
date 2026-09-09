@@ -8,6 +8,8 @@ import {
   type CapacityTournamentVariantId,
 } from '../../../../benchmarks/research/capacityTournament.js'
 import {
+  accountCapacityNovelty,
+  createCapacityNoveltyAccounting,
   selectAblationSeeds,
 } from '../../../../benchmarks/research/capacityTournamentRun.js'
 import type { ProposalSeedV1 } from '../../../../benchmarks/research/proposalSeeds.js'
@@ -35,6 +37,9 @@ function progressPoint(
     metricSource: 'canonical-delivered-v1',
     cumulativeCandidateCount: evaluationCount + 1,
     structuralOperationCount: evaluationCount,
+    cumulativeParetoNovelCount: evaluationCount + 1,
+    cumulativeDominatedCount: 0,
+    cumulativeEquivalentMetricCount: 0,
     bestOrigin: 'synthetic',
   }
 }
@@ -183,5 +188,60 @@ describe('capacity-aware same-runtime tournament', () => {
       .toEqual([11, 31, 61, 121])
     expect(result.runs[0]!.checkpoints.map((point) => point.structuralOperationCount))
       .toEqual([10, 30, 60, 120])
+  })
+
+  it('records cooperative deadline overshoot when the last synchronous work unit returns late', () => {
+    let clockMs = 0
+    const lateVariant: CapacityTournamentVariant = {
+      algorithmId: 'resumable-beam-v1',
+      variantId: 'resumable-beam-v1',
+      run: (context) => {
+        context.report(progressPoint('initial', 0, 0, 1.2, 2.4))
+        clockMs = 59_000
+        expect(context.elapsedMs()).toBe(59_000)
+        context.report(progressPoint('last-progress', 59_000, 1, 1.0, 2.0))
+        context.startWorkUnit()
+        clockMs = 62_000
+        return {
+          terminationReason: 'deadline',
+          metadata: { runner: 'synthetic-late-operation' },
+        }
+      },
+    }
+
+    const result = runCapacityTournament({
+      cases: [{
+        problemId: 'titan-to-storm',
+        inputSha256,
+        referenceSnapshotSha256,
+        maxFilters: 10,
+        seed: 0,
+      }],
+      variants: [lateVariant],
+      shortlistedVariantIds: ['resumable-beam-v1'],
+      nowMs: () => clockMs,
+    })
+
+    expect(result.runs[0]!.termination).toEqual({
+      reason: 'deadline',
+      deadlineMode: 'cooperative',
+      deadlineMs: 60_000,
+      lastProgressElapsedMs: 59_000,
+      lastWorkUnitStartedElapsedMs: 59_000,
+      observedElapsedMs: 62_000,
+      overshootMs: 2_000,
+      deadlineRespected: false,
+    })
+    expect(result.runs[0]!.checkpoints.at(-1)!.candidateId).toBe('last-progress')
+    expect(result.runs[0]!.checkpoints.at(-1)!.stopReason).toBe('deadline')
+  })
+
+  it('classifies a component-local novelty against the global frontier and separates duplicates', () => {
+    const accounting = createCapacityNoveltyAccounting()
+    accountCapacityNovelty(accounting, progressPoint('global-best', 0, 0, 1, 2))
+    accountCapacityNovelty(accounting, progressPoint('local-novel-global-dominated', 1, 1, 1.1, 2.1))
+    accountCapacityNovelty(accounting, progressPoint('duplicate-seed', 2, 2, 1, 2))
+
+    expect(accounting).toMatchObject({ paretoNovel: 1, dominated: 1, equivalent: 1 })
   })
 })

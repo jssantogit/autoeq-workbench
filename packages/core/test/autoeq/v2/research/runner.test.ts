@@ -1,3 +1,6 @@
+import { mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { calculateErrorMetrics } from '../../../../src/metrics/errorMetrics.js'
 import {
   DEFAULT_AUTOEQ_SETTINGS,
@@ -5,7 +8,7 @@ import {
   type AutoEqResultV2,
   type StandardAutoEqInputV2,
 } from '../../../../src/index.js'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
 import { prepareResearchDesired, loadResearchCases } from '../../../../benchmarks/research/corpus.js'
 import {
@@ -14,6 +17,21 @@ import {
   parseResearchCliArgs,
   runResearchCell,
 } from '../../../../benchmarks/research/run.js'
+
+const temporaryOutputDirectories: string[] = []
+
+function testResearchOptions() {
+  const options = parseResearchCliArgs(['--test-mode'])
+  options.outputDir = mkdtempSync(join(tmpdir(), 'autoeq-research-runner-test-'))
+  temporaryOutputDirectories.push(options.outputDir)
+  return options
+}
+
+afterEach(() => {
+  for (const directory of temporaryOutputDirectories.splice(0)) {
+    rmSync(directory, { recursive: true, force: true })
+  }
+})
 
 function fakeResult(input: StandardAutoEqInputV2, caseId: 'titan-to-storm' | 'titan-to-u12t' | 'titan-to-trio'): AutoEqResultV2 {
   const prepared = prepareResearchDesired(caseId)
@@ -167,7 +185,7 @@ describe('research runner', () => {
   })
 
   it('accepts explicit metadata for schema-v2 provenance', async () => {
-    const options = parseResearchCliArgs(['--test-mode'])
+    const options = testResearchOptions()
     options.cases = ['titan-to-storm']
     options.budgets = [5]
     options.maxFilters = [10]
@@ -198,7 +216,7 @@ describe('research runner', () => {
   })
 
   it('emits case-aware provenance for every normal multi-cell run', async () => {
-    const options = parseResearchCliArgs(['--test-mode'])
+    const options = testResearchOptions()
     options.cases = ['titan-to-storm', 'titan-to-u12t']
     options.budgets = [5, 30]
     options.maxFilters = [10]
@@ -232,7 +250,7 @@ describe('research runner', () => {
   })
 
   it('requires case-specific hashes for multi-case execution', async () => {
-    const options = parseResearchCliArgs(['--test-mode'])
+    const options = testResearchOptions()
     options.cases = ['titan-to-storm', 'titan-to-u12t']
     options.budgets = [5]
     options.maxFilters = [10]

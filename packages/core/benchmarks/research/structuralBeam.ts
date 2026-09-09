@@ -96,10 +96,13 @@ export interface StructuralBeamRunInput {
   referenceSnapshotSha256: string
   config?: StructuralBeamConfig
   seeds?: readonly StructuralBeamSeed[]
+  includeZeroSeed?: boolean
   evaluate?: (candidate: SolverLabCandidateV1) => SolverLabEvaluationV1
   isExpired?: () => boolean
   nowMs?: () => number
+  elapsedMs?: () => number
   onPoint?: (point: SolverTrajectoryPointV1, filters: readonly Filter[]) => void
+  onWorkUnitStart?: () => void
 }
 
 export interface StructuralBeamRunResult {
@@ -557,7 +560,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       candidate,
       evaluation,
       evaluationsUsed,
-      Math.min(60_000, Math.max(0, nowMs() - startedAt)),
+      Math.min(60_000, Math.max(0, input.elapsedMs?.() ?? nowMs() - startedAt)),
       input.referenceFrontier,
     )
     candidates.push(candidate)
@@ -571,7 +574,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
   }
 
   const initialSeeds: StructuralBeamSeed[] = [
-    { seedId: 'zero', origin: 'zero', filters: [] },
+    ...(input.includeZeroSeed === false ? [] : [{ seedId: 'zero', origin: 'zero' as const, filters: [] }]),
     ...(input.seeds ?? []).map((seed) => ({ ...seed, filters: seed.filters.map((filter) => ({ ...filter })) })),
   ]
   for (const seed of initialSeeds) {
@@ -585,6 +588,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       continue
     }
     visited.add(key)
+    input.onWorkUnitStart?.()
     record(filters, seed.origin, seed.seedId)
   }
   let beam = retainParetoBeam(states, config.beamWidth)
@@ -615,6 +619,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
         if (input.isExpired?.()) break
         if (evaluationsUsed >= input.evaluationBudget) break
         if (proposal.filters.length > config.maxFilters) continue
+        input.onWorkUnitStart?.()
         const polished = polish(
           input.problem,
           proposal.filters,

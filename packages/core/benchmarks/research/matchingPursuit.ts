@@ -1,6 +1,7 @@
 import {
   cascadeMagnitudeDb,
   DEFAULT_AUTOEQ_SETTINGS,
+  evaluateV2Solution,
   quantizeV2Filters,
   resolveStandardAutoEqV2Config,
   type Filter,
@@ -52,10 +53,71 @@ export interface MatchingPursuitRunInput {
   referenceSnapshotSha256: string
   dictionary?: DictionaryConfig
   checkpointEveryEvaluations?: number
+  replacementOrdering?: MatchingPursuitReplacementOrdering
   evaluate?: (candidate: SolverLabCandidateV1) => SolverLabEvaluationV1
   isExpired?: () => boolean
+  isCancelled?: () => boolean
   nowMs?: () => number
+  elapsedMs?: () => number
   onPoint?: (point: SolverTrajectoryPointV1, filters: readonly Filter[]) => void
+  onTelemetry?: (point: MatchingPursuitTelemetryPointV1, filters: readonly Filter[]) => void
+  onWorkUnitStart?: () => void
+}
+
+export type MatchingPursuitReplacementOrdering =
+  | 'dictionary-drop-major-v1'
+  | 'dictionary-drop-round-robin-v1'
+  | 'residual-ranked-drop-round-robin-v1'
+
+export interface MatchingPursuitTelemetryPointV1 {
+  candidateId: string
+  phase: 'baseline' | 'greedy' | 'replacement'
+  evaluationCount: number
+  elapsedMs: number
+  observedCompletionElapsedMs: number
+  admissibleForTrajectory: boolean
+  selectionKey: string
+  selectedAtomIds: string[]
+  removedAtomIds: string[]
+  addedAtomIds: string[]
+  preQuantizationRmseDb: number
+  preQuantizationMaxAbsDb: number
+  postQuantizationRmseDb: number
+  postQuantizationMaxAbsDb: number
+  preSolveGainVector: number[]
+  boundedGainVector: number[]
+  preSolveLinearResidualRmseDb: number
+  postSolveLinearResidualRmseDb: number
+  residualReductionRmseDb: number
+  improvementVsParentRmseDb: number
+  quantizationDeltaRmseDb: number
+  quantizationDeltaMaxAbsDb: number
+  paretoNovel: boolean
+  dominated: boolean
+  equivalentMetrics: boolean
+  referenceImproved: boolean
+  selectedChange: boolean
+  acceptedReplacement: boolean
+  equivalentStructuralRevisit: boolean
+  evaluationsSinceUsefulImprovement: number | null
+  candidateEvaluationsSinceUsefulImprovement: number | null
+  elapsedMsSinceUsefulImprovement: number | null
+}
+
+export interface MatchingPursuitDiagnosticsV1 {
+  evaluatedCandidates: number
+  uniqueSelections: number
+  paretoNovelCandidates: number
+  dominatedCandidates: number
+  equivalentMetricCandidates: number
+  referenceImprovements: number
+  selectedChanges: number
+  attemptedReplacements: number
+  acceptedReplacements: number
+  atomsRemoved: number
+  atomsAdded: number
+  equivalentStructuralRevisits: number
+  usefulImprovementCount: number
 }
 
 export interface MatchingPursuitRunResult {
@@ -67,8 +129,10 @@ export interface MatchingPursuitRunResult {
   qualityTimeFrontierV1: number
   candidates: SolverLabCandidateV1[]
   evaluations: SolverLabEvaluationV1[]
+  telemetry: MatchingPursuitTelemetryPointV1[]
+  diagnostics: MatchingPursuitDiagnosticsV1
   selectedAtoms: DictionaryAtom[]
-  stopReason: 'deadline' | 'evaluation-budget' | 'search-space-exhausted-under-current-mechanism'
+  stopReason: 'deadline' | 'cancelled' | 'evaluation-budget' | 'search-space-exhausted-under-current-mechanism'
   metadata: Record<string, string | number | boolean>
 }
 
@@ -264,6 +328,30 @@ function appendBest(trajectory: SolverTrajectoryPointV1[], point: SolverTrajecto
   }
 }
 
+function sameMetrics(left: SolverTrajectoryPointV1, right: SolverTrajectoryPointV1): boolean {
+  return Math.abs(left.canonicalRmseDb - right.canonicalRmseDb) <= 1e-12 &&
+    Math.abs(left.canonicalMaxAbsDb - right.canonicalMaxAbsDb) <= 1e-12
+}
+
+function structuralKey(filters: readonly Filter[]): string {
+  return JSON.stringify(filters.map(({ id: _id, ...filter }) => filter).sort((left, right) =>
+    left.type.localeCompare(right.type) || left.frequencyHz - right.frequencyHz ||
+    left.gainDb - right.gainDb || left.q - right.q))
+}
+
+function linearResidualRmse(
+  desiredDb: readonly number[],
+  columns: readonly (readonly number[])[],
+  gains: readonly number[],
+): number {
+  const meanSquare = desiredDb.reduce((sum, desired, row) => {
+    const residual = desired - columns.reduce((response, column, index) =>
+      response + column[row]! * gains[index]!, 0)
+    return sum + residual ** 2
+  }, 0) / desiredDb.length
+  return Math.sqrt(meanSquare)
+}
+
 function quantizationConfig(problem: MatchingPursuitProblem) {
   return resolveStandardAutoEqV2Config({
     ...DEFAULT_AUTOEQ_SETTINGS,
@@ -277,26 +365,51 @@ function quantizationConfig(problem: MatchingPursuitProblem) {
   })
 }
 
-export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPursuitRunResult {
+function* matchingPursuitGenerator(
+  input: MatchingPursuitRunInput,
+): Generator<void, MatchingPursuitRunResult, void> {
   nonNegativeInteger(input.seed, 'matching pursuit seed')
   positiveInteger(input.evaluationBudget, 'matching pursuit evaluationBudget')
   positiveInteger(input.checkpointEveryEvaluations ?? 200, 'checkpointEveryEvaluations')
   if (!/^[a-f0-9]{64}$/.test(input.referenceSnapshotSha256)) throw new Error('reference snapshot hash is invalid')
   if (input.referenceFrontier.length === 0) throw new Error('matching pursuit reference frontier is required')
 
-  const dictionary = buildDictionary(input.problem, input.dictionary)
-  const matrix = buildUnitResponseMatrix(input.problem, dictionary)
-  const config = quantizationConfig(input.problem)
-  const checkpointEvery = input.checkpointEveryEvaluations ?? 200
-  const evaluate = input.evaluate ?? ((candidate) => evaluateSolverLabCandidate(input.problem as SolverLabProblemV1, candidate))
   const nowMs = input.nowMs ?? (() => 0)
   const startedAt = nowMs()
+  let dictionary: DictionaryAtom[] = []
+  let matrix: number[][] = []
+  const config = quantizationConfig(input.problem)
+  const checkpointEvery = input.checkpointEveryEvaluations ?? 200
+  const replacementOrdering = input.replacementOrdering ?? 'dictionary-drop-major-v1'
+  const evaluate = input.evaluate ?? ((candidate) => evaluateSolverLabCandidate(input.problem as SolverLabProblemV1, candidate))
   const candidates: SolverLabCandidateV1[] = []
   const evaluations: SolverLabEvaluationV1[] = []
   const trajectory: SolverTrajectoryPointV1[] = []
+  const telemetry: MatchingPursuitTelemetryPointV1[] = []
+  let paretoFrontier: SolverTrajectoryPointV1[] = []
+  const selectionKeys = new Set<string>()
+  const structuralKeys = new Set<string>()
+  const continuousRmseBySelection = new Map<string, number>()
+  let lastUsefulEvaluation = 0
+  let lastUsefulCandidateIndex = 0
+  let lastUsefulElapsedMs = 0
   const selectedIndices: number[] = []
   let residual = [...input.problem.desiredDb]
-  const record = (filters: readonly Filter[], label: string, work: number): SolverTrajectoryPointV1 => {
+  const baselineRmseDb = evaluateV2Solution(
+    [], input.problem.desiredDb, input.problem.frequenciesHz, input.problem.sampleRateHz,
+  ).metrics.rmseDb
+  const record = (
+    filters: readonly Filter[],
+    unquantizedFilters: readonly Filter[],
+    selected: readonly number[],
+    label: string,
+    work: number,
+    phase: MatchingPursuitTelemetryPointV1['phase'],
+    removed: readonly number[] = [],
+    added: readonly number[] = [],
+    gains: readonly number[] = [],
+    parentSelection: readonly number[] | null = null,
+  ): SolverTrajectoryPointV1 => {
     const candidate: SolverLabCandidateV1 = {
       protocolVersion: 1,
       problemId: input.problem.problemId,
@@ -307,31 +420,123 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
       filters: filters.map((filter) => ({ ...filter })),
     }
     const evaluation = evaluate(candidate)
+    const observedCompletionElapsedMs = Math.max(0, input.elapsedMs?.() ?? nowMs() - startedAt)
+    const admissibleForTrajectory = observedCompletionElapsedMs < 60_000
     const point = candidatePoint(
       candidate,
       evaluation,
       Math.min(input.evaluationBudget, work),
-      Math.min(60_000, Math.max(0, nowMs() - startedAt)),
+      Math.min(60_000, observedCompletionElapsedMs),
       input.referenceFrontier,
     )
     candidates.push(candidate)
     evaluations.push(evaluation)
-    appendBest(trajectory, point)
-    input.onPoint?.(point, evaluation.deliverable?.filters ?? [])
+    const previousTrajectoryLength = trajectory.length
+    if (admissibleForTrajectory) appendBest(trajectory, point)
+    const selectedChange = trajectory.length > previousTrajectoryLength
+    const equivalentMetrics = paretoFrontier.some((previous) => sameMetrics(previous, point))
+    const strictlyDominated = paretoFrontier.some((previous) => dominates(previous, point))
+    const paretoNovel = !strictlyDominated && !equivalentMetrics
+    if (paretoNovel) {
+      paretoFrontier = paretoFrontier.filter((previous) => !dominates(point, previous))
+      paretoFrontier.push(point)
+    }
+    const selectionKey = [...selected].sort((left, right) => left - right).join(',')
+    selectionKeys.add(selectionKey)
+    const deliveredFilters = evaluation.deliverable?.filters ?? []
+    const deliveredStructuralKey = structuralKey(deliveredFilters)
+    const equivalentStructuralRevisit = structuralKeys.has(deliveredStructuralKey)
+    structuralKeys.add(deliveredStructuralKey)
+    const continuousMetrics = evaluateV2Solution(
+      unquantizedFilters,
+      input.problem.desiredDb,
+      input.problem.frequenciesHz,
+      input.problem.sampleRateHz,
+    ).metrics
+    continuousRmseBySelection.set(selectionKey, continuousMetrics.rmseDb)
+    const selectedColumns = selected.map((index) => matrix[index]!)
+    const preSolveGainVector = selected.map(() => 0)
+    const preSolveLinearResidualRmseDb = linearResidualRmse(
+      input.problem.desiredDb, selectedColumns, preSolveGainVector,
+    )
+    const postSolveLinearResidualRmseDb = linearResidualRmse(
+      input.problem.desiredDb, selectedColumns, gains,
+    )
+    const parentKey = parentSelection === null
+      ? null
+      : [...parentSelection].sort((left, right) => left - right).join(',')
+    const parentRmseDb = parentKey === null
+      ? baselineRmseDb
+      : continuousRmseBySelection.get(parentKey) ?? baselineRmseDb
+    const usefulImprovement = selectedChange && telemetry.length > 0
+    const telemetryPoint: MatchingPursuitTelemetryPointV1 = {
+      candidateId: point.candidateId,
+      phase,
+      evaluationCount: point.evaluationCount,
+      elapsedMs: point.elapsedMs,
+      observedCompletionElapsedMs,
+      admissibleForTrajectory,
+      selectionKey,
+      selectedAtomIds: selected.map((index) => dictionary[index]!.atomId),
+      removedAtomIds: removed.map((index) => dictionary[index]!.atomId),
+      addedAtomIds: added.map((index) => dictionary[index]!.atomId),
+      preQuantizationRmseDb: continuousMetrics.rmseDb,
+      preQuantizationMaxAbsDb: continuousMetrics.maxAbsDb,
+      postQuantizationRmseDb: point.canonicalRmseDb,
+      postQuantizationMaxAbsDb: point.canonicalMaxAbsDb,
+      preSolveGainVector,
+      boundedGainVector: [...gains],
+      preSolveLinearResidualRmseDb,
+      postSolveLinearResidualRmseDb,
+      residualReductionRmseDb: baselineRmseDb - continuousMetrics.rmseDb,
+      improvementVsParentRmseDb: parentRmseDb - continuousMetrics.rmseDb,
+      quantizationDeltaRmseDb: point.canonicalRmseDb - continuousMetrics.rmseDb,
+      quantizationDeltaMaxAbsDb: point.canonicalMaxAbsDb - continuousMetrics.maxAbsDb,
+      paretoNovel,
+      dominated: strictlyDominated,
+      equivalentMetrics,
+      referenceImproved: point.referenceImproved,
+      selectedChange,
+      acceptedReplacement: phase === 'replacement' && selectedChange,
+      equivalentStructuralRevisit,
+      evaluationsSinceUsefulImprovement: usefulImprovement ? point.evaluationCount - lastUsefulEvaluation : null,
+      candidateEvaluationsSinceUsefulImprovement: usefulImprovement
+        ? telemetry.length - lastUsefulCandidateIndex
+        : null,
+      elapsedMsSinceUsefulImprovement: usefulImprovement ? point.elapsedMs - lastUsefulElapsedMs : null,
+    }
+    if (usefulImprovement) {
+      lastUsefulEvaluation = point.evaluationCount
+      lastUsefulCandidateIndex = telemetry.length
+      lastUsefulElapsedMs = point.elapsedMs
+    }
+    telemetry.push(telemetryPoint)
+    input.onTelemetry?.(telemetryPoint, deliveredFilters)
+    if (admissibleForTrajectory) input.onPoint?.(point, evaluation.deliverable?.filters ?? [])
     return point
   }
 
-  record([], 'baseline', 0)
+  input.onWorkUnitStart?.()
+  record([], [], [], 'baseline', 0, 'baseline', [], [], [], null)
+  yield
+  input.onWorkUnitStart?.()
+  dictionary = buildDictionary(input.problem, input.dictionary)
+  matrix = buildUnitResponseMatrix(input.problem, dictionary)
   const visitedSelections = new Set<string>([''])
   let stopReason: MatchingPursuitRunResult['stopReason'] = 'search-space-exhausted-under-current-mechanism'
   let replacementCandidates = 0
+  let replacementRankingScoreComputations = 0
   let searchPasses = 1
   let work = 0
+  const requestedStopReason = (): 'deadline' | 'cancelled' | null =>
+    input.isCancelled?.() ? 'cancelled' : input.isExpired?.() ? 'deadline' : null
   while (selectedIndices.length < Math.min(10, input.problem.bounds.maxFilters, dictionary.length)) {
-    if (input.isExpired?.()) {
-      stopReason = 'deadline'
+    const requestedStop = requestedStopReason()
+    if (requestedStop !== null) {
+      stopReason = requestedStop
       break
     }
+    input.onWorkUnitStart?.()
     work += checkpointEvery
     if (work > input.evaluationBudget) {
       stopReason = 'evaluation-budget'
@@ -356,6 +561,7 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
       }
     }
     if (selectedIndex < 0 || !Number.isFinite(selectedScore) || selectedScore <= 1e-12) break
+    const parentSelection = [...selectedIndices]
     selectedIndices.push(selectedIndex)
     visitedSelections.add([...selectedIndices].sort((left, right) => left - right).join(','))
     const gains = solveBoundedCoordinateGains(
@@ -367,40 +573,98 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
     residual = input.problem.desiredDb.map((desired, row) =>
       desired - selectedIndices.reduce((sum, index, position) => sum + matrix[index]![row]! * gains[position]!, 0),
     )
-    const filters = quantizeV2Filters(
-      selectedIndices.map((index, position) => filterForAtom(dictionary[index]!, gains[position]!)),
-      config,
-    )
-    record(filters, 'sparse', work)
+    const continuousFilters = selectedIndices.map((index, position) =>
+      filterForAtom(dictionary[index]!, gains[position]!))
+    const filters = quantizeV2Filters(continuousFilters, config)
+    record(filters, continuousFilters, selectedIndices, 'sparse', work, 'greedy', [], [selectedIndex], gains, parentSelection)
+    yield
   }
 
 
   let bestSelectedIndices = [...selectedIndices]
   while (
     stopReason !== 'deadline' &&
+    stopReason !== 'cancelled' &&
     stopReason !== 'evaluation-budget' &&
     bestSelectedIndices.length > 0
   ) {
-    if (input.isExpired?.()) {
-      stopReason = 'deadline'
+    const requestedStop = requestedStopReason()
+    if (requestedStop !== null) {
+      stopReason = requestedStop
       break
     }
     searchPasses += 1
     const base = [...bestSelectedIndices]
     let nextBest = [...base]
     let generatedThisPass = 0
-    outer: for (let dropPosition = 0; dropPosition < base.length; dropPosition += 1) {
+    const replacementRankings: number[][] = []
+    for (let dropPosition = 0; dropPosition < base.length; dropPosition += 1) {
+      input.onWorkUnitStart?.()
       const retained = base.filter((_, position) => position !== dropPosition)
       const retainedSet = new Set(retained)
-      for (let replacementIndex = 0; replacementIndex < dictionary.length; replacementIndex += 1) {
-        if (input.isExpired?.()) {
-          stopReason = 'deadline'
+      let ranked: number[]
+      if (replacementOrdering === 'residual-ranked-drop-round-robin-v1') {
+        const retainedGains = solveBoundedCoordinateGains(
+          retained.map((index) => matrix[index]!),
+          input.problem.desiredDb,
+          input.problem.bounds.minGainDb,
+          input.problem.bounds.maxGainDb,
+        )
+        const retainedResidual = input.problem.desiredDb.map((desired, row) =>
+          desired - retained.reduce((sum, index, position) =>
+            sum + matrix[index]![row]! * retainedGains[position]!, 0))
+        ranked = dictionary.map((_, replacementIndex) => {
+          if (retainedSet.has(replacementIndex)) return { replacementIndex, score: -Infinity }
+          replacementRankingScoreComputations += 1
+          const column = matrix[replacementIndex]!
+          let numerator = 0
+          let denominator = 0
+          for (let row = 0; row < retainedResidual.length; row += 1) {
+            numerator += column[row]! * retainedResidual[row]!
+            denominator += column[row]! ** 2
+          }
+          return {
+            replacementIndex,
+            score: Math.abs(numerator) / Math.max(denominator, 1e-30),
+          }
+        }).filter((candidate) => Number.isFinite(candidate.score))
+          .sort((left, right) => right.score - left.score || left.replacementIndex - right.replacementIndex)
+          .map((candidate) => candidate.replacementIndex)
+      } else {
+        ranked = dictionary.map((_, replacementIndex) => replacementIndex)
+          .filter((replacementIndex) => !retainedSet.has(replacementIndex))
+      }
+      replacementRankings.push(ranked)
+      const rankingStop = requestedStopReason()
+      if (rankingStop !== null) {
+        stopReason = rankingStop
+        break
+      }
+    }
+    const maximumRank = Math.max(0, ...replacementRankings.map((ranking) => ranking.length))
+    const replacementTrials: { dropPosition: number; replacementIndex: number }[] = []
+    if (replacementOrdering === 'dictionary-drop-major-v1') {
+      replacementRankings.forEach((ranking, dropPosition) => ranking.forEach((replacementIndex) =>
+        replacementTrials.push({ dropPosition, replacementIndex })))
+    } else {
+      for (let candidateRank = 0; candidateRank < maximumRank; candidateRank += 1) {
+        for (let dropPosition = 0; dropPosition < base.length; dropPosition += 1) {
+          const replacementIndex = replacementRankings[dropPosition]?.[candidateRank]
+          if (replacementIndex !== undefined) replacementTrials.push({ dropPosition, replacementIndex })
+        }
+      }
+    }
+    outer: for (const { dropPosition, replacementIndex } of replacementTrials) {
+        const trialStop = requestedStopReason()
+        if (trialStop !== null) {
+          stopReason = trialStop
           break outer
         }
-        if (retainedSet.has(replacementIndex)) continue
+        const retained = base.filter((_, position) => position !== dropPosition)
         const trial = [...retained, replacementIndex]
         const key = [...trial].sort((left, right) => left - right).join(',')
         if (visitedSelections.has(key)) continue
+        input.onWorkUnitStart?.()
         work += checkpointEvery
         if (work > input.evaluationBudget) {
           stopReason = 'evaluation-budget'
@@ -415,15 +679,25 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
           input.problem.bounds.minGainDb,
           input.problem.bounds.maxGainDb,
         )
-        const filters = quantizeV2Filters(
-          trial.map((index, position) => filterForAtom(dictionary[index]!, gains[position]!)),
-          config,
+        const continuousFilters = trial.map((index, position) =>
+          filterForAtom(dictionary[index]!, gains[position]!))
+        const filters = quantizeV2Filters(continuousFilters, config)
+        const point = record(
+          filters,
+          continuousFilters,
+          trial,
+          `replacement-${searchPasses}`,
+          work,
+          'replacement',
+          [base[dropPosition]!],
+          [replacementIndex],
+          gains,
+          base,
         )
-        const point = record(filters, `replacement-${searchPasses}`, work)
         if (trajectory.at(-1)?.candidateId === point.candidateId) nextBest = trial
-      }
+        yield
     }
-    if (stopReason === 'deadline' || stopReason === 'evaluation-budget') break
+    if (stopReason === 'deadline' || stopReason === 'cancelled' || stopReason === 'evaluation-budget') break
     if (generatedThisPass === 0) {
       stopReason = 'search-space-exhausted-under-current-mechanism'
       break
@@ -435,6 +709,21 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
     elapsedSeconds: point.elapsedMs / 1_000,
     regret: point.referenceRegret,
   }))
+  const diagnostics: MatchingPursuitDiagnosticsV1 = {
+    evaluatedCandidates: telemetry.length,
+    uniqueSelections: selectionKeys.size,
+    paretoNovelCandidates: telemetry.filter((point) => point.paretoNovel).length,
+    dominatedCandidates: telemetry.filter((point) => point.dominated).length,
+    equivalentMetricCandidates: telemetry.filter((point) => point.equivalentMetrics).length,
+    referenceImprovements: telemetry.filter((point) => point.referenceImproved).length,
+    selectedChanges: telemetry.filter((point) => point.selectedChange).length,
+    attemptedReplacements: telemetry.filter((point) => point.phase === 'replacement').length,
+    acceptedReplacements: telemetry.filter((point) => point.acceptedReplacement).length,
+    atomsRemoved: telemetry.reduce((sum, point) => sum + point.removedAtomIds.length, 0),
+    atomsAdded: telemetry.reduce((sum, point) => sum + point.addedAtomIds.length, 0),
+    equivalentStructuralRevisits: telemetry.filter((point) => point.equivalentStructuralRevisit).length,
+    usefulImprovementCount: Math.max(0, trajectory.length - 1),
+  }
   return {
     algorithmId: 'matching-pursuit-v1',
     variantId: 'matching-pursuit-v1',
@@ -444,6 +733,8 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
     qualityTimeFrontierV1: computeQualityTimeFrontier(points),
     candidates,
     evaluations,
+    telemetry,
+    diagnostics,
     selectedAtoms: bestSelectedIndices.map((index) => dictionary[index]!),
     stopReason,
     metadata: {
@@ -451,6 +742,8 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
       selectedAtoms: bestSelectedIndices.length,
       greedySelectedAtoms: selectedIndices.length,
       replacementCandidates,
+      replacementOrdering,
+      replacementRankingScoreComputations,
       searchPasses,
       visitedSelections: visitedSelections.size,
       checkpointEveryEvaluations: checkpointEvery,
@@ -458,4 +751,66 @@ export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPurs
       timingBasis: input.nowMs === undefined ? 'synthetic-evaluation-count' : 'injected-clock',
     },
   }
+}
+
+export interface MatchingPursuitContinuationV1 {
+  readonly version: 1
+  done: boolean
+  emittedCandidates: number
+  result: MatchingPursuitRunResult | null
+}
+
+const matchingPursuitGenerators = new WeakMap<
+  MatchingPursuitContinuationV1,
+  Generator<void, MatchingPursuitRunResult, void>
+>()
+
+export function createMatchingPursuitContinuation(
+  input: MatchingPursuitRunInput,
+): MatchingPursuitContinuationV1 {
+  const continuation: MatchingPursuitContinuationV1 = {
+    version: 1,
+    done: false,
+    emittedCandidates: 0,
+    result: null,
+  }
+  matchingPursuitGenerators.set(continuation, matchingPursuitGenerator(input))
+  return continuation
+}
+
+export function advanceMatchingPursuitContinuation(
+  continuation: MatchingPursuitContinuationV1,
+  maxCandidateEvaluations: number,
+): MatchingPursuitContinuationV1 {
+  positiveInteger(maxCandidateEvaluations, 'matching pursuit continuation candidate budget')
+  const generator = matchingPursuitGenerators.get(continuation)
+  if (generator === undefined) throw new Error('matching pursuit continuation is not owned by this runtime')
+  if (continuation.done) return continuation
+  for (let count = 0; count < maxCandidateEvaluations && !continuation.done; count += 1) {
+    const next = generator.next()
+    if (next.done) {
+      continuation.done = true
+      continuation.result = next.value
+    } else {
+      continuation.emittedCandidates += 1
+    }
+  }
+  return continuation
+}
+
+export function matchingPursuitContinuationResult(
+  continuation: MatchingPursuitContinuationV1,
+): MatchingPursuitRunResult {
+  if (!continuation.done || continuation.result === null) {
+    throw new Error('matching pursuit continuation has not completed')
+  }
+  return continuation.result
+}
+
+export function runMatchingPursuit(input: MatchingPursuitRunInput): MatchingPursuitRunResult {
+  const continuation = createMatchingPursuitContinuation(input)
+  while (!continuation.done) {
+    advanceMatchingPursuitContinuation(continuation, Number.MAX_SAFE_INTEGER)
+  }
+  return matchingPursuitContinuationResult(continuation)
 }

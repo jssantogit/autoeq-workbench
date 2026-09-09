@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  advanceMatchingPursuitContinuation,
   buildDictionary,
+  createMatchingPursuitContinuation,
+  matchingPursuitContinuationResult,
   runMatchingPursuit,
   solveBoundedCoordinateGains,
   type MatchingPursuitProblem,
@@ -88,5 +91,220 @@ describe('TypeScript matching pursuit research component', () => {
     expect(result.candidates.map((candidate) => candidate.filters.map((filter) => filter.id).join(',')))
       .toEqual([...new Set(result.candidates.map((candidate) => candidate.filters.map((filter) => filter.id).join(',')))])
     expect(result.stopReason).toMatch(/evaluation-budget|search-space-exhausted-under-current-mechanism/)
+    expect(result.telemetry.filter((point) => point.selectedChange && point.phase !== 'baseline')
+      .every((point) => (point.candidateEvaluationsSinceUsefulImprovement ?? 0) > 0))
+      .toBe(true)
+  })
+
+  it('accounts for every evaluated selection from bounded solve through canonical selection', () => {
+    const result = runMatchingPursuit({
+      problem,
+      seed: 0,
+      evaluationBudget: 12,
+      checkpointEveryEvaluations: 1,
+      dictionary: { frequenciesPerOctave: 1, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      evaluate: (candidate) => ({
+        protocolVersion: 1,
+        candidateId: candidate.candidateId,
+        valid: true,
+        rejectionReason: null,
+        continuous: { rmseDb: 1, maxAbsDb: 2, bandRmseDb: {} },
+        deliverable: {
+          filters: candidate.filters.map((filter) => ({ ...filter })),
+          rmseDb: 1,
+          maxAbsDb: 2,
+          bandRmseDb: {},
+          cancellationTotalScore: 0,
+        },
+      }),
+    })
+
+    expect(result.telemetry).toHaveLength(result.candidates.length)
+    expect(result.diagnostics.evaluatedCandidates).toBe(result.candidates.length)
+    expect(result.diagnostics.uniqueSelections).toBe(result.candidates.length)
+    expect(result.diagnostics.paretoNovelCandidates + result.diagnostics.dominatedCandidates +
+      result.diagnostics.equivalentMetricCandidates)
+      .toBe(result.candidates.length)
+    expect(result.diagnostics.selectedChanges).toBe(result.trajectory.length)
+    expect(result.diagnostics.attemptedReplacements).toBe(result.metadata.replacementCandidates)
+    expect(result.diagnostics.acceptedReplacements).toBeLessThanOrEqual(result.diagnostics.attemptedReplacements)
+    expect(result.diagnostics.atomsRemoved).toBe(result.diagnostics.attemptedReplacements)
+    expect(result.diagnostics.atomsAdded).toBeGreaterThanOrEqual(result.diagnostics.attemptedReplacements)
+    expect(result.telemetry.every((point) =>
+      Number.isFinite(point.preQuantizationRmseDb) &&
+      Number.isFinite(point.preQuantizationMaxAbsDb) &&
+      Number.isFinite(point.postQuantizationRmseDb) &&
+      Number.isFinite(point.postQuantizationMaxAbsDb) &&
+      Number.isFinite(point.preSolveLinearResidualRmseDb) &&
+      Number.isFinite(point.postSolveLinearResidualRmseDb) &&
+      Number.isFinite(point.residualReductionRmseDb)))
+      .toBe(true)
+    expect(result.telemetry.every((point) =>
+      point.preSolveGainVector.every((gain) => gain === 0) &&
+      point.boundedGainVector.every((gain) => Number.isFinite(gain) && gain >= -15 && gain <= 15)))
+      .toBe(true)
+  })
+
+  it('keeps a synchronous candidate completed after the deadline out of the admissible trajectory', () => {
+    let clockMs = 0
+    let workUnits = 0
+    const result = runMatchingPursuit({
+      problem,
+      seed: 0,
+      evaluationBudget: 3,
+      checkpointEveryEvaluations: 1,
+      dictionary: { frequenciesPerOctave: 1, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      nowMs: () => clockMs,
+      isExpired: () => clockMs >= 60_000,
+      onWorkUnitStart: () => {
+        workUnits += 1
+        if (workUnits === 3) clockMs = 59_000
+      },
+      evaluate: (candidate) => {
+        if (candidate.filters.length > 0) clockMs = 62_000
+        const metric = candidate.filters.length > 0 ? 0.5 : 1
+        return {
+          protocolVersion: 1,
+          candidateId: candidate.candidateId,
+          valid: true,
+          rejectionReason: null,
+          continuous: { rmseDb: metric, maxAbsDb: metric, bandRmseDb: {} },
+          deliverable: {
+            filters: candidate.filters.map((filter) => ({ ...filter })),
+            rmseDb: metric,
+            maxAbsDb: metric,
+            bandRmseDb: {},
+            cancellationTotalScore: 0,
+          },
+        }
+      },
+    })
+
+    expect(result.stopReason).toBe('deadline')
+    expect(result.trajectory).toHaveLength(1)
+    expect(result.telemetry.at(-1)).toMatchObject({
+      observedCompletionElapsedMs: 62_000,
+      admissibleForTrajectory: false,
+      selectedChange: false,
+    })
+  })
+
+  it('interleaves residual-ranked replacements across removable atoms at a bounded budget', () => {
+    const result = runMatchingPursuit({
+      problem,
+      seed: 0,
+      evaluationBudget: 16,
+      checkpointEveryEvaluations: 1,
+      replacementOrdering: 'residual-ranked-drop-round-robin-v1',
+      dictionary: { frequenciesPerOctave: 2, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      evaluate: (candidate) => {
+        const metric = 10 - candidate.filters.length
+        return {
+          protocolVersion: 1,
+          candidateId: candidate.candidateId,
+          valid: true,
+          rejectionReason: null,
+          continuous: { rmseDb: metric, maxAbsDb: metric, bandRmseDb: {} },
+          deliverable: {
+            filters: candidate.filters.map((filter) => ({ ...filter })),
+            rmseDb: metric,
+            maxAbsDb: metric,
+            bandRmseDb: {},
+            cancellationTotalScore: 0,
+          },
+        }
+      },
+    })
+
+    const removed = new Set(result.telemetry
+      .filter((point) => point.phase === 'replacement')
+      .flatMap((point) => point.removedAtomIds))
+    expect(removed.size).toBeGreaterThan(1)
+    expect(result.metadata.replacementRankingScoreComputations).toBeGreaterThan(0)
+  })
+
+  it('resumes with the same candidate sequence and result as one continuous advance', () => {
+    const input = {
+      problem,
+      seed: 0,
+      evaluationBudget: 30,
+      checkpointEveryEvaluations: 1,
+      replacementOrdering: 'dictionary-drop-round-robin-v1' as const,
+      dictionary: { frequenciesPerOctave: 1, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      evaluate: (candidate: Parameters<NonNullable<Parameters<typeof runMatchingPursuit>[0]['evaluate']>>[0]) => {
+        const metric = 10 - candidate.filters.length
+        return {
+          protocolVersion: 1 as const,
+          candidateId: candidate.candidateId,
+          valid: true,
+          rejectionReason: null,
+          continuous: { rmseDb: metric, maxAbsDb: metric, bandRmseDb: {} },
+          deliverable: {
+            filters: candidate.filters.map((filter) => ({ ...filter })),
+            rmseDb: metric,
+            maxAbsDb: metric,
+            bandRmseDb: {},
+            cancellationTotalScore: 0,
+          },
+        }
+      },
+    }
+    const continuous = runMatchingPursuit(input)
+    const resumed = createMatchingPursuitContinuation(input)
+    advanceMatchingPursuitContinuation(resumed, 5)
+    expect(resumed.done).toBe(false)
+    advanceMatchingPursuitContinuation(resumed, 100)
+    const resumedResult = matchingPursuitContinuationResult(resumed)
+    const emittedAtCompletion = resumed.emittedCandidates
+    advanceMatchingPursuitContinuation(resumed, 1)
+
+    expect(resumedResult.candidates).toEqual(continuous.candidates)
+    expect(resumedResult.trajectory).toEqual(continuous.trajectory)
+    expect(resumedResult.diagnostics).toEqual(continuous.diagnostics)
+    expect(resumed.emittedCandidates).toBe(emittedAtCompletion)
+  })
+
+  it('cancels between continuation slices without evaluating another candidate', () => {
+    let cancelled = false
+    const continuation = createMatchingPursuitContinuation({
+      problem,
+      seed: 0,
+      evaluationBudget: 30,
+      checkpointEveryEvaluations: 1,
+      dictionary: { frequenciesPerOctave: 1, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      isCancelled: () => cancelled,
+      evaluate: (candidate) => ({
+        protocolVersion: 1,
+        candidateId: candidate.candidateId,
+        valid: true,
+        rejectionReason: null,
+        continuous: { rmseDb: 1, maxAbsDb: 1, bandRmseDb: {} },
+        deliverable: {
+          filters: candidate.filters,
+          rmseDb: 1,
+          maxAbsDb: 1,
+          bandRmseDb: {},
+          cancellationTotalScore: 0,
+        },
+      }),
+    })
+    advanceMatchingPursuitContinuation(continuation, 3)
+    const emittedBeforeCancel = continuation.emittedCandidates
+    cancelled = true
+    advanceMatchingPursuitContinuation(continuation, 3)
+
+    expect(continuation.done).toBe(true)
+    expect(continuation.emittedCandidates).toBe(emittedBeforeCancel)
+    expect(matchingPursuitContinuationResult(continuation).stopReason).toBe('cancelled')
   })
 })

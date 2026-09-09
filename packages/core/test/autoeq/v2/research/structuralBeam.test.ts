@@ -94,6 +94,23 @@ describe('TypeScript structural beam research component', () => {
     expect(result.stopReason).toBe('no-admissible-proposals')
     expect(result.metadata.deduplicatedProposals).toBeGreaterThan(0)
   })
+
+  it('can continue an explicit handoff seed without reevaluating the zero seed', () => {
+    const seed = [{ id: 'handoff', enabled: true, type: 'PK' as const, frequencyHz: 1_000, gainDb: 2, q: 1 }]
+    const result = runStructuralBeam({
+      problem: { ...problem, desiredDb: [0, 0, 4, 0] },
+      seed: 0,
+      evaluationBudget: 1,
+      referenceSnapshotSha256: 'c'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 1 }],
+      includeZeroSeed: false,
+      seeds: [{ seedId: 'mp-handoff', origin: 'matching-pursuit', filters: seed }],
+      evaluate: filterCountEvaluator(true),
+    })
+
+    expect(result.candidates).toHaveLength(1)
+    expect(result.candidates[0]!.filters).toHaveLength(1)
+  })
 })
 
 function filterCountEvaluator(improving: boolean, counts: number[] = []) {
