@@ -96,6 +96,121 @@ describe('TypeScript matching pursuit research component', () => {
       .toBe(true)
   })
 
+  it('rebases a canonical selected replacement and reaches descendant depth two or greater', () => {
+    let evaluations = 0
+    const result = runMatchingPursuit({
+      problem: {
+        ...problem,
+        bounds: { ...problem.bounds, maxFilters: 2 },
+      },
+      seed: 0,
+      evaluationBudget: 40,
+      checkpointEveryEvaluations: 1,
+      traversalPolicy: 'immediate-canonical-rebase-v1',
+      dictionary: { frequenciesPerOctave: 1, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      evaluate: (candidate) => {
+        evaluations += 1
+        const metric = candidate.filters.length === 0 ? 10 : 10 - evaluations
+        return {
+          protocolVersion: 1,
+          candidateId: candidate.candidateId,
+          valid: true,
+          rejectionReason: null,
+          continuous: { rmseDb: metric, maxAbsDb: metric, bandRmseDb: {} },
+          deliverable: {
+            filters: candidate.filters.map((filter) => ({ ...filter })),
+            rmseDb: metric,
+            maxAbsDb: metric,
+            bandRmseDb: {},
+            cancellationTotalScore: 0,
+          },
+        }
+      },
+    })
+
+    expect(result.metadata.traversalPolicy).toBe('immediate-canonical-rebase-v1')
+    expect(result.metadata.maxSearchDepth).toBeGreaterThanOrEqual(2)
+    expect(result.metadata.rebaseTransitions).toBeGreaterThan(0)
+    expect(result.telemetry.some((point) => point.selectionDepth >= 2)).toBe(true)
+    expect(result.telemetry.filter((point) => point.phase === 'replacement')
+      .every((point) => point.parentSelectionKey !== null &&
+        point.lineageSelectionKeys.length >= point.selectionDepth + 1 &&
+        point.lineageSelectionKeys.at(-1) === point.selectionKey))
+      .toBe(true)
+  })
+
+  it('keeps replacement selections globally visited while rebasing', () => {
+    let evaluations = 0
+    const result = runMatchingPursuit({
+      problem: {
+        ...problem,
+        bounds: { ...problem.bounds, maxFilters: 2 },
+      },
+      seed: 0,
+      evaluationBudget: 40,
+      checkpointEveryEvaluations: 1,
+      traversalPolicy: 'immediate-canonical-rebase-v1',
+      dictionary: { frequenciesPerOctave: 1, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      evaluate: (candidate) => {
+        evaluations += 1
+        const metric = candidate.filters.length === 0 ? 10 : 10 - evaluations
+        return {
+          protocolVersion: 1,
+          candidateId: candidate.candidateId,
+          valid: true,
+          rejectionReason: null,
+          continuous: { rmseDb: metric, maxAbsDb: metric, bandRmseDb: {} },
+          deliverable: {
+            filters: candidate.filters.map((filter) => ({ ...filter })),
+            rmseDb: metric,
+            maxAbsDb: metric,
+            bandRmseDb: {},
+            cancellationTotalScore: 0,
+          },
+        }
+      },
+    })
+
+    const selectionKeys = result.telemetry.map((point) => point.selectionKey)
+    expect(new Set(selectionKeys).size).toBe(selectionKeys.length)
+    expect(result.metadata.visitedSelections).toBe(selectionKeys.length)
+  })
+
+  it('retains a Pareto-first width-two selection beam with deterministic transitions', () => {
+    let evaluations = 0
+    const result = runMatchingPursuit({
+      problem: { ...problem, bounds: { ...problem.bounds, maxFilters: 2 } },
+      seed: 0,
+      evaluationBudget: 40,
+      checkpointEveryEvaluations: 1,
+      traversalPolicy: 'selection-beam-width-2-v1',
+      dictionary: { frequenciesPerOctave: 1, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      evaluate: (candidate) => {
+        evaluations += 1
+        const value = candidate.filters.length === 0 ? 10 : 10 - evaluations
+        return {
+          protocolVersion: 1 as const,
+          candidateId: candidate.candidateId,
+          valid: true,
+          rejectionReason: null,
+          continuous: { rmseDb: value, maxAbsDb: value, bandRmseDb: {} },
+          deliverable: { filters: candidate.filters.map((filter) => ({ ...filter })), rmseDb: value, maxAbsDb: value, bandRmseDb: {}, cancellationTotalScore: 0 },
+        }
+      },
+    })
+
+    expect(result.metadata.traversalPolicy).toBe('selection-beam-width-2-v1')
+    expect(result.metadata.beamTransitions).toBeGreaterThan(0)
+    expect(result.metadata.maxSearchDepth).toBeGreaterThanOrEqual(2)
+    expect(result.telemetry.filter((point) => point.phase === 'replacement').some((point) => point.selectionDepth >= 2)).toBe(true)
+  })
+
   it('accounts for every evaluated selection from bounded solve through canonical selection', () => {
     const result = runMatchingPursuit({
       problem,
@@ -139,7 +254,8 @@ describe('TypeScript matching pursuit research component', () => {
       Number.isFinite(point.postQuantizationMaxAbsDb) &&
       Number.isFinite(point.preSolveLinearResidualRmseDb) &&
       Number.isFinite(point.postSolveLinearResidualRmseDb) &&
-      Number.isFinite(point.residualReductionRmseDb)))
+      Number.isFinite(point.continuousRmseImprovementVsBaselineDb) &&
+      point.residualReductionRmseDb === point.continuousRmseImprovementVsBaselineDb))
       .toBe(true)
     expect(result.telemetry.every((point) =>
       point.preSolveGainVector.every((gain) => gain === 0) &&

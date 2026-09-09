@@ -40,7 +40,7 @@ import {
   createMatchingPursuitContinuation,
   runMatchingPursuit,
 } from './matchingPursuit.js'
-import type { MatchingPursuitReplacementOrdering } from './matchingPursuit.js'
+import type { MatchingPursuitReplacementOrdering, MatchingPursuitTraversalPolicy } from './matchingPursuit.js'
 import {
   loadProposalSeeds,
   type ProposalSeedV1,
@@ -131,8 +131,9 @@ function parseOptions(args: readonly string[]): CapacityTournamentCliOptions {
     index += 1
   }
   const cases = requiredOption(values, '--cases').split(',')
-  if (JSON.stringify(cases) !== JSON.stringify([...CAPACITY_TOURNAMENT_CASES])) {
-    throw new Error('capacity tournament cases must be exactly titan-to-storm,titan-to-u12t,titan-to-trio')
+  if (cases.length === 0 || new Set(cases).size !== cases.length ||
+    cases.some((caseId) => !CAPACITY_TOURNAMENT_CASES.includes(caseId as typeof CAPACITY_TOURNAMENT_CASES[number]))) {
+    throw new Error('--cases must contain unique approved research case IDs')
   }
   const checkpointsMs = requiredOption(values, '--checkpoints-ms').split(',').map((value) => {
     if (!/^\d+$/.test(value)) throw new Error('--checkpoints-ms requires integer milliseconds')
@@ -505,6 +506,7 @@ function runMatchingPursuitVariant(
   data: TournamentCaseData,
   replacementOrdering: MatchingPursuitReplacementOrdering,
   onRawCandidate?: (point: CapacityTournamentProgressPointV1) => void,
+  traversalPolicy: MatchingPursuitTraversalPolicy = 'baseline-v1',
 ): CapacityTournamentExecutionResult {
   let best: CapacityTournamentProgressPointV1 | undefined
   let candidateCount = 0
@@ -520,6 +522,7 @@ function runMatchingPursuitVariant(
     referenceFrontier: data.references,
     referenceSnapshotSha256: context.referenceSnapshotSha256,
     replacementOrdering,
+    traversalPolicy,
     isExpired: context.isExpired,
     nowMs: context.nowMs,
     elapsedMs: context.elapsedMs,
@@ -575,6 +578,7 @@ function runMatchingPursuitVariant(
       teacherSeedCount: 0,
       nodeVersion: process.version,
       replacementOrdering,
+      traversalPolicy,
       replacementRankingScoreComputations: result.metadata.replacementRankingScoreComputations,
       ...result.diagnostics,
     },
@@ -588,6 +592,7 @@ function runStructuralBeamVariant(
   seedPolicy: AblationSeedPolicy,
   onRawCandidate?: (point: CapacityTournamentProgressPointV1) => void,
   useRootElapsed = true,
+  evaluationBudget = 1_000_000,
 ): CapacityTournamentExecutionResult {
   let best: CapacityTournamentProgressPointV1 | undefined
   let candidateCount = 0
@@ -607,7 +612,7 @@ function runStructuralBeamVariant(
   const result = runStructuralBeam({
     problem: data.problem,
     seed: context.seed ?? 0,
-    evaluationBudget: 1_000_000,
+    evaluationBudget,
     referenceFrontier: data.references,
     referenceSnapshotSha256: context.referenceSnapshotSha256,
     config: {
@@ -824,6 +829,7 @@ function runMpStructuralComposition(
   replacementOrdering: MatchingPursuitReplacementOrdering,
 ): CapacityTournamentExecutionResult {
   const tracker = createCompositionTracker()
+  const structuralEvaluationAllowance = 120
   const mpPhase = beginCompositionPhase(
     context, tracker, 'zero→matching-pursuit', 0, 0,
     { pareto: 0, dominated: 0, equivalent: 0 }, () => context.elapsedMs() >= 15_000,
@@ -837,7 +843,7 @@ function runMpStructuralComposition(
     const structural = runStructuralBeamVariant(structuralPhase.context, {
       ...data,
       proposalSeeds: [seedForData(data, mpBest.candidateId, mpBest.filters)],
-    }, 'proposal', structuralPhase.observeRaw, false)
+    }, 'proposal', structuralPhase.observeRaw, false, structuralEvaluationAllowance)
     structuralStopReason = structural.terminationReason
     structuralPhase.finish()
   }
@@ -852,6 +858,8 @@ function runMpStructuralComposition(
       mpPhaseStopReason: mp.terminationReason === 'deadline' ? 'phase-budget' : mp.terminationReason,
       mpContinuationHadAdmissibleWork: mp.terminationReason === 'deadline' && !context.isExpired(),
       structuralStopReason,
+      configuredStructuralEvaluationAllowance: structuralEvaluationAllowance,
+      structuralCandidateEvaluations: tracker.structuralOffset,
       nodeVersion: process.version,
     },
     researchTrace: [...tracker.trace, ...(mp.researchTrace ?? [])],
@@ -872,6 +880,8 @@ function runAnytimeComposition(
   const tracker = createCompositionTracker()
   const feedbackQueue: FeedbackSeed[] = []
   const queued = new Set<string>()
+  const structuralEvaluationAllowance = 120
+  let observedStructuralCandidateEvaluations = 0
   let mpCandidateCount = 0
   let mpStructuralCount = 0
   let mpParetoCount = 0
@@ -939,13 +949,17 @@ function runAnytimeComposition(
     takeFeedback: () => feedbackEnabled ? feedbackQueue.shift() : undefined,
     processFeedback: (seed) => {
       if (context.isExpired()) return 0
+      const remainingStructuralAllowance = structuralEvaluationAllowance - observedStructuralCandidateEvaluations
+      if (remainingStructuralAllowance <= 0) {
+        return { workUnits: 0, structuralCandidateEvaluations: 0, configuredStructuralBudget: 0, polishWork: 0, useful: false }
+      }
       const structuralPhase = beginCompositionPhase(
         context, tracker, `zero→matching-pursuit→structural:${seed.candidateId}`,
       )
       const structural = runStructuralBeam({
         problem: data.problem,
         seed: context.seed ?? 0,
-        evaluationBudget: 12,
+        evaluationBudget: Math.min(12, remainingStructuralAllowance),
         referenceFrontier: data.references,
         referenceSnapshotSha256: context.referenceSnapshotSha256,
         config: { beamWidth: 2, proposalsPerParent: 4, localPolishEvaluations: 24, maxFilters: 10 },
@@ -966,6 +980,7 @@ function runAnytimeComposition(
       })
       const structuralBest = structuralPhase.localBest
       structuralPhase.finish()
+      observedStructuralCandidateEvaluations += structural.candidates.length
       let stateBankWork = 0
       if (structuralBest !== undefined && !context.isExpired()) {
         const statePhase = beginCompositionPhase(
@@ -978,7 +993,13 @@ function runAnytimeComposition(
         stateBankWork = Number(stateResult.metadata.cumulativeCandidateCount ?? 0)
         statePhase.finish()
       }
-      return structural.candidates.length + stateBankWork
+      return {
+        workUnits: structural.candidates.length + stateBankWork,
+      structuralCandidateEvaluations: structural.candidates.length,
+        configuredStructuralBudget: Math.min(12, remainingStructuralAllowance),
+        polishWork: 24,
+        useful: structuralBest !== undefined,
+      }
     },
   })
   return {
@@ -995,6 +1016,12 @@ function runAnytimeComposition(
       mpSlices: schedule.mpSlices,
       handoffs: schedule.handoffs,
       workUnits: schedule.workUnits,
+      structuralCandidateEvaluations: schedule.structuralCandidateEvaluations,
+      configuredStructuralBudget: schedule.configuredStructuralBudget,
+      polishWork: schedule.polishWork,
+      usefulHandoffs: schedule.usefulHandoffs,
+      configuredStructuralEvaluationAllowance: structuralEvaluationAllowance,
+      observedStructuralCandidateEvaluations,
       cumulativeCandidateCount: tracker.candidateOffset,
       structuralOperationCount: tracker.structuralOffset,
       queuedNovelSelections: queued.size,
@@ -1032,6 +1059,33 @@ function createVariants(
         const data = dataByCase.get(context.problemId)
         if (data === undefined) throw new Error(`missing tournament case data: ${context.problemId}`)
         return runMatchingPursuitVariant(context, data, options.mpReplacementOrdering)
+      },
+    },
+    {
+      algorithmId: 'matching-pursuit-v1',
+      variantId: 'matching-pursuit-ranked-v2',
+      run: (context) => {
+        const data = dataByCase.get(context.problemId)
+        if (data === undefined) throw new Error(`missing tournament case data: ${context.problemId}`)
+        return runMatchingPursuitVariant(context, data, 'residual-ranked-drop-round-robin-v1')
+      },
+    },
+    {
+      algorithmId: 'matching-pursuit-v1',
+      variantId: 'matching-pursuit-immediate-rebase-v2',
+      run: (context) => {
+        const data = dataByCase.get(context.problemId)
+        if (data === undefined) throw new Error(`missing tournament case data: ${context.problemId}`)
+        return runMatchingPursuitVariant(context, data, 'dictionary-drop-major-v1', undefined, 'immediate-canonical-rebase-v1')
+      },
+    },
+    {
+      algorithmId: 'matching-pursuit-v1',
+      variantId: 'matching-pursuit-selection-beam-v2',
+      run: (context) => {
+        const data = dataByCase.get(context.problemId)
+        if (data === undefined) throw new Error(`missing tournament case data: ${context.problemId}`)
+        return runMatchingPursuitVariant(context, data, 'dictionary-drop-major-v1', undefined, 'selection-beam-width-2-v1')
       },
     },
     {

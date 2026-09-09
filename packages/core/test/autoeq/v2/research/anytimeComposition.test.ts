@@ -145,4 +145,22 @@ describe('capacity-aware anytime feedback schedule', () => {
     expect(processed).toEqual(['duplicate', 'useful'])
     expect(result).toMatchObject({ handoffs: 2, workUnits: 2, stopReason: 'exhausted' })
   })
+
+  it('separates observed structural evaluations from nominal budget and polish work', () => {
+    const result = runAnytimeFeedbackSchedule({
+      isExpired: () => false,
+      mpDone: () => true,
+      advanceMpSlice: () => 0,
+      takeFeedback: (() => { let available = true; return () => available ? (available = false, 'seed') : undefined })(),
+      processFeedback: () => ({ workUnits: 3, structuralCandidateEvaluations: 2, configuredStructuralBudget: 12, polishWork: 24, useful: true }),
+    })
+    expect(result).toMatchObject({
+      handoffs: 1,
+      workUnits: 3,
+      structuralCandidateEvaluations: 2,
+      configuredStructuralBudget: 12,
+      polishWork: 24,
+      usefulHandoffs: 1,
+    })
+  })
 })
