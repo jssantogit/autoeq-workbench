@@ -1,0 +1,1077 @@
+{
+  "schemaVersion": 2,
+  "experimentVersion": "storm-seed-allocation-causal-v2",
+  "sourceCommit": "22a05fdcac88bdd603b7d80d7d96ffe10a28d606",
+  "sourceReportPath": "/root/projects/autoeq-workbench/.worktrees/capacity-aware-traversal-20260909/packages/core/.research-artifacts/mp-reallocation-corrective-20260909/storm-rerun1/tournament-report.json",
+  "sourceReportSha256": "c8bf9b05b3c00cb4b9475bb850665d4708ad6c5e027971cb0d461f59c1b00351",
+  "referenceSnapshotPath": "/tmp/autoeq-capacity-recovery-20260908/OracleReferenceSnapshotV1.json",
+  "referenceSnapshotSha256": "0aea73de5592c3afb32491ea6766513a1b2d2982d4765912ba2bfdb74f4b63d3",
+  "problemId": "titan-to-storm",
+  "frozenSeedPoolSha256": "a87b9fbf856ff06cc750578a3d54abe0fdea697061ac462b8c414419814febd1",
+  "frozenSeedPool": [
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0007",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0007",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":11.1,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.5,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-9.4,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.4,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8}]",
+      "selectionKey": "2133,2277,2469,2805,2841,2867,2879",
+      "canonicalRmseDb": 2.0409828863397173,
+      "canonicalMaxAbsDb": 6.447132122673079,
+      "canonicalFilterCount": 7,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0007",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -7.5,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.4,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.4,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 11.1,
+          "q": 0.7
+        }
+      ]
+    },
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0006",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0006",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.5,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-9.4,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-8.6,\"q\":8}]",
+      "selectionKey": "2133,2277,2469,2805,2867,2879",
+      "canonicalRmseDb": 2.083020217824927,
+      "canonicalMaxAbsDb": 6.386518200989402,
+      "canonicalFilterCount": 6,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0006",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -7.5,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.4,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -8.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 15,
+          "q": 0.7
+        }
+      ]
+    },
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0005",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0005",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-10.2,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-8.6,\"q\":8}]",
+      "selectionKey": "2277,2469,2805,2867,2879",
+      "canonicalRmseDb": 2.253907510603818,
+      "canonicalMaxAbsDb": 6.383185638199154,
+      "canonicalFilterCount": 5,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0005",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -10.2,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -8.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 15,
+          "q": 0.7
+        }
+      ]
+    },
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0004",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0004",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":13.5,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-10.2,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8}]",
+      "selectionKey": "2277,2469,2867,2879",
+      "canonicalRmseDb": 2.3644518551728915,
+      "canonicalMaxAbsDb": 8.907450344193066,
+      "canonicalFilterCount": 4,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0004",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -10.2,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 13.5,
+          "q": 0.7
+        }
+      ]
+    },
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0003",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0003",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":13.5,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8}]",
+      "selectionKey": "2469,2867,2879",
+      "canonicalRmseDb": 2.639501489895383,
+      "canonicalMaxAbsDb": 8.913520566025994,
+      "canonicalFilterCount": 3,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0003",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 13.5,
+          "q": 0.7
+        }
+      ]
+    },
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0002",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0002",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8}]",
+      "selectionKey": "2469,2879",
+      "canonicalRmseDb": 2.75684324811595,
+      "canonicalMaxAbsDb": 9.786717261610335,
+      "canonicalFilterCount": 2,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0002",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 15,
+          "q": 0.7
+        }
+      ]
+    },
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":15,\"q\":0.7}]",
+      "selectionKey": "2879",
+      "canonicalRmseDb": 3.3551539402962347,
+      "canonicalMaxAbsDb": 19.74960760602988,
+      "canonicalFilterCount": 1,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 15,
+          "q": 0.7
+        }
+      ]
+    },
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":10.5,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":174,\"gainDb\":-6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2635,\"gainDb\":-5.6,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-9.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8}]",
+      "selectionKey": "909,2037,2133,2277,2469,2697,2805,2841,2867,2879",
+      "canonicalRmseDb": 1.69443656174349,
+      "canonicalMaxAbsDb": 6.025019146179327,
+      "canonicalFilterCount": 10,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ]
+    },
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0009",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0009",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":10.5,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":174,\"gainDb\":-6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.5,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-9.4,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8}]",
+      "selectionKey": "909,2133,2277,2469,2697,2805,2841,2867,2879",
+      "canonicalRmseDb": 1.8069840739277647,
+      "canonicalMaxAbsDb": 6.029159485521417,
+      "canonicalFilterCount": 9,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0009",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -7.5,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.4,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ]
+    },
+    {
+      "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0008",
+      "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0008",
+      "origin": "matching-pursuit-selection-beam-v2",
+      "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":11.1,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":174,\"gainDb\":-6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.5,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-9.4,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.4,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8}]",
+      "selectionKey": "909,2133,2277,2469,2805,2841,2867,2879",
+      "canonicalRmseDb": 1.8938941990427312,
+      "canonicalMaxAbsDb": 6.447142578613321,
+      "canonicalFilterCount": 8,
+      "canonicalCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0008",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -7.5,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.4,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.4,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 11.1,
+          "q": 0.7
+        }
+      ]
+    }
+  ],
+  "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+  "alternateSeedIds": [
+    "matching-pursuit-v1:titan-to-storm:0:sparse-0001",
+    "matching-pursuit-v1:titan-to-storm:0:sparse-0006"
+  ],
+  "diversityPolicy": {
+    "id": "greedy-max-min-jaccard-v1",
+    "distance": "semantic-key-token-set-jaccard",
+    "alternateCount": 2
+  },
+  "structuralConfig": {
+    "beamWidth": 2,
+    "proposalsPerParent": 4,
+    "localPolishEvaluations": 24,
+    "maxFilters": 10
+  },
+  "targetDescendantEvaluations": 8,
+  "seedValidationOverhead": {
+    "concentrated": 1,
+    "distributed": 3,
+    "distributedMinusConcentrated": 2
+  },
+  "controls": {
+    "canonicalDeliveredEvaluation": "canonical-delivered-v1",
+    "quantization": "standard-v2-quantized",
+    "frozenReferenceSnapshotSha256": "0aea73de5592c3afb32491ea6766513a1b2d2982d4765912ba2bfdb74f4b63d3",
+    "frozenSelector": "reference-selector-v1",
+    "deadlineMode": "cooperative",
+    "deadlineMs": 60000
+  },
+  "concentrated": {
+    "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+    "frozenSeedPoolSha256": "a87b9fbf856ff06cc750578a3d54abe0fdea697061ac462b8c414419814febd1",
+    "seedIds": [
+      "matching-pursuit-v1:titan-to-storm:0:sparse-0010"
+    ],
+    "allocations": [
+      {
+        "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "descendantWorkTarget": 8
+      }
+    ],
+    "seedValidationEvaluations": 1,
+    "descendantProposalEvaluations": 8,
+    "totalStructuralCandidateEvaluations": 9,
+    "perSeed": [
+      {
+        "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "seedValidationEvaluations": 1,
+        "descendantProposalEvaluations": 8,
+        "totalStructuralCandidateEvaluations": 9,
+        "descendantsProduced": 8,
+        "seedValidationPoints": [
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "canonicalRmseDb": 1.69443656174349,
+            "canonicalMaxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "directedReferenceRegretV1": 1.6357158771757774,
+            "referenceImproved": false,
+            "phase": "seed-validation"
+          }
+        ],
+        "descendantPoints": [
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-merge:0001",
+            "canonicalRmseDb": 1.8600490806256555,
+            "canonicalMaxAbsDb": 5.899909013582937,
+            "filterCount": 9,
+            "directedReferenceRegretV1": 2.1811260718628063,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-2-remove:0002",
+            "canonicalRmseDb": 2.1878625643339666,
+            "canonicalMaxAbsDb": 8.715501215505615,
+            "filterCount": 9,
+            "directedReferenceRegretV1": 5.554226132480243,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-3-remove:0003",
+            "canonicalRmseDb": 1.8367740125912453,
+            "canonicalMaxAbsDb": 5.904748612556391,
+            "filterCount": 9,
+            "directedReferenceRegretV1": 2.094299508592714,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-remove:0004",
+            "canonicalRmseDb": 2.0487535434545334,
+            "canonicalMaxAbsDb": 6.720068525948621,
+            "filterCount": 9,
+            "directedReferenceRegretV1": 3.327445720248407,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-9-add-hs:0005",
+            "canonicalRmseDb": 2.935908327489881,
+            "canonicalMaxAbsDb": 10.748055358688767,
+            "filterCount": 10,
+            "directedReferenceRegretV1": 9.55468848854771,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-10-add-ls:0006",
+            "canonicalRmseDb": 4.114570305309717,
+            "canonicalMaxAbsDb": 7.760580508377698,
+            "filterCount": 10,
+            "directedReferenceRegretV1": 11.53345442621294,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-11-add-pk:0007",
+            "canonicalRmseDb": 2.3550607370740586,
+            "canonicalMaxAbsDb": 8.42771244108759,
+            "filterCount": 10,
+            "directedReferenceRegretV1": 5.7108370285344625,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-12-remove:0008",
+            "canonicalRmseDb": 2.3565191091696174,
+            "canonicalMaxAbsDb": 13.995917754598986,
+            "filterCount": 8,
+            "directedReferenceRegretV1": 12.138469628359433,
+            "referenceImproved": false,
+            "phase": "descendant"
+          }
+        ],
+        "descendantWorkTarget": 8,
+        "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "origin": "matching-pursuit-selection-beam-v2",
+        "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":10.5,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":174,\"gainDb\":-6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2635,\"gainDb\":-5.6,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-9.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8}]",
+        "selectionKey": "909,2037,2133,2277,2469,2697,2805,2841,2867,2879",
+        "canonicalEntryRmseDb": 1.69443656174349,
+        "canonicalEntryMaxAbsDb": 6.025019146179327,
+        "canonicalEntryFilterCount": 10,
+        "localParetoNovelDescendants": 2,
+        "localSelectedBestChanges": 0,
+        "localReferenceImprovements": 0,
+        "firstUsefulDescendantEvaluation": null,
+        "descendantEvaluationsToBestResult": null,
+        "stopReason": "evaluation-budget",
+        "deadline": {
+          "mode": "cooperative",
+          "deadlineMs": 60000,
+          "observedElapsedMs": 239.7044619999997,
+          "deadlineRespected": true,
+          "cancelled": false
+        }
+      }
+    ],
+    "global": {
+      "initialSelectedBest": {
+        "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "canonicalRmseDb": 1.69443656174349,
+        "canonicalMaxAbsDb": 6.025019146179327,
+        "filterCount": 10,
+        "directedReferenceRegretV1": 1.6357158771757774,
+        "referenceImproved": false,
+        "phase": "seed-validation"
+      },
+      "selectedBest": {
+        "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "canonicalRmseDb": 1.69443656174349,
+        "canonicalMaxAbsDb": 6.025019146179327,
+        "filterCount": 10,
+        "directedReferenceRegretV1": 1.6357158771757774,
+        "referenceImproved": false,
+        "phase": "seed-validation"
+      },
+      "globalParetoFrontier": [
+        {
+          "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-merge:0001",
+          "canonicalRmseDb": 1.8600490806256555,
+          "canonicalMaxAbsDb": 5.899909013582937,
+          "filterCount": 9,
+          "directedReferenceRegretV1": 2.1811260718628063,
+          "referenceImproved": false,
+          "phase": "descendant"
+        },
+        {
+          "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-3-remove:0003",
+          "canonicalRmseDb": 1.8367740125912453,
+          "canonicalMaxAbsDb": 5.904748612556391,
+          "filterCount": 9,
+          "directedReferenceRegretV1": 2.094299508592714,
+          "referenceImproved": false,
+          "phase": "descendant"
+        }
+      ],
+      "paretoNovelDescendants": 2,
+      "selectedBestChanges": 0,
+      "referenceImprovements": 0,
+      "firstUsefulDescendantEvaluation": null,
+      "descendantEvaluationsToBestResult": null,
+      "improvementPerDescendantEvaluation": {
+        "rmseDb": 0,
+        "maxAbsDb": 0
+      }
+    },
+    "globalParetoNovelDescendants": 2,
+    "globalSelectedBestChanges": 0,
+    "globalReferenceImprovements": 0,
+    "concentratedSeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010"
+  },
+  "distributed": {
+    "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+    "frozenSeedPoolSha256": "a87b9fbf856ff06cc750578a3d54abe0fdea697061ac462b8c414419814febd1",
+    "seedIds": [
+      "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+      "matching-pursuit-v1:titan-to-storm:0:sparse-0001",
+      "matching-pursuit-v1:titan-to-storm:0:sparse-0006"
+    ],
+    "allocations": [
+      {
+        "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "descendantWorkTarget": 3
+      },
+      {
+        "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001",
+        "descendantWorkTarget": 3
+      },
+      {
+        "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0006",
+        "descendantWorkTarget": 2
+      }
+    ],
+    "seedValidationEvaluations": 3,
+    "descendantProposalEvaluations": 8,
+    "totalStructuralCandidateEvaluations": 11,
+    "perSeed": [
+      {
+        "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "seedValidationEvaluations": 1,
+        "descendantProposalEvaluations": 3,
+        "totalStructuralCandidateEvaluations": 4,
+        "descendantsProduced": 3,
+        "seedValidationPoints": [
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "canonicalRmseDb": 1.69443656174349,
+            "canonicalMaxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "directedReferenceRegretV1": 1.6357158771757774,
+            "referenceImproved": false,
+            "phase": "seed-validation"
+          }
+        ],
+        "descendantPoints": [
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-merge:0001",
+            "canonicalRmseDb": 1.8600490806256555,
+            "canonicalMaxAbsDb": 5.899909013582937,
+            "filterCount": 9,
+            "directedReferenceRegretV1": 2.1811260718628063,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-2-remove:0002",
+            "canonicalRmseDb": 2.1878625643339666,
+            "canonicalMaxAbsDb": 8.715501215505615,
+            "filterCount": 9,
+            "directedReferenceRegretV1": 5.554226132480243,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-3-remove:0003",
+            "canonicalRmseDb": 1.8367740125912453,
+            "canonicalMaxAbsDb": 5.904748612556391,
+            "filterCount": 9,
+            "directedReferenceRegretV1": 2.094299508592714,
+            "referenceImproved": false,
+            "phase": "descendant"
+          }
+        ],
+        "descendantWorkTarget": 3,
+        "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "origin": "matching-pursuit-selection-beam-v2",
+        "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":10.5,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":174,\"gainDb\":-6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2635,\"gainDb\":-5.6,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-9.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8}]",
+        "selectionKey": "909,2037,2133,2277,2469,2697,2805,2841,2867,2879",
+        "canonicalEntryRmseDb": 1.69443656174349,
+        "canonicalEntryMaxAbsDb": 6.025019146179327,
+        "canonicalEntryFilterCount": 10,
+        "localParetoNovelDescendants": 2,
+        "localSelectedBestChanges": 0,
+        "localReferenceImprovements": 0,
+        "firstUsefulDescendantEvaluation": null,
+        "descendantEvaluationsToBestResult": null,
+        "stopReason": "evaluation-budget",
+        "deadline": {
+          "mode": "cooperative",
+          "deadlineMs": 60000,
+          "observedElapsedMs": 49.878000000000156,
+          "deadlineRespected": true,
+          "cancelled": false
+        }
+      },
+      {
+        "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001",
+        "seedValidationEvaluations": 1,
+        "descendantProposalEvaluations": 3,
+        "totalStructuralCandidateEvaluations": 4,
+        "descendantsProduced": 3,
+        "seedValidationPoints": [
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0001:0000",
+            "canonicalRmseDb": 3.3551539402962347,
+            "canonicalMaxAbsDb": 19.74960760602988,
+            "filterCount": 1,
+            "directedReferenceRegretV1": 20.739597416132884,
+            "referenceImproved": false,
+            "phase": "seed-validation"
+          }
+        ],
+        "descendantPoints": [
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-add-hs:0001",
+            "canonicalRmseDb": 4.6469543625716545,
+            "canonicalMaxAbsDb": 16.94122538716747,
+            "filterCount": 2,
+            "directedReferenceRegretV1": 20.275807006308426,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-2-add-ls:0002",
+            "canonicalRmseDb": 10.967270968449071,
+            "canonicalMaxAbsDb": 15.892271374826807,
+            "filterCount": 2,
+            "directedReferenceRegretV1": 40.967081202236855,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-3-add-pk:0003",
+            "canonicalRmseDb": 3.003456614269531,
+            "canonicalMaxAbsDb": 10.443671019971767,
+            "filterCount": 2,
+            "directedReferenceRegretV1": 9.445359481768504,
+            "referenceImproved": false,
+            "phase": "descendant"
+          }
+        ],
+        "descendantWorkTarget": 3,
+        "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0001",
+        "origin": "matching-pursuit-selection-beam-v2",
+        "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":15,\"q\":0.7}]",
+        "selectionKey": "2879",
+        "canonicalEntryRmseDb": 3.3551539402962347,
+        "canonicalEntryMaxAbsDb": 19.74960760602988,
+        "canonicalEntryFilterCount": 1,
+        "localParetoNovelDescendants": 3,
+        "localSelectedBestChanges": 2,
+        "localReferenceImprovements": 0,
+        "firstUsefulDescendantEvaluation": 1,
+        "descendantEvaluationsToBestResult": 3,
+        "stopReason": "evaluation-budget",
+        "deadline": {
+          "mode": "cooperative",
+          "deadlineMs": 60000,
+          "observedElapsedMs": 20.205191999999897,
+          "deadlineRespected": true,
+          "cancelled": false
+        }
+      },
+      {
+        "seedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0006",
+        "seedValidationEvaluations": 1,
+        "descendantProposalEvaluations": 2,
+        "totalStructuralCandidateEvaluations": 3,
+        "descendantsProduced": 2,
+        "seedValidationPoints": [
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0006:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0006:0000",
+            "canonicalRmseDb": 2.083020217824927,
+            "canonicalMaxAbsDb": 6.386518200989402,
+            "filterCount": 6,
+            "directedReferenceRegretV1": 3.2441052475112726,
+            "referenceImproved": false,
+            "phase": "seed-validation"
+          }
+        ],
+        "descendantPoints": [
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0006:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-add-hs:0001",
+            "canonicalRmseDb": 2.5929033325516886,
+            "canonicalMaxAbsDb": 9.289206997172705,
+            "filterCount": 7,
+            "directedReferenceRegretV1": 7.196373392479061,
+            "referenceImproved": false,
+            "phase": "descendant"
+          },
+          {
+            "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0006:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-2-add-ls:0002",
+            "canonicalRmseDb": 5.943707368143771,
+            "canonicalMaxAbsDb": 9.983178994279902,
+            "filterCount": 7,
+            "directedReferenceRegretV1": 19.39864301477717,
+            "referenceImproved": false,
+            "phase": "descendant"
+          }
+        ],
+        "descendantWorkTarget": 2,
+        "sourceCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0006",
+        "origin": "matching-pursuit-selection-beam-v2",
+        "semanticKey": "[{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.5,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-9.4,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-8.6,\"q\":8}]",
+        "selectionKey": "2133,2277,2469,2805,2867,2879",
+        "canonicalEntryRmseDb": 2.083020217824927,
+        "canonicalEntryMaxAbsDb": 6.386518200989402,
+        "canonicalEntryFilterCount": 6,
+        "localParetoNovelDescendants": 1,
+        "localSelectedBestChanges": 0,
+        "localReferenceImprovements": 0,
+        "firstUsefulDescendantEvaluation": null,
+        "descendantEvaluationsToBestResult": null,
+        "stopReason": "evaluation-budget",
+        "deadline": {
+          "mode": "cooperative",
+          "deadlineMs": 60000,
+          "observedElapsedMs": 37.42723100000012,
+          "deadlineRespected": true,
+          "cancelled": false
+        }
+      }
+    ],
+    "global": {
+      "initialSelectedBest": {
+        "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "canonicalRmseDb": 1.69443656174349,
+        "canonicalMaxAbsDb": 6.025019146179327,
+        "filterCount": 10,
+        "directedReferenceRegretV1": 1.6357158771757774,
+        "referenceImproved": false,
+        "phase": "seed-validation"
+      },
+      "selectedBest": {
+        "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "canonicalRmseDb": 1.69443656174349,
+        "canonicalMaxAbsDb": 6.025019146179327,
+        "filterCount": 10,
+        "directedReferenceRegretV1": 1.6357158771757774,
+        "referenceImproved": false,
+        "phase": "seed-validation"
+      },
+      "globalParetoFrontier": [
+        {
+          "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-merge:0001",
+          "canonicalRmseDb": 1.8600490806256555,
+          "canonicalMaxAbsDb": 5.899909013582937,
+          "filterCount": 9,
+          "directedReferenceRegretV1": 2.1811260718628063,
+          "referenceImproved": false,
+          "phase": "descendant"
+        },
+        {
+          "candidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-3-remove:0003",
+          "canonicalRmseDb": 1.8367740125912453,
+          "canonicalMaxAbsDb": 5.904748612556391,
+          "filterCount": 9,
+          "directedReferenceRegretV1": 2.094299508592714,
+          "referenceImproved": false,
+          "phase": "descendant"
+        }
+      ],
+      "paretoNovelDescendants": 2,
+      "selectedBestChanges": 0,
+      "referenceImprovements": 0,
+      "firstUsefulDescendantEvaluation": null,
+      "descendantEvaluationsToBestResult": null,
+      "improvementPerDescendantEvaluation": {
+        "rmseDb": 0,
+        "maxAbsDb": 0
+      }
+    },
+    "globalParetoNovelDescendants": 2,
+    "globalSelectedBestChanges": 0,
+    "globalReferenceImprovements": 0
+  },
+  "equalization": {
+    "status": "equalized",
+    "causalClaimAllowed": true,
+    "reason": "exact descendant work equalized and every distributed seed exercised"
+  }
+}
