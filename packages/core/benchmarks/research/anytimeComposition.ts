@@ -11,6 +11,12 @@ export interface AnytimeFeedbackWork {
   structuralCandidateEvaluations: number
   configuredStructuralBudget: number
   polishWork: number
+  observedPolishWork?: number
+  descendantsProduced?: number
+  seedImprovements?: number
+  globalSelectedBestImprovements?: number
+  referenceImprovements?: number
+  /** @deprecated Useful handoffs are derived from seedImprovements. */
   useful: boolean
 }
 
@@ -22,6 +28,11 @@ export interface AnytimeFeedbackScheduleResult {
   structuralCandidateEvaluations: number
   configuredStructuralBudget: number
   polishWork: number
+  observedPolishWork: number
+  descendantsProduced: number
+  seedImprovements: number
+  globalSelectedBestImprovements: number
+  referenceImprovements: number
   usefulHandoffs: number
   stopReason: 'deadline' | 'exhausted' | 'no-progress'
 }
@@ -36,11 +47,16 @@ export function runAnytimeFeedbackSchedule<T>(
   let structuralCandidateEvaluations = 0
   let configuredStructuralBudget = 0
   let polishWork = 0
+  let observedPolishWork = 0
+  let descendantsProduced = 0
+  let seedImprovements = 0
+  let globalSelectedBestImprovements = 0
+  let referenceImprovements = 0
   let usefulHandoffs = 0
   while (true) {
     rounds += 1
     if (input.isExpired()) {
-      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, usefulHandoffs, stopReason: 'deadline' }
+      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, observedPolishWork, descendantsProduced, seedImprovements, globalSelectedBestImprovements, referenceImprovements, usefulHandoffs, stopReason: 'deadline' }
     }
     let roundWork = 0
     if (!input.mpDone()) {
@@ -53,7 +69,7 @@ export function runAnytimeFeedbackSchedule<T>(
       workUnits += mpWork
     }
     if (input.isExpired()) {
-      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, usefulHandoffs, stopReason: 'deadline' }
+      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, observedPolishWork, descendantsProduced, seedImprovements, globalSelectedBestImprovements, referenceImprovements, usefulHandoffs, stopReason: 'deadline' }
     }
     const feedback = input.takeFeedback()
     let consumedFeedback = false
@@ -71,13 +87,18 @@ export function runAnytimeFeedbackSchedule<T>(
         structuralCandidateEvaluations += feedbackResult.structuralCandidateEvaluations
         configuredStructuralBudget += feedbackResult.configuredStructuralBudget
         polishWork += feedbackResult.polishWork
-        if (feedbackResult.useful) usefulHandoffs += 1
+        observedPolishWork += feedbackResult.observedPolishWork ?? 0
+        descendantsProduced += feedbackResult.descendantsProduced ?? 0
+        seedImprovements += feedbackResult.seedImprovements ?? 0
+        globalSelectedBestImprovements += feedbackResult.globalSelectedBestImprovements ?? 0
+        referenceImprovements += feedbackResult.referenceImprovements ?? 0
+        if ((feedbackResult.seedImprovements ?? 0) > 0) usefulHandoffs += 1
       }
     } else if (input.mpDone()) {
-      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, usefulHandoffs, stopReason: 'exhausted' }
+      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, observedPolishWork, descendantsProduced, seedImprovements, globalSelectedBestImprovements, referenceImprovements, usefulHandoffs, stopReason: 'exhausted' }
     }
     if (roundWork === 0 && !consumedFeedback) {
-      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, usefulHandoffs, stopReason: 'no-progress' }
+      return { rounds, mpSlices, handoffs, workUnits, structuralCandidateEvaluations, configuredStructuralBudget, polishWork, observedPolishWork, descendantsProduced, seedImprovements, globalSelectedBestImprovements, referenceImprovements, usefulHandoffs, stopReason: 'no-progress' }
     }
   }
 }

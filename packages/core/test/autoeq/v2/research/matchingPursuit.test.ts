@@ -211,6 +211,39 @@ describe('TypeScript matching pursuit research component', () => {
     expect(result.telemetry.filter((point) => point.phase === 'replacement').some((point) => point.selectionDepth >= 2)).toBe(true)
   })
 
+  it('promotes and expands an alternate width-two parent before a replacement pass completes', () => {
+    let evaluations = 0
+    const result = runMatchingPursuit({
+      problem: { ...problem, bounds: { ...problem.bounds, maxFilters: 2 } },
+      seed: 0,
+      evaluationBudget: 10,
+      checkpointEveryEvaluations: 1,
+      traversalPolicy: 'selection-beam-width-2-v1',
+      dictionary: { frequenciesPerOctave: 1, pkQValues: [1], includeShelves: false },
+      referenceSnapshotSha256: 'd'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 10 }],
+      evaluate: (candidate) => {
+        evaluations += 1
+        const replacement = candidate.candidateId.includes(':replacement-')
+        const rmseDb = replacement ? 10 - evaluations : 10
+        const maxAbsDb = replacement ? evaluations : 10
+        return {
+          protocolVersion: 1 as const,
+          candidateId: candidate.candidateId,
+          valid: true,
+          rejectionReason: null,
+          continuous: { rmseDb, maxAbsDb, bandRmseDb: {} },
+          deliverable: { filters: candidate.filters.map((filter) => ({ ...filter })), rmseDb, maxAbsDb, bandRmseDb: {}, cancellationTotalScore: 0 },
+        }
+      },
+    })
+
+    expect(result.metadata.incrementalBeamPromotions).toBeGreaterThan(0)
+    expect(result.metadata.alternateParentsExpanded).toBeGreaterThan(0)
+    expect(result.metadata.completedReplacementPasses).toBe(0)
+    expect(result.telemetry.some((point) => point.phase === 'replacement' && point.selectionDepth >= 2)).toBe(true)
+  })
+
   it('accounts for every evaluated selection from bounded solve through canonical selection', () => {
     const result = runMatchingPursuit({
       problem,

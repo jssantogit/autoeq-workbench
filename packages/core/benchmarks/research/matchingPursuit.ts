@@ -363,7 +363,7 @@ function retainSelectionBeam(
   ])).values()]
   const nonDominated = unique.filter((entry) =>
     !unique.some((other) => other !== entry && dominates(other.point, entry.point)))
-  const preferred = nonDominated.length >= width ? nonDominated : unique
+  const preferred = nonDominated
   const selected: MatchingPursuitParentState[] = []
   const remaining = [...preferred]
   while (selected.length < width && remaining.length > 0) {
@@ -592,6 +592,10 @@ function* matchingPursuitGenerator(
   let searchPasses = 1
   let rebaseTransitions = 0
   let beamTransitions = 0
+  let incrementalBeamPromotions = 0
+  let alternateParentsExpanded = 0
+  let completedReplacementPasses = 0
+  const expandedBeamParentKeys = new Set<string>()
   let maxSearchDepth = Math.max(...selectionDepthByKey.values(), 0)
   let work = 0
   const requestedStopReason = (): 'deadline' | 'cancelled' | null =>
@@ -665,7 +669,11 @@ function* matchingPursuitGenerator(
     }
     searchPasses += 1
     const initialBases = traversalPolicy === 'selection-beam-width-2-v1'
-      ? parentFrontier
+      ? (() => {
+          const unexpanded = parentFrontier.filter((entry) =>
+            !expandedBeamParentKeys.has([...entry.selection].sort((left, right) => left - right).join(',')))
+          return unexpanded.length > 0 ? unexpanded : parentFrontier
+        })()
       : [{
           selection: [...bestSelectedIndices],
           point: selectionPointByKey.get([...bestSelectedIndices].sort((left, right) => left - right).join(','))!,
@@ -674,8 +682,14 @@ function* matchingPursuitGenerator(
     let generatedThisPass = 0
     const generatedParents: MatchingPursuitParentState[] = [...initialBases]
     let rebaseTriggered = false
+    let beamPromotionTriggered = false
     baseLoop: for (const baseState of initialBases) {
       const base = [...baseState.selection]
+      if (traversalPolicy === 'selection-beam-width-2-v1') {
+        const baseKey = [...base].sort((left, right) => left - right).join(',')
+        if (expandedBeamParentKeys.size > 0 && !expandedBeamParentKeys.has(baseKey)) alternateParentsExpanded += 1
+        expandedBeamParentKeys.add(baseKey)
+      }
       const replacementRankings: number[][] = []
       for (let dropPosition = 0; dropPosition < base.length; dropPosition += 1) {
         input.onWorkUnitStart?.()
@@ -786,11 +800,24 @@ function* matchingPursuitGenerator(
         }
         if (traversalPolicy === 'selection-beam-width-2-v1') {
           generatedParents.push({ selection: [...trial], point })
+          const previousKeys = parentFrontier.map((entry) => [...entry.selection].sort((left, right) => left - right).join(','))
+          const retained = retainSelectionBeam(generatedParents, 2)
+          const nextKeys = retained.map((entry) => [...entry.selection].sort((left, right) => left - right).join(','))
+          if (nextKeys.join('|') !== previousKeys.join('|')) {
+            parentFrontier = retained
+            beamTransitions += 1
+            incrementalBeamPromotions += 1
+            if (retained.some((entry) => !expandedBeamParentKeys.has(
+              [...entry.selection].sort((left, right) => left - right).join(','),
+            ))) {
+              beamPromotionTriggered = true
+            }
+          }
         }
         yield
-        if (rebaseTriggered) break baseLoop
+        if (rebaseTriggered || beamPromotionTriggered) break baseLoop
       }
-      if (rebaseTriggered) break
+      if (rebaseTriggered || beamPromotionTriggered) break
     }
     if (stopReason === 'deadline' || stopReason === 'cancelled' || stopReason === 'evaluation-budget') break
     if (generatedThisPass === 0) {
@@ -801,6 +828,11 @@ function* matchingPursuitGenerator(
       bestSelectedIndices = nextBest
       continue
     }
+    if (beamPromotionTriggered) {
+      bestSelectedIndices = [...(parentFrontier[0]?.selection ?? bestSelectedIndices)]
+      continue
+    }
+    completedReplacementPasses += 1
     if (traversalPolicy === 'selection-beam-width-2-v1') {
       const previousKeys = parentFrontier.map((entry) => [...entry.selection].sort((left, right) => left - right).join(','))
       parentFrontier = retainSelectionBeam(generatedParents, 2)
@@ -859,6 +891,9 @@ function* matchingPursuitGenerator(
       maxSearchDepth,
       rebaseTransitions,
       beamTransitions,
+      incrementalBeamPromotions,
+      alternateParentsExpanded,
+      completedReplacementPasses,
       visitedSelections: visitedSelections.size,
       checkpointEveryEvaluations: checkpointEvery,
       maxFilters: Math.min(10, input.problem.bounds.maxFilters),

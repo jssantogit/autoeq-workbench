@@ -580,6 +580,10 @@ function runMatchingPursuitVariant(
       replacementOrdering,
       traversalPolicy,
       replacementRankingScoreComputations: result.metadata.replacementRankingScoreComputations,
+      incrementalBeamPromotions: result.metadata.incrementalBeamPromotions,
+      alternateParentsExpanded: result.metadata.alternateParentsExpanded,
+      completedReplacementPasses: result.metadata.completedReplacementPasses,
+      visitedSelections: result.metadata.visitedSelections,
       ...result.diagnostics,
     },
     researchTrace,
@@ -838,6 +842,7 @@ function runMpStructuralComposition(
   mpPhase.finish()
   const mpBest = mpPhase.localBest
   let structuralStopReason = 'not-started'
+  let observedStructuralCandidateEvaluations = 0
   if (mpBest !== undefined && !context.isExpired()) {
     const structuralPhase = beginCompositionPhase(context, tracker, 'zero→matching-pursuit→structural')
     const structural = runStructuralBeamVariant(structuralPhase.context, {
@@ -845,6 +850,7 @@ function runMpStructuralComposition(
       proposalSeeds: [seedForData(data, mpBest.candidateId, mpBest.filters)],
     }, 'proposal', structuralPhase.observeRaw, false, structuralEvaluationAllowance)
     structuralStopReason = structural.terminationReason
+    observedStructuralCandidateEvaluations = Number(structural.metadata.evaluatedStateCount ?? 0)
     structuralPhase.finish()
   }
   return {
@@ -853,13 +859,16 @@ function runMpStructuralComposition(
       searchComponent: 'mp-structural-v2',
       mpPhaseBudgetMs: 15_000,
       cumulativeCandidateCount: tracker.candidateOffset,
-      structuralOperationCount: tracker.structuralOffset,
+      mpCandidateEvaluations: Number(mp.metadata.candidateCount ?? 0),
+      mpReplacementOperations: Number(mp.metadata.structuralOperationCount ?? 0),
+      structuralBeamCandidateEvaluations: observedStructuralCandidateEvaluations,
+      stateBankEvaluations: 0,
       feedbackEnabled: false,
       mpPhaseStopReason: mp.terminationReason === 'deadline' ? 'phase-budget' : mp.terminationReason,
       mpContinuationHadAdmissibleWork: mp.terminationReason === 'deadline' && !context.isExpired(),
       structuralStopReason,
       configuredStructuralEvaluationAllowance: structuralEvaluationAllowance,
-      structuralCandidateEvaluations: tracker.structuralOffset,
+      structuralCandidateEvaluations: observedStructuralCandidateEvaluations,
       nodeVersion: process.version,
     },
     researchTrace: [...tracker.trace, ...(mp.researchTrace ?? [])],
@@ -882,6 +891,7 @@ function runAnytimeComposition(
   const queued = new Set<string>()
   const structuralEvaluationAllowance = 120
   let observedStructuralCandidateEvaluations = 0
+  let observedStateBankEvaluations = 0
   let mpCandidateCount = 0
   let mpStructuralCount = 0
   let mpParetoCount = 0
@@ -951,11 +961,20 @@ function runAnytimeComposition(
       if (context.isExpired()) return 0
       const remainingStructuralAllowance = structuralEvaluationAllowance - observedStructuralCandidateEvaluations
       if (remainingStructuralAllowance <= 0) {
-        return { workUnits: 0, structuralCandidateEvaluations: 0, configuredStructuralBudget: 0, polishWork: 0, useful: false }
+        return {
+          workUnits: 0, structuralCandidateEvaluations: 0, configuredStructuralBudget: 0, polishWork: 0,
+          useful: false, descendantsProduced: 0, seedImprovements: 0,
+          globalSelectedBestImprovements: 0, referenceImprovements: 0,
+        }
       }
       const structuralPhase = beginCompositionPhase(
         context, tracker, `zero→matching-pursuit→structural:${seed.candidateId}`,
       )
+      let seedPoint: CapacityTournamentProgressPointV1 | undefined
+      let descendantsProduced = 0
+      let seedImprovements = 0
+      let globalSelectedBestImprovements = 0
+      let referenceImprovements = 0
       const structural = runStructuralBeam({
         problem: data.problem,
         seed: context.seed ?? 0,
@@ -969,13 +988,31 @@ function runAnytimeComposition(
         nowMs: context.nowMs,
         onWorkUnitStart: context.startWorkUnit,
         onPoint: (point, filters) => {
+          const isDescendant = point.candidateId.includes(':proposal-')
+          if (!isDescendant && seedPoint === undefined) seedPoint = progressPoint(point, filters, {
+            cumulativeCandidateCount: point.evaluationCount + 1,
+            structuralOperationCount: Math.max(0, point.evaluationCount),
+            bestOrigin: 'matching-pursuit-seed→structural',
+          })
+          if (isDescendant) {
+            descendantsProduced += 1
+            const candidateSeedComparison = progressPoint(point, filters, {
+              cumulativeCandidateCount: point.evaluationCount + 1,
+              structuralOperationCount: Math.max(0, point.evaluationCount),
+              bestOrigin: 'matching-pursuit-seed→structural',
+            })
+            if (seedPoint !== undefined && shouldReport(seedPoint, candidateSeedComparison)) seedImprovements += 1
+            if (candidateSeedComparison.referenceImproved) referenceImprovements += 1
+          }
           const candidate = progressPoint(point, filters, {
             cumulativeCandidateCount: point.evaluationCount + 1,
             structuralOperationCount: Math.max(0, point.evaluationCount),
             bestOrigin: 'matching-pursuit-seed→structural',
           })
+          const changesSelectedGlobalBest = isDescendant && shouldReport(tracker.best, candidate)
           structuralPhase.observeRaw(candidate)
           structuralPhase.context.report(candidate)
+          if (changesSelectedGlobalBest) globalSelectedBestImprovements += 1
         },
       })
       const structuralBest = structuralPhase.localBest
@@ -991,6 +1028,7 @@ function runAnytimeComposition(
           proposalSeeds: [seedForData(data, structuralBest.candidateId, structuralBest.filters)],
         }, 'proposal', false, statePhase.observeRaw)
         stateBankWork = Number(stateResult.metadata.cumulativeCandidateCount ?? 0)
+        observedStateBankEvaluations += stateBankWork
         statePhase.finish()
       }
       return {
@@ -998,7 +1036,12 @@ function runAnytimeComposition(
       structuralCandidateEvaluations: structural.candidates.length,
         configuredStructuralBudget: Math.min(12, remainingStructuralAllowance),
         polishWork: 24,
-        useful: structuralBest !== undefined,
+        observedPolishWork: 0,
+        descendantsProduced,
+        seedImprovements,
+        globalSelectedBestImprovements,
+        referenceImprovements,
+        useful: seedImprovements > 0,
       }
     },
   })
@@ -1018,12 +1061,20 @@ function runAnytimeComposition(
       workUnits: schedule.workUnits,
       structuralCandidateEvaluations: schedule.structuralCandidateEvaluations,
       configuredStructuralBudget: schedule.configuredStructuralBudget,
-      polishWork: schedule.polishWork,
+      configuredPolishAllowance: schedule.polishWork,
+      observedPolishWork: schedule.observedPolishWork,
+      descendantsProduced: schedule.descendantsProduced,
+      seedImprovements: schedule.seedImprovements,
+      globalSelectedBestImprovements: schedule.globalSelectedBestImprovements,
+      referenceImprovements: schedule.referenceImprovements,
       usefulHandoffs: schedule.usefulHandoffs,
       configuredStructuralEvaluationAllowance: structuralEvaluationAllowance,
       observedStructuralCandidateEvaluations,
       cumulativeCandidateCount: tracker.candidateOffset,
-      structuralOperationCount: tracker.structuralOffset,
+      mpCandidateEvaluations: mpCandidateCount,
+      mpReplacementOperations: mpStructuralCount,
+      structuralBeamCandidateEvaluations: schedule.structuralCandidateEvaluations,
+      stateBankEvaluations: observedStateBankEvaluations,
       queuedNovelSelections: queued.size,
       unprocessedFeedbackSeeds: feedbackQueue.length,
       scheduleStopReason: schedule.stopReason,

@@ -152,7 +152,17 @@ describe('capacity-aware anytime feedback schedule', () => {
       mpDone: () => true,
       advanceMpSlice: () => 0,
       takeFeedback: (() => { let available = true; return () => available ? (available = false, 'seed') : undefined })(),
-      processFeedback: () => ({ workUnits: 3, structuralCandidateEvaluations: 2, configuredStructuralBudget: 12, polishWork: 24, useful: true }),
+      processFeedback: () => ({
+        workUnits: 3,
+        structuralCandidateEvaluations: 2,
+        configuredStructuralBudget: 12,
+        polishWork: 24,
+        useful: true,
+        descendantsProduced: 1,
+        seedImprovements: 1,
+        globalSelectedBestImprovements: 1,
+        referenceImprovements: 0,
+      }),
     })
     expect(result).toMatchObject({
       handoffs: 1,
@@ -161,6 +171,36 @@ describe('capacity-aware anytime feedback schedule', () => {
       configuredStructuralBudget: 12,
       polishWork: 24,
       usefulHandoffs: 1,
+      descendantsProduced: 1,
+      seedImprovements: 1,
+    })
+  })
+
+  it('does not count a local best without a seed-improving descendant as a useful handoff', () => {
+    const result = runAnytimeFeedbackSchedule({
+      isExpired: () => false,
+      mpDone: () => true,
+      advanceMpSlice: () => 0,
+      takeFeedback: (() => { let available = true; return () => available ? (available = false, 'seed') : undefined })(),
+      processFeedback: () => ({
+        workUnits: 2,
+        structuralCandidateEvaluations: 2,
+        configuredStructuralBudget: 12,
+        polishWork: 24,
+        useful: true,
+        descendantsProduced: 1,
+        seedImprovements: 0,
+        globalSelectedBestImprovements: 0,
+        referenceImprovements: 0,
+      }),
+    })
+
+    expect(result).toMatchObject({
+      handoffs: 1,
+      structuralCandidateEvaluations: 2,
+      usefulHandoffs: 0,
+      seedImprovements: 0,
+      descendantsProduced: 1,
     })
   })
 })
