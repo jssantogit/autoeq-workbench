@@ -5,10 +5,12 @@ import {
   buildDictionary,
   createMatchingPursuitContinuation,
   matchingPursuitContinuationResult,
+  retainMatchingPursuitSelectionBeam,
   runMatchingPursuit,
   solveBoundedCoordinateGains,
   type MatchingPursuitProblem,
 } from '../../../../benchmarks/research/matchingPursuit.js'
+import type { SolverTrajectoryPointV1 } from '../../../../benchmarks/research/solverRunArtifact.js'
 
 const problem: MatchingPursuitProblem = {
   problemId: 'synthetic-matching-pursuit',
@@ -29,6 +31,19 @@ const problem: MatchingPursuitProblem = {
 }
 
 describe('TypeScript matching pursuit research component', () => {
+  it('retains two Pareto tradeoffs at selection-beam width two before frozen-selector trimming', () => {
+    const states = [
+      selectionBeamState('peak-tradeoff', [2], 4, 1),
+      selectionBeamState('rmse-tradeoff', [1], 1, 4),
+      selectionBeamState('dominated', [3], 5, 5),
+    ]
+
+    expect(retainMatchingPursuitSelectionBeam(states, 2).map((state) => state.point.candidateId))
+      .toEqual(['peak-tradeoff', 'rmse-tradeoff'])
+    expect(retainMatchingPursuitSelectionBeam(states, 1).map((state) => state.point.candidateId))
+      .toHaveLength(1)
+    expect(retainMatchingPursuitSelectionBeam(states, 1)[0]!.point.candidateId).not.toBe('dominated')
+  })
   it('keeps the approved dictionary order and atom geometry', () => {
     const atoms = buildDictionary(problem, {
       frequenciesPerOctave: 24,
@@ -457,3 +472,24 @@ describe('TypeScript matching pursuit research component', () => {
     expect(matchingPursuitContinuationResult(continuation).stopReason).toBe('cancelled')
   })
 })
+
+function selectionBeamState(
+  candidateId: string,
+  selection: number[],
+  canonicalRmseDb: number,
+  canonicalMaxAbsDb: number,
+): { selection: number[]; point: SolverTrajectoryPointV1 } {
+  return {
+    selection,
+    point: {
+      candidateId,
+      evaluationCount: 0,
+      elapsedMs: 0,
+      actualDeliveredFilterCount: selection.length,
+      canonicalRmseDb,
+      canonicalMaxAbsDb,
+      referenceRegret: 0,
+      referenceImproved: false,
+    },
+  }
+}

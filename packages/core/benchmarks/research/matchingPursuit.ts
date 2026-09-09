@@ -348,23 +348,25 @@ function sameMetrics(left: SolverTrajectoryPointV1, right: SolverTrajectoryPoint
     Math.abs(left.canonicalMaxAbsDb - right.canonicalMaxAbsDb) <= 1e-12
 }
 
-interface MatchingPursuitParentState {
+export interface MatchingPursuitSelectionBeamState {
   selection: number[]
   point: SolverTrajectoryPointV1
 }
 
-function retainSelectionBeam(
-  entries: readonly MatchingPursuitParentState[],
+export function retainMatchingPursuitSelectionBeam(
+  entries: readonly MatchingPursuitSelectionBeamState[],
   width: number,
-): MatchingPursuitParentState[] {
+): MatchingPursuitSelectionBeamState[] {
+  positiveInteger(width, 'selection beam width')
   const unique = [...new Map(entries.map((entry) => [
     [...entry.selection].sort((left, right) => left - right).join(','),
     entry,
   ])).values()]
   const nonDominated = unique.filter((entry) =>
     !unique.some((other) => other !== entry && dominates(other.point, entry.point)))
+  if (nonDominated.length <= width) return nonDominated
   const preferred = nonDominated
-  const selected: MatchingPursuitParentState[] = []
+  const selected: MatchingPursuitSelectionBeamState[] = []
   const remaining = [...preferred]
   while (selected.length < width && remaining.length > 0) {
     const best = selectReferencePoint(remaining.map((entry) => selectorPoint(entry.point)))
@@ -652,7 +654,7 @@ function* matchingPursuitGenerator(
 
 
   let bestSelectedIndices = [...selectedIndices]
-  let parentFrontier: MatchingPursuitParentState[] = [{
+  let parentFrontier: MatchingPursuitSelectionBeamState[] = [{
     selection: [...bestSelectedIndices],
     point: selectionPointByKey.get([...bestSelectedIndices].sort((left, right) => left - right).join(','))!,
   }]
@@ -680,7 +682,7 @@ function* matchingPursuitGenerator(
         }]
     let nextBest = [...bestSelectedIndices]
     let generatedThisPass = 0
-    const generatedParents: MatchingPursuitParentState[] = [...initialBases]
+    const generatedParents: MatchingPursuitSelectionBeamState[] = [...initialBases]
     let rebaseTriggered = false
     let beamPromotionTriggered = false
     baseLoop: for (const baseState of initialBases) {
@@ -801,7 +803,7 @@ function* matchingPursuitGenerator(
         if (traversalPolicy === 'selection-beam-width-2-v1') {
           generatedParents.push({ selection: [...trial], point })
           const previousKeys = parentFrontier.map((entry) => [...entry.selection].sort((left, right) => left - right).join(','))
-          const retained = retainSelectionBeam(generatedParents, 2)
+          const retained = retainMatchingPursuitSelectionBeam(generatedParents, 2)
           const nextKeys = retained.map((entry) => [...entry.selection].sort((left, right) => left - right).join(','))
           if (nextKeys.join('|') !== previousKeys.join('|')) {
             parentFrontier = retained
@@ -835,7 +837,7 @@ function* matchingPursuitGenerator(
     completedReplacementPasses += 1
     if (traversalPolicy === 'selection-beam-width-2-v1') {
       const previousKeys = parentFrontier.map((entry) => [...entry.selection].sort((left, right) => left - right).join(','))
-      parentFrontier = retainSelectionBeam(generatedParents, 2)
+      parentFrontier = retainMatchingPursuitSelectionBeam(generatedParents, 2)
       const nextKeys = parentFrontier.map((entry) => [...entry.selection].sort((left, right) => left - right).join(','))
       if (nextKeys.join('|') !== previousKeys.join('|')) beamTransitions += 1
       bestSelectedIndices = [...(parentFrontier[0]?.selection ?? bestSelectedIndices)]
