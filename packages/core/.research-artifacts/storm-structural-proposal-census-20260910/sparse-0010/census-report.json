@@ -1,0 +1,5928 @@
+{
+  "schemaVersion": 1,
+  "experimentVersion": "storm-structural-proposal-census-v1",
+  "caseId": "titan-to-storm",
+  "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+  "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+  "frozenReplaySourceCommit": "26ba86bdb17e0b5d365fd51590dd6abdb4636b96",
+  "producerCommit": "989832ea9f6aca047433b64107d07cc61ada1bea",
+  "sourceArtifact": {
+    "logicalId": "external:storm-mp-reallocation-corrective-rerun1/tournament-report.json",
+    "sha256": "c8bf9b05b3c00cb4b9475bb850665d4708ad6c5e027971cb0d461f59c1b00351"
+  },
+  "replayArtifact": {
+    "logicalId": "repo:packages/core/.research-artifacts/storm-diagnostic-replay-20260910/sparse-0010/replay-report.json",
+    "sha256": "930c0474b01c03267469d5bc5c3e0a690c9b7a11fe1e8267fdf44db4a8ee4aba"
+  },
+  "referenceSnapshot": {
+    "logicalId": "external:OracleReferenceSnapshotV1.json",
+    "sha256": "0aea73de5592c3afb32491ea6766513a1b2d2982d4765912ba2bfdb74f4b63d3"
+  },
+  "runtimeInputs": {
+    "sourceArtifact": "replay.sourceArtifact.path",
+    "referenceSnapshot": "snapshotPath or DEFAULT_SNAPSHOT"
+  },
+  "configuration": {
+    "maxFilters": 10,
+    "beamWidth": 2,
+    "proposalsPerParent": 4,
+    "localPolishEvaluations": 24,
+    "top4Admission": 4
+  },
+  "controls": {
+    "initialParentOnly": true,
+    "frozenReference": true,
+    "frozenReferenceSnapshotSha256": "0aea73de5592c3afb32491ea6766513a1b2d2982d4765912ba2bfdb74f4b63d3",
+    "frozenSelector": "reference-selector-v1",
+    "canonicalDeliveredEvaluation": "canonical-delivered-v1",
+    "quantization": "standard-v2-quantized",
+    "quantizationSteps": {
+      "frequencyStepHz": 1,
+      "gainStepDb": 0.1,
+      "qStep": 0.01
+    },
+    "generatorIdentity": "generateStructuralMutations",
+    "orderIdentity": "orderStructuralProposals",
+    "admissionPolicy": "lexical-rank <= 4"
+  },
+  "inventory": {
+    "totalProposalCount": 21,
+    "countsByMutationType": {
+      "add-pk": 0,
+      "add-ls": 0,
+      "add-hs": 0,
+      "remove": 10,
+      "type-mutation": 10,
+      "split": 0,
+      "merge": 1
+    },
+    "originalOrdinalRange": [
+      1,
+      21
+    ]
+  },
+  "admissionBoundary": {
+    "orderedBeforeSlice": true,
+    "top4": 4,
+    "admittedCount": 4,
+    "excludedCount": 17,
+    "admittedRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "excludedRanks": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ]
+  },
+  "results": {
+    "parent": {
+      "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+      "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+      "filters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "canonicalFilters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "frozenReplayCanonicalFilters": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "canonical": {
+        "rmseDb": 1.69443656174349,
+        "maxAbsDb": 6.025019146179327,
+        "filterCount": 10,
+        "cancellationScore": 0,
+        "directedReferenceRegretV1": 1.6357158771757774,
+        "referenceImproved": false
+      },
+      "frozenReplayCanonical": {
+        "rmseDb": 1.69443656174349,
+        "maxAbsDb": 6.025019146179327,
+        "filterCount": 10,
+        "cancellationScore": 0,
+        "directedReferenceRegretV1": 1.6357158771757774,
+        "referenceImproved": false
+      },
+      "replayComparison": {
+        "canonicalFiltersMatched": true,
+        "cancellationScoreMatched": true,
+        "referenceRegretMatched": true
+      }
+    },
+    "proposals": [
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 21,
+        "lexicalAdmissionRank": 1,
+        "admittedByCurrentTop4": true,
+        "mutation": "merge",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "merge-autoeq-9-autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19562.082350226,
+            "gainDb": 15,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 195,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -10.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19562,
+            "gainDb": 15,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.7780314969732776,
+          "maxAbsDb": 6.008734393902259
+        },
+        "postPolishContinuous": {
+          "rmseDb": 1.860148450931376,
+          "maxAbsDb": 5.899810826890398
+        },
+        "canonical": {
+          "rmseDb": 1.8600490806256555,
+          "maxAbsDb": 5.899909013582937,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 2.1811260718628063,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "tradeoff",
+          "againstPrimary": "tradeoff"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "merge-autoeq-9-autoeq-10",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "merge-autoeq-9-autoeq-10",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 17,
+        "lexicalAdmissionRank": 2,
+        "admittedByCurrentTop4": true,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 155,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2348,
+            "gainDb": -4.6,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4183,
+            "gainDb": -8.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.9281057398169095,
+          "maxAbsDb": 8.716363585402057
+        },
+        "postPolishContinuous": {
+          "rmseDb": 2.1880254811566697,
+          "maxAbsDb": 8.715500931055612
+        },
+        "canonical": {
+          "rmseDb": 2.1878625643339666,
+          "maxAbsDb": 8.715501215505615,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 5.554226132480243,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 19,
+        "lexicalAdmissionRank": 3,
+        "admittedByCurrentTop4": true,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 195,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -10.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.7538248331958555,
+          "maxAbsDb": 6.013575593883999
+        },
+        "postPolishContinuous": {
+          "rmseDb": 1.8368651211277602,
+          "maxAbsDb": 5.904652026872139
+        },
+        "canonical": {
+          "rmseDb": 1.8367740125912453,
+          "maxAbsDb": 5.904748612556391,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 2.094299508592714,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "tradeoff",
+          "againstPrimary": "tradeoff"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 15,
+        "lexicalAdmissionRank": 4,
+        "admittedByCurrentTop4": true,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 155,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2348,
+            "gainDb": -4.6,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4183,
+            "gainDb": -8.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.7681394024007941,
+          "maxAbsDb": 6.721877992361329
+        },
+        "postPolishContinuous": {
+          "rmseDb": 2.048927676326693,
+          "maxAbsDb": 6.720067930368773
+        },
+        "canonical": {
+          "rmseDb": 2.0487535434545334,
+          "maxAbsDb": 6.720068525948621,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 3.327445720248407,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-8",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 13,
+        "lexicalAdmissionRank": 5,
+        "admittedByCurrentTop4": false,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 195,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 5270,
+            "gainDb": -10.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.8709642802927922,
+          "maxAbsDb": 9.051847310209427
+        },
+        "postPolishContinuous": {
+          "rmseDb": 2.046532170456431,
+          "maxAbsDb": 9.044274199003967
+        },
+        "canonical": {
+          "rmseDb": 2.0464496338825615,
+          "maxAbsDb": 9.044280438778317,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 5.601143952177122,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-8",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 11,
+        "lexicalAdmissionRank": 6,
+        "admittedByCurrentTop4": false,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 155,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2348,
+            "gainDb": -4.6,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4183,
+            "gainDb": -8.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.785499337452002,
+          "maxAbsDb": 6.46699165872551
+        },
+        "postPolishContinuous": {
+          "rmseDb": 2.062910915573649,
+          "maxAbsDb": 6.45718374969576
+        },
+        "canonical": {
+          "rmseDb": 2.0627383118971485,
+          "maxAbsDb": 6.457186923346409,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 3.2093187558832854,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-8",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 9,
+        "lexicalAdmissionRank": 7,
+        "admittedByCurrentTop4": false,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 195,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 5270,
+            "gainDb": -10.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 2.5019316558859024,
+          "maxAbsDb": 19.613550597026254
+        },
+        "postPolishContinuous": {
+          "rmseDb": 2.5670391314952847,
+          "maxAbsDb": 19.367114137977808
+        },
+        "canonical": {
+          "rmseDb": 2.566989515553885,
+          "maxAbsDb": 19.36720188000778,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 19.235165168733136,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-8",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 7,
+        "lexicalAdmissionRank": 8,
+        "admittedByCurrentTop4": false,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 195,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.9969155981759403,
+          "maxAbsDb": 6.746974125900628
+        },
+        "postPolishContinuous": {
+          "rmseDb": 1.901522727110446,
+          "maxAbsDb": 6.075201788947922
+        },
+        "canonical": {
+          "rmseDb": 1.901454339015441,
+          "maxAbsDb": 6.075298374632183,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 2.414488201508928,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-4",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-8",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 5,
+        "lexicalAdmissionRank": 9,
+        "admittedByCurrentTop4": false,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 195,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -10.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.840725135669484,
+          "maxAbsDb": 6.050795826954705
+        },
+        "postPolishContinuous": {
+          "rmseDb": 1.6990017666736137,
+          "maxAbsDb": 5.850278905538724
+        },
+        "canonical": {
+          "rmseDb": 1.6989353408590506,
+          "maxAbsDb": 5.850643387777495,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 1.5509895845764776,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "tradeoff",
+          "againstPrimary": "tradeoff"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "storm-census-proposal-0009",
+            "winner": "candidate"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "storm-census-proposal-0009",
+            "winner": "candidate"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-4",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-8",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 3,
+        "lexicalAdmissionRank": 10,
+        "admittedByCurrentTop4": false,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 195,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -10.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.8137873440324388,
+          "maxAbsDb": 6.037151498152225
+        },
+        "postPolishContinuous": {
+          "rmseDb": 1.8776238850823719,
+          "maxAbsDb": 5.803178128199189
+        },
+        "canonical": {
+          "rmseDb": 1.8775808187066088,
+          "maxAbsDb": 5.803573701724353,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 2.21506257426515,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "tradeoff",
+          "againstPrimary": "tradeoff"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-4",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-8",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 1,
+        "lexicalAdmissionRank": 11,
+        "admittedByCurrentTop4": false,
+        "mutation": "remove",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -10.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 1.8573193362017753,
+          "maxAbsDb": 6.025066970548769
+        },
+        "postPolishContinuous": {
+          "rmseDb": 1.9690654289505782,
+          "maxAbsDb": 5.91623934325567
+        },
+        "canonical": {
+          "rmseDb": 1.9691238312745232,
+          "maxAbsDb": 5.916335315487425,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 2.606809709158419,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "tradeoff",
+          "againstPrimary": "tradeoff"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 3,
+              "filterId": "autoeq-4",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 7,
+              "filterId": "autoeq-8",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 2,
+        "lexicalAdmissionRank": 12,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 155,
+            "gainDb": -5.3,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -5.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 3.2989466275422603,
+          "maxAbsDb": 8.589234624956411
+        },
+        "postPolishContinuous": {
+          "rmseDb": 2.852884584383358,
+          "maxAbsDb": 7.588767536031364
+        },
+        "canonical": {
+          "rmseDb": 2.8528678258153106,
+          "maxAbsDb": 7.588766412119765,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 6.711499237079988,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 20,
+        "lexicalAdmissionRank": 13,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 195,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 5270,
+            "gainDb": -10.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 2.0968840075041575,
+          "maxAbsDb": 8.054957170769956
+        },
+        "postPolishContinuous": {
+          "rmseDb": 2.2316814640492795,
+          "maxAbsDb": 8.050932770921996
+        },
+        "canonical": {
+          "rmseDb": 2.2316160417953386,
+          "maxAbsDb": 8.050936149841181,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 5.006522017704542,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 9,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 9,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 18,
+        "lexicalAdmissionRank": 14,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 195,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 5270,
+            "gainDb": -10.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 2.5035486055801996,
+          "maxAbsDb": 10.499819108750962
+        },
+        "postPolishContinuous": {
+          "rmseDb": 2.5919204964060616,
+          "maxAbsDb": 10.495794708902999
+        },
+        "canonical": {
+          "rmseDb": 2.591875672708353,
+          "maxAbsDb": 10.495798087822152,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 8.422423756136991,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 4,
+        "lexicalAdmissionRank": 15,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 2348,
+            "gainDb": -4.6,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -5.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -8.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 4.202282986037079,
+          "maxAbsDb": 8.43915461892775
+        },
+        "postPolishContinuous": {
+          "rmseDb": 3.365217207143347,
+          "maxAbsDb": 6.8928961157976625
+        },
+        "canonical": {
+          "rmseDb": 3.3652777756069057,
+          "maxAbsDb": 6.892896493838112,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 8.34050765583354,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 6,
+        "lexicalAdmissionRank": 16,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 2958,
+            "gainDb": -5.3,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2958,
+            "gainDb": -4.6,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -8.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 4.842938320825121,
+          "maxAbsDb": 9.139481882894477
+        },
+        "postPolishContinuous": {
+          "rmseDb": 3.9249775596533767,
+          "maxAbsDb": 7.592893428999692
+        },
+        "canonical": {
+          "rmseDb": 3.925016534670907,
+          "maxAbsDb": 7.592893812705234,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 10.743029505695128,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 8,
+        "lexicalAdmissionRank": 17,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -4.6,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 4183,
+            "gainDb": -8.3,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 7.497288883152705,
+          "maxAbsDb": 12.139667922524767
+        },
+        "postPolishContinuous": {
+          "rmseDb": 6.431388906995059,
+          "maxAbsDb": 10.592890990769046
+        },
+        "canonical": {
+          "rmseDb": 6.43147610190364,
+          "maxAbsDb": 10.592891381225288,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 21.50684735078381,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 10,
+        "lexicalAdmissionRank": 18,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -4.6,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3727,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 6640,
+            "gainDb": -14,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 12.90390464200959,
+          "maxAbsDb": 17.839834666230857
+        },
+        "postPolishContinuous": {
+          "rmseDb": 11.719512487880362,
+          "maxAbsDb": 16.292893072876566
+        },
+        "canonical": {
+          "rmseDb": 11.719628431604427,
+          "maxAbsDb": 16.292893462993185,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 43.98148069859234,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 0,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 12,
+        "lexicalAdmissionRank": 19,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 11494,
+            "gainDb": 5.3,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 6.7668300035204005,
+          "maxAbsDb": 11.918691361195858
+        },
+        "postPolishContinuous": {
+          "rmseDb": 5.528045156011221,
+          "maxAbsDb": 10.65478662980988
+        },
+        "canonical": {
+          "rmseDb": 5.528435574171336,
+          "maxAbsDb": 10.654789480746686,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 18.154175948146268,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 5,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 5,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 14,
+        "lexicalAdmissionRank": 20,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -4.6,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -5.3,
+            "q": 11.31
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 14906,
+            "gainDb": -8.7,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 8.981655596614154,
+          "maxAbsDb": 14.343213962205134
+        },
+        "postPolishContinuous": {
+          "rmseDb": 7.762802133993601,
+          "maxAbsDb": 12.887381124567236
+        },
+        "canonical": {
+          "rmseDb": 7.762902726495027,
+          "maxAbsDb": 12.887528134817865,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 27.558186530988912,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 5,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 5,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+        "parentCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "primaryCanonical": {
+          "rmseDb": 1.69443656174349,
+          "maxAbsDb": 6.025019146179327,
+          "filterCount": 10,
+          "cancellationScore": 0,
+          "directedReferenceRegretV1": 1.6357158771757774
+        },
+        "proposalOrdinal": 16,
+        "lexicalAdmissionRank": 21,
+        "admittedByCurrentTop4": false,
+        "mutation": "type-mutation",
+        "filtersBeforePolish": [
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 18246,
+            "gainDb": 9,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -5.6,
+            "q": 8
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "canonicalFiltersAfterPolish": [
+          {
+            "id": "autoeq-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 174,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2635,
+            "gainDb": -6.6,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3320,
+            "gainDb": -7.3,
+            "q": 5.66
+          },
+          {
+            "id": "autoeq-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4695,
+            "gainDb": -9.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7453,
+            "gainDb": -15,
+            "q": 8
+          },
+          {
+            "id": "autoeq-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 12902,
+            "gainDb": 6.3,
+            "q": 8
+          },
+          {
+            "id": "autoeq-7",
+            "enabled": true,
+            "type": "LS",
+            "frequencyHz": 16255,
+            "gainDb": 8,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-8",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16731,
+            "gainDb": -9.7,
+            "q": 8
+          },
+          {
+            "id": "autoeq-9",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19331,
+            "gainDb": 15,
+            "q": 0.7
+          },
+          {
+            "id": "autoeq-10",
+            "enabled": true,
+            "type": "HS",
+            "frequencyHz": 19897,
+            "gainDb": 10.5,
+            "q": 0.7
+          }
+        ],
+        "prePolish": {
+          "rmseDb": 9.562892747825718,
+          "maxAbsDb": 14.985888647698498
+        },
+        "postPolishContinuous": {
+          "rmseDb": 8.224866645353302,
+          "maxAbsDb": 13.876253508719667
+        },
+        "canonical": {
+          "rmseDb": 8.22526114281793,
+          "maxAbsDb": 13.876336741807565,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 29.764341046353007,
+        "referenceImproved": false,
+        "paretoRelation": {
+          "againstParent": "baseline-dominates",
+          "againstPrimary": "baseline-dominates"
+        },
+        "frozenReferenceSelectorV1": {
+          "againstParent": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+            "winner": "parent"
+          },
+          "againstPrimary": {
+            "selectedCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+            "winner": "primary"
+          }
+        },
+        "coordinateTrialCount": 24,
+        "relevantBoundSaturation": {
+          "prePolish": [
+            {
+              "filterIndex": 5,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "postPolishContinuous": [
+            {
+              "filterIndex": 5,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ],
+          "canonical": [
+            {
+              "filterIndex": 4,
+              "filterId": "autoeq-5",
+              "fields": [
+                "gain-min"
+              ]
+            },
+            {
+              "filterIndex": 8,
+              "filterId": "autoeq-9",
+              "fields": [
+                "gain-max"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "summary": {
+    "countsByMutationType": {
+      "add-pk": 0,
+      "add-ls": 0,
+      "add-hs": 0,
+      "remove": 10,
+      "type-mutation": 10,
+      "split": 0,
+      "merge": 1
+    },
+    "mutationTypesTop4": [
+      "merge",
+      "remove"
+    ],
+    "whollyTruncatedTypes": [
+      "type-mutation"
+    ],
+    "bestCanonicalAdmitted": {
+      "proposalOrdinal": 19,
+      "lexicalAdmissionRank": 3,
+      "mutation": "remove",
+      "admittedByCurrentTop4": true,
+      "canonical": {
+        "rmseDb": 1.8367740125912453,
+        "maxAbsDb": 5.904748612556391,
+        "filterCount": 9,
+        "cancellationScore": 0
+      },
+      "directedReferenceRegretV1": 2.094299508592714
+    },
+    "bestCanonicalExcluded": {
+      "proposalOrdinal": 5,
+      "lexicalAdmissionRank": 9,
+      "mutation": "remove",
+      "admittedByCurrentTop4": false,
+      "canonical": {
+        "rmseDb": 1.6989353408590506,
+        "maxAbsDb": 5.850643387777495,
+        "filterCount": 9,
+        "cancellationScore": 0
+      },
+      "directedReferenceRegretV1": 1.5509895845764776
+    },
+    "lexicalRankBestOverall": {
+      "proposalOrdinal": 21,
+      "lexicalAdmissionRank": 1,
+      "mutation": "merge",
+      "admittedByCurrentTop4": true,
+      "canonical": {
+        "rmseDb": 1.8600490806256555,
+        "maxAbsDb": 5.899909013582937,
+        "filterCount": 9,
+        "cancellationScore": 0
+      },
+      "directedReferenceRegretV1": 2.1811260718628063
+    },
+    "bestByMutationType": {
+      "remove": {
+        "proposalOrdinal": 5,
+        "lexicalAdmissionRank": 9,
+        "mutation": "remove",
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 1.6989353408590506,
+          "maxAbsDb": 5.850643387777495,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 1.5509895845764776
+      },
+      "type-mutation": {
+        "proposalOrdinal": 20,
+        "lexicalAdmissionRank": 13,
+        "mutation": "type-mutation",
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 2.2316160417953386,
+          "maxAbsDb": 8.050936149841181,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 5.006522017704542
+      },
+      "merge": {
+        "proposalOrdinal": 21,
+        "lexicalAdmissionRank": 1,
+        "mutation": "merge",
+        "admittedByCurrentTop4": true,
+        "canonical": {
+          "rmseDb": 1.8600490806256555,
+          "maxAbsDb": 5.899909013582937,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "directedReferenceRegretV1": 2.1811260718628063
+      }
+    },
+    "counts": {
+      "total": 21,
+      "admitted": 4,
+      "excluded": 17,
+      "excludedDominatesAnyAdmitted": 5,
+      "excludedSelectorPreferredToAnyAdmitted": 6,
+      "excludedSelectorPreferredToBestAdmitted": 1,
+      "excludedDominatesParent": 0,
+      "excludedSelectorBeatParent": 1,
+      "excludedSelectorBeatPrimary": 1,
+      "excludedImproveReference": 0,
+      "allDominatesParent": 0,
+      "allSelectorBeatParent": 1,
+      "allSelectorBeatPrimary": 1,
+      "allImproveReference": 0
+    },
+    "classificationCriteria": {
+      "materialReplacementCriterion": "canonical dominates parent or sparse-0010, or frozen-selector beats sparse-0010",
+      "excludedMaterialReplacementCount": 1,
+      "excludedSelectorPreferredToBestAdmitted": 1,
+      "exclusionsConsistentlyOutperformRelevantAdmitted": false,
+      "admittedComparableOrBetter": false,
+      "excludedUsefulSignal": true
+    }
+  },
+  "facts": {
+    "allMutationsEnumeratedBeforeSlice": true,
+    "top4AdmissionExact": true,
+    "proposalCount": 21,
+    "admittedProposalCount": 4,
+    "excludedProposalCount": 17,
+    "excludedCountsThatDominateAnyAdmitted": 5,
+    "excludedSelectorPreferredToAnyAdmitted": 6,
+    "excludedDominateParent": 0,
+    "excludedSelectorBeatParent": 1,
+    "excludedSelectorBeatPrimary": 1,
+    "excludedImproveReference": 0,
+    "mutationTypesWhollyTruncated": [
+      "type-mutation"
+    ],
+    "parentCanonicalRmseDb": 1.69443656174349,
+    "parentCanonicalMaxAbsDb": 6.025019146179327,
+    "bestAdmittedRmseDb": 1.8367740125912453,
+    "bestAdmittedMaxAbsDb": 5.904748612556391,
+    "bestAdmittedReferenceRegret": 2.094299508592714,
+    "bestExcludedRmseDb": 1.6989353408590506,
+    "bestExcludedMaxAbsDb": 5.850643387777495,
+    "bestExcludedReferenceRegret": 1.5509895845764776
+  },
+  "interpretation": {
+    "classification": "admission-bottleneck-supported",
+    "guards": [
+      "A positive result means an admission/truncation issue only in this frozen configuration and parent; it is not an automatic cause, solution, or policy decision.",
+      "A negative result only weakens the top-4-loss hypothesis at this parent; it does not rule out other parents or configurations.",
+      "Structural ranks are lexical solver-order ranks; no dictionary atom/rank semantics were collected or inferred."
+    ],
+    "evidence": [
+      "17 proposal(s) were excluded after the rank-4 boundary.",
+      "1 excluded proposal(s) were selector-preferred to the best admitted proposal.",
+      "1 excluded proposal(s) met the conservative material-replacement criterion: canonical dominates parent or sparse-0010, or frozen-selector beats sparse-0010."
+    ],
+    "recommendation": "Positive admission/truncation evidence: separately design a causal ranking/admission experiment; this census alone does not authorize a policy change."
+  },
+  "classification": "admission-bottleneck-supported",
+  "recommendedNextExperiment": "Positive admission/truncation evidence: separately design a causal ranking/admission experiment; this census alone does not authorize a policy change.",
+  "hashes": {
+    "frozenReplaySourceCommit": "26ba86bdb17e0b5d365fd51590dd6abdb4636b96",
+    "producerCommit": "989832ea9f6aca047433b64107d07cc61ada1bea",
+    "sourceArtifactSha256": "c8bf9b05b3c00cb4b9475bb850665d4708ad6c5e027971cb0d461f59c1b00351",
+    "replayArtifactSha256": "930c0474b01c03267469d5bc5c3e0a690c9b7a11fe1e8267fdf44db4a8ee4aba",
+    "referenceSnapshotSha256": "0aea73de5592c3afb32491ea6766513a1b2d2982d4765912ba2bfdb74f4b63d3"
+  },
+  "testsAndGates": {
+    "focusedTestCommand": "pnpm exec vitest run test/autoeq/v2/research/stormStructuralProposalCensus.test.ts test/autoeq/v2/research/structuralBeam.test.ts test/autoeq/v2/research/stormDiagnosticReplay.test.ts",
+    "requiredGateCommands": [
+      "pnpm test",
+      "pnpm typecheck",
+      "pnpm build",
+      "pnpm lint",
+      "pnpm --filter @autoeq-workbench/core benchmark",
+      "git diff --check",
+      "node --test .agents/skills/astra-orchestra/routing-policy.test.mjs"
+    ],
+    "artifactGenerationCommand": "pnpm --filter @autoeq-workbench/core research:storm-structural-census",
+    "validationStatus": "evidence-recorded-in-report"
+  }
+}

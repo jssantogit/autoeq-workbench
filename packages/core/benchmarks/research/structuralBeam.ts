@@ -36,7 +36,7 @@ export type StructuralBeamProblem = Pick<
   'problemId' | 'inputSha256' | 'frequenciesHz' | 'sampleRateHz' | 'bounds'
 >
 
-type StructuralBeamRunProblem = StructuralBeamProblem & Pick<SolverLabProblemV1, 'desiredDb'>
+export type StructuralBeamRunProblem = StructuralBeamProblem & Pick<SolverLabProblemV1, 'desiredDb'>
 
 export type StructuralMutation =
   | 'add-pk'
@@ -497,18 +497,25 @@ function quantizationConfig(problem: StructuralBeamProblem) {
   })
 }
 
-interface PolishResult {
+export interface StructuralProposalPolishResult {
   refinedFilters: Filter[]
   deliveredFilters: Filter[]
   coordinateTrials: number
 }
 
-function polish(
+export function quantizeStructuralBeamFilters(
+  problem: StructuralBeamProblem,
+  filters: readonly Filter[],
+): Filter[] {
+  return quantizeV2Filters(filters, quantizationConfig(problem))
+}
+
+export function polishStructuralProposal(
   problem: StructuralBeamRunProblem,
   filters: readonly Filter[],
   evaluations: number,
   isExpired: () => boolean,
-): PolishResult {
+): StructuralProposalPolishResult {
   if (evaluations <= 0 || filters.length === 0) {
     const refinedFilters = canonical(filters)
     return { refinedFilters, deliveredFilters: refinedFilters, coordinateTrials: 0 }
@@ -662,7 +669,7 @@ function residualPeak(
   }
 }
 
-function boundSaturation(
+export function structuralBoundSaturation(
   filters: readonly Filter[],
   problem: StructuralBeamProblem,
 ): StructuralBeamBoundSaturation[] {
@@ -748,9 +755,9 @@ function appendDiagnosticEntry(
       referenceImproved: point.referenceImproved,
     },
     bounds: {
-      prePolish: boundSaturation(context.filtersBeforePolish, problem),
-      boundedContinuous: boundSaturation(context.boundedContinuousFilters, problem),
-      canonical: boundSaturation(delivered.filters, problem),
+      prePolish: structuralBoundSaturation(context.filtersBeforePolish, problem),
+      boundedContinuous: structuralBoundSaturation(context.boundedContinuousFilters, problem),
+      canonical: structuralBoundSaturation(delivered.filters, problem),
     },
     deltas: {
       prePolishToBoundedContinuous: diagnosticDelta(prePolishMetrics, boundedContinuousMetrics, references),
@@ -1026,13 +1033,13 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
         if (evaluationsUsed >= input.evaluationBudget) break
         if (proposal.filters.length > config.maxFilters) continue
         input.onWorkUnitStart?.()
-        const polished = polish(
+        const polished = polishStructuralProposal(
           input.problem,
           proposal.filters,
           config.localPolishEvaluations,
           input.isExpired ?? (() => false),
         )
-        const quantized = quantizeV2Filters(polished.deliveredFilters, quantizationConfig(input.problem))
+        const quantized = quantizeStructuralBeamFilters(input.problem, polished.deliveredFilters)
         const key = semanticFilterKey(quantized)
         if (visited.has(key)) {
           deduplicatedProposals += 1
