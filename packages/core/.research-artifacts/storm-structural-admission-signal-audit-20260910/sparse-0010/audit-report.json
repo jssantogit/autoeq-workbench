@@ -1,0 +1,4327 @@
+{
+  "schemaVersion": 1,
+  "experimentVersion": "storm-structural-admission-signal-audit-v1",
+  "caseId": "titan-to-storm",
+  "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+  "sourceCommit": "26ba86bdb17e0b5d365fd51590dd6abdb4636b96",
+  "censusProducerCommit": "989832ea9f6aca047433b64107d07cc61ada1bea",
+  "producerCommit": "b67c9c8c628662de6c6f6344b2bcde90f034479e",
+  "censusArtifact": {
+    "logicalId": "repo:packages/core/.research-artifacts/storm-structural-proposal-census-20260910/sparse-0010/census-report.json",
+    "sha256": "62dc02f53b7e9ae3e730950cb0f205a4d6907542d4c8734c78e0d95569b944c0"
+  },
+  "replayArtifact": {
+    "logicalId": "repo:packages/core/.research-artifacts/storm-diagnostic-replay-20260910/sparse-0010/replay-report.json",
+    "sha256": "930c0474b01c03267469d5bc5c3e0a690c9b7a11fe1e8267fdf44db4a8ee4aba"
+  },
+  "sourceArtifact": {
+    "logicalId": "external:storm-mp-reallocation-corrective-rerun1/tournament-report.json",
+    "sha256": "c8bf9b05b3c00cb4b9475bb850665d4708ad6c5e027971cb0d461f59c1b00351"
+  },
+  "referenceSnapshot": {
+    "logicalId": "external:OracleReferenceSnapshotV1.json",
+    "sha256": "0aea73de5592c3afb32491ea6766513a1b2d2982d4765912ba2bfdb74f4b63d3"
+  },
+  "configuration": {
+    "maxFilters": 10,
+    "beamWidth": 2,
+    "proposalsPerParent": 4,
+    "currentLocalPolishEvaluations": 24,
+    "admissionSignalProbeTrials": [
+      2,
+      6
+    ],
+    "top4Admission": 4,
+    "proposalCount": 21
+  },
+  "controls": {
+    "frozenInitialParentOnly": true,
+    "currentLexicalBaseline": "current orderStructuralProposals then slice(0,4)",
+    "currentAdmissionUnchanged": true,
+    "labelsPostHocOnly": true,
+    "labelsNotReadByRanking": true,
+    "probesAdmissionOnly": true,
+    "probesFeedBackIntoSolver": false,
+    "refinementIdentity": "polishStructuralProposal",
+    "quantization": "standard-v2-quantized",
+    "selector": "reference-selector-v1",
+    "permittedAdmissionTimeInformation": [
+      "proposal mutation and unpolished proposal filter structure",
+      "current lexical order key",
+      "canonical delivered RMSE/maxAbs/filter-count/cancellation metrics of an unpolished proposal",
+      "canonical delivered metrics from exactly 2 or 6 coordinate-trial admission-only probes"
+    ],
+    "materialRecallCriterion": "same eligible set and at least one additional recovered proposal in either recall@4 set versus lexical baseline",
+    "excludedCases": [
+      "titan-to-u12t",
+      "titan-to-trio"
+    ]
+  },
+  "frozenInputs": {
+    "proposalCount": 21,
+    "parentId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+    "parentFilterSemanticSha256": "ba04cd61d4a12f2ff0f661b32bb4f520637f6bd9f136942770cf488b8db3ddfb",
+    "semanticSetSha256": "1db7e2cbb3a1542c97666757a9e4cac09f223294035d78d18be3c5c500e69f99",
+    "lexicalOrderReproduced": true,
+    "censusHashMatched": true,
+    "replayHashMatched": true,
+    "sourceHashMatched": true
+  },
+  "proposals": [
+    {
+      "proposalRank": 1,
+      "proposalOrdinal": 21,
+      "mutation": "merge",
+      "admittedByCurrentTop4": true,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "merge-autoeq-9-autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19562.082350226,
+          "gainDb": 15,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 1,
+        "mutation": "merge",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.7780314969732776,
+            "maxAbsDb": 6.008734393902259
+          },
+          "canonical": {
+            "rmseDb": 1.778021833233275,
+            "maxAbsDb": 6.008735994911504,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.778021833233275,
+              "maxAbsDb": 6.008735994911504,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 1.7861879441822648,
+              "maxAbsDb": 6.008712163476305,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 1,
+        "admittedByCurrentTop4": true,
+        "canonical": {
+          "rmseDb": 1.8600490806256555,
+          "maxAbsDb": 5.899909013582937,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 2,
+      "proposalOrdinal": 17,
+      "mutation": "remove",
+      "admittedByCurrentTop4": true,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 2,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.9281057398169095,
+            "maxAbsDb": 8.716363585402057
+          },
+          "canonical": {
+            "rmseDb": 1.9281057262174022,
+            "maxAbsDb": 8.716363585401982,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.9281057262174022,
+              "maxAbsDb": 8.716363585401982,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 1.9361021085879446,
+              "maxAbsDb": 8.716363217732537,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 2,
+        "admittedByCurrentTop4": true,
+        "canonical": {
+          "rmseDb": 2.1878625643339666,
+          "maxAbsDb": 8.715501215505615,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 3,
+      "proposalOrdinal": 19,
+      "mutation": "remove",
+      "admittedByCurrentTop4": true,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 3,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.7538248331958555,
+            "maxAbsDb": 6.013575593883999
+          },
+          "canonical": {
+            "rmseDb": 1.7538248182449416,
+            "maxAbsDb": 6.013575593884958,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.7538248182449416,
+              "maxAbsDb": 6.013575593884958,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 1.7621030083129094,
+              "maxAbsDb": 6.01355176244976,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 3,
+        "admittedByCurrentTop4": true,
+        "canonical": {
+          "rmseDb": 1.8367740125912453,
+          "maxAbsDb": 5.904748612556391,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 4,
+      "proposalOrdinal": 15,
+      "mutation": "remove",
+      "admittedByCurrentTop4": true,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 4,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.7681394024007941,
+            "maxAbsDb": 6.721877992361329
+          },
+          "canonical": {
+            "rmseDb": 1.7681393875709246,
+            "maxAbsDb": 6.721877992361302,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.7681393875709246,
+              "maxAbsDb": 6.721877992361302,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 1.7768559679995763,
+              "maxAbsDb": 6.72187723289732,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 4,
+        "admittedByCurrentTop4": true,
+        "canonical": {
+          "rmseDb": 2.0487535434545334,
+          "maxAbsDb": 6.720068525948621,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 5,
+      "proposalOrdinal": 13,
+      "mutation": "remove",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 5,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.8709642802927922,
+            "maxAbsDb": 9.051847310209427
+          },
+          "canonical": {
+            "rmseDb": 1.8709642662779298,
+            "maxAbsDb": 9.051847310209435,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.8709642662779298,
+              "maxAbsDb": 9.051847310209435,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 1.8787256771538339,
+              "maxAbsDb": 9.051845324588296,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 5,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 2.0464496338825615,
+          "maxAbsDb": 9.044280438778317,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 6,
+      "proposalOrdinal": 11,
+      "mutation": "remove",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 6,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.785499337452002,
+            "maxAbsDb": 6.46699165872551
+          },
+          "canonical": {
+            "rmseDb": 1.7854993227663327,
+            "maxAbsDb": 6.466991658725507,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.7854993227663327,
+              "maxAbsDb": 6.466991658725507,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 1.7941310336223621,
+              "maxAbsDb": 6.466988010928064,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 6,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 2.0627383118971485,
+          "maxAbsDb": 6.457186923346409,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 7,
+      "proposalOrdinal": 9,
+      "mutation": "remove",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 7,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 2.5019316558859024,
+            "maxAbsDb": 19.613550597026254
+          },
+          "canonical": {
+            "rmseDb": 2.501931645405271,
+            "maxAbsDb": 19.613550597026247,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 2.501931645405271,
+              "maxAbsDb": 19.613550597026247,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 2.5077302898180545,
+              "maxAbsDb": 19.61352593729022,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 7,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 2.566989515553885,
+          "maxAbsDb": 19.36720188000778,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 8,
+      "proposalOrdinal": 7,
+      "mutation": "remove",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 8,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.9969155981759403,
+            "maxAbsDb": 6.746974125900628
+          },
+          "canonical": {
+            "rmseDb": 1.9969155850447284,
+            "maxAbsDb": 6.746974125900681,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.9969155850447284,
+              "maxAbsDb": 6.746974125900681,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 2.004169573267765,
+              "maxAbsDb": 6.74690282884987,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 8,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 1.901454339015441,
+          "maxAbsDb": 6.075298374632183,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 9,
+      "proposalOrdinal": 5,
+      "mutation": "remove",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 9,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.840725135669484,
+            "maxAbsDb": 6.050795826954705
+          },
+          "canonical": {
+            "rmseDb": 1.8407251214239058,
+            "maxAbsDb": 6.050795826955662,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.8407251214239058,
+              "maxAbsDb": 6.050795826955662,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 1.8485851654492462,
+              "maxAbsDb": 6.0507719955204635,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 9,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 1.6989353408590506,
+          "maxAbsDb": 5.850643387777495,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": true
+      }
+    },
+    {
+      "proposalRank": 10,
+      "proposalOrdinal": 3,
+      "mutation": "remove",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 10,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.8137873440324388,
+            "maxAbsDb": 6.037151498152225
+          },
+          "canonical": {
+            "rmseDb": 1.8137873295750162,
+            "maxAbsDb": 6.037151498153188,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.8137873295750162,
+              "maxAbsDb": 6.037151498153188,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 1.8217514875009677,
+              "maxAbsDb": 6.037127666717989,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 10,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 1.8775808187066088,
+          "maxAbsDb": 5.803573701724353,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 11,
+      "proposalOrdinal": 1,
+      "mutation": "remove",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 11,
+        "mutation": "remove",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 1.8573193362017753,
+            "maxAbsDb": 6.025066970548769
+          },
+          "canonical": {
+            "rmseDb": 1.8573193362019107,
+            "maxAbsDb": 6.025066970549734,
+            "filterCount": 9,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 1.8573193362019107,
+              "maxAbsDb": 6.025066970549734,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 1.9377807617138987,
+              "maxAbsDb": 6.0174183235615555,
+              "filterCount": 9,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 11,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 1.9691238312745232,
+          "maxAbsDb": 5.916335315487425,
+          "filterCount": 9,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 12,
+      "proposalOrdinal": 2,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 12,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 3.2989466275422603,
+            "maxAbsDb": 8.589234624956411
+          },
+          "canonical": {
+            "rmseDb": 3.298946637926199,
+            "maxAbsDb": 8.589234645071658,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 3.298946637926199,
+              "maxAbsDb": 8.589234645071658,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 2.87688508235718,
+              "maxAbsDb": 7.588755442309822,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 12,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 2.8528678258153106,
+          "maxAbsDb": 7.588766412119765,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 13,
+      "proposalOrdinal": 20,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 13,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 2.0968840075041575,
+            "maxAbsDb": 8.054957170769956
+          },
+          "canonical": {
+            "rmseDb": 2.0968839949989104,
+            "maxAbsDb": 8.054957170769004,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 2.0968839949989104,
+              "maxAbsDb": 8.054957170769004,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 2.103798426633199,
+              "maxAbsDb": 8.054956086628493,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 13,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 2.2316160417953386,
+          "maxAbsDb": 8.050936149841181,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 14,
+      "proposalOrdinal": 18,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 14,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 2.5035486055801996,
+            "maxAbsDb": 10.499819108750962
+          },
+          "canonical": {
+            "rmseDb": 2.503548595105819,
+            "maxAbsDb": 10.499819108749975,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 2.503548595105819,
+              "maxAbsDb": 10.499819108749975,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 2.5093270936995675,
+              "maxAbsDb": 10.49981802460946,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 14,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 2.591875672708353,
+          "maxAbsDb": 10.495798087822152,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 15,
+      "proposalOrdinal": 4,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 15,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 4.202282986037079,
+            "maxAbsDb": 8.43915461892775
+          },
+          "canonical": {
+            "rmseDb": 4.2022829880289105,
+            "maxAbsDb": 8.439154157950435,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 4.2022829880289105,
+              "maxAbsDb": 8.439154157950435,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 3.45229781777525,
+              "maxAbsDb": 7.439106133436679,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 15,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 3.3652777756069057,
+          "maxAbsDb": 6.892896493838112,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 16,
+      "proposalOrdinal": 6,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 16,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 4.842938320825121,
+            "maxAbsDb": 9.139481882894477
+          },
+          "canonical": {
+            "rmseDb": 4.842938323447119,
+            "maxAbsDb": 9.139481421917104,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 4.842938323447119,
+              "maxAbsDb": 9.139481421917104,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 4.0463573110480455,
+              "maxAbsDb": 8.139444613041674,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 16,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 3.925016534670907,
+          "maxAbsDb": 7.592893812705234,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 17,
+      "proposalOrdinal": 8,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 17,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 7.497288883152705,
+            "maxAbsDb": 12.139667922524767
+          },
+          "canonical": {
+            "rmseDb": 7.497288887318445,
+            "maxAbsDb": 12.139667461547287,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 7.497288887318445,
+              "maxAbsDb": 12.139667461547287,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 6.617250484525304,
+              "maxAbsDb": 11.139626720434837,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 17,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 6.43147610190364,
+          "maxAbsDb": 10.592891381225288,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 18,
+      "proposalOrdinal": 10,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 18,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 12.90390464200959,
+            "maxAbsDb": 17.839834666230857
+          },
+          "canonical": {
+            "rmseDb": 12.903904647158926,
+            "maxAbsDb": 17.83983420525338,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 12.903904647158926,
+              "maxAbsDb": 17.83983420525338,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 11.928568653561406,
+              "maxAbsDb": 16.83979947126804,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 18,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 11.719628431604427,
+          "maxAbsDb": 16.292893462993185,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 19,
+      "proposalOrdinal": 12,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 19,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 6.7668300035204005,
+            "maxAbsDb": 11.918691361195858
+          },
+          "canonical": {
+            "rmseDb": 6.76682999389372,
+            "maxAbsDb": 11.918691361196819,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 6.76682999389372,
+              "maxAbsDb": 11.918691361196819,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 5.823690054204756,
+              "maxAbsDb": 10.707267752501371,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 19,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 5.528435574171336,
+          "maxAbsDb": 10.654789480746686,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 20,
+      "proposalOrdinal": 14,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 20,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 8.981655596614154,
+            "maxAbsDb": 14.343213962205134
+          },
+          "canonical": {
+            "rmseDb": 8.981655600366754,
+            "maxAbsDb": 14.343213962205139,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 8.981655600366754,
+              "maxAbsDb": 14.343213962205139,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 7.959236293026824,
+              "maxAbsDb": 12.896278083299132,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 20,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 7.762902726495027,
+          "maxAbsDb": 12.887528134817865,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    },
+    {
+      "proposalRank": 21,
+      "proposalOrdinal": 16,
+      "mutation": "type-mutation",
+      "admittedByCurrentTop4": false,
+      "filtersBeforePolish": [
+        {
+          "id": "autoeq-8",
+          "enabled": true,
+          "type": "LS",
+          "frequencyHz": 18246,
+          "gainDb": 9,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-1",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 174,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-2",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 2635,
+          "gainDb": -5.6,
+          "q": 8
+        },
+        {
+          "id": "autoeq-3",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 3320,
+          "gainDb": -6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-4",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 4695,
+          "gainDb": -9.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-5",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 7453,
+          "gainDb": -15,
+          "q": 8
+        },
+        {
+          "id": "autoeq-6",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 12902,
+          "gainDb": 6.3,
+          "q": 8
+        },
+        {
+          "id": "autoeq-7",
+          "enabled": true,
+          "type": "PK",
+          "frequencyHz": 16731,
+          "gainDb": -9.7,
+          "q": 8
+        },
+        {
+          "id": "autoeq-9",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19331,
+          "gainDb": 15,
+          "q": 0.7
+        },
+        {
+          "id": "autoeq-10",
+          "enabled": true,
+          "type": "HS",
+          "frequencyHz": 19897,
+          "gainDb": 10.5,
+          "q": 0.7
+        }
+      ],
+      "signalRow": {
+        "proposalRank": 21,
+        "mutation": "type-mutation",
+        "prePolish": {
+          "continuous": {
+            "rmseDb": 9.562892747825718,
+            "maxAbsDb": 14.985888647698498
+          },
+          "canonical": {
+            "rmseDb": 9.56289273926946,
+            "maxAbsDb": 14.985888647699463,
+            "filterCount": 10,
+            "cancellationScore": 0
+          }
+        },
+        "partialRefinement": {
+          "2": {
+            "metrics": {
+              "rmseDb": 9.56289273926946,
+              "maxAbsDb": 14.985888647699463,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 2
+          },
+          "6": {
+            "metrics": {
+              "rmseDb": 8.526835614678584,
+              "maxAbsDb": 13.92881501356225,
+              "filterCount": 10,
+              "cancellationScore": 0
+            },
+            "coordinateTrials": 6
+          }
+        }
+      },
+      "fullCanonicalLabel": {
+        "proposalRank": 21,
+        "admittedByCurrentTop4": false,
+        "canonical": {
+          "rmseDb": 8.22526114281793,
+          "maxAbsDb": 13.876336741807565,
+          "filterCount": 10,
+          "cancellationScore": 0
+        },
+        "coordinateTrialCount": 24,
+        "selectorBeatsParent": false
+      }
+    }
+  ],
+  "summary": {
+    "signals": [
+      {
+        "signalId": "lexical",
+        "definition": "Current lexical orderStructuralProposals rank, with proposal rank as the score.",
+        "ranking": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21
+        ],
+        "rankByProposal": {
+          "1": 1,
+          "2": 2,
+          "3": 3,
+          "4": 4,
+          "5": 5,
+          "6": 6,
+          "7": 7,
+          "8": 8,
+          "9": 9,
+          "10": 10,
+          "11": 11,
+          "12": 12,
+          "13": 13,
+          "14": 14,
+          "15": 15,
+          "16": 16,
+          "17": 17,
+          "18": 18,
+          "19": 19,
+          "20": 20,
+          "21": 21
+        },
+        "scores": [
+          {
+            "proposalRank": 1,
+            "metrics": null
+          },
+          {
+            "proposalRank": 2,
+            "metrics": null
+          },
+          {
+            "proposalRank": 3,
+            "metrics": null
+          },
+          {
+            "proposalRank": 4,
+            "metrics": null
+          },
+          {
+            "proposalRank": 5,
+            "metrics": null
+          },
+          {
+            "proposalRank": 6,
+            "metrics": null
+          },
+          {
+            "proposalRank": 7,
+            "metrics": null
+          },
+          {
+            "proposalRank": 8,
+            "metrics": null
+          },
+          {
+            "proposalRank": 9,
+            "metrics": null
+          },
+          {
+            "proposalRank": 10,
+            "metrics": null
+          },
+          {
+            "proposalRank": 11,
+            "metrics": null
+          },
+          {
+            "proposalRank": 12,
+            "metrics": null
+          },
+          {
+            "proposalRank": 13,
+            "metrics": null
+          },
+          {
+            "proposalRank": 14,
+            "metrics": null
+          },
+          {
+            "proposalRank": 15,
+            "metrics": null
+          },
+          {
+            "proposalRank": 16,
+            "metrics": null
+          },
+          {
+            "proposalRank": 17,
+            "metrics": null
+          },
+          {
+            "proposalRank": 18,
+            "metrics": null
+          },
+          {
+            "proposalRank": 19,
+            "metrics": null
+          },
+          {
+            "proposalRank": 20,
+            "metrics": null
+          },
+          {
+            "proposalRank": 21,
+            "metrics": null
+          }
+        ],
+        "tieOrderStable": true,
+        "bestFullCanonicalProposal": {
+          "proposalRank": 9,
+          "rank": 9,
+          "top1": false,
+          "top4": false
+        },
+        "recallAt4OfProposalsBeatingAnyCurrentAdmitted": {
+          "recoveredProposalRanks": [],
+          "eligibleProposalRanks": [
+            6,
+            8,
+            9,
+            10,
+            11,
+            13
+          ],
+          "recoveredCount": 0,
+          "eligibleCount": 6,
+          "value": 0
+        },
+        "recallAt4OfProposalsBeatingParentByFrozenSelector": {
+          "recoveredProposalRanks": [],
+          "eligibleProposalRanks": [
+            9
+          ],
+          "recoveredCount": 0,
+          "eligibleCount": 1,
+          "value": 0
+        },
+        "overlapWithLexicalTop4": {
+          "proposalRanks": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "count": 4
+        },
+        "cost": {
+          "currentAdmission": {
+            "generatedProposalCount": 21,
+            "admittedProposalCount": 4,
+            "canonicalEvaluations": 4,
+            "coordinateTrialsPerAdmittedProposal": 24,
+            "coordinateTrialsTotal": 96
+          },
+          "signalEvaluationWork": {
+            "canonicalEvaluations": 0,
+            "continuousEvaluations": 0,
+            "coordinateTrialsTotal": 0
+          },
+          "coordinateTrialsPerProbe": 0,
+          "labelCost": {
+            "canonicalEvaluations": 21,
+            "coordinateTrialsPerProposal": 24,
+            "coordinateTrialsTotal": 504,
+            "offlineOnly": true
+          }
+        }
+      },
+      {
+        "signalId": "pre-polish-rmse-max-abs",
+        "definition": "Canonical delivered RMSE then maxAbs of each unpolished proposal structure; deterministic tie-break is filter count, cancellation score, proposal rank.",
+        "ranking": [
+          3,
+          4,
+          1,
+          6,
+          10,
+          9,
+          11,
+          5,
+          2,
+          8,
+          13,
+          7,
+          14,
+          12,
+          15,
+          16,
+          19,
+          17,
+          20,
+          21,
+          18
+        ],
+        "rankByProposal": {
+          "1": 3,
+          "2": 9,
+          "3": 1,
+          "4": 2,
+          "5": 8,
+          "6": 4,
+          "7": 12,
+          "8": 10,
+          "9": 6,
+          "10": 5,
+          "11": 7,
+          "12": 14,
+          "13": 11,
+          "14": 13,
+          "15": 15,
+          "16": 16,
+          "17": 18,
+          "18": 21,
+          "19": 17,
+          "20": 19,
+          "21": 20
+        },
+        "scores": [
+          {
+            "proposalRank": 1,
+            "metrics": {
+              "rmseDb": 1.778021833233275,
+              "maxAbsDb": 6.008735994911504,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 2,
+            "metrics": {
+              "rmseDb": 1.9281057262174022,
+              "maxAbsDb": 8.716363585401982,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 3,
+            "metrics": {
+              "rmseDb": 1.7538248182449416,
+              "maxAbsDb": 6.013575593884958,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 4,
+            "metrics": {
+              "rmseDb": 1.7681393875709246,
+              "maxAbsDb": 6.721877992361302,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 5,
+            "metrics": {
+              "rmseDb": 1.8709642662779298,
+              "maxAbsDb": 9.051847310209435,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 6,
+            "metrics": {
+              "rmseDb": 1.7854993227663327,
+              "maxAbsDb": 6.466991658725507,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 7,
+            "metrics": {
+              "rmseDb": 2.501931645405271,
+              "maxAbsDb": 19.613550597026247,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 8,
+            "metrics": {
+              "rmseDb": 1.9969155850447284,
+              "maxAbsDb": 6.746974125900681,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 9,
+            "metrics": {
+              "rmseDb": 1.8407251214239058,
+              "maxAbsDb": 6.050795826955662,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 10,
+            "metrics": {
+              "rmseDb": 1.8137873295750162,
+              "maxAbsDb": 6.037151498153188,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 11,
+            "metrics": {
+              "rmseDb": 1.8573193362019107,
+              "maxAbsDb": 6.025066970549734,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 12,
+            "metrics": {
+              "rmseDb": 3.298946637926199,
+              "maxAbsDb": 8.589234645071658,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 13,
+            "metrics": {
+              "rmseDb": 2.0968839949989104,
+              "maxAbsDb": 8.054957170769004,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 14,
+            "metrics": {
+              "rmseDb": 2.503548595105819,
+              "maxAbsDb": 10.499819108749975,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 15,
+            "metrics": {
+              "rmseDb": 4.2022829880289105,
+              "maxAbsDb": 8.439154157950435,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 16,
+            "metrics": {
+              "rmseDb": 4.842938323447119,
+              "maxAbsDb": 9.139481421917104,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 17,
+            "metrics": {
+              "rmseDb": 7.497288887318445,
+              "maxAbsDb": 12.139667461547287,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 18,
+            "metrics": {
+              "rmseDb": 12.903904647158926,
+              "maxAbsDb": 17.83983420525338,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 19,
+            "metrics": {
+              "rmseDb": 6.76682999389372,
+              "maxAbsDb": 11.918691361196819,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 20,
+            "metrics": {
+              "rmseDb": 8.981655600366754,
+              "maxAbsDb": 14.343213962205139,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 21,
+            "metrics": {
+              "rmseDb": 9.56289273926946,
+              "maxAbsDb": 14.985888647699463,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          }
+        ],
+        "tieOrderStable": true,
+        "bestFullCanonicalProposal": {
+          "proposalRank": 9,
+          "rank": 6,
+          "top1": false,
+          "top4": false
+        },
+        "recallAt4OfProposalsBeatingAnyCurrentAdmitted": {
+          "recoveredProposalRanks": [
+            6
+          ],
+          "eligibleProposalRanks": [
+            6,
+            8,
+            9,
+            10,
+            11,
+            13
+          ],
+          "recoveredCount": 1,
+          "eligibleCount": 6,
+          "value": 0.16666666666666666
+        },
+        "recallAt4OfProposalsBeatingParentByFrozenSelector": {
+          "recoveredProposalRanks": [],
+          "eligibleProposalRanks": [
+            9
+          ],
+          "recoveredCount": 0,
+          "eligibleCount": 1,
+          "value": 0
+        },
+        "overlapWithLexicalTop4": {
+          "proposalRanks": [
+            3,
+            4,
+            1
+          ],
+          "count": 3
+        },
+        "cost": {
+          "currentAdmission": {
+            "generatedProposalCount": 21,
+            "admittedProposalCount": 4,
+            "canonicalEvaluations": 4,
+            "coordinateTrialsPerAdmittedProposal": 24,
+            "coordinateTrialsTotal": 96
+          },
+          "signalEvaluationWork": {
+            "canonicalEvaluations": 21,
+            "continuousEvaluations": 21,
+            "coordinateTrialsTotal": 0
+          },
+          "coordinateTrialsPerProbe": 0,
+          "labelCost": {
+            "canonicalEvaluations": 21,
+            "coordinateTrialsPerProposal": 24,
+            "coordinateTrialsTotal": 504,
+            "offlineOnly": true
+          }
+        }
+      },
+      {
+        "signalId": "pre-polish-frozen-selector",
+        "definition": "Frozen reference-selector-v1 key on the canonical delivered state of each unpolished proposal structure; no full-polish label is read.",
+        "ranking": [
+          3,
+          1,
+          10,
+          9,
+          11,
+          6,
+          4,
+          8,
+          13,
+          2,
+          5,
+          14,
+          12,
+          15,
+          16,
+          7,
+          19,
+          17,
+          20,
+          21,
+          18
+        ],
+        "rankByProposal": {
+          "1": 2,
+          "2": 10,
+          "3": 1,
+          "4": 7,
+          "5": 11,
+          "6": 6,
+          "7": 16,
+          "8": 8,
+          "9": 4,
+          "10": 3,
+          "11": 5,
+          "12": 13,
+          "13": 9,
+          "14": 12,
+          "15": 14,
+          "16": 15,
+          "17": 18,
+          "18": 21,
+          "19": 17,
+          "20": 19,
+          "21": 20
+        },
+        "scores": [
+          {
+            "proposalRank": 1,
+            "metrics": {
+              "rmseDb": 1.778021833233275,
+              "maxAbsDb": 6.008735994911504,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 2,
+            "metrics": {
+              "rmseDb": 1.9281057262174022,
+              "maxAbsDb": 8.716363585401982,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 3,
+            "metrics": {
+              "rmseDb": 1.7538248182449416,
+              "maxAbsDb": 6.013575593884958,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 4,
+            "metrics": {
+              "rmseDb": 1.7681393875709246,
+              "maxAbsDb": 6.721877992361302,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 5,
+            "metrics": {
+              "rmseDb": 1.8709642662779298,
+              "maxAbsDb": 9.051847310209435,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 6,
+            "metrics": {
+              "rmseDb": 1.7854993227663327,
+              "maxAbsDb": 6.466991658725507,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 7,
+            "metrics": {
+              "rmseDb": 2.501931645405271,
+              "maxAbsDb": 19.613550597026247,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 8,
+            "metrics": {
+              "rmseDb": 1.9969155850447284,
+              "maxAbsDb": 6.746974125900681,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 9,
+            "metrics": {
+              "rmseDb": 1.8407251214239058,
+              "maxAbsDb": 6.050795826955662,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 10,
+            "metrics": {
+              "rmseDb": 1.8137873295750162,
+              "maxAbsDb": 6.037151498153188,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 11,
+            "metrics": {
+              "rmseDb": 1.8573193362019107,
+              "maxAbsDb": 6.025066970549734,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 12,
+            "metrics": {
+              "rmseDb": 3.298946637926199,
+              "maxAbsDb": 8.589234645071658,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 13,
+            "metrics": {
+              "rmseDb": 2.0968839949989104,
+              "maxAbsDb": 8.054957170769004,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 14,
+            "metrics": {
+              "rmseDb": 2.503548595105819,
+              "maxAbsDb": 10.499819108749975,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 15,
+            "metrics": {
+              "rmseDb": 4.2022829880289105,
+              "maxAbsDb": 8.439154157950435,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 16,
+            "metrics": {
+              "rmseDb": 4.842938323447119,
+              "maxAbsDb": 9.139481421917104,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 17,
+            "metrics": {
+              "rmseDb": 7.497288887318445,
+              "maxAbsDb": 12.139667461547287,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 18,
+            "metrics": {
+              "rmseDb": 12.903904647158926,
+              "maxAbsDb": 17.83983420525338,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 19,
+            "metrics": {
+              "rmseDb": 6.76682999389372,
+              "maxAbsDb": 11.918691361196819,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 20,
+            "metrics": {
+              "rmseDb": 8.981655600366754,
+              "maxAbsDb": 14.343213962205139,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 21,
+            "metrics": {
+              "rmseDb": 9.56289273926946,
+              "maxAbsDb": 14.985888647699463,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          }
+        ],
+        "tieOrderStable": true,
+        "bestFullCanonicalProposal": {
+          "proposalRank": 9,
+          "rank": 4,
+          "top1": false,
+          "top4": true
+        },
+        "recallAt4OfProposalsBeatingAnyCurrentAdmitted": {
+          "recoveredProposalRanks": [
+            10,
+            9
+          ],
+          "eligibleProposalRanks": [
+            6,
+            8,
+            9,
+            10,
+            11,
+            13
+          ],
+          "recoveredCount": 2,
+          "eligibleCount": 6,
+          "value": 0.3333333333333333
+        },
+        "recallAt4OfProposalsBeatingParentByFrozenSelector": {
+          "recoveredProposalRanks": [
+            9
+          ],
+          "eligibleProposalRanks": [
+            9
+          ],
+          "recoveredCount": 1,
+          "eligibleCount": 1,
+          "value": 1
+        },
+        "overlapWithLexicalTop4": {
+          "proposalRanks": [
+            3,
+            1
+          ],
+          "count": 2
+        },
+        "cost": {
+          "currentAdmission": {
+            "generatedProposalCount": 21,
+            "admittedProposalCount": 4,
+            "canonicalEvaluations": 4,
+            "coordinateTrialsPerAdmittedProposal": 24,
+            "coordinateTrialsTotal": 96
+          },
+          "signalEvaluationWork": {
+            "canonicalEvaluations": 21,
+            "continuousEvaluations": 0,
+            "coordinateTrialsTotal": 0
+          },
+          "coordinateTrialsPerProbe": 0,
+          "labelCost": {
+            "canonicalEvaluations": 21,
+            "coordinateTrialsPerProposal": 24,
+            "coordinateTrialsTotal": 504,
+            "offlineOnly": true
+          }
+        }
+      },
+      {
+        "signalId": "partial-refinement-2",
+        "definition": "Frozen reference-selector-v1 key after exactly two coordinate trials through polishStructuralProposal and standard-v2 quantization.",
+        "ranking": [
+          3,
+          1,
+          10,
+          9,
+          11,
+          6,
+          4,
+          8,
+          13,
+          2,
+          5,
+          14,
+          12,
+          15,
+          16,
+          7,
+          19,
+          17,
+          20,
+          21,
+          18
+        ],
+        "rankByProposal": {
+          "1": 2,
+          "2": 10,
+          "3": 1,
+          "4": 7,
+          "5": 11,
+          "6": 6,
+          "7": 16,
+          "8": 8,
+          "9": 4,
+          "10": 3,
+          "11": 5,
+          "12": 13,
+          "13": 9,
+          "14": 12,
+          "15": 14,
+          "16": 15,
+          "17": 18,
+          "18": 21,
+          "19": 17,
+          "20": 19,
+          "21": 20
+        },
+        "scores": [
+          {
+            "proposalRank": 1,
+            "metrics": {
+              "rmseDb": 1.778021833233275,
+              "maxAbsDb": 6.008735994911504,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 2,
+            "metrics": {
+              "rmseDb": 1.9281057262174022,
+              "maxAbsDb": 8.716363585401982,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 3,
+            "metrics": {
+              "rmseDb": 1.7538248182449416,
+              "maxAbsDb": 6.013575593884958,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 4,
+            "metrics": {
+              "rmseDb": 1.7681393875709246,
+              "maxAbsDb": 6.721877992361302,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 5,
+            "metrics": {
+              "rmseDb": 1.8709642662779298,
+              "maxAbsDb": 9.051847310209435,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 6,
+            "metrics": {
+              "rmseDb": 1.7854993227663327,
+              "maxAbsDb": 6.466991658725507,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 7,
+            "metrics": {
+              "rmseDb": 2.501931645405271,
+              "maxAbsDb": 19.613550597026247,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 8,
+            "metrics": {
+              "rmseDb": 1.9969155850447284,
+              "maxAbsDb": 6.746974125900681,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 9,
+            "metrics": {
+              "rmseDb": 1.8407251214239058,
+              "maxAbsDb": 6.050795826955662,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 10,
+            "metrics": {
+              "rmseDb": 1.8137873295750162,
+              "maxAbsDb": 6.037151498153188,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 11,
+            "metrics": {
+              "rmseDb": 1.8573193362019107,
+              "maxAbsDb": 6.025066970549734,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 12,
+            "metrics": {
+              "rmseDb": 3.298946637926199,
+              "maxAbsDb": 8.589234645071658,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 13,
+            "metrics": {
+              "rmseDb": 2.0968839949989104,
+              "maxAbsDb": 8.054957170769004,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 14,
+            "metrics": {
+              "rmseDb": 2.503548595105819,
+              "maxAbsDb": 10.499819108749975,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 15,
+            "metrics": {
+              "rmseDb": 4.2022829880289105,
+              "maxAbsDb": 8.439154157950435,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 16,
+            "metrics": {
+              "rmseDb": 4.842938323447119,
+              "maxAbsDb": 9.139481421917104,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 17,
+            "metrics": {
+              "rmseDb": 7.497288887318445,
+              "maxAbsDb": 12.139667461547287,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 18,
+            "metrics": {
+              "rmseDb": 12.903904647158926,
+              "maxAbsDb": 17.83983420525338,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 19,
+            "metrics": {
+              "rmseDb": 6.76682999389372,
+              "maxAbsDb": 11.918691361196819,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 20,
+            "metrics": {
+              "rmseDb": 8.981655600366754,
+              "maxAbsDb": 14.343213962205139,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 21,
+            "metrics": {
+              "rmseDb": 9.56289273926946,
+              "maxAbsDb": 14.985888647699463,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          }
+        ],
+        "tieOrderStable": true,
+        "bestFullCanonicalProposal": {
+          "proposalRank": 9,
+          "rank": 4,
+          "top1": false,
+          "top4": true
+        },
+        "recallAt4OfProposalsBeatingAnyCurrentAdmitted": {
+          "recoveredProposalRanks": [
+            10,
+            9
+          ],
+          "eligibleProposalRanks": [
+            6,
+            8,
+            9,
+            10,
+            11,
+            13
+          ],
+          "recoveredCount": 2,
+          "eligibleCount": 6,
+          "value": 0.3333333333333333
+        },
+        "recallAt4OfProposalsBeatingParentByFrozenSelector": {
+          "recoveredProposalRanks": [
+            9
+          ],
+          "eligibleProposalRanks": [
+            9
+          ],
+          "recoveredCount": 1,
+          "eligibleCount": 1,
+          "value": 1
+        },
+        "overlapWithLexicalTop4": {
+          "proposalRanks": [
+            3,
+            1
+          ],
+          "count": 2
+        },
+        "cost": {
+          "currentAdmission": {
+            "generatedProposalCount": 21,
+            "admittedProposalCount": 4,
+            "canonicalEvaluations": 4,
+            "coordinateTrialsPerAdmittedProposal": 24,
+            "coordinateTrialsTotal": 96
+          },
+          "signalEvaluationWork": {
+            "canonicalEvaluations": 21,
+            "continuousEvaluations": 0,
+            "coordinateTrialsTotal": 42
+          },
+          "coordinateTrialsPerProbe": 2,
+          "labelCost": {
+            "canonicalEvaluations": 21,
+            "coordinateTrialsPerProposal": 24,
+            "coordinateTrialsTotal": 504,
+            "offlineOnly": true
+          }
+        }
+      },
+      {
+        "signalId": "partial-refinement-6",
+        "definition": "Frozen reference-selector-v1 key after exactly six coordinate trials through polishStructuralProposal and standard-v2 quantization.",
+        "ranking": [
+          3,
+          1,
+          10,
+          9,
+          11,
+          6,
+          4,
+          8,
+          13,
+          2,
+          5,
+          12,
+          15,
+          14,
+          16,
+          19,
+          7,
+          17,
+          20,
+          21,
+          18
+        ],
+        "rankByProposal": {
+          "1": 2,
+          "2": 10,
+          "3": 1,
+          "4": 7,
+          "5": 11,
+          "6": 6,
+          "7": 17,
+          "8": 8,
+          "9": 4,
+          "10": 3,
+          "11": 5,
+          "12": 12,
+          "13": 9,
+          "14": 14,
+          "15": 13,
+          "16": 15,
+          "17": 18,
+          "18": 21,
+          "19": 16,
+          "20": 19,
+          "21": 20
+        },
+        "scores": [
+          {
+            "proposalRank": 1,
+            "metrics": {
+              "rmseDb": 1.7861879441822648,
+              "maxAbsDb": 6.008712163476305,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 2,
+            "metrics": {
+              "rmseDb": 1.9361021085879446,
+              "maxAbsDb": 8.716363217732537,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 3,
+            "metrics": {
+              "rmseDb": 1.7621030083129094,
+              "maxAbsDb": 6.01355176244976,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 4,
+            "metrics": {
+              "rmseDb": 1.7768559679995763,
+              "maxAbsDb": 6.72187723289732,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 5,
+            "metrics": {
+              "rmseDb": 1.8787256771538339,
+              "maxAbsDb": 9.051845324588296,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 6,
+            "metrics": {
+              "rmseDb": 1.7941310336223621,
+              "maxAbsDb": 6.466988010928064,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 7,
+            "metrics": {
+              "rmseDb": 2.5077302898180545,
+              "maxAbsDb": 19.61352593729022,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 8,
+            "metrics": {
+              "rmseDb": 2.004169573267765,
+              "maxAbsDb": 6.74690282884987,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 9,
+            "metrics": {
+              "rmseDb": 1.8485851654492462,
+              "maxAbsDb": 6.0507719955204635,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 10,
+            "metrics": {
+              "rmseDb": 1.8217514875009677,
+              "maxAbsDb": 6.037127666717989,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 11,
+            "metrics": {
+              "rmseDb": 1.9377807617138987,
+              "maxAbsDb": 6.0174183235615555,
+              "filterCount": 9,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 12,
+            "metrics": {
+              "rmseDb": 2.87688508235718,
+              "maxAbsDb": 7.588755442309822,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 13,
+            "metrics": {
+              "rmseDb": 2.103798426633199,
+              "maxAbsDb": 8.054956086628493,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 14,
+            "metrics": {
+              "rmseDb": 2.5093270936995675,
+              "maxAbsDb": 10.49981802460946,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 15,
+            "metrics": {
+              "rmseDb": 3.45229781777525,
+              "maxAbsDb": 7.439106133436679,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 16,
+            "metrics": {
+              "rmseDb": 4.0463573110480455,
+              "maxAbsDb": 8.139444613041674,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 17,
+            "metrics": {
+              "rmseDb": 6.617250484525304,
+              "maxAbsDb": 11.139626720434837,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 18,
+            "metrics": {
+              "rmseDb": 11.928568653561406,
+              "maxAbsDb": 16.83979947126804,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 19,
+            "metrics": {
+              "rmseDb": 5.823690054204756,
+              "maxAbsDb": 10.707267752501371,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 20,
+            "metrics": {
+              "rmseDb": 7.959236293026824,
+              "maxAbsDb": 12.896278083299132,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          },
+          {
+            "proposalRank": 21,
+            "metrics": {
+              "rmseDb": 8.526835614678584,
+              "maxAbsDb": 13.92881501356225,
+              "filterCount": 10,
+              "cancellationScore": 0
+            }
+          }
+        ],
+        "tieOrderStable": true,
+        "bestFullCanonicalProposal": {
+          "proposalRank": 9,
+          "rank": 4,
+          "top1": false,
+          "top4": true
+        },
+        "recallAt4OfProposalsBeatingAnyCurrentAdmitted": {
+          "recoveredProposalRanks": [
+            10,
+            9
+          ],
+          "eligibleProposalRanks": [
+            6,
+            8,
+            9,
+            10,
+            11,
+            13
+          ],
+          "recoveredCount": 2,
+          "eligibleCount": 6,
+          "value": 0.3333333333333333
+        },
+        "recallAt4OfProposalsBeatingParentByFrozenSelector": {
+          "recoveredProposalRanks": [
+            9
+          ],
+          "eligibleProposalRanks": [
+            9
+          ],
+          "recoveredCount": 1,
+          "eligibleCount": 1,
+          "value": 1
+        },
+        "overlapWithLexicalTop4": {
+          "proposalRanks": [
+            3,
+            1
+          ],
+          "count": 2
+        },
+        "cost": {
+          "currentAdmission": {
+            "generatedProposalCount": 21,
+            "admittedProposalCount": 4,
+            "canonicalEvaluations": 4,
+            "coordinateTrialsPerAdmittedProposal": 24,
+            "coordinateTrialsTotal": 96
+          },
+          "signalEvaluationWork": {
+            "canonicalEvaluations": 21,
+            "continuousEvaluations": 0,
+            "coordinateTrialsTotal": 126
+          },
+          "coordinateTrialsPerProbe": 6,
+          "labelCost": {
+            "canonicalEvaluations": 21,
+            "coordinateTrialsPerProposal": 24,
+            "coordinateTrialsTotal": 504,
+            "offlineOnly": true
+          }
+        }
+      }
+    ],
+    "oracle": {
+      "bestFullCanonicalProposalRank": 9,
+      "bestFullCanonicalSelectorKey": [
+        1,
+        10.345795468710799,
+        1.6989353408590506,
+        5.850643387777495,
+        0,
+        9,
+        "storm-admission-signal-proposal-0009"
+      ],
+      "currentAdmittedRanks": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "proposalsBeatingAnyCurrentAdmitted": [
+        6,
+        8,
+        9,
+        10,
+        11,
+        13
+      ],
+      "proposalsBeatingParentByFrozenSelector": [
+        9
+      ]
+    }
+  },
+  "classification": "cheap-signal-supported",
+  "interpretation": {
+    "measuredFacts": [
+      "Exactly 21 frozen initial-parent proposals were ranked.",
+      "The best full-polish canonical proposal is lexical rank 9.",
+      "Cheap signals placing that proposal in top-4: pre-polish-frozen-selector.",
+      "Partial-refinement signals placing that proposal in top-4: partial-refinement-2, partial-refinement-6.",
+      "Signals with material recall improvement versus lexical baseline: pre-polish-rmse-max-abs, pre-polish-frozen-selector, partial-refinement-2, partial-refinement-6.",
+      "Full-polish labels cost 21 offline canonical evaluations and 504 coordinate trials; they were not used by ranking."
+    ],
+    "interpretation": [
+      "At this frozen parent, at least one admission-time cheap signal ranks the best known full-polish canonical proposal into top-4 and materially improves recall versus lexical admission."
+    ],
+    "hypotheses": [
+      "A separate causal equal-work study is needed to determine whether replacing current lexical admission improves solver outcomes under equal downstream work."
+    ],
+    "limitations": [
+      "This is one frozen sparse-0010 initial parent and 21 proposals; it is not a holdout or promotion study.",
+      "The full-polish canonical outcome is a post-hoc label/oracle and cannot establish a deployable signal by itself.",
+      "No U12t, Trio, MP rank audit, refinement-potential oracle, or structured-admission policy was run.",
+      "Partial probes were admission-only and did not feed back into solver beam state or parent expansion."
+    ],
+    "recommendation": "Recommend a separate causal equal-work study comparing current lexical admission with the candidate signal; do not implement a policy change from this audit."
+  },
+  "hashes": {
+    "censusArtifactSha256": "62dc02f53b7e9ae3e730950cb0f205a4d6907542d4c8734c78e0d95569b944c0",
+    "replayArtifactSha256": "930c0474b01c03267469d5bc5c3e0a690c9b7a11fe1e8267fdf44db4a8ee4aba",
+    "sourceArtifactSha256": "c8bf9b05b3c00cb4b9475bb850665d4708ad6c5e027971cb0d461f59c1b00351",
+    "semanticSetSha256": "1db7e2cbb3a1542c97666757a9e4cac09f223294035d78d18be3c5c500e69f99",
+    "referenceSnapshotSha256": "0aea73de5592c3afb32491ea6766513a1b2d2982d4765912ba2bfdb74f4b63d3"
+  },
+  "testsAndGates": {
+    "focusedTestCommand": "pnpm --filter @autoeq-workbench/core exec vitest run test/autoeq/v2/research/stormStructuralAdmissionSignalAudit.test.ts",
+    "requiredGateCommands": [
+      "pnpm test",
+      "pnpm typecheck",
+      "pnpm build",
+      "pnpm lint",
+      "pnpm --filter @autoeq-workbench/core benchmark",
+      "git diff --check"
+    ],
+    "artifactGenerationCommand": "pnpm --filter @autoeq-workbench/core research:storm-structural-admission-signal-audit",
+    "validationStatus": "evidence-recorded-in-report"
+  }
+}
