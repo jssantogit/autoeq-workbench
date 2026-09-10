@@ -127,6 +127,52 @@ describe('TypeScript structural beam research component', () => {
       .toHaveLength(1)
     expect(retainParetoBeam(states, 1)[0]!.candidate.candidateId).not.toBe('dominated')
   })
+
+  it('keeps opt-in diagnostics observational and preserves candidate order when enabled', () => {
+    const input = {
+      problem: { ...problem, desiredDb: [0, 0, 4, 0] },
+      seed: 0,
+      evaluationBudget: 8,
+      referenceSnapshotSha256: 'c'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 1 }],
+      config: { beamWidth: 1, proposalsPerParent: 3, localPolishEvaluations: 0, maxFilters: 4 },
+      evaluate: filterCountEvaluator(true),
+    }
+    const disabled = runStructuralBeam(input)
+    const disabledTrace = { enabled: false, entries: [] as Array<Record<string, unknown>> }
+    const explicitlyDisabled = runStructuralBeam({
+      ...input, diagnosticTrace: disabledTrace,
+    } as unknown as typeof input)
+    const enabledTrace = { enabled: true, entries: [] as Array<Record<string, unknown>> }
+    const enabled = runStructuralBeam({
+      ...input, diagnosticTrace: enabledTrace,
+    } as unknown as typeof input)
+
+    expect(explicitlyDisabled.candidates).toEqual(disabled.candidates)
+    expect(explicitlyDisabled.evaluations).toEqual(disabled.evaluations)
+    expect(disabledTrace.entries).toEqual([])
+    expect(enabledTrace.entries.length).toBeGreaterThan(1)
+    const descendants = enabledTrace.entries.filter((entry) => entry.stage === 'descendant')
+    expect(descendants.map((entry) => entry.candidateId)).toEqual(
+      enabled.candidates.slice(1).map((candidate) => candidate.candidateId),
+    )
+    expect(descendants[0]).toMatchObject({
+      parentCandidateId: enabled.candidates[0]!.candidateId,
+      mutation: expect.any(String),
+      proposalRank: 1,
+      filtersBeforePolish: expect.any(Array),
+      prePolish: expect.any(Object),
+      boundedContinuous: { boundedLinearSolver: 'not-applicable' },
+      canonical: expect.any(Object),
+      bounds: expect.any(Object),
+      deltas: {
+        prePolishToBoundedContinuous: { referenceRegret: expect.any(Number) },
+      },
+      dominance: expect.any(Object),
+      selector: expect.any(Object),
+      dictionary: { status: 'unknown' },
+    })
+  })
 })
 
 function stateWithMetrics(candidateId: string, rmseDb: number, maxAbsDb: number): StructuralBeamState {

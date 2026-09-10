@@ -73,9 +73,14 @@ describe('Storm causal seed-allocation runner contract', () => {
     })).toThrow(/descendant|exercis|per-seed/)
   })
 
+  it('accepts unknown source producer provenance without inventing an audited commit', () => {
+    const base = validArtifact()
+    expect(() => assertStormSeedAllocationArtifact({ ...base, sourceCommit: null })).not.toThrow()
+  })
+
   it('anchors relative paths to the project root for isolated artifacts', () => {
     expect(resolveResearchPath('packages/core/benchmarks/research/seedAllocationRun.ts'))
-      .toMatch(/autoeq-workbench\/packages\/core\/benchmarks\/research\/seedAllocationRun\.ts$/)
+      .toMatch(/packages\/core\/benchmarks\/research\/seedAllocationRun\.ts$/)
   })
 })
 

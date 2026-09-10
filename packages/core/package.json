@@ -19,6 +19,7 @@
     "research:parity-fixture": "tsx benchmarks/research/parityFixture.ts",
     "research:quantization-fixture": "tsx benchmarks/research/quantizationFixture.ts",
     "research:oracle-report": "tsx benchmarks/research/oracleReport.ts",
+    "research:storm-diagnostic": "tsx benchmarks/research/stormDiagnosticReplay.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",

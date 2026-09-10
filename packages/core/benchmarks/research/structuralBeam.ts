@@ -82,6 +82,99 @@ export interface StructuralBeamSeed {
   filters: Filter[]
 }
 
+export const STRUCTURAL_BEAM_DIAGNOSTIC_SCHEMA_VERSION = 1 as const
+
+export type StructuralBeamDiagnosticStage = 'seed-validation' | 'descendant'
+export type StructuralBeamDiagnosticDominance =
+  | 'candidate-dominates'
+  | 'baseline-dominates'
+  | 'tradeoff'
+  | 'equivalent'
+
+export interface StructuralBeamDiagnosticMetrics {
+  rmseDb: number
+  maxAbsDb: number
+  filterCount: number
+  cancellationScore: number
+}
+
+export interface StructuralBeamDiagnosticDelta {
+  rmseDb: number
+  maxAbsDb: number
+  filterCount: number
+  referenceRegret: number
+}
+
+export interface StructuralBeamBoundSaturation {
+  filterIndex: number
+  filterId: string
+  fields: string[]
+}
+
+export interface StructuralBeamDiagnosticEntry {
+  schemaVersion: typeof STRUCTURAL_BEAM_DIAGNOSTIC_SCHEMA_VERSION
+  stage: StructuralBeamDiagnosticStage
+  evaluationIndex: number
+  candidateId: string
+  parentCandidateId: string | null
+  parentCanonical: StructuralBeamDiagnosticMetrics | null
+  residualPeak: { index: number; frequencyHz: number; residualDb: number } | null
+  mutation: StructuralMutation | 'seed-validation'
+  proposalRank: number | null
+  proposalOrdinal: number | null
+  proposalSource: 'structural-mutation-library-v1' | 'seed-validation'
+  filtersBeforePolish: Filter[]
+  prePolish: {
+    filters: Filter[]
+    metrics: StructuralBeamDiagnosticMetrics
+  }
+  boundedContinuous: {
+    filters: Filter[]
+    metrics: StructuralBeamDiagnosticMetrics
+    boundedLinearSolver: 'not-applicable'
+    coordinateTrials: number
+  }
+  canonical: {
+    filters: Filter[]
+    metrics: StructuralBeamDiagnosticMetrics
+    referenceRegret: number
+    referenceImproved: boolean
+  }
+  bounds: {
+    prePolish: StructuralBeamBoundSaturation[]
+    boundedContinuous: StructuralBeamBoundSaturation[]
+    canonical: StructuralBeamBoundSaturation[]
+  }
+  deltas: {
+    prePolishToBoundedContinuous: StructuralBeamDiagnosticDelta
+    boundedContinuousToCanonical: StructuralBeamDiagnosticDelta
+    parentToCanonical: StructuralBeamDiagnosticDelta | null
+    primaryToCanonical: StructuralBeamDiagnosticDelta | null
+  }
+  dominance: {
+    againstParent: StructuralBeamDiagnosticDominance | null
+    againstPrimary: StructuralBeamDiagnosticDominance | null
+  }
+  selector: {
+    frozenSelector: 'reference-selector-v1'
+    againstParent: { selectedCandidateId: string; winner: 'candidate' | 'parent' } | null
+    againstPrimary: { selectedCandidateId: string; winner: 'candidate' | 'primary' } | null
+  }
+  dictionary: {
+    status: 'unknown'
+    atomRank: null
+  }
+}
+
+export interface StructuralBeamDiagnosticTrace {
+  enabled: boolean
+  entries: StructuralBeamDiagnosticEntry[]
+}
+
+export function createStructuralBeamDiagnosticTrace(enabled = true): StructuralBeamDiagnosticTrace {
+  return { enabled, entries: [] }
+}
+
 export interface StructuralBeamState {
   candidate: SolverLabCandidateV1
   evaluation: SolverLabEvaluationV1
@@ -103,6 +196,7 @@ export interface StructuralBeamRunInput {
   elapsedMs?: () => number
   onPoint?: (point: SolverTrajectoryPointV1, filters: readonly Filter[]) => void
   onWorkUnitStart?: () => void
+  diagnosticTrace?: StructuralBeamDiagnosticTrace
 }
 
 export interface StructuralBeamRunResult {
@@ -403,13 +497,22 @@ function quantizationConfig(problem: StructuralBeamProblem) {
   })
 }
 
+interface PolishResult {
+  refinedFilters: Filter[]
+  deliveredFilters: Filter[]
+  coordinateTrials: number
+}
+
 function polish(
   problem: StructuralBeamRunProblem,
   filters: readonly Filter[],
   evaluations: number,
   isExpired: () => boolean,
-): Filter[] {
-  if (evaluations <= 0 || filters.length === 0) return canonical(filters)
+): PolishResult {
+  if (evaluations <= 0 || filters.length === 0) {
+    const refinedFilters = canonical(filters)
+    return { refinedFilters, deliveredFilters: refinedFilters, coordinateTrials: 0 }
+  }
   const config = quantizationConfig(problem)
   let continuation = createJointRefineContinuationV2({
     solution: evaluateV2Solution(filters, problem.desiredDb, problem.frequenciesHz, problem.sampleRateHz),
@@ -419,7 +522,12 @@ function polish(
     deadline: { isExpired: () => continuation.coordinateTrials >= evaluations || isExpired() },
   })
   while (!continuation.done) continuation = advanceJointRefineContinuationV2(continuation)
-  return canonical(quantizeV2Filters(continuation.solution.filters, config))
+  const refinedFilters = canonical(continuation.solution.filters)
+  return {
+    refinedFilters,
+    deliveredFilters: canonical(quantizeV2Filters(refinedFilters, config)),
+    coordinateTrials: continuation.coordinateTrials,
+  }
 }
 
 function candidatePoint(
@@ -449,6 +557,269 @@ function candidatePoint(
     referenceRegret: regret.regret,
     referenceImproved: regret.referenceImproved,
   }
+}
+
+function cloneFilters(filters: readonly Filter[]): Filter[] {
+  return filters.map((filter) => ({ ...filter }))
+}
+
+function diagnosticMetrics(
+  filters: readonly Filter[],
+  problem: StructuralBeamRunProblem,
+): StructuralBeamDiagnosticMetrics {
+  const solution = evaluateV2Solution(
+    filters,
+    problem.desiredDb,
+    problem.frequenciesHz,
+    problem.sampleRateHz,
+  )
+  return {
+    rmseDb: solution.metrics.rmseDb,
+    maxAbsDb: solution.metrics.maxAbsDb,
+    filterCount: filters.length,
+    cancellationScore: 0,
+  }
+}
+
+function diagnosticDelta(
+  from: StructuralBeamDiagnosticMetrics,
+  to: StructuralBeamDiagnosticMetrics,
+  references: readonly ReferenceRegretPoint[],
+): StructuralBeamDiagnosticDelta {
+  const regret = (metrics: StructuralBeamDiagnosticMetrics): number =>
+    directedReferenceRegret({
+      candidateId: 'structural-beam-diagnostic-stage',
+      rmseDb: metrics.rmseDb,
+      maxAbsDb: metrics.maxAbsDb,
+      filterCount: metrics.filterCount,
+    }, references).regret
+  return {
+    rmseDb: to.rmseDb - from.rmseDb,
+    maxAbsDb: to.maxAbsDb - from.maxAbsDb,
+    filterCount: to.filterCount - from.filterCount,
+    referenceRegret: regret(to) - regret(from),
+  }
+}
+
+function diagnosticPoint(
+  candidateId: string,
+  metrics: StructuralBeamDiagnosticMetrics,
+  cancellationScore = metrics.cancellationScore,
+): SelectorPoint {
+  return {
+    candidateId,
+    rmseDb: metrics.rmseDb,
+    maxAbsDb: metrics.maxAbsDb,
+    filterCount: metrics.filterCount,
+    cancellationScore,
+  }
+}
+
+function diagnosticDominance(
+  candidate: StructuralBeamDiagnosticMetrics,
+  baseline: StructuralBeamDiagnosticMetrics,
+): StructuralBeamDiagnosticDominance {
+  const candidatePointValue = diagnosticPoint('candidate', candidate)
+  const baselinePointValue = diagnosticPoint('baseline', baseline)
+  if (dominates(candidatePointValue, baselinePointValue)) return 'candidate-dominates'
+  if (dominates(baselinePointValue, candidatePointValue)) return 'baseline-dominates'
+  if (Math.abs(candidate.rmseDb - baseline.rmseDb) <= 1e-12 &&
+    Math.abs(candidate.maxAbsDb - baseline.maxAbsDb) <= 1e-12) return 'equivalent'
+  return 'tradeoff'
+}
+
+function selectorOutcome<T extends 'parent' | 'primary'>(
+  candidateId: string,
+  candidate: StructuralBeamDiagnosticMetrics,
+  baselineId: string,
+  baseline: StructuralBeamDiagnosticMetrics,
+  baselineKind: T,
+): { selectedCandidateId: string; winner: 'candidate' | T } {
+  const selectedCandidateId = selectReferencePoint([
+    diagnosticPoint(baselineId, baseline),
+    diagnosticPoint(candidateId, candidate),
+  ]).candidateId
+  return {
+    selectedCandidateId,
+    winner: selectedCandidateId === candidateId ? 'candidate' :
+      baselineKind,
+  }
+}
+
+function residualPeak(
+  problem: StructuralBeamRunProblem,
+  residualDb: readonly number[],
+): { index: number; frequencyHz: number; residualDb: number } | null {
+  if (residualDb.length === 0) return null
+  let bestIndex = 0
+  for (let index = 1; index < residualDb.length; index += 1) {
+    if (Math.abs(residualDb[index]!) > Math.abs(residualDb[bestIndex]!)) bestIndex = index
+  }
+  return {
+    index: bestIndex,
+    frequencyHz: problem.frequenciesHz[bestIndex]!,
+    residualDb: residualDb[bestIndex]!,
+  }
+}
+
+function boundSaturation(
+  filters: readonly Filter[],
+  problem: StructuralBeamProblem,
+): StructuralBeamBoundSaturation[] {
+  const epsilon = 1e-12
+  return filters.flatMap((filter, filterIndex) => {
+    const fields: string[] = []
+    if (Math.abs(filter.frequencyHz - problem.bounds.minFrequencyHz) <= epsilon) fields.push('frequency-min')
+    if (Math.abs(filter.frequencyHz - problem.bounds.maxFrequencyHz) <= epsilon) fields.push('frequency-max')
+    if (Math.abs(filter.gainDb - problem.bounds.minGainDb) <= epsilon) fields.push('gain-min')
+    if (Math.abs(filter.gainDb - problem.bounds.maxGainDb) <= epsilon) fields.push('gain-max')
+    if (filter.type === 'PK' && Math.abs(filter.q - problem.bounds.minPkQ) <= epsilon) fields.push('q-min')
+    if (filter.type === 'PK' && Math.abs(filter.q - problem.bounds.maxPkQ) <= epsilon) fields.push('q-max')
+    return fields.length === 0 ? [] : [{ filterIndex, filterId: filter.id, fields }]
+  })
+}
+
+interface StructuralBeamDiagnosticContext {
+  parent: StructuralBeamState | null
+  residualPeak: { index: number; frequencyHz: number; residualDb: number } | null
+  mutation: StructuralMutation | 'seed-validation'
+  proposalRank: number | null
+  proposalOrdinal: number | null
+  filtersBeforePolish: Filter[]
+  boundedContinuousFilters: Filter[]
+  coordinateTrials: number
+}
+
+function appendDiagnosticEntry(
+  trace: StructuralBeamDiagnosticTrace | undefined,
+  context: StructuralBeamDiagnosticContext,
+  state: StructuralBeamState,
+  point: SolverTrajectoryPointV1,
+  primary: StructuralBeamState | undefined,
+  problem: StructuralBeamRunProblem,
+  references: readonly ReferenceRegretPoint[],
+): void {
+  if (trace?.enabled !== true) return
+  const delivered = state.evaluation.deliverable
+  if (delivered === null) throw new Error('diagnostic state requires delivered metrics')
+  const prePolishMetrics = diagnosticMetrics(context.filtersBeforePolish, problem)
+  const boundedContinuousMetrics = diagnosticMetrics(context.boundedContinuousFilters, problem)
+  const canonicalMetrics: StructuralBeamDiagnosticMetrics = {
+    rmseDb: delivered.rmseDb,
+    maxAbsDb: delivered.maxAbsDb,
+    filterCount: delivered.filters.length,
+    cancellationScore: delivered.cancellationTotalScore,
+  }
+  const parentCanonical = context.parent === null ? null : statePoint(context.parent)
+  const primaryCanonical = primary === undefined ? null : statePoint(primary)
+  const entry: StructuralBeamDiagnosticEntry = {
+    schemaVersion: STRUCTURAL_BEAM_DIAGNOSTIC_SCHEMA_VERSION,
+    stage: context.mutation === 'seed-validation' ? 'seed-validation' : 'descendant',
+    evaluationIndex: point.evaluationCount,
+    candidateId: state.candidate.candidateId,
+    parentCandidateId: context.parent?.candidate.candidateId ?? null,
+    parentCanonical: parentCanonical === null ? null : {
+      rmseDb: parentCanonical.rmseDb,
+      maxAbsDb: parentCanonical.maxAbsDb,
+      filterCount: parentCanonical.filterCount,
+      cancellationScore: parentCanonical.cancellationScore,
+    },
+    residualPeak: context.residualPeak,
+    mutation: context.mutation,
+    proposalRank: context.proposalRank,
+    proposalOrdinal: context.proposalOrdinal,
+    proposalSource: context.mutation === 'seed-validation'
+      ? 'seed-validation' : 'structural-mutation-library-v1',
+    filtersBeforePolish: cloneFilters(context.filtersBeforePolish),
+    prePolish: {
+      filters: cloneFilters(context.filtersBeforePolish),
+      metrics: prePolishMetrics,
+    },
+    boundedContinuous: {
+      filters: cloneFilters(context.boundedContinuousFilters),
+      metrics: boundedContinuousMetrics,
+      boundedLinearSolver: 'not-applicable',
+      coordinateTrials: context.coordinateTrials,
+    },
+    canonical: {
+      filters: cloneFilters(delivered.filters),
+      metrics: canonicalMetrics,
+      referenceRegret: point.referenceRegret,
+      referenceImproved: point.referenceImproved,
+    },
+    bounds: {
+      prePolish: boundSaturation(context.filtersBeforePolish, problem),
+      boundedContinuous: boundSaturation(context.boundedContinuousFilters, problem),
+      canonical: boundSaturation(delivered.filters, problem),
+    },
+    deltas: {
+      prePolishToBoundedContinuous: diagnosticDelta(prePolishMetrics, boundedContinuousMetrics, references),
+      boundedContinuousToCanonical: diagnosticDelta(boundedContinuousMetrics, canonicalMetrics, references),
+      parentToCanonical: parentCanonical === null ? null : diagnosticDelta(
+        {
+          rmseDb: parentCanonical.rmseDb,
+          maxAbsDb: parentCanonical.maxAbsDb,
+          filterCount: parentCanonical.filterCount,
+          cancellationScore: parentCanonical.cancellationScore,
+        },
+        canonicalMetrics,
+        references,
+      ),
+      primaryToCanonical: primaryCanonical === null ? null : diagnosticDelta(
+        {
+          rmseDb: primaryCanonical.rmseDb,
+          maxAbsDb: primaryCanonical.maxAbsDb,
+          filterCount: primaryCanonical.filterCount,
+          cancellationScore: primaryCanonical.cancellationScore,
+        },
+        canonicalMetrics,
+        references,
+      ),
+    },
+    dominance: {
+      againstParent: parentCanonical === null ? null : diagnosticDominance(canonicalMetrics, {
+        rmseDb: parentCanonical.rmseDb,
+        maxAbsDb: parentCanonical.maxAbsDb,
+        filterCount: parentCanonical.filterCount,
+        cancellationScore: parentCanonical.cancellationScore,
+      }),
+      againstPrimary: primaryCanonical === null ? null : diagnosticDominance(canonicalMetrics, {
+        rmseDb: primaryCanonical.rmseDb,
+        maxAbsDb: primaryCanonical.maxAbsDb,
+        filterCount: primaryCanonical.filterCount,
+        cancellationScore: primaryCanonical.cancellationScore,
+      }),
+    },
+    selector: {
+      frozenSelector: 'reference-selector-v1',
+      againstParent: parentCanonical === null ? null : selectorOutcome(
+        state.candidate.candidateId,
+        canonicalMetrics,
+        context.parent!.candidate.candidateId,
+        {
+          rmseDb: parentCanonical.rmseDb,
+          maxAbsDb: parentCanonical.maxAbsDb,
+          filterCount: parentCanonical.filterCount,
+          cancellationScore: parentCanonical.cancellationScore,
+        },
+        'parent',
+      ),
+      againstPrimary: primaryCanonical === null ? null : selectorOutcome(
+        state.candidate.candidateId,
+        canonicalMetrics,
+        primary!.candidate.candidateId,
+        {
+          rmseDb: primaryCanonical.rmseDb,
+          maxAbsDb: primaryCanonical.maxAbsDb,
+          filterCount: primaryCanonical.filterCount,
+          cancellationScore: primaryCanonical.cancellationScore,
+        },
+        'primary',
+      ),
+    },
+    dictionary: { status: 'unknown', atomRank: null },
+  }
+  trace.entries.push(entry)
 }
 
 function dominatesTrajectory(left: SolverTrajectoryPointV1, right: SolverTrajectoryPointV1): boolean {
@@ -544,7 +915,13 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
     split: 0,
     merge: 0,
   }
-  const record = (filters: readonly Filter[], origin: string, seedId: string): StructuralBeamState => {
+  let primaryState: StructuralBeamState | undefined
+  const record = (
+    filters: readonly Filter[],
+    origin: string,
+    seedId: string,
+    diagnosticContext?: StructuralBeamDiagnosticContext,
+  ): StructuralBeamState => {
     const canonicalFilters = canonical(filters)
     const candidate: SolverLabCandidateV1 = {
       protocolVersion: 1,
@@ -570,7 +947,19 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
     input.onPoint?.(point, evaluation.deliverable?.filters ?? [])
     evaluationsUsed += 1
     maxObservedFilterCount = Math.max(maxObservedFilterCount, canonicalFilters.length)
-    return states.at(-1)!
+    const state = states.at(-1)!
+    if (diagnosticContext !== undefined) {
+      appendDiagnosticEntry(
+        input.diagnosticTrace,
+        diagnosticContext,
+        state,
+        point,
+        primaryState,
+        input.problem,
+        input.referenceFrontier,
+      )
+    }
+    return state
   }
 
   const initialSeeds: StructuralBeamSeed[] = [
@@ -589,7 +978,24 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
     }
     visited.add(key)
     input.onWorkUnitStart?.()
-    record(filters, seed.origin, seed.seedId)
+    const initialState = record(
+      filters,
+      seed.origin,
+      seed.seedId,
+      input.diagnosticTrace?.enabled === true
+        ? {
+            parent: null,
+            residualPeak: null,
+            mutation: 'seed-validation',
+            proposalRank: null,
+            proposalOrdinal: null,
+            filtersBeforePolish: filters,
+            boundedContinuousFilters: filters,
+            coordinateTrials: 0,
+          }
+        : undefined,
+    )
+    if (primaryState === undefined) primaryState = initialState
   }
   let beam = retainParetoBeam(states, config.beamWidth)
   while (evaluationsUsed < input.evaluationBudget) {
@@ -613,7 +1019,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       const proposals = orderStructuralProposals(
         generateStructuralMutations(input.problem, parent.candidate.filters, residual),
       ).slice(0, config.proposalsPerParent)
-      for (const proposal of proposals) {
+      for (const [proposalIndex, proposal] of proposals.entries()) {
         proposalsConsidered += 1
         structuralOperationCounts[proposal.mutation] += 1
         if (input.isExpired?.()) break
@@ -626,7 +1032,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
           config.localPolishEvaluations,
           input.isExpired ?? (() => false),
         )
-        const quantized = quantizeV2Filters(polished, quantizationConfig(input.problem))
+        const quantized = quantizeV2Filters(polished.deliveredFilters, quantizationConfig(input.problem))
         const key = semanticFilterKey(quantized)
         if (visited.has(key)) {
           deduplicatedProposals += 1
@@ -637,6 +1043,18 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
           quantized,
           parent.origin,
           `proposal-${proposalsConsidered}-${proposal.mutation}`,
+          input.diagnosticTrace?.enabled === true
+            ? {
+                parent,
+                residualPeak: residualPeak(input.problem, residual),
+                mutation: proposal.mutation,
+                proposalRank: proposalIndex + 1,
+                proposalOrdinal: proposalsConsidered,
+                filtersBeforePolish: proposal.filters,
+                boundedContinuousFilters: polished.refinedFilters,
+                coordinateTrials: polished.coordinateTrials,
+              }
+            : undefined,
         ))
       }
     }
@@ -684,6 +1102,9 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       maxObservedFilterCount,
       capacityUnused: Math.max(0, config.maxFilters - maxObservedFilterCount),
       timingBasis: input.nowMs === undefined ? 'synthetic-evaluation-count' : 'injected-clock',
+      ...(input.diagnosticTrace?.enabled === true
+        ? { diagnosticTraceSchemaVersion: STRUCTURAL_BEAM_DIAGNOSTIC_SCHEMA_VERSION }
+        : {}),
     },
   }
 }

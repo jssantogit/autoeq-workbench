@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "storm-seed-allocation-semantic-closeout-v1",
+  "historicalArtifact": {
+    "path": "/root/projects/autoeq-workbench/.worktrees/storm-diagnosis-20260910/packages/core/.research-artifacts/seed-allocation-causal-20260909/storm-target8/tournament-report.json",
+    "sha256": "322ed5ea9fd2c44c429dd3ccdcdc7987fcd86c56f4f9f35a71f9bd248ffe82f9",
+    "byteIdentical": true
+  },
+  "sourceArtifact": {
+    "path": "/root/projects/autoeq-workbench/.worktrees/capacity-aware-traversal-20260909/packages/core/.research-artifacts/mp-reallocation-corrective-20260909/storm-rerun1/tournament-report.json",
+    "sha256": "c8bf9b05b3c00cb4b9475bb850665d4708ad6c5e027971cb0d461f59c1b00351"
+  },
+  "provenance": {
+    "producerCommit": null,
+    "producerCommitStatus": "unknown",
+    "auditedTreeCommit": "22a05fdcac88bdd603b7d80d7d96ffe10a28d606",
+    "sourceArtifactPath": "/root/projects/autoeq-workbench/.worktrees/capacity-aware-traversal-20260909/packages/core/.research-artifacts/mp-reallocation-corrective-20260909/storm-rerun1/tournament-report.json",
+    "sourceArtifactSha256": "c8bf9b05b3c00cb4b9475bb850665d4708ad6c5e027971cb0d461f59c1b00351"
+  },
+  "causalArtifact": {
+    "path": "/root/projects/autoeq-workbench/.worktrees/storm-diagnosis-20260910/packages/core/.research-artifacts/seed-allocation-causal-20260909/storm-target8/tournament-report.json",
+    "sha256": "322ed5ea9fd2c44c429dd3ccdcdc7987fcd86c56f4f9f35a71f9bd248ffe82f9",
+    "sourceArtifactPath": "/root/projects/autoeq-workbench/.worktrees/capacity-aware-traversal-20260909/packages/core/.research-artifacts/mp-reallocation-corrective-20260909/storm-rerun1/tournament-report.json",
+    "sourceArtifactSha256": "c8bf9b05b3c00cb4b9475bb850665d4708ad6c5e027971cb0d461f59c1b00351"
+  },
+  "paretoAccounting": {
+    "metricName": "paretoNovelAgainstSeedBaselines",
+    "descendantOnlyMetricName": "paretoNovelDescendantsOnly",
+    "baselineStages": [
+      "seed-validation"
+    ],
+    "arms": {
+      "concentrated": {
+        "seedValidationBaselineCount": 1,
+        "descendantCount": 8,
+        "historicalDescendantOnlyMetric": 2,
+        "recomputedParetoNovelAgainstSeedBaselines": 2,
+        "recomputedParetoNovelDescendantsOnly": 2,
+        "historicalSelectedBestCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "recomputedSelectedBestCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "selectedBestUnchanged": true
+      },
+      "distributed": {
+        "seedValidationBaselineCount": 3,
+        "descendantCount": 8,
+        "historicalDescendantOnlyMetric": 2,
+        "recomputedParetoNovelAgainstSeedBaselines": 2,
+        "recomputedParetoNovelDescendantsOnly": 2,
+        "historicalSelectedBestCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "recomputedSelectedBestCandidateId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010:structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:sparse-0010:0000",
+        "selectedBestUnchanged": true
+      }
+    }
+  },
+  "conclusion": {
+    "primarySelectedBestUnchanged": true,
+    "referenceImprovementUnchanged": true,
+    "historicalJsonUntouched": true,
+    "causalInterpretationUnchanged": true
+  },
+  "generator": {
+    "sourceCommit": "26ba86bdb17e0b5d365fd51590dd6abdb4636b96",
+    "instrumentationVersion": "structural-beam-diagnostic-v1"
+  }
+}

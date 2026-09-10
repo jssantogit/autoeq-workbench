@@ -130,15 +130,31 @@ describe('causal Storm seed allocation contract', () => {
     const descendants = [
       point('a-descendant', 1, 3, 'descendant'),
       point('b-descendant', 1.5, 3.5, 'descendant'),
+      point('seed-dominated', 2.5, 2.5, 'descendant'),
       point('shared-dominated', 2.5, 4, 'descendant'),
     ]
     const metrics = aggregateGlobalSeedAllocationMetrics(initial, descendants)
 
     expect(metrics.paretoNovelDescendants).toBe(1)
+    expect(metrics.paretoNovelAgainstSeedBaselines).toBe(1)
+    expect(metrics.paretoNovelDescendantsOnly).toBe(2)
     expect(metrics.selectedBestChanges).toBe(1)
     expect(metrics.referenceImprovements).toBe(1)
     expect(metrics.globalParetoFrontier.map((candidate) => candidate.candidateId)).toEqual([
+      'seed-a',
       'a-descendant',
+    ])
+  })
+
+  it('does not admit a descendant as Pareto-novel when a validated seed already dominates it', () => {
+    const metrics = aggregateGlobalSeedAllocationMetrics(
+      [point('validated-seed', 2, 2, 'seed-validation')],
+      [point('dominated-descendant', 2.5, 2.5, 'descendant')],
+    )
+
+    expect(metrics.paretoNovelAgainstSeedBaselines).toBe(0)
+    expect(metrics.globalParetoFrontier.map((candidate) => candidate.candidateId)).toEqual([
+      'validated-seed',
     ])
   })
 })

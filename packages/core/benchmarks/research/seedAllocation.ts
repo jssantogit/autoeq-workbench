@@ -50,7 +50,11 @@ export interface GlobalSeedAllocationMetrics {
   initialSelectedBest: SeedAllocationPoint | null
   selectedBest: SeedAllocationPoint | null
   globalParetoFrontier: SeedAllocationPoint[]
+  /** Descendant progress admitted against the arm's validated seed baseline. */
   paretoNovelDescendants: number
+  paretoNovelAgainstSeedBaselines: number
+  /** Legacy descendant-only accounting retained under an explicit name. */
+  paretoNovelDescendantsOnly: number
   selectedBestChanges: number
   referenceImprovements: number
   firstUsefulDescendantEvaluation: number | null
@@ -67,6 +71,8 @@ export interface SeedAllocationArmResult {
   global: GlobalSeedAllocationMetrics
   /** Aliases kept at arm level so JSON consumers need not know the nested shape. */
   globalParetoNovelDescendants: number
+  globalParetoNovelAgainstSeedBaselines: number
+  globalParetoNovelDescendantsOnly: number
   globalSelectedBestChanges: number
   globalReferenceImprovements: number
 }
@@ -353,6 +359,24 @@ function selectBestPoint(points: readonly SeedAllocationPoint[]): SeedAllocation
   return clonePoint(point)
 }
 
+function addToParetoFrontier(
+  frontier: SeedAllocationPoint[],
+  point: SeedAllocationPoint,
+): boolean {
+  if (frontier.some((previous) => equivalentMetrics(previous, point))) return false
+  if (frontier.some((previous) => dominatesMetrics(previous, point))) return false
+  const next = frontier.filter((previous) => !dominatesMetrics(point, previous))
+  next.push(clonePoint(point))
+  frontier.splice(0, frontier.length, ...next)
+  return true
+}
+
+function seedValidationFrontier(points: readonly SeedAllocationPoint[]): SeedAllocationPoint[] {
+  const frontier: SeedAllocationPoint[] = []
+  points.forEach((point) => addToParetoFrontier(frontier, point))
+  return frontier
+}
+
 /** Aggregate all points in one arm; descendant novelty is explicitly arm-global. */
 export function aggregateGlobalSeedAllocationMetrics(
   seedValidationPointsOrInput: readonly SeedAllocationPoint[] | {
@@ -378,20 +402,17 @@ export function aggregateGlobalSeedAllocationMetrics(
   let selectedBest = initialSelectedBest
   let selectedBestChanges = 0
   let firstUsefulDescendantEvaluation: number | null = null
-  let globalParetoFrontier: SeedAllocationPoint[] = []
-  let paretoNovelDescendants = 0
+  let globalParetoFrontier = seedValidationFrontier(seedValidationPoints)
+  const descendantOnlyFrontier: SeedAllocationPoint[] = []
+  let paretoNovelAgainstSeedBaselines = 0
+  let paretoNovelDescendantsOnly = 0
   let referenceImprovements = 0
   let descendantEvaluationsToBestResult: number | null = null
 
   descendantPoints.forEach((point, index) => {
     const candidate = clonePoint(point)
-    const equivalent = globalParetoFrontier.some((previous) => equivalentMetrics(previous, candidate))
-    const dominated = globalParetoFrontier.some((previous) => dominatesMetrics(previous, candidate))
-    if (!equivalent && !dominated) {
-      paretoNovelDescendants += 1
-      globalParetoFrontier = globalParetoFrontier.filter((previous) => !dominatesMetrics(candidate, previous))
-      globalParetoFrontier.push(candidate)
-    }
+    if (addToParetoFrontier(descendantOnlyFrontier, candidate)) paretoNovelDescendantsOnly += 1
+    if (addToParetoFrontier(globalParetoFrontier, candidate)) paretoNovelAgainstSeedBaselines += 1
     if (candidate.referenceImproved) referenceImprovements += 1
     if (selectedBest === null || selectorPrefers(candidate, selectedBest)) {
       selectedBest = candidate
@@ -412,7 +433,9 @@ export function aggregateGlobalSeedAllocationMetrics(
     initialSelectedBest,
     selectedBest,
     globalParetoFrontier,
-    paretoNovelDescendants,
+    paretoNovelDescendants: paretoNovelAgainstSeedBaselines,
+    paretoNovelAgainstSeedBaselines,
+    paretoNovelDescendantsOnly,
     selectedBestChanges,
     referenceImprovements,
     firstUsefulDescendantEvaluation,
@@ -450,6 +473,8 @@ function executeArm<T extends SeedAllocationSeed>(
     totalStructuralCandidateEvaluations,
     global,
     globalParetoNovelDescendants: global.paretoNovelDescendants,
+    globalParetoNovelAgainstSeedBaselines: global.paretoNovelAgainstSeedBaselines,
+    globalParetoNovelDescendantsOnly: global.paretoNovelDescendantsOnly,
     globalSelectedBestChanges: global.selectedBestChanges,
     globalReferenceImprovements: global.referenceImprovements,
   }

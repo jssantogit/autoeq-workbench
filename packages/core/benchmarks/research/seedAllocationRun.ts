@@ -29,7 +29,6 @@ import {
 import { runStructuralBeam, type StructuralBeamRunResult } from './structuralBeam.js'
 
 export const STORM_SEED_ALLOCATION_EXPERIMENT_VERSION = 'storm-seed-allocation-causal-v2' as const
-export const HISTORICAL_PILOT_COMMIT = '22a05fdcac88bdd603b7d80d7d96ffe10a28d606' as const
 export const PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..')
 export const DEFAULT_SOURCE_REPORT = '.worktrees/capacity-aware-traversal-20260909/packages/core/.research-artifacts/mp-reallocation-corrective-20260909/storm-rerun1/tournament-report.json'
 export const DEFAULT_SNAPSHOT = '/tmp/autoeq-capacity-recovery-20260908/OracleReferenceSnapshotV1.json'
@@ -89,6 +88,8 @@ interface StormArm {
   perSeed: StormSeedPerSeedResult[]
   global: GlobalSeedAllocationMetrics
   globalParetoNovelDescendants: number
+  globalParetoNovelAgainstSeedBaselines: number
+  globalParetoNovelDescendantsOnly: number
   globalSelectedBestChanges: number
   globalReferenceImprovements: number
 }
@@ -96,7 +97,8 @@ interface StormArm {
 export interface StormSeedAllocationArtifact {
   schemaVersion: 2
   experimentVersion: typeof STORM_SEED_ALLOCATION_EXPERIMENT_VERSION
-  sourceCommit: string
+  /** Producer commit embedded in the source report, or null when unproven. */
+  sourceCommit: string | null
   sourceReportPath: string
   sourceReportSha256: string
   referenceSnapshotPath: string
@@ -387,6 +389,8 @@ function detailForArm(
     perSeed,
     global: result.global,
     globalParetoNovelDescendants: result.globalParetoNovelDescendants,
+    globalParetoNovelAgainstSeedBaselines: result.globalParetoNovelAgainstSeedBaselines,
+    globalParetoNovelDescendantsOnly: result.globalParetoNovelDescendantsOnly,
     globalSelectedBestChanges: result.globalSelectedBestChanges,
     globalReferenceImprovements: result.globalReferenceImprovements,
   }
@@ -454,7 +458,9 @@ export function assertStormSeedAllocationArtifact(value: unknown): asserts value
   if (value.schemaVersion !== 2) throw new Error('Storm seed-allocation artifact schemaVersion must be 2')
   if (value.experimentVersion !== STORM_SEED_ALLOCATION_EXPERIMENT_VERSION) throw new Error('Storm seed-allocation experiment version is invalid')
   if (value.problemId !== 'titan-to-storm') throw new Error('Storm seed-allocation artifact must be Storm-only')
-  requiredString(value.sourceCommit, 'sourceCommit')
+  if (value.sourceCommit !== null && (typeof value.sourceCommit !== 'string' || value.sourceCommit.length === 0)) {
+    throw new Error('sourceCommit must be a non-empty string or null')
+  }
   requiredString(value.sourceReportPath, 'sourceReportPath')
   requiredString(value.referenceSnapshotPath, 'referenceSnapshotPath')
   validateHash(value.sourceReportSha256, 'sourceReportSha256')
@@ -531,7 +537,7 @@ export function runStormSeedAllocation(
     schemaVersion: 2,
     experimentVersion: STORM_SEED_ALLOCATION_EXPERIMENT_VERSION,
     sourceCommit: isRecord(source) && typeof source.sourceCommit === 'string'
-      ? source.sourceCommit : HISTORICAL_PILOT_COMMIT,
+      ? source.sourceCommit : null,
     sourceReportPath: resolvedSource,
     sourceReportSha256: sha256File(resolvedSource),
     referenceSnapshotPath: resolvedSnapshot,
