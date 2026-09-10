@@ -21,6 +21,7 @@
     "research:oracle-report": "tsx benchmarks/research/oracleReport.ts",
     "research:storm-diagnostic": "tsx benchmarks/research/stormDiagnosticReplay.ts",
     "research:storm-structural-census": "tsx benchmarks/research/stormStructuralProposalCensus.ts",
+    "research:storm-structural-admission-oracle": "tsx benchmarks/research/stormStructuralAdmissionOracle.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",

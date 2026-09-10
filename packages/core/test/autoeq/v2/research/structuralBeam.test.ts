@@ -173,6 +173,66 @@ describe('TypeScript structural beam research component', () => {
       dictionary: { status: 'unknown' },
     })
   })
+
+  it('applies an explicit admission override only to the initial parent and leaves later expansion normal', () => {
+    const contexts: Array<{ layerIndex: number; parentCandidateId: string; admitted: number }> = []
+    let applied = 0
+    const rescue = {
+      mutation: 'remove' as const,
+      filters: [],
+    }
+    const result = runStructuralBeam({
+      problem: { ...problem, desiredDb: [0, 0, 4, 0] },
+      seed: 0,
+      evaluationBudget: 8,
+      referenceSnapshotSha256: 'c'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 1 }],
+      config: { beamWidth: 1, proposalsPerParent: 4, localPolishEvaluations: 0, maxFilters: 4 },
+      evaluate: filterCountEvaluator(true),
+      admissionOverride: {
+        apply(context) {
+          contexts.push({
+            layerIndex: context.layerIndex,
+            parentCandidateId: context.parent.candidate.candidateId,
+            admitted: context.admittedProposals.length,
+          })
+          if (context.layerIndex !== 1 || applied > 0) return null
+          applied += 1
+          return {
+            proposals: [
+              ...context.admittedProposals.slice(0, 2),
+              rescue,
+            ],
+            intervention: 'rescue' as const,
+          }
+        },
+      },
+    })
+
+    expect(applied).toBe(1)
+    expect(contexts[0]).toMatchObject({ layerIndex: 1, admitted: 3 })
+    expect(contexts.length).toBeGreaterThan(1)
+    expect(contexts.slice(1).every((context) => context.layerIndex > 1)).toBe(true)
+    expect(result.candidates.length).toBeGreaterThan(1)
+  })
+
+  it('does not change a normal beam when an admission hook is absent', () => {
+    const input = {
+      problem: { ...problem, desiredDb: [0, 0, 4, 0] },
+      seed: 0,
+      evaluationBudget: 8,
+      referenceSnapshotSha256: 'c'.repeat(64),
+      referenceFrontier: [{ candidateId: 'reference', rmseDb: 0, maxAbsDb: 0, filterCount: 1 }],
+      config: { beamWidth: 1, proposalsPerParent: 4, localPolishEvaluations: 0, maxFilters: 4 },
+      evaluate: filterCountEvaluator(true),
+    }
+    const baseline = runStructuralBeam(input)
+    const explicitlyDisabled = runStructuralBeam({
+      ...input,
+      admissionOverride: undefined,
+    })
+    expect(explicitlyDisabled).toEqual(baseline)
+  })
 })
 
 function stateWithMetrics(candidateId: string, rmseDb: number, maxAbsDb: number): StructuralBeamState {

@@ -181,6 +181,29 @@ export interface StructuralBeamState {
   origin: StructuralBeamOrigin | string
 }
 
+/**
+ * Diagnostic-only admission context. The default structural beam never
+ * constructs or invokes this hook; callers must explicitly opt in.
+ */
+export interface StructuralBeamAdmissionContext {
+  layerIndex: number
+  parentIndex: number
+  parent: StructuralBeamState
+  orderedProposals: readonly StructuralProposal[]
+  admittedProposals: readonly StructuralProposal[]
+}
+
+export interface StructuralBeamAdmissionDecision {
+  proposals: readonly StructuralProposal[]
+  intervention: 'rescue' | 'custom'
+}
+
+export interface StructuralBeamAdmissionOverride {
+  apply: (
+    context: StructuralBeamAdmissionContext,
+  ) => StructuralBeamAdmissionDecision | null
+}
+
 export interface StructuralBeamRunInput {
   problem: StructuralBeamRunProblem
   seed: number
@@ -197,6 +220,7 @@ export interface StructuralBeamRunInput {
   onPoint?: (point: SolverTrajectoryPointV1, filters: readonly Filter[]) => void
   onWorkUnitStart?: () => void
   diagnosticTrace?: StructuralBeamDiagnosticTrace
+  admissionOverride?: StructuralBeamAdmissionOverride
 }
 
 export interface StructuralBeamRunResult {
@@ -1012,7 +1036,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
     }
     layersExecuted += 1
     const generated: StructuralBeamState[] = []
-    for (const parent of beam) {
+    for (const [parentIndex, parent] of beam.entries()) {
       if (input.isExpired?.()) break
       if (evaluationsUsed >= input.evaluationBudget) break
       const delivered = parent.evaluation.deliverable
@@ -1023,9 +1047,21 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
         input.problem.sampleRateHz,
       )
       const residual = input.problem.desiredDb.map((desired, index) => desired - actual[index]!)
-      const proposals = orderStructuralProposals(
+      const orderedProposals = orderStructuralProposals(
         generateStructuralMutations(input.problem, parent.candidate.filters, residual),
-      ).slice(0, config.proposalsPerParent)
+      )
+      const admittedProposals = orderedProposals.slice(0, config.proposalsPerParent)
+      const admissionDecision = input.admissionOverride?.apply({
+        layerIndex: layersExecuted,
+        parentIndex,
+        parent,
+        orderedProposals,
+        admittedProposals,
+      })
+      const proposals = admissionDecision?.proposals ?? admittedProposals
+      if (proposals.length > config.proposalsPerParent) {
+        throw new Error('structural beam admission override exceeds proposalsPerParent')
+      }
       for (const [proposalIndex, proposal] of proposals.entries()) {
         proposalsConsidered += 1
         structuralOperationCounts[proposal.mutation] += 1
