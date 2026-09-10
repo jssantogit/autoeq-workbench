@@ -25,6 +25,7 @@
     "research:storm-structural-admission-signal-audit": "tsx benchmarks/research/stormStructuralAdmissionSignalAudit.ts",
     "research:storm-structural-admission-cheap": "tsx benchmarks/research/stormStructuralAdmissionCheapAdmission.ts",
     "research:storm-structural-admission-cost-aware": "tsx benchmarks/research/stormStructuralAdmissionCostAware.ts",
+    "research:storm-post-initial-census": "tsx benchmarks/research/stormPostInitialAdmissionCensus.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
