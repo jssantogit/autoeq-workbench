@@ -40,7 +40,8 @@
     "research:storm-admission-independent-policy-validation": "tsx benchmarks/research/stormAdmissionIndependentPolicyValidation.ts",
     "research:storm-admission-quota-campaign": "tsx benchmarks/research/stormAdmissionQuotaCampaign.ts",
     "research:storm-admission-quota-anytime": "tsx benchmarks/research/stormAdmissionQuotaAnytimeCampaign.ts",
-    "research:storm-search-exhaustion-census": "tsx benchmarks/research/stormSearchExhaustionCensus.ts"
+    "research:storm-search-exhaustion-census": "tsx benchmarks/research/stormSearchExhaustionCensus.ts",
+    "research:storm-beam-escape-causal": "tsx benchmarks/research/stormBeamEscapeCausalCampaign.ts"
   },
   "devDependencies": {
     "tsx": "^4.23.12",

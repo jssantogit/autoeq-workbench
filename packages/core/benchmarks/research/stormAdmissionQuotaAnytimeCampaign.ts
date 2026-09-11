@@ -15,6 +15,7 @@ import {
   runStructuralBeam,
   type StructuralBeamAdmissionOverride,
   type StructuralBeamExhaustionTrace,
+  type StructuralBeamRetentionOverride,
   type StructuralProposal,
 } from './structuralBeam.js'
 import { getReferenceCell, type OracleReferenceSnapshotV1 } from './referenceSnapshot.js'
@@ -225,6 +226,8 @@ export function runAnytimeArm(
   cell: GeneratedPolicyCell,
   snapshot: OracleReferenceSnapshotV1,
   exhaustionTrace?: StructuralBeamExhaustionTrace,
+  beamRetentionOverride?: StructuralBeamRetentionOverride,
+  deadlineMs = 60_000,
 ) {
   const caseDef = loadLayeredResearchCases('adversarial')
     .find((candidate) => candidate.id === cell.caseId)
@@ -236,7 +239,7 @@ export function runAnytimeArm(
   const started = performance.now()
   const nowMs = () => performance.now()
   const elapsedMs = () => performance.now() - started
-  const isExpired = () => elapsedMs() >= 60_000
+  const isExpired = () => elapsedMs() >= deadlineMs
 
   const result = runStructuralBeam({
     problem,
@@ -253,6 +256,7 @@ export function runAnytimeArm(
     includeZeroSeed: false,
     admissionOverride: createAnytimeQuotaOverride(arm, problem, ledger, elapsedMs),
     exhaustionTrace,
+    beamRetentionOverride,
     nowMs,
     elapsedMs,
     isExpired,

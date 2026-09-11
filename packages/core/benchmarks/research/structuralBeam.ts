@@ -244,6 +244,25 @@ export interface StructuralBeamAdmissionOverride {
   ) => StructuralBeamAdmissionDecision | null
 }
 
+export interface StructuralBeamRetentionContext {
+  layerIndex: number
+  beamWidth: number
+  previousBeam: readonly StructuralBeamState[]
+  generatedStates: readonly StructuralBeamState[]
+  defaultRetained: readonly StructuralBeamState[]
+}
+
+export interface StructuralBeamRetentionDecision {
+  states: readonly StructuralBeamState[]
+  intervention: 'custom'
+}
+
+export interface StructuralBeamRetentionOverride {
+  apply: (
+    context: StructuralBeamRetentionContext,
+  ) => StructuralBeamRetentionDecision | null
+}
+
 export interface StructuralBeamRunInput {
   problem: StructuralBeamRunProblem
   seed: number
@@ -262,6 +281,7 @@ export interface StructuralBeamRunInput {
   diagnosticTrace?: StructuralBeamDiagnosticTrace
   exhaustionTrace?: StructuralBeamExhaustionTrace
   admissionOverride?: StructuralBeamAdmissionOverride
+  beamRetentionOverride?: StructuralBeamRetentionOverride
 }
 
 export interface StructuralBeamRunResult {
@@ -1207,7 +1227,28 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       stopReason = 'no-admissible-proposals'
       break
     }
-    beam = retainParetoBeam([...beam, ...generated], config.beamWidth)
+    const previousBeam = beam
+    const defaultRetained = retainParetoBeam([...previousBeam, ...generated], config.beamWidth)
+    const retentionDecision = input.beamRetentionOverride?.apply({
+      layerIndex: layersExecuted,
+      beamWidth: config.beamWidth,
+      previousBeam,
+      generatedStates: generated,
+      defaultRetained,
+    })
+    if (retentionDecision !== null && retentionDecision !== undefined) {
+      if (retentionDecision.states.length === 0 || retentionDecision.states.length > config.beamWidth) {
+        throw new Error('structural beam retention override returned invalid beam width')
+      }
+      const allowedIds = new Set([...previousBeam, ...generated].map((state) => state.candidate.candidateId))
+      const chosenIds = retentionDecision.states.map((state) => state.candidate.candidateId)
+      if (new Set(chosenIds).size !== chosenIds.length || chosenIds.some((candidateId) => !allowedIds.has(candidateId))) {
+        throw new Error('structural beam retention override returned invalid states')
+      }
+      beam = [...retentionDecision.states]
+    } else {
+      beam = defaultRetained
+    }
     if (exhaustionLayer !== undefined) {
       const generatedIds = new Set(exhaustionLayer.generatedCandidateIds)
       exhaustionLayer.retainedCandidateIds = beam.map((state) => state.candidate.candidateId)

@@ -48,6 +48,7 @@ jobs:
             test/autoeq/v2/research/stormAdmissionQuotaCampaign.test.ts \
             test/autoeq/v2/research/stormAdmissionQuotaAnytimeCampaign.test.ts \
             test/autoeq/v2/research/stormSearchExhaustionCensus.test.ts \
+            test/autoeq/v2/research/stormBeamEscapeCausalCampaign.test.ts \
             test/autoeq/v2/research/stormAdmissionGeneralizationCampaign.test.ts \
             test/autoeq/v2/research/stormAdmissionValidationCampaign.test.ts
       - name: Verify core typecheck
@@ -117,6 +118,11 @@ jobs:
           set -euo pipefail
           pnpm --filter @autoeq-workbench/core research:storm-search-exhaustion-census
 
+      - name: Run beam novelty-slot causal campaign
+        run: |
+          set -euo pipefail
+          pnpm --filter @autoeq-workbench/core research:storm-beam-escape-causal
+
       - name: Replay selected Storm campaign
         run: |
           set -euo pipefail
@@ -151,6 +157,8 @@ jobs:
           cp docs/superpowers/specs/2026-09-11-storm-admission-quota-anytime-results.md "$GITHUB_WORKSPACE/storm-replay/quota-anytime-results.md"
           cp packages/core/.research-artifacts/storm-search-exhaustion-census-20260911/census-report.json "$GITHUB_WORKSPACE/storm-replay/search-exhaustion-census.json"
           cp docs/superpowers/specs/2026-09-11-storm-search-exhaustion-census-results.md "$GITHUB_WORKSPACE/storm-replay/search-exhaustion-census-results.md"
+          cp packages/core/.research-artifacts/storm-beam-escape-causal-20260911/campaign-report.json "$GITHUB_WORKSPACE/storm-replay/beam-escape-causal-report.json"
+          cp docs/superpowers/specs/2026-09-11-storm-beam-escape-causal-results.md "$GITHUB_WORKSPACE/storm-replay/beam-escape-causal-results.md"
           if [[ "$CAMPAIGN" == "validation" ]]; then
             cp packages/core/.research-artifacts/storm-admission-validation-20260911/campaign-report.json "$GITHUB_WORKSPACE/storm-replay/campaign-report.json"
             cp docs/superpowers/specs/2026-09-11-storm-admission-validation-results.md "$GITHUB_WORKSPACE/storm-replay/results.md"
