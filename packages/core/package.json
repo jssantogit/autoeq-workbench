@@ -37,7 +37,8 @@
     "lint": "tsc --noEmit",
     "research:storm-frozen-inputs": "tsx benchmarks/research/frozenResearchInputs.ts",
     "research:storm-admission-holdout-inventory": "tsx benchmarks/research/stormAdmissionHoldoutInventory.ts",
-    "research:storm-admission-independent-policy-validation": "tsx benchmarks/research/stormAdmissionIndependentPolicyValidation.ts"
+    "research:storm-admission-independent-policy-validation": "tsx benchmarks/research/stormAdmissionIndependentPolicyValidation.ts",
+    "research:storm-admission-quota-campaign": "tsx benchmarks/research/stormAdmissionQuotaCampaign.ts"
   },
   "devDependencies": {
     "tsx": "^4.23.12",
