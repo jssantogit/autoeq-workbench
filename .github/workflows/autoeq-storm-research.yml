@@ -44,6 +44,7 @@ jobs:
           pnpm --filter @autoeq-workbench/core exec vitest run \
             test/autoeq/v2/research/frozenResearchInputs.test.ts \
             test/autoeq/v2/research/stormAdmissionHoldoutInventory.test.ts \
+            test/autoeq/v2/research/stormAdmissionIndependentPolicyValidation.test.ts \
             test/autoeq/v2/research/stormAdmissionGeneralizationCampaign.test.ts \
             test/autoeq/v2/research/stormAdmissionValidationCampaign.test.ts
       - name: Verify core typecheck
@@ -93,6 +94,11 @@ jobs:
           set -euo pipefail
           pnpm --filter @autoeq-workbench/core research:storm-admission-holdout-inventory
 
+      - name: Run independent admission policy validation
+        run: |
+          set -euo pipefail
+          pnpm --filter @autoeq-workbench/core research:storm-admission-independent-policy-validation
+
       - name: Replay selected Storm campaign
         run: |
           set -euo pipefail
@@ -119,6 +125,8 @@ jobs:
           mkdir -p "$GITHUB_WORKSPACE/storm-replay"
           cp "$GITHUB_WORKSPACE/frozen-inputs/manifest.json" "$GITHUB_WORKSPACE/storm-replay/frozen-input-manifest.json"
           cp packages/core/.research-artifacts/storm-admission-holdout-inventory-20260911/inventory-report.json "$GITHUB_WORKSPACE/storm-replay/holdout-inventory.json"
+          cp packages/core/.research-artifacts/storm-admission-independent-policy-validation-20260911/campaign-report.json "$GITHUB_WORKSPACE/storm-replay/independent-policy-report.json"
+          cp docs/superpowers/specs/2026-09-11-storm-admission-independent-policy-validation-results.md "$GITHUB_WORKSPACE/storm-replay/independent-policy-results.md"
           if [[ "$CAMPAIGN" == "validation" ]]; then
             cp packages/core/.research-artifacts/storm-admission-validation-20260911/campaign-report.json "$GITHUB_WORKSPACE/storm-replay/campaign-report.json"
             cp docs/superpowers/specs/2026-09-11-storm-admission-validation-results.md "$GITHUB_WORKSPACE/storm-replay/results.md"
