@@ -1,0 +1,3889 @@
+{
+  "schemaVersion": 1,
+  "experimentVersion": "storm-admission-generalization-v1",
+  "campaignMatrix": [
+    {
+      "cellId": "storm-bridge-parent",
+      "caseId": "titan-to-storm"
+    },
+    {
+      "cellId": "storm-sparse-0010",
+      "caseId": "titan-to-storm"
+    },
+    {
+      "cellId": "storm-sparse-0001",
+      "caseId": "titan-to-storm"
+    },
+    {
+      "cellId": "storm-sparse-0006",
+      "caseId": "titan-to-storm"
+    },
+    {
+      "cellId": "u12t-mp-seed",
+      "caseId": "titan-to-u12t"
+    },
+    {
+      "cellId": "trio-mp-seed",
+      "caseId": "titan-to-trio"
+    }
+  ],
+  "frozenConfig": {
+    "maxFilters": 10,
+    "beamWidth": 2,
+    "proposalsPerParent": 4,
+    "localPolishEvaluations": 24
+  },
+  "checkpoints": [
+    4,
+    8,
+    16
+  ],
+  "perCellResults": [
+    {
+      "cellId": "storm-bridge-parent",
+      "armId": "A",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 9,
+          "coordinateTrials": 216,
+          "descendantsEvaluated": 8
+        },
+        "overhead": {
+          "canonicalEvaluations": 0,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 9,
+          "coordinateTrials": 216,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 384
+    },
+    {
+      "cellId": "storm-bridge-parent",
+      "armId": "B",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-11-remove:0007",
+            "rmseDb": 1.8229740182732619,
+            "maxAbsDb": 5.485640677937267,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.9385728006200238,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-24-merge:0016",
+            "rmseDb": 1.747203655432439,
+            "maxAbsDb": 5.267746185931901,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.6334699853734227,
+            "referenceImproved": false,
+            "evaluationIndex": 16
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 165,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 182,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 1406
+    },
+    {
+      "cellId": "storm-bridge-parent",
+      "armId": "C",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 9,
+          "coordinateTrials": 216,
+          "descendantsEvaluated": 8
+        },
+        "overhead": {
+          "canonicalEvaluations": 139,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 148,
+          "coordinateTrials": 216,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 1020
+    },
+    {
+      "cellId": "storm-bridge-parent",
+      "armId": "D",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 9,
+          "coordinateTrials": 216,
+          "descendantsEvaluated": 8
+        },
+        "overhead": {
+          "canonicalEvaluations": 139,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 139,
+          "lookaheadUnpolishedEvaluations": 3720
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 3868,
+          "coordinateTrials": 216,
+          "structuralProposalEnumerations": 139
+        }
+      },
+      "elapsedMs": 15874
+    },
+    {
+      "cellId": "storm-sparse-0010",
+      "armId": "A",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 1.69443656174349,
+            "maxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 1.6357158771757774,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 1.69443656174349,
+            "maxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 1.6357158771757774,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 1.69443656174349,
+            "maxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 1.6357158771757774,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 9,
+          "coordinateTrials": 216,
+          "descendantsEvaluated": 8
+        },
+        "overhead": {
+          "canonicalEvaluations": 0,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 9,
+          "coordinateTrials": 216,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 153
+    },
+    {
+      "cellId": "storm-sparse-0010",
+      "armId": "B",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 1.69443656174349,
+            "maxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 1.6357158771757774,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 1.69443656174349,
+            "maxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 1.6357158771757774,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 1.69443656174349,
+            "maxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 1.6357158771757774,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 13,
+          "coordinateTrials": 312,
+          "descendantsEvaluated": 12
+        },
+        "overhead": {
+          "canonicalEvaluations": 168,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 181,
+          "coordinateTrials": 312,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 1057
+    },
+    {
+      "cellId": "storm-sparse-0010",
+      "armId": "C",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-remove:0004",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": 4
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-remove:0004",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-remove:0004",
+            "rmseDb": 1.6989353408590506,
+            "maxAbsDb": 5.850643387777495,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 1.5509895845764776,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 13,
+          "coordinateTrials": 312,
+          "descendantsEvaluated": 12
+        },
+        "overhead": {
+          "canonicalEvaluations": 181,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 194,
+          "coordinateTrials": 312,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 1159
+    },
+    {
+      "cellId": "storm-sparse-0010",
+      "armId": "D",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 1.69443656174349,
+            "maxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 1.6357158771757774,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 1.69443656174349,
+            "maxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 1.6357158771757774,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 1.69443656174349,
+            "maxAbsDb": 6.025019146179327,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 1.6357158771757774,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 13,
+          "coordinateTrials": 312,
+          "descendantsEvaluated": 12
+        },
+        "overhead": {
+          "canonicalEvaluations": 168,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 168,
+          "lookaheadUnpolishedEvaluations": 4420
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 4601,
+          "coordinateTrials": 312,
+          "structuralProposalEnumerations": 168
+        }
+      },
+      "elapsedMs": 18263
+    },
+    {
+      "cellId": "storm-sparse-0001",
+      "armId": "A",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-3-add-pk:0003",
+            "rmseDb": 3.003456614269531,
+            "maxAbsDb": 10.443671019971767,
+            "filterCount": 2,
+            "cancellationScore": 0,
+            "regret": 9.445359481768504,
+            "referenceImproved": false,
+            "evaluationIndex": 3
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-3-add-pk:0003",
+            "rmseDb": 3.003456614269531,
+            "maxAbsDb": 10.443671019971767,
+            "filterCount": 2,
+            "cancellationScore": 0,
+            "regret": 9.445359481768504,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-17-add-hs:0013",
+            "rmseDb": 2.5919160769028293,
+            "maxAbsDb": 7.483209741706887,
+            "filterCount": 5,
+            "cancellationScore": 0,
+            "regret": 5.718082409409092,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 0,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 124
+    },
+    {
+      "cellId": "storm-sparse-0001",
+      "armId": "B",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-add-pk:0004",
+            "rmseDb": 3.003456614269531,
+            "maxAbsDb": 10.443671019971767,
+            "filterCount": 2,
+            "cancellationScore": 0,
+            "regret": 9.445359481768504,
+            "referenceImproved": false,
+            "evaluationIndex": 4
+          },
+          "relationToControl": {
+            "selectorRelation": "control",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-5-split:0005",
+            "rmseDb": 2.8270563999797016,
+            "maxAbsDb": 8.553109240754894,
+            "filterCount": 3,
+            "cancellationScore": 0,
+            "regret": 7.272987064601682,
+            "referenceImproved": false,
+            "evaluationIndex": 5
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "candidate-dominates"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-9-split:0009",
+            "rmseDb": 2.7408361271409794,
+            "maxAbsDb": 8.250815973371616,
+            "filterCount": 4,
+            "cancellationScore": 0,
+            "regret": 6.760424856355322,
+            "referenceImproved": false,
+            "evaluationIndex": 9
+          },
+          "relationToControl": {
+            "selectorRelation": "control",
+            "paretoRelation": "control-dominates"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 45,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 62,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 188
+    },
+    {
+      "cellId": "storm-sparse-0001",
+      "armId": "C",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-add-pk:0001",
+            "rmseDb": 3.003456614269531,
+            "maxAbsDb": 10.443671019971767,
+            "filterCount": 2,
+            "cancellationScore": 0,
+            "regret": 9.445359481768504,
+            "referenceImproved": false,
+            "evaluationIndex": 1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-6-split:0006",
+            "rmseDb": 2.8270563999797016,
+            "maxAbsDb": 8.553109240754894,
+            "filterCount": 3,
+            "cancellationScore": 0,
+            "regret": 7.272987064601682,
+            "referenceImproved": false,
+            "evaluationIndex": 6
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "candidate-dominates"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-16-merge:0016",
+            "rmseDb": 2.65700559807652,
+            "maxAbsDb": 7.892718288212743,
+            "filterCount": 3,
+            "cancellationScore": 0,
+            "regret": 6.21912753055204,
+            "referenceImproved": false,
+            "evaluationIndex": 16
+          },
+          "relationToControl": {
+            "selectorRelation": "control",
+            "paretoRelation": "control-dominates"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 45,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 62,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 178
+    },
+    {
+      "cellId": "storm-sparse-0001",
+      "armId": "D",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-add-pk:0001",
+            "rmseDb": 3.003456614269531,
+            "maxAbsDb": 10.443671019971767,
+            "filterCount": 2,
+            "cancellationScore": 0,
+            "regret": 9.445359481768504,
+            "referenceImproved": false,
+            "evaluationIndex": 1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-6-split:0006",
+            "rmseDb": 2.8270563999797016,
+            "maxAbsDb": 8.553109240754894,
+            "filterCount": 3,
+            "cancellationScore": 0,
+            "regret": 7.272987064601682,
+            "referenceImproved": false,
+            "evaluationIndex": 6
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "candidate-dominates"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-14-split:0014",
+            "rmseDb": 2.652554354175512,
+            "maxAbsDb": 7.915089967272975,
+            "filterCount": 5,
+            "cancellationScore": 0,
+            "regret": 6.2199471203480226,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "control",
+            "paretoRelation": "control-dominates"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 45,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 45,
+          "lookaheadUnpolishedEvaluations": 606
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 668,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 45
+        }
+      },
+      "elapsedMs": 1394
+    },
+    {
+      "cellId": "storm-sparse-0006",
+      "armId": "A",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 2.083020217824927,
+            "maxAbsDb": 6.386518200989402,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.2441052475112726,
+            "referenceImproved": false,
+            "evaluationIndex": 0
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 2.083020217824927,
+            "maxAbsDb": 6.386518200989402,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.2441052475112726,
+            "referenceImproved": false,
+            "evaluationIndex": 0
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 2.083020217824927,
+            "maxAbsDb": 6.386518200989402,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.2441052475112726,
+            "referenceImproved": false,
+            "evaluationIndex": 0
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 5,
+          "coordinateTrials": 120,
+          "descendantsEvaluated": 4
+        },
+        "overhead": {
+          "canonicalEvaluations": 0,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 5,
+          "coordinateTrials": 120,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 74
+    },
+    {
+      "cellId": "storm-sparse-0006",
+      "armId": "B",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 2.083020217824927,
+            "maxAbsDb": 6.386518200989402,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.2441052475112726,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-11-merge:0007",
+            "rmseDb": 2.0963092645305377,
+            "maxAbsDb": 6.302051549664135,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.250492291183528,
+            "referenceImproved": false,
+            "evaluationIndex": 7
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-25-split:0013",
+            "rmseDb": 2.0902539341438917,
+            "maxAbsDb": 6.298716646033547,
+            "filterCount": 8,
+            "cancellationScore": 0,
+            "regret": 3.226307946594175,
+            "referenceImproved": false,
+            "evaluationIndex": 13
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 162,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 179,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 950
+    },
+    {
+      "cellId": "storm-sparse-0006",
+      "armId": "C",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 2.083020217824927,
+            "maxAbsDb": 6.386518200989402,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.2441052475112726,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-9-merge:0005",
+            "rmseDb": 2.0963092645305377,
+            "maxAbsDb": 6.302051549664135,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.250492291183528,
+            "referenceImproved": false,
+            "evaluationIndex": 5
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-25-split:0013",
+            "rmseDb": 2.0902539341438917,
+            "maxAbsDb": 6.298716646033547,
+            "filterCount": 8,
+            "cancellationScore": 0,
+            "regret": 3.226307946594175,
+            "referenceImproved": false,
+            "evaluationIndex": 13
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 162,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 179,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 857
+    },
+    {
+      "cellId": "storm-sparse-0006",
+      "armId": "D",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 2.083020217824927,
+            "maxAbsDb": 6.386518200989402,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.2441052475112726,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 2.083020217824927,
+            "maxAbsDb": 6.386518200989402,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.2441052475112726,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+            "rmseDb": 2.083020217824927,
+            "maxAbsDb": 6.386518200989402,
+            "filterCount": 6,
+            "cancellationScore": 0,
+            "regret": 3.2441052475112726,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 8,
+          "coordinateTrials": 192,
+          "descendantsEvaluated": 7
+        },
+        "overhead": {
+          "canonicalEvaluations": 120,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 120,
+          "lookaheadUnpolishedEvaluations": 2901
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 3029,
+          "coordinateTrials": 192,
+          "structuralProposalEnumerations": 120
+        }
+      },
+      "elapsedMs": 9547
+    },
+    {
+      "cellId": "u12t-mp-seed",
+      "armId": "A",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
+            "rmseDb": 1.2257165384464115,
+            "maxAbsDb": 3.6013255820762784,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 0.011261184729902673,
+            "referenceImproved": false,
+            "evaluationIndex": 2
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
+            "rmseDb": 1.2257165384464115,
+            "maxAbsDb": 3.6013255820762784,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 0.011261184729902673,
+            "referenceImproved": false,
+            "evaluationIndex": 2
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
+            "rmseDb": 1.2257165384464115,
+            "maxAbsDb": 3.6013255820762784,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 0.011261184729902673,
+            "referenceImproved": false,
+            "evaluationIndex": 2
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 9,
+          "coordinateTrials": 216,
+          "descendantsEvaluated": 8
+        },
+        "overhead": {
+          "canonicalEvaluations": 0,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 9,
+          "coordinateTrials": 216,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 148
+    },
+    {
+      "cellId": "u12t-mp-seed",
+      "armId": "B",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-1-remove:0001",
+            "rmseDb": 1.2257165384464115,
+            "maxAbsDb": 3.6013255820762784,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 0.011261184729902673,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-10-split:0006",
+            "rmseDb": 1.1657024567334162,
+            "maxAbsDb": 3.5968494197412006,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 0,
+            "referenceImproved": true,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "candidate-dominates"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-10-split:0006",
+            "rmseDb": 1.1657024567334162,
+            "maxAbsDb": 3.5968494197412006,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 0,
+            "referenceImproved": true,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "candidate-dominates"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 111,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 128,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 760
+    },
+    {
+      "cellId": "u12t-mp-seed",
+      "armId": "C",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-1-remove:0001",
+            "rmseDb": 1.2257165384464115,
+            "maxAbsDb": 3.6013255820762784,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 0.011261184729902673,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-9-split:0005",
+            "rmseDb": 1.1657024567334162,
+            "maxAbsDb": 3.5968494197412006,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 0,
+            "referenceImproved": true,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "candidate-dominates"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-9-split:0005",
+            "rmseDb": 1.1657024567334162,
+            "maxAbsDb": 3.5968494197412006,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 0,
+            "referenceImproved": true,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "candidate-dominates"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 111,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 128,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 766
+    },
+    {
+      "cellId": "u12t-mp-seed",
+      "armId": "D",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-1-remove:0001",
+            "rmseDb": 1.2257165384464115,
+            "maxAbsDb": 3.6013255820762784,
+            "filterCount": 9,
+            "cancellationScore": 0,
+            "regret": 0.011261184729902673,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-11-split:0007",
+            "rmseDb": 1.1680875393285064,
+            "maxAbsDb": 3.5998494150492633,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 0,
+            "referenceImproved": true,
+            "evaluationIndex": 7
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "candidate-dominates"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-11-split:0007",
+            "rmseDb": 1.1680875393285064,
+            "maxAbsDb": 3.5998494150492633,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 0,
+            "referenceImproved": true,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "candidate",
+            "paretoRelation": "candidate-dominates"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 17,
+          "coordinateTrials": 408,
+          "descendantsEvaluated": 16
+        },
+        "overhead": {
+          "canonicalEvaluations": 112,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 112,
+          "lookaheadUnpolishedEvaluations": 2847
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 2976,
+          "coordinateTrials": 408,
+          "structuralProposalEnumerations": 112
+        }
+      },
+      "elapsedMs": 11871
+    },
+    {
+      "cellId": "trio-mp-seed",
+      "armId": "A",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": 0
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": 0
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": 0
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 5,
+          "coordinateTrials": 120,
+          "descendantsEvaluated": 4
+        },
+        "overhead": {
+          "canonicalEvaluations": 0,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 5,
+          "coordinateTrials": 120,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 71
+    },
+    {
+      "cellId": "trio-mp-seed",
+      "armId": "B",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 13,
+          "coordinateTrials": 312,
+          "descendantsEvaluated": 12
+        },
+        "overhead": {
+          "canonicalEvaluations": 159,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 172,
+          "coordinateTrials": 312,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 1053
+    },
+    {
+      "cellId": "trio-mp-seed",
+      "armId": "C",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 13,
+          "coordinateTrials": 312,
+          "descendantsEvaluated": 12
+        },
+        "overhead": {
+          "canonicalEvaluations": 159,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 0,
+          "lookaheadUnpolishedEvaluations": 0
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 172,
+          "coordinateTrials": 312,
+          "structuralProposalEnumerations": 0
+        }
+      },
+      "elapsedMs": 1057
+    },
+    {
+      "cellId": "trio-mp-seed",
+      "armId": "D",
+      "checkpoints": [
+        {
+          "evaluationIndex": 4,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 8,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        },
+        {
+          "evaluationIndex": 16,
+          "selectedBest": {
+            "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+            "rmseDb": 1.2591239856453276,
+            "maxAbsDb": 4.722496940036333,
+            "filterCount": 10,
+            "cancellationScore": 0,
+            "regret": 2.1867305341618795,
+            "referenceImproved": false,
+            "evaluationIndex": -1
+          },
+          "relationToControl": {
+            "selectorRelation": "equivalent",
+            "paretoRelation": "tradeoff"
+          }
+        }
+      ],
+      "workBreakdown": {
+        "downstream": {
+          "canonicalEvaluations": 13,
+          "coordinateTrials": 312,
+          "descendantsEvaluated": 12
+        },
+        "overhead": {
+          "canonicalEvaluations": 159,
+          "coordinateTrials": 0,
+          "structuralProposalEnumerations": 159,
+          "lookaheadUnpolishedEvaluations": 4178
+        },
+        "totalCharged": {
+          "canonicalEvaluations": 4350,
+          "coordinateTrials": 312,
+          "structuralProposalEnumerations": 159
+        }
+      },
+      "elapsedMs": 17040
+    }
+  ],
+  "cells": {
+    "storm-bridge-parent": {
+      "A": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            }
+          }
+        ]
+      },
+      "B": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-11-remove:0007",
+              "rmseDb": 1.8229740182732619,
+              "maxAbsDb": 5.485640677937267,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.9385728006200238,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-24-merge:0016",
+              "rmseDb": 1.747203655432439,
+              "maxAbsDb": 5.267746185931901,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.6334699853734227,
+              "referenceImproved": false,
+              "evaluationIndex": 16
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      },
+      "C": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      },
+      "D": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:root:0000",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      }
+    },
+    "storm-sparse-0010": {
+      "A": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 1.69443656174349,
+              "maxAbsDb": 6.025019146179327,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 1.6357158771757774,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 1.69443656174349,
+              "maxAbsDb": 6.025019146179327,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 1.6357158771757774,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 1.69443656174349,
+              "maxAbsDb": 6.025019146179327,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 1.6357158771757774,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            }
+          }
+        ]
+      },
+      "B": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 1.69443656174349,
+              "maxAbsDb": 6.025019146179327,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 1.6357158771757774,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 1.69443656174349,
+              "maxAbsDb": 6.025019146179327,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 1.6357158771757774,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 1.69443656174349,
+              "maxAbsDb": 6.025019146179327,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 1.6357158771757774,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      },
+      "C": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-remove:0004",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": 4
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-remove:0004",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-remove:0004",
+              "rmseDb": 1.6989353408590506,
+              "maxAbsDb": 5.850643387777495,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 1.5509895845764776,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      },
+      "D": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 1.69443656174349,
+              "maxAbsDb": 6.025019146179327,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 1.6357158771757774,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 1.69443656174349,
+              "maxAbsDb": 6.025019146179327,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 1.6357158771757774,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 1.69443656174349,
+              "maxAbsDb": 6.025019146179327,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 1.6357158771757774,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      }
+    },
+    "storm-sparse-0001": {
+      "A": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-3-add-pk:0003",
+              "rmseDb": 3.003456614269531,
+              "maxAbsDb": 10.443671019971767,
+              "filterCount": 2,
+              "cancellationScore": 0,
+              "regret": 9.445359481768504,
+              "referenceImproved": false,
+              "evaluationIndex": 3
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-3-add-pk:0003",
+              "rmseDb": 3.003456614269531,
+              "maxAbsDb": 10.443671019971767,
+              "filterCount": 2,
+              "cancellationScore": 0,
+              "regret": 9.445359481768504,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-17-add-hs:0013",
+              "rmseDb": 2.5919160769028293,
+              "maxAbsDb": 7.483209741706887,
+              "filterCount": 5,
+              "cancellationScore": 0,
+              "regret": 5.718082409409092,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            }
+          }
+        ]
+      },
+      "B": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-add-pk:0004",
+              "rmseDb": 3.003456614269531,
+              "maxAbsDb": 10.443671019971767,
+              "filterCount": 2,
+              "cancellationScore": 0,
+              "regret": 9.445359481768504,
+              "referenceImproved": false,
+              "evaluationIndex": 4
+            },
+            "relationToControl": {
+              "selectorRelation": "control",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-5-split:0005",
+              "rmseDb": 2.8270563999797016,
+              "maxAbsDb": 8.553109240754894,
+              "filterCount": 3,
+              "cancellationScore": 0,
+              "regret": 7.272987064601682,
+              "referenceImproved": false,
+              "evaluationIndex": 5
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "candidate-dominates"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-9-split:0009",
+              "rmseDb": 2.7408361271409794,
+              "maxAbsDb": 8.250815973371616,
+              "filterCount": 4,
+              "cancellationScore": 0,
+              "regret": 6.760424856355322,
+              "referenceImproved": false,
+              "evaluationIndex": 9
+            },
+            "relationToControl": {
+              "selectorRelation": "control",
+              "paretoRelation": "control-dominates"
+            }
+          }
+        ]
+      },
+      "C": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-add-pk:0001",
+              "rmseDb": 3.003456614269531,
+              "maxAbsDb": 10.443671019971767,
+              "filterCount": 2,
+              "cancellationScore": 0,
+              "regret": 9.445359481768504,
+              "referenceImproved": false,
+              "evaluationIndex": 1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-6-split:0006",
+              "rmseDb": 2.8270563999797016,
+              "maxAbsDb": 8.553109240754894,
+              "filterCount": 3,
+              "cancellationScore": 0,
+              "regret": 7.272987064601682,
+              "referenceImproved": false,
+              "evaluationIndex": 6
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "candidate-dominates"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-16-merge:0016",
+              "rmseDb": 2.65700559807652,
+              "maxAbsDb": 7.892718288212743,
+              "filterCount": 3,
+              "cancellationScore": 0,
+              "regret": 6.21912753055204,
+              "referenceImproved": false,
+              "evaluationIndex": 16
+            },
+            "relationToControl": {
+              "selectorRelation": "control",
+              "paretoRelation": "control-dominates"
+            }
+          }
+        ]
+      },
+      "D": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-1-add-pk:0001",
+              "rmseDb": 3.003456614269531,
+              "maxAbsDb": 10.443671019971767,
+              "filterCount": 2,
+              "cancellationScore": 0,
+              "regret": 9.445359481768504,
+              "referenceImproved": false,
+              "evaluationIndex": 1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-6-split:0006",
+              "rmseDb": 2.8270563999797016,
+              "maxAbsDb": 8.553109240754894,
+              "filterCount": 3,
+              "cancellationScore": 0,
+              "regret": 7.272987064601682,
+              "referenceImproved": false,
+              "evaluationIndex": 6
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "candidate-dominates"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-14-split:0014",
+              "rmseDb": 2.652554354175512,
+              "maxAbsDb": 7.915089967272975,
+              "filterCount": 5,
+              "cancellationScore": 0,
+              "regret": 6.2199471203480226,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "control",
+              "paretoRelation": "control-dominates"
+            }
+          }
+        ]
+      }
+    },
+    "storm-sparse-0006": {
+      "A": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 2.083020217824927,
+              "maxAbsDb": 6.386518200989402,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.2441052475112726,
+              "referenceImproved": false,
+              "evaluationIndex": 0
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 2.083020217824927,
+              "maxAbsDb": 6.386518200989402,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.2441052475112726,
+              "referenceImproved": false,
+              "evaluationIndex": 0
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 2.083020217824927,
+              "maxAbsDb": 6.386518200989402,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.2441052475112726,
+              "referenceImproved": false,
+              "evaluationIndex": 0
+            }
+          }
+        ]
+      },
+      "B": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 2.083020217824927,
+              "maxAbsDb": 6.386518200989402,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.2441052475112726,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-11-merge:0007",
+              "rmseDb": 2.0963092645305377,
+              "maxAbsDb": 6.302051549664135,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.250492291183528,
+              "referenceImproved": false,
+              "evaluationIndex": 7
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-25-split:0013",
+              "rmseDb": 2.0902539341438917,
+              "maxAbsDb": 6.298716646033547,
+              "filterCount": 8,
+              "cancellationScore": 0,
+              "regret": 3.226307946594175,
+              "referenceImproved": false,
+              "evaluationIndex": 13
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      },
+      "C": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 2.083020217824927,
+              "maxAbsDb": 6.386518200989402,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.2441052475112726,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-9-merge:0005",
+              "rmseDb": 2.0963092645305377,
+              "maxAbsDb": 6.302051549664135,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.250492291183528,
+              "referenceImproved": false,
+              "evaluationIndex": 5
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-25-split:0013",
+              "rmseDb": 2.0902539341438917,
+              "maxAbsDb": 6.298716646033547,
+              "filterCount": 8,
+              "cancellationScore": 0,
+              "regret": 3.226307946594175,
+              "referenceImproved": false,
+              "evaluationIndex": 13
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      },
+      "D": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 2.083020217824927,
+              "maxAbsDb": 6.386518200989402,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.2441052475112726,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 2.083020217824927,
+              "maxAbsDb": 6.386518200989402,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.2441052475112726,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:root:0000",
+              "rmseDb": 2.083020217824927,
+              "maxAbsDb": 6.386518200989402,
+              "filterCount": 6,
+              "cancellationScore": 0,
+              "regret": 3.2441052475112726,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      }
+    },
+    "u12t-mp-seed": {
+      "A": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
+              "rmseDb": 1.2257165384464115,
+              "maxAbsDb": 3.6013255820762784,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 0.011261184729902673,
+              "referenceImproved": false,
+              "evaluationIndex": 2
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
+              "rmseDb": 1.2257165384464115,
+              "maxAbsDb": 3.6013255820762784,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 0.011261184729902673,
+              "referenceImproved": false,
+              "evaluationIndex": 2
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
+              "rmseDb": 1.2257165384464115,
+              "maxAbsDb": 3.6013255820762784,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 0.011261184729902673,
+              "referenceImproved": false,
+              "evaluationIndex": 2
+            }
+          }
+        ]
+      },
+      "B": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-1-remove:0001",
+              "rmseDb": 1.2257165384464115,
+              "maxAbsDb": 3.6013255820762784,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 0.011261184729902673,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-10-split:0006",
+              "rmseDb": 1.1657024567334162,
+              "maxAbsDb": 3.5968494197412006,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 0,
+              "referenceImproved": true,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "candidate-dominates"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-10-split:0006",
+              "rmseDb": 1.1657024567334162,
+              "maxAbsDb": 3.5968494197412006,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 0,
+              "referenceImproved": true,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "candidate-dominates"
+            }
+          }
+        ]
+      },
+      "C": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-1-remove:0001",
+              "rmseDb": 1.2257165384464115,
+              "maxAbsDb": 3.6013255820762784,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 0.011261184729902673,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-9-split:0005",
+              "rmseDb": 1.1657024567334162,
+              "maxAbsDb": 3.5968494197412006,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 0,
+              "referenceImproved": true,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "candidate-dominates"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-9-split:0005",
+              "rmseDb": 1.1657024567334162,
+              "maxAbsDb": 3.5968494197412006,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 0,
+              "referenceImproved": true,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "candidate-dominates"
+            }
+          }
+        ]
+      },
+      "D": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-1-remove:0001",
+              "rmseDb": 1.2257165384464115,
+              "maxAbsDb": 3.6013255820762784,
+              "filterCount": 9,
+              "cancellationScore": 0,
+              "regret": 0.011261184729902673,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-11-split:0007",
+              "rmseDb": 1.1680875393285064,
+              "maxAbsDb": 3.5998494150492633,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 0,
+              "referenceImproved": true,
+              "evaluationIndex": 7
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "candidate-dominates"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-11-split:0007",
+              "rmseDb": 1.1680875393285064,
+              "maxAbsDb": 3.5998494150492633,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 0,
+              "referenceImproved": true,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "candidate",
+              "paretoRelation": "candidate-dominates"
+            }
+          }
+        ]
+      }
+    },
+    "trio-mp-seed": {
+      "A": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": 0
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": 0
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": 0
+            }
+          }
+        ]
+      },
+      "B": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      },
+      "C": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      },
+      "D": {
+        "armCheckpoints": [
+          {
+            "evaluationIndex": 4,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 8,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          },
+          {
+            "evaluationIndex": 16,
+            "selectedBest": {
+              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:root:0000",
+              "rmseDb": 1.2591239856453276,
+              "maxAbsDb": 4.722496940036333,
+              "filterCount": 10,
+              "cancellationScore": 0,
+              "regret": 2.1867305341618795,
+              "referenceImproved": false,
+              "evaluationIndex": -1
+            },
+            "relationToControl": {
+              "selectorRelation": "equivalent",
+              "paretoRelation": "tradeoff"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "aggregateComparisons": {
+    "B": {
+      "searchQuality": {
+        "wins": 3,
+        "losses": 1,
+        "ties": 2,
+        "pareto": {
+          "candidateDominates": 1,
+          "controlDominates": 1,
+          "tradeoff": 4,
+          "equivalent": 0
+        },
+        "deltaDistributions": {
+          "rmse": {
+            "mean": 0.024067999902918007,
+            "min": -0.06001408171299527,
+            "max": 0.14892005023815003,
+            "deltas": [
+              0.04826831457338843,
+              0,
+              0.14892005023815003,
+              0.007233716318964856,
+              -0.06001408171299527,
+              0
+            ]
+          },
+          "maxAbs": {
+            "mean": 0.015405218754700392,
+            "min": -0.5828972018455945,
+            "max": 0.767606231664729,
+            "deltas": [
+              -0.5828972018455945,
+              0,
+              0.767606231664729,
+              -0.0878015549558544,
+              -0.004476162335077749,
+              0
+            ]
+          },
+          "regret": {
+            "mean": 0.18262739368269576,
+            "min": -0.017797300917097747,
+            "max": 1.04234244694623,
+            "deltas": [
+              0.08248040079694507,
+              0,
+              1.04234244694623,
+              -0.017797300917097747,
+              -0.011261184729902673,
+              0
+            ]
+          }
+        }
+      },
+      "totalCost": {
+        "canonicalEvaluations": {
+          "controlTotal": 54,
+          "candidateTotal": 904,
+          "ratio": 16.74074074074074
+        },
+        "coordinateTrials": {
+          "controlTotal": 1296,
+          "candidateTotal": 2256,
+          "ratio": 1.7407407407407407
+        },
+        "costAdjustedWins": 0
+      }
+    },
+    "C": {
+      "searchQuality": {
+        "wins": 3,
+        "losses": 1,
+        "ties": 2,
+        "pareto": {
+          "candidateDominates": 1,
+          "controlDominates": 1,
+          "tradeoff": 4,
+          "equivalent": 0
+        },
+        "deltaDistributions": {
+          "rmse": {
+            "mean": 0.002801322482536839,
+            "min": -0.06001408171299527,
+            "max": 0.06508952117369082,
+            "deltas": [
+              0,
+              0.004498779115560625,
+              0.06508952117369082,
+              0.007233716318964856,
+              -0.06001408171299527,
+              0
+            ]
+          },
+          "maxAbs": {
+            "mean": 0.02380917846884878,
+            "min": -0.1743757584018315,
+            "max": 0.40950854650585633,
+            "deltas": [
+              0,
+              -0.1743757584018315,
+              0.40950854650585633,
+              -0.0878015549558544,
+              -0.004476162335077749,
+              0
+            ]
+          },
+          "regret": {
+            "mean": 0.06454339048277458,
+            "min": -0.08472629259929976,
+            "max": 0.5010451211429476,
+            "deltas": [
+              0,
+              -0.08472629259929976,
+              0.5010451211429476,
+              -0.017797300917097747,
+              -0.011261184729902673,
+              0
+            ]
+          }
+        }
+      },
+      "totalCost": {
+        "canonicalEvaluations": {
+          "controlTotal": 54,
+          "candidateTotal": 883,
+          "ratio": 16.35185185185185
+        },
+        "coordinateTrials": {
+          "controlTotal": 1296,
+          "candidateTotal": 2064,
+          "ratio": 1.5925925925925926
+        },
+        "costAdjustedWins": 0
+      }
+    },
+    "D": {
+      "searchQuality": {
+        "wins": 1,
+        "losses": 1,
+        "ties": 4,
+        "pareto": {
+          "candidateDominates": 1,
+          "controlDominates": 1,
+          "tradeoff": 4,
+          "equivalent": 0
+        },
+        "deltaDistributions": {
+          "rmse": {
+            "mean": 0.0005015463591295788,
+            "min": -0.05762899911790509,
+            "max": 0.06063827727268256,
+            "deltas": [
+              0,
+              0,
+              0.06063827727268256,
+              0,
+              -0.05762899911790509,
+              0
+            ]
+          },
+          "maxAbs": {
+            "mean": 0.07173400975651216,
+            "min": -0.0014761670270151406,
+            "max": 0.43188022556608807,
+            "deltas": [
+              0,
+              0,
+              0.43188022556608807,
+              0,
+              -0.0014761670270151406,
+              0
+            ]
+          },
+          "regret": {
+            "mean": 0.08176725436817127,
+            "min": -0.011261184729902673,
+            "max": 0.5018647109389303,
+            "deltas": [
+              0,
+              0,
+              0.5018647109389303,
+              0,
+              -0.011261184729902673,
+              0
+            ]
+          }
+        }
+      },
+      "totalCost": {
+        "canonicalEvaluations": {
+          "controlTotal": 54,
+          "candidateTotal": 19492,
+          "ratio": 360.962962962963
+        },
+        "coordinateTrials": {
+          "controlTotal": 1296,
+          "candidateTotal": 1848,
+          "ratio": 1.4259259259259258
+        },
+        "costAdjustedWins": 0
+      }
+    }
+  },
+  "frozenPredecessorArtifacts": [
+    {
+      "logicalId": "audit",
+      "expectedSha256": "ad8b12c9a2deda33ebc81f00e682cbd97f3ce57529460e8e92e6c4050da8ac4b",
+      "sha256After": "ad8b12c9a2deda33ebc81f00e682cbd97f3ce57529460e8e92e6c4050da8ac4b",
+      "unchanged": true
+    },
+    {
+      "logicalId": "causal",
+      "expectedSha256": "646129bb60b2faa6d0d78b9e41e6c2097575d4d8bc98263f4c1d89f7189583f7",
+      "sha256After": "646129bb60b2faa6d0d78b9e41e6c2097575d4d8bc98263f4c1d89f7189583f7",
+      "unchanged": true
+    },
+    {
+      "logicalId": "census1",
+      "expectedSha256": "733b8d5f4f62e33aac1318c2c05b5e9a037b2541e9735ca48f0119b43d94f06d",
+      "sha256After": "733b8d5f4f62e33aac1318c2c05b5e9a037b2541e9735ca48f0119b43d94f06d",
+      "unchanged": true
+    },
+    {
+      "logicalId": "census2",
+      "expectedSha256": "fd4d719636d91d6129f7a0b858d93952c8ccfd1f4991205852ef70204ed8b920",
+      "sha256After": "fd4d719636d91d6129f7a0b858d93952c8ccfd1f4991205852ef70204ed8b920",
+      "unchanged": true
+    }
+  ],
+  "stormMilestones": {
+    "storm-bridge-parent-A": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-bridge-parent-B": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-bridge-parent-C": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-bridge-parent-D": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0010-A": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0010-B": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0010-C": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0010-D": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0001-A": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0001-B": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0001-C": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0001-D": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0006-A": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0006-B": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0006-C": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ],
+    "storm-sparse-0006-D": [
+      {
+        "milestone": "<5.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<4.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.5 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      },
+      {
+        "milestone": "<3.0 dB",
+        "reached": false,
+        "evaluationIndex": null,
+        "rmseDb": null,
+        "maxAbsDb": null
+      }
+    ]
+  },
+  "classifications": {
+    "A": "baseline",
+    "B": "generalization-supported",
+    "C": "mixed-tradeoff",
+    "D": "no-generalization"
+  },
+  "algorithmCandidateEvaluation": {
+    "eligible": true
+  }
+}

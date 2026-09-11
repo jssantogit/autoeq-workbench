@@ -32,7 +32,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "research:storm-admission-generalization": "tsx benchmarks/research/stormAdmissionGeneralizationCampaign.ts"
   },
   "devDependencies": {
     "tsx": "^4.23.12",
