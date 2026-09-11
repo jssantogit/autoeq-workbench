@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { performance } from 'node:perf_hooks'
 
-import { type Filter } from '../../src/index.js'
+import { cascadeMagnitudeDb, type Filter } from '../../src/index.js'
 import { loadLayeredResearchCases } from './corpus.js'
 import {
   createSolverLabProblem,
@@ -14,6 +14,8 @@ import { runMatchingPursuit } from './matchingPursuit.js'
 import { referenceSelectorKey } from './referenceSelector.js'
 import {
   createStructuralBeamDiagnosticTrace,
+  generateStructuralMutations,
+  orderStructuralProposals,
   quantizeStructuralBeamFilters,
   runStructuralBeam,
   type StructuralBeamAdmissionOverride,
@@ -199,6 +201,98 @@ export function generateIndependentPolicyCells(
   })
 
   return cells
+}
+
+function initialAdmissionFeatures(
+  cell: GeneratedPolicyCell,
+  snapshot: OracleReferenceSnapshotV1,
+) {
+  const caseDef = loadLayeredResearchCases('adversarial').find((candidate) => candidate.id === cell.caseId)
+  if (caseDef === undefined) throw new Error(`missing case for feature audit: ${cell.cellId}`)
+  const problem = createSolverLabProblem(caseDef, 10)
+  const parentEvaluation = evaluateSolverLabCandidate(problem, {
+    protocolVersion: 1,
+    problemId: problem.problemId,
+    inputSha256: problem.inputSha256,
+    candidateId: `${cell.sourceCandidateId}:feature-parent`,
+    algorithmId: 'feature-audit',
+    seed: 0,
+    filters: cell.filters,
+  })
+  if (!parentEvaluation.valid || parentEvaluation.deliverable === null) {
+    throw new Error(`invalid feature-audit parent: ${cell.cellId}`)
+  }
+  const delivered = parentEvaluation.deliverable.filters
+  const curve = cascadeMagnitudeDb(delivered, problem.frequenciesHz, problem.sampleRateHz)
+  const residualDb = problem.desiredDb.map((desired, index) => desired - curve[index]!)
+  const ordered = orderStructuralProposals(generateStructuralMutations(problem, delivered, residualDb))
+  const scored = ordered.map((proposal, lexicalRank) => {
+    const quantized = quantizeStructuralBeamFilters(problem, proposal.filters)
+    const evaluation = evaluateSolverLabCandidate(problem, {
+      protocolVersion: 1,
+      problemId: problem.problemId,
+      inputSha256: problem.inputSha256,
+      candidateId: `${cell.sourceCandidateId}:feature-proposal-${lexicalRank}`,
+      algorithmId: 'feature-audit',
+      seed: 0,
+      filters: quantized,
+    })
+    if (!evaluation.valid || evaluation.deliverable === null) {
+      throw new Error(`invalid feature-audit proposal: ${cell.cellId}/${lexicalRank}`)
+    }
+    return {
+      lexicalRank,
+      mutation: proposal.mutation,
+      rmseDb: evaluation.deliverable.rmseDb,
+      maxAbsDb: evaluation.deliverable.maxAbsDb,
+      filterCount: evaluation.deliverable.filters.length,
+      cancellationScore: evaluation.deliverable.cancellationTotalScore,
+    }
+  })
+  const rmseRanked = [...scored].sort((left, right) =>
+    left.rmseDb - right.rmseDb ||
+    left.maxAbsDb - right.maxAbsDb ||
+    left.filterCount - right.filterCount ||
+    left.cancellationScore - right.cancellationScore ||
+    left.lexicalRank - right.lexicalRank)
+  const lexicalTop = scored.slice(0, STRUCTURAL_CONFIG.proposalsPerParent)
+  const rmseTop = rmseRanked.slice(0, STRUCTURAL_CONFIG.proposalsPerParent)
+  const rmseRanks = new Set(rmseTop.map((entry) => entry.lexicalRank))
+  const countMutation = (entries: typeof scored, mutation: string) =>
+    entries.filter((entry) => entry.mutation === mutation).length
+  return {
+    parent: {
+      rmseDb: parentEvaluation.deliverable.rmseDb,
+      maxAbsDb: parentEvaluation.deliverable.maxAbsDb,
+      maxAbsToRmseRatio: parentEvaluation.deliverable.maxAbsDb / parentEvaluation.deliverable.rmseDb,
+      filterCount: parentEvaluation.deliverable.filters.length,
+      cancellationScore: parentEvaluation.deliverable.cancellationTotalScore,
+    },
+    proposalCount: scored.length,
+    lexicalTop4: lexicalTop.map((entry) => ({
+      lexicalRank: entry.lexicalRank,
+      mutation: entry.mutation,
+    })),
+    rmseTop4: rmseTop.map((entry) => ({
+      lexicalRank: entry.lexicalRank,
+      mutation: entry.mutation,
+      rmseDb: entry.rmseDb,
+      maxAbsDb: entry.maxAbsDb,
+    })),
+    top4OverlapCount: lexicalTop.filter((entry) => rmseRanks.has(entry.lexicalRank)).length,
+    lexicalTop4AddCount:
+      countMutation(lexicalTop, 'add-pk') +
+      countMutation(lexicalTop, 'add-ls') +
+      countMutation(lexicalTop, 'add-hs'),
+    rmseTop4AddCount:
+      countMutation(rmseTop, 'add-pk') +
+      countMutation(rmseTop, 'add-ls') +
+      countMutation(rmseTop, 'add-hs'),
+    lexicalTop4SplitCount: countMutation(lexicalTop, 'split'),
+    rmseTop4SplitCount: countMutation(rmseTop, 'split'),
+    bestPrePolishRmseDeltaDb: rmseTop[0]!.rmseDb - parentEvaluation.deliverable.rmseDb,
+    bestPrePolishMaxAbsDeltaDb: rmseTop[0]!.maxAbsDb - parentEvaluation.deliverable.maxAbsDb,
+  }
 }
 
 function createPolicyOverride(
@@ -421,6 +515,7 @@ export function runIndependentPolicyValidation() {
       sourceCandidateId: cell.sourceCandidateId,
       sourcePhase: cell.sourcePhase,
       initialFilterCount: cell.initialFilterCount,
+      initialAdmissionFeatures: initialAdmissionFeatures(cell, snapshot),
       A,
       B,
       F,
@@ -505,10 +600,30 @@ export function runIndependentPolicyValidation() {
   mkdirSync(dirname(mdPath), { recursive: true })
   writeFileSync(mdPath, md)
 
+  const discoveryU12tLowStart = report.results
+    .filter((row: any) =>
+      row.caseId === 'titan-to-u12t' &&
+      row.initialFilterCount <= POLICY_F_MAX_LEXICAL_FILTER_COUNT)
+    .map((row: any) => ({
+      cellId: row.cellId,
+      initialFilterCount: row.initialFilterCount,
+      initialAdmissionFeatures: row.initialAdmissionFeatures,
+      bRelationToControl: row.B.relationToControl,
+      bParetoToControl: row.B.paretoToControl,
+      bDeltaRmseDb: row.B.selectedBest.rmseDb - row.A.selectedBest.rmseDb,
+      bDeltaMaxAbsDb: row.B.selectedBest.maxAbsDb - row.A.selectedBest.maxAbsDb,
+      bDeltaRegret: row.B.selectedBest.regret - row.A.selectedBest.regret,
+    }))
+
   process.stdout.write(JSON.stringify({
     generatedCells: report.cells,
     aggregate: report.aggregate,
     classifications: report.classifications,
+    discoverySplit: {
+      discovery: 'u12t sparse-0001..0004',
+      reservedValidation: 'trio sparse-0001..0004',
+    },
+    discoveryU12tLowStart,
   }, null, 2) + '\n')
 }
 
