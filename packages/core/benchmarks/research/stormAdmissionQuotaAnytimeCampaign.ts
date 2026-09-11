@@ -191,9 +191,13 @@ export function compareSelected(left: any, right: any): 'Q31' | 'Q04' | 'equival
   return 'equivalent'
 }
 
-function paretoRelation(left: any, right: any) {
+export function paretoRelation(left: any, right: any) {
   if (left === null || right === null) return 'incomplete'
   const epsilon = 1e-12
+  if (
+    Math.abs(left.rmseDb - right.rmseDb) <= epsilon &&
+    Math.abs(left.maxAbsDb - right.maxAbsDb) <= epsilon
+  ) return 'equivalent'
   const dominates = (a: any, b: any) =>
     a.rmseDb <= b.rmseDb + epsilon &&
     a.maxAbsDb <= b.maxAbsDb + epsilon &&
