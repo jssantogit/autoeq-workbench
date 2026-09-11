@@ -18,7 +18,7 @@ on:
         default: ''
         type: string
       expected_manifest_sha256:
-        description: Optional pinned manifest SHA-256
+        description: Optional pinned archive SHA-256 (defaults to the accepted v1 release on push)
         required: false
         default: ''
         type: string
@@ -51,13 +51,10 @@ jobs:
         run: pnpm --filter @autoeq-workbench/core research:storm-frozen-inputs -- --help
 
   scientific-replay:
-    if: >-
-      (github.event_name == 'workflow_dispatch' && inputs.frozen_input_release_tag != '') ||
-      (github.event_name == 'push' && vars.AUTOEQ_STORM_INPUT_RELEASE_TAG != '')
     runs-on: ubuntu-latest
     env:
-      FROZEN_INPUT_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.frozen_input_release_tag || vars.AUTOEQ_STORM_INPUT_RELEASE_TAG }}
-      EXPECTED_MANIFEST_SHA256: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_manifest_sha256 || vars.AUTOEQ_STORM_INPUT_MANIFEST_SHA256 }}
+      FROZEN_INPUT_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.frozen_input_release_tag || 'autoeq-storm-frozen-inputs-v1' }}
+      EXPECTED_ARCHIVE_SHA256: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_manifest_sha256 || 'cc62a174220dcd4da4a17396d58d2807559ee557424b9c5f6961400037207667' }}
       CAMPAIGN: ${{ github.event_name == 'workflow_dispatch' && inputs.campaign || 'validation' }}
     steps:
       - uses: actions/checkout@v4
@@ -80,6 +77,8 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --pattern autoeq-storm-frozen-inputs-v1.tar.gz \
             --dir "$GITHUB_WORKSPACE/frozen-download"
+          printf '%s  %s\n' "$EXPECTED_ARCHIVE_SHA256" "$GITHUB_WORKSPACE/frozen-download/autoeq-storm-frozen-inputs-v1.tar.gz" \
+            | sha256sum --check -
           tar -xzf "$GITHUB_WORKSPACE/frozen-download/autoeq-storm-frozen-inputs-v1.tar.gz" \
             -C "$GITHUB_WORKSPACE/frozen-inputs"
       - name: Verify frozen research inputs
@@ -87,10 +86,6 @@ jobs:
           set -euo pipefail
           pnpm --filter @autoeq-workbench/core research:storm-frozen-inputs -- \
             verify --root "$GITHUB_WORKSPACE/frozen-inputs"
-          if [[ -n "$EXPECTED_MANIFEST_SHA256" ]]; then
-            printf '%s  %s\n' "$EXPECTED_MANIFEST_SHA256" "$GITHUB_WORKSPACE/frozen-inputs/manifest.json" \
-              | sha256sum --check -
-          fi
           echo "AUTOEQ_CAPACITY_RECOVERY_ROOT=$GITHUB_WORKSPACE/frozen-inputs/capacity-recovery" >> "$GITHUB_ENV"
       - name: Replay selected Storm campaign
         run: |
