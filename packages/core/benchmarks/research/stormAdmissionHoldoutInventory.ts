@@ -76,7 +76,10 @@ export function buildStormHoldoutInventory(sameRun: unknown) {
   if (sameRun === null || typeof sameRun !== 'object' || Array.isArray(sameRun)) {
     throw new Error('same-runtime tournament must be an object')
   }
-  const runs = (sameRun as { runs?: unknown }).runs
+  const record = sameRun as { runs?: unknown; tournament?: { runs?: unknown } }
+  const runs = Array.isArray(record.tournament?.runs)
+    ? record.tournament.runs
+    : record.runs
   if (!Array.isArray(runs)) throw new Error('same-runtime tournament runs are missing')
   const stormRun = runs.find((run) => {
     if (run === null || typeof run !== 'object' || Array.isArray(run)) return false
