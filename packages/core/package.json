@@ -35,7 +35,8 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
     "lint": "tsc --noEmit",
-    "research:storm-frozen-inputs": "tsx benchmarks/research/frozenResearchInputs.ts"
+    "research:storm-frozen-inputs": "tsx benchmarks/research/frozenResearchInputs.ts",
+    "research:storm-admission-holdout-inventory": "tsx benchmarks/research/stormAdmissionHoldoutInventory.ts"
   },
   "devDependencies": {
     "tsx": "^4.23.12",
