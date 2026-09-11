@@ -7,17 +7,11 @@ import {
   buildStormHoldoutInventory,
 } from '../../../../benchmarks/research/stormAdmissionHoldoutInventory.js'
 
-function point(candidateId: string, filterCount: number, evaluationCount: number) {
+function seed(sourceId: string, filterCount: number) {
   return {
-    candidateId,
-    evaluationCount,
-    elapsedMs: evaluationCount,
-    actualDeliveredFilterCount: filterCount,
-    canonicalRmseDb: 1 + evaluationCount / 100,
-    canonicalMaxAbsDb: 5 + evaluationCount / 100,
-    referenceRegret: 1,
-    referenceImproved: false,
-    filters: Array.from({ length: filterCount }, (_, index) => ({ id: String(index) })),
+    sourceId,
+    sourceKind: 'transfer',
+    filters: Array.from({ length: filterCount }, (_, index) => ({ id: `${sourceId}-${index}` })),
   }
 }
 
@@ -37,38 +31,41 @@ describe('Storm admission holdout inventory', () => {
     )
   })
 
-  it('selects by first appearance within each stratum without reading policy outcomes', () => {
+  it('selects lexicographically within strata without policy outcomes', () => {
     const observed = PREVIOUSLY_OBSERVED_STORM_POLICY_IDS[0]
-    const sameRun = {
-      runs: [{
-        problemId: 'titan-to-storm',
-        algorithmId: 'matching-pursuit-v1',
-        variantId: 'matching-pursuit-v1',
-        progressTrace: [
-          point(observed, 1, 1),
-          point('low-b', 4, 4),
-          point('low-a', 3, 3),
-          point('mid-a', 5, 5),
-          point('mid-b', 6, 6),
-          point('high-a', 7, 7),
-          point('high-b', 8, 8),
-          point('full-a', 9, 9),
-          point('full-b', 10, 10),
-          point('low-a', 3, 30),
-        ],
-      }],
+    const bundle = {
+      seeds: [
+        seed(observed, 1),
+        seed('low-b', 4),
+        seed('low-a', 3),
+        seed('mid-b', 6),
+        seed('mid-a', 5),
+        seed('high-b', 8),
+        seed('high-a', 7),
+        seed('full-b', 10),
+        seed('full-a', 9),
+      ],
     }
-    const report = buildStormHoldoutInventory(sameRun)
-    expect(report.selected.map((candidate) => candidate.candidateId)).toEqual([
+    const report = buildStormHoldoutInventory(bundle)
+    expect(report.selected.map((candidate) => candidate.sourceId)).toEqual([
       'low-a', 'low-b',
       'mid-a', 'mid-b',
       'high-a', 'high-b',
       'full-a', 'full-b',
     ])
-    expect(report.selected.some((candidate) => candidate.candidateId === observed)).toBe(false)
+    expect(report.selected.some((candidate) => candidate.sourceId === observed)).toBe(false)
   })
 
-  it('requires the exact frozen matching-pursuit-v1 Storm run', () => {
-    expect(() => buildStormHoldoutInventory({ runs: [] })).toThrow(/matching-pursuit-v1 run is missing/)
+  it('deduplicates exact filter payloads before selection', () => {
+    const duplicate = seed('a', 5)
+    const report = buildStormHoldoutInventory({
+      seeds: [duplicate, { ...duplicate, sourceId: 'b' }],
+    })
+    expect(report.uniqueEligibleCandidates).toBe(1)
+    expect(report.selectedCount).toBe(1)
+  })
+
+  it('requires a seed array', () => {
+    expect(() => buildStormHoldoutInventory({})).toThrow(/seeds are missing/)
   })
 })

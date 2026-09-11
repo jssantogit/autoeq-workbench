@@ -28,29 +28,10 @@ export const HOLDOUT_STRATA = Object.freeze([
 
 export const HOLDOUTS_PER_STRATUM = 3 as const
 
-interface TournamentPoint {
-  candidateId: string
-  evaluationCount: number
-  elapsedMs: number
-  actualDeliveredFilterCount: number
-  canonicalRmseDb: number
-  canonicalMaxAbsDb: number
-  referenceRegret: number
-  referenceImproved: boolean
+interface SeedRecord {
+  sourceId: string
   filters: unknown[]
-}
-
-interface InventoryCandidate {
-  candidateId: string
-  firstEvaluationCount: number
-  firstElapsedMs: number
-  filterCount: number
-  rmseDb: number
-  maxAbsDb: number
-  regret: number
-  referenceImproved: boolean
-  filters: unknown[]
-  stratum: string
+  sourceKind?: string
 }
 
 function stratumFor(filterCount: number): string | null {
@@ -58,114 +39,68 @@ function stratumFor(filterCount: number): string | null {
     filterCount >= stratum.minFilters && filterCount <= stratum.maxFilters)?.id ?? null
 }
 
-function isTournamentPoint(value: unknown): value is TournamentPoint {
+function isSeedRecord(value: unknown): value is SeedRecord {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return false
-  const point = value as Partial<TournamentPoint>
-  return typeof point.candidateId === 'string' &&
-    Number.isFinite(point.evaluationCount) &&
-    Number.isFinite(point.elapsedMs) &&
-    Number.isFinite(point.actualDeliveredFilterCount) &&
-    Number.isFinite(point.canonicalRmseDb) &&
-    Number.isFinite(point.canonicalMaxAbsDb) &&
-    Number.isFinite(point.referenceRegret) &&
-    typeof point.referenceImproved === 'boolean' &&
-    Array.isArray(point.filters)
+  const record = value as Partial<SeedRecord>
+  return typeof record.sourceId === 'string' && Array.isArray(record.filters)
 }
 
-export function buildStormHoldoutInventory(sameRun: unknown) {
-  if (sameRun === null || typeof sameRun !== 'object' || Array.isArray(sameRun)) {
-    throw new Error('same-runtime tournament must be an object')
+export function buildStormHoldoutInventory(seedBundle: unknown) {
+  if (seedBundle === null || typeof seedBundle !== 'object' || Array.isArray(seedBundle)) {
+    throw new Error('Storm proposal seed bundle must be an object')
   }
-  const record = sameRun as Record<string, unknown> & {
-    runs?: unknown
-    tournament?: { runs?: unknown }
-  }
-  const runArrays = [
-    Array.isArray(record.runs) ? record.runs : [],
-    Array.isArray(record.tournament?.runs) ? record.tournament!.runs! : [],
-  ]
-  const matchingRuns = runArrays.flat().filter((run) => {
-    if (run === null || typeof run !== 'object' || Array.isArray(run)) return false
-    const candidate = run as Record<string, unknown>
-    return candidate.problemId === 'titan-to-storm' &&
-      candidate.algorithmId === 'matching-pursuit-v1' &&
-      candidate.variantId === 'matching-pursuit-v1'
-  }) as Record<string, unknown>[]
-  if (matchingRuns.length === 0) {
-    throw new Error('frozen Storm matching-pursuit-v1 run is missing')
-  }
-
-  const stormRun = matchingRuns.find((run) => Array.isArray(run.progressTrace))
-  if (stormRun === undefined) {
-    const schemaDiagnostic = {
-      topLevelKeys: Object.keys(record).sort(),
-      tournamentKeys: record.tournament && typeof record.tournament === 'object'
-        ? Object.keys(record.tournament).sort()
-        : [],
-      matchingRunKeys: matchingRuns.map((run) => Object.keys(run).sort()),
-    }
-    throw new Error(`Storm progressTrace is missing; schema=${JSON.stringify(schemaDiagnostic)}`)
-  }
-  const progressTrace = stormRun.progressTrace as unknown[]
+  const seeds = (seedBundle as { seeds?: unknown }).seeds
+  if (!Array.isArray(seeds)) throw new Error('Storm proposal seed bundle seeds are missing')
 
   const observed = new Set<string>(PREVIOUSLY_OBSERVED_STORM_POLICY_IDS)
-  const byCandidateId = new Map<string, InventoryCandidate>()
-  for (const raw of progressTrace) {
-    if (!isTournamentPoint(raw)) continue
-    if (observed.has(raw.candidateId)) continue
-    if (raw.actualDeliveredFilterCount <= 0 || raw.actualDeliveredFilterCount > 10) continue
-    if (raw.filters.length !== raw.actualDeliveredFilterCount) continue
-    const stratum = stratumFor(raw.actualDeliveredFilterCount)
-    if (stratum === null) continue
-    const current = byCandidateId.get(raw.candidateId)
-    if (current !== undefined && current.firstEvaluationCount <= raw.evaluationCount) continue
-    byCandidateId.set(raw.candidateId, {
-      candidateId: raw.candidateId,
-      firstEvaluationCount: raw.evaluationCount,
-      firstElapsedMs: raw.elapsedMs,
-      filterCount: raw.actualDeliveredFilterCount,
-      rmseDb: raw.canonicalRmseDb,
-      maxAbsDb: raw.canonicalMaxAbsDb,
-      regret: raw.referenceRegret,
-      referenceImproved: raw.referenceImproved,
-      filters: raw.filters,
-      stratum,
-    })
-  }
+  const eligible = seeds
+    .filter(isSeedRecord)
+    .filter((seed) => !observed.has(seed.sourceId))
+    .map((seed) => ({
+      sourceId: seed.sourceId,
+      sourceKind: seed.sourceKind ?? null,
+      filterCount: seed.filters.length,
+      filters: seed.filters,
+      stratum: stratumFor(seed.filters.length),
+    }))
+    .filter((seed) => seed.stratum !== null)
+    .sort((left, right) => left.sourceId.localeCompare(right.sourceId))
 
-  const eligible = [...byCandidateId.values()].sort((left, right) =>
-    left.firstEvaluationCount - right.firstEvaluationCount ||
-    left.candidateId.localeCompare(right.candidateId))
+  const seen = new Set<string>()
+  const uniqueEligible = eligible.filter((seed) => {
+    const key = JSON.stringify(seed.filters)
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
 
   const selected = HOLDOUT_STRATA.flatMap((stratum) =>
-    eligible
-      .filter((candidate) => candidate.stratum === stratum.id)
+    uniqueEligible
+      .filter((seed) => seed.stratum === stratum.id)
       .slice(0, HOLDOUTS_PER_STRATUM))
 
   const countsByStratum = Object.fromEntries(HOLDOUT_STRATA.map((stratum) => [
     stratum.id,
-    eligible.filter((candidate) => candidate.stratum === stratum.id).length,
+    uniqueEligible.filter((seed) => seed.stratum === stratum.id).length,
   ]))
 
   return {
     schemaVersion: 1,
-    experimentVersion: 'storm-admission-holdout-inventory-v1',
+    experimentVersion: 'storm-admission-holdout-inventory-v2',
     source: {
-      artifact: 'same-runtime-tournament/tournament-report.json',
-      problemId: 'titan-to-storm',
-      algorithmId: 'matching-pursuit-v1',
-      variantId: 'matching-pursuit-v1',
+      artifact: 'mp-seeds/titan-to-storm-teacher-student.json',
+      caseId: 'titan-to-storm',
     },
     selectionRule: {
       outcomeBlind: true,
-      excludePreviouslyObservedCandidateIds: [...PREVIOUSLY_OBSERVED_STORM_POLICY_IDS],
-      deduplicateBy: 'candidateId-first-appearance',
-      orderBy: ['firstEvaluationCount-asc', 'candidateId-asc'],
+      excludePreviouslyObservedSourceIds: [...PREVIOUSLY_OBSERVED_STORM_POLICY_IDS],
+      deduplicateBy: 'exact-filter-payload',
+      orderBy: ['sourceId-asc'],
       strata: HOLDOUT_STRATA,
       takePerStratum: HOLDOUTS_PER_STRATUM,
     },
-    progressTraceRows: progressTrace.length,
-    uniqueEligibleCandidates: eligible.length,
+    sourceSeedCount: seeds.length,
+    uniqueEligibleCandidates: uniqueEligible.length,
     countsByStratum,
     selectedCount: selected.length,
     selected,
@@ -173,26 +108,24 @@ export function buildStormHoldoutInventory(sameRun: unknown) {
 }
 
 export function runInventory() {
-  const path = resolveCapacityRecoveryPath('same-runtime-tournament/tournament-report.json')
-  const sameRun = JSON.parse(readFileSync(path, 'utf8')) as unknown
-  const report = buildStormHoldoutInventory(sameRun)
+  const path = resolveCapacityRecoveryPath('mp-seeds/titan-to-storm-teacher-student.json')
+  const bundle = JSON.parse(readFileSync(path, 'utf8')) as unknown
+  const report = buildStormHoldoutInventory(bundle)
   const outPath = resolveResearchPath(
     'packages/core/.research-artifacts/storm-admission-holdout-inventory-20260911/inventory-report.json',
   )
   mkdirSync(dirname(outPath), { recursive: true })
   writeFileSync(outPath, JSON.stringify(report, null, 2) + '\n')
   process.stdout.write(JSON.stringify({
+    sourceSeedCount: report.sourceSeedCount,
     uniqueEligibleCandidates: report.uniqueEligibleCandidates,
     countsByStratum: report.countsByStratum,
     selectedCount: report.selectedCount,
-    selected: report.selected.map((candidate) => ({
-      candidateId: candidate.candidateId,
-      firstEvaluationCount: candidate.firstEvaluationCount,
-      filterCount: candidate.filterCount,
-      rmseDb: candidate.rmseDb,
-      maxAbsDb: candidate.maxAbsDb,
-      regret: candidate.regret,
-      stratum: candidate.stratum,
+    selected: report.selected.map((seed) => ({
+      sourceId: seed.sourceId,
+      sourceKind: seed.sourceKind,
+      filterCount: seed.filterCount,
+      stratum: seed.stratum,
     })),
   }, null, 2) + '\n')
 }
