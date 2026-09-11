@@ -29,11 +29,12 @@
     "research:storm-two-hop-reachability": "tsx benchmarks/research/stormTwoHopReachabilityCensus.ts",
     "research:storm-single-blocker-bridge": "tsx benchmarks/research/stormSingleBlockerBridgeCausal.ts",
     "research:storm-bridge-detectability": "tsx benchmarks/research/stormBridgeDetectabilityAudit.ts",
+    "research:storm-admission-generalization": "tsx benchmarks/research/stormAdmissionGeneralizationCampaign.ts",
+    "research:storm-admission-validation": "tsx benchmarks/research/stormAdmissionValidationCampaign.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
-    "lint": "tsc --noEmit",
-    "research:storm-admission-generalization": "tsx benchmarks/research/stormAdmissionGeneralizationCampaign.ts"
+    "lint": "tsc --noEmit"
   },
   "devDependencies": {
     "tsx": "^4.23.12",
