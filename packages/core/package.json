@@ -28,6 +28,7 @@
     "research:storm-post-initial-census": "tsx benchmarks/research/stormPostInitialAdmissionCensus.ts",
     "research:storm-two-hop-reachability": "tsx benchmarks/research/stormTwoHopReachabilityCensus.ts",
     "research:storm-single-blocker-bridge": "tsx benchmarks/research/stormSingleBlockerBridgeCausal.ts",
+    "research:storm-bridge-detectability": "tsx benchmarks/research/stormBridgeDetectabilityAudit.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
