@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   POLICY_F_MAX_LEXICAL_FILTER_COUNT,
+  POLICY_G_LOW_START_MAX_FILTER_COUNT,
   SPARSE_HOLDOUT_MAX_INDEX,
   STORM_REPLACEMENT_HOLDOUT_COUNT,
   STRUCTURAL_EVALUATION_BUDGET,
@@ -12,6 +13,7 @@ import {
 describe('Storm admission independent policy validation', () => {
   it('predeclares the post-hoc adaptive hypothesis before new policy outcomes', () => {
     expect(POLICY_F_MAX_LEXICAL_FILTER_COUNT).toBe(4)
+    expect(POLICY_G_LOW_START_MAX_FILTER_COUNT).toBe(4)
     expect(SPARSE_HOLDOUT_MAX_INDEX).toBe(9)
     expect(STORM_REPLACEMENT_HOLDOUT_COUNT).toBe(6)
     expect(STRUCTURAL_EVALUATION_BUDGET).toBe(17)

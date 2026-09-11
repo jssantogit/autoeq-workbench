@@ -31,6 +31,7 @@ export const INDEPENDENT_POLICY_CASES = Object.freeze([
 ] as const)
 
 export const POLICY_F_MAX_LEXICAL_FILTER_COUNT = 4 as const
+export const POLICY_G_LOW_START_MAX_FILTER_COUNT = 4 as const
 export const SPARSE_HOLDOUT_MAX_INDEX = 9 as const
 export const STORM_REPLACEMENT_HOLDOUT_COUNT = 6 as const
 export const STRUCTURAL_EVALUATION_BUDGET = 17 as const
@@ -296,7 +297,7 @@ function initialAdmissionFeatures(
 }
 
 function createPolicyOverride(
-  armId: 'A' | 'B' | 'F',
+  armId: 'A' | 'B' | 'F' | 'G',
   problem: SolverLabProblemV1,
   overhead: Overhead,
 ): StructuralBeamAdmissionOverride | undefined {
@@ -304,9 +305,10 @@ function createPolicyOverride(
   return {
     apply: (context) => {
       const parentFilterCount = context.parent.evaluation.deliverable?.filters.length ?? 0
-      const useRmse = armId === 'B' ||
+      const scoreRmse = armId === 'B' ||
+        armId === 'G' ||
         (armId === 'F' && parentFilterCount > POLICY_F_MAX_LEXICAL_FILTER_COUNT)
-      if (!useRmse) return null
+      if (!scoreRmse) return null
 
       const started = performance.now()
       const ranked = context.orderedProposals.map((proposal, lexicalRank) => {
@@ -342,8 +344,18 @@ function createPolicyOverride(
         left.lexicalRank - right.lexicalRank)
 
       overhead.elapsedMs += performance.now() - started
+      const rmseTop = ranked.slice(0, STRUCTURAL_CONFIG.proposalsPerParent)
+
+      if (
+        armId === 'G' &&
+        parentFilterCount <= POLICY_G_LOW_START_MAX_FILTER_COUNT &&
+        rmseTop.some((entry) => entry.proposal.mutation.startsWith('add-'))
+      ) {
+        return null
+      }
+
       return {
-        proposals: ranked.slice(0, STRUCTURAL_CONFIG.proposalsPerParent).map((entry) => entry.proposal),
+        proposals: rmseTop.map((entry) => entry.proposal),
         intervention: 'custom',
       }
     },
@@ -393,7 +405,7 @@ function paretoRelation(candidate: any, control: any) {
 }
 
 function runArm(
-  armId: 'A' | 'B' | 'F',
+  armId: 'A' | 'B' | 'F' | 'G',
   cell: GeneratedPolicyCell,
   snapshot: OracleReferenceSnapshotV1,
 ) {
@@ -482,7 +494,8 @@ export function runIndependentPolicyValidation() {
     const A = runArm('A', cell, snapshot)
     const B = runArm('B', cell, snapshot)
     const F = runArm('F', cell, snapshot)
-    for (const candidate of [B, F]) {
+    const G = runArm('G', cell, snapshot)
+    for (const candidate of [B, F, G]) {
       const relation = compareSelected(
         {
           candidateId: candidate.selectedBest.candidateId,
@@ -519,10 +532,11 @@ export function runIndependentPolicyValidation() {
       A,
       B,
       F,
+      G,
     })
   }
 
-  for (const armId of ['B', 'F']) {
+  for (const armId of ['B', 'F', 'G']) {
     const aggregate = {
       wins: 0,
       losses: 0,
@@ -570,6 +584,32 @@ export function runIndependentPolicyValidation() {
   report.classifications.B = classifyPurePolicy(report.aggregate.B)
   report.classifications.F = classifyAdaptiveThreshold(report.aggregate.B, report.aggregate.F)
 
+  const reservedValidationRows = report.results.filter((row: any) =>
+    row.caseId === 'titan-to-trio' &&
+    row.initialFilterCount <= POLICY_G_LOW_START_MAX_FILTER_COUNT)
+  const summarizeReserved = (armId: 'B' | 'G') => {
+    const counts = { wins: 0, losses: 0, ties: 0 }
+    for (const row of reservedValidationRows) {
+      const relation = row[armId].relationToControl
+      if (relation === 'candidate') counts.wins += 1
+      else if (relation === 'control') counts.losses += 1
+      else counts.ties += 1
+    }
+    return counts
+  }
+  report.reservedValidation = {
+    split: 'trio sparse-0001..0004',
+    B: summarizeReserved('B'),
+    G: summarizeReserved('G'),
+  }
+  report.classifications.G =
+    report.reservedValidation.G.losses < report.reservedValidation.B.losses &&
+    report.reservedValidation.G.wins >= report.reservedValidation.B.wins
+      ? 'low-start-mutation-gate-supported'
+      : report.reservedValidation.G.losses < report.reservedValidation.B.losses
+        ? 'low-start-mutation-gate-partial-tradeoff'
+        : 'low-start-mutation-gate-not-supported'
+
   const outPath = resolveResearchPath(
     'packages/core/.research-artifacts/storm-admission-independent-policy-validation-20260911/campaign-report.json',
   )
@@ -585,6 +625,9 @@ export function runIndependentPolicyValidation() {
     `Generated cells: ${report.cells.length}`,
     `B: ${report.aggregate.B.wins} wins / ${report.aggregate.B.losses} losses / ${report.aggregate.B.ties} ties — ${report.classifications.B}`,
     `F: ${report.aggregate.F.wins} wins / ${report.aggregate.F.losses} losses / ${report.aggregate.F.ties} ties — ${report.classifications.F}`,
+    `G: ${report.aggregate.G.wins} wins / ${report.aggregate.G.losses} losses / ${report.aggregate.G.ties} ties — ${report.classifications.G}`,
+    `Reserved Trio low-start B: ${report.reservedValidation.B.wins}/${report.reservedValidation.B.losses}/${report.reservedValidation.B.ties}`,
+    `Reserved Trio low-start G: ${report.reservedValidation.G.wins}/${report.reservedValidation.G.losses}/${report.reservedValidation.G.ties}`,
     '',
     '## Low-start cells (initial filters <= 4)',
     `B: ${report.aggregate.B.lowStart.wins}/${report.aggregate.B.lowStart.losses}/${report.aggregate.B.lowStart.ties}`,
@@ -619,6 +662,11 @@ export function runIndependentPolicyValidation() {
     generatedCells: report.cells,
     aggregate: report.aggregate,
     classifications: report.classifications,
+    reservedValidation: report.reservedValidation,
+    policyG: {
+      lowStartRule: 'if parentFilterCount <= 4 and RMSE top-4 contains any add-* mutation, use lexical; otherwise use RMSE top-4',
+      provenance: 'predeclared from U12t sparse-0001..0004 discovery only',
+    },
     discoverySplit: {
       discovery: 'u12t sparse-0001..0004',
       reservedValidation: 'trio sparse-0001..0004',
