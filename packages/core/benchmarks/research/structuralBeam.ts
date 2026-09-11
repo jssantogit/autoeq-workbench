@@ -175,6 +175,46 @@ export function createStructuralBeamDiagnosticTrace(enabled = true): StructuralB
   return { enabled, entries: [] }
 }
 
+export const STRUCTURAL_BEAM_EXHAUSTION_SCHEMA_VERSION = 1 as const
+
+export interface StructuralBeamExhaustionParentEntry {
+  schemaVersion: typeof STRUCTURAL_BEAM_EXHAUSTION_SCHEMA_VERSION
+  layerIndex: number
+  parentIndex: number
+  parentCandidateId: string
+  parentFilterCount: number
+  orderedProposalCount: number
+  defaultAdmittedCount: number
+  selectedProposalCount: number
+  admissionIntervention: 'default' | 'rescue' | 'custom'
+  prePolishAlreadyVisitedCount: number
+  overMaxFiltersCount: number
+  postPolishVisitedCount: number
+  evaluatedNewCount: number
+  evaluatedCandidateIds: string[]
+}
+
+export interface StructuralBeamExhaustionLayerEntry {
+  schemaVersion: typeof STRUCTURAL_BEAM_EXHAUSTION_SCHEMA_VERSION
+  layerIndex: number
+  beamBeforeCandidateIds: string[]
+  parents: StructuralBeamExhaustionParentEntry[]
+  generatedCandidateIds: string[]
+  retainedCandidateIds: string[]
+  retainedGeneratedCandidateIds: string[]
+  droppedGeneratedCandidateIds: string[]
+  terminalNoGenerated: boolean
+}
+
+export interface StructuralBeamExhaustionTrace {
+  enabled: boolean
+  layers: StructuralBeamExhaustionLayerEntry[]
+}
+
+export function createStructuralBeamExhaustionTrace(enabled = true): StructuralBeamExhaustionTrace {
+  return { enabled, layers: [] }
+}
+
 export interface StructuralBeamState {
   candidate: SolverLabCandidateV1
   evaluation: SolverLabEvaluationV1
@@ -220,6 +260,7 @@ export interface StructuralBeamRunInput {
   onPoint?: (point: SolverTrajectoryPointV1, filters: readonly Filter[]) => void
   onWorkUnitStart?: () => void
   diagnosticTrace?: StructuralBeamDiagnosticTrace
+  exhaustionTrace?: StructuralBeamExhaustionTrace
   admissionOverride?: StructuralBeamAdmissionOverride
 }
 
@@ -1036,6 +1077,21 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
     }
     layersExecuted += 1
     const generated: StructuralBeamState[] = []
+    const exhaustionLayer: StructuralBeamExhaustionLayerEntry | undefined =
+      input.exhaustionTrace?.enabled === true
+        ? {
+            schemaVersion: STRUCTURAL_BEAM_EXHAUSTION_SCHEMA_VERSION,
+            layerIndex: layersExecuted,
+            beamBeforeCandidateIds: beam.map((state) => state.candidate.candidateId),
+            parents: [],
+            generatedCandidateIds: [],
+            retainedCandidateIds: [],
+            retainedGeneratedCandidateIds: [],
+            droppedGeneratedCandidateIds: [],
+            terminalNoGenerated: false,
+          }
+        : undefined
+    if (exhaustionLayer !== undefined) input.exhaustionTrace!.layers.push(exhaustionLayer)
     for (const [parentIndex, parent] of beam.entries()) {
       if (input.isExpired?.()) break
       if (evaluationsUsed >= input.evaluationBudget) break
@@ -1062,12 +1118,41 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       if (proposals.length > config.proposalsPerParent) {
         throw new Error('structural beam admission override exceeds proposalsPerParent')
       }
+      const exhaustionParent: StructuralBeamExhaustionParentEntry | undefined =
+        exhaustionLayer === undefined
+          ? undefined
+          : {
+              schemaVersion: STRUCTURAL_BEAM_EXHAUSTION_SCHEMA_VERSION,
+              layerIndex: layersExecuted,
+              parentIndex,
+              parentCandidateId: parent.candidate.candidateId,
+              parentFilterCount: parent.candidate.filters.length,
+              orderedProposalCount: orderedProposals.length,
+              defaultAdmittedCount: admittedProposals.length,
+              selectedProposalCount: proposals.length,
+              admissionIntervention: admissionDecision?.intervention ?? 'default',
+              prePolishAlreadyVisitedCount: 0,
+              overMaxFiltersCount: 0,
+              postPolishVisitedCount: 0,
+              evaluatedNewCount: 0,
+              evaluatedCandidateIds: [],
+            }
+      if (exhaustionParent !== undefined) exhaustionLayer!.parents.push(exhaustionParent)
       for (const [proposalIndex, proposal] of proposals.entries()) {
         proposalsConsidered += 1
         structuralOperationCounts[proposal.mutation] += 1
         if (input.isExpired?.()) break
         if (evaluationsUsed >= input.evaluationBudget) break
-        if (proposal.filters.length > config.maxFilters) continue
+        if (proposal.filters.length > config.maxFilters) {
+          if (exhaustionParent !== undefined) exhaustionParent.overMaxFiltersCount += 1
+          continue
+        }
+        if (exhaustionParent !== undefined) {
+          const prePolishQuantized = quantizeStructuralBeamFilters(input.problem, proposal.filters)
+          if (visited.has(semanticFilterKey(prePolishQuantized))) {
+            exhaustionParent.prePolishAlreadyVisitedCount += 1
+          }
+        }
         input.onWorkUnitStart?.()
         const polished = polishStructuralProposal(
           input.problem,
@@ -1079,10 +1164,11 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
         const key = semanticFilterKey(quantized)
         if (visited.has(key)) {
           deduplicatedProposals += 1
+          if (exhaustionParent !== undefined) exhaustionParent.postPolishVisitedCount += 1
           continue
         }
         visited.add(key)
-        generated.push(record(
+        const generatedState = record(
           quantized,
           parent.origin,
           `proposal-${proposalsConsidered}-${proposal.mutation}`,
@@ -1098,18 +1184,39 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
                 coordinateTrials: polished.coordinateTrials,
               }
             : undefined,
-        ))
+        )
+        generated.push(generatedState)
+        if (exhaustionParent !== undefined) {
+          exhaustionParent.evaluatedNewCount += 1
+          exhaustionParent.evaluatedCandidateIds.push(generatedState.candidate.candidateId)
+        }
       }
+    }
+    if (exhaustionLayer !== undefined) {
+      exhaustionLayer.generatedCandidateIds = generated.map((state) => state.candidate.candidateId)
     }
     if (input.isExpired?.()) {
       stopReason = 'deadline'
       break
     }
     if (generated.length === 0) {
+      if (exhaustionLayer !== undefined) {
+        exhaustionLayer.terminalNoGenerated = true
+        exhaustionLayer.retainedCandidateIds = beam.map((state) => state.candidate.candidateId)
+      }
       stopReason = 'no-admissible-proposals'
       break
     }
     beam = retainParetoBeam([...beam, ...generated], config.beamWidth)
+    if (exhaustionLayer !== undefined) {
+      const generatedIds = new Set(exhaustionLayer.generatedCandidateIds)
+      exhaustionLayer.retainedCandidateIds = beam.map((state) => state.candidate.candidateId)
+      exhaustionLayer.retainedGeneratedCandidateIds = exhaustionLayer.retainedCandidateIds
+        .filter((candidateId) => generatedIds.has(candidateId))
+      const retainedGenerated = new Set(exhaustionLayer.retainedGeneratedCandidateIds)
+      exhaustionLayer.droppedGeneratedCandidateIds = exhaustionLayer.generatedCandidateIds
+        .filter((candidateId) => !retainedGenerated.has(candidateId))
+    }
     if (evaluationsUsed >= input.evaluationBudget) {
       stopReason = 'evaluation-budget'
       break
@@ -1147,6 +1254,9 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       timingBasis: input.nowMs === undefined ? 'synthetic-evaluation-count' : 'injected-clock',
       ...(input.diagnosticTrace?.enabled === true
         ? { diagnosticTraceSchemaVersion: STRUCTURAL_BEAM_DIAGNOSTIC_SCHEMA_VERSION }
+        : {}),
+      ...(input.exhaustionTrace?.enabled === true
+        ? { exhaustionTraceSchemaVersion: STRUCTURAL_BEAM_EXHAUSTION_SCHEMA_VERSION }
         : {}),
     },
   }

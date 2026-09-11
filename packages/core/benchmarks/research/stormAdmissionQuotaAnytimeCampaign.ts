@@ -14,6 +14,7 @@ import {
   quantizeStructuralBeamFilters,
   runStructuralBeam,
   type StructuralBeamAdmissionOverride,
+  type StructuralBeamExhaustionTrace,
   type StructuralProposal,
 } from './structuralBeam.js'
 import { getReferenceCell, type OracleReferenceSnapshotV1 } from './referenceSnapshot.js'
@@ -219,10 +220,11 @@ function signalEvaluationsAt(ledger: SignalLedger, checkpointMs: number): number
   return count
 }
 
-function runAnytimeArm(
+export function runAnytimeArm(
   arm: AnytimeArm,
   cell: GeneratedPolicyCell,
   snapshot: OracleReferenceSnapshotV1,
+  exhaustionTrace?: StructuralBeamExhaustionTrace,
 ) {
   const caseDef = loadLayeredResearchCases('adversarial')
     .find((candidate) => candidate.id === cell.caseId)
@@ -250,6 +252,7 @@ function runAnytimeArm(
     }],
     includeZeroSeed: false,
     admissionOverride: createAnytimeQuotaOverride(arm, problem, ledger, elapsedMs),
+    exhaustionTrace,
     nowMs,
     elapsedMs,
     isExpired,

@@ -47,6 +47,7 @@ jobs:
             test/autoeq/v2/research/stormAdmissionIndependentPolicyValidation.test.ts \
             test/autoeq/v2/research/stormAdmissionQuotaCampaign.test.ts \
             test/autoeq/v2/research/stormAdmissionQuotaAnytimeCampaign.test.ts \
+            test/autoeq/v2/research/stormSearchExhaustionCensus.test.ts \
             test/autoeq/v2/research/stormAdmissionGeneralizationCampaign.test.ts \
             test/autoeq/v2/research/stormAdmissionValidationCampaign.test.ts
       - name: Verify core typecheck
@@ -111,6 +112,11 @@ jobs:
           set -euo pipefail
           pnpm --filter @autoeq-workbench/core research:storm-admission-quota-anytime
 
+      - name: Run structural search exhaustion census
+        run: |
+          set -euo pipefail
+          pnpm --filter @autoeq-workbench/core research:storm-search-exhaustion-census
+
       - name: Replay selected Storm campaign
         run: |
           set -euo pipefail
@@ -143,6 +149,8 @@ jobs:
           cp docs/superpowers/specs/2026-09-11-storm-admission-quota-campaign-results.md "$GITHUB_WORKSPACE/storm-replay/quota-campaign-results.md"
           cp packages/core/.research-artifacts/storm-admission-quota-anytime-20260911/campaign-report.json "$GITHUB_WORKSPACE/storm-replay/quota-anytime-report.json"
           cp docs/superpowers/specs/2026-09-11-storm-admission-quota-anytime-results.md "$GITHUB_WORKSPACE/storm-replay/quota-anytime-results.md"
+          cp packages/core/.research-artifacts/storm-search-exhaustion-census-20260911/census-report.json "$GITHUB_WORKSPACE/storm-replay/search-exhaustion-census.json"
+          cp docs/superpowers/specs/2026-09-11-storm-search-exhaustion-census-results.md "$GITHUB_WORKSPACE/storm-replay/search-exhaustion-census-results.md"
           if [[ "$CAMPAIGN" == "validation" ]]; then
             cp packages/core/.research-artifacts/storm-admission-validation-20260911/campaign-report.json "$GITHUB_WORKSPACE/storm-replay/campaign-report.json"
             cp docs/superpowers/specs/2026-09-11-storm-admission-validation-results.md "$GITHUB_WORKSPACE/storm-replay/results.md"
