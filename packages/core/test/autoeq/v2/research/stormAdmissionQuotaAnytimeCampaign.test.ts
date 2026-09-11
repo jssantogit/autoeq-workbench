@@ -39,12 +39,15 @@ describe('Storm admission Q31 vs Q04 anytime campaign', () => {
     expect(classifyAnytimeCampaign([
       { checkpointMs: 5_000, q31Wins: 3, q04Wins: 2, ties: 1 },
       { checkpointMs: 15_000, q31Wins: 3, q04Wins: 2, ties: 1 },
-    ])).toBe('Q31-anytime-favorable')
+    ], false)).toBe('Q31-anytime-favorable')
     expect(classifyAnytimeCampaign([
       { checkpointMs: 5_000, q31Wins: 2, q04Wins: 3, ties: 1 },
-    ])).toBe('Q04-anytime-favorable')
+    ], false)).toBe('Q04-anytime-favorable')
     expect(classifyAnytimeCampaign([
       { checkpointMs: 5_000, q31Wins: 2, q04Wins: 2, ties: 2 },
-    ])).toBe('anytime-tradeoff')
+    ], false)).toBe('anytime-tradeoff')
+    expect(classifyAnytimeCampaign([
+      { checkpointMs: 5_000, q31Wins: 1, q04Wins: 3, ties: 2 },
+    ], true)).toBe('search-exhausted-before-first-checkpoint')
   })
 })

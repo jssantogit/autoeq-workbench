@@ -278,7 +278,9 @@ export function classifyAnytimeCampaign(
     q04Wins: number
     ties: number
   }[],
-): 'Q31-anytime-favorable' | 'Q04-anytime-favorable' | 'anytime-tradeoff' {
+  allRunsExhaustedBeforeFirstCheckpoint: boolean,
+): 'search-exhausted-before-first-checkpoint' | 'Q31-anytime-favorable' | 'Q04-anytime-favorable' | 'anytime-tradeoff' {
+  if (allRunsExhaustedBeforeFirstCheckpoint) return 'search-exhausted-before-first-checkpoint'
   const q31 = checkpointSummaries.reduce((sum, row) => sum + row.q31Wins, 0)
   const q04 = checkpointSummaries.reduce((sum, row) => sum + row.q04Wins, 0)
   if (q31 > q04) return 'Q31-anytime-favorable'
@@ -369,7 +371,16 @@ export function runAnytimeCampaign() {
     }
   })
 
-  const classification = classifyAnytimeCampaign(checkpoints)
+  const firstCheckpointMs = ANYTIME_CHECKPOINTS_MS[0]
+  const allRunsExhaustedBeforeFirstCheckpoint = results.every((row) =>
+    row.arms.Q31.naturallyExhausted &&
+    row.arms.Q04.naturallyExhausted &&
+    row.arms.Q31.totalElapsedMs < firstCheckpointMs &&
+    row.arms.Q04.totalElapsedMs < firstCheckpointMs)
+  const classification = classifyAnytimeCampaign(
+    checkpoints,
+    allRunsExhaustedBeforeFirstCheckpoint,
+  )
   const report = {
     schemaVersion: 1,
     experimentVersion: 'storm-admission-quota-anytime-v1',
@@ -388,6 +399,7 @@ export function runAnytimeCampaign() {
       oneRunPerArmCell: true,
       checkpointsExtractedFromSingle60SecondTrajectory: true,
       noPostOutcomeBudgetExtension: true,
+      allRunsExhaustedBeforeFirstCheckpoint,
     },
     results,
     checkpointSummaries: checkpoints,
@@ -415,6 +427,9 @@ export function runAnytimeCampaign() {
     '',
     `Classification: ${classification}`,
     '',
+    allRunsExhaustedBeforeFirstCheckpoint
+      ? 'All Q31/Q04 runs naturally exhausted before 5 seconds; 5/15/30/60 second checkpoints therefore repeat the same terminal state and do not measure additional anytime scaling.'
+      : 'At least one run remained active through the first checkpoint, so checkpoint differences contain actual anytime information.',
     'D/S means downstream canonical evaluations / admission-signal canonical evaluations accumulated by the checkpoint.',
     'This timing panel is diagnostic and does not establish independent corpus generalization.',
     '',
@@ -424,6 +439,7 @@ export function runAnytimeCampaign() {
 
   process.stdout.write(JSON.stringify({
     checkpointSummaries: checkpoints,
+    allRunsExhaustedBeforeFirstCheckpoint,
     classification,
     stopReasons: results.map((row) => ({
       cellId: row.cellId,
