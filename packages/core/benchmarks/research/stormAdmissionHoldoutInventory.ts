@@ -76,22 +76,37 @@ export function buildStormHoldoutInventory(sameRun: unknown) {
   if (sameRun === null || typeof sameRun !== 'object' || Array.isArray(sameRun)) {
     throw new Error('same-runtime tournament must be an object')
   }
-  const record = sameRun as { runs?: unknown; tournament?: { runs?: unknown } }
-  const runs = Array.isArray(record.tournament?.runs)
-    ? record.tournament.runs
-    : record.runs
-  if (!Array.isArray(runs)) throw new Error('same-runtime tournament runs are missing')
-  const stormRun = runs.find((run) => {
+  const record = sameRun as Record<string, unknown> & {
+    runs?: unknown
+    tournament?: { runs?: unknown }
+  }
+  const runArrays = [
+    Array.isArray(record.runs) ? record.runs : [],
+    Array.isArray(record.tournament?.runs) ? record.tournament!.runs! : [],
+  ]
+  const matchingRuns = runArrays.flat().filter((run) => {
     if (run === null || typeof run !== 'object' || Array.isArray(run)) return false
-    const record = run as Record<string, unknown>
-    return record.problemId === 'titan-to-storm' &&
-      record.algorithmId === 'matching-pursuit-v1' &&
-      record.variantId === 'matching-pursuit-v1'
-  }) as Record<string, unknown> | undefined
-  if (stormRun === undefined) throw new Error('frozen Storm matching-pursuit-v1 run is missing')
+    const candidate = run as Record<string, unknown>
+    return candidate.problemId === 'titan-to-storm' &&
+      candidate.algorithmId === 'matching-pursuit-v1' &&
+      candidate.variantId === 'matching-pursuit-v1'
+  }) as Record<string, unknown>[]
+  if (matchingRuns.length === 0) {
+    throw new Error('frozen Storm matching-pursuit-v1 run is missing')
+  }
 
-  const progressTrace = stormRun.progressTrace
-  if (!Array.isArray(progressTrace)) throw new Error('Storm progressTrace is missing')
+  const stormRun = matchingRuns.find((run) => Array.isArray(run.progressTrace))
+  if (stormRun === undefined) {
+    const schemaDiagnostic = {
+      topLevelKeys: Object.keys(record).sort(),
+      tournamentKeys: record.tournament && typeof record.tournament === 'object'
+        ? Object.keys(record.tournament).sort()
+        : [],
+      matchingRunKeys: matchingRuns.map((run) => Object.keys(run).sort()),
+    }
+    throw new Error(`Storm progressTrace is missing; schema=${JSON.stringify(schemaDiagnostic)}`)
+  }
+  const progressTrace = stormRun.progressTrace as unknown[]
 
   const observed = new Set<string>(PREVIOUSLY_OBSERVED_STORM_POLICY_IDS)
   const byCandidateId = new Map<string, InventoryCandidate>()
