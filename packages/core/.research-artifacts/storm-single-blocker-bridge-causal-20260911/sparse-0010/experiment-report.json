@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "experimentVersion": "storm-single-blocker-bridge-causal-v1",
+  "caseId": "titan-to-storm",
+  "primarySeedId": "matching-pursuit-v1:titan-to-storm:0:sparse-0010",
+  "frozenBridgePath": "parent-intermediate-0016-grandchild-0001",
+  "frozenBridgeIntermediateRank": 16,
+  "frozenBridgeMutation": "split",
+  "frozenBridgeGrandchildLexicalRank": 1,
+  "frozenDisplacedRank": 4,
+  "predeclaredSelectionRule": "best-selector-winner-by-frozen-census-rmse-among-valid-rank16-grandchildren",
+  "experimentConfig": {
+    "beamWidth": 2,
+    "proposalsPerParent": 4,
+    "localPolishEvaluations": 24,
+    "maxFilters": 10,
+    "evaluationBudget": 9
+  },
+  "equalWorkEnforced": true,
+  "equalWorkBasis": "Smallest fixed budget allowing full hop-1 + hop-2 expansion: 1 seed + 4 hop-1 + 4 hop-2 = 8 descendant evaluations (9 total canonical evaluations) per arm. Exactly 192 local-polish coordinate trials per arm.",
+  "frozenIntermediateSemanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":195,\"gainDb\":-7.3,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2958,\"gainDb\":-6.6,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4561.34246371618,\"gainDb\":-5.15,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4832.5740010411955,\"gainDb\":-5.15,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":10.5,\"q\":0.7}]",
+  "frozenGrandchildSemanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":219,\"gainDb\":-8.3,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.6,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4305,\"gainDb\":-5.1,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":5120,\"gainDb\":-6.1,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19562.082350226,\"gainDb\":15,\"q\":0.7}]",
+  "control": {
+    "arm": "control",
+    "seedValidation": {
+      "rmseDb": 1.6989353408590506,
+      "maxAbsDb": 5.850643387777495,
+      "filterCount": 9,
+      "cancellationScore": 0,
+      "referenceRegret": 1.5509895845764776,
+      "referenceImproved": false
+    },
+    "hop1AdmittedRanks": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "hop1InterventionApplied": false,
+    "hop1InterventionSlotReplaced": null,
+    "hop1BridgeIntermediateAdmitted": false,
+    "retainedBeamAfterHop1": [
+      "structural-beam-v1:titan-to-storm:0:matching-pursuit:frozen-parent:0000",
+      "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-merge:0004"
+    ],
+    "bridgeIntermediateInBeam": false,
+    "hop2ParentsExpanded": [
+      "structural-beam-v1:titan-to-storm:0:matching-pursuit:frozen-parent:0000",
+      "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-merge:0004"
+    ],
+    "hop2ProposalRankings": [
+      {
+        "parentCandidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:frozen-parent:0000",
+        "proposals": []
+      },
+      {
+        "parentCandidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-merge:0004",
+        "proposals": [
+          {
+            "rank": 1,
+            "mutation": "add-hs",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":219,\"gainDb\":-8.3,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.6,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-11.3,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":7561.349867210237,\"gainDb\":-5.702460773862317,\"q\":0.7},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19562,\"gainDb\":15,\"q\":0.7}]",
+            "admitted": true
+          },
+          {
+            "rank": 2,
+            "mutation": "add-ls",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":7561.349867210237,\"gainDb\":-5.702460773862317,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":219,\"gainDb\":-8.3,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.6,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-11.3,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19562,\"gainDb\":15,\"q\":0.7}]",
+            "admitted": true
+          },
+          {
+            "rank": 3,
+            "mutation": "add-pk",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":219,\"gainDb\":-8.3,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.6,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-11.3,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7561.349867210237,\"gainDb\":-5.702460773862317,\"q\":1.0954451150103324},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19562,\"gainDb\":15,\"q\":0.7}]",
+            "admitted": true
+          },
+          {
+            "rank": 4,
+            "mutation": "remove",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":219,\"gainDb\":-8.3,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.6,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-11.3,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8}]",
+            "admitted": true
+          }
+        ]
+      }
+    ],
+    "bridgeExpandedAtHop2": false,
+    "bridgeGrandchildGenerated": false,
+    "bridgeGrandchildAdmitted": false,
+    "bridgeGrandchildEvaluated": false,
+    "bridgeGrandchildCanonical": null,
+    "exactBridgePathFollowed": false,
+    "bestRmse": 1.6989353408590506,
+    "bestMaxAbs": 5.850643387777495,
+    "bestRegret": 1.5509895845764776,
+    "selectedBestCandidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:frozen-parent:0000",
+    "paretoVsParent": {
+      "pareto": "equivalent",
+      "selectorWinner": "baseline"
+    },
+    "paretoVsBGlobalBest": {
+      "pareto": "equivalent",
+      "selectorWinner": "baseline"
+    },
+    "selectorWinsOverParent": false,
+    "selectorWinsOverBGlobalBest": false,
+    "improvementEvaluationIndex": null,
+    "evaluationCount": 9,
+    "descendantEvaluations": 8,
+    "workBreakdown": {
+      "seedEvaluations": 1,
+      "hop1DescendantEvaluations": 4,
+      "hop2DescendantEvaluations": 4,
+      "totalDescendants": 8,
+      "fullPolishCoordinateTrials": 192,
+      "canonicalEvaluations": 9
+    }
+  },
+  "rescue": {
+    "arm": "rescue",
+    "seedValidation": {
+      "rmseDb": 1.6989353408590506,
+      "maxAbsDb": 5.850643387777495,
+      "filterCount": 9,
+      "cancellationScore": 0,
+      "referenceRegret": 1.5509895845764776,
+      "referenceImproved": false
+    },
+    "hop1AdmittedRanks": [
+      1,
+      2,
+      3,
+      16
+    ],
+    "hop1InterventionApplied": true,
+    "hop1InterventionSlotReplaced": 4,
+    "hop1BridgeIntermediateAdmitted": true,
+    "retainedBeamAfterHop1": [
+      "structural-beam-v1:titan-to-storm:0:matching-pursuit:frozen-parent:0000",
+      "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-split:0004"
+    ],
+    "bridgeIntermediateInBeam": true,
+    "hop2ParentsExpanded": [
+      "structural-beam-v1:titan-to-storm:0:matching-pursuit:frozen-parent:0000",
+      "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-split:0004"
+    ],
+    "hop2ProposalRankings": [
+      {
+        "parentCandidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:frozen-parent:0000",
+        "proposals": [
+          {
+            "rank": 4,
+            "mutation": "merge",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":195,\"gainDb\":-7.3,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2958,\"gainDb\":-6.6,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4695,\"gainDb\":-10.3,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19562.082350226,\"gainDb\":15,\"q\":0.7}]",
+            "admitted": true
+          }
+        ]
+      },
+      {
+        "parentCandidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-4-split:0004",
+        "proposals": [
+          {
+            "rank": 1,
+            "mutation": "merge",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":219,\"gainDb\":-8.3,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.6,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4305,\"gainDb\":-5.1,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":5120,\"gainDb\":-6.1,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19562.082350226,\"gainDb\":15,\"q\":0.7}]",
+            "admitted": true
+          },
+          {
+            "rank": 2,
+            "mutation": "remove",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":219,\"gainDb\":-8.3,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.6,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4305,\"gainDb\":-5.1,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":5120,\"gainDb\":-6.1,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19331,\"gainDb\":15,\"q\":0.7}]",
+            "admitted": true
+          },
+          {
+            "rank": 3,
+            "mutation": "remove",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":219,\"gainDb\":-8.3,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3320,\"gainDb\":-7.6,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4305,\"gainDb\":-5.1,\"q\":5.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":5120,\"gainDb\":-6.1,\"q\":4},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":7453,\"gainDb\":-15,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":6.3,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16731,\"gainDb\":-9.7,\"q\":8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18246,\"gainDb\":9,\"q\":8},{\"enabled\":true,\"type\":\"HS\",\"frequencyHz\":19897,\"gainDb\":10.5,\"q\":0.7}]",
+            "admitted": true
+          }
+        ]
+      }
+    ],
+    "bridgeExpandedAtHop2": true,
+    "bridgeGrandchildGenerated": true,
+    "bridgeGrandchildAdmitted": true,
+    "bridgeGrandchildEvaluated": true,
+    "bridgeGrandchildCanonical": {
+      "rmseDb": 1.785598097827203,
+      "maxAbsDb": 5.4931755792623775,
+      "filterCount": 9,
+      "cancellationScore": 0,
+      "referenceRegret": 1.7897631054087433,
+      "referenceImproved": false
+    },
+    "exactBridgePathFollowed": true,
+    "bestRmse": 1.785598097827203,
+    "bestMaxAbs": 5.4931755792623775,
+    "bestRegret": 1.7897631054087433,
+    "selectedBestCandidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:proposal-9-merge:0006",
+    "paretoVsParent": {
+      "pareto": "tradeoff",
+      "selectorWinner": "candidate"
+    },
+    "paretoVsBGlobalBest": {
+      "pareto": "tradeoff",
+      "selectorWinner": "candidate"
+    },
+    "selectorWinsOverParent": true,
+    "selectorWinsOverBGlobalBest": true,
+    "improvementEvaluationIndex": 6,
+    "evaluationCount": 9,
+    "descendantEvaluations": 8,
+    "workBreakdown": {
+      "seedEvaluations": 1,
+      "hop1DescendantEvaluations": 4,
+      "hop2DescendantEvaluations": 4,
+      "totalDescendants": 8,
+      "fullPolishCoordinateTrials": 192,
+      "canonicalEvaluations": 9
+    }
+  },
+  "classification": "single-blocker-bridge-causal-impact-supported",
+  "frozenPredecessorArtifacts": [
+    {
+      "logicalId": "packages/core/.research-artifacts/storm-two-hop-reachability-census-20260910/sparse-0010/census-report.json",
+      "sha256Before": "733b8d5f4f62e33aac1318c2c05b5e9a037b2541e9735ca48f0119b43d94f06d",
+      "sha256After": "733b8d5f4f62e33aac1318c2c05b5e9a037b2541e9735ca48f0119b43d94f06d",
+      "unchanged": true
+    }
+  ],
+  "validationIncidents": [],
+  "sourceCommit": "bf48b8e6500aa74bb9fba893adb88a6cf78b98c4"
+}
