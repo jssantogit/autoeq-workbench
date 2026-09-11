@@ -27,6 +27,7 @@ export function compareSelectorKeys(
   return 0
 }
 import { resolveResearchPath } from './seedAllocationRun.js'
+import { resolveCapacityRecoveryPath } from './frozenResearchInputs.js'
 import {
   runStructuralBeam,
   quantizeStructuralBeamFilters,
@@ -70,9 +71,9 @@ export const EVALUATION_BUDGET = 17
 export function loadCampaignInputs() {
   const read = (path: string) => readFileSync(path, 'utf8')
   const sha = (text: string) => createHash('sha256').update(text).digest('hex')
-  const snapshotRaw = read('/tmp/autoeq-capacity-recovery-20260908/OracleReferenceSnapshotV1.json')
-  const mpTrioRaw = read('/tmp/autoeq-capacity-recovery-20260908/mp-seeds/titan-to-trio-teacher-student.json')
-  const mpU12tRaw = read('/tmp/autoeq-capacity-recovery-20260908/mp-seeds/titan-to-u12t-teacher-student.json')
+  const snapshotRaw = read(resolveCapacityRecoveryPath('OracleReferenceSnapshotV1.json'))
+  const mpTrioRaw = read(resolveCapacityRecoveryPath('mp-seeds/titan-to-trio-teacher-student.json'))
+  const mpU12tRaw = read(resolveCapacityRecoveryPath('mp-seeds/titan-to-u12t-teacher-student.json'))
   const seedAllocRaw = read(resolveResearchPath('packages/core/.research-artifacts/seed-allocation-causal-20260909/storm-target8/tournament-report.json'))
   const twoHopRaw = read(resolveResearchPath('packages/core/.research-artifacts/storm-two-hop-reachability-census-20260910/sparse-0010/census-report.json'))
   const causalRaw = read(resolveResearchPath('packages/core/.research-artifacts/storm-single-blocker-bridge-causal-20260911/sparse-0010/experiment-report.json'))

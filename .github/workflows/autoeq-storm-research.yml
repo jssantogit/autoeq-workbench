@@ -1,0 +1,137 @@
+name: AutoEQ Storm Research CI
+
+on:
+  push:
+    branches:
+      - research/storm-diagnosis-20260910
+  workflow_dispatch:
+    inputs:
+      campaign:
+        description: Research campaign to replay when a frozen bundle is supplied
+        required: true
+        default: validation
+        type: choice
+        options: [validation, generalization]
+      frozen_input_release_tag:
+        description: Release tag containing autoeq-storm-frozen-inputs-v1.tar.gz
+        required: false
+        default: ''
+        type: string
+      expected_manifest_sha256:
+        description: Optional pinned manifest SHA-256
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  static-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Verify Storm research infrastructure
+        run: |
+          pnpm --filter @autoeq-workbench/core exec vitest run \
+            test/autoeq/v2/research/frozenResearchInputs.test.ts \
+            test/autoeq/v2/research/stormAdmissionGeneralizationCampaign.test.ts \
+            test/autoeq/v2/research/stormAdmissionValidationCampaign.test.ts
+      - name: Verify core typecheck
+        run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Verify frozen-input CLI surface
+        run: pnpm --filter @autoeq-workbench/core research:storm-frozen-inputs -- --help
+
+  scientific-replay:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.frozen_input_release_tag != '') ||
+      (github.event_name == 'push' && vars.AUTOEQ_STORM_INPUT_RELEASE_TAG != '')
+    runs-on: ubuntu-latest
+    env:
+      FROZEN_INPUT_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.frozen_input_release_tag || vars.AUTOEQ_STORM_INPUT_RELEASE_TAG }}
+      EXPECTED_MANIFEST_SHA256: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_manifest_sha256 || vars.AUTOEQ_STORM_INPUT_MANIFEST_SHA256 }}
+      CAMPAIGN: ${{ github.event_name == 'workflow_dispatch' && inputs.campaign || 'validation' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Download pinned frozen research inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test -n "$FROZEN_INPUT_RELEASE_TAG"
+          mkdir -p "$GITHUB_WORKSPACE/frozen-download" "$GITHUB_WORKSPACE/frozen-inputs"
+          gh release download "$FROZEN_INPUT_RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern autoeq-storm-frozen-inputs-v1.tar.gz \
+            --dir "$GITHUB_WORKSPACE/frozen-download"
+          tar -xzf "$GITHUB_WORKSPACE/frozen-download/autoeq-storm-frozen-inputs-v1.tar.gz" \
+            -C "$GITHUB_WORKSPACE/frozen-inputs"
+      - name: Verify frozen research inputs
+        run: |
+          set -euo pipefail
+          pnpm --filter @autoeq-workbench/core research:storm-frozen-inputs -- \
+            verify --root "$GITHUB_WORKSPACE/frozen-inputs"
+          if [[ -n "$EXPECTED_MANIFEST_SHA256" ]]; then
+            printf '%s  %s\n' "$EXPECTED_MANIFEST_SHA256" "$GITHUB_WORKSPACE/frozen-inputs/manifest.json" \
+              | sha256sum --check -
+          fi
+          echo "AUTOEQ_CAPACITY_RECOVERY_ROOT=$GITHUB_WORKSPACE/frozen-inputs/capacity-recovery" >> "$GITHUB_ENV"
+      - name: Replay selected Storm campaign
+        run: |
+          set -euo pipefail
+          case "$CAMPAIGN" in
+            validation)
+              pnpm --filter @autoeq-workbench/core research:storm-admission-validation
+              ;;
+            generalization)
+              pnpm --filter @autoeq-workbench/core research:storm-admission-generalization
+              ;;
+            *)
+              echo "Unsupported campaign: $CAMPAIGN" >&2
+              exit 1
+              ;;
+          esac
+      - name: Enforce research-only scope
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain -- packages/core/src apps vendor)"
+          git diff --check
+      - name: Collect replay evidence
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/storm-replay"
+          cp "$GITHUB_WORKSPACE/frozen-inputs/manifest.json" "$GITHUB_WORKSPACE/storm-replay/frozen-input-manifest.json"
+          if [[ "$CAMPAIGN" == "validation" ]]; then
+            cp packages/core/.research-artifacts/storm-admission-validation-20260911/campaign-report.json "$GITHUB_WORKSPACE/storm-replay/campaign-report.json"
+            cp docs/superpowers/specs/2026-09-11-storm-admission-validation-results.md "$GITHUB_WORKSPACE/storm-replay/results.md"
+          else
+            cp packages/core/.research-artifacts/storm-admission-generalization-20260911/campaign-report.json "$GITHUB_WORKSPACE/storm-replay/campaign-report.json"
+            cp docs/superpowers/specs/2026-09-11-storm-admission-generalization-results.md "$GITHUB_WORKSPACE/storm-replay/results.md"
+          fi
+          printf '{"repositorySha":"%s","workflowRunId":"%s","campaign":"%s","frozenInputReleaseTag":"%s"}\n' \
+            "$GITHUB_SHA" "$GITHUB_RUN_ID" "$CAMPAIGN" "$FROZEN_INPUT_RELEASE_TAG" \
+            > "$GITHUB_WORKSPACE/storm-replay/replay-provenance.json"
+      - name: Upload replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autoeq-storm-replay-${{ github.run_id }}
+          path: storm-replay
+          if-no-files-found: error
+          retention-days: 30
