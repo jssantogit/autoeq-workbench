@@ -266,7 +266,7 @@ export function runCampaign() {
       })
 
       for (const idx of CHECKPOINTS) {
-         const evals = evaluations.slice(0, idx + 1).filter(e => e)
+         const evals = evaluations.slice(0, idx + 1).filter((e): e is NonNullable<typeof e> => e !== null)
          let bestCand: any = null
          for (const cand of evals) {
              if (!bestCand) { bestCand = cand; continue }

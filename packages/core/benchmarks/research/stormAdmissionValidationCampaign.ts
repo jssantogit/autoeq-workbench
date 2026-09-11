@@ -12,7 +12,7 @@ import {
   type SolverLabProblemV1,
   type SolverLabEvaluationV1,
 } from './labProtocol.js'
-import { referenceSelectorKey, type SelectorPoint } from './referenceSelector.js'
+import { referenceSelectorKey, selectReferencePoint, type SelectorPoint } from './referenceSelector.js'
 
 export function compareSelectorKeys(
   left: readonly (number | string)[],
@@ -40,7 +40,6 @@ import {
 } from './structuralBeam.js'
 import { getReferenceCell, type OracleReferenceSnapshotV1 } from './referenceSnapshot.js'
 import { directedReferenceRegret, type ReferenceRegretPoint } from './referenceRegret.js'
-import { selectReferencePoint } from './solverRunArtifact.js'
 
 export const CHECKPOINTS_EVAL = Object.freeze([4, 8, 16])
 export const CHECKPOINTS_TIME = Object.freeze([5000, 15000, 30000, 60000])
