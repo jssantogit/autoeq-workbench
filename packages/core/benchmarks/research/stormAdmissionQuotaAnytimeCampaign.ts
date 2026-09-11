@@ -236,6 +236,7 @@ export function runAnytimeArm(
   const problem = createSolverLabProblem(caseDef, 10)
   const references = referenceFrontier(snapshot, problem)
   const ledger: SignalLedger = { canonicalEvaluations: 0, elapsedMs: 0, events: [] }
+  const downstreamEvaluationTimesMs: number[] = []
   const started = performance.now()
   const nowMs = () => performance.now()
   const elapsedMs = () => performance.now() - started
@@ -260,6 +261,7 @@ export function runAnytimeArm(
     nowMs,
     elapsedMs,
     isExpired,
+    onPoint: (point) => downstreamEvaluationTimesMs.push(point.elapsedMs),
   })
 
   const totalElapsedMs = elapsedMs()
@@ -268,7 +270,8 @@ export function runAnytimeArm(
     return {
       checkpointMs,
       selectedBest,
-      downstreamEvaluations: selectedBest?.evaluationCount ?? 0,
+      downstreamEvaluations: downstreamEvaluationTimesMs
+        .filter((elapsed) => elapsed <= checkpointMs).length,
       signalCanonicalEvaluations: signalEvaluationsAt(ledger, checkpointMs),
     }
   })
