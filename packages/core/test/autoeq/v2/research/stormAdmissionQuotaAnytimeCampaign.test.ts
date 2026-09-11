@@ -6,6 +6,8 @@ import {
   ANYTIME_EVALUATION_BUDGET_CEILING,
   ANYTIME_PANEL_CELL_IDS,
   classifyAnytimeCampaign,
+  compareSelected,
+  paretoRelation,
 } from '../../../../benchmarks/research/stormAdmissionQuotaAnytimeCampaign.js'
 
 describe('Storm admission Q31 vs Q04 anytime campaign', () => {
@@ -33,6 +35,13 @@ describe('Storm admission Q31 vs Q04 anytime campaign', () => {
 
   it('uses a ceiling high enough for the deadline to be the intended limiter', () => {
     expect(ANYTIME_EVALUATION_BUDGET_CEILING).toBe(100_000)
+  })
+
+  it('treats identical policy outcomes as equivalent before candidate-id tie breaks', () => {
+    const left = { candidateId: 'left', rmseDb: 1, maxAbsDb: 2, filterCount: 4 }
+    const right = { candidateId: 'right', rmseDb: 1, maxAbsDb: 2, filterCount: 4 }
+    expect(compareSelected(left, right)).toBe('equivalent')
+    expect(paretoRelation(left, right)).toBe('equivalent')
   })
 
   it('classifies aggregate checkpoint wins without a hidden quality threshold', () => {

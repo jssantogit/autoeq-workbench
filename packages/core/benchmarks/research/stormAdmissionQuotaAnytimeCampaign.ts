@@ -155,10 +155,17 @@ function selectedBestAt(trajectory: readonly any[], checkpointMs: number) {
   }
 }
 
-function compareSelected(left: any, right: any): 'Q31' | 'Q04' | 'equivalent' {
+export function compareSelected(left: any, right: any): 'Q31' | 'Q04' | 'equivalent' {
   if (left === null && right === null) return 'equivalent'
   if (left === null) return 'Q04'
   if (right === null) return 'Q31'
+
+  const epsilon = 1e-12
+  if (
+    Math.abs(left.rmseDb - right.rmseDb) <= epsilon &&
+    Math.abs(left.maxAbsDb - right.maxAbsDb) <= epsilon &&
+    left.filterCount === right.filterCount
+  ) return 'equivalent'
 
   const leftKey = referenceSelectorKey({
     candidateId: left.candidateId,
