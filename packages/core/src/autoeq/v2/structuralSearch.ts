@@ -427,7 +427,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
 
         const polished = polishFilters(
           proposal.filters,
-          Math.max(config.localPolishEvaluations, proposal.filters.length * 8),
+          Math.max(config.localPolishEvaluations, proposal.filters.length * 6),
           bounds,
           desiredDb,
           frequencies,
