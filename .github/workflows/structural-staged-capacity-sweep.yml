@@ -1,0 +1,27 @@
+name: Structural Staged Capacity Sweep
+
+on:
+  push:
+    branches:
+      - research/audit-staged-capacity-scaling-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run staged 10 to 15 to 20 sweep
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralStagedCapacitySweep.ts
