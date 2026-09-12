@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   cascadeMagnitudeDb,
   createV2ResponseCache,
+  removeV2ResponseCacheFilter,
   replaceV2ResponseCacheFilter,
   type Filter,
 } from '../../../src/index.js'
@@ -44,6 +45,23 @@ describe('Standard v2 response cache', () => {
     expect(replaced.filterResponsesDb[0]).toBe(cache.filterResponsesDb[0])
     expect(replaced.filterResponsesDb[1]).not.toBe(cache.filterResponsesDb[1])
     expect(replaced.filterResponsesDb[2]).toBe(cache.filterResponsesDb[2])
+  })
+
+  it('removes one cached response with the exact same summation result as rebuilding', () => {
+    const cache = createV2ResponseCache(filters, frequencies, sampleRateHz)
+    const removed = removeV2ResponseCacheFilter(cache, 1, frequencies, sampleRateHz)
+    const rebuilt = createV2ResponseCache(
+      [filters[0]!, filters[2]!],
+      frequencies,
+      sampleRateHz,
+      cache.responseGrid,
+    )
+
+    expect(removed.cascadeDb).toEqual(rebuilt.cascadeDb)
+    expect(removed.filterResponsesDb).toEqual(rebuilt.filterResponsesDb)
+    expect(removed.filterResponsesDb[0]).toBe(cache.filterResponsesDb[0])
+    expect(removed.filterResponsesDb[1]).toBe(cache.filterResponsesDb[2])
+    expect(removed.responseGrid).toBe(cache.responseGrid)
   })
 
   it('builds the fixed response grid once and reuses it for replacements', () => {
