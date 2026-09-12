@@ -3,7 +3,7 @@ name: Q31 X8 Public Corpus Audit
 on:
   push:
     branches:
-      - research/audit-q31-x8-public-corpus-20260912
+      - research/audit-q31-x8-public-corpus-smoke-20260912
 
 permissions:
   contents: read
