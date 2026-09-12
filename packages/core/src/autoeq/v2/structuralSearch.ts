@@ -375,6 +375,10 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     cancellationScore
   }
   let beam: SearchState[] = [initialPolished]
+  let bestAchieved: SearchState | undefined =
+    initialPolished.rmseDb <= 0.25 && initialPolished.maxAbsDb <= 0.75
+      ? initialPolished
+      : undefined
 
   while (beam.length > 0 && !deadline.isExpired()) {
     const nextStates: SearchState[] = []
@@ -439,6 +443,14 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         visited.add(key)
 
         polished.candidateId = String(candidateCounter++).padStart(4, '0')
+        if (polished.rmseDb <= 0.25 && polished.maxAbsDb <= 0.75) {
+          if (
+            bestAchieved === undefined ||
+            compareKeys(referenceSelectorKey(polished), referenceSelectorKey(bestAchieved)) < 0
+          ) {
+            bestAchieved = polished
+          }
+        }
         nextStates.push(polished)
       }
     }
@@ -456,7 +468,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     }
   }
 
-  const best = selectReferencePoint(beam)
+  const best = bestAchieved ?? selectReferencePoint(beam)
   return {
     filters: best.filters,
     rmseDb: best.rmseDb,
