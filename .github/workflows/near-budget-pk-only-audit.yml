@@ -1,0 +1,35 @@
+name: Near Budget PK Only Audit
+
+on:
+  push:
+    branches:
+      - research/audit-q31-x8-near-budget-pk-only-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run near-budget PK-only audit
+        env:
+          AUDIT_OUTPUT_DIR: ${{ github.workspace }}/near-budget-pk-only-audit
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/nearBudgetPkOnlyAudit.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: near-budget-pk-only-audit-${{ github.run_id }}
+          path: near-budget-pk-only-audit
+          if-no-files-found: error
+          retention-days: 30
