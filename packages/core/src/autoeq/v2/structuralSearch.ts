@@ -27,7 +27,15 @@ export interface ResolvedStructuralSearchConfig {
   proposalsPerParent: number
   localPolishEvaluations: number
   maxFilters: number
-  admission: 'lexical' | 'q31-b4-p8'
+  featureRegionCount?: number
+  minFeatureSeparationOctaves?: number
+  candidatePolicy?: 'legacy' | 'semantic'
+  selectionMetric?: 'hypot' | 'violation'
+  mergeProximityOctaves?: number
+  marginalPruneTolerance?: number
+  structuralCleanupMinFilters?: number
+  structuralCleanupMaxSteps?: number
+  admission: 'lexical' | 'q31-b4-p8' | 'metric'
   workProfile: 'short-5s' | 'full'
 }
 
@@ -42,6 +50,14 @@ export function resolveStructuralSearchConfig(options?: {
       proposalsPerParent: 8,
       localPolishEvaluations: 24,
       maxFilters: 10,
+      featureRegionCount: 6,
+      minFeatureSeparationOctaves: 0.5,
+      candidatePolicy: 'semantic',
+      selectionMetric: 'violation',
+      mergeProximityOctaves: 1 / 12 + 0.002,
+      marginalPruneTolerance: 0.01,
+      structuralCleanupMinFilters: 8,
+      structuralCleanupMaxSteps: 3,
       admission: 'q31-b4-p8',
       workProfile: options.timeLimitSeconds === 5 ? 'short-5s' : 'full',
     }
@@ -52,6 +68,14 @@ export function resolveStructuralSearchConfig(options?: {
     proposalsPerParent: 4,
     localPolishEvaluations: 24,
     maxFilters: 10,
+    featureRegionCount: 1,
+    minFeatureSeparationOctaves: 0,
+    candidatePolicy: 'legacy',
+    selectionMetric: 'hypot',
+    mergeProximityOctaves: 1 / 12,
+    marginalPruneTolerance: 0,
+    structuralCleanupMinFilters: 10,
+    structuralCleanupMaxSteps: 0,
     admission: 'lexical',
     workProfile: options?.timeLimitSeconds === 5 ? 'short-5s' : 'full',
   }
@@ -115,6 +139,64 @@ function splitDepth(id: string): number {
   return id.split('-split-').length - 1
 }
 
+export interface ResidualFeature {
+  frequencyHz: number
+  residual: number
+}
+
+export function selectResidualFeatures(
+  frequenciesHz: readonly number[],
+  residualDb: readonly number[],
+  bounds: StandardAutoEqV2Config,
+  maxFeatures: number,
+  minSeparationOctaves: number,
+  includeEndpoints = true,
+): ResidualFeature[] {
+  if (
+    frequenciesHz.length === 0 ||
+    frequenciesHz.length !== residualDb.length ||
+    maxFeatures <= 0
+  ) return []
+
+  const extrema: number[] = []
+  const startIndex = includeEndpoints ? 0 : 1
+  const endIndex = includeEndpoints ? residualDb.length : residualDb.length - 1
+  for (let index = startIndex; index < endIndex; index += 1) {
+    const magnitude = Math.abs(residualDb[index]!)
+    const left = index === 0 || magnitude >= Math.abs(residualDb[index - 1]!)
+    const right = index === residualDb.length - 1 || magnitude >= Math.abs(residualDb[index + 1]!)
+    if (
+      left &&
+      right &&
+      magnitude >= bounds.algorithm.candidateResidualFloorDb
+    ) {
+      extrema.push(index)
+    }
+  }
+
+  extrema.sort((leftIndex, rightIndex) =>
+    Math.abs(residualDb[rightIndex]!) - Math.abs(residualDb[leftIndex]!) ||
+    frequenciesHz[leftIndex]! - frequenciesHz[rightIndex]!
+  )
+
+  const selected: ResidualFeature[] = []
+  for (const index of extrema) {
+    const frequencyHz = clamp(
+      frequenciesHz[index]!,
+      bounds.minFrequencyHz,
+      bounds.maxFrequencyHz,
+    )
+    const separated = selected.every((feature) =>
+      Math.abs(Math.log2(frequencyHz / feature.frequencyHz)) >= minSeparationOctaves
+    )
+    if (!separated) continue
+
+    selected.push({ frequencyHz, residual: residualDb[index]! })
+    if (selected.length >= maxFeatures) break
+  }
+  return selected
+}
+
 function featureFrequency(
   frequenciesHz: readonly number[],
   residualDb: readonly number[],
@@ -150,13 +232,13 @@ function median(values: readonly number[]): number {
     : sorted[middle]!
 }
 
-interface ShelfEvidence {
+export interface ShelfEvidence {
   type: 'LS' | 'HS'
   frequencyHz: number
   residual: number
 }
 
-function selectShelfEvidence(
+export function selectShelfEvidence(
   frequenciesHz: readonly number[],
   residualDb: readonly number[],
   bounds: StandardAutoEqV2Config,
@@ -223,6 +305,13 @@ function selectShelfEvidence(
   return result
 }
 
+export function localPolishEvaluationBudget(
+  baseEvaluations: number,
+  filterCount: number,
+): number {
+  return Math.max(baseEvaluations, Math.max(0, filterCount) * 8)
+}
+
 function addProposal(
   filters: readonly Filter[],
   mutation: Extract<StructuralMutation, 'add-pk' | 'add-ls' | 'add-hs'>,
@@ -246,7 +335,7 @@ function addProposal(
   return { mutation, filters: canonical([...filters, newFilter]) }
 }
 
-export function generateStructuralMutations(
+function generateStructuralMutationsCurrent(
   filters: readonly Filter[],
   residualDb: readonly number[],
   frequenciesHz: readonly number[],
@@ -373,6 +462,163 @@ export function generateStructuralMutations(
   return proposals
 }
 
+function generateStructuralMutationsCompatibility(
+  filters: readonly Filter[],
+  residualDb: readonly number[],
+  frequenciesHz: readonly number[],
+  bounds: StandardAutoEqV2Config,
+  featureRegionCount = 1,
+  minFeatureSeparationOctaves = 0,
+  candidatePolicy: 'legacy' | 'semantic' = 'legacy',
+  mergeProximityOctaves = 1 / 12,
+): StructuralProposal[] {
+  const current = filters.map((filter) => projectFilter(filter, bounds))
+  const features = selectResidualFeatures(
+    frequenciesHz,
+    residualDb,
+    bounds,
+    featureRegionCount,
+    minFeatureSeparationOctaves,
+    candidatePolicy === 'legacy',
+  )
+  const proposals: StructuralProposal[] = []
+  if (current.length < bounds.maxFilters) {
+    if (candidatePolicy === 'semantic') {
+      for (const { frequencyHz, residual } of features) {
+        proposals.push(addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds))
+      }
+      for (const shelf of selectShelfEvidence(frequenciesHz, residualDb, bounds)) {
+        proposals.push(addProposal(
+          current,
+          shelf.type === 'LS' ? 'add-ls' : 'add-hs',
+          shelf.type,
+          shelf.frequencyHz,
+          shelf.residual,
+          bounds,
+        ))
+      }
+    } else {
+      for (const { frequencyHz, residual } of features) {
+        proposals.push(
+          addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds),
+          addProposal(current, 'add-ls', 'LS', frequencyHz, residual, bounds),
+          addProposal(current, 'add-hs', 'HS', frequencyHz, residual, bounds),
+        )
+      }
+    }
+  }
+  current.forEach((filter, index) => {
+    proposals.push({
+      mutation: 'remove',
+      filters: canonical(current.filter((_, candidateIndex) => candidateIndex !== index)),
+    })
+    if (candidatePolicy === 'legacy' || filter.type !== 'PK') {
+      const nextType: Filter['type'] = candidatePolicy === 'semantic'
+        ? 'PK'
+        : ({ PK: 'LS', LS: 'HS', HS: 'PK' } as const)[filter.type]
+      proposals.push({
+        mutation: 'type-mutation',
+        filters: canonical([
+          ...current.slice(0, index),
+          projectFilter({ ...filter, type: nextType }, bounds),
+          ...current.slice(index + 1),
+        ]),
+      })
+    }
+    if (
+      current.length < bounds.maxFilters &&
+      (candidatePolicy === 'legacy' || filter.type === 'PK')
+    ) {
+      const ratio = 2 ** (1 / 24)
+      const first = projectFilter({
+        ...filter,
+        id: uniqueId(current, `${filter.id}-split-low`),
+        frequencyHz: filter.frequencyHz / ratio,
+        gainDb: filter.gainDb / 2,
+      }, bounds)
+      const second = projectFilter({
+        ...filter,
+        id: uniqueId([...current, first], `${filter.id}-split-high`),
+        frequencyHz: filter.frequencyHz * ratio,
+        gainDb: filter.gainDb / 2,
+      }, bounds)
+      proposals.push({
+        mutation: 'split',
+        filters: canonical([
+          ...current.slice(0, index),
+          first,
+          second,
+          ...current.slice(index + 1),
+        ]),
+      })
+    }
+  })
+  for (let leftIndex = 0; leftIndex < current.length; leftIndex += 1) {
+    const left = current[leftIndex]!
+    for (let rightIndex = leftIndex + 1; rightIndex < current.length; rightIndex += 1) {
+      const right = current[rightIndex]!
+      if (
+        left.type !== right.type ||
+        Math.abs(Math.log2(left.frequencyHz / right.frequencyHz)) > mergeProximityOctaves
+      ) {
+        continue
+      }
+      const leftWeight = Math.abs(left.gainDb)
+      const rightWeight = Math.abs(right.gainDb)
+      const totalWeight = leftWeight + rightWeight
+      const centerOctave = totalWeight > 0
+        ? (leftWeight * Math.log2(left.frequencyHz) + rightWeight * Math.log2(right.frequencyHz)) / totalWeight
+        : (Math.log2(left.frequencyHz) + Math.log2(right.frequencyHz)) / 2
+      const merged = projectFilter({
+        id: uniqueId(current, `merge-${left.id}-${right.id}`),
+        enabled: left.enabled || right.enabled,
+        type: left.type,
+        frequencyHz: 2 ** centerOctave,
+        gainDb: left.gainDb + right.gainDb,
+        q: (left.q + right.q) / 2,
+      }, bounds)
+      proposals.push({
+        mutation: 'merge',
+        filters: canonical([
+          ...current.filter((_, index) => index !== leftIndex && index !== rightIndex),
+          merged,
+        ]),
+      })
+    }
+  }
+  return proposals
+}
+
+export function generateStructuralMutations(
+  filters: readonly Filter[],
+  residualDb: readonly number[],
+  frequenciesHz: readonly number[],
+  bounds: StandardAutoEqV2Config,
+  featureRegionCount?: number,
+  minFeatureSeparationOctaves?: number,
+  candidatePolicy?: 'legacy' | 'semantic',
+  mergeProximityOctaves?: number,
+): StructuralProposal[] {
+  if (
+    featureRegionCount !== undefined ||
+    minFeatureSeparationOctaves !== undefined ||
+    candidatePolicy !== undefined ||
+    mergeProximityOctaves !== undefined
+  ) {
+    return generateStructuralMutationsCompatibility(
+      filters,
+      residualDb,
+      frequenciesHz,
+      bounds,
+      featureRegionCount ?? 1,
+      minFeatureSeparationOctaves ?? 0,
+      candidatePolicy ?? 'legacy',
+      mergeProximityOctaves ?? (1 / 12),
+    )
+  }
+  return generateStructuralMutationsCurrent(filters, residualDb, frequenciesHz, bounds)
+}
+
 function filterKey(filters: readonly Filter[]): string {
   const order: Record<Filter['type'], number> = { LS: 0, PK: 1, HS: 2 }
   return JSON.stringify(filters
@@ -477,6 +723,164 @@ export interface StructuralSearchResult {
   filters: Filter[]
   rmseDb: number
   maxAbsDb: number
+}
+
+function evaluateStructuralFilters(
+  filters: readonly Filter[],
+  candidateId: string,
+  bounds: StandardAutoEqV2Config,
+  desiredDb: readonly number[],
+  frequencies: readonly number[],
+  sampleRateHz: number,
+): SearchState {
+  const quantized = canonical(quantizeV2Filters(filters, bounds))
+  const solution = evaluateV2Solution(quantized, desiredDb, frequencies, sampleRateHz)
+  return {
+    candidateId,
+    filters: canonical(solution.filters),
+    rmseDb: solution.metrics.rmseDb,
+    maxAbsDb: solution.metrics.maxAbsDb,
+    cancellationScore: solution.cancellationAudit.totalScore,
+  }
+}
+
+function mergeStructuralPair(
+  filters: readonly Filter[],
+  leftIndex: number,
+  rightIndex: number,
+  bounds: StandardAutoEqV2Config,
+): Filter[] {
+  const left = filters[leftIndex]!
+  const right = filters[rightIndex]!
+  const leftWeight = Math.abs(left.gainDb)
+  const rightWeight = Math.abs(right.gainDb)
+  const totalWeight = leftWeight + rightWeight
+  const centerOctave = totalWeight > 0
+    ? (
+        leftWeight * Math.log2(left.frequencyHz) +
+        rightWeight * Math.log2(right.frequencyHz)
+      ) / totalWeight
+    : (Math.log2(left.frequencyHz) + Math.log2(right.frequencyHz)) / 2
+  const merged = projectFilter({
+    id: uniqueId(filters, `cleanup-merge-${left.id}-${right.id}`),
+    enabled: left.enabled || right.enabled,
+    type: left.type,
+    frequencyHz: 2 ** centerOctave,
+    gainDb: left.gainDb + right.gainDb,
+    q: (left.q + right.q) / 2,
+  }, bounds)
+
+  return canonical([
+    ...filters.filter((_, index) => index !== leftIndex && index !== rightIndex),
+    merged,
+  ])
+}
+
+function isCleanupWithinTolerance(
+  anchor: SearchState,
+  candidate: SearchState,
+  tolerance: number,
+): boolean {
+  const anchorViolation = Math.max(anchor.rmseDb / 0.25, anchor.maxAbsDb / 0.75)
+  const candidateViolation = Math.max(candidate.rmseDb / 0.25, candidate.maxAbsDb / 0.75)
+  return candidateViolation - anchorViolation <= tolerance + 1e-12 &&
+    (candidate.rmseDb - anchor.rmseDb) / 0.25 <= tolerance + 1e-12 &&
+    (candidate.maxAbsDb - anchor.maxAbsDb) / 0.75 <= tolerance + 1e-12
+}
+
+export function simplifyStructuralState(
+  state: SearchState,
+  desiredDb: readonly number[],
+  frequencies: readonly number[],
+  sampleRateHz: number,
+  bounds: StandardAutoEqV2Config,
+  mergeProximityOctaves: number,
+  tolerance: number,
+  maxSteps: number,
+): SearchState {
+  if (tolerance <= 0 || maxSteps <= 0 || state.filters.length === 0) return state
+
+  const anchor = state
+  let current = state
+
+  for (let step = 0; step < maxSteps && current.filters.length > 0; step += 1) {
+    const candidates: SearchState[] = []
+
+    for (let index = 0; index < current.filters.length; index += 1) {
+      const candidate = evaluateStructuralFilters(
+        current.filters.filter((_, filterIndex) => filterIndex !== index),
+        current.candidateId,
+        bounds,
+        desiredDb,
+        frequencies,
+        sampleRateHz,
+      )
+      if (isCleanupWithinTolerance(anchor, candidate, tolerance)) {
+        candidates.push(candidate)
+      }
+    }
+
+    for (let leftIndex = 0; leftIndex < current.filters.length; leftIndex += 1) {
+      const left = current.filters[leftIndex]!
+      for (let rightIndex = leftIndex + 1; rightIndex < current.filters.length; rightIndex += 1) {
+        const right = current.filters[rightIndex]!
+        if (
+          left.type !== right.type ||
+          Math.abs(Math.log2(left.frequencyHz / right.frequencyHz)) > mergeProximityOctaves
+        ) continue
+
+        const candidate = evaluateStructuralFilters(
+          mergeStructuralPair(current.filters, leftIndex, rightIndex, bounds),
+          current.candidateId,
+          bounds,
+          desiredDb,
+          frequencies,
+          sampleRateHz,
+        )
+        if (isCleanupWithinTolerance(anchor, candidate, tolerance)) {
+          candidates.push(candidate)
+        }
+      }
+    }
+
+    if (candidates.length === 0) break
+
+    candidates.sort((left, right) =>
+      Math.max(left.rmseDb / 0.25, left.maxAbsDb / 0.75) -
+        Math.max(right.rmseDb / 0.25, right.maxAbsDb / 0.75) ||
+      left.rmseDb - right.rmseDb ||
+      left.maxAbsDb - right.maxAbsDb ||
+      left.cancellationScore - right.cancellationScore ||
+      left.filters.length - right.filters.length ||
+      semanticFilterKey(left.filters).localeCompare(semanticFilterKey(right.filters))
+    )
+
+    const next = candidates[0]!
+    if (next.filters.length >= current.filters.length) break
+    current = next
+  }
+
+  return current
+}
+
+export function pruneMarginalFilter(
+  state: SearchState,
+  desiredDb: readonly number[],
+  frequencies: readonly number[],
+  sampleRateHz: number,
+  tolerance: number,
+): SearchState {
+  const bounds = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
+  return simplifyStructuralState(
+    state,
+    desiredDb,
+    frequencies,
+    sampleRateHz,
+    bounds,
+    0,
+    tolerance,
+    1,
+  )
 }
 
 export function runStructuralSearch(input: StructuralSearchInput): StructuralSearchResult {
