@@ -476,8 +476,8 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         const selected = selectQuotaProposals(
           prePolishScored,
           rmseRanked,
-          2,
           6,
+          2,
           config.proposalsPerParent,
         )
         admitted = selected.map(s => s.proposal)
@@ -489,13 +489,9 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         if (deadline.isExpired()) break
         if (proposal.filters.length > config.maxFilters) continue
 
-        const polishEvaluations = localPolishEvaluationBudget(
-          config.localPolishEvaluations,
-          proposal.filters.length,
-        )
         const polished = polishFilters(
           proposal.filters,
-          polishEvaluations,
+          config.localPolishEvaluations,
           bounds,
           desiredDb,
           frequencies,
