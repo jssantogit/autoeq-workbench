@@ -1,0 +1,41 @@
+name: Short5 R5S2 Gates
+
+on:
+  push:
+    branches:
+      - research/audit-q31-x8-short5-r5s2-natural-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  real:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/research/short5NaturalRealCorpus.ts
+  holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/short5HoldoutCorpus.ts
