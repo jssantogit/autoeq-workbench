@@ -586,3 +586,93 @@ The solver approximates the low shelf with a PK around 27 Hz, contains two inter
    starting from the non-regressive replace-at-cap branch, guarantee one pre-polish replacement proposal survives admission when at the filter cap.
 
 These remain isolated; no combination is promoted before individual evidence.
+
+
+## Phase 2.3 — Decomposed shelf and replacement admission results
+
+### Evidence-based shelf adds only
+
+Run: `34709072795`
+
+Only direct LS/HS add proposals are replaced by edge-evidence shelves. Legacy type mutation and split behavior remain unchanged.
+
+Aggregate:
+- targets achieved: **6/10** versus baseline 5/10;
+- exact/no-timeout behavior retained in the smoke pass.
+
+Strong gains:
+- dense_treble: violation 1.1276 -> 0.6011; target recovered
+- stress_mixed_edges: 1.5167 -> 0.7724; target recovered
+- overcomplete_compress: 1.3063 -> 1.0327
+- alternating_2_8k: 0.9942 -> 0.9324
+
+Regressions:
+- mixed_widths: 0.5398 -> 1.1210; target lost
+- stress_mid_treble: 3.2908 -> 3.5875
+- near_budget: 1.8648 -> 1.9826
+- overlap: 0.2912 -> 0.4907
+
+Classification: **specialist mechanism, reject as unconditional global policy**.
+
+### Shelf type discipline only
+
+Run: `34709074469`
+
+Legacy direct shelf adds are preserved, but PK -> shelf type mutation is disabled and shelves are no longer split.
+
+Result:
+- target count falls to 4/10;
+- alternating_2_8k loses target;
+- dense_treble remains a miss;
+- only modest gains on mixed_widths and overlap.
+
+Classification: **reject**.
+
+The large dense/edge gains of the full semantic shelf geometry are therefore driven primarily by evidence-based shelf add geometry, not by type discipline alone.
+
+### Reserved replacement admission
+
+Run: `34709076422`
+
+Starting from the non-regressive direct replacement mechanism, one best pre-polish replacement is forced into the admitted proposal set whenever a parent is at Max Filters.
+
+Gains:
+- dense_treble: 1.1276 -> 0.9674; target recovered
+- overcomplete_compress: 1.3063 -> 1.0185
+- mixed_widths and quantization_sensitive also improve
+
+Regressions:
+- stress_mid_treble: 3.2908 -> 3.5461
+- stress_mixed_edges: 1.5167 -> 1.5679
+
+near_budget remains unchanged.
+
+Classification: **reject forced admission**. Keep the earlier direct replacement proposal competing normally; do not reserve a global quota slot.
+
+## Updated retained/rejected mechanism list
+
+Retained for further research:
+- Q31 B4/P8 structural search semantics;
+- filter-count-scaled local polish x8;
+- direct one-for-one PK replacement at the cap, normal admission only.
+
+Rejected as global defaults:
+- multi-region always-on proposals;
+- quota inversion;
+- normalized-violation/semantic-ranking bundle;
+- cumulative cleanup;
+- target-valid archive as default delivery;
+- full semantic shelf geometry;
+- shelf type discipline alone;
+- forced replacement admission.
+
+Specialist evidence, not yet globally usable:
+- edge-evidence shelf add proposals.
+
+## Next causal axis: PK width/Q seeding
+
+Standard V2 derives PK Q from residual width using sign-crossing/half-height boundaries and evaluates Q scales 0.5x, 1x and 2x.
+
+Frozen Q31 instead seeds every newly added PK at approximately the geometric-mean Q (~1.095) and relies on local polish to move Q afterward.
+
+The next isolated experiment will keep all Q31+x8 semantics unchanged except for generating width-informed Q variants for the strongest residual PK feature. This directly targets dense_treble/stress_mid_treble without importing Standard V2's expensive global search architecture.
