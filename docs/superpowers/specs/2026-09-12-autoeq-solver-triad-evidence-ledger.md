@@ -408,3 +408,68 @@ The production research direction remains:
 - canonical recomputation before publication;
 - a generous wall-clock safety fuse;
 - no dependence on the exact moment the fuse fires during normal operation.
+
+
+## Phase 2 — Public synthetic V2 corpus generalization
+
+Candidate: frozen Q31 + filter-count-scaled polish x8.  
+Run: `34708468207`  
+Corpus: all 10 public `V2_BENCHMARK_CASES`.  
+Protocol: Standard V2 with its 60 s contract; candidate with 15 s safety fuse and five repeats.
+
+### Aggregate result
+
+- exact candidate repeatability: **10/10 cases**
+- candidate cases with any deadline hit: **0/10**
+- candidate targets achieved in all repeats: **5/10**
+- Standard V2 targets achieved: **9/10**
+- candidate normalized-violation wins / losses / ties versus V2: **3 / 7 / 0**
+
+### Per-case result
+
+| Case | MaxF | V2 violation | Q31+8x violation | Candidate time | V2 time | Result |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| bass_mid_mix | 10 | 0.3447 | 0.5172 | 1.71 s | 0.78 s | target met, V2 better/faster |
+| alternating_2_8k | 10 | 0.6253 | 0.9942 | 1.23 s | 9.71 s | target met, much faster, lower precision |
+| dense_treble | 10 | 0.8778 | 1.1276 | 3.66 s | 9.04 s | target missed narrowly |
+| mixed_widths | 10 | 0.8928 | 0.5398 | 3.43 s | 1.98 s | candidate precision win |
+| overlap | 10 | 0.8107 | 0.2912 | 5.31 s | 9.08 s | candidate precision + speed win |
+| near_budget | 8 | 0.8741 | 1.8648 | 0.46 s | 3.42 s | cap-pressure failure |
+| quantization_sensitive | 10 | 0.8537 | 0.1039 | 1.73 s | 0.07 s | major precision win, structural overuse |
+| overcomplete_compress | 6 | 0.9754 | 1.3063 | 0.28 s | 2.49 s | cap/compression failure |
+| stress_mid_treble | 10 | 2.3310 | 3.2908 | 4.33 s | 27.28 s | much faster, precision loss |
+| stress_mixed_edges | 10 | 0.6881 | 1.5167 | 0.90 s | 0.99 s | edge/shelf failure |
+
+### Structural interpretation
+
+The candidate's main remaining failures are not caused by timing or randomness:
+
+- every cell returns one exact signature across five runs;
+- every cell naturally exhausts before the 15-second fuse.
+
+The failures therefore belong to search geometry/state management.
+
+Three distinct mechanisms are now implicated:
+
+1. **Target-valid state retention / structural overuse**
+   - `bass_mid_mix` returns 10 filters versus V2's 5.
+   - `quantization_sensitive` returns 10 filters versus V2's 2 despite a very strong final fit.
+   - The selector prefers fewer filters after target achievement, but Pareto retention considers only RMSE/maxAbs and can discard a lower-filter target-valid state when a more precise high-filter state dominates it.
+
+2. **Capacity / slot replacement**
+   - `near_budget` (MaxF=8) and `overcomplete_compress` (MaxF=6) terminate very quickly at the cap with poor quality.
+   - Q31 cannot add or split when at the cap, so improvement must happen through remove/type/merge trajectories. This is a reachability restriction, not a runtime shortage.
+
+3. **Edge/shelf and dense-feature geometry**
+   - `stress_mixed_edges` contains real LS/HS structure and fails badly under the legacy “LS/HS at strongest residual feature” proposal geometry.
+   - `dense_treble` and `stress_mid_treble` indicate a separate dense/high-Q candidate geometry limitation.
+
+### Next isolated ablations
+
+All start from frozen Q31 + x8 polish. No ranking/selector rewrite and no cumulative cleanup.
+
+A. evidence-based shelf proposal generation only;  
+B. preserve/archive the best target-valid low-filter state independently of Pareto beam survival;  
+C. deterministic one-for-one slot replacement when at Max Filters.
+
+Only mechanisms with public-corpus gains and no cross-case material regressions may advance.
