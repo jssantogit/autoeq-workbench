@@ -1,0 +1,29 @@
+name: Atomic Deadline Gates
+
+on:
+  push:
+    branches:
+      - research/audit-q31-x8-dual-order-atomic-deadline-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run deadline diagnostic
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/research/deadlineDeterminismDiagnostic.ts
+      - name: Run 5s real-FR gate
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/research/dualOrderRealCorpus5s.ts
