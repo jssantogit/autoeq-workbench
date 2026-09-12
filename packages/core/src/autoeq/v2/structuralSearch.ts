@@ -58,6 +58,7 @@ export type StructuralMutation =
   | 'type-mutation'
   | 'split'
   | 'merge'
+  | 'replace'
 
 export interface StructuralProposal {
   mutation: StructuralMutation
@@ -206,6 +207,22 @@ export function generateStructuralMutations(
       addProposal(current, 'add-ls', 'LS', frequencyHz, residual, bounds),
       addProposal(current, 'add-hs', 'HS', frequencyHz, residual, bounds),
     )
+  } else if (current.length > 0) {
+    current.forEach((_, index) => {
+      const remaining = current.filter((__, candidateIndex) => candidateIndex !== index)
+      const replacement = addProposal(
+        remaining,
+        'add-pk',
+        'PK',
+        frequencyHz,
+        residual,
+        bounds,
+      )
+      proposals.push({
+        mutation: 'replace',
+        filters: replacement.filters,
+      })
+    })
   }
   current.forEach((filter, index) => {
     proposals.push({
