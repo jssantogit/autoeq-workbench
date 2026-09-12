@@ -110,17 +110,23 @@ function featureFrequency(
   bounds: StandardAutoEqV2Config
 ): { frequencyHz: number; residual: number } {
   const extrema: number[] = []
-  for (let index = 0; index < residualDb.length; index += 1) {
+  for (let index = 1; index < residualDb.length - 1; index += 1) {
     const magnitude = Math.abs(residualDb[index]!)
-    const left = index === 0 || magnitude >= Math.abs(residualDb[index - 1]!)
-    const right = index === residualDb.length - 1 || magnitude >= Math.abs(residualDb[index + 1]!)
+    const left = magnitude >= Math.abs(residualDb[index - 1]!)
+    const right = magnitude >= Math.abs(residualDb[index + 1]!)
     if (left && right) extrema.push(index)
+  }
+  const fallbackStart = residualDb.length >= 3 ? 1 : 0
+  const fallbackEnd = residualDb.length >= 3 ? residualDb.length - 1 : residualDb.length
+  let fallbackIndex = fallbackStart
+  for (let index = fallbackStart + 1; index < fallbackEnd; index += 1) {
+    if (Math.abs(residualDb[index]!) > Math.abs(residualDb[fallbackIndex]!)) fallbackIndex = index
   }
   const index = extrema.reduce((best, candidate) => {
     const bestMagnitude = Math.abs(residualDb[best]!)
     const candidateMagnitude = Math.abs(residualDb[candidate]!)
     return candidateMagnitude > bestMagnitude ? candidate : best
-  }, extrema[0] ?? 0)
+  }, extrema[0] ?? fallbackIndex)
   return {
     frequencyHz: clamp(
       frequenciesHz[index]!,
