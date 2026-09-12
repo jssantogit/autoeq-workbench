@@ -883,3 +883,100 @@ Next experiment:
 - compare replacement on near-budget first, then the full public corpus if positive.
 
 No holdout cases are opened.
+
+
+## Phase 2.3 — Near-budget reachability diagnostics
+
+### One-hop strongest-residual swap
+
+Targeted run: `34711479890`
+
+Adding a same-cap `swap-pk` mutation using the current strongest residual feature and default structural Q produced **no output change**.
+
+A direct diagnostic then bypassed admission and polished all eight such swaps independently.
+
+Run: `34711613003`
+
+Result:
+
+- incumbent violation: **1.982598**
+- swap proposals evaluated: **8**
+- improving swaps: **0**
+- best swap violation: **2.174530**
+
+Conclusion: the simple single-feature/default-Q replacement operator is rejected. Its failure is not caused by Q31 admission.
+
+### V2-geometry replacement oracle
+
+Run: `34711687452`
+
+The same incumbent residual was passed through Standard V2's richer PK candidate generator:
+
+- multiple local extrema;
+- sign-crossing / half-height width estimation;
+- Q-scale variants;
+- shortlist ranking.
+
+Results:
+
+- generated PK candidates: **84**
+- shortlisted candidates: **8**
+- replacement combinations polished directly: **64**
+- improving replacements: **4**
+- incumbent violation: **1.982598**
+- best replacement violation: **1.911585**
+
+The best seed was approximately:
+
+- 15.014 kHz
+- -1.487 dB
+- Q 5.44
+
+replacing the incumbent's weak ~4.6 kHz slot.
+
+This proves that candidate geometry matters: the structural Max10 default-Q proposal missed a locally useful replacement that the V2 width/Q geometry exposed.
+
+### Iterative rich-replacement oracle
+
+Run: `34711752385`
+
+After accepting the best rich replacement, the residual was recomputed and the entire V2-geometry replacement search repeated.
+
+Result:
+
+- step 0: **1.982598 -> 1.911585**
+- subsequent improving steps: **0**
+
+Conclusion: rich single-slot replacement helps, but replacement reachability alone does not explain the full gap to Standard V2 (`0.8741`). The bad basin requires more than successive local slot swaps.
+
+### PK-only near-budget test
+
+Run: `34711837828`
+
+All shelf additions were disabled while preserving Q31 + 8× polish.
+
+Result:
+
+- violation: **1.631808**
+- RMSE: **0.407952 dB**
+- maxAbs: **1.207166 dB**
+- runtime: ~0.37–0.47 s
+- exact repeatability: **5/5**
+
+This is materially better than the retained shelf policy (`1.982598`), proving that false-positive shelves consume useful capacity under this pressure case.
+
+However the PK-only deliverable still wastes slots at **28 Hz** and **20 kHz**, and contains a close pair around 5 kHz. The target remains materially better represented by Standard V2.
+
+### Next isolated mechanism: internal-extrema-only PK seeding
+
+The original Q31 `featureFrequency()` treats grid endpoints as local extrema. That allows structural PK additions to be seeded directly at the low/high evaluation boundaries.
+
+Next experiment:
+
+- exclude index 0 and index N-1 from PK feature selection;
+- retain evidence-based LS/HS generation at the edges;
+- retain no PK->shelf mutation;
+- retain shelf split;
+- preserve original Q31 beam/quota/selector and 8× polish.
+
+This separates legitimate edge correction (shelves) from illegitimate endpoint PK attraction.
