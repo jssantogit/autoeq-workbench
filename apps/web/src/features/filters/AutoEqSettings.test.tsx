@@ -2,15 +2,17 @@ import {
   AUTOEQ_PRODUCT_LIMITS,
   DEFAULT_AUTOEQ_SETTINGS,
 } from '@autoeq-workbench/core'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { uiStore } from '../../state/uiStore'
 import { workspaceStore } from '../../state/workspaceStore'
 import { AutoEqSettings } from './AutoEqSettings'
 
 describe('AutoEqSettings', () => {
   beforeEach(() => {
     workspaceStore.setState({ autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS } })
+    uiStore.setState({ experimentalMax10Enabled: false })
   })
 
   it('edits the existing seven validated AutoEqSettings fields', async () => {
@@ -68,6 +70,30 @@ describe('AutoEqSettings', () => {
     fireEvent.blur(minimumFrequency)
     expect(minimumFrequency).toHaveAttribute('aria-invalid', 'true')
     expect(workspaceStore.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
+  })
+
+  it('exposes validated Experimental Max10 as opt-in and disables it outside Max10 bounds', async () => {
+    const user = userEvent.setup()
+    render(<AutoEqSettings />)
+
+    const experimental = screen.getByRole('switch', {
+      name: 'Use experimental Max10 Q31-B4-P8',
+    })
+    expect(experimental).toBeEnabled()
+    expect(experimental).not.toBeChecked()
+
+    await user.click(experimental)
+    expect(uiStore.getState().experimentalMax10Enabled).toBe(true)
+    expect(experimental).toBeChecked()
+
+    const maxFilters = screen.getByRole('spinbutton', { name: 'AutoEQ max filters' })
+    await user.clear(maxFilters)
+    await user.type(maxFilters, '12')
+    fireEvent.blur(maxFilters)
+
+    await waitFor(() => expect(experimental).toBeDisabled())
+    expect(experimental).not.toBeChecked()
+    expect(uiStore.getState().experimentalMax10Enabled).toBe(false)
   })
 
   it('offers the exact Time Limit options with a 60-second default', async () => {

@@ -1,6 +1,5 @@
 import {
   CoreError,
-  DEFAULT_AUTOEQ_SETTINGS,
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   auditCancellations,
   calculateErrorMetrics,
@@ -21,6 +20,7 @@ import {
 
 import {
   EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE,
+  isExperimentalStructuralAutoEqEligible,
   type AutoEqExecutionMode,
   type AutoEqPublicError,
   type AutoEqWorkerMessage,
@@ -57,19 +57,6 @@ type ExperimentalAutoEqResultV2 = AutoEqResultV2 & {
   }
 }
 
-function usesValidatedExperimentalBounds(input: StandardAutoEqInputV2): boolean {
-  const settings = input.settings
-  return (
-    settings.minFrequencyHz === DEFAULT_AUTOEQ_SETTINGS.minFrequencyHz &&
-    settings.maxFrequencyHz === DEFAULT_AUTOEQ_SETTINGS.maxFrequencyHz &&
-    settings.minGainDb === DEFAULT_AUTOEQ_SETTINGS.minGainDb &&
-    settings.maxGainDb === DEFAULT_AUTOEQ_SETTINGS.maxGainDb &&
-    settings.minQ === DEFAULT_AUTOEQ_SETTINGS.minQ &&
-    settings.maxQ === DEFAULT_AUTOEQ_SETTINGS.maxQ &&
-    settings.maxFilters === 10
-  )
-}
-
 export function runExperimentalStructuralAutoEqWorkerInput(
   input: StandardAutoEqInputV2,
 ): ExperimentalAutoEqResultV2 {
@@ -85,7 +72,7 @@ export function runExperimentalStructuralAutoEqWorkerInput(
   }
 
   const standardConfig = resolveStandardAutoEqV2Config(input.settings)
-  if (!usesValidatedExperimentalBounds(input)) {
+  if (!isExperimentalStructuralAutoEqEligible(input.settings)) {
     throw new CoreError(
       'validation',
       'Experimental Max10 structural search requires default frequency/gain/Q bounds and maxFilters=10.',

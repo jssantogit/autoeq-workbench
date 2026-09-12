@@ -1,4 +1,9 @@
-import type { AutoEqResultV2, StandardAutoEqInputV2 } from '@autoeq-workbench/core'
+import {
+  DEFAULT_AUTOEQ_SETTINGS,
+  type AutoEqResultV2,
+  type AutoEqSettings,
+  type StandardAutoEqInputV2,
+} from '@autoeq-workbench/core'
 
 export const EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE =
   'max10-q31-b4-p8-experimental-zero-start' as const
@@ -9,6 +14,20 @@ export type AutoEqExecutionMode =
 
 export interface AutoEqRunOptions {
   mode?: AutoEqExecutionMode
+}
+
+export function isExperimentalStructuralAutoEqEligible(
+  settings: AutoEqSettings,
+): boolean {
+  return (
+    settings.minFrequencyHz === DEFAULT_AUTOEQ_SETTINGS.minFrequencyHz &&
+    settings.maxFrequencyHz === DEFAULT_AUTOEQ_SETTINGS.maxFrequencyHz &&
+    settings.minGainDb === DEFAULT_AUTOEQ_SETTINGS.minGainDb &&
+    settings.maxGainDb === DEFAULT_AUTOEQ_SETTINGS.maxGainDb &&
+    settings.minQ === DEFAULT_AUTOEQ_SETTINGS.minQ &&
+    settings.maxQ === DEFAULT_AUTOEQ_SETTINGS.maxQ &&
+    settings.maxFilters === 10
+  )
 }
 
 export interface AutoEqPublicError {
