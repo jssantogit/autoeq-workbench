@@ -755,3 +755,131 @@ Next active ablations:
 2. full shelf semantics: evidence-based additions plus no arbitrary PK->shelf mutation and no shelf split.
 
 The holdout corpus remains unopened.
+
+
+## Phase 2.1 — Shelf semantics isolation on Q31 + 8× polish
+
+All shelf experiments preserve:
+
+- frozen Q31 beam/admission/selector behavior;
+- single-region feature selection;
+- 8× local polish;
+- no cleanup;
+- public 10-case corpus only;
+- five repeats per case with 15 s safety fuse.
+
+All variants remained **10/10 exactly repeatable** and **10/10 deadline-free**.
+
+### A. Evidence-based shelf additions only
+
+Run: `34711092758`
+
+Rule:
+
+- strongest residual feature still generates PK;
+- LS/HS additions are generated only from sustained edge evidence;
+- legacy type mutation and split remain enabled.
+
+Notable deltas versus Q31+8×:
+
+| Case | Q31+8× | Shelf-add only | Direction |
+| --- | ---: | ---: | --- |
+| alternating_2_8k | 0.9942 | 0.9324 | better |
+| dense_treble | 1.1276 | 0.6011 | much better |
+| overcomplete_compress | 1.3063 | 1.0327 | better |
+| stress_mixed_edges | 1.5167 | 0.7724 | much better |
+| mixed_widths | 0.5398 | 1.1210 | worse |
+| near_budget | 1.8648 | 1.9826 | worse |
+| stress_mid_treble | 3.2908 | 3.5875 | worse |
+
+Verdict: promising but incomplete.
+
+### B. Full shelf semantics
+
+Run: `34711095229`
+
+In addition to evidence-based additions:
+
+- PK cannot mutate into shelf;
+- shelves cannot split.
+
+This produced:
+
+- alternating_2_8k: **0.5488**
+- dense_treble: **0.6011**
+- stress_mixed_edges: **1.7995**
+
+The combined policy therefore improves one all-PK alternating case strongly but destroys the mixed-edge stress case.
+
+### C. Evidence-based additions + no PK->shelf, while keeping shelf split
+
+Run: `34711273538`
+
+This isolates the type-mutation restriction.
+
+Key results:
+
+| Case | Violation |
+| --- | ---: |
+| bass_mid_mix | 0.4808 |
+| alternating_2_8k | **0.5488** |
+| dense_treble | **0.6011** |
+| mixed_widths | 1.1210 |
+| overlap | 0.4907 |
+| near_budget | 1.9826 |
+| quantization_sensitive | **0.0895** |
+| overcomplete_compress | 1.0327 |
+| stress_mid_treble | 3.5875 |
+| stress_mixed_edges | **0.7724** |
+
+This retains the large alternating improvement while preserving the good mixed-edge result from shelf-add-only.
+
+Verdict: **retain as the leading shelf policy**.
+
+### D. Evidence-based additions + no shelf split, while keeping legacy type mutation
+
+Run: `34711275721`
+
+Key results:
+
+- alternating_2_8k: 0.9324
+- dense_treble: 0.6011
+- mixed_widths: 1.0327
+- stress_mixed_edges: 1.7995
+
+This demonstrates that the large mixed-edge regression comes from removing shelf split, while the alternating improvement comes from removing PK->shelf mutation.
+
+Verdict: **reject shelf-split prohibition**.
+
+### Shelf conclusion
+
+Retained mechanisms:
+
+1. shelf additions require sustained edge evidence;
+2. PK must not mutate arbitrarily into LS/HS;
+3. existing shelf split/refinement remains allowed.
+
+Rejected mechanisms:
+
+- globally forbidding shelf split;
+- importing the prior semantic-ranking bundle;
+- changing beam/final selector as part of shelf semantics.
+
+This shelf policy improves candidate topology without changing the determinism contract.
+
+## Phase 2.2 — Next causal target: slot replacement / bridge reachability
+
+The public `near_budget` fixture remains poor under every shelf variant.
+
+Target structure uses eight PK bands. Q31 reaches the eight-filter cap but settles on the wrong composition and cannot efficiently exchange a bad slot for a missing useful one.
+
+This matches prior research evidence that a temporarily worse intermediate can be required to reach a better descendant. Current structural search performs remove and add as separate hops, so a seven-filter bridge can be dominated or dropped before the replacement add occurs.
+
+Next experiment:
+
+- add a deterministic single-hop **replace** mutation at capacity;
+- for each existing slot, replace that slot with a PK seeded at the current strongest residual feature;
+- preserve Q31 admission, beam, selector, 8× polish and the retained shelf policy;
+- compare replacement on near-budget first, then the full public corpus if positive.
+
+No holdout cases are opened.
