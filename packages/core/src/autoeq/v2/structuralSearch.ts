@@ -840,6 +840,240 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     }
   }
 
+  let interiorRecycled = false
+  if (
+    rescued.filters.length === config.maxFilters &&
+    Math.max(rescued.rmseDb / 0.25, rescued.maxAbsDb / 0.75) > 1 &&
+    !deadline.isExpired()
+  ) {
+    const currentSolution = evaluateV2Solution(
+      rescued.filters,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+    )
+    const shortlist = rankV2CandidateShortlist(
+      generateV2Candidates({
+        frequencies,
+        residualDb: currentSolution.residualDb,
+        config: bounds,
+        boundaryMode: 'mixed',
+      }).filter((candidate) => candidate.type === 'PK')
+    ).slice(0, 8)
+
+    const improving: Array<{
+      state: SearchState
+      rank: number
+      leftIndex: number
+      rightIndex: number
+    }> = []
+
+    for (let leftIndex = 0; leftIndex < rescued.filters.length; leftIndex += 1) {
+      const left = rescued.filters[leftIndex]!
+      for (let rightIndex = leftIndex + 1; rightIndex < rescued.filters.length; rightIndex += 1) {
+        if (deadline.isExpired()) break
+        const right = rescued.filters[rightIndex]!
+        if (left.type !== right.type) continue
+
+        const distance = Math.abs(Math.log2(left.frequencyHz / right.frequencyHz))
+        if (distance > 0.5) continue
+
+        const leftWeight = Math.abs(left.gainDb)
+        const rightWeight = Math.abs(right.gainDb)
+        const totalWeight = leftWeight + rightWeight
+        const centerOctave = totalWeight > 0
+          ? (
+            leftWeight * Math.log2(left.frequencyHz) +
+            rightWeight * Math.log2(right.frequencyHz)
+          ) / totalWeight
+          : (Math.log2(left.frequencyHz) + Math.log2(right.frequencyHz)) / 2
+
+        const retained = rescued.filters.filter(
+          (_, index) => index !== leftIndex && index !== rightIndex,
+        )
+        const merged = projectFilter({
+          id: uniqueId(retained, `stagnation-interior-merge-${leftIndex}-${rightIndex}`),
+          enabled: left.enabled || right.enabled,
+          type: left.type,
+          frequencyHz: 2 ** centerOctave,
+          gainDb: left.gainDb + right.gainDb,
+          q: (left.q + right.q) / 2,
+        }, bounds)
+
+        for (let rank = 0; rank < shortlist.length; rank += 1) {
+          if (deadline.isExpired()) break
+          const candidate = shortlist[rank]!
+          const added = projectFilter({
+            id: uniqueId(
+              [...retained, merged],
+              `stagnation-interior-recycle-${rank}`,
+            ),
+            enabled: true,
+            type: 'PK',
+            frequencyHz: candidate.frequencyHz,
+            gainDb: candidate.gainDb,
+            q: candidate.q,
+          }, bounds)
+          const seeded = canonical([...retained, merged, added])
+          const polished = polishFilters(
+            seeded,
+            Math.max(config.localPolishEvaluations, seeded.length * 32),
+            bounds,
+            desiredDb,
+            frequencies,
+            deadline,
+            sampleRateHz,
+          )
+          const paretoImproves =
+            polished.rmseDb <= rescued.rmseDb + epsilon &&
+            polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
+            (
+              polished.rmseDb < rescued.rmseDb - epsilon ||
+              polished.maxAbsDb < rescued.maxAbsDb - epsilon
+            )
+          if (paretoImproves) {
+            improving.push({ state: polished, rank, leftIndex, rightIndex })
+          }
+        }
+      }
+    }
+
+    if (improving.length > 0) {
+      improving.sort((left, right) => {
+        const leftViolation = Math.max(
+          left.state.rmseDb / 0.25,
+          left.state.maxAbsDb / 0.75,
+        )
+        const rightViolation = Math.max(
+          right.state.rmseDb / 0.25,
+          right.state.maxAbsDb / 0.75,
+        )
+        return leftViolation - rightViolation ||
+          left.state.rmseDb - right.state.rmseDb ||
+          left.state.maxAbsDb - right.state.maxAbsDb ||
+          left.rank - right.rank ||
+          left.leftIndex - right.leftIndex ||
+          left.rightIndex - right.rightIndex
+      })
+      rescued = improving[0]!.state
+      interiorRecycled = true
+    }
+  }
+
+  if (interiorRecycled && !deadline.isExpired()) {
+    const deepPolished = polishFilters(
+      rescued.filters,
+      Math.max(config.localPolishEvaluations, rescued.filters.length * 64),
+      bounds,
+      desiredDb,
+      frequencies,
+      deadline,
+      sampleRateHz,
+    )
+    const rescuedViolation = Math.max(
+      rescued.rmseDb / 0.25,
+      rescued.maxAbsDb / 0.75,
+    )
+    const deepViolation = Math.max(
+      deepPolished.rmseDb / 0.25,
+      deepPolished.maxAbsDb / 0.75,
+    )
+    if (deepViolation < rescuedViolation - epsilon) {
+      rescued = deepPolished
+    }
+
+    if (
+      rescued.filters.length === config.maxFilters &&
+      Math.max(rescued.rmseDb / 0.25, rescued.maxAbsDb / 0.75) > 1 &&
+      !deadline.isExpired()
+    ) {
+      const currentSolution = evaluateV2Solution(
+        rescued.filters,
+        desiredDb,
+        frequencies,
+        sampleRateHz,
+      )
+      const shortlist = rankV2CandidateShortlist(
+        generateV2Candidates({
+          frequencies,
+          residualDb: currentSolution.residualDb,
+          config: bounds,
+          boundaryMode: 'mixed',
+        }).filter((candidate) => candidate.type === 'PK')
+      ).slice(0, 8)
+
+      const improving: Array<{
+        state: SearchState
+        rank: number
+        replacementIndex: number
+      }> = []
+
+      for (let rank = 0; rank < shortlist.length; rank += 1) {
+        const candidate = shortlist[rank]!
+        for (
+          let replacementIndex = 0;
+          replacementIndex < rescued.filters.length;
+          replacementIndex += 1
+        ) {
+          if (deadline.isExpired()) break
+          const retained = rescued.filters.filter(
+            (_, index) => index !== replacementIndex,
+          )
+          const added = projectFilter({
+            id: uniqueId(
+              retained,
+              `stagnation-post-interior-swap-${rank}-${replacementIndex}`,
+            ),
+            enabled: true,
+            type: 'PK',
+            frequencyHz: candidate.frequencyHz,
+            gainDb: candidate.gainDb,
+            q: candidate.q,
+          }, bounds)
+          const seeded = canonical([...retained, added])
+          const polished = polishFilters(
+            seeded,
+            Math.max(config.localPolishEvaluations, seeded.length * 32),
+            bounds,
+            desiredDb,
+            frequencies,
+            deadline,
+            sampleRateHz,
+          )
+          const paretoImproves =
+            polished.rmseDb <= rescued.rmseDb + epsilon &&
+            polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
+            (
+              polished.rmseDb < rescued.rmseDb - epsilon ||
+              polished.maxAbsDb < rescued.maxAbsDb - epsilon
+            )
+          if (paretoImproves) {
+            improving.push({ state: polished, rank, replacementIndex })
+          }
+        }
+      }
+
+      if (improving.length > 0) {
+        improving.sort((left, right) => {
+          const leftViolation = Math.max(
+            left.state.rmseDb / 0.25,
+            left.state.maxAbsDb / 0.75,
+          )
+          const rightViolation = Math.max(
+            right.state.rmseDb / 0.25,
+            right.state.maxAbsDb / 0.75,
+          )
+          return leftViolation - rightViolation ||
+            left.state.rmseDb - right.state.rmseDb ||
+            left.state.maxAbsDb - right.state.maxAbsDb ||
+            left.rank - right.rank ||
+            left.replacementIndex - right.replacementIndex
+        })
+        rescued = improving[0]!.state
+      }
+    }
+  }
+
   if (
     rescued.rmseDb <= 0.25 &&
     rescued.maxAbsDb <= 0.75 &&
