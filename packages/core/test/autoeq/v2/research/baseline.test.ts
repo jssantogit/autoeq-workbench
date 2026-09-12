@@ -111,17 +111,18 @@ describe('research baseline compatibility', () => {
 })
 
 describe('research monotonicity warnings', () => {
-  it('warns on material median quality regressions from 15 to 30 and 30 to 60 seconds', () => {
+  it('warns on material median quality regressions across 5→15, 15→30, and 30→60 seconds', () => {
     const warnings = findPracticalMonotonicityWarnings([
+      aggregate(5, 0.20, 0.70),
       aggregate(15, 0.30, 0.70),
       aggregate(30, 0.36, 0.70),
       aggregate(60, 0.36, 0.85),
     ])
 
-    expect(warnings).toHaveLength(2)
+    expect(warnings).toHaveLength(3)
     expect(warnings.map(({ shorterBudgetSeconds, longerBudgetSeconds }) => [
       shorterBudgetSeconds,
       longerBudgetSeconds,
-    ])).toEqual([[15, 30], [30, 60]])
+    ])).toEqual([[5, 15], [15, 30], [30, 60]])
   })
 })
