@@ -14,6 +14,7 @@ import {
 import type { StandardAutoEqV2Config } from './config.js'
 import type { StandardV2Deadline } from './runtime.js'
 import { auditCancellations } from '../cancellation.js'
+import { generateV2Candidates, rankV2CandidateShortlist } from './candidates.js'
 
 export const MAX10_BASELINE_PRESET = 'max10-baseline' as const
 export const MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET = 'max10-q31-b4-p8-experimental' as const
@@ -552,10 +553,82 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
   }
 
   const best = selectReferencePoint(beam)
+  let rescued = best
+  let rescueSteps = 0
+  const epsilon = 1e-12
+
+  while (
+    rescueSteps < 2 &&
+    rescued.filters.length < config.maxFilters &&
+    (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75) &&
+    !deadline.isExpired()
+  ) {
+    const currentSolution = evaluateV2Solution(
+      rescued.filters,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+    )
+    const shortlist = rankV2CandidateShortlist(
+      generateV2Candidates({
+        frequencies,
+        residualDb: currentSolution.residualDb,
+        config: bounds,
+        boundaryMode: 'mixed',
+      }).filter((candidate) => candidate.type === 'PK')
+    ).slice(0, 8)
+
+    const improving: Array<{ state: SearchState; rank: number }> = []
+    for (let rank = 0; rank < shortlist.length; rank += 1) {
+      if (deadline.isExpired()) break
+      const candidate = shortlist[rank]!
+      const seeded = canonical([
+        ...rescued.filters,
+        projectFilter({
+          id: uniqueId(rescued.filters, `stagnation-rescue-${rescueSteps}-${rank}`),
+          enabled: true,
+          type: 'PK',
+          frequencyHz: candidate.frequencyHz,
+          gainDb: candidate.gainDb,
+          q: candidate.q,
+        }, bounds),
+      ])
+      const polished = polishFilters(
+        seeded,
+        Math.max(config.localPolishEvaluations, seeded.length * 8),
+        bounds,
+        desiredDb,
+        frequencies,
+        deadline,
+        sampleRateHz,
+      )
+      const paretoImproves =
+        polished.rmseDb <= rescued.rmseDb + epsilon &&
+        polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
+        (
+          polished.rmseDb < rescued.rmseDb - epsilon ||
+          polished.maxAbsDb < rescued.maxAbsDb - epsilon
+        )
+      if (paretoImproves) improving.push({ state: polished, rank })
+    }
+
+    if (improving.length === 0) break
+    improving.sort((left, right) => {
+      const leftViolation = Math.max(left.state.rmseDb / 0.25, left.state.maxAbsDb / 0.75)
+      const rightViolation = Math.max(right.state.rmseDb / 0.25, right.state.maxAbsDb / 0.75)
+      return leftViolation - rightViolation ||
+        left.state.rmseDb - right.state.rmseDb ||
+        left.state.maxAbsDb - right.state.maxAbsDb ||
+        left.rank - right.rank
+    })
+    rescued = improving[0]!.state
+    rescueSteps += 1
+  }
+
   return {
-    filters: best.filters,
-    rmseDb: best.rmseDb,
-    maxAbsDb: best.maxAbsDb,
+    filters: rescued.filters,
+    rmseDb: rescued.rmseDb,
+    maxAbsDb: rescued.maxAbsDb,
   }
 }
 
