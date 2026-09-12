@@ -26,6 +26,8 @@ export interface ResolvedStructuralSearchConfig {
   proposalsPerParent: number
   localPolishEvaluations: number
   maxFilters: number
+  featureRegionCount?: number
+  minFeatureSeparationOctaves?: number
   admission: 'lexical' | 'q31-b4-p8'
 }
 
@@ -37,6 +39,8 @@ export function resolveStructuralSearchConfig(options?: { preset?: StructuralSea
       proposalsPerParent: 8,
       localPolishEvaluations: 24,
       maxFilters: 10,
+      featureRegionCount: 6,
+      minFeatureSeparationOctaves: 0.5,
       admission: 'q31-b4-p8',
     }
   }
@@ -46,6 +50,8 @@ export function resolveStructuralSearchConfig(options?: { preset?: StructuralSea
     proposalsPerParent: 4,
     localPolishEvaluations: 24,
     maxFilters: 10,
+    featureRegionCount: 1,
+    minFeatureSeparationOctaves: 0,
     admission: 'lexical',
   }
 }
@@ -104,31 +110,66 @@ function uniqueId(filters: readonly Filter[], prefix: string): string {
   return candidate
 }
 
-function featureFrequency(
+export interface ResidualFeature {
+  frequencyHz: number
+  residual: number
+}
+
+export function selectResidualFeatures(
   frequenciesHz: readonly number[],
   residualDb: readonly number[],
-  bounds: StandardAutoEqV2Config
-): { frequencyHz: number; residual: number } {
+  bounds: StandardAutoEqV2Config,
+  maxFeatures: number,
+  minSeparationOctaves: number,
+): ResidualFeature[] {
+  if (
+    frequenciesHz.length === 0 ||
+    frequenciesHz.length !== residualDb.length ||
+    maxFeatures <= 0
+  ) return []
+
   const extrema: number[] = []
   for (let index = 0; index < residualDb.length; index += 1) {
     const magnitude = Math.abs(residualDb[index]!)
     const left = index === 0 || magnitude >= Math.abs(residualDb[index - 1]!)
     const right = index === residualDb.length - 1 || magnitude >= Math.abs(residualDb[index + 1]!)
-    if (left && right) extrema.push(index)
+    if (
+      left &&
+      right &&
+      magnitude >= bounds.algorithm.candidateResidualFloorDb
+    ) {
+      extrema.push(index)
+    }
   }
-  const index = extrema.reduce((best, candidate) => {
-    const bestMagnitude = Math.abs(residualDb[best]!)
-    const candidateMagnitude = Math.abs(residualDb[candidate]!)
-    return candidateMagnitude > bestMagnitude ? candidate : best
-  }, extrema[0] ?? 0)
-  return {
-    frequencyHz: clamp(
+
+  extrema.sort((leftIndex, rightIndex) =>
+    Math.abs(residualDb[rightIndex]!) - Math.abs(residualDb[leftIndex]!) ||
+    frequenciesHz[leftIndex]! - frequenciesHz[rightIndex]!
+  )
+
+  const selected: ResidualFeature[] = []
+  for (const index of extrema) {
+    const frequencyHz = clamp(
       frequenciesHz[index]!,
       bounds.minFrequencyHz,
       bounds.maxFrequencyHz,
-    ),
-    residual: residualDb[index]!,
+    )
+    const separated = selected.every((feature) =>
+      Math.abs(Math.log2(frequencyHz / feature.frequencyHz)) >= minSeparationOctaves
+    )
+    if (!separated) continue
+
+    selected.push({ frequencyHz, residual: residualDb[index]! })
+    if (selected.length >= maxFeatures) break
   }
+  return selected
+}
+
+export function localPolishEvaluationBudget(
+  baseEvaluations: number,
+  filterCount: number,
+): number {
+  return Math.max(baseEvaluations, Math.max(0, filterCount) * 8)
 }
 
 function addProposal(
@@ -158,17 +199,27 @@ export function generateStructuralMutations(
   filters: readonly Filter[],
   residualDb: readonly number[],
   frequenciesHz: readonly number[],
-  bounds: StandardAutoEqV2Config
+  bounds: StandardAutoEqV2Config,
+  featureRegionCount = 1,
+  minFeatureSeparationOctaves = 0,
 ): StructuralProposal[] {
   const current = filters.map((filter) => projectFilter(filter, bounds))
-  const { frequencyHz, residual } = featureFrequency(frequenciesHz, residualDb, bounds)
+  const features = selectResidualFeatures(
+    frequenciesHz,
+    residualDb,
+    bounds,
+    featureRegionCount,
+    minFeatureSeparationOctaves,
+  )
   const proposals: StructuralProposal[] = []
   if (current.length < bounds.maxFilters) {
-    proposals.push(
-      addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds),
-      addProposal(current, 'add-ls', 'LS', frequencyHz, residual, bounds),
-      addProposal(current, 'add-hs', 'HS', frequencyHz, residual, bounds),
-    )
+    for (const { frequencyHz, residual } of features) {
+      proposals.push(
+        addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds),
+        addProposal(current, 'add-ls', 'LS', frequencyHz, residual, bounds),
+        addProposal(current, 'add-hs', 'HS', frequencyHz, residual, bounds),
+      )
+    }
   }
   current.forEach((filter, index) => {
     proposals.push({
@@ -382,7 +433,14 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       if (deadline.isExpired()) break
 
       const solution = evaluateV2Solution(parent.filters, desiredDb, frequencies, sampleRateHz)
-      const proposals = generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
+      const proposals = generateStructuralMutations(
+        parent.filters,
+        solution.residualDb,
+        frequencies,
+        bounds,
+        config.featureRegionCount ?? 1,
+        config.minFeatureSeparationOctaves ?? 0,
+      )
       const ordered = orderStructuralProposals(proposals)
 
       let admitted: StructuralProposal[] = []
@@ -415,7 +473,13 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           a.cancellationScore - b.cancellationScore ||
           a.lexicalRank - b.lexicalRank
         )
-        const selected = selectQuotaProposals(prePolishScored, rmseRanked, 6, 2, config.proposalsPerParent)
+        const selected = selectQuotaProposals(
+          prePolishScored,
+          rmseRanked,
+          2,
+          6,
+          config.proposalsPerParent,
+        )
         admitted = selected.map(s => s.proposal)
       } else {
         admitted = ordered.slice(0, config.proposalsPerParent)
@@ -425,7 +489,19 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         if (deadline.isExpired()) break
         if (proposal.filters.length > config.maxFilters) continue
 
-        const polished = polishFilters(proposal.filters, config.localPolishEvaluations, bounds, desiredDb, frequencies, deadline, sampleRateHz)
+        const polishEvaluations = localPolishEvaluationBudget(
+          config.localPolishEvaluations,
+          proposal.filters.length,
+        )
+        const polished = polishFilters(
+          proposal.filters,
+          polishEvaluations,
+          bounds,
+          desiredDb,
+          frequencies,
+          deadline,
+          sampleRateHz,
+        )
         const key = semanticFilterKey(polished.filters)
         if (visited.has(key)) continue
         visited.add(key)
