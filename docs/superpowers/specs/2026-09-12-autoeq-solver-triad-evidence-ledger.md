@@ -676,3 +676,82 @@ Standard V2 derives PK Q from residual width using sign-crossing/half-height bou
 Frozen Q31 instead seeds every newly added PK at approximately the geometric-mean Q (~1.095) and relies on local polish to move Q afterward.
 
 The next isolated experiment will keep all Q31+x8 semantics unchanged except for generating width-informed Q variants for the strongest residual PK feature. This directly targets dense_treble/stress_mid_treble without importing Standard V2's expensive global search architecture.
+
+
+## Phase 2 — Public synthetic V2 corpus generalization
+
+Run: `34710832786`  
+Artifact: `q31-x8-v2-corpus-34710832786`
+
+Candidate under test:
+
+- frozen Q31 structural search;
+- local polish `max(24, filterCount * 8)`;
+- no multi-region patch;
+- no semantic-ranking bundle;
+- no cleanup;
+- case-specific `maxFilters` preserved;
+- 15-second safety fuse;
+- five repeated candidate runs per case.
+
+### Aggregate result
+
+- public cases: **10**
+- exact-repeatability cases: **10/10**
+- deadline-free cases: **10/10**
+- lower normalized violation than Standard V2: **3/10**
+- higher normalized violation than Standard V2: **7/10**
+
+The candidate therefore generalizes its **consistency** and bounded runtime, but not yet V2-level precision across the public corpus.
+
+### Case table
+
+| Case | Category | V2 violation | Q31+8× violation | Delta | V2 time | Q31+8× time | Repeatability |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+| bass_mid_mix | solvable | 0.3447 | 0.5172 | +0.1725 | 0.77 s | 1.69 s | exact |
+| alternating_2_8k | solvable | 0.6253 | 0.9942 | +0.3689 | 9.51 s | 1.22 s | exact |
+| dense_treble | solvable | 0.8778 | 1.1276 | +0.2497 | 8.94 s | 3.64 s | exact |
+| mixed_widths | solvable | 0.8928 | **0.5398** | **-0.3530** | 2.00 s | 3.42 s | exact |
+| overlap | solvable | 0.8107 | **0.2912** | **-0.5195** | 8.96 s | 5.30 s | exact |
+| near_budget | solvable, max=8 | 0.8741 | 1.8648 | +0.9907 | 3.37 s | 0.46 s | exact |
+| quantization_sensitive | solvable | 0.8537 | **0.1039** | **-0.7498** | 0.07 s | 1.73 s | exact |
+| overcomplete_compress | solvable, max=6 | 0.9754 | 1.3063 | +0.3309 | 2.48 s | 0.29 s | exact |
+| stress_mid_treble | stress | 2.3310 | 3.2908 | +0.9598 | 27.06 s | 4.30 s | exact |
+| stress_mixed_edges | stress | 0.6881 | 1.5167 | +0.8286 | 0.99 s | 0.89 s | exact |
+
+### Important structural observation
+
+The Q31+8× candidate still manufactures shelves from arbitrary local residual extrema. The public-corpus failures expose this clearly.
+
+Examples from candidate deliverables include:
+
+- `HS 1721 Hz` and `HS 5664 Hz` in an all-PK alternating fixture;
+- `LS 6689 Hz` in the all-PK near-budget fixture;
+- several high-frequency `LS` filters in dense-treble;
+- `LS 2200 Hz` and `LS 12626 Hz` in stress-mixed-edges.
+
+This is independent evidence for a candidate-geometry defect: local extrema are being allowed to express themselves as shelf topology without edge evidence.
+
+The shelf problem is now being isolated separately without changing Q31 ranking, quota, beam, selector, or polish depth.
+
+### Updated status of Q31+8×
+
+Retain:
+
+- exact repeatability;
+- bounded deterministic-looking completion before the safety fuse on all 10 public cases;
+- strong wins on mixed widths, overlap, and quantization-sensitive cases;
+- strong prior wins on U12t and Trio.
+
+Do not promote yet:
+
+- seven public-corpus regressions remain;
+- near-budget and stress cases reveal large precision gaps;
+- arbitrary shelf topology is a plausible causal mechanism for several of those failures.
+
+Next active ablations:
+
+1. evidence-based shelf additions only;
+2. full shelf semantics: evidence-based additions plus no arbitrary PK->shelf mutation and no shelf split.
+
+The holdout corpus remains unopened.
