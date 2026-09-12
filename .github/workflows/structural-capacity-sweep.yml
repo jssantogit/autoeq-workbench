@@ -1,0 +1,27 @@
+name: Structural Capacity Sweep
+
+on:
+  push:
+    branches:
+      - research/audit-maxfilters-scaling-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run 15s capacity sweep
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralCapacitySweep.ts
