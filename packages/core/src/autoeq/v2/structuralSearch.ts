@@ -432,8 +432,27 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           a.cancellationScore - b.cancellationScore ||
           a.lexicalRank - b.lexicalRank
         )
-        const selected = selectQuotaProposals(prePolishScored, rmseRanked, 6, 2, config.proposalsPerParent)
-        admitted = selected.map(s => s.proposal)
+        let selected = selectQuotaProposals(
+          prePolishScored,
+          rmseRanked,
+          6,
+          2,
+          config.proposalsPerParent,
+        )
+        if (parent.filters.length >= config.maxFilters) {
+          const bestReplacement = rmseRanked.find(
+            (item) => item.proposal.mutation === 'replace',
+          )
+          if (
+            bestReplacement !== undefined &&
+            !selected.some((item) => item.key === bestReplacement.key)
+          ) {
+            selected = selected.length < config.proposalsPerParent
+              ? [...selected, bestReplacement]
+              : [...selected.slice(0, -1), bestReplacement]
+          }
+        }
+        admitted = selected.map((item) => item.proposal)
       } else {
         admitted = ordered.slice(0, config.proposalsPerParent)
       }
