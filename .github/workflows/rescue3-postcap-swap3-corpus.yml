@@ -1,0 +1,35 @@
+name: Rescue3 Post-Cap Swap3 Corpus
+
+on:
+  push:
+    branches:
+      - research/audit-q31-x8-depth2-rescue3-postcap-swap3-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run Rescue3 post-cap swap3 full corpus
+        env:
+          AUDIT_OUTPUT_DIR: ${{ github.workspace }}/rescue3-postcap-swap3-corpus
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/rescue3PostCapSwap3Corpus.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rescue3-postcap-swap3-corpus-${{ github.run_id }}
+          path: rescue3-postcap-swap3-corpus
+          if-no-files-found: error
+          retention-days: 30
