@@ -246,16 +246,6 @@ export function generateStructuralMutations(
   const proposals: StructuralProposal[] = []
   if (current.length < bounds.maxFilters) {
     proposals.push(addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds))
-    for (const shelf of selectShelfEvidence(frequenciesHz, residualDb, bounds)) {
-      proposals.push(addProposal(
-        current,
-        shelf.type === 'LS' ? 'add-ls' : 'add-hs',
-        shelf.type,
-        shelf.frequencyHz,
-        shelf.residual,
-        bounds,
-      ))
-    }
   }
   current.forEach((filter, index) => {
     proposals.push({
