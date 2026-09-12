@@ -1,0 +1,36 @@
+name: Q31 X8 Failure Topology
+
+on:
+  push:
+    branches:
+      - research/audit-q31-x8-failure-topology-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Capture failure topologies
+        env:
+          AUDIT_OUTPUT_DIR: ${{ github.workspace }}/autoeq-q31-x8-failure-topology
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/research/q31x8FailureTopology.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: q31-x8-failure-topology-${{ github.run_id }}
+          path: autoeq-q31-x8-failure-topology
+          if-no-files-found: warn
+          retention-days: 30
