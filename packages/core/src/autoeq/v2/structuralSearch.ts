@@ -13,6 +13,7 @@ import {
 } from './jointRefineContinuation.js'
 import type { StandardAutoEqV2Config } from './config.js'
 import type { StandardV2Deadline } from './runtime.js'
+import { calculateV2NormalizedViolation } from './ranking.js'
 import { auditCancellations } from '../cancellation.js'
 
 export const MAX10_BASELINE_PRESET = 'max10-baseline' as const
@@ -28,7 +29,9 @@ export interface ResolvedStructuralSearchConfig {
   maxFilters: number
   featureRegionCount?: number
   minFeatureSeparationOctaves?: number
-  admission: 'lexical' | 'q31-b4-p8'
+  candidatePolicy?: 'legacy' | 'semantic'
+  selectionMetric?: 'hypot' | 'violation'
+  admission: 'lexical' | 'q31-b4-p8' | 'metric'
 }
 
 export function resolveStructuralSearchConfig(options?: { preset?: StructuralSearchPreset | undefined }): ResolvedStructuralSearchConfig {
@@ -41,7 +44,9 @@ export function resolveStructuralSearchConfig(options?: { preset?: StructuralSea
       maxFilters: 10,
       featureRegionCount: 6,
       minFeatureSeparationOctaves: 0.5,
-      admission: 'q31-b4-p8',
+      candidatePolicy: 'semantic',
+      selectionMetric: 'violation',
+      admission: 'metric',
     }
   }
   return {
@@ -52,6 +57,8 @@ export function resolveStructuralSearchConfig(options?: { preset?: StructuralSea
     maxFilters: 10,
     featureRegionCount: 1,
     minFeatureSeparationOctaves: 0,
+    candidatePolicy: 'legacy',
+    selectionMetric: 'hypot',
     admission: 'lexical',
   }
 }
@@ -121,6 +128,7 @@ export function selectResidualFeatures(
   bounds: StandardAutoEqV2Config,
   maxFeatures: number,
   minSeparationOctaves: number,
+  includeEndpoints = true,
 ): ResidualFeature[] {
   if (
     frequenciesHz.length === 0 ||
@@ -129,7 +137,9 @@ export function selectResidualFeatures(
   ) return []
 
   const extrema: number[] = []
-  for (let index = 0; index < residualDb.length; index += 1) {
+  const startIndex = includeEndpoints ? 0 : 1
+  const endIndex = includeEndpoints ? residualDb.length : residualDb.length - 1
+  for (let index = startIndex; index < endIndex; index += 1) {
     const magnitude = Math.abs(residualDb[index]!)
     const left = index === 0 || magnitude >= Math.abs(residualDb[index - 1]!)
     const right = index === residualDb.length - 1 || magnitude >= Math.abs(residualDb[index + 1]!)
@@ -163,6 +173,86 @@ export function selectResidualFeatures(
     if (selected.length >= maxFeatures) break
   }
   return selected
+}
+
+function median(values: readonly number[]): number {
+  const sorted = [...values].sort((left, right) => left - right)
+  const middle = Math.floor(sorted.length / 2)
+  return sorted.length % 2 === 0
+    ? (sorted[middle - 1]! + sorted[middle]!) / 2
+    : sorted[middle]!
+}
+
+export interface ShelfEvidence {
+  type: 'LS' | 'HS'
+  frequencyHz: number
+  residual: number
+}
+
+export function selectShelfEvidence(
+  frequenciesHz: readonly number[],
+  residualDb: readonly number[],
+  bounds: StandardAutoEqV2Config,
+): ShelfEvidence[] {
+  if (frequenciesHz.length < 3 || frequenciesHz.length !== residualDb.length) return []
+
+  const result: ShelfEvidence[] = []
+  const evidenceCount = Math.max(3, Math.ceil(frequenciesHz.length / 4))
+
+  for (const type of ['LS', 'HS'] as const) {
+    const edgeIndex = type === 'LS' ? 0 : frequenciesHz.length - 1
+    const direction = type === 'LS' ? 1 : -1
+    const fixedStart = type === 'LS' ? 0 : frequenciesHz.length - evidenceCount
+    let evidence = residualDb.slice(fixedStart, fixedStart + evidenceCount)
+    let evidenceFrequencies = frequenciesHz.slice(fixedStart, fixedStart + evidenceCount)
+    let signedMedian = median(evidence)
+    const matching = evidence.filter((value) => Math.sign(value) === Math.sign(signedMedian)).length
+    const fixedEvidenceUsable =
+      Math.abs(signedMedian) >= bounds.algorithm.candidateResidualFloorDb &&
+      matching / evidence.length >= 0.75 &&
+      evidenceFrequencies.at(-1)! / evidenceFrequencies[0]! >= 1.4
+
+    if (!fixedEvidenceUsable) {
+      const edgeSign = Math.sign(residualDb[edgeIndex]!)
+      const contiguousIndices: number[] = []
+      for (
+        let index = edgeIndex;
+        index >= 0 && index < frequenciesHz.length;
+        index += direction
+      ) {
+        const value = residualDb[index]!
+        if (
+          Math.abs(value) < bounds.algorithm.candidateResidualFloorDb ||
+          Math.sign(value) !== edgeSign
+        ) break
+        contiguousIndices.push(index)
+      }
+      contiguousIndices.sort((left, right) => left - right)
+      if (contiguousIndices.length < 3) continue
+      evidence = contiguousIndices.map((index) => residualDb[index]!)
+      evidenceFrequencies = contiguousIndices.map((index) => frequenciesHz[index]!)
+      if (evidenceFrequencies.at(-1)! / evidenceFrequencies[0]! < 1.4) continue
+      signedMedian = median(evidence)
+    }
+
+    const halfHeight = Math.abs(signedMedian) / 2
+    const searchIndices = type === 'LS'
+      ? Array.from({ length: frequenciesHz.length }, (_, index) => index)
+      : Array.from({ length: frequenciesHz.length }, (_, index) => frequenciesHz.length - 1 - index)
+    const transitionIndex = searchIndices.find((index) => Math.abs(residualDb[index]!) <= halfHeight) ??
+      (type === 'LS' ? evidenceCount - 1 : frequenciesHz.length - evidenceCount)
+
+    result.push({
+      type,
+      frequencyHz: clamp(
+        frequenciesHz[transitionIndex]!,
+        bounds.minFrequencyHz,
+        bounds.maxFrequencyHz,
+      ),
+      residual: clamp(signedMedian, bounds.minGainDb, bounds.maxGainDb),
+    })
+  }
+  return result
 }
 
 export function localPolishEvaluationBudget(
@@ -202,6 +292,7 @@ export function generateStructuralMutations(
   bounds: StandardAutoEqV2Config,
   featureRegionCount = 1,
   minFeatureSeparationOctaves = 0,
+  candidatePolicy: 'legacy' | 'semantic' = 'legacy',
 ): StructuralProposal[] {
   const current = filters.map((filter) => projectFilter(filter, bounds))
   const features = selectResidualFeatures(
@@ -210,15 +301,32 @@ export function generateStructuralMutations(
     bounds,
     featureRegionCount,
     minFeatureSeparationOctaves,
+    candidatePolicy === 'legacy',
   )
   const proposals: StructuralProposal[] = []
   if (current.length < bounds.maxFilters) {
-    for (const { frequencyHz, residual } of features) {
-      proposals.push(
-        addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds),
-        addProposal(current, 'add-ls', 'LS', frequencyHz, residual, bounds),
-        addProposal(current, 'add-hs', 'HS', frequencyHz, residual, bounds),
-      )
+    if (candidatePolicy === 'semantic') {
+      for (const { frequencyHz, residual } of features) {
+        proposals.push(addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds))
+      }
+      for (const shelf of selectShelfEvidence(frequenciesHz, residualDb, bounds)) {
+        proposals.push(addProposal(
+          current,
+          shelf.type === 'LS' ? 'add-ls' : 'add-hs',
+          shelf.type,
+          shelf.frequencyHz,
+          shelf.residual,
+          bounds,
+        ))
+      }
+    } else {
+      for (const { frequencyHz, residual } of features) {
+        proposals.push(
+          addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds),
+          addProposal(current, 'add-ls', 'LS', frequencyHz, residual, bounds),
+          addProposal(current, 'add-hs', 'HS', frequencyHz, residual, bounds),
+        )
+      }
     }
   }
   current.forEach((filter, index) => {
@@ -226,16 +334,23 @@ export function generateStructuralMutations(
       mutation: 'remove',
       filters: canonical(current.filter((_, candidateIndex) => candidateIndex !== index)),
     })
-    const nextType: Record<Filter['type'], Filter['type']> = { PK: 'LS', LS: 'HS', HS: 'PK' }
-    proposals.push({
-      mutation: 'type-mutation',
-      filters: canonical([
-        ...current.slice(0, index),
-        projectFilter({ ...filter, type: nextType[filter.type] }, bounds),
-        ...current.slice(index + 1),
-      ]),
-    })
-    if (current.length < bounds.maxFilters) {
+    if (candidatePolicy === 'legacy' || filter.type !== 'PK') {
+      const nextType: Filter['type'] = candidatePolicy === 'semantic'
+        ? 'PK'
+        : ({ PK: 'LS', LS: 'HS', HS: 'PK' } as const)[filter.type]
+      proposals.push({
+        mutation: 'type-mutation',
+        filters: canonical([
+          ...current.slice(0, index),
+          projectFilter({ ...filter, type: nextType }, bounds),
+          ...current.slice(index + 1),
+        ]),
+      })
+    }
+    if (
+      current.length < bounds.maxFilters &&
+      (candidatePolicy === 'legacy' || filter.type === 'PK')
+    ) {
       const ratio = 2 ** (1 / 24)
       const first = projectFilter({
         ...filter,
@@ -340,7 +455,20 @@ function dominates(left: SearchState, right: SearchState): boolean {
     (left.rmseDb < right.rmseDb - epsilon || left.maxAbsDb < right.maxAbsDb - epsilon)
 }
 
-export function referenceSelectorKey(point: SearchState): readonly (number | string)[] {
+export function referenceSelectorKey(
+  point: SearchState,
+  metric: 'hypot' | 'violation' = 'hypot',
+): readonly (number | string)[] {
+  if (metric === 'violation') {
+    return [
+      Math.max(point.rmseDb / 0.25, point.maxAbsDb / 0.75),
+      point.rmseDb,
+      point.maxAbsDb,
+      point.cancellationScore,
+      point.filters.length,
+      point.candidateId,
+    ]
+  }
   const achieved = point.rmseDb <= 0.25 && point.maxAbsDb <= 0.75
   return achieved
     ? [0, point.filters.length, point.rmseDb, point.maxAbsDb, point.cancellationScore, point.candidateId]
@@ -357,14 +485,18 @@ function compareKeys(left: readonly (number | string)[], right: readonly (number
   return 0
 }
 
-export function selectReferencePoint(points: readonly SearchState[]): SearchState {
+export function selectReferencePoint(
+  points: readonly SearchState[],
+  metric: 'hypot' | 'violation' = 'hypot',
+): SearchState {
   return points.reduce((best, point) =>
-    compareKeys(referenceSelectorKey(point), referenceSelectorKey(best)) < 0 ? point : best)
+    compareKeys(referenceSelectorKey(point, metric), referenceSelectorKey(best, metric)) < 0 ? point : best)
 }
 
 export function retainParetoBeam(
   states: readonly SearchState[],
   beamWidth: number,
+  metric: 'hypot' | 'violation' = 'hypot',
 ): SearchState[] {
   if (states.length === 0) return []
   const frontier = states.filter((point, index) =>
@@ -376,7 +508,7 @@ export function retainParetoBeam(
   let remaining = [...frontier]
   const selected = new Set<string>()
   while (remaining.length > 0 && selected.size < beamWidth) {
-    const chosen = selectReferencePoint(remaining).candidateId
+    const chosen = selectReferencePoint(remaining, metric).candidateId
     selected.add(chosen)
     remaining = remaining.filter((point) => point.candidateId !== chosen)
   }
@@ -440,12 +572,13 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         bounds,
         config.featureRegionCount ?? 1,
         config.minFeatureSeparationOctaves ?? 0,
+        config.candidatePolicy ?? 'legacy',
       )
       const ordered = orderStructuralProposals(proposals)
 
       let admitted: StructuralProposal[] = []
 
-      if (config.admission === 'q31-b4-p8') {
+      if (config.admission === 'q31-b4-p8' || config.admission === 'metric') {
         const prePolishScored = ordered.map((proposal, lexicalRank) => {
           const quantized = quantizeV2Filters(proposal.filters, bounds)
           const magnitude = cascadeMagnitudeDb(quantized, frequencies, sampleRateHz)
@@ -458,6 +591,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
             proposal,
             lexicalRank,
             quantized,
+            violation: calculateV2NormalizedViolation(metrics),
             rmseDb: metrics.rmseDb,
             maxAbsDb: metrics.maxAbsDb,
             filterCount: quantized.length,
@@ -466,21 +600,23 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           }
         })
 
-        const rmseRanked = [...prePolishScored].sort((a, b) =>
+        const metricRanked = [...prePolishScored].sort((a, b) =>
+          a.violation - b.violation ||
           a.rmseDb - b.rmseDb ||
           a.maxAbsDb - b.maxAbsDb ||
-          a.filterCount - b.filterCount ||
           a.cancellationScore - b.cancellationScore ||
+          a.filterCount - b.filterCount ||
           a.lexicalRank - b.lexicalRank
         )
-        const selected = selectQuotaProposals(
-          prePolishScored,
-          rmseRanked,
-          2,
-          6,
-          config.proposalsPerParent,
-        )
-        admitted = selected.map(s => s.proposal)
+        admitted = config.admission === 'metric'
+          ? metricRanked.slice(0, config.proposalsPerParent).map((item) => item.proposal)
+          : selectQuotaProposals(
+              prePolishScored,
+              metricRanked,
+              2,
+              6,
+              config.proposalsPerParent,
+            ).map((item) => item.proposal)
       } else {
         admitted = ordered.slice(0, config.proposalsPerParent)
       }
@@ -513,7 +649,11 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
 
     if (nextStates.length === 0) break
     const combined = [...beam, ...nextStates]
-    beam = retainParetoBeam(combined, config.beamWidth)
+    beam = retainParetoBeam(
+      combined,
+      config.beamWidth,
+      config.selectionMetric ?? 'hypot',
+    )
   }
 
   if (beam.length === 0) {
@@ -524,7 +664,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     }
   }
 
-  const best = selectReferencePoint(beam)
+  const best = selectReferencePoint(beam, config.selectionMetric ?? 'hypot')
   return {
     filters: best.filters,
     rmseDb: best.rmseDb,
