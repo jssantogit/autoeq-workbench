@@ -1,0 +1,35 @@
+name: Novelty Audit
+
+on:
+  push:
+    branches:
+      - research/audit-q31-x8-novelty-third-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run novelty audit
+        env:
+          AUDIT_OUTPUT_DIR: ${{ github.workspace }}/novelty-audit
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/noveltyAudit.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: novelty-audit-${{ github.run_id }}
+          path: novelty-audit
+          if-no-files-found: error
+          retention-days: 30
