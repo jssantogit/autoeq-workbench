@@ -234,3 +234,74 @@ Starting from the positive multi-region-only result, if any:
 7. normalized-violation beam/final selector only.
 
 No cleanup or slot recycling enters these ablations.
+
+
+## Phase 1.6 — Isolation of the bundled multi-region commit
+
+All three experiments below start from frozen Q31 behavior and isolate one mechanism.
+
+### Multi-region feature generation only
+
+Run: `34707438548`
+
+| Case | RMSE | maxAbs | violation | elapsed | filters | signatures |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Storm | 2.6219 | 9.3438 | 12.4583 | 2.36 s | 9 | 1 |
+| U12t | 1.5834 | 6.9536 | 9.2715 | 0.86 s | 6 | 1 |
+| Trio | 2.1344 | 9.3598 | 12.4797 | 0.22 s | 3 | 1 |
+
+Verdict: **reject as always-on mechanism**. Merely exposing six separated residual regions causes premature/exhausted poor solutions under the original Q31 admission/refinement behavior.
+
+### Quota inversion only — 2 lexical + 6 RMSE
+
+Run: `34707440184`
+
+| Case | RMSE | maxAbs | violation | elapsed | filters | signatures |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Storm | 2.4791 | 7.9690 | 10.6253 | 0.43 s | 3 | 1 |
+| U12t | 1.4639 | 4.5317 | 6.0423 | 1.79 s | 10 | 1 |
+| Trio | 1.5243 | 4.8277 | 6.4370 | 3.75 s | 10 | 1 |
+
+Verdict: **reject as global replacement**. It preserves much of Q31 behavior on Storm/U12t but worsens Trio and causes premature three-filter Storm exhaustion.
+
+### Filter-count-scaled local polish only
+
+Run: `34707442052`
+
+Rule under test:
+
+`localPolishEvaluations = max(24, filterCount * 8)`
+
+| Case | RMSE | maxAbs | violation | elapsed | filters | signatures | deadline |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Storm | 1.9667 | 6.1346 | 8.1795 | 5.00 s | 9–10 | 3 | 5/5 |
+| U12t | 1.4225 | 4.2963 | 5.7284 | 3.28 s | 10 | 1 | 0/5 |
+| Trio | 0.6844 | 2.0179 | 2.7378 | 4.79 s | 10 | 1 | 0/5 |
+
+Verdict: **retain as the strongest mechanism found in this audit so far**.
+
+Key implications:
+
+1. The strong Trio improvement does not require multi-region proposals, new shelf semantics, normalized-violation admission, or cleanup.
+2. U12t also improves over frozen Q31 while remaining naturally deterministic before 5 seconds.
+3. Storm improves materially but now needs more than the 5-second wall-clock budget; time-limited runs again diverge.
+4. Therefore the precision mechanism and the consistency problem are separable:
+   - deeper per-candidate local refinement improves the precision frontier;
+   - wall-clock truncation reintroduces inconsistency when the deterministic search has not finished.
+
+The next question is no longer whether scaled polish helps. It is whether its **terminal deterministic result** is good enough and how much deterministic work it requires.
+
+### Updated leading architecture hypothesis
+
+The strongest current direction is:
+
+- frozen Q31 structural topology/search semantics;
+- original single-region proposal geometry;
+- original Q31 admission quota and selector;
+- no new semantic-ranking bundle;
+- no cleanup;
+- local refinement budget scaled with current filter count;
+- deterministic completion/work budget as the normal termination condition;
+- wall-clock only as a safety fuse.
+
+This hypothesis must now be evaluated at terminal/no-timeout and then tuned for the minimum work multiplier that preserves the quality gain.
