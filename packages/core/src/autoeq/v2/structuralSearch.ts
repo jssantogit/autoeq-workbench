@@ -251,6 +251,35 @@ export function generateStructuralMutations(
   const proposals: StructuralProposal[] = []
   if (current.length < bounds.maxFilters) {
     proposals.push(addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds))
+    const currentMetrics = calculateErrorMetrics(residualDb, frequenciesHz)
+    const currentViolation = Math.max(
+      currentMetrics.rmseDb / 0.25,
+      currentMetrics.maxAbsDb / 0.75,
+    )
+    if (current.length >= bounds.maxFilters - 2 && currentViolation > 1) {
+      const latePkCandidates = rankV2CandidateShortlist(
+        generateV2Candidates({
+          frequencies: frequenciesHz,
+          residualDb,
+          config: bounds,
+          boundaryMode: 'mixed',
+        }).filter((candidate) => candidate.type === 'PK')
+      ).slice(0, 2)
+      for (const candidate of latePkCandidates) {
+        const lateFilter = projectFilter({
+          id: uniqueId(current, 'struct-late-pk'),
+          enabled: true,
+          type: 'PK',
+          frequencyHz: candidate.frequencyHz,
+          gainDb: candidate.gainDb,
+          q: candidate.q,
+        }, bounds)
+        proposals.push({
+          mutation: 'add-pk',
+          filters: canonical([...current, lateFilter]),
+        })
+      }
+    }
     for (const shelf of selectShelfEvidence(frequenciesHz, residualDb, bounds)) {
       proposals.push(addProposal(
         current,
@@ -389,7 +418,7 @@ export function referenceSelectorKey(point: SearchState): readonly (number | str
   const achieved = point.rmseDb <= 0.25 && point.maxAbsDb <= 0.75
   return achieved
     ? [0, point.filters.length, point.rmseDb, point.maxAbsDb, point.cancellationScore, point.candidateId]
-    : [1, Math.hypot(point.rmseDb / 0.25, point.maxAbsDb / 0.75), point.rmseDb, point.maxAbsDb, point.cancellationScore, point.filters.length, point.candidateId]
+    : [1, Math.max(point.rmseDb / 0.25, point.maxAbsDb / 0.75), point.rmseDb, point.maxAbsDb, point.cancellationScore, point.filters.length, point.candidateId]
 }
 
 function compareKeys(left: readonly (number | string)[], right: readonly (number | string)[]): number {
