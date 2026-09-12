@@ -643,7 +643,7 @@ export function polishFilters(
 ): SearchState {
   if (evaluations <= 0 || filters.length === 0) {
     const refinedFilters = canonical(filters)
-    const quantized = quantizeV2Filters(refinedFilters, bounds)
+    const quantized = quantizeV2Filters(refinedFilters, bounds).filter((filter) => filter.gainDb !== 0)
     const magnitude = cascadeMagnitudeDb(quantized, frequencies, sampleRateHz ?? 48000)
           const residualDb = desiredDb.map((desired, index) => desired - magnitude[index]!)
           const metrics = calculateErrorMetrics(residualDb, frequencies)
@@ -667,6 +667,7 @@ const cancellationScore = auditCancellations(quantized, frequencies, sampleRateH
   while (!continuation.done) continuation = advanceJointRefineContinuationV2(continuation)
   const refinedFilters = canonical(continuation.solution.filters)
   const deliveredFilters = canonical(quantizeV2Filters(refinedFilters, bounds))
+    .filter((filter) => filter.gainDb !== 0)
   const solution = evaluateV2Solution(deliveredFilters, desiredDb, frequencies, sampleRateHz ?? 48000)
   return {
     candidateId: 'initial',
