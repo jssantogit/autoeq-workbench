@@ -1,0 +1,35 @@
+name: Rescue3 Swap3 LatePK2 Violation Corpus
+
+on:
+  push:
+    branches:
+      - research/audit-q31-x8-depth2-rescue3-swap3-latepk2-violation-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run full corpus
+        env:
+          AUDIT_OUTPUT_DIR: ${{ github.workspace }}/rescue3-swap3-latepk2-violation-corpus
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/rescue3PostCapSwap3Corpus.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rescue3-swap3-latepk2-violation-corpus-${{ github.run_id }}
+          path: rescue3-swap3-latepk2-violation-corpus
+          if-no-files-found: error
+          retention-days: 30
