@@ -587,7 +587,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
   const epsilon = 1e-12
 
   while (
-    rescueSteps < 3 &&
+    rescueSteps < 5 &&
     rescued.filters.length < config.maxFilters &&
     (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75) &&
     !deadline.isExpired()
