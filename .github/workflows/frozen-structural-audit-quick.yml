@@ -1,0 +1,36 @@
+name: Frozen Structural Audit Quick
+
+on:
+  push:
+    branches:
+      - research/audit-multiregion-quick-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run quick frozen structural audit
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          AUDIT_OUTPUT_DIR: ${{ github.workspace }}/autoeq-structural-audit-quick
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/research/structuralAuditQuick.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frozen-structural-audit-quick-${{ github.run_id }}
+          path: autoeq-structural-audit-quick
+          if-no-files-found: error
+          retention-days: 30
