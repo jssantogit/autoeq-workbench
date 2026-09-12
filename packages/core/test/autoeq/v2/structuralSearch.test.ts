@@ -16,6 +16,7 @@ import {
   runStructuralSearch,
   selectResidualFeatures,
   selectShelfEvidence,
+  simplifyStructuralState,
 } from '../../../src/autoeq/v2/structuralSearch.js'
 
 const frequencies = [
@@ -45,6 +46,8 @@ describe('Experimental Max10 structural search', () => {
       selectionMetric: 'hypot',
       mergeProximityOctaves: 1 / 12,
       marginalPruneTolerance: 0,
+      structuralCleanupMinFilters: 10,
+      structuralCleanupMaxSteps: 0,
       admission: 'lexical',
     })
     expect(resolveStructuralSearchConfig({
@@ -56,6 +59,8 @@ describe('Experimental Max10 structural search', () => {
       selectionMetric: 'violation',
       mergeProximityOctaves: 1 / 12 + 0.002,
       marginalPruneTolerance: 0.01,
+      structuralCleanupMinFilters: 8,
+      structuralCleanupMaxSteps: 3,
       admission: 'metric',
     })
   })
@@ -281,6 +286,85 @@ describe('Experimental Max10 structural search', () => {
       0.01,
     )
     expect(preserved.filters).toHaveLength(2)
+  })
+
+  it('can merge and prune more than one redundant structural slot within one cumulative tolerance budget', () => {
+    const bounds = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
+    const testFrequencies = [
+      200, 400, 800, 1_000, 1_100, 1_191, 1_226, 1_262, 1_400, 2_000, 4_000, 8_000,
+    ]
+    const main = {
+      id: 'main',
+      enabled: true,
+      type: 'PK' as const,
+      frequencyHz: 4_000,
+      gainDb: -2,
+      q: 1.4,
+    }
+    const left = {
+      id: 'left',
+      enabled: true,
+      type: 'PK' as const,
+      frequencyHz: 1_191,
+      gainDb: 0.7,
+      q: 1.1,
+    }
+    const right = {
+      id: 'right',
+      enabled: true,
+      type: 'PK' as const,
+      frequencyHz: 1_262,
+      gainDb: 0.7,
+      q: 1.1,
+    }
+    const redundant = {
+      id: 'redundant',
+      enabled: true,
+      type: 'PK' as const,
+      frequencyHz: 97,
+      gainDb: 0,
+      q: 0.7,
+    }
+    const mergedIdeal = {
+      id: 'merged-ideal',
+      enabled: true,
+      type: 'PK' as const,
+      frequencyHz: Math.sqrt(1_191 * 1_262),
+      gainDb: 1.4,
+      q: 1.1,
+    }
+
+    const desired = cascadeMagnitudeDb([main, mergedIdeal], testFrequencies, 48_000)
+    const initialSolution = evaluateV2Solution(
+      [main, left, right, redundant],
+      desired,
+      testFrequencies,
+      48_000,
+    )
+    const initialState = {
+      candidateId: 'cleanup-state',
+      filters: initialSolution.filters,
+      rmseDb: initialSolution.metrics.rmseDb,
+      maxAbsDb: initialSolution.metrics.maxAbsDb,
+      cancellationScore: initialSolution.cancellationAudit.totalScore,
+    }
+
+    const simplified = simplifyStructuralState(
+      initialState,
+      desired,
+      testFrequencies,
+      48_000,
+      bounds,
+      1 / 12 + 0.002,
+      0.01,
+      3,
+    )
+
+    expect(simplified.filters).toHaveLength(2)
+    expect(simplified.filters.some((filter) => filter.id === 'main')).toBe(true)
+    expect(simplified.filters.some((filter) => filter.id === 'redundant')).toBe(false)
+    expect(simplified.filters.some((filter) => filter.id === 'left')).toBe(false)
+    expect(simplified.filters.some((filter) => filter.id === 'right')).toBe(false)
   })
 
   it('scales local polish budget with filter count instead of staying fixed at 24 trials', () => {
