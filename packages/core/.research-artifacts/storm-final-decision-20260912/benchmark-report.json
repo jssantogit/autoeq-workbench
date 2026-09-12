@@ -1,582 +1,1232 @@
 {
   "schemaVersion": 1,
   "classification": "FINAL_CANDIDATE_SUPPORTED",
+  "candidateConfig": {
+    "maxFilters": 10,
+    "beamWidth": 4,
+    "proposalsPerParent": 8,
+    "localPolishEvaluations": 24
+  },
+  "baselineConfig": {
+    "maxFilters": 10,
+    "beamWidth": 2,
+    "proposalsPerParent": 4,
+    "localPolishEvaluations": 24
+  },
+  "primaryDeadlineMs": 5000,
+  "sanityDeadlineMs": 15000,
   "results": [
     {
       "caseId": "titan-to-storm",
+      "targetFamily": "Storm",
       "seedType": "teacher-student",
+      "deadlineMs": 5000,
       "A": {
         "armId": "A",
-        "totalElapsedMs": 183.6856539999999,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 241.056153,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 241.056153,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 5,
         "coordinateTrials": 120,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
-              "rmseDb": 1.5871419174342807,
-              "maxAbsDb": 5.3961368474708475,
-              "filterCount": 10,
-              "regret": 0.9932230333807892,
-              "elapsedMs": 36.16196200000013
-            },
-            "downstreamEvaluations": 5,
-            "signalCanonicalEvaluations": 0
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
-              "rmseDb": 1.5871419174342807,
-              "maxAbsDb": 5.3961368474708475,
-              "filterCount": 10,
-              "regret": 0.9932230333807892,
-              "elapsedMs": 36.16196200000013
-            },
-            "downstreamEvaluations": 5,
-            "signalCanonicalEvaluations": 0
-          }
-        ]
+        "downstreamEvaluations": 5,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
+          "rmseDb": 1.5871419174342807,
+          "maxAbsDb": 5.3961368474708475,
+          "filterCount": 10,
+          "regret": 0.9932230333807892,
+          "elapsedMs": 84.26903799999991
+        }
       },
       "C": {
         "armId": "C",
-        "totalElapsedMs": 2102.358306,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 1759.9976139999994,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 1759.9976139999994,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 33,
         "coordinateTrials": 792,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
-              "rmseDb": 1.5871419174342807,
-              "maxAbsDb": 5.3961368474708475,
-              "filterCount": 10,
-              "regret": 0.9932230333807892,
-              "elapsedMs": 8.994616000000406
-            },
-            "downstreamEvaluations": 33,
-            "signalCanonicalEvaluations": 302
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
-              "rmseDb": 1.5871419174342807,
-              "maxAbsDb": 5.3961368474708475,
-              "filterCount": 10,
-              "regret": 0.9932230333807892,
-              "elapsedMs": 8.994616000000406
-            },
-            "downstreamEvaluations": 33,
-            "signalCanonicalEvaluations": 302
-          }
-        ]
-      },
-      "checkpoints": [
-        {
-          "budgetMs": 5000,
-          "deltaRmseDb": 0,
-          "deltaMaxAbsDb": 0,
-          "deltaRegret": 0,
-          "selectorRelation": "equivalent",
-          "paretoRelation": "equivalent",
-          "computeDelta": 330,
-          "timeToBestDelta": -27.167345999999725
-        },
-        {
-          "budgetMs": 15000,
-          "deltaRmseDb": 0,
-          "deltaMaxAbsDb": 0,
-          "deltaRegret": 0,
-          "selectorRelation": "equivalent",
-          "paretoRelation": "equivalent",
-          "computeDelta": 330,
-          "timeToBestDelta": -27.167345999999725
+        "downstreamEvaluations": 33,
+        "signalCanonicalEvaluations": 302,
+        "signalElapsedMs": 1180.968960000001,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
+          "rmseDb": 1.5871419174342807,
+          "maxAbsDb": 5.3961368474708475,
+          "filterCount": 10,
+          "regret": 0.9932230333807892,
+          "elapsedMs": 7.793883999999707
         }
-      ]
+      },
+      "deltaRmseDb": 0,
+      "deltaMaxAbsDb": 0,
+      "deltaRegret": 0,
+      "selectorRelation": "equivalent",
+      "paretoRelation": "equivalent",
+      "computeDelta": 330,
+      "timeToBestDelta": -76.4751540000002,
+      "wallClockSatisfied": true
     },
     {
       "caseId": "titan-to-storm",
+      "targetFamily": "Storm",
       "seedType": "zero-seed",
+      "deadlineMs": 5000,
       "A": {
         "armId": "A",
-        "totalElapsedMs": 62.907499999999345,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 62.53176899999926,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 62.53176899999926,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 15,
         "coordinateTrials": 360,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-6-add-pk:0006",
-              "rmseDb": 3.0905982362391216,
-              "maxAbsDb": 9.992384553389481,
-              "filterCount": 2,
-              "regret": 9.288605214390818,
-              "elapsedMs": 16.94373099999939
-            },
-            "downstreamEvaluations": 15,
-            "signalCanonicalEvaluations": 0
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-6-add-pk:0006",
-              "rmseDb": 3.0905982362391216,
-              "maxAbsDb": 9.992384553389481,
-              "filterCount": 2,
-              "regret": 9.288605214390818,
-              "elapsedMs": 16.94373099999939
-            },
-            "downstreamEvaluations": 15,
-            "signalCanonicalEvaluations": 0
-          }
-        ]
+        "downstreamEvaluations": 15,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-6-add-pk:0006",
+          "rmseDb": 3.0905982362391216,
+          "maxAbsDb": 9.992384553389481,
+          "filterCount": 2,
+          "regret": 9.288605214390818,
+          "elapsedMs": 22.521614999999656
+        }
       },
       "C": {
         "armId": "C",
-        "totalElapsedMs": 4490.247112,
-        "stopReason": "no-admissible-proposals",
-        "uniqueStructuralStates": 217,
-        "coordinateTrials": 5208,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-321-split:0211",
-              "rmseDb": 2.633095121396706,
-              "maxAbsDb": 8.1751672084425,
-              "filterCount": 10,
-              "regret": 6.348538653929847,
-              "elapsedMs": 3473.716305000001
-            },
-            "downstreamEvaluations": 217,
-            "signalCanonicalEvaluations": 1047
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-321-split:0211",
-              "rmseDb": 2.633095121396706,
-              "maxAbsDb": 8.1751672084425,
-              "filterCount": 10,
-              "regret": 6.348538653929847,
-              "elapsedMs": 3473.716305000001
-            },
-            "downstreamEvaluations": 217,
-            "signalCanonicalEvaluations": 1047
-          }
-        ]
-      },
-      "checkpoints": [
-        {
-          "budgetMs": 5000,
-          "deltaRmseDb": -0.45750311484241557,
-          "deltaMaxAbsDb": -1.8172173449469806,
-          "deltaRegret": -2.9400665604609717,
-          "selectorRelation": "C",
-          "paretoRelation": "C-dominates",
-          "computeDelta": 1249,
-          "timeToBestDelta": 3456.7725740000014
+        "deadlineMs": 5000,
+        "totalElapsedMs": 5116.243227000001,
+        "stopReason": "deadline",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 5116.243227000001,
+          "overshootMs": 116.24322700000084,
+          "satisfied": true,
+          "stopReason": "deadline"
         },
-        {
-          "budgetMs": 15000,
-          "deltaRmseDb": -0.45750311484241557,
-          "deltaMaxAbsDb": -1.8172173449469806,
-          "deltaRegret": -2.9400665604609717,
-          "selectorRelation": "C",
-          "paretoRelation": "C-dominates",
-          "computeDelta": 1249,
-          "timeToBestDelta": 3456.7725740000014
+        "uniqueStructuralStates": 277,
+        "coordinateTrials": 6648,
+        "downstreamEvaluations": 277,
+        "signalCanonicalEvaluations": 1359,
+        "signalElapsedMs": 3306.6646919999976,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-425-split:0261",
+          "rmseDb": 2.564228530678801,
+          "maxAbsDb": 7.827739283331402,
+          "filterCount": 10,
+          "regret": 5.859850484726171,
+          "elapsedMs": 4638.7826509999995
         }
-      ]
+      },
+      "deltaRmseDb": -0.5263697055603207,
+      "deltaMaxAbsDb": -2.164645270058079,
+      "deltaRegret": -3.4287547296646474,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 1621,
+      "timeToBestDelta": 4616.261036,
+      "wallClockSatisfied": true
     },
     {
       "caseId": "titan-to-u12t",
+      "targetFamily": "U12t",
       "seedType": "teacher-student",
+      "deadlineMs": 5000,
       "A": {
         "armId": "A",
-        "totalElapsedMs": 100.56177000000025,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 102.18003899999894,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 102.18003899999894,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 9,
         "coordinateTrials": 216,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
-              "rmseDb": 1.2257165384464115,
-              "maxAbsDb": 3.6013255820762784,
-              "filterCount": 9,
-              "regret": 0.011261184729902673,
-              "elapsedMs": 25.05957699999999
-            },
-            "downstreamEvaluations": 9,
-            "signalCanonicalEvaluations": 0
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
-              "rmseDb": 1.2257165384464115,
-              "maxAbsDb": 3.6013255820762784,
-              "filterCount": 9,
-              "regret": 0.011261184729902673,
-              "elapsedMs": 25.05957699999999
-            },
-            "downstreamEvaluations": 9,
-            "signalCanonicalEvaluations": 0
-          }
-        ]
+        "downstreamEvaluations": 9,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
+          "rmseDb": 1.2257165384464115,
+          "maxAbsDb": 3.6013255820762784,
+          "filterCount": 9,
+          "regret": 0.011261184729902673,
+          "elapsedMs": 17.3364619999993
+        }
       },
       "C": {
         "armId": "C",
-        "totalElapsedMs": 2440.7877289999997,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 2581.9223439999987,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 2581.9223439999987,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 73,
         "coordinateTrials": 1752,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-24-split:0016",
-              "rmseDb": 1.1657024567334162,
-              "maxAbsDb": 3.5968494197412006,
-              "filterCount": 10,
-              "regret": 0,
-              "elapsedMs": 345.6092689999987
-            },
-            "downstreamEvaluations": 73,
-            "signalCanonicalEvaluations": 549
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-24-split:0016",
-              "rmseDb": 1.1657024567334162,
-              "maxAbsDb": 3.5968494197412006,
-              "filterCount": 10,
-              "regret": 0,
-              "elapsedMs": 345.6092689999987
-            },
-            "downstreamEvaluations": 73,
-            "signalCanonicalEvaluations": 549
-          }
-        ]
-      },
-      "checkpoints": [
-        {
-          "budgetMs": 5000,
-          "deltaRmseDb": -0.06001408171299527,
-          "deltaMaxAbsDb": -0.004476162335077749,
-          "deltaRegret": -0.011261184729902673,
-          "selectorRelation": "C",
-          "paretoRelation": "C-dominates",
-          "computeDelta": 613,
-          "timeToBestDelta": 320.5496919999987
-        },
-        {
-          "budgetMs": 15000,
-          "deltaRmseDb": -0.06001408171299527,
-          "deltaMaxAbsDb": -0.004476162335077749,
-          "deltaRegret": -0.011261184729902673,
-          "selectorRelation": "C",
-          "paretoRelation": "C-dominates",
-          "computeDelta": 613,
-          "timeToBestDelta": 320.5496919999987
+        "downstreamEvaluations": 73,
+        "signalCanonicalEvaluations": 549,
+        "signalElapsedMs": 1772.8408819999895,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-24-split:0016",
+          "rmseDb": 1.1657024567334162,
+          "maxAbsDb": 3.5968494197412006,
+          "filterCount": 10,
+          "regret": 0,
+          "elapsedMs": 356.51376900000105
         }
-      ]
+      },
+      "deltaRmseDb": -0.06001408171299527,
+      "deltaMaxAbsDb": -0.004476162335077749,
+      "deltaRegret": -0.011261184729902673,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 613,
+      "timeToBestDelta": 339.17730700000175,
+      "wallClockSatisfied": true
     },
     {
       "caseId": "titan-to-u12t",
+      "targetFamily": "U12t",
       "seedType": "zero-seed",
+      "deadlineMs": 5000,
       "A": {
         "armId": "A",
-        "totalElapsedMs": 105.9448459999985,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 115.5837309999988,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 115.5837309999988,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 30,
         "coordinateTrials": 720,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-26-add-pk:0024",
-              "rmseDb": 1.7403334269121966,
-              "maxAbsDb": 4.651405070902967,
-              "filterCount": 4,
-              "regret": 2.069728738593043,
-              "elapsedMs": 79.16234600000098
-            },
-            "downstreamEvaluations": 30,
-            "signalCanonicalEvaluations": 0
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-26-add-pk:0024",
-              "rmseDb": 1.7403334269121966,
-              "maxAbsDb": 4.651405070902967,
-              "filterCount": 4,
-              "regret": 2.069728738593043,
-              "elapsedMs": 79.16234600000098
-            },
-            "downstreamEvaluations": 30,
-            "signalCanonicalEvaluations": 0
-          }
-        ]
+        "downstreamEvaluations": 30,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-26-add-pk:0024",
+          "rmseDb": 1.7403334269121966,
+          "maxAbsDb": 4.651405070902967,
+          "filterCount": 4,
+          "regret": 2.069728738593043,
+          "elapsedMs": 86.13257700000031
+        }
       },
       "C": {
         "armId": "C",
-        "totalElapsedMs": 6677.3821100000005,
-        "stopReason": "no-admissible-proposals",
-        "uniqueStructuralStates": 284,
-        "coordinateTrials": 6816,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-294-split:0188",
-              "rmseDb": 1.4402024938081597,
-              "maxAbsDb": 4.427162875632694,
-              "filterCount": 8,
-              "regret": 0.8692050061768954,
-              "elapsedMs": 2750.4119979999996
-            },
-            "downstreamEvaluations": 253,
-            "signalCanonicalEvaluations": 1255
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-463-split:0260",
-              "rmseDb": 1.440256112224315,
-              "maxAbsDb": 4.426646930116777,
-              "filterCount": 10,
-              "regret": 0.8694194798415165,
-              "elapsedMs": 5092.998727
-            },
-            "downstreamEvaluations": 284,
-            "signalCanonicalEvaluations": 1680
-          }
-        ]
-      },
-      "checkpoints": [
-        {
-          "budgetMs": 5000,
-          "deltaRmseDb": -0.30013093310403693,
-          "deltaMaxAbsDb": -0.22424219527027223,
-          "deltaRegret": -1.2005237324161477,
-          "selectorRelation": "C",
-          "paretoRelation": "C-dominates",
-          "computeDelta": 1478,
-          "timeToBestDelta": 2671.2496519999986
+        "deadlineMs": 5000,
+        "totalElapsedMs": 5000.783649999998,
+        "stopReason": "deadline",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 5000.783649999998,
+          "overshootMs": 0.7836499999975786,
+          "satisfied": true,
+          "stopReason": "deadline"
         },
-        {
-          "budgetMs": 15000,
-          "deltaRmseDb": -0.3000773146878817,
-          "deltaMaxAbsDb": -0.2247581407861894,
-          "deltaRegret": -1.2003092587515267,
-          "selectorRelation": "C",
-          "paretoRelation": "C-dominates",
-          "computeDelta": 1934,
-          "timeToBestDelta": 5013.836380999999
+        "uniqueStructuralStates": 253,
+        "coordinateTrials": 6072,
+        "downstreamEvaluations": 253,
+        "signalCanonicalEvaluations": 1212,
+        "signalElapsedMs": 3206.672917000011,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-294-split:0188",
+          "rmseDb": 1.4402024938081597,
+          "maxAbsDb": 4.427162875632694,
+          "filterCount": 8,
+          "regret": 0.8692050061768954,
+          "elapsedMs": 2835.5216899999978
         }
-      ]
+      },
+      "deltaRmseDb": -0.30013093310403693,
+      "deltaMaxAbsDb": -0.22424219527027223,
+      "deltaRegret": -1.2005237324161477,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 1435,
+      "timeToBestDelta": 2749.3891129999975,
+      "wallClockSatisfied": true
     },
     {
       "caseId": "titan-to-trio",
+      "targetFamily": "Trio",
       "seedType": "teacher-student",
+      "deadlineMs": 5000,
       "A": {
         "armId": "A",
-        "totalElapsedMs": 39.64476900000227,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 41.45807700000296,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 41.45807700000296,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 5,
         "coordinateTrials": 120,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
-              "rmseDb": 1.2591239856453276,
-              "maxAbsDb": 4.722496940036333,
-              "filterCount": 10,
-              "regret": 2.1867305341618795,
-              "elapsedMs": 3.1778850000009697
-            },
-            "downstreamEvaluations": 5,
-            "signalCanonicalEvaluations": 0
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
-              "rmseDb": 1.2591239856453276,
-              "maxAbsDb": 4.722496940036333,
-              "filterCount": 10,
-              "regret": 2.1867305341618795,
-              "elapsedMs": 3.1778850000009697
-            },
-            "downstreamEvaluations": 5,
-            "signalCanonicalEvaluations": 0
-          }
-        ]
+        "downstreamEvaluations": 5,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
+          "rmseDb": 1.2591239856453276,
+          "maxAbsDb": 4.722496940036333,
+          "filterCount": 10,
+          "regret": 2.1867305341618795,
+          "elapsedMs": 3.3265769999998156
+        }
       },
       "C": {
         "armId": "C",
-        "totalElapsedMs": 1620.683191,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 1717.6583830000018,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 1717.6583830000018,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 56,
         "coordinateTrials": 1344,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
-              "rmseDb": 1.2591239856453276,
-              "maxAbsDb": 4.722496940036333,
-              "filterCount": 10,
-              "regret": 2.1867305341618795,
-              "elapsedMs": 3.1360380000005534
-            },
-            "downstreamEvaluations": 56,
-            "signalCanonicalEvaluations": 360
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
-              "rmseDb": 1.2591239856453276,
-              "maxAbsDb": 4.722496940036333,
-              "filterCount": 10,
-              "regret": 2.1867305341618795,
-              "elapsedMs": 3.1360380000005534
-            },
-            "downstreamEvaluations": 56,
-            "signalCanonicalEvaluations": 360
-          }
-        ]
-      },
-      "checkpoints": [
-        {
-          "budgetMs": 5000,
-          "deltaRmseDb": 0,
-          "deltaMaxAbsDb": 0,
-          "deltaRegret": 0,
-          "selectorRelation": "equivalent",
-          "paretoRelation": "equivalent",
-          "computeDelta": 411,
-          "timeToBestDelta": -0.0418470000004163
-        },
-        {
-          "budgetMs": 15000,
-          "deltaRmseDb": 0,
-          "deltaMaxAbsDb": 0,
-          "deltaRegret": 0,
-          "selectorRelation": "equivalent",
-          "paretoRelation": "equivalent",
-          "computeDelta": 411,
-          "timeToBestDelta": -0.0418470000004163
+        "downstreamEvaluations": 56,
+        "signalCanonicalEvaluations": 360,
+        "signalElapsedMs": 1136.03023199999,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
+          "rmseDb": 1.2591239856453276,
+          "maxAbsDb": 4.722496940036333,
+          "filterCount": 10,
+          "regret": 2.1867305341618795,
+          "elapsedMs": 3.2490770000003977
         }
-      ]
+      },
+      "deltaRmseDb": 0,
+      "deltaMaxAbsDb": 0,
+      "deltaRegret": 0,
+      "selectorRelation": "equivalent",
+      "paretoRelation": "equivalent",
+      "computeDelta": 411,
+      "timeToBestDelta": -0.07749999999941792,
+      "wallClockSatisfied": true
     },
     {
       "caseId": "titan-to-trio",
+      "targetFamily": "Trio",
       "seedType": "zero-seed",
+      "deadlineMs": 5000,
       "A": {
         "armId": "A",
-        "totalElapsedMs": 217.5231539999986,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 189.16476899999543,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 189.16476899999543,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 38,
         "coordinateTrials": 912,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-47-merge:0033",
-              "rmseDb": 1.8476704405510282,
-              "maxAbsDb": 5.542359135037337,
-              "filterCount": 6,
-              "regret": 4.708773685838825,
-              "elapsedMs": 182.18996200000038
-            },
-            "downstreamEvaluations": 38,
-            "signalCanonicalEvaluations": 0
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-47-merge:0033",
-              "rmseDb": 1.8476704405510282,
-              "maxAbsDb": 5.542359135037337,
-              "filterCount": 6,
-              "regret": 4.708773685838825,
-              "elapsedMs": 182.18996200000038
-            },
-            "downstreamEvaluations": 38,
-            "signalCanonicalEvaluations": 0
-          }
-        ]
+        "downstreamEvaluations": 38,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-47-merge:0033",
+          "rmseDb": 1.8476704405510282,
+          "maxAbsDb": 5.542359135037337,
+          "filterCount": 6,
+          "regret": 4.708773685838825,
+          "elapsedMs": 158.97203799999988
+        }
       },
       "C": {
         "armId": "C",
-        "totalElapsedMs": 7196.202533000003,
+        "deadlineMs": 5000,
+        "totalElapsedMs": 5060.982342999996,
+        "stopReason": "deadline",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 5060.982342999996,
+          "overshootMs": 60.982342999996035,
+          "satisfied": true,
+          "stopReason": "deadline"
+        },
+        "uniqueStructuralStates": 341,
+        "coordinateTrials": 8184,
+        "downstreamEvaluations": 341,
+        "signalCanonicalEvaluations": 1208,
+        "signalElapsedMs": 3128.271884000067,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-387-merge:0329",
+          "rmseDb": 1.4535114426660751,
+          "maxAbsDb": 3.208745407371396,
+          "filterCount": 7,
+          "regret": 2.287939087128648,
+          "elapsedMs": 4841.233727999999
+        }
+      },
+      "deltaRmseDb": -0.3941589978849531,
+      "deltaMaxAbsDb": -2.333613727665941,
+      "deltaRegret": -2.4208345987101767,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 1511,
+      "timeToBestDelta": 4682.261689999999,
+      "wallClockSatisfied": true
+    }
+  ],
+  "results5s": [
+    {
+      "caseId": "titan-to-storm",
+      "targetFamily": "Storm",
+      "seedType": "teacher-student",
+      "deadlineMs": 5000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 241.056153,
         "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 241.056153,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 5,
+        "coordinateTrials": 120,
+        "downstreamEvaluations": 5,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
+          "rmseDb": 1.5871419174342807,
+          "maxAbsDb": 5.3961368474708475,
+          "filterCount": 10,
+          "regret": 0.9932230333807892,
+          "elapsedMs": 84.26903799999991
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 1759.9976139999994,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 1759.9976139999994,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 33,
+        "coordinateTrials": 792,
+        "downstreamEvaluations": 33,
+        "signalCanonicalEvaluations": 302,
+        "signalElapsedMs": 1180.968960000001,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
+          "rmseDb": 1.5871419174342807,
+          "maxAbsDb": 5.3961368474708475,
+          "filterCount": 10,
+          "regret": 0.9932230333807892,
+          "elapsedMs": 7.793883999999707
+        }
+      },
+      "deltaRmseDb": 0,
+      "deltaMaxAbsDb": 0,
+      "deltaRegret": 0,
+      "selectorRelation": "equivalent",
+      "paretoRelation": "equivalent",
+      "computeDelta": 330,
+      "timeToBestDelta": -76.4751540000002,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-storm",
+      "targetFamily": "Storm",
+      "seedType": "zero-seed",
+      "deadlineMs": 5000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 62.53176899999926,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 62.53176899999926,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 15,
+        "coordinateTrials": 360,
+        "downstreamEvaluations": 15,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-6-add-pk:0006",
+          "rmseDb": 3.0905982362391216,
+          "maxAbsDb": 9.992384553389481,
+          "filterCount": 2,
+          "regret": 9.288605214390818,
+          "elapsedMs": 22.521614999999656
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 5116.243227000001,
+        "stopReason": "deadline",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 5116.243227000001,
+          "overshootMs": 116.24322700000084,
+          "satisfied": true,
+          "stopReason": "deadline"
+        },
+        "uniqueStructuralStates": 277,
+        "coordinateTrials": 6648,
+        "downstreamEvaluations": 277,
+        "signalCanonicalEvaluations": 1359,
+        "signalElapsedMs": 3306.6646919999976,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-425-split:0261",
+          "rmseDb": 2.564228530678801,
+          "maxAbsDb": 7.827739283331402,
+          "filterCount": 10,
+          "regret": 5.859850484726171,
+          "elapsedMs": 4638.7826509999995
+        }
+      },
+      "deltaRmseDb": -0.5263697055603207,
+      "deltaMaxAbsDb": -2.164645270058079,
+      "deltaRegret": -3.4287547296646474,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 1621,
+      "timeToBestDelta": 4616.261036,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-u12t",
+      "targetFamily": "U12t",
+      "seedType": "teacher-student",
+      "deadlineMs": 5000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 102.18003899999894,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 102.18003899999894,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 9,
+        "coordinateTrials": 216,
+        "downstreamEvaluations": 9,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
+          "rmseDb": 1.2257165384464115,
+          "maxAbsDb": 3.6013255820762784,
+          "filterCount": 9,
+          "regret": 0.011261184729902673,
+          "elapsedMs": 17.3364619999993
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 2581.9223439999987,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 2581.9223439999987,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 73,
+        "coordinateTrials": 1752,
+        "downstreamEvaluations": 73,
+        "signalCanonicalEvaluations": 549,
+        "signalElapsedMs": 1772.8408819999895,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-24-split:0016",
+          "rmseDb": 1.1657024567334162,
+          "maxAbsDb": 3.5968494197412006,
+          "filterCount": 10,
+          "regret": 0,
+          "elapsedMs": 356.51376900000105
+        }
+      },
+      "deltaRmseDb": -0.06001408171299527,
+      "deltaMaxAbsDb": -0.004476162335077749,
+      "deltaRegret": -0.011261184729902673,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 613,
+      "timeToBestDelta": 339.17730700000175,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-u12t",
+      "targetFamily": "U12t",
+      "seedType": "zero-seed",
+      "deadlineMs": 5000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 115.5837309999988,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 115.5837309999988,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 30,
+        "coordinateTrials": 720,
+        "downstreamEvaluations": 30,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-26-add-pk:0024",
+          "rmseDb": 1.7403334269121966,
+          "maxAbsDb": 4.651405070902967,
+          "filterCount": 4,
+          "regret": 2.069728738593043,
+          "elapsedMs": 86.13257700000031
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 5000.783649999998,
+        "stopReason": "deadline",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 5000.783649999998,
+          "overshootMs": 0.7836499999975786,
+          "satisfied": true,
+          "stopReason": "deadline"
+        },
+        "uniqueStructuralStates": 253,
+        "coordinateTrials": 6072,
+        "downstreamEvaluations": 253,
+        "signalCanonicalEvaluations": 1212,
+        "signalElapsedMs": 3206.672917000011,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-294-split:0188",
+          "rmseDb": 1.4402024938081597,
+          "maxAbsDb": 4.427162875632694,
+          "filterCount": 8,
+          "regret": 0.8692050061768954,
+          "elapsedMs": 2835.5216899999978
+        }
+      },
+      "deltaRmseDb": -0.30013093310403693,
+      "deltaMaxAbsDb": -0.22424219527027223,
+      "deltaRegret": -1.2005237324161477,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 1435,
+      "timeToBestDelta": 2749.3891129999975,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-trio",
+      "targetFamily": "Trio",
+      "seedType": "teacher-student",
+      "deadlineMs": 5000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 41.45807700000296,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 41.45807700000296,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 5,
+        "coordinateTrials": 120,
+        "downstreamEvaluations": 5,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
+          "rmseDb": 1.2591239856453276,
+          "maxAbsDb": 4.722496940036333,
+          "filterCount": 10,
+          "regret": 2.1867305341618795,
+          "elapsedMs": 3.3265769999998156
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 1717.6583830000018,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 1717.6583830000018,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 56,
+        "coordinateTrials": 1344,
+        "downstreamEvaluations": 56,
+        "signalCanonicalEvaluations": 360,
+        "signalElapsedMs": 1136.03023199999,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
+          "rmseDb": 1.2591239856453276,
+          "maxAbsDb": 4.722496940036333,
+          "filterCount": 10,
+          "regret": 2.1867305341618795,
+          "elapsedMs": 3.2490770000003977
+        }
+      },
+      "deltaRmseDb": 0,
+      "deltaMaxAbsDb": 0,
+      "deltaRegret": 0,
+      "selectorRelation": "equivalent",
+      "paretoRelation": "equivalent",
+      "computeDelta": 411,
+      "timeToBestDelta": -0.07749999999941792,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-trio",
+      "targetFamily": "Trio",
+      "seedType": "zero-seed",
+      "deadlineMs": 5000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 189.16476899999543,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 189.16476899999543,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 38,
+        "coordinateTrials": 912,
+        "downstreamEvaluations": 38,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-47-merge:0033",
+          "rmseDb": 1.8476704405510282,
+          "maxAbsDb": 5.542359135037337,
+          "filterCount": 6,
+          "regret": 4.708773685838825,
+          "elapsedMs": 158.97203799999988
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 5000,
+        "totalElapsedMs": 5060.982342999996,
+        "stopReason": "deadline",
+        "timingFidelity": {
+          "deadlineMs": 5000,
+          "actualElapsedMs": 5060.982342999996,
+          "overshootMs": 60.982342999996035,
+          "satisfied": true,
+          "stopReason": "deadline"
+        },
+        "uniqueStructuralStates": 341,
+        "coordinateTrials": 8184,
+        "downstreamEvaluations": 341,
+        "signalCanonicalEvaluations": 1208,
+        "signalElapsedMs": 3128.271884000067,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-387-merge:0329",
+          "rmseDb": 1.4535114426660751,
+          "maxAbsDb": 3.208745407371396,
+          "filterCount": 7,
+          "regret": 2.287939087128648,
+          "elapsedMs": 4841.233727999999
+        }
+      },
+      "deltaRmseDb": -0.3941589978849531,
+      "deltaMaxAbsDb": -2.333613727665941,
+      "deltaRegret": -2.4208345987101767,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 1511,
+      "timeToBestDelta": 4682.261689999999,
+      "wallClockSatisfied": true
+    }
+  ],
+  "results15s": [
+    {
+      "caseId": "titan-to-storm",
+      "targetFamily": "Storm",
+      "seedType": "teacher-student",
+      "deadlineMs": 15000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 50.421731000000364,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 50.421731000000364,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 5,
+        "coordinateTrials": 120,
+        "downstreamEvaluations": 5,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
+          "rmseDb": 1.5871419174342807,
+          "maxAbsDb": 5.3961368474708475,
+          "filterCount": 10,
+          "regret": 0.9932230333807892,
+          "elapsedMs": 3.5662309999997888
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 1618.631499,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 1618.631499,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 33,
+        "coordinateTrials": 792,
+        "downstreamEvaluations": 33,
+        "signalCanonicalEvaluations": 302,
+        "signalElapsedMs": 1104.9356140000018,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:matching-pursuit:matching-pursuit-v1:titan-to-storm:0:replacement-2-2572:0000",
+          "rmseDb": 1.5871419174342807,
+          "maxAbsDb": 5.3961368474708475,
+          "filterCount": 10,
+          "regret": 0.9932230333807892,
+          "elapsedMs": 3.6673069999997097
+        }
+      },
+      "deltaRmseDb": 0,
+      "deltaMaxAbsDb": 0,
+      "deltaRegret": 0,
+      "selectorRelation": "equivalent",
+      "paretoRelation": "equivalent",
+      "computeDelta": 330,
+      "timeToBestDelta": 0.1010759999999209,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-storm",
+      "targetFamily": "Storm",
+      "seedType": "zero-seed",
+      "deadlineMs": 15000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 64.85688499999924,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 64.85688499999924,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 15,
+        "coordinateTrials": 360,
+        "downstreamEvaluations": 15,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-6-add-pk:0006",
+          "rmseDb": 3.0905982362391216,
+          "maxAbsDb": 9.992384553389481,
+          "filterCount": 2,
+          "regret": 9.288605214390818,
+          "elapsedMs": 17.05576900000051
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 10357.592530999998,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 10357.592530999998,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 475,
+        "coordinateTrials": 11400,
+        "downstreamEvaluations": 475,
+        "signalCanonicalEvaluations": 2863,
+        "signalElapsedMs": 7102.289801999988,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-storm:0:zero:proposal-687-merge:0433",
+          "rmseDb": 2.4810975041376007,
+          "maxAbsDb": 7.9300972986533225,
+          "filterCount": 6,
+          "regret": 5.664256896113838,
+          "elapsedMs": 9072.73834
+        }
+      },
+      "deltaRmseDb": -0.6095007321015209,
+      "deltaMaxAbsDb": -2.062287254736159,
+      "deltaRegret": -3.6243483182769802,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 3323,
+      "timeToBestDelta": 9055.682571,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-u12t",
+      "targetFamily": "U12t",
+      "seedType": "teacher-student",
+      "deadlineMs": 15000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 108.27600000000166,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 108.27600000000166,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 9,
+        "coordinateTrials": 216,
+        "downstreamEvaluations": 9,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-2-remove:0002",
+          "rmseDb": 1.2257165384464115,
+          "maxAbsDb": 3.6013255820762784,
+          "filterCount": 9,
+          "regret": 0.011261184729902673,
+          "elapsedMs": 18.79996100000062
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 2587.961804999999,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 2587.961804999999,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 73,
+        "coordinateTrials": 1752,
+        "downstreamEvaluations": 73,
+        "signalCanonicalEvaluations": 549,
+        "signalElapsedMs": 1768.683151000012,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:matching-pursuit:proposal-24-split:0016",
+          "rmseDb": 1.1657024567334162,
+          "maxAbsDb": 3.5968494197412006,
+          "filterCount": 10,
+          "regret": 0,
+          "elapsedMs": 354.4078069999996
+        }
+      },
+      "deltaRmseDb": -0.06001408171299527,
+      "deltaMaxAbsDb": -0.004476162335077749,
+      "deltaRegret": -0.011261184729902673,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 613,
+      "timeToBestDelta": 335.607845999999,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-u12t",
+      "targetFamily": "U12t",
+      "seedType": "zero-seed",
+      "deadlineMs": 15000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 119.03684599999906,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 119.03684599999906,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 30,
+        "coordinateTrials": 720,
+        "downstreamEvaluations": 30,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-26-add-pk:0024",
+          "rmseDb": 1.7403334269121966,
+          "maxAbsDb": 4.651405070902967,
+          "filterCount": 4,
+          "regret": 2.069728738593043,
+          "elapsedMs": 83.77149999999892
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 6838.746572,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 6838.746572,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 284,
+        "coordinateTrials": 6816,
+        "downstreamEvaluations": 284,
+        "signalCanonicalEvaluations": 1680,
+        "signalElapsedMs": 4515.071263999995,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-u12t:0:zero:proposal-463-split:0260",
+          "rmseDb": 1.440256112224315,
+          "maxAbsDb": 4.426646930116777,
+          "filterCount": 10,
+          "regret": 0.8694194798415165,
+          "elapsedMs": 5131.988458000003
+        }
+      },
+      "deltaRmseDb": -0.3000773146878817,
+      "deltaMaxAbsDb": -0.2247581407861894,
+      "deltaRegret": -1.2003092587515267,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 1934,
+      "timeToBestDelta": 5048.2169580000045,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-trio",
+      "targetFamily": "Trio",
+      "seedType": "teacher-student",
+      "deadlineMs": 15000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 40.37276899999415,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 40.37276899999415,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 5,
+        "coordinateTrials": 120,
+        "downstreamEvaluations": 5,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
+          "rmseDb": 1.2591239856453276,
+          "maxAbsDb": 4.722496940036333,
+          "filterCount": 10,
+          "regret": 2.1867305341618795,
+          "elapsedMs": 3.66865400000097
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 1660.328499000003,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 1660.328499000003,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 56,
+        "coordinateTrials": 1344,
+        "downstreamEvaluations": 56,
+        "signalCanonicalEvaluations": 360,
+        "signalElapsedMs": 1134.477728999991,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:matching-pursuit:matching-pursuit-v1:titan-to-trio:0:replacement-2-0913:0000",
+          "rmseDb": 1.2591239856453276,
+          "maxAbsDb": 4.722496940036333,
+          "filterCount": 10,
+          "regret": 2.1867305341618795,
+          "elapsedMs": 3.2850000000034925
+        }
+      },
+      "deltaRmseDb": 0,
+      "deltaMaxAbsDb": 0,
+      "deltaRegret": 0,
+      "selectorRelation": "equivalent",
+      "paretoRelation": "equivalent",
+      "computeDelta": 411,
+      "timeToBestDelta": -0.3836539999974775,
+      "wallClockSatisfied": true
+    },
+    {
+      "caseId": "titan-to-trio",
+      "targetFamily": "Trio",
+      "seedType": "zero-seed",
+      "deadlineMs": 15000,
+      "A": {
+        "armId": "A",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 189.0484609999985,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 189.0484609999985,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
+        "uniqueStructuralStates": 38,
+        "coordinateTrials": 912,
+        "downstreamEvaluations": 38,
+        "signalCanonicalEvaluations": 0,
+        "signalElapsedMs": 0,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-47-merge:0033",
+          "rmseDb": 1.8476704405510282,
+          "maxAbsDb": 5.542359135037337,
+          "filterCount": 6,
+          "regret": 4.708773685838825,
+          "elapsedMs": 159.70346099999733
+        }
+      },
+      "C": {
+        "armId": "C",
+        "deadlineMs": 15000,
+        "totalElapsedMs": 7228.349225999998,
+        "stopReason": "no-admissible-proposals",
+        "timingFidelity": {
+          "deadlineMs": 15000,
+          "actualElapsedMs": 7228.349225999998,
+          "overshootMs": 0,
+          "satisfied": true,
+          "stopReason": "no-admissible-proposals"
+        },
         "uniqueStructuralStates": 403,
         "coordinateTrials": 9672,
-        "checkpoints": [
-          {
-            "budgetMs": 5000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-387-merge:0329",
-              "rmseDb": 1.4535114426660751,
-              "maxAbsDb": 3.208745407371396,
-              "filterCount": 7,
-              "regret": 2.287939087128648,
-              "elapsedMs": 4800.3441120000025
-            },
-            "downstreamEvaluations": 341,
-            "signalCanonicalEvaluations": 1201
-          },
-          {
-            "budgetMs": 15000,
-            "selectedBest": {
-              "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-423-split:0348",
-              "rmseDb": 1.42671267864784,
-              "maxAbsDb": 3.1625112857849396,
-              "filterCount": 8,
-              "regret": 2.180744031055707,
-              "elapsedMs": 5250.714458000002
-            },
-            "downstreamEvaluations": 403,
-            "signalCanonicalEvaluations": 1714
-          }
-        ]
-      },
-      "checkpoints": [
-        {
-          "budgetMs": 5000,
-          "deltaRmseDb": -0.3941589978849531,
-          "deltaMaxAbsDb": -2.333613727665941,
-          "deltaRegret": -2.4208345987101767,
-          "selectorRelation": "C",
-          "paretoRelation": "C-dominates",
-          "computeDelta": 1504,
-          "timeToBestDelta": 4618.154150000002
-        },
-        {
-          "budgetMs": 15000,
-          "deltaRmseDb": -0.42095776190318834,
-          "deltaMaxAbsDb": -2.3798478492523976,
-          "deltaRegret": -2.5280296547831176,
-          "selectorRelation": "C",
-          "paretoRelation": "C-dominates",
-          "computeDelta": 2079,
-          "timeToBestDelta": 5068.524496000002
+        "downstreamEvaluations": 403,
+        "signalCanonicalEvaluations": 1714,
+        "signalElapsedMs": 4636.852224999966,
+        "selectedBest": {
+          "candidateId": "structural-beam-v1:titan-to-trio:0:zero:proposal-423-split:0348",
+          "rmseDb": 1.42671267864784,
+          "maxAbsDb": 3.1625112857849396,
+          "filterCount": 8,
+          "regret": 2.180744031055707,
+          "elapsedMs": 5242.685458
         }
-      ]
+      },
+      "deltaRmseDb": -0.42095776190318834,
+      "deltaMaxAbsDb": -2.3798478492523976,
+      "deltaRegret": -2.5280296547831176,
+      "selectorRelation": "C",
+      "paretoRelation": "C-dominates",
+      "computeDelta": 2079,
+      "timeToBestDelta": 5082.981997000003,
+      "wallClockSatisfied": true
     }
-  ]
+  ],
+  "summary5s": {
+    "selectorWins": 4,
+    "selectorLosses": 0,
+    "selectorTies": 2,
+    "meanDeltaMaxAbsDb": -0.7878295592215617,
+    "meanDeltaRmseDb": -0.21344561971038434,
+    "meanDeltaRegret": -1.1768957075868125,
+    "stormMeanDeltaMaxAbsDb": -1.0823226350290396,
+    "worstMaxAbsRegressionDb": 0
+  },
+  "summary15s": {
+    "selectorWins": 4,
+    "selectorLosses": 0,
+    "selectorTies": 2,
+    "meanDeltaMaxAbsDb": -0.7785615678516372,
+    "meanDeltaRmseDb": -0.2317583150675977,
+    "meanDeltaRegret": -1.2273247360902546,
+    "stormMeanDeltaMaxAbsDb": -1.0311436273680794,
+    "worstMaxAbsRegressionDb": 0
+  }
 }
