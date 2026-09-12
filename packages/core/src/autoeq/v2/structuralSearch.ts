@@ -798,7 +798,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           const seeded = canonical([...retained, compressed, added])
           const polished = polishFilters(
             seeded,
-            Math.max(config.localPolishEvaluations, seeded.length * 8),
+            Math.max(config.localPolishEvaluations, seeded.length * 32),
             bounds,
             desiredDb,
             frequencies,
