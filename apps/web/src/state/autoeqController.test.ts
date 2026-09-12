@@ -10,9 +10,11 @@ import { describe, expect, it } from 'vitest'
 
 import { createAutoEqResultV2 } from '../test/autoEqFixture'
 import {
+  EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE,
   AutoEqCancelledError,
   AutoEqWorkerError,
   type AutoEqClient,
+  type AutoEqRunOptions,
 } from '../workers/autoeqClient'
 import { createAutoEqController, createAutoEqRunInputSignature } from './autoeqController'
 import { createAutoEqRunStore } from './autoeqRunStore'
@@ -45,6 +47,7 @@ function syntheticCurve(id: string, kind: Curve['kind'], middleDb: number): Curv
 interface ControlledRun {
   runId: string
   input: StandardAutoEqInputV2
+  options?: AutoEqRunOptions
   resolve: (result: AutoEqResultV2) => void
   reject: (cause: unknown) => void
 }
@@ -52,8 +55,8 @@ interface ControlledRun {
 function createControlledClient() {
   const runs: ControlledRun[] = []
   const client: AutoEqClient = {
-    run: (runId, input) => new Promise((resolve, reject) => {
-      runs.push({ runId, input, resolve, reject })
+    run: (runId, input, options) => new Promise((resolve, reject) => {
+      runs.push({ runId, input, options, resolve, reject })
     }),
     cancel: (runId) => {
       const run = runs.find((candidate) => candidate.runId === runId)
@@ -125,6 +128,41 @@ describe('AutoEQ controller', () => {
     expect(captured.normalization).not.toBe(state.normalization)
     expect(captured.settings).not.toBe(state.autoeqSettings)
     expect(runStore.getState()).toMatchObject({ status: 'running', activeRunId: 'run-1' })
+  })
+
+  it('routes the validated experimental mode explicitly without changing the default path', async () => {
+    const { workspace, runStore, controller, runs } = setup()
+    const pending = controller.runAutoEq({ mode: EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE })
+
+    expect(runs[0]!.options).toEqual({ mode: EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE })
+    const result = createAutoEqResultV2(4)
+    ;(result.manifest as typeof result.manifest & {
+      experimentalStructuralSearch?: { preset: string; seedMode: string }
+    }).experimentalStructuralSearch = {
+      preset: 'max10-q31-b4-p8-experimental',
+      seedMode: 'zero-start',
+    }
+    runs[0]!.resolve(result)
+    await pending
+
+    expect(workspace.getState().filters).toEqual(result.filters)
+    expect(runStore.getState()).toMatchObject({ status: 'idle', activeRunId: null, error: null })
+  })
+
+  it('rejects an unmarked Standard-v2 result for an experimental request', async () => {
+    const { workspace, runStore, controller, runs } = setup()
+    const before = solutionSnapshot(workspace.getState())
+    const pending = controller.runAutoEq({ mode: EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE })
+
+    runs[0]!.resolve(createAutoEqResultV2(4))
+    await pending
+
+    expect(solutionSnapshot(workspace.getState())).toEqual(before)
+    expect(runStore.getState()).toMatchObject({
+      status: 'error',
+      activeRunId: null,
+      error: { category: 'optimization' },
+    })
   })
 
   it('starts transient running state after the client starts the Worker run', async () => {

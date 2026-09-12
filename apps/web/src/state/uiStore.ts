@@ -16,6 +16,7 @@ export interface UiState {
   activeDockTab: DockTab
   inspectorEnabled: boolean
   labelsEnabled: boolean
+  experimentalMax10Enabled: boolean
   graphZoomPreset: GraphZoomPreset
   smoothingLevel: number
   baselineCurveId: string | null
@@ -24,6 +25,7 @@ export interface UiState {
   setActiveDockTab: (tab: DockTab) => void
   toggleInspector: () => void
   toggleLabels: () => void
+  setExperimentalMax10Enabled: (enabled: boolean) => void
   setGraphZoomPreset: (preset: GraphZoomPreset) => void
   setSmoothingLevel: (level: number) => void
   setBaselineCurve: (id: string | null) => void
@@ -99,6 +101,7 @@ export function createUiStore(random: () => number = Math.random) {
     activeDockTab: 'curves',
     inspectorEnabled: true,
     labelsEnabled: true,
+    experimentalMax10Enabled: false,
     graphZoomPreset: 'full',
     smoothingLevel: 5,
     baselineCurveId: null,
@@ -111,6 +114,8 @@ export function createUiStore(random: () => number = Math.random) {
     setActiveDockTab: (activeDockTab) => set({ activeDockTab }),
     toggleInspector: () => set((state) => ({ inspectorEnabled: !state.inspectorEnabled })),
     toggleLabels: () => set((state) => ({ labelsEnabled: !state.labelsEnabled })),
+    setExperimentalMax10Enabled: (experimentalMax10Enabled) =>
+      set({ experimentalMax10Enabled }),
     setGraphZoomPreset: (graphZoomPreset) => set({ graphZoomPreset }),
     setSmoothingLevel: (smoothingLevel) => {
       if (!Number.isFinite(smoothingLevel) || smoothingLevel < 0) return

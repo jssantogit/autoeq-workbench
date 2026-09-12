@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createAutoEqResultV2 } from '../test/autoEqFixture'
 import {
+  EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE,
   AutoEqCancelledError,
   createAutoEqClient,
   type AutoEqWorkerMessage,
@@ -78,6 +79,21 @@ describe('AutoEQ Worker client', () => {
 
     await expect(run).resolves.toEqual(result)
     expect(workers[0]!.terminated).toBe(true)
+  })
+
+  it('posts the experimental execution mode only when explicitly requested', async () => {
+    const { client, workers } = setup()
+    const run = client.run('run-exp', input, { mode: EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE })
+    const result = createAutoEqResultV2()
+
+    expect(workers[0]!.posted).toEqual([{
+      type: 'run',
+      runId: 'run-exp',
+      input,
+      mode: EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE,
+    }])
+    workers[0]!.emit({ type: 'result', runId: 'run-exp', result })
+    await expect(run).resolves.toEqual(result)
   })
 
   it('rejects with the structured public Worker error', async () => {

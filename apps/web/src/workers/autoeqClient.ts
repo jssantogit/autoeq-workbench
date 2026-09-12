@@ -1,4 +1,34 @@
-import type { AutoEqResultV2, StandardAutoEqInputV2 } from '@autoeq-workbench/core'
+import {
+  DEFAULT_AUTOEQ_SETTINGS,
+  type AutoEqResultV2,
+  type AutoEqSettings,
+  type StandardAutoEqInputV2,
+} from '@autoeq-workbench/core'
+
+export const EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE =
+  'max10-q31-b4-p8-experimental-zero-start' as const
+
+export type AutoEqExecutionMode =
+  | 'standard'
+  | typeof EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE
+
+export interface AutoEqRunOptions {
+  mode?: AutoEqExecutionMode
+}
+
+export function isExperimentalStructuralAutoEqEligible(
+  settings: AutoEqSettings,
+): boolean {
+  return (
+    settings.minFrequencyHz === DEFAULT_AUTOEQ_SETTINGS.minFrequencyHz &&
+    settings.maxFrequencyHz === DEFAULT_AUTOEQ_SETTINGS.maxFrequencyHz &&
+    settings.minGainDb === DEFAULT_AUTOEQ_SETTINGS.minGainDb &&
+    settings.maxGainDb === DEFAULT_AUTOEQ_SETTINGS.maxGainDb &&
+    settings.minQ === DEFAULT_AUTOEQ_SETTINGS.minQ &&
+    settings.maxQ === DEFAULT_AUTOEQ_SETTINGS.maxQ &&
+    settings.maxFilters === 10
+  )
+}
 
 export interface AutoEqPublicError {
   category: 'validation' | 'optimization' | 'numeric'
@@ -9,6 +39,7 @@ export interface AutoEqWorkerRequest {
   type: 'run'
   runId: string
   input: StandardAutoEqInputV2
+  mode?: AutoEqExecutionMode
 }
 
 export type AutoEqWorkerMessage =
@@ -46,7 +77,11 @@ interface ActiveRun {
 }
 
 export interface AutoEqClient {
-  run(runId: string, input: StandardAutoEqInputV2): Promise<AutoEqResultV2>
+  run(
+    runId: string,
+    input: StandardAutoEqInputV2,
+    options?: AutoEqRunOptions,
+  ): Promise<AutoEqResultV2>
   cancel(runId?: string): void
 }
 
@@ -74,7 +109,7 @@ export function createAutoEqClient(
   }
 
   return {
-    run: (runId, input) => {
+    run: (runId, input, options) => {
       cancel()
       const worker = createWorker()
 
@@ -98,7 +133,12 @@ export function createAutoEqClient(
         }
 
         try {
-          worker.postMessage({ type: 'run', runId, input })
+          const mode = options?.mode ?? 'standard'
+          worker.postMessage(
+            mode === 'standard'
+              ? { type: 'run', runId, input }
+              : { type: 'run', runId, input, mode },
+          )
         } catch {
           dispose(run)
           reject(new AutoEqWorkerError({
