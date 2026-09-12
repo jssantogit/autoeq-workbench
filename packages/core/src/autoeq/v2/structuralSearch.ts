@@ -587,7 +587,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
   const epsilon = 1e-12
 
   while (
-    rescueSteps < 5 &&
+    rescueSteps < 3 &&
     rescued.filters.length < config.maxFilters &&
     (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75) &&
     !deadline.isExpired()
@@ -656,7 +656,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
 
   let capSwapSteps = 0
   while (
-    capSwapSteps < 4 &&
+    capSwapSteps < 2 &&
     rescued.filters.length === config.maxFilters &&
     (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75) &&
     !deadline.isExpired()
@@ -726,6 +726,14 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     })
     rescued = improving[0]!.state
     capSwapSteps += 1
+  }
+
+  if (Math.max(rescued.rmseDb / 0.25, rescued.maxAbsDb / 0.75) > 1) {
+    return {
+      filters: rescued.filters,
+      rmseDb: rescued.rmseDb,
+      maxAbsDb: rescued.maxAbsDb,
+    }
   }
 
   if (
