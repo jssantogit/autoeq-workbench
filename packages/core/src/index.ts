@@ -176,3 +176,15 @@ export type {
   NormalizationMode,
   PreparedCurve,
 } from './types/curve.js'
+export {
+  MAX10_BASELINE_PRESET,
+  MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
+  resolveStructuralSearchConfig,
+  runStructuralSearch,
+} from './autoeq/v2/structuralSearch.js'
+export type {
+  StructuralSearchPreset,
+  ResolvedStructuralSearchConfig,
+  StructuralSearchInput,
+  StructuralSearchResult,
+} from './autoeq/v2/structuralSearch.js'
