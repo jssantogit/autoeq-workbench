@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DEFAULT_AUTOEQ_SETTINGS,
+  cascadeMagnitudeDb,
+  evaluateV2Solution,
   resolveStandardAutoEqV2Config,
 } from '../../../src/index.js'
 import {
@@ -9,6 +11,7 @@ import {
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   generateStructuralMutations,
   localPolishEvaluationBudget,
+  pruneMarginalFilter,
   resolveStructuralSearchConfig,
   runStructuralSearch,
   selectResidualFeatures,
@@ -40,6 +43,8 @@ describe('Experimental Max10 structural search', () => {
       minFeatureSeparationOctaves: 0,
       candidatePolicy: 'legacy',
       selectionMetric: 'hypot',
+      mergeProximityOctaves: 1 / 12,
+      marginalPruneTolerance: 0,
       admission: 'lexical',
     })
     expect(resolveStructuralSearchConfig({
@@ -49,6 +54,8 @@ describe('Experimental Max10 structural search', () => {
       minFeatureSeparationOctaves: 0.5,
       candidatePolicy: 'semantic',
       selectionMetric: 'violation',
+      mergeProximityOctaves: 1 / 12 + 0.002,
+      marginalPruneTolerance: 0.01,
       admission: 'metric',
     })
   })
@@ -150,6 +157,130 @@ describe('Experimental Max10 structural search', () => {
     const typeMutation = fromShelf.find((proposal) => proposal.mutation === 'type-mutation')
     expect(typeMutation?.filters.some((filter) => filter.type === 'PK')).toBe(true)
     expect(fromShelf.some((proposal) => proposal.mutation === 'split')).toBe(false)
+  })
+
+  it('merges split siblings after small quantization/refinement drift only in the experimental tolerance', () => {
+    const bounds = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
+    const nearSplitPair = [
+      {
+        id: 'left',
+        enabled: true,
+        type: 'PK' as const,
+        frequencyHz: 1_191,
+        gainDb: 0.7,
+        q: 1.1,
+      },
+      {
+        id: 'right',
+        enabled: true,
+        type: 'PK' as const,
+        frequencyHz: 1_262,
+        gainDb: 0.7,
+        q: 1.1,
+      },
+    ]
+
+    const baseline = generateStructuralMutations(
+      nearSplitPair,
+      localizedResidual,
+      frequencies,
+      bounds,
+      6,
+      0.5,
+      'semantic',
+      1 / 12,
+    )
+    const experimental = generateStructuralMutations(
+      nearSplitPair,
+      localizedResidual,
+      frequencies,
+      bounds,
+      6,
+      0.5,
+      'semantic',
+      1 / 12 + 0.002,
+    )
+
+    expect(baseline.some((proposal) => proposal.mutation === 'merge')).toBe(false)
+    expect(experimental.some((proposal) => proposal.mutation === 'merge')).toBe(true)
+  })
+
+  it('prunes a truly redundant slot but preserves a small filter with measurable contribution', () => {
+    const testFrequencies = [50, 100, 200, 500, 1_000, 2_000, 5_000, 10_000]
+    const main = {
+      id: 'main',
+      enabled: true,
+      type: 'PK' as const,
+      frequencyHz: 1_000,
+      gainDb: 2,
+      q: 1,
+    }
+    const redundant = {
+      id: 'redundant',
+      enabled: true,
+      type: 'PK' as const,
+      frequencyHz: 100,
+      gainDb: 0,
+      q: 0.7,
+    }
+    const smallButUseful = {
+      id: 'small',
+      enabled: true,
+      type: 'PK' as const,
+      frequencyHz: 100,
+      gainDb: 0.1,
+      q: 0.7,
+    }
+
+    const desiredWithoutSmall = cascadeMagnitudeDb([main], testFrequencies, 48_000)
+    const redundantSolution = evaluateV2Solution(
+      [main, redundant],
+      desiredWithoutSmall,
+      testFrequencies,
+      48_000,
+    )
+    const redundantState = {
+      candidateId: 'redundant-state',
+      filters: redundantSolution.filters,
+      rmseDb: redundantSolution.metrics.rmseDb,
+      maxAbsDb: redundantSolution.metrics.maxAbsDb,
+      cancellationScore: redundantSolution.cancellationAudit.totalScore,
+    }
+    const pruned = pruneMarginalFilter(
+      redundantState,
+      desiredWithoutSmall,
+      testFrequencies,
+      48_000,
+      0.01,
+    )
+    expect(pruned.filters.map((filter) => filter.id)).toEqual(['main'])
+
+    const desiredWithSmall = cascadeMagnitudeDb(
+      [main, smallButUseful],
+      testFrequencies,
+      48_000,
+    )
+    const usefulSolution = evaluateV2Solution(
+      [main, smallButUseful],
+      desiredWithSmall,
+      testFrequencies,
+      48_000,
+    )
+    const usefulState = {
+      candidateId: 'useful-state',
+      filters: usefulSolution.filters,
+      rmseDb: usefulSolution.metrics.rmseDb,
+      maxAbsDb: usefulSolution.metrics.maxAbsDb,
+      cancellationScore: usefulSolution.cancellationAudit.totalScore,
+    }
+    const preserved = pruneMarginalFilter(
+      usefulState,
+      desiredWithSmall,
+      testFrequencies,
+      48_000,
+      0.01,
+    )
+    expect(preserved.filters).toHaveLength(2)
   })
 
   it('scales local polish budget with filter count instead of staying fixed at 24 trials', () => {
