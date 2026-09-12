@@ -104,6 +104,10 @@ function uniqueId(filters: readonly Filter[], prefix: string): string {
   return candidate
 }
 
+function splitDepth(id: string): number {
+  return id.split('-split-').length - 1
+}
+
 function featureFrequency(
   frequenciesHz: readonly number[],
   residualDb: readonly number[],
@@ -272,7 +276,10 @@ export function generateStructuralMutations(
         ]),
       })
     }
-    if (current.length < bounds.maxFilters) {
+    if (
+      current.length < bounds.maxFilters &&
+      (filter.type !== 'PK' || splitDepth(filter.id) < 2)
+    ) {
       const ratio = 2 ** (1 / 24)
       const first = projectFilter({
         ...filter,
