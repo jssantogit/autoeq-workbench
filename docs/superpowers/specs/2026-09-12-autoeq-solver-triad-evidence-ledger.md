@@ -473,3 +473,116 @@ B. preserve/archive the best target-valid low-filter state independently of Pare
 C. deterministic one-for-one slot replacement when at Max Filters.
 
 Only mechanisms with public-corpus gains and no cross-case material regressions may advance.
+
+
+## Phase 2.1 — Targeted mechanism ablations on Q31+x8
+
+All rows are one-repeat public-corpus smoke runs after the 5-repeat Q31+x8 baseline established exact determinism.
+
+### A. Semantic shelf geometry bundle
+
+Run: `34708810409`
+
+Changes only proposal geometry for shelves:
+- direct PK remains single strongest residual;
+- LS/HS direct adds require edge evidence;
+- PK is no longer type-mutated into arbitrary shelves;
+- shelves are not split.
+
+Result:
+- V2 comparison wins/losses: 4/6 versus baseline 3/7;
+- target count remains 5/10.
+
+Major gains:
+- alternating_2_8k violation: 0.9942 -> 0.5488
+- dense_treble: 1.1276 -> 0.6011, target now achieved
+- overcomplete_compress: 1.3063 -> 1.1385
+
+Material regressions:
+- mixed_widths: 0.5398 -> 1.0327
+- overlap: 0.2912 -> 0.4919
+- stress_mid_treble: 3.2908 -> 3.5387
+- stress_mixed_edges: 1.5167 -> 1.7995
+
+Classification: **promising but too broad; decompose further**.
+
+### B. Best target-valid state archive
+
+Run: `34708813194`
+
+This does not alter the search path. It archives the best target-valid state by the existing selector and returns it even if a later more precise high-filter state dominates it in the RMSE/maxAbs Pareto frontier.
+
+It proves low-filter valid states exist:
+- bass_mid_mix: 10 -> 6 filters
+- alternating_2_8k: 9 -> 8
+- mixed_widths: 8 -> 7
+- overlap: 9 -> 6
+- quantization_sensitive: 10 -> 3
+
+However quality moves toward the target boundary, e.g.:
+- quantization_sensitive violation 0.1039 -> 0.9126
+- overlap 0.2912 -> 0.6485
+- bass_mid_mix 0.5172 -> 0.9919
+
+Classification: **reject as default precision policy**. It remains useful evidence for a future optional compact-delivery policy, not for the core solver objective.
+
+### C. One-for-one PK replacement at the cap
+
+Run: `34708815431`
+
+At Max Filters, generate direct same-cardinality PK replacements at the strongest residual instead of requiring a remove state to survive before a later add.
+
+Public-corpus quality was non-regressive in every case.
+
+Positive deltas:
+- mixed_widths: 0.5398 -> 0.5055
+- quantization_sensitive: 0.1039 -> 0.0782
+- overcomplete_compress: 1.3063 -> 1.0185
+
+Unchanged:
+- near_budget remained 1.8648
+- stress_mid_treble remained 3.2908
+- all other cells were equal or improved.
+
+Classification: **retain**. This is the cleanest new mechanism after scaled polish, but replacement reachability still needs stronger admission for the hardest cap cases.
+
+## Phase 2.2 — Failure topology evidence
+
+Run: `34708918980`
+
+### dense_treble
+
+Returned 9 filters, including three internal LS filters around 1.4 kHz, 8.3 kHz and 11.1 kHz. Error concentrates in 4-8 kHz and 8-20 kHz. This confirms that legacy shelf/type geometry consumes structure that should be used for dense PK features.
+
+### near_budget (MaxF=8)
+
+Returned:
+- LS ~6.7 kHz -1.5 dB;
+- PKs near 233, 523, 1165, 2616, 5047, 15454 and 20 kHz.
+
+The intended eight-PK structure includes meaningful features around 90 Hz and 9 kHz, but the delivered state has neither. The solver reaches the hard cap quickly (~0.35-0.46 s) and cannot recover the missing slots. This is a reachability/admission failure, not a runtime failure.
+
+### overcomplete_compress (MaxF=6)
+
+Returned an LS around 1.77 kHz +4.3 dB and five PKs, missing the intended low-frequency shelf and high shelf structure. One-for-one replacement improves the fit strongly but stops just above the RMSE target boundary.
+
+### stress_mid_treble
+
+Two internal LS filters around 5.5 and 6.2 kHz consume slots while the target contains dense PK structure extending through 16.5 kHz. The result concentrates filters below ~4 kHz and leaves presence/treble with very large residual error.
+
+### stress_mixed_edges
+
+The solver approximates the low shelf with a PK around 27 Hz, contains two internal LS filters (~2.2 kHz and ~12.6 kHz), and places an HS near 17.8 kHz. The residual peak remains around 15.9 kHz. The failure is not absence of edge capability alone; it is shelf proposal/type discipline plus slot allocation.
+
+## Next decomposed experiments
+
+1. **evidence-shelf-adds only**:
+   replace direct strongest-feature LS/HS adds with evidence-based edge shelf adds, but leave legacy type-mutation and split behavior intact.
+
+2. **shelf type discipline only**:
+   preserve legacy direct shelf adds, but prevent PK -> arbitrary shelf type mutation and prevent shelf splitting.
+
+3. **reserved replacement admission**:
+   starting from the non-regressive replace-at-cap branch, guarantee one pre-polish replacement proposal survives admission when at the filter cap.
+
+These remain isolated; no combination is promoted before individual evidence.
