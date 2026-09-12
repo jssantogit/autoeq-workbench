@@ -31,6 +31,8 @@ export interface ResolvedStructuralSearchConfig {
   minFeatureSeparationOctaves?: number
   candidatePolicy?: 'legacy' | 'semantic'
   selectionMetric?: 'hypot' | 'violation'
+  mergeProximityOctaves?: number
+  marginalPruneTolerance?: number
   admission: 'lexical' | 'q31-b4-p8' | 'metric'
 }
 
@@ -46,6 +48,8 @@ export function resolveStructuralSearchConfig(options?: { preset?: StructuralSea
       minFeatureSeparationOctaves: 0.5,
       candidatePolicy: 'semantic',
       selectionMetric: 'violation',
+      mergeProximityOctaves: 1 / 12 + 0.002,
+      marginalPruneTolerance: 0.01,
       admission: 'metric',
     }
   }
@@ -59,6 +63,8 @@ export function resolveStructuralSearchConfig(options?: { preset?: StructuralSea
     minFeatureSeparationOctaves: 0,
     candidatePolicy: 'legacy',
     selectionMetric: 'hypot',
+    mergeProximityOctaves: 1 / 12,
+    marginalPruneTolerance: 0,
     admission: 'lexical',
   }
 }
@@ -293,6 +299,7 @@ export function generateStructuralMutations(
   featureRegionCount = 1,
   minFeatureSeparationOctaves = 0,
   candidatePolicy: 'legacy' | 'semantic' = 'legacy',
+  mergeProximityOctaves = 1 / 12,
 ): StructuralProposal[] {
   const current = filters.map((filter) => projectFilter(filter, bounds))
   const features = selectResidualFeatures(
@@ -379,7 +386,10 @@ export function generateStructuralMutations(
     const left = current[leftIndex]!
     for (let rightIndex = leftIndex + 1; rightIndex < current.length; rightIndex += 1) {
       const right = current[rightIndex]!
-      if (left.type !== right.type || Math.abs(Math.log2(left.frequencyHz / right.frequencyHz)) > 1 / 12) {
+      if (
+        left.type !== right.type ||
+        Math.abs(Math.log2(left.frequencyHz / right.frequencyHz)) > mergeProximityOctaves
+      ) {
         continue
       }
       const leftWeight = Math.abs(left.gainDb)
@@ -531,6 +541,66 @@ export interface StructuralSearchResult {
   maxAbsDb: number
 }
 
+export function pruneMarginalFilter(
+  state: SearchState,
+  desiredDb: readonly number[],
+  frequencies: readonly number[],
+  sampleRateHz: number,
+  tolerance: number,
+): SearchState {
+  if (tolerance <= 0 || state.filters.length === 0) return state
+
+  const baseViolation = Math.max(state.rmseDb / 0.25, state.maxAbsDb / 0.75)
+  const candidates: Array<{
+    index: number
+    state: SearchState
+    violationDelta: number
+    rmseDeltaNormalized: number
+    maxAbsDeltaNormalized: number
+  }> = []
+
+  for (let index = 0; index < state.filters.length; index += 1) {
+    const filters = state.filters.filter((_, filterIndex) => filterIndex !== index)
+    const solution = evaluateV2Solution(filters, desiredDb, frequencies, sampleRateHz)
+    const candidate: SearchState = {
+      candidateId: state.candidateId,
+      filters: canonical(solution.filters),
+      rmseDb: solution.metrics.rmseDb,
+      maxAbsDb: solution.metrics.maxAbsDb,
+      cancellationScore: solution.cancellationAudit.totalScore,
+    }
+    const violation = Math.max(candidate.rmseDb / 0.25, candidate.maxAbsDb / 0.75)
+    const violationDelta = violation - baseViolation
+    const rmseDeltaNormalized = (candidate.rmseDb - state.rmseDb) / 0.25
+    const maxAbsDeltaNormalized = (candidate.maxAbsDb - state.maxAbsDb) / 0.75
+
+    if (
+      violationDelta <= tolerance + 1e-12 &&
+      rmseDeltaNormalized <= tolerance + 1e-12 &&
+      maxAbsDeltaNormalized <= tolerance + 1e-12
+    ) {
+      candidates.push({
+        index,
+        state: candidate,
+        violationDelta,
+        rmseDeltaNormalized,
+        maxAbsDeltaNormalized,
+      })
+    }
+  }
+
+  if (candidates.length === 0) return state
+
+  candidates.sort((left, right) =>
+    left.violationDelta - right.violationDelta ||
+    left.rmseDeltaNormalized - right.rmseDeltaNormalized ||
+    left.maxAbsDeltaNormalized - right.maxAbsDeltaNormalized ||
+    left.state.cancellationScore - right.state.cancellationScore ||
+    left.index - right.index
+  )
+  return candidates[0]!.state
+}
+
 export function runStructuralSearch(input: StructuralSearchInput): StructuralSearchResult {
   const { desiredDb, frequencies, sampleRateHz, config, deadline } = input
 
@@ -573,6 +643,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         config.featureRegionCount ?? 1,
         config.minFeatureSeparationOctaves ?? 0,
         config.candidatePolicy ?? 'legacy',
+        config.mergeProximityOctaves ?? 1 / 12,
       )
       const ordered = orderStructuralProposals(proposals)
 
@@ -629,7 +700,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           config.localPolishEvaluations,
           proposal.filters.length,
         )
-        const polished = polishFilters(
+        let polished = polishFilters(
           proposal.filters,
           polishEvaluations,
           bounds,
@@ -638,6 +709,18 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           deadline,
           sampleRateHz,
         )
+        if (
+          (config.marginalPruneTolerance ?? 0) > 0 &&
+          polished.filters.length >= config.maxFilters
+        ) {
+          polished = pruneMarginalFilter(
+            polished,
+            desiredDb,
+            frequencies,
+            sampleRateHz,
+            config.marginalPruneTolerance ?? 0,
+          )
+        }
         const key = semanticFilterKey(polished.filters)
         if (visited.has(key)) continue
         visited.add(key)
@@ -665,10 +748,19 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
   }
 
   const best = selectReferencePoint(beam, config.selectionMetric ?? 'hypot')
+  const delivered = (config.marginalPruneTolerance ?? 0) > 0
+    ? pruneMarginalFilter(
+        best,
+        desiredDb,
+        frequencies,
+        sampleRateHz,
+        config.marginalPruneTolerance ?? 0,
+      )
+    : best
   return {
-    filters: best.filters,
-    rmseDb: best.rmseDb,
-    maxAbsDb: best.maxAbsDb,
+    filters: delivered.filters,
+    rmseDb: delivered.rmseDb,
+    maxAbsDb: delivered.maxAbsDb,
   }
 }
 
