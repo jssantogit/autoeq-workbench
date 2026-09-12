@@ -272,7 +272,7 @@ export function generateStructuralMutations(
         ]),
       })
     }
-    if (current.length < bounds.maxFilters) {
+    if (current.length < bounds.maxFilters && filter.type !== 'PK') {
       const ratio = 2 ** (1 / 24)
       const first = projectFilter({
         ...filter,
