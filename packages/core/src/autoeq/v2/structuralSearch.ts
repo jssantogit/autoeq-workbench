@@ -108,7 +108,7 @@ function featureFrequency(
   frequenciesHz: readonly number[],
   residualDb: readonly number[],
   bounds: StandardAutoEqV2Config
-): { frequencyHz: number; residual: number } {
+): { index: number; frequencyHz: number; residual: number } {
   const extrema: number[] = []
   for (let index = 0; index < residualDb.length; index += 1) {
     const magnitude = Math.abs(residualDb[index]!)
@@ -122,6 +122,7 @@ function featureFrequency(
     return candidateMagnitude > bestMagnitude ? candidate : best
   }, extrema[0] ?? 0)
   return {
+    index,
     frequencyHz: clamp(
       frequenciesHz[index]!,
       bounds.minFrequencyHz,
@@ -131,17 +132,36 @@ function featureFrequency(
   }
 }
 
+function boundaryIndex(
+  residualDb: readonly number[],
+  centerIndex: number,
+  direction: -1 | 1,
+): number {
+  const center = residualDb[centerIndex]!
+  for (
+    let index = centerIndex + direction;
+    index >= 0 && index < residualDb.length;
+    index += direction
+  ) {
+    if (Math.sign(residualDb[index]!) !== Math.sign(center) || residualDb[index] === 0) {
+      return index
+    }
+  }
+  return direction < 0 ? 0 : residualDb.length - 1
+}
+
 function addProposal(
   filters: readonly Filter[],
   mutation: Extract<StructuralMutation, 'add-pk' | 'add-ls' | 'add-hs'>,
   type: Filter['type'],
   frequencyHz: number,
   residual: number,
-  bounds: StandardAutoEqV2Config
+  bounds: StandardAutoEqV2Config,
+  qOverride?: number,
 ): StructuralProposal {
   const gainDb = clamp(residual, bounds.minGainDb, bounds.maxGainDb)
   const q = type === 'PK'
-    ? Math.sqrt(bounds.minPkQ * bounds.maxPkQ)
+    ? clamp(qOverride ?? Math.sqrt(bounds.minPkQ * bounds.maxPkQ), bounds.minPkQ, bounds.maxPkQ)
     : (bounds.shelfQ ?? Math.sqrt(bounds.minPkQ * bounds.maxPkQ))
   const newFilter: Filter = {
     id: uniqueId(filters, `struct-${mutation}`),
@@ -161,11 +181,28 @@ export function generateStructuralMutations(
   bounds: StandardAutoEqV2Config
 ): StructuralProposal[] {
   const current = filters.map((filter) => projectFilter(filter, bounds))
-  const { frequencyHz, residual } = featureFrequency(frequenciesHz, residualDb, bounds)
+  const { index: featureIndex, frequencyHz, residual } =
+    featureFrequency(frequenciesHz, residualDb, bounds)
   const proposals: StructuralProposal[] = []
   if (current.length < bounds.maxFilters) {
+    const leftIndex = boundaryIndex(residualDb, featureIndex, -1)
+    const rightIndex = boundaryIndex(residualDb, featureIndex, 1)
+    const baseQ = frequencyHz / Math.max(
+      Number.EPSILON,
+      frequenciesHz[rightIndex]! - frequenciesHz[leftIndex]!,
+    )
+    for (const qScale of [0.5, 1, 2] as const) {
+      proposals.push(addProposal(
+        current,
+        'add-pk',
+        'PK',
+        frequencyHz,
+        residual,
+        bounds,
+        baseQ * qScale,
+      ))
+    }
     proposals.push(
-      addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds),
       addProposal(current, 'add-ls', 'LS', frequencyHz, residual, bounds),
       addProposal(current, 'add-hs', 'HS', frequencyHz, residual, bounds),
     )
