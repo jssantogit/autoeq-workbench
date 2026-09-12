@@ -1267,8 +1267,19 @@ const cancellationScore = auditCancellations(quantized, frequencies, sampleRateH
     config: bounds,
     deadline: { isExpired: () => continuation.coordinateTrials >= evaluations || deadline.isExpired() },
   })
-  while (!continuation.done) continuation = advanceJointRefineContinuationV2(continuation)
-  const refinedFilters = canonical(continuation.solution.filters)
+  let lastCompletedCycleFilters = continuation.solution.filters.map((filter) => ({ ...filter }))
+  let observedCompletedCycles = continuation.completedCycles
+  while (!continuation.done) {
+    continuation = advanceJointRefineContinuationV2(continuation)
+    if (continuation.completedCycles > observedCompletedCycles) {
+      observedCompletedCycles = continuation.completedCycles
+      lastCompletedCycleFilters = continuation.solution.filters.map((filter) => ({ ...filter }))
+    }
+  }
+  const externalDeadlineExpired = deadline.isExpired()
+  const refinedFilters = canonical(
+    externalDeadlineExpired ? lastCompletedCycleFilters : continuation.solution.filters,
+  )
   const deliveredFilters = canonical(quantizeV2Filters(refinedFilters, bounds))
     .filter((filter) => filter.gainDb !== 0)
   const solution = evaluateV2Solution(deliveredFilters, desiredDb, frequencies, sampleRateHz ?? 48000)
