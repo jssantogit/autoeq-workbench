@@ -415,7 +415,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           a.cancellationScore - b.cancellationScore ||
           a.lexicalRank - b.lexicalRank
         )
-        const selected = selectQuotaProposals(prePolishScored, rmseRanked, 6, 2, config.proposalsPerParent)
+        const selected = selectQuotaProposals(prePolishScored, rmseRanked, 2, 6, config.proposalsPerParent)
         admitted = selected.map(s => s.proposal)
       } else {
         admitted = ordered.slice(0, config.proposalsPerParent)
