@@ -55,6 +55,7 @@ export type StructuralMutation =
   | 'add-ls'
   | 'add-hs'
   | 'remove'
+  | 'swap-pk'
   | 'type-mutation'
   | 'split'
   | 'merge'
@@ -257,6 +258,27 @@ export function generateStructuralMutations(
       ))
     }
   }
+  if (current.length >= bounds.maxFilters) {
+    for (let index = 0; index < current.length; index += 1) {
+      const swap = projectFilter({
+        id: uniqueId(current, `swap-pk-${index}`),
+        enabled: true,
+        type: 'PK',
+        frequencyHz,
+        gainDb: residual,
+        q: Math.sqrt(bounds.minPkQ * bounds.maxPkQ),
+      }, bounds)
+      proposals.push({
+        mutation: 'swap-pk',
+        filters: canonical([
+          ...current.slice(0, index),
+          swap,
+          ...current.slice(index + 1),
+        ]),
+      })
+    }
+  }
+
   current.forEach((filter, index) => {
     proposals.push({
       mutation: 'remove',
