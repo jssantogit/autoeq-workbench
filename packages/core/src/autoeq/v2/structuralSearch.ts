@@ -625,6 +625,80 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     rescueSteps += 1
   }
 
+  let capSwapSteps = 0
+  while (
+    capSwapSteps < 1 &&
+    rescued.filters.length === config.maxFilters &&
+    (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75) &&
+    !deadline.isExpired()
+  ) {
+    const currentSolution = evaluateV2Solution(
+      rescued.filters,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+    )
+    const shortlist = rankV2CandidateShortlist(
+      generateV2Candidates({
+        frequencies,
+        residualDb: currentSolution.residualDb,
+        config: bounds,
+        boundaryMode: 'mixed',
+      }).filter((candidate) => candidate.type === 'PK')
+    ).slice(0, 8)
+
+    const improving: Array<{ state: SearchState; rank: number; replacementIndex: number }> = []
+    for (let rank = 0; rank < shortlist.length; rank += 1) {
+      if (deadline.isExpired()) break
+      const candidate = shortlist[rank]!
+      for (let replacementIndex = 0; replacementIndex < rescued.filters.length; replacementIndex += 1) {
+        if (deadline.isExpired()) break
+        const retained = rescued.filters.filter((_, index) => index !== replacementIndex)
+        const seeded = canonical([
+          ...retained,
+          projectFilter({
+            id: uniqueId(retained, `stagnation-cap-swap-${capSwapSteps}-${rank}-${replacementIndex}`),
+            enabled: true,
+            type: 'PK',
+            frequencyHz: candidate.frequencyHz,
+            gainDb: candidate.gainDb,
+            q: candidate.q,
+          }, bounds),
+        ])
+        const polished = polishFilters(
+          seeded,
+          Math.max(config.localPolishEvaluations, seeded.length * 8),
+          bounds,
+          desiredDb,
+          frequencies,
+          deadline,
+          sampleRateHz,
+        )
+        const paretoImproves =
+          polished.rmseDb <= rescued.rmseDb + epsilon &&
+          polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
+          (
+            polished.rmseDb < rescued.rmseDb - epsilon ||
+            polished.maxAbsDb < rescued.maxAbsDb - epsilon
+          )
+        if (paretoImproves) improving.push({ state: polished, rank, replacementIndex })
+      }
+    }
+
+    if (improving.length === 0) break
+    improving.sort((left, right) => {
+      const leftViolation = Math.max(left.state.rmseDb / 0.25, left.state.maxAbsDb / 0.75)
+      const rightViolation = Math.max(right.state.rmseDb / 0.25, right.state.maxAbsDb / 0.75)
+      return leftViolation - rightViolation ||
+        left.state.rmseDb - right.state.rmseDb ||
+        left.state.maxAbsDb - right.state.maxAbsDb ||
+        left.rank - right.rank ||
+        left.replacementIndex - right.replacementIndex
+    })
+    rescued = improving[0]!.state
+    capSwapSteps += 1
+  }
+
   return {
     filters: rescued.filters,
     rmseDb: rescued.rmseDb,
