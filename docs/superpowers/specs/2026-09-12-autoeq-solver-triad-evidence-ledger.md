@@ -305,3 +305,44 @@ The strongest current direction is:
 - wall-clock only as a safety fuse.
 
 This hypothesis must now be evaluated at terminal/no-timeout and then tuned for the minimum work multiplier that preserves the quality gain.
+
+
+## Phase 1.7 — Scaled-polish practical terminal result
+
+Run: `34707686890`  
+Solver: frozen Q31 + only `max(24, filterCount * 8)` local polish.
+
+Five repeated runs with a 15-second safety fuse:
+
+| Case | RMSE | maxAbs | violation | median elapsed | filters | signatures | deadline hits |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Storm | 1.8787 | 5.8120 | 7.7494 | 9.90 s | 9 | 1 | 0/5 |
+| U12t | 1.4225 | 4.2963 | 5.7284 | 3.19 s | 10 | 1 | 0/5 |
+| Trio | 0.6844 | 2.0179 | 2.7378 | 4.70 s | 10 | 1 | 0/5 |
+
+### Comparison against converged historical Standard V2
+
+| Case | Standard V2 violation / time | Q31 + scaled polish violation / time | Direction |
+| --- | --- | --- | --- |
+| Storm | 7.1348 / 21.70 s | 7.7494 / 9.90 s | ~54% less time, modest precision loss |
+| U12t | 6.4606 / 16.27 s | 5.7284 / 3.19 s | better precision and ~80% less time |
+| Trio | 4.6577 / 12.46 s | 2.7378 / 4.70 s | substantially better precision and ~62% less time |
+
+This is the first candidate in the audit that simultaneously demonstrates:
+
+- exact repeated output once allowed to complete;
+- large runtime reduction versus Standard V2;
+- precision improvement on two of three adversarial cases;
+- only one remaining precision gap, Storm.
+
+The consistency failure seen at the 5-second Storm budget is therefore not intrinsic randomness. It is again a safety-fuse truncation of an otherwise deterministic search.
+
+### Next tuning axis
+
+Keep every other Q31 mechanism frozen and vary only the polish multiplier:
+
+- `4×`
+- `6×`
+- current `8×`
+
+Goal: find the lowest multiplier whose naturally exhausted result retains most of the U12t/Trio gains and materially closes Storm, while staying inside the desired practical runtime window.
