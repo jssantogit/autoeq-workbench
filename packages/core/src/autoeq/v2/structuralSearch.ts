@@ -559,7 +559,6 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
 
   while (
     rescueSteps < 3 &&
-    rescued.filters.length < config.maxFilters &&
     (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75) &&
     !deadline.isExpired()
   ) {
@@ -578,38 +577,48 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       }).filter((candidate) => candidate.type === 'PK')
     ).slice(0, 8)
 
-    const improving: Array<{ state: SearchState; rank: number }> = []
+    const improving: Array<{ state: SearchState; rank: number; replacementIndex: number }> = []
     for (let rank = 0; rank < shortlist.length; rank += 1) {
       if (deadline.isExpired()) break
       const candidate = shortlist[rank]!
-      const seeded = canonical([
-        ...rescued.filters,
-        projectFilter({
-          id: uniqueId(rescued.filters, `stagnation-rescue-${rescueSteps}-${rank}`),
-          enabled: true,
-          type: 'PK',
-          frequencyHz: candidate.frequencyHz,
-          gainDb: candidate.gainDb,
-          q: candidate.q,
-        }, bounds),
-      ])
-      const polished = polishFilters(
-        seeded,
-        Math.max(config.localPolishEvaluations, seeded.length * 8),
-        bounds,
-        desiredDb,
-        frequencies,
-        deadline,
-        sampleRateHz,
-      )
-      const paretoImproves =
-        polished.rmseDb <= rescued.rmseDb + epsilon &&
-        polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
-        (
-          polished.rmseDb < rescued.rmseDb - epsilon ||
-          polished.maxAbsDb < rescued.maxAbsDb - epsilon
+      const replacementIndices = rescued.filters.length < config.maxFilters
+        ? [-1]
+        : rescued.filters.map((_, index) => index)
+
+      for (const replacementIndex of replacementIndices) {
+        if (deadline.isExpired()) break
+        const retained = replacementIndex < 0
+          ? rescued.filters
+          : rescued.filters.filter((_, index) => index !== replacementIndex)
+        const seeded = canonical([
+          ...retained,
+          projectFilter({
+            id: uniqueId(retained, `stagnation-rescue-${rescueSteps}-${rank}-${replacementIndex}`),
+            enabled: true,
+            type: 'PK',
+            frequencyHz: candidate.frequencyHz,
+            gainDb: candidate.gainDb,
+            q: candidate.q,
+          }, bounds),
+        ])
+        const polished = polishFilters(
+          seeded,
+          Math.max(config.localPolishEvaluations, seeded.length * 8),
+          bounds,
+          desiredDb,
+          frequencies,
+          deadline,
+          sampleRateHz,
         )
-      if (paretoImproves) improving.push({ state: polished, rank })
+        const paretoImproves =
+          polished.rmseDb <= rescued.rmseDb + epsilon &&
+          polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
+          (
+            polished.rmseDb < rescued.rmseDb - epsilon ||
+            polished.maxAbsDb < rescued.maxAbsDb - epsilon
+          )
+        if (paretoImproves) improving.push({ state: polished, rank, replacementIndex })
+      }
     }
 
     if (improving.length === 0) break
@@ -619,7 +628,8 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       return leftViolation - rightViolation ||
         left.state.rmseDb - right.state.rmseDb ||
         left.state.maxAbsDb - right.state.maxAbsDb ||
-        left.rank - right.rank
+        left.rank - right.rank ||
+        left.replacementIndex - right.replacementIndex
     })
     rescued = improving[0]!.state
     rescueSteps += 1
