@@ -1,0 +1,37 @@
+name: Replace At Cap Full Audit
+
+on:
+  push:
+    branches:
+      - research/audit-replace-at-cap-full-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run replace-at-cap full public corpus audit
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          AUDIT_OUTPUT_DIR: ${{ github.workspace }}/autoeq-replace-at-cap-full
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/research/publicCorpusQ31x8Audit.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: replace-at-cap-full-${{ github.run_id }}
+          path: autoeq-replace-at-cap-full
+          if-no-files-found: warn
+          retention-days: 30
