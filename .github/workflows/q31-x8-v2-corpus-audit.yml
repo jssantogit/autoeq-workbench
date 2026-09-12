@@ -1,0 +1,35 @@
+name: Q31 x8 vs V2 Corpus Audit
+
+on:
+  push:
+    branches:
+      - research/audit-q31-x8-v2-corpus-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run Q31 x8 vs V2 public corpus audit
+        env:
+          AUDIT_OUTPUT_DIR: ${{ github.workspace }}/autoeq-v2-corpus-audit
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/q31x8VsV2Corpus.ts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q31-x8-v2-corpus-${{ github.run_id }}
+          path: autoeq-v2-corpus-audit
+          if-no-files-found: error
+          retention-days: 30
