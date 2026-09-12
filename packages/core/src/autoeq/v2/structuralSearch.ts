@@ -425,7 +425,15 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         if (deadline.isExpired()) break
         if (proposal.filters.length > config.maxFilters) continue
 
-        const polished = polishFilters(proposal.filters, config.localPolishEvaluations, bounds, desiredDb, frequencies, deadline, sampleRateHz)
+        const polished = polishFilters(
+          proposal.filters,
+          Math.max(config.localPolishEvaluations, proposal.filters.length * 8),
+          bounds,
+          desiredDb,
+          frequencies,
+          deadline,
+          sampleRateHz,
+        )
         const key = semanticFilterKey(polished.filters)
         if (visited.has(key)) continue
         visited.add(key)
