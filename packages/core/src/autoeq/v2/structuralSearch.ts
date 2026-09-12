@@ -111,7 +111,9 @@ function splitDepth(id: string): number {
 function featureFrequency(
   frequenciesHz: readonly number[],
   residualDb: readonly number[],
-  bounds: StandardAutoEqV2Config
+  bounds: StandardAutoEqV2Config,
+  existingPkFrequencies: readonly number[] = [],
+  minSeparationOctaves = 0,
 ): { frequencyHz: number; residual: number } {
   const extrema: number[] = []
   for (let index = 0; index < residualDb.length; index += 1) {
@@ -120,11 +122,17 @@ function featureFrequency(
     const right = index === residualDb.length - 1 || magnitude >= Math.abs(residualDb[index + 1]!)
     if (left && right) extrema.push(index)
   }
-  const index = extrema.reduce((best, candidate) => {
-    const bestMagnitude = Math.abs(residualDb[best]!)
-    const candidateMagnitude = Math.abs(residualDb[candidate]!)
-    return candidateMagnitude > bestMagnitude ? candidate : best
-  }, extrema[0] ?? 0)
+  const ranked = [...extrema].sort((leftIndex, rightIndex) =>
+    Math.abs(residualDb[rightIndex]!) - Math.abs(residualDb[leftIndex]!) ||
+    frequenciesHz[leftIndex]! - frequenciesHz[rightIndex]!
+  )
+  const novelIndex = ranked.find((index) => {
+    const frequencyHz = clamp(frequenciesHz[index]!, bounds.minFrequencyHz, bounds.maxFrequencyHz)
+    return existingPkFrequencies.every((existingHz) =>
+      Math.abs(Math.log2(frequencyHz / existingHz)) >= minSeparationOctaves
+    )
+  })
+  const index = novelIndex ?? ranked[0] ?? 0
   return {
     frequencyHz: clamp(
       frequenciesHz[index]!,
@@ -246,7 +254,13 @@ export function generateStructuralMutations(
   bounds: StandardAutoEqV2Config
 ): StructuralProposal[] {
   const current = filters.map((filter) => projectFilter(filter, bounds))
-  const { frequencyHz, residual } = featureFrequency(frequenciesHz, residualDb, bounds)
+  const { frequencyHz, residual } = featureFrequency(
+    frequenciesHz,
+    residualDb,
+    bounds,
+    current.filter((filter) => filter.type === 'PK').map((filter) => filter.frequencyHz),
+    1 / 4,
+  )
   const proposals: StructuralProposal[] = []
   if (current.length < bounds.maxFilters) {
     proposals.push(addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds))
