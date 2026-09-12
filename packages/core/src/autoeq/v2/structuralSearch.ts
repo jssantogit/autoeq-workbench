@@ -728,7 +728,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     capSwapSteps += 1
   }
 
-  if (Math.max(rescued.rmseDb / 0.25, rescued.maxAbsDb / 0.75) > 1) {
+  if (Math.max(rescued.rmseDb / 0.25, rescued.maxAbsDb / 0.75) > 1.6) {
     return {
       filters: rescued.filters,
       rmseDb: rescued.rmseDb,
