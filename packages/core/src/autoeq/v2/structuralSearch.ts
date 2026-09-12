@@ -356,14 +356,19 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     maxFilters: config.maxFilters,
   })
 
+  const visited = new Set<string>()
   let initialFilters = input.seedFilters ?? []
   const quantized = quantizeV2Filters(initialFilters, bounds)
+  visited.add(semanticFilterKey(quantized))
+
   const magnitude = cascadeMagnitudeDb(quantized, frequencies, sampleRateHz)
   const residualDb = desiredDb.map((desired, index) => desired - magnitude[index]!)
   const metrics = calculateErrorMetrics(residualDb, frequencies)
   const cancellationScore = auditCancellations(quantized, frequencies, sampleRateHz).totalScore
-  const initialPolished = {
-    candidateId: 'initial',
+
+  let candidateCounter = 0
+  const initialPolished: SearchState = {
+    candidateId: String(candidateCounter++).padStart(4, '0'),
     filters: quantized,
     rmseDb: metrics.rmseDb,
     maxAbsDb: metrics.maxAbsDb,
@@ -371,11 +376,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
   }
   let beam: SearchState[] = [initialPolished]
 
-  let idCounter = 1
-  let generation = 0
-
   while (beam.length > 0 && !deadline.isExpired()) {
-    generation++
     const nextStates: SearchState[] = []
     for (const parent of beam) {
       if (deadline.isExpired()) break
@@ -392,9 +393,10 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           const magnitude = cascadeMagnitudeDb(quantized, frequencies, sampleRateHz)
           const residualDb = desiredDb.map((desired, index) => desired - magnitude[index]!)
           const metrics = calculateErrorMetrics(residualDb, frequencies)
-const cancellationScore = auditCancellations(quantized, frequencies, sampleRateHz ?? 48000).totalScore
+          const cancellationScore = auditCancellations(quantized, frequencies, sampleRateHz ?? 48000).totalScore
 
           return {
+            key: proposalKey(proposal),
             proposal,
             lexicalRank,
             quantized,
@@ -402,7 +404,7 @@ const cancellationScore = auditCancellations(quantized, frequencies, sampleRateH
             maxAbsDb: metrics.maxAbsDb,
             filterCount: quantized.length,
             cancellationScore,
-            semanticKey: semanticFilterKey(quantized)
+            semanticKey: proposalKey(proposal)
           }
         })
 
@@ -421,29 +423,21 @@ const cancellationScore = auditCancellations(quantized, frequencies, sampleRateH
 
       for (const proposal of admitted) {
         if (deadline.isExpired()) break
+        if (proposal.filters.length > config.maxFilters) continue
+
         const polished = polishFilters(proposal.filters, config.localPolishEvaluations, bounds, desiredDb, frequencies, deadline, sampleRateHz)
-        polished.candidateId = `cand-${generation}-${idCounter++}`
+        const key = semanticFilterKey(polished.filters)
+        if (visited.has(key)) continue
+        visited.add(key)
+
+        polished.candidateId = String(candidateCounter++).padStart(4, '0')
         nextStates.push(polished)
       }
     }
 
     if (nextStates.length === 0) break
     const combined = [...beam, ...nextStates]
-
-    const newBeam = retainParetoBeam(combined, config.beamWidth)
-
-    // Check if beam didn't improve or change
-    const oldKeys = new Set(beam.map(b => semanticFilterKey(b.filters)))
-    const newKeys = new Set(newBeam.map(b => semanticFilterKey(b.filters)))
-
-    let hasNew = false
-    for (const key of newKeys) {
-      if (!oldKeys.has(key)) hasNew = true
-    }
-
-    if (!hasNew) break
-
-    beam = newBeam
+    beam = retainParetoBeam(combined, config.beamWidth)
   }
 
   if (beam.length === 0) {
@@ -454,15 +448,15 @@ const cancellationScore = auditCancellations(quantized, frequencies, sampleRateH
     }
   }
 
-  beam.sort((a, b) => a.rmseDb - b.rmseDb || a.maxAbsDb - b.maxAbsDb)
+  const best = selectReferencePoint(beam)
   return {
-    filters: beam[0]!.filters,
-    rmseDb: beam[0]!.rmseDb,
-    maxAbsDb: beam[0]!.maxAbsDb,
+    filters: best.filters,
+    rmseDb: best.rmseDb,
+    maxAbsDb: best.maxAbsDb,
   }
 }
 
-function polishFilters(
+export function polishFilters(
   filters: readonly Filter[],
   evaluations: number,
   bounds: StandardAutoEqV2Config,
@@ -507,7 +501,14 @@ const cancellationScore = auditCancellations(quantized, frequencies, sampleRateH
   }
 }
 
-export function selectQuotaProposals<T extends { proposal: any; semanticKey: string }>(
+export function proposalKey(proposal: StructuralProposal): string {
+  return JSON.stringify({
+    mutation: proposal.mutation,
+    filters: proposal.filters.map(({ id: _id, ...filter }) => filter),
+  })
+}
+
+export function selectQuotaProposals<T extends { proposal: any; key?: string; semanticKey?: string }>(
   scoredProposals: readonly T[],
   rmseRankedProposals: readonly T[],
   lexicalQuota = 6,
@@ -516,11 +517,13 @@ export function selectQuotaProposals<T extends { proposal: any; semanticKey: str
 ): T[] {
   const selected: T[] = []
   const seenKeys = new Set<string>()
+  const getKey = (item: T) => item.key ?? item.semanticKey ?? ''
 
   for (const item of scoredProposals) {
     if (selected.length >= lexicalQuota) break
-    if (!seenKeys.has(item.semanticKey)) {
-      seenKeys.add(item.semanticKey)
+    const k = getKey(item)
+    if (!seenKeys.has(k)) {
+      seenKeys.add(k)
       selected.push(item)
     }
   }
@@ -528,8 +531,9 @@ export function selectQuotaProposals<T extends { proposal: any; semanticKey: str
   let addedRmse = 0
   for (const item of rmseRankedProposals) {
     if (addedRmse >= rmseQuota || selected.length >= targetCount) break
-    if (!seenKeys.has(item.semanticKey)) {
-      seenKeys.add(item.semanticKey)
+    const k = getKey(item)
+    if (!seenKeys.has(k)) {
+      seenKeys.add(k)
       selected.push(item)
       addedRmse += 1
     }
@@ -538,8 +542,9 @@ export function selectQuotaProposals<T extends { proposal: any; semanticKey: str
   if (selected.length < targetCount) {
     for (const item of scoredProposals) {
       if (selected.length >= targetCount) break
-      if (!seenKeys.has(item.semanticKey)) {
-        seenKeys.add(item.semanticKey)
+      const k = getKey(item)
+      if (!seenKeys.has(k)) {
+        seenKeys.add(k)
         selected.push(item)
       }
     }
@@ -547,8 +552,9 @@ export function selectQuotaProposals<T extends { proposal: any; semanticKey: str
   if (selected.length < targetCount) {
     for (const item of rmseRankedProposals) {
       if (selected.length >= targetCount) break
-      if (!seenKeys.has(item.semanticKey)) {
-        seenKeys.add(item.semanticKey)
+      const k = getKey(item)
+      if (!seenKeys.has(k)) {
+        seenKeys.add(k)
         selected.push(item)
       }
     }
