@@ -10,13 +10,12 @@ import {
   cascadeMagnitudeDb,
   createEvaluationGrid,
   desiredCorrection,
-  generateStructuralMutations,
-  polishFilters,
   prepareCurve,
   resolveStandardAutoEqV2Config,
   resolveStructuralSearchConfig,
   runStructuralSearch,
 } from '../src/index.js'
+import { generateStructuralMutations, polishFilters } from '../src/autoeq/v2/structuralSearch.js'
 import { V2_BENCHMARK_CASES } from './v2Cases.js'
 
 const benchmarkCase = V2_BENCHMARK_CASES.find((item) => item.id === 'near_budget')
