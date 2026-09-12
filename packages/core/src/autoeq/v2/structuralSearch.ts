@@ -866,6 +866,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       rank: number
       leftIndex: number
       rightIndex: number
+      seedOrder: number
     }> = []
 
     for (let leftIndex = 0; leftIndex < rescued.filters.length; leftIndex += 1) {
@@ -914,25 +915,40 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
             gainDb: candidate.gainDb,
             q: candidate.q,
           }, bounds)
-          const seeded = canonical([...retained, merged, added])
-          const polished = polishFilters(
-            seeded,
-            Math.max(config.localPolishEvaluations, seeded.length * 32),
-            bounds,
-            desiredDb,
-            frequencies,
-            deadline,
-            sampleRateHz,
-          )
-          const paretoImproves =
-            polished.rmseDb <= rescued.rmseDb + epsilon &&
-            polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
-            (
-              polished.rmseDb < rescued.rmseDb - epsilon ||
-              polished.maxAbsDb < rescued.maxAbsDb - epsilon
+          const mutationOrdered = [...retained, merged, added]
+          const seedVariants = [
+            canonical(mutationOrdered),
+            mutationOrdered,
+          ]
+
+          for (let seedOrder = 0; seedOrder < seedVariants.length; seedOrder += 1) {
+            if (deadline.isExpired()) break
+            const seeded = seedVariants[seedOrder]!
+            const polished = polishFilters(
+              seeded,
+              Math.max(config.localPolishEvaluations, seeded.length * 32),
+              bounds,
+              desiredDb,
+              frequencies,
+              deadline,
+              sampleRateHz,
             )
-          if (paretoImproves) {
-            improving.push({ state: polished, rank, leftIndex, rightIndex })
+            const paretoImproves =
+              polished.rmseDb <= rescued.rmseDb + epsilon &&
+              polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
+              (
+                polished.rmseDb < rescued.rmseDb - epsilon ||
+                polished.maxAbsDb < rescued.maxAbsDb - epsilon
+              )
+            if (paretoImproves) {
+              improving.push({
+                state: polished,
+                rank,
+                leftIndex,
+                rightIndex,
+                seedOrder,
+              })
+            }
           }
         }
       }
@@ -953,7 +969,8 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           left.state.maxAbsDb - right.state.maxAbsDb ||
           left.rank - right.rank ||
           left.leftIndex - right.leftIndex ||
-          left.rightIndex - right.rightIndex
+          left.rightIndex - right.rightIndex ||
+          left.seedOrder - right.seedOrder
       })
       rescued = improving[0]!.state
       interiorRecycled = true
