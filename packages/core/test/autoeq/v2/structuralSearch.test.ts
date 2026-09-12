@@ -375,6 +375,29 @@ describe('Experimental Max10 structural search', () => {
     expect(localPolishEvaluationBudget(24, 10)).toBe(80)
   })
 
+  it('uses the deterministic short work profile only for the 5 second budget', () => {
+    expect(resolveStructuralSearchConfig({
+      preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
+      timeLimitSeconds: 5,
+    }).workProfile).toBe('short-5s')
+  })
+
+  it.each([15, 30, 60, 120])(
+    'uses the full work profile for a %i second budget',
+    (timeLimitSeconds) => {
+      expect(resolveStructuralSearchConfig({
+        preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
+        timeLimitSeconds,
+      }).workProfile).toBe('full')
+    },
+  )
+
+  it('defaults to the full work profile when no time budget is provided', () => {
+    expect(resolveStructuralSearchConfig({
+      preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
+    }).workProfile).toBe('full')
+  })
+
   it('returns bit-for-bit identical filters for repeated deterministic searches', () => {
     const config = {
       ...resolveStructuralSearchConfig({
