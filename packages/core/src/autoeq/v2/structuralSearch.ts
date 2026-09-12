@@ -26,8 +26,8 @@ export interface ResolvedStructuralSearchConfig {
   proposalsPerParent: number
   localPolishEvaluations: number
   maxFilters: number
-  featureRegionCount: number
-  minFeatureSeparationOctaves: number
+  featureRegionCount?: number
+  minFeatureSeparationOctaves?: number
   admission: 'lexical' | 'q31-b4-p8'
 }
 
@@ -438,8 +438,8 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         solution.residualDb,
         frequencies,
         bounds,
-        config.featureRegionCount,
-        config.minFeatureSeparationOctaves,
+        config.featureRegionCount ?? 1,
+        config.minFeatureSeparationOctaves ?? 0,
       )
       const ordered = orderStructuralProposals(proposals)
 
