@@ -131,6 +131,87 @@ function featureFrequency(
   }
 }
 
+function median(values: readonly number[]): number {
+  const sorted = [...values].sort((left, right) => left - right)
+  const middle = Math.floor(sorted.length / 2)
+  return sorted.length % 2 === 0
+    ? (sorted[middle - 1]! + sorted[middle]!) / 2
+    : sorted[middle]!
+}
+
+interface ShelfEvidence {
+  type: 'LS' | 'HS'
+  frequencyHz: number
+  residual: number
+}
+
+function selectShelfEvidence(
+  frequenciesHz: readonly number[],
+  residualDb: readonly number[],
+  bounds: StandardAutoEqV2Config,
+): ShelfEvidence[] {
+  if (frequenciesHz.length < 3 || frequenciesHz.length !== residualDb.length) return []
+
+  const result: ShelfEvidence[] = []
+  const evidenceCount = Math.max(3, Math.ceil(frequenciesHz.length / 4))
+
+  for (const type of ['LS', 'HS'] as const) {
+    const edgeIndex = type === 'LS' ? 0 : frequenciesHz.length - 1
+    const direction = type === 'LS' ? 1 : -1
+    const fixedStart = type === 'LS' ? 0 : frequenciesHz.length - evidenceCount
+    let evidence = residualDb.slice(fixedStart, fixedStart + evidenceCount)
+    let evidenceFrequencies = frequenciesHz.slice(fixedStart, fixedStart + evidenceCount)
+    let signedMedian = median(evidence)
+    const matching = evidence.filter((value) => Math.sign(value) === Math.sign(signedMedian)).length
+    const fixedEvidenceUsable =
+      Math.abs(signedMedian) >= bounds.algorithm.candidateResidualFloorDb &&
+      matching / evidence.length >= 0.75 &&
+      evidenceFrequencies.at(-1)! / evidenceFrequencies[0]! >= 1.4
+
+    if (!fixedEvidenceUsable) {
+      const edgeSign = Math.sign(residualDb[edgeIndex]!)
+      const contiguousIndices: number[] = []
+      for (
+        let index = edgeIndex;
+        index >= 0 && index < frequenciesHz.length;
+        index += direction
+      ) {
+        const value = residualDb[index]!
+        if (
+          Math.abs(value) < bounds.algorithm.candidateResidualFloorDb ||
+          Math.sign(value) !== edgeSign
+        ) break
+        contiguousIndices.push(index)
+      }
+      contiguousIndices.sort((left, right) => left - right)
+      if (contiguousIndices.length < 3) continue
+      evidence = contiguousIndices.map((index) => residualDb[index]!)
+      evidenceFrequencies = contiguousIndices.map((index) => frequenciesHz[index]!)
+      if (evidenceFrequencies.at(-1)! / evidenceFrequencies[0]! < 1.4) continue
+      signedMedian = median(evidence)
+    }
+
+    const halfHeight = Math.abs(signedMedian) / 2
+    const searchIndices = type === 'LS'
+      ? Array.from({ length: frequenciesHz.length }, (_, index) => index)
+      : Array.from({ length: frequenciesHz.length }, (_, index) => frequenciesHz.length - 1 - index)
+    const transitionIndex = searchIndices.find((index) => Math.abs(residualDb[index]!) <= halfHeight) ??
+      (type === 'LS' ? evidenceCount - 1 : frequenciesHz.length - evidenceCount)
+
+    result.push({
+      type,
+      frequencyHz: clamp(
+        frequenciesHz[transitionIndex]!,
+        bounds.minFrequencyHz,
+        bounds.maxFrequencyHz,
+      ),
+      residual: clamp(signedMedian, bounds.minGainDb, bounds.maxGainDb),
+    })
+  }
+
+  return result
+}
+
 function addProposal(
   filters: readonly Filter[],
   mutation: Extract<StructuralMutation, 'add-pk' | 'add-ls' | 'add-hs'>,
@@ -164,27 +245,34 @@ export function generateStructuralMutations(
   const { frequencyHz, residual } = featureFrequency(frequenciesHz, residualDb, bounds)
   const proposals: StructuralProposal[] = []
   if (current.length < bounds.maxFilters) {
-    proposals.push(
-      addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds),
-      addProposal(current, 'add-ls', 'LS', frequencyHz, residual, bounds),
-      addProposal(current, 'add-hs', 'HS', frequencyHz, residual, bounds),
-    )
+    proposals.push(addProposal(current, 'add-pk', 'PK', frequencyHz, residual, bounds))
+    for (const shelf of selectShelfEvidence(frequenciesHz, residualDb, bounds)) {
+      proposals.push(addProposal(
+        current,
+        shelf.type === 'LS' ? 'add-ls' : 'add-hs',
+        shelf.type,
+        shelf.frequencyHz,
+        shelf.residual,
+        bounds,
+      ))
+    }
   }
   current.forEach((filter, index) => {
     proposals.push({
       mutation: 'remove',
       filters: canonical(current.filter((_, candidateIndex) => candidateIndex !== index)),
     })
-    const nextType: Record<Filter['type'], Filter['type']> = { PK: 'LS', LS: 'HS', HS: 'PK' }
-    proposals.push({
-      mutation: 'type-mutation',
-      filters: canonical([
-        ...current.slice(0, index),
-        projectFilter({ ...filter, type: nextType[filter.type] }, bounds),
-        ...current.slice(index + 1),
-      ]),
-    })
-    if (current.length < bounds.maxFilters) {
+    if (filter.type !== 'PK') {
+      proposals.push({
+        mutation: 'type-mutation',
+        filters: canonical([
+          ...current.slice(0, index),
+          projectFilter({ ...filter, type: 'PK' }, bounds),
+          ...current.slice(index + 1),
+        ]),
+      })
+    }
+    if (current.length < bounds.maxFilters && filter.type === 'PK') {
       const ratio = 2 ** (1 / 24)
       const first = projectFilter({
         ...filter,
