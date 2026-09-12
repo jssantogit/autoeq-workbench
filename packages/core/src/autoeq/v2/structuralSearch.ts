@@ -858,6 +858,14 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     }
   }
 
+  if (config.workProfile === 'short-5s' && postSwapViolation > 1) {
+    return {
+      filters: rescued.filters,
+      rmseDb: rescued.rmseDb,
+      maxAbsDb: rescued.maxAbsDb,
+    }
+  }
+
   let interiorRecycled = false
   if (
     rescued.filters.length === config.maxFilters &&
