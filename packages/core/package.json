@@ -31,6 +31,7 @@
     "research:storm-bridge-detectability": "tsx benchmarks/research/stormBridgeDetectabilityAudit.ts",
     "research:storm-admission-generalization": "tsx benchmarks/research/stormAdmissionGeneralizationCampaign.ts",
     "research:storm-admission-validation": "tsx benchmarks/research/stormAdmissionValidationCampaign.ts",
+    "research:storm-final-decision": "tsx benchmarks/research/stormFinalDecisionBenchmark.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",

@@ -1,0 +1,34 @@
+{
+  "corpus": [
+    {
+      "id": "titan-to-storm",
+      "targetFamily": "Storm",
+      "inputSha": "12d7384980a0953f2a27f8edc8d0171d8d22f35cd1bc48060d5bf20defefafa7",
+      "provenance": "packages/core/benchmarks/research/raw/subtonic-storm.txt",
+      "reproducibleEntries": [
+        "mp-seeds/titan-to-storm-teacher-student.json",
+        "mp-seeds/titan-to-storm-zero-seed.json"
+      ]
+    },
+    {
+      "id": "titan-to-u12t",
+      "targetFamily": "U12t",
+      "inputSha": "6d9b6c937749237ceeb6b9733783349776cd39a7137a4c90db343bbd3a289286",
+      "provenance": "packages/core/benchmarks/research/raw/64-audio-u12t.txt",
+      "reproducibleEntries": [
+        "mp-seeds/titan-to-u12t-teacher-student.json",
+        "mp-seeds/titan-to-u12t-zero-seed.json"
+      ]
+    },
+    {
+      "id": "titan-to-trio",
+      "targetFamily": "Trio",
+      "inputSha": "f902f6925f0ad06ee71c37ce7bd26b0e6c7d9de2695f9f0327482ab68ac7ef6e",
+      "provenance": "packages/core/benchmarks/research/raw/64-audio-trio.txt",
+      "reproducibleEntries": [
+        "mp-seeds/titan-to-trio-teacher-student.json",
+        "mp-seeds/titan-to-trio-zero-seed.json"
+      ]
+    }
+  ]
+}
