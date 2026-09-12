@@ -1064,6 +1064,96 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     rescueSteps += 1
   }
 
+  if (
+    rescued.filters.length <= config.maxFilters - 2 &&
+    (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75) &&
+    !deadline.isExpired()
+  ) {
+    const currentSolution = evaluateV2Solution(
+      rescued.filters,
+      desiredDb,
+      frequencies,
+      sampleRateHz,
+    )
+    const shortlist = rankV2CandidateShortlist(
+      generateV2Candidates({
+        frequencies,
+        residualDb: currentSolution.residualDb,
+        config: bounds,
+        boundaryMode: 'mixed',
+      }).filter((candidate) => candidate.type === 'PK')
+    ).slice(0, 6)
+
+    const improving: Array<{
+      state: SearchState
+      leftRank: number
+      rightRank: number
+    }> = []
+
+    for (let leftRank = 0; leftRank < shortlist.length; leftRank += 1) {
+      const leftCandidate = shortlist[leftRank]!
+      for (let rightRank = leftRank + 1; rightRank < shortlist.length; rightRank += 1) {
+        if (deadline.isExpired()) break
+        const rightCandidate = shortlist[rightRank]!
+        const first = projectFilter({
+          id: uniqueId(rescued.filters, `stagnation-pair-add-${leftRank}-a`),
+          enabled: true,
+          type: 'PK',
+          frequencyHz: leftCandidate.frequencyHz,
+          gainDb: leftCandidate.gainDb,
+          q: leftCandidate.q,
+        }, bounds)
+        const second = projectFilter({
+          id: uniqueId([...rescued.filters, first], `stagnation-pair-add-${rightRank}-b`),
+          enabled: true,
+          type: 'PK',
+          frequencyHz: rightCandidate.frequencyHz,
+          gainDb: rightCandidate.gainDb,
+          q: rightCandidate.q,
+        }, bounds)
+        const seeded = canonical([...rescued.filters, first, second])
+        const polished = polishFilters(
+          seeded,
+          Math.max(config.localPolishEvaluations, seeded.length * 16),
+          bounds,
+          desiredDb,
+          frequencies,
+          deadline,
+          sampleRateHz,
+        )
+        const paretoImproves =
+          polished.rmseDb <= rescued.rmseDb + epsilon &&
+          polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
+          (
+            polished.rmseDb < rescued.rmseDb - epsilon ||
+            polished.maxAbsDb < rescued.maxAbsDb - epsilon
+          )
+        if (paretoImproves) {
+          improving.push({ state: polished, leftRank, rightRank })
+        }
+      }
+    }
+
+    if (improving.length > 0) {
+      improving.sort((left, right) => {
+        const leftViolation = Math.max(
+          left.state.rmseDb / 0.25,
+          left.state.maxAbsDb / 0.75,
+        )
+        const rightViolation = Math.max(
+          right.state.rmseDb / 0.25,
+          right.state.maxAbsDb / 0.75,
+        )
+        return leftViolation - rightViolation ||
+          left.state.rmseDb - right.state.rmseDb ||
+          left.state.maxAbsDb - right.state.maxAbsDb ||
+          left.leftRank - right.leftRank ||
+          left.rightRank - right.rightRank
+      })
+      rescued = improving[0]!.state
+    }
+  }
+
   let capSwapSteps = 0
   while (
     capSwapSteps < (config.workProfile === 'short-5s' ? 2 : 4) &&
