@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DEFAULT_AUTOEQ_SETTINGS,
+  MVP_NUMERIC_POLICY,
+  calculateErrorMetrics,
+  cascadeMagnitudeDb,
   createEvaluationGrid,
+  desiredCorrection,
+  prepareCurve,
   runStandardAutoEqV2,
   type Curve,
   type StandardAutoEqInputV2,
@@ -42,6 +47,45 @@ describe('runStandardAutoEqV2', () => {
     )
     expect(['target-reached', 'converged', 'time-limit'])
       .toContain(first.manifest.terminationReason)
+  })
+
+  it('reports final metrics from the canonical delivered-filter response', () => {
+    const runInput = input()
+    runInput.settings = { ...runInput.settings, maxFilters: 1 }
+    runInput.source.rawPoints = runInput.source.rawPoints.map((point) => ({
+      ...point,
+      db: point.frequencyHz >= 800 && point.frequencyHz <= 1_500 ? 4 : 0,
+    }))
+
+    const result = runStandardAutoEqV2(runInput, { nowMs: () => 0 })
+    expect(result.filters.length).toBeGreaterThan(0)
+
+    const canonicalFrequencies = createEvaluationGrid()
+    const source = prepareCurve(runInput.source, runInput.normalization, canonicalFrequencies)
+    const target = prepareCurve(runInput.target, runInput.normalization, canonicalFrequencies)
+    const canonicalDesiredDb = desiredCorrection(source.db, target.db)
+    const frequencies: number[] = []
+    const desiredDb: number[] = []
+    for (let index = 0; index < canonicalFrequencies.length; index += 1) {
+      const frequencyHz = canonicalFrequencies[index]!
+      if (
+        frequencyHz >= runInput.settings.minFrequencyHz &&
+        frequencyHz <= runInput.settings.maxFrequencyHz
+      ) {
+        frequencies.push(frequencyHz)
+        desiredDb.push(canonicalDesiredDb[index]!)
+      }
+    }
+    const cascadeDb = cascadeMagnitudeDb(
+      result.filters,
+      frequencies,
+      MVP_NUMERIC_POLICY.sampleRateHz,
+    )
+    const residualDb = desiredDb.map((desired, index) => desired - cascadeDb[index]!)
+    const expectedMetrics = calculateErrorMetrics(residualDb, frequencies)
+
+    expect(result.metrics).toEqual(expectedMetrics)
+    expect(result.manifest.metrics).toEqual(expectedMetrics)
   })
 
   it('returns the zero-filter checkpoint as a normal controlled timeout', () => {

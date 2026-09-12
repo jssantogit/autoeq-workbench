@@ -37,10 +37,21 @@ export {
   resolveStandardAutoEqV2Config,
 } from './autoeq/v2/config.js'
 export type { StandardAutoEqV2Config } from './autoeq/v2/config.js'
-export { compareV2Solutions, isV2TargetAchieved } from './autoeq/v2/ranking.js'
+export {
+  compareV2DeliverableQuality,
+  compareV2Solutions,
+  isV2TargetAchieved,
+} from './autoeq/v2/ranking.js'
 export type { V2Solution } from './autoeq/v2/ranking.js'
-export { createStandardV2Deadline } from './autoeq/v2/runtime.js'
-export type { StandardV2Deadline, StandardV2Runtime } from './autoeq/v2/runtime.js'
+export {
+  createStandardV2Deadline,
+  createStandardV2DeadlineWindow,
+} from './autoeq/v2/runtime.js'
+export type {
+  StandardV2Deadline,
+  StandardV2DeadlineWindow,
+  StandardV2Runtime,
+} from './autoeq/v2/runtime.js'
 export type {
   StandardV2ResearchPhase,
   StandardV2ResearchTrace,
@@ -49,6 +60,7 @@ export type {
 export {
   appendV2ResponseCacheFilter,
   createV2ResponseCache,
+  removeV2ResponseCacheFilter,
   replaceV2ResponseCacheFilter,
 } from './autoeq/v2/responseCache.js'
 export type { V2ResponseCache } from './autoeq/v2/responseCache.js'
@@ -85,6 +97,7 @@ export type {
   DiscreteTrial,
 } from './autoeq/v2/discreteRefine.js'
 export {
+  buildCheckpointDeliverableV2,
   buildDeliverableV2,
   compressDeliverableV2,
 } from './autoeq/v2/deliverable.js'

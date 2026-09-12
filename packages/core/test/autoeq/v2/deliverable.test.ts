@@ -1,7 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('../../../src/autoeq/cancellation.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../src/autoeq/cancellation.js')>()
+  return {
+    ...actual,
+    auditCancellations: vi.fn(actual.auditCancellations),
+  }
+})
 
 import {
   DEFAULT_AUTOEQ_SETTINGS,
+  buildCheckpointDeliverableV2,
   buildDeliverableV2,
   compressDeliverableV2,
   evaluateV2Solution,
@@ -9,6 +18,7 @@ import {
   resolveStandardAutoEqV2Config,
   type Filter,
 } from '../../../src/index.js'
+import { auditCancellations } from '../../../src/autoeq/cancellation.js'
 
 const frequencies = [50, 100, 200, 500, 1_000, 2_000, 5_000, 10_000, 20_000]
 const deadline = { isExpired: () => false }
@@ -17,6 +27,46 @@ const filter = (id: string, frequencyHz: number, gainDb: number): Filter => ({
 })
 
 describe('Standard v2 deliverables', () => {
+  it('builds a safe checkpoint without discrete refinement', () => {
+    const config = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 1 })
+    let discreteTrials = 0
+    const result = buildCheckpointDeliverableV2({
+      filters: [filter('a', 1_000.4, 2.04), filter('b', 2_000.4, -1.96)],
+      desiredDb: frequencies.map(() => 0),
+      frequencies,
+      config,
+      deadline,
+      researchTrace: { onDiscreteTrial: () => { discreteTrials += 1 } },
+    })
+
+    expect(discreteTrials).toBe(0)
+    expect(result.filters.length).toBeLessThanOrEqual(1)
+    expect(result.filters.map(({ id }, index) => id === `autoeq-${index + 1}`))
+      .not.toContain(false)
+    for (const delivered of result.filters) {
+      expect(delivered.frequencyHz % 1).toBe(0)
+      expect(Number.isInteger(delivered.gainDb * 10)).toBe(true)
+    }
+    expect(result.metrics.rmseDb).toBeGreaterThanOrEqual(0)
+    expect(Number.isFinite(result.preampDb)).toBe(true)
+  })
+
+  it('defers cancellation audits when primary metrics already choose the cap-removal winner', () => {
+    const config = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 1 })
+    const auditSpy = vi.mocked(auditCancellations)
+    auditSpy.mockClear()
+
+    buildCheckpointDeliverableV2({
+      filters: [filter('large', 1_000, 6), filter('small', 5_000, 0.5)],
+      desiredDb: frequencies.map(() => 0),
+      frequencies,
+      config,
+      deadline,
+    })
+
+    expect(auditSpy).not.toHaveBeenCalled()
+  })
+
   it('always builds a quantized checkpoint inside the delivered filter cap', () => {
     const config = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 1 })
     const result = buildDeliverableV2({

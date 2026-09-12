@@ -56,7 +56,6 @@ describe('research quality timeline', () => {
     expect(projected).toEqual([
       checkpoint(500, 1.2, 2.5),
       checkpoint(1_000, 0.8, 1.7),
-      checkpoint(2_000, 0.4, 1.2),
     ])
   })
 
@@ -91,7 +90,7 @@ describe('research quality timeline', () => {
     })
   })
 
-  it('keeps light timing separate from deep phase profiling', () => {
+  it('keeps light timing separate from deep phase profiling and records run termination', () => {
     let lightClockCalls = 0
     const light = createResearchTelemetry({
       mode: 'light',
@@ -108,8 +107,9 @@ describe('research quality timeline', () => {
       preampDb: 0,
     })
 
-    expect(lightClockCalls).toBe(2)
-    expect(light.snapshot().checkpoints).toHaveLength(1)
+    const lightSnapshot = light.snapshot()
+    expect(lightClockCalls).toBe(3)
+    expect(lightSnapshot.checkpoints.map(({ elapsedMs }) => elapsedMs)).toEqual([10, 20])
 
     let deepClock = 100
     const deep = createResearchTelemetry({

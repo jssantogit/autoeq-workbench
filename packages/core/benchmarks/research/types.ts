@@ -162,8 +162,8 @@ export interface ResearchWarning {
   type: 'practical-monotonicity'
   caseId: ResearchCaseId
   maxFilters: number
-  shorterBudgetSeconds: 15 | 30
-  longerBudgetSeconds: 30 | 60
+  shorterBudgetSeconds: 5 | 15 | 30
+  longerBudgetSeconds: 15 | 30 | 60
   rmseDb: { shorter: number; longer: number; delta: number; threshold: number }
   maxAbsDb: { shorter: number; longer: number; delta: number; threshold: number }
   triggers: Array<'rmse' | 'maxAbs'>
