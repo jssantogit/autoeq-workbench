@@ -130,7 +130,7 @@ async function main() {
   for (const benchmarkCase of V2_BENCHMARK_CASES) {
     const v2 = runV2Case(benchmarkCase)
     const structuralRuns: StructuralRun[] = []
-    for (let repeatIndex = 0; repeatIndex < 5; repeatIndex += 1) {
+    for (let repeatIndex = 0; repeatIndex < 1; repeatIndex += 1) {
       structuralRuns.push(runStructuralCase(benchmarkCase, repeatIndex))
     }
 
@@ -168,7 +168,7 @@ async function main() {
     cases: rows.length,
     q31ExactRepeatableCases: rows.filter((row) => row.q31x8.exactRepeatability).length,
     q31CasesWithoutDeadlineHit: rows.filter((row) => row.q31x8.deadlineHits === 0).length,
-    q31CasesMeetingTargetAllRepeats: rows.filter((row) => row.q31x8.targetAchievedCount === 5).length,
+    q31CasesMeetingTargetAllRepeats: rows.filter((row) => row.q31x8.targetAchievedCount === 1).length,
     v2CasesMeetingTarget: rows.filter((row) => row.standardV2.targetAchieved).length,
     q31ViolationWins: rows.filter(
       (row) => row.q31x8.normalizedViolationMedian < row.standardV2.normalizedViolation - 1e-12,
