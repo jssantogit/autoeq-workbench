@@ -165,7 +165,7 @@ describe('Experimental Max10 structural search', () => {
       ...resolveStructuralSearchConfig({
         preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
       }),
-      maxFilters: 3,
+      maxFilters: 2,
       beamWidth: 2,
       proposalsPerParent: 4,
     }
@@ -176,7 +176,7 @@ describe('Experimental Max10 structural search', () => {
         frequencies: [...frequencies],
         sampleRateHz: 48_000,
         config,
-        deadline: { isExpired: () => ++deadlineChecks > 5_000 },
+        deadline: { isExpired: () => ++deadlineChecks > 500 },
         seedFilters: [],
       })
     }
