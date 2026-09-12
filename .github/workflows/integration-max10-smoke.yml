@@ -1,0 +1,32 @@
+name: Integration Max10 Smoke
+
+on:
+  push:
+    branches:
+      - research/integration-max10-budget-profiles-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - run: pnpm --filter @autoeq-workbench/web typecheck
+      - name: Test structural search
+        run: pnpm --filter @autoeq-workbench/core test -- structuralSearch.test.ts
+      - name: Test experimental worker
+        run: pnpm --filter @autoeq-workbench/web test -- autoeq.worker.test.ts
+      - name: Build Pages bundle
+        run: pnpm build:pages
