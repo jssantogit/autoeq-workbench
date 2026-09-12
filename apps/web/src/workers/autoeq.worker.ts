@@ -106,6 +106,7 @@ export function runExperimentalStructuralAutoEqWorkerInput(
     sampleRateHz: standardConfig.sampleRateHz,
     config: resolveStructuralSearchConfig({
       preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
+      timeLimitSeconds: input.settings.timeLimitSeconds,
     }),
     deadline,
     seedFilters: [],
