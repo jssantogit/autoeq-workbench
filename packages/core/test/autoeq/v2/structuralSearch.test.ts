@@ -169,17 +169,20 @@ describe('Experimental Max10 structural search', () => {
       beamWidth: 2,
       proposalsPerParent: 4,
     }
-    const input = {
-      desiredDb: [...localizedResidual],
-      frequencies: [...frequencies],
-      sampleRateHz: 48_000,
-      config,
-      deadline: { isExpired: () => false },
-      seedFilters: [],
+    const run = () => {
+      let deadlineChecks = 0
+      return runStructuralSearch({
+        desiredDb: [...localizedResidual],
+        frequencies: [...frequencies],
+        sampleRateHz: 48_000,
+        config,
+        deadline: { isExpired: () => ++deadlineChecks > 5_000 },
+        seedFilters: [],
+      })
     }
 
-    const first = runStructuralSearch(input)
-    const second = runStructuralSearch(input)
+    const first = run()
+    const second = run()
 
     expect(second).toEqual(first)
   })
