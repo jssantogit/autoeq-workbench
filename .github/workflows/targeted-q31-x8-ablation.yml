@@ -1,0 +1,37 @@
+name: Targeted Q31 X8 Ablation
+
+on:
+  push:
+    branches:
+      - research/audit-shelf-type-discipline-only-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Run targeted public corpus ablation
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          AUDIT_OUTPUT_DIR: ${{ github.workspace }}/autoeq-targeted-ablation
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/research/publicCorpusQ31x8Audit.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: targeted-audit-shelf-type-discipline-only-20260912-${{ github.run_id }}
+          path: autoeq-targeted-ablation
+          if-no-files-found: warn
+          retention-days: 30
