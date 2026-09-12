@@ -28,9 +28,13 @@ export interface ResolvedStructuralSearchConfig {
   localPolishEvaluations: number
   maxFilters: number
   admission: 'lexical' | 'q31-b4-p8'
+  workProfile: 'short-5s' | 'full'
 }
 
-export function resolveStructuralSearchConfig(options?: { preset?: StructuralSearchPreset | undefined }): ResolvedStructuralSearchConfig {
+export function resolveStructuralSearchConfig(options?: {
+  preset?: StructuralSearchPreset | undefined
+  timeLimitSeconds?: number | undefined
+}): ResolvedStructuralSearchConfig {
   if (options?.preset === MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET) {
     return {
       preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
@@ -39,6 +43,7 @@ export function resolveStructuralSearchConfig(options?: { preset?: StructuralSea
       localPolishEvaluations: 24,
       maxFilters: 10,
       admission: 'q31-b4-p8',
+      workProfile: options.timeLimitSeconds === 5 ? 'short-5s' : 'full',
     }
   }
   return {
@@ -48,6 +53,7 @@ export function resolveStructuralSearchConfig(options?: { preset?: StructuralSea
     localPolishEvaluations: 24,
     maxFilters: 10,
     admission: 'lexical',
+    workProfile: options?.timeLimitSeconds === 5 ? 'short-5s' : 'full',
   }
 }
 
@@ -656,7 +662,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
 
   let capSwapSteps = 0
   while (
-    capSwapSteps < 4 &&
+    capSwapSteps < (config.workProfile === 'short-5s' ? 2 : 4) &&
     rescued.filters.length === config.maxFilters &&
     (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75) &&
     !deadline.isExpired()
@@ -726,6 +732,18 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     })
     rescued = improving[0]!.state
     capSwapSteps += 1
+  }
+
+  const postSwapViolation = Math.max(
+    rescued.rmseDb / 0.25,
+    rescued.maxAbsDb / 0.75,
+  )
+  if (config.workProfile === 'short-5s' && postSwapViolation > 1.6) {
+    return {
+      filters: rescued.filters,
+      rmseDb: rescued.rmseDb,
+      maxAbsDb: rescued.maxAbsDb,
+    }
   }
 
   if (
