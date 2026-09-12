@@ -980,3 +980,98 @@ Next experiment:
 - preserve original Q31 beam/quota/selector and 8× polish.
 
 This separates legitimate edge correction (shelves) from illegitimate endpoint PK attraction.
+
+
+## Phase 2.4 — PK split recursion and dead-slot diagnostics
+
+### No PK split
+
+Run: `34712908182`
+
+Shelves retained split, PK split disabled.
+
+| Case | violation | filters |
+| --- | ---: | ---: |
+| mixed_widths | 1.1210 | 7 |
+| near_budget | 1.9303 | 8 |
+| stress_mid_treble | **4.1523** | 2 |
+| stress_mixed_edges | 0.9376 | 10 |
+
+Verdict: **reject**. PK split is required for reachability.
+
+### PK split depth cap
+
+Runs:
+
+- depth 1: `34712999193`
+- depth 2: `34713001254`
+
+| Case | retained shelf policy | depth 1 | depth 2 |
+| --- | ---: | ---: | ---: |
+| mixed_widths | 1.1210 | 1.1210 | 1.1210 |
+| near_budget | 1.9826 | 1.9826 | 1.9826 |
+| stress_mid_treble | 3.5875 | **3.5075** | **3.5025** |
+| stress_mixed_edges | 0.7724 | 0.7818 | **0.7724** |
+
+Depth 2 is the leading split policy:
+
+- preserves the mixed-edge result exactly;
+- does not regress near-budget/mixed-widths;
+- modestly improves stress-mid-treble;
+- prevents unbounded recursive PK split chains.
+
+However stress-mid-treble still exhibits severe regional concentration: seven pairs are within 1/6 octave and the highest filter is only ~4.1 kHz.
+
+### All-rich-candidate oracle after depth 2
+
+Run: `34713128578`
+
+Final depth-2 stress state:
+
+- 9 filters
+- violation: **3.50254**
+- generated rich PK candidates: **54**
+- directly improving candidates: **13**
+
+Best one-slot addition:
+
+- ~5.385 kHz
+- +2.63 dB
+- Q ~6.61
+- violation: **3.17017**
+
+A ~12 kHz candidate also improves the state to **3.39043**.
+
+Conclusion: the V2 shortlist is not the primary tunnel cause. Higher-frequency candidates are useful, but the current state still prefers another mid-treble correction when only one slot is available.
+
+### Exact zero-gain canonicalization
+
+Run: `34713250052`
+
+After every polish, filters quantized to exactly 0.0 dB were removed.
+
+Stress-mid-treble changed:
+
+- filter count: **9 -> 7**
+- violation: **3.50254 -> 3.50254** (exactly unchanged)
+
+The freed slots were not reused. The search still terminated in the same basin.
+
+Conclusion:
+
+- exact-zero filters are dead capacity and should eventually be canonicalized away;
+- but they are a symptom rather than the root cause;
+- the next structural add is collapsing back into an already explored local region.
+
+### Next experiment
+
+Use a single novelty-aware PK feature:
+
+- retain one add-PK proposal per state;
+- rank residual extrema by magnitude;
+- prefer an extremum separated from existing PK centers by a minimum octave distance;
+- fall back to the original strongest extremum when no novel feature exists;
+- keep depth-2 PK split for local refinement;
+- keep retained shelf semantics and 8x polish.
+
+This is intentionally different from rejected always-on multi-region search: proposal count does not increase.
