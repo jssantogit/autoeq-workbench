@@ -1,4 +1,5 @@
 import {
+  MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   isValidAutoEqSettings,
   type AutoEqResultV2,
   type Curve,
@@ -7,10 +8,13 @@ import {
 import type { StoreApi } from 'zustand/vanilla'
 
 import {
+  EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE,
   AutoEqCancelledError,
   AutoEqWorkerError,
   autoEqClient,
   type AutoEqClient,
+  type AutoEqExecutionMode,
+  type AutoEqRunOptions,
 } from '../workers/autoeqClient'
 import { autoEqRunStore, type AutoEqRunState } from './autoeqRunStore'
 import {
@@ -48,9 +52,25 @@ function captureRunInput(state: WorkspaceState): StandardAutoEqInputV2 | null {
 function matchesCapturedProvenance(
   manifest: AutoEqResultV2['manifest'] | undefined,
   input: StandardAutoEqInputV2,
+  mode: AutoEqExecutionMode,
 ): boolean {
   if (!manifest || typeof manifest !== 'object') return false
   if (manifest.schemaVersion !== 3 || manifest.algorithmVersion !== 'standard-v2') return false
+  const experimentalMarker = (
+    manifest as AutoEqResultV2['manifest'] & {
+      experimentalStructuralSearch?: { preset?: unknown; seedMode?: unknown }
+    }
+  ).experimentalStructuralSearch
+  if (mode === EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE) {
+    if (
+      experimentalMarker?.preset !== MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET ||
+      experimentalMarker.seedMode !== 'zero-start'
+    ) {
+      return false
+    }
+  } else if (experimentalMarker !== undefined) {
+    return false
+  }
   if (manifest.sourceName !== input.source.name || manifest.targetName !== input.target.name) {
     return false
   }
@@ -88,7 +108,7 @@ interface AutoEqControllerDependencies {
 }
 
 export interface AutoEqController {
-  runAutoEq(): Promise<void>
+  runAutoEq(options?: AutoEqRunOptions): Promise<void>
   cancelAutoEq(): void
 }
 
@@ -105,7 +125,8 @@ export function createAutoEqController({
     runStore.getState().cancel(runId)
   }
 
-  const runAutoEq = async (): Promise<void> => {
+  const runAutoEq = async (options: AutoEqRunOptions = {}): Promise<void> => {
+    const mode = options.mode ?? 'standard'
     const state = workspace.getState()
     const input = captureRunInput(state)
     const signature = createAutoEqRunInputSignature(state)
@@ -128,7 +149,7 @@ export function createAutoEqController({
     const runId = createRunId()
     let pending: Promise<AutoEqResultV2>
     try {
-      pending = client.run(runId, input)
+      pending = client.run(runId, input, options)
     } catch {
       runStore.getState().reject({
         category: 'optimization',
@@ -144,7 +165,7 @@ export function createAutoEqController({
 
       if (createAutoEqRunInputSignature(workspace.getState()) === signature) {
         if (
-          !matchesCapturedProvenance(result?.manifest, input) ||
+          !matchesCapturedProvenance(result?.manifest, input, mode) ||
           !workspace.getState().applyAutoEqResult(result)
         ) {
           runStore.getState().fail(runId, {
@@ -179,6 +200,10 @@ const defaultController = createAutoEqController({
 
 export function runAutoEq(): Promise<void> {
   return defaultController.runAutoEq()
+}
+
+export function runAutoEqExperimentalMax10(): Promise<void> {
+  return defaultController.runAutoEq({ mode: EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE })
 }
 
 export function cancelAutoEq(): void {

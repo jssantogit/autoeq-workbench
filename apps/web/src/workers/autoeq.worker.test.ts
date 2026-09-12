@@ -6,7 +6,12 @@ import {
 } from '@autoeq-workbench/core'
 import { describe, expect, it } from 'vitest'
 
-import { runAutoEqWorkerInput, sanitizeAutoEqError } from './autoeq.worker'
+import {
+  runAutoEqWorkerInput,
+  runExperimentalStructuralAutoEqWorkerInput,
+  sanitizeAutoEqError,
+} from './autoeq.worker'
+import { EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE } from './autoeqClient'
 
 const input: StandardAutoEqInputV2 = {
   source: {
@@ -42,6 +47,31 @@ describe('AutoEQ Worker execution', () => {
       algorithmVersion: 'standard-v2',
       autoeqSettings: { timeLimitSeconds: 5 },
     })
+  })
+})
+
+describe('AutoEQ Worker experimental structural execution', () => {
+  it('runs the validated Q31-B4-P8 zero-start mode only when explicitly requested', () => {
+    const result = runAutoEqWorkerInput(input, EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE)
+    const marker = (
+      result.manifest as typeof result.manifest & {
+        experimentalStructuralSearch?: { preset?: string; seedMode?: string }
+      }
+    ).experimentalStructuralSearch
+
+    expect(marker).toEqual({
+      preset: 'max10-q31-b4-p8-experimental',
+      seedMode: 'zero-start',
+    })
+    expect(result.filters.length).toBeLessThanOrEqual(10)
+    expect(result.manifest.autoeqSettings.timeLimitSeconds).toBe(5)
+  }, 15_000)
+
+  it('rejects unvalidated non-default bounds instead of silently changing candidate semantics', () => {
+    expect(() => runExperimentalStructuralAutoEqWorkerInput({
+      ...input,
+      settings: { ...input.settings, maxFilters: 8 },
+    })).toThrowError(/requires default frequency\/gain\/Q bounds and maxFilters=10/)
   })
 })
 
