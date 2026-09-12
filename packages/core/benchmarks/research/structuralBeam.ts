@@ -6,6 +6,7 @@ import {
   resolveStandardAutoEqV2Config,
   type Filter,
 } from '../../src/index.js'
+export { cascadeMagnitudeDb }
 import {
   advanceJointRefineContinuationV2,
   createJointRefineContinuationV2,
@@ -192,6 +193,11 @@ export interface StructuralBeamExhaustionParentEntry {
   postPolishVisitedCount: number
   evaluatedNewCount: number
   evaluatedCandidateIds: string[]
+  rawProposalsGenerated?: number
+  semanticUniqueProposalsBeforeAdmission?: number
+  duplicatesWithinGeneratedSet?: number
+  proposalsExcludedByAdmission?: number
+  mutationFamilyCounts?: Record<string, number>
 }
 
 export interface StructuralBeamExhaustionLayerEntry {
@@ -204,11 +210,20 @@ export interface StructuralBeamExhaustionLayerEntry {
   retainedGeneratedCandidateIds: string[]
   droppedGeneratedCandidateIds: string[]
   terminalNoGenerated: boolean
+  candidatesEligibleForBeamRetention?: number
+  candidatesRejectedByBeamRetention?: number
+  cumulativeEvaluations?: number
+  cumulativeTrials?: number
+  cumulativeUniqueStatesGenerated?: number
+  cumulativeUniqueStatesEvaluated?: number
+  cumulativeUniqueStatesRetained?: number
+  elapsedMs?: number
 }
 
 export interface StructuralBeamExhaustionTrace {
   enabled: boolean
   layers: StructuralBeamExhaustionLayerEntry[]
+  visitedKeys?: string[]
 }
 
 export function createStructuralBeamExhaustionTrace(enabled = true): StructuralBeamExhaustionTrace {
@@ -231,6 +246,7 @@ export interface StructuralBeamAdmissionContext {
   parent: StructuralBeamState
   orderedProposals: readonly StructuralProposal[]
   admittedProposals: readonly StructuralProposal[]
+  isVisited?: (filters: readonly Filter[]) => boolean
 }
 
 export interface StructuralBeamAdmissionDecision {
@@ -508,7 +524,7 @@ function filterKey(filters: readonly Filter[]): string {
       left.id.localeCompare(right.id)))
 }
 
-function semanticFilterKey(filters: readonly Filter[]): string {
+export function semanticFilterKey(filters: readonly Filter[]): string {
   const order: Record<Filter['type'], number> = { LS: 0, PK: 1, HS: 2 }
   return JSON.stringify(filters
     .map(({ id: _id, ...filter }) => filter)
@@ -992,6 +1008,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
   const trajectory: SolverTrajectoryPointV1[] = []
   const states: StructuralBeamState[] = []
   let evaluationsUsed = 0
+  let totalCoordinateTrials = 0
   let proposalsConsidered = 0
   let layersExecuted = 0
   let deduplicatedProposals = 0
@@ -1127,16 +1144,44 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
         generateStructuralMutations(input.problem, parent.candidate.filters, residual),
       )
       const admittedProposals = orderedProposals.slice(0, config.proposalsPerParent)
+      const isVisited = (filters: readonly Filter[]) => {
+        const quantized = quantizeStructuralBeamFilters(input.problem, filters)
+        return visited.has(semanticFilterKey(quantized))
+      }
       const admissionDecision = input.admissionOverride?.apply({
         layerIndex: layersExecuted,
         parentIndex,
         parent,
         orderedProposals,
         admittedProposals,
+        isVisited,
       })
       const proposals = admissionDecision?.proposals ?? admittedProposals
       if (proposals.length > config.proposalsPerParent) {
         throw new Error('structural beam admission override exceeds proposalsPerParent')
+      }
+      let mutationFamilyCounts: Record<string, number> | undefined
+      let rawProposalsGenerated: number | undefined
+      let semanticUniqueProposalsBeforeAdmission: number | undefined
+      let duplicatesWithinGeneratedSet: number | undefined
+      let proposalsExcludedByAdmission: number | undefined
+      if (exhaustionLayer !== undefined) {
+        mutationFamilyCounts = {}
+        const seenPrePolish = new Set<string>()
+        let dups = 0
+        for (const prop of orderedProposals) {
+          mutationFamilyCounts[prop.mutation] = (mutationFamilyCounts[prop.mutation] ?? 0) + 1
+          const key = semanticFilterKey(quantizeStructuralBeamFilters(input.problem, prop.filters))
+          if (seenPrePolish.has(key)) {
+            dups += 1
+          } else {
+            seenPrePolish.add(key)
+          }
+        }
+        rawProposalsGenerated = orderedProposals.length
+        semanticUniqueProposalsBeforeAdmission = seenPrePolish.size
+        duplicatesWithinGeneratedSet = dups
+        proposalsExcludedByAdmission = Math.max(0, orderedProposals.length - proposals.length)
       }
       const exhaustionParent: StructuralBeamExhaustionParentEntry | undefined =
         exhaustionLayer === undefined
@@ -1156,6 +1201,11 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
               postPolishVisitedCount: 0,
               evaluatedNewCount: 0,
               evaluatedCandidateIds: [],
+              rawProposalsGenerated,
+              semanticUniqueProposalsBeforeAdmission,
+              duplicatesWithinGeneratedSet,
+              proposalsExcludedByAdmission,
+              mutationFamilyCounts,
             }
       if (exhaustionParent !== undefined) exhaustionLayer!.parents.push(exhaustionParent)
       for (const [proposalIndex, proposal] of proposals.entries()) {
@@ -1180,6 +1230,7 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
           config.localPolishEvaluations,
           input.isExpired ?? (() => false),
         )
+        totalCoordinateTrials += polished.coordinateTrials
         const quantized = quantizeStructuralBeamFilters(input.problem, polished.deliveredFilters)
         const key = semanticFilterKey(quantized)
         if (visited.has(key)) {
@@ -1223,6 +1274,14 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       if (exhaustionLayer !== undefined) {
         exhaustionLayer.terminalNoGenerated = true
         exhaustionLayer.retainedCandidateIds = beam.map((state) => state.candidate.candidateId)
+        exhaustionLayer.candidatesEligibleForBeamRetention = beam.length
+        exhaustionLayer.candidatesRejectedByBeamRetention = 0
+        exhaustionLayer.cumulativeEvaluations = evaluationsUsed
+        exhaustionLayer.cumulativeTrials = totalCoordinateTrials
+        exhaustionLayer.cumulativeUniqueStatesGenerated = visited.size
+        exhaustionLayer.cumulativeUniqueStatesEvaluated = states.length
+        exhaustionLayer.cumulativeUniqueStatesRetained = beam.length
+        exhaustionLayer.elapsedMs = input.elapsedMs?.() ?? (nowMs() - startedAt)
       }
       stopReason = 'no-admissible-proposals'
       break
@@ -1257,11 +1316,22 @@ export function runStructuralBeam(input: StructuralBeamRunInput): StructuralBeam
       const retainedGenerated = new Set(exhaustionLayer.retainedGeneratedCandidateIds)
       exhaustionLayer.droppedGeneratedCandidateIds = exhaustionLayer.generatedCandidateIds
         .filter((candidateId) => !retainedGenerated.has(candidateId))
+      exhaustionLayer.candidatesEligibleForBeamRetention = previousBeam.length + generated.length
+      exhaustionLayer.candidatesRejectedByBeamRetention = Math.max(0, (previousBeam.length + generated.length) - beam.length)
+      exhaustionLayer.cumulativeEvaluations = evaluationsUsed
+      exhaustionLayer.cumulativeTrials = totalCoordinateTrials
+      exhaustionLayer.cumulativeUniqueStatesGenerated = visited.size
+      exhaustionLayer.cumulativeUniqueStatesEvaluated = states.length
+      exhaustionLayer.cumulativeUniqueStatesRetained = beam.length
+      exhaustionLayer.elapsedMs = input.elapsedMs?.() ?? (nowMs() - startedAt)
     }
     if (evaluationsUsed >= input.evaluationBudget) {
       stopReason = 'evaluation-budget'
       break
     }
+  }
+  if (input.exhaustionTrace !== undefined) {
+    input.exhaustionTrace.visitedKeys = Array.from(visited)
   }
   const qualityTimePoints: QualityTimePoint[] = trajectory.map((point) => ({
     elapsedSeconds: point.elapsedMs / 1_000,
