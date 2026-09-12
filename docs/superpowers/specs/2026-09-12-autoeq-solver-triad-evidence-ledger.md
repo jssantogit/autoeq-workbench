@@ -346,3 +346,65 @@ Keep every other Q31 mechanism frozen and vary only the polish multiplier:
 - current `8×`
 
 Goal: find the lowest multiplier whose naturally exhausted result retains most of the U12t/Trio gains and materially closes Storm, while staying inside the desired practical runtime window.
+
+
+## Phase 1.8 — Polish multiplier sweep
+
+All variants preserve frozen Q31 search topology, proposal geometry, admission, selector, and Max10. Only the local polish multiplier changes.
+
+### 4× polish
+
+Run: `34707867974`
+
+| Case | RMSE | maxAbs | violation | elapsed | filters | repeatability |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Storm | 2.5306 | 8.0240 | 10.6987 | 3.38 s | 9 | 5/5 exact |
+| U12t | 1.4035 | 4.2252 | 5.6336 | 3.14 s | 10 | 5/5 exact |
+| Trio | 1.4341 | 2.9767 | 5.7364 | 2.46 s | 7 | 5/5 exact |
+
+### 6× polish
+
+Run: `34707869931`
+
+| Case | RMSE | maxAbs | violation | elapsed | filters | repeatability |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Storm | 1.8727 | 6.9479 | 9.2639 | 3.97 s | 7 | 5/5 exact |
+| U12t | 1.4822 | 4.5059 | 6.0079 | 1.10 s | 9 | 5/5 exact |
+| Trio | 0.8855 | 2.3265 | 3.5420 | 5.41 s | 10 | 5/5 exact |
+
+### 8× polish
+
+Run: `34707686890`
+
+| Case | RMSE | maxAbs | violation | elapsed | filters | repeatability |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| Storm | 1.8787 | 5.8120 | 7.7494 | 9.90 s | 9 | 5/5 exact |
+| U12t | 1.4225 | 4.2963 | 5.7284 | 3.19 s | 10 | 5/5 exact |
+| Trio | 0.6844 | 2.0179 | 2.7378 | 4.70 s | 10 | 5/5 exact |
+
+### Decision
+
+`8×` is retained as the leading multiplier.
+
+Reasons:
+
+- it has the strongest Storm maxAbs by a wide margin;
+- it nearly matches the best U12t result while materially beating `6×`;
+- it strongly dominates `4×` and `6×` on Trio precision;
+- all three cases finish before the 15-second fuse with one exact signature;
+- runtime remains substantially below converged Standard V2 on all three cases.
+
+The multiplier sweep is not monotonic in runtime or quality because local-polish depth changes which structural states survive and therefore changes the search trajectory. This rules out selecting a lower multiplier based only on nominal trial count.
+
+### Deep no-timeout runner note
+
+Run `34707590335` was intentionally stricter than the product-like 15-second validation. It eventually failed during extended terminal exploration because the stored structural result metrics diverged from independent canonical recomputation on Trio.
+
+This does not invalidate the bounded 15-second `8×` evidence, which passed canonical recomputation. It does establish that unbounded “search until absolute exhaustion” is not a safe production contract.
+
+The production research direction remains:
+
+- deterministic bounded work/search;
+- canonical recomputation before publication;
+- a generous wall-clock safety fuse;
+- no dependence on the exact moment the fuse fires during normal operation.
