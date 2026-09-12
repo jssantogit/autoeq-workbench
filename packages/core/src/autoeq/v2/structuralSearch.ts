@@ -656,7 +656,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
 
   let capSwapSteps = 0
   while (
-    capSwapSteps < 3 &&
+    capSwapSteps < 4 &&
     rescued.filters.length === config.maxFilters &&
     (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75) &&
     !deadline.isExpired()
