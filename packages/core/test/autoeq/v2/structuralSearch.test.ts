@@ -61,7 +61,8 @@ describe('Experimental Max10 structural search', () => {
       marginalPruneTolerance: 0.01,
       structuralCleanupMinFilters: 8,
       structuralCleanupMaxSteps: 3,
-      admission: 'metric',
+      admission: 'q31-b4-p8',
+      workProfile: 'full',
     })
   })
 
