@@ -175,16 +175,17 @@ export function generateStructuralMutations(
       mutation: 'remove',
       filters: canonical(current.filter((_, candidateIndex) => candidateIndex !== index)),
     })
-    const nextType: Record<Filter['type'], Filter['type']> = { PK: 'LS', LS: 'HS', HS: 'PK' }
-    proposals.push({
-      mutation: 'type-mutation',
-      filters: canonical([
-        ...current.slice(0, index),
-        projectFilter({ ...filter, type: nextType[filter.type] }, bounds),
-        ...current.slice(index + 1),
-      ]),
-    })
-    if (current.length < bounds.maxFilters) {
+    if (filter.type !== 'PK') {
+      proposals.push({
+        mutation: 'type-mutation',
+        filters: canonical([
+          ...current.slice(0, index),
+          projectFilter({ ...filter, type: 'PK' }, bounds),
+          ...current.slice(index + 1),
+        ]),
+      })
+    }
+    if (current.length < bounds.maxFilters && filter.type === 'PK') {
       const ratio = 2 ** (1 / 24)
       const first = projectFilter({
         ...filter,
