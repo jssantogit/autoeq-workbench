@@ -78,6 +78,8 @@ export interface ScalableStructuralSearchInput {
   /** Internal research selector; omitted means the unchanged legacy policy. */
   schedulerPolicy?: ScalableSchedulerPolicy
   adaptivePolicyParameters?: AdaptiveSchedulerPolicyParameters
+  /** Internal research override; omitted to retain the existing 5 s quantum. */
+  stageQuantumMs?: number
   /** Optional deadline remainder supplied by a research runner. */
   remainingWallClockMs?: () => number
   nowMs?: () => number
@@ -219,6 +221,10 @@ export function runScalableStructuralSearch(
   input: ScalableStructuralSearchInput,
 ): ScalableStructuralSearchResult {
   const nowMs = input.nowMs ?? (() => performance.now())
+  const stageQuantumMs = input.stageQuantumMs ?? SCALABLE_STAGE_QUANTUM_MS
+  if (!Number.isFinite(stageQuantumMs) || stageQuantumMs <= 0) {
+    throw new Error('stageQuantumMs must be positive')
+  }
   const maximum = Math.max(1, Math.floor(input.maxFilters))
   let capacity = Math.min(SCALABLE_BASE_CAPACITY, maximum)
   let effortLevel = 0
@@ -239,7 +245,7 @@ export function runScalableStructuralSearch(
   )
 
   while (!input.deadline.isExpired() && stageIndex < 256) {
-    const stageDeadlineAt = nowMs() + SCALABLE_STAGE_QUANTUM_MS
+    const stageDeadlineAt = nowMs() + stageQuantumMs
     const atMaximumCapacity = capacity >= maximum
     const useRemovalReseed =
       atMaximumCapacity &&
