@@ -5,6 +5,12 @@ import {
 import type { Filter } from '../../types/filter.js'
 import type { StandardV2Deadline } from './runtime.js'
 import {
+  ADAPTIVE_RESOURCE_POLICY,
+  decideAdaptiveSchedulerAction,
+  type AdaptiveSchedulerDecisionReason,
+  type AdaptiveSchedulerPolicyParameters,
+} from './adaptiveScheduler.js'
+import {
   addSearchWorkDelta,
   runStructuralSearch,
   createSearchWorkDelta,
@@ -19,6 +25,8 @@ export const SCALABLE_BASE_CAPACITY = 10
 export const SCALABLE_CAPACITY_GROWTH = 1.5
 export const SCALABLE_STAGE_QUANTUM_MS = 5_000
 export const SCALABLE_MAX_EFFORT_LEVEL = 6
+
+export type ScalableSchedulerPolicy = 'legacy' | 'adaptive-resource'
 
 export type ScalableSearchAction =
   | 'explore-current-capacity'
@@ -42,6 +50,11 @@ export interface ScalableSearchStage {
   incumbentViolation: number
   improved: boolean
   action?: ScalableSearchAction
+  schedulerPolicy?: ScalableSchedulerPolicy
+  decisionReason?: AdaptiveSchedulerDecisionReason
+  stagesSinceMeaningfulImprovement?: number
+  workSinceMeaningfulImprovement?: SearchWorkTotals
+  remainingWallClockMs?: number
   qualityBefore?: number
   candidateQuality?: number
   qualityAfter?: number
@@ -62,6 +75,11 @@ export interface ScalableStructuralSearchInput {
   baseConfig: ResolvedStructuralSearchConfig
   deadline: StandardV2Deadline
   seedFilters?: readonly Filter[]
+  /** Internal research selector; omitted means the unchanged legacy policy. */
+  schedulerPolicy?: ScalableSchedulerPolicy
+  adaptivePolicyParameters?: AdaptiveSchedulerPolicyParameters
+  /** Optional deadline remainder supplied by a research runner. */
+  remainingWallClockMs?: () => number
   nowMs?: () => number
   onStage?: (stage: ScalableSearchStage) => void
 }
@@ -166,6 +184,14 @@ function actionForStage(
   return 'explore-current-capacity'
 }
 
+function stageActionForAdaptiveDecision(
+  decision: ReturnType<typeof decideAdaptiveSchedulerAction>,
+  effortLevel: number,
+): ScalableSearchAction {
+  if (decision.action === 'expand-capacity') return 'expand-capacity'
+  return effortLevel > 0 ? 'deepen' : 'explore-current-capacity'
+}
+
 function rankRemovalSeeds(
   filters: readonly Filter[],
   desiredDb: readonly number[],
@@ -200,6 +226,11 @@ export function runScalableStructuralSearch(
   let reseedCursor = 0
   let stageIndex = 0
   let cumulativeWork = createSearchWorkDelta()
+  let recentGain = 0
+  let stagesSinceMeaningfulImprovement = 0
+  let workSinceMeaningfulImprovement = createSearchWorkDelta()
+  const schedulerPolicy = input.schedulerPolicy ?? 'legacy'
+  const adaptivePolicyParameters = input.adaptivePolicyParameters ?? ADAPTIVE_RESOURCE_POLICY
   let incumbent = evaluateFilters(
     input.seedFilters ?? [],
     input.desiredDb,
@@ -215,12 +246,23 @@ export function runScalableStructuralSearch(
       effortLevel >= 2 &&
       consecutiveNoImprovement >= 1 &&
       incumbent.filters.length > 0
-    const action = actionForStage(
-      capacity,
-      maximum,
-      effortLevel,
-      useRemovalReseed,
-    )
+    const remainingWallClockMs = input.remainingWallClockMs?.()
+    const adaptiveDecision = schedulerPolicy === 'adaptive-resource'
+      ? decideAdaptiveSchedulerAction({
+        currentCapacity: capacity,
+        maximumCapacity: maximum,
+        effortLevel,
+        recentGain,
+        stagesSinceMeaningfulImprovement,
+        workSinceMeaningfulImprovement,
+        remainingWallClockMs,
+      }, adaptivePolicyParameters)
+      : undefined
+    const action = useRemovalReseed
+      ? 'reseed'
+      : adaptiveDecision === undefined
+        ? actionForStage(capacity, maximum, effortLevel, false)
+        : stageActionForAdaptiveDecision(adaptiveDecision, effortLevel)
 
     let seedFilters = incumbent.filters.map((filter) => ({ ...filter }))
     let removedFilterId: string | undefined
@@ -295,6 +337,19 @@ export function runScalableStructuralSearch(
       : undefined
     cumulativeWork = addSearchWorkDelta(cumulativeWork, workDelta)
 
+    recentGain = qualityDelta > 0 ? qualityDelta : 0
+    const meaningfulImprovement = recentGain >= adaptivePolicyParameters.meaningfulGainThreshold
+    if (meaningfulImprovement) {
+      stagesSinceMeaningfulImprovement = 0
+      workSinceMeaningfulImprovement = createSearchWorkDelta()
+    } else {
+      stagesSinceMeaningfulImprovement += 1
+      workSinceMeaningfulImprovement = addSearchWorkDelta(
+        workSinceMeaningfulImprovement,
+        workDelta,
+      )
+    }
+
     input.onStage?.({
       stageIndex,
       capacity,
@@ -305,6 +360,11 @@ export function runScalableStructuralSearch(
       incumbentViolation: structuralViolation(incumbent),
       improved,
       action,
+      schedulerPolicy,
+      decisionReason: adaptiveDecision?.reason,
+      stagesSinceMeaningfulImprovement,
+      workSinceMeaningfulImprovement,
+      remainingWallClockMs,
       qualityBefore,
       candidateQuality,
       qualityAfter,
@@ -318,7 +378,13 @@ export function runScalableStructuralSearch(
     })
 
     stageIndex += 1
-    if (capacity < maximum) {
+    if (action === 'expand-capacity' && capacity < maximum) {
+      // Work and gains are regime-local.  The expansion stage used the old
+      // capacity, so the new regime must collect its own evidence before a
+      // subsequent expansion can be considered.
+      recentGain = 0
+      stagesSinceMeaningfulImprovement = 0
+      workSinceMeaningfulImprovement = createSearchWorkDelta()
       capacity = nextScalableCapacity(capacity, maximum)
       effortLevel = 0
       consecutiveNoImprovement = 0

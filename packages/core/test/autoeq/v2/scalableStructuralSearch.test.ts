@@ -9,6 +9,7 @@ import {
   resolveStructuralSearchConfig,
   runScalableStructuralSearch,
   SCALABLE_BASE_CAPACITY,
+  SCALABLE_STAGE_QUANTUM_MS,
   structuralViolation,
   type Filter,
   type SearchWorkDelta,
@@ -525,5 +526,132 @@ describe('scalable structural search policy', () => {
     expect(stages.slice(3).map((stage) => stage.action)).toEqual(['reseed', 'reseed'])
     expect(stages[3]?.workDelta?.reseedAttempts).toBe(1)
     expect(stages[4]?.workDelta?.reseedAttempts).toBe(1)
+  })
+
+  it('keeps a productive current regime before adaptive expansion', () => {
+    resetMockRunner()
+    let invocation = 0
+    mockedRunStructuralSearch.mockImplementation(({ seedFilters }) => {
+      invocation += 1
+      return invocation === 1
+        ? { filters: [], rmseDb: 0.1, maxAbsDb: 0.1 }
+        : {
+          filters: (seedFilters ?? []).map((entry) => ({ ...entry })),
+          rmseDb: 99,
+          maxAbsDb: 99,
+        }
+    })
+    const stages: ScalableSearchStage[] = []
+
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 43,
+      seedFilters: [filter('seed')],
+      schedulerPolicy: 'adaptive-resource',
+      remainingWallClockMs: () => SCALABLE_STAGE_QUANTUM_MS * 8,
+      deadline: deadlineAfterStages(3),
+      onStage: (stage) => stages.push(stage),
+    }))
+
+    expect(stages.map((stage) => stage.capacity)).toEqual([10, 10, 10])
+    expect(stages[0]?.decisionReason).toBe('insufficient-work-to-judge')
+    expect(stages[0]?.action).toBe('explore-current-capacity')
+    expect(stages[1]?.decisionReason).toBe('productive-current-regime')
+    expect(stages[2]?.action).toBe('deepen')
+  })
+
+  it('expands a stagnant adaptive regime only after deterministic work and keeps generic ceilings', () => {
+    resetMockRunner()
+    mockedRunStructuralSearch.mockImplementation(({ seedFilters }) => ({
+      filters: (seedFilters ?? []).map((entry) => ({ ...entry })),
+      rmseDb: 99,
+      maxAbsDb: 99,
+    }))
+    const stages: ScalableSearchStage[] = []
+
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 43,
+      schedulerPolicy: 'adaptive-resource',
+      remainingWallClockMs: () => SCALABLE_STAGE_QUANTUM_MS * 8,
+      deadline: deadlineAfterStages(5),
+      onStage: (stage) => stages.push(stage),
+    }))
+
+    expect(stages.map((stage) => stage.capacity)).toEqual([10, 10, 10, 15, 15])
+    expect(stages.map((stage) => stage.decisionReason)).toEqual([
+      'insufficient-work-to-judge',
+      'insufficient-work-to-judge',
+      'stagnated-with-headroom',
+      'insufficient-work-to-judge',
+      'insufficient-work-to-judge',
+    ])
+    expect(stages[2]?.action).toBe('expand-capacity')
+    expect(stages[4]?.action).toBe('deepen')
+    expect(stages.every((stage) => stage.capacity <= 43)).toBe(true)
+  })
+
+  it('keeps adaptive expansion disabled without headroom or follow-up reserve', () => {
+    resetMockRunner()
+    mockedRunStructuralSearch.mockImplementation(({ seedFilters }) => ({
+      filters: (seedFilters ?? []).map((entry) => ({ ...entry })),
+      rmseDb: 99,
+      maxAbsDb: 99,
+    }))
+    const noHeadroom: ScalableSearchStage[] = []
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 10,
+      schedulerPolicy: 'adaptive-resource',
+      remainingWallClockMs: () => SCALABLE_STAGE_QUANTUM_MS * 8,
+      deadline: deadlineAfterStages(3),
+      onStage: (stage) => noHeadroom.push(stage),
+    }))
+    expect(noHeadroom.map((stage) => stage.capacity)).toEqual([10, 10, 10])
+
+    resetMockRunner()
+    mockedRunStructuralSearch.mockImplementation(({ seedFilters }) => ({
+      filters: (seedFilters ?? []).map((entry) => ({ ...entry })),
+      rmseDb: 99,
+      maxAbsDb: 99,
+    }))
+    const noReserve: ScalableSearchStage[] = []
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 43,
+      schedulerPolicy: 'adaptive-resource',
+      remainingWallClockMs: () => SCALABLE_STAGE_QUANTUM_MS * 2 - 1,
+      deadline: deadlineAfterStages(3),
+      onStage: (stage) => noReserve.push(stage),
+    }))
+    expect(noReserve.map((stage) => stage.capacity)).toEqual([10, 10, 10])
+    expect(noReserve.every((stage) => stage.decisionReason === 'insufficient-time-reserve')).toBe(true)
+  })
+
+  it('preserves the legacy progression when the baseline policy is selected', () => {
+    resetMockRunner()
+    mockedRunStructuralSearch.mockImplementation(() => ({
+      filters: [],
+      rmseDb: 99,
+      maxAbsDb: 99,
+    }))
+    const omitted: ScalableSearchStage[] = []
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 43,
+      deadline: deadlineAfterStages(5),
+      onStage: (stage) => omitted.push(stage),
+    }))
+
+    resetMockRunner()
+    mockedRunStructuralSearch.mockImplementation(() => ({
+      filters: [],
+      rmseDb: 99,
+      maxAbsDb: 99,
+    }))
+    const explicit: ScalableSearchStage[] = []
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 43,
+      schedulerPolicy: 'legacy',
+      deadline: deadlineAfterStages(5),
+      onStage: (stage) => explicit.push(stage),
+    }))
+
+    expect(explicit).toEqual(omitted)
   })
 })

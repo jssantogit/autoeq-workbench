@@ -181,6 +181,7 @@ export {
 } from './autoeq/v2/scalableStructuralSearch.js'
 export type {
   ScalableSearchAction,
+  ScalableSchedulerPolicy,
   ScalableSearchQualityKey,
   ScalableSearchStage,
   ScalableStructuralSearchInput,
@@ -202,3 +203,15 @@ export type {
   SchedulerDecisionWorkComparison,
   SchedulerDecisionWorkDimension,
 } from './autoeq/v2/decisionOracle.js'
+
+export {
+  ADAPTIVE_RESOURCE_POLICY,
+  decideAdaptiveSchedulerAction,
+} from './autoeq/v2/adaptiveScheduler.js'
+export type {
+  AdaptiveSchedulerAction,
+  AdaptiveSchedulerDecision,
+  AdaptiveSchedulerDecisionReason,
+  AdaptiveSchedulerPolicyParameters,
+  AdaptiveSchedulerState,
+} from './autoeq/v2/adaptiveScheduler.js'
