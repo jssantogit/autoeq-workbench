@@ -309,9 +309,11 @@ function workComparison(
  * Evaluate one research continuation from a cloned scheduler snapshot.
  * Production scheduling never calls this function.
  */
-export function evaluateSchedulerDecision(
+export interface SchedulerConfiguredContinuation { capacity: number; effortLevel: number }
+
+export function evaluateConfiguredContinuation(
   snapshot: SchedulerDecisionSnapshot,
-  action: SchedulerDecisionAction,
+  configuration: SchedulerConfiguredContinuation,
   workBudget: SchedulerDecisionWorkBudget,
   options: SchedulerDecisionOptions = {},
 ): SchedulerDecisionArmResult {
@@ -321,8 +323,10 @@ export function evaluateSchedulerDecision(
   const nowMs = options.nowMs ?? (() => performance.now())
   const run = options.run ?? runStructuralSearch
   const capacityBefore = snapshot.currentCapacity
-  const capacityAfter = actionCapacity(snapshot, action)
-  const effortLevelUsed = actionEffort(snapshot, action)
+  const capacityAfter = configuration.capacity
+  const effortLevelUsed = configuration.effortLevel
+  assertPositiveSafeInteger(capacityAfter, 'configuration.capacity')
+  if (!Number.isSafeInteger(effortLevelUsed) || effortLevelUsed < 0 || effortLevelUsed > SCALABLE_MAX_EFFORT_LEVEL) throw new Error('configuration.effortLevel is out of range')
   const startingIncumbent = cloneResult(snapshot.incumbent)
   let incumbent = cloneResult(startingIncumbent)
   let candidate = cloneResult(startingIncumbent)
@@ -382,7 +386,7 @@ export function evaluateSchedulerDecision(
   )
 
   return {
-    action,
+    action: 'deepen-current-regime',
     capacityBefore,
     capacityAfter,
     capacityExpanded: capacityAfter > capacityBefore,
@@ -401,6 +405,18 @@ export function evaluateSchedulerDecision(
     elapsedMs: Math.max(0, nowMs() - startedAt),
     frontierUtilization,
   }
+}
+
+export function evaluateSchedulerDecision(
+  snapshot: SchedulerDecisionSnapshot,
+  action: SchedulerDecisionAction,
+  workBudget: SchedulerDecisionWorkBudget,
+  options: SchedulerDecisionOptions = {},
+): SchedulerDecisionArmResult {
+  return evaluateConfiguredContinuation(snapshot, {
+    capacity: actionCapacity(snapshot, action),
+    effortLevel: actionEffort(snapshot, action),
+  }, workBudget, options)
 }
 
 /**

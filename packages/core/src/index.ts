@@ -196,10 +196,12 @@ export type {
 } from './autoeq/v2/scalableStructuralSearch.js'
 
 export {
+  evaluateConfiguredContinuation,
   evaluateSchedulerDecision,
   evaluateSchedulerDecisionPair,
 } from './autoeq/v2/decisionOracle.js'
 export type {
+  SchedulerConfiguredContinuation,
   SchedulerDecisionAction,
   SchedulerDecisionArmResult,
   SchedulerDecisionOptions,
