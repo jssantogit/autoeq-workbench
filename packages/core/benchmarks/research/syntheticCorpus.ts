@@ -1,6 +1,14 @@
 import { cascadeMagnitudeDb } from '../../src/dsp/cascade.js'
 import { createEvaluationGrid, MVP_NUMERIC_POLICY } from '../../src/config/numericPolicy.js'
+import { calculateErrorMetrics } from '../../src/metrics/errorMetrics.js'
+import { MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET, resolveStructuralSearchConfig } from '../../src/autoeq/v2/structuralSearch.js'
 import type { Filter } from '../../src/types/filter.js'
+import type { SchedulerDecisionSearchRunner, SchedulerDecisionSnapshot } from '../../src/autoeq/v2/decisionOracle.js'
+import {
+  runFixedCapacityTrajectory,
+  type FixedCapacityTrajectoryOptions,
+  type FixedCapacityTrajectoryResult,
+} from './fixedCapacity.js'
 
 export type SyntheticGroundTruthFamily =
   | 'easy-broadband'
@@ -176,4 +184,52 @@ export function createSyntheticCapacityProbeSequence(
     throw new Error('Synthetic cases require structural complexity greater than one for below/at/above probes')
   }
   return [complexity - 1, complexity, complexity + 1]
+}
+
+export interface SyntheticCapacityThresholdProbeOptions extends Omit<FixedCapacityTrajectoryOptions, 'capacity'> {
+  run?: SchedulerDecisionSearchRunner
+}
+
+export interface SyntheticCapacityThresholdProbeResult {
+  caseId: string
+  knownStructuralComplexity: number
+  ceilings: number[]
+  trajectories: FixedCapacityTrajectoryResult[]
+}
+
+function syntheticSnapshot(value: SyntheticGroundTruthCase, maximumCapacity: number): SchedulerDecisionSnapshot {
+  const baseConfig = resolveStructuralSearchConfig({
+    preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
+    timeLimitSeconds: 5,
+  })
+  const initial = calculateErrorMetrics(value.desiredDb, value.frequenciesHz)
+  return {
+    desiredDb: [...value.desiredDb],
+    frequencies: [...value.frequenciesHz],
+    sampleRateHz: value.sampleRateHz,
+    baseConfig,
+    incumbent: { filters: [], rmseDb: initial.rmseDb, maxAbsDb: initial.maxAbsDb },
+    currentCapacity: Math.min(...createSyntheticCapacityProbeSequence(value)),
+    maximumCapacity,
+    effortLevel: 0,
+  }
+}
+
+/** Run below/at/above known-complexity probes as matched fixed trajectories. */
+export function runSyntheticCapacityThresholdProbe(
+  value: SyntheticGroundTruthCase,
+  options: SyntheticCapacityThresholdProbeOptions = {},
+): SyntheticCapacityThresholdProbeResult {
+  const ceilings = createSyntheticCapacityProbeSequence(value)
+  const snapshot = syntheticSnapshot(value, ceilings.at(-1)!)
+  const trajectories = ceilings.map((capacity) => runFixedCapacityTrajectory(snapshot, {
+    ...options,
+    capacity,
+  }))
+  return {
+    caseId: value.id,
+    knownStructuralComplexity: value.knownStructuralComplexity,
+    ceilings,
+    trajectories,
+  }
 }

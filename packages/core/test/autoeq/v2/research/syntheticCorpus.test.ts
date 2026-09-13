@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   createSyntheticCapacityProbeSequence,
   loadSyntheticGroundTruthCorpus,
+  runSyntheticCapacityThresholdProbe,
 } from '../../../../benchmarks/research/syntheticCorpus.js'
+import type { Filter } from '../../../../src/types/filter.js'
 
 describe('deterministic synthetic ground-truth corpus', () => {
   it('covers the documented structural-search families with reproducible cascades', () => {
@@ -36,5 +38,22 @@ describe('deterministic synthetic ground-truth corpus', () => {
       dense.knownStructuralComplexity,
       dense.knownStructuralComplexity + 1,
     ])
+  })
+
+  it('evaluates matched fixed-capacity trajectories for the threshold probes', () => {
+    const value = loadSyntheticGroundTruthCorpus().find(({ family }) => family === 'sparse-structural')!
+    const result = runSyntheticCapacityThresholdProbe(value, {
+      checkpointSeconds: [1],
+      stageQuantumMs: 1_000,
+      nowMs: () => 0,
+      run: ({ config, seedFilters }): { filters: Filter[]; rmseDb: number; maxAbsDb: number } => {
+        const filters = [...(seedFilters ?? [])]
+        if (filters.length < config.maxFilters) filters.push({ id: `synthetic-${filters.length}`, enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 1, q: 1 })
+        return { filters, rmseDb: 1 / Math.max(1, filters.length), maxAbsDb: 1 / Math.max(1, filters.length) }
+      },
+    })
+    expect(result.ceilings).toEqual([2, 3, 4])
+    expect(result.trajectories.map(({ capacity }) => capacity)).toEqual([2, 3, 4])
+    expect(result.trajectories.every(({ checkpoints }) => checkpoints.length === 1)).toBe(true)
   })
 })
