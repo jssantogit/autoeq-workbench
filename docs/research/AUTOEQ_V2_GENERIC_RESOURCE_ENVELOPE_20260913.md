@@ -536,3 +536,49 @@ pressure predicts expansion; it only shows that fullness alone does not do so
 justified: condition (1), naturally saturated/high-pressure states, was not
 met. The next experiment, if approved, should extend the live envelope only to
 observe first natural saturation—not tune a scheduler or evaluate shadows.
+
+## Search-frontier capacity utilization (2026-09-13)
+
+### Frontier model and coupling audit
+
+Structural trace now records already-existing beam parents, generated proposals,
+admitted proposals, and polished candidates: raw maximum filter counts plus
+counts at capacity and within one slot. It does not create candidates or copy
+candidate populations. Incumbent utilization, this frontier telemetry, and
+capacity-pressure gates remain separate fields.
+
+`maxFilters` directly bounds structural additions, split, rescue, and pair-add.
+It does not directly set beam width, proposals per parent, or polish budget.
+However the oracle's actions are confounded: deepen increments `effortLevel`,
+while expand changes capacity **and resets effort to zero**;
+`resolveScalableEffortConfig` derives beam width, proposals per parent, and
+local polish evaluations from effort. Thus expand/deepen compare structural
+allowance plus different search intensity, not slots alone.
+
+### Live expansion frontier evidence
+
+| Case | Live expansion incumbent/capacity | Generated frontier max/capacity | At-capacity generated | Interpretation |
+| --- | --- | --- | ---: | --- |
+| RSV | 0/10; 3/15 | 3/10; 5/15 | 0; 0 | incumbent low, frontier low |
+| Mystic 8 | 0/10; 4/15 | 5/10; 6/15 | 0; 0 | incumbent low, frontier low |
+| S12 Ultra | 0/10; 4/15 | 4/10; 7/15 | 0; 0 | incumbent low, frontier low |
+
+All observed expansions remained below both incumbent and generated-frontier
+capacity; pressure was zero. The sparse live evidence therefore supports
+premature stage progression rather than demonstrated structural exhaustion.
+
+### Paired-arm slot use
+
+From the reconstructed states, deepen/expand generated maxima were RSV 5/7,
+Mystic 8/9, and S12 9/11 filters respectively (old capacities 6, 6, 9).
+The expand arm did explore candidates above the old capacity in every row, so
+its different result cannot be claimed to arise without newly available slots.
+It still cannot be attributed solely to slots because the effort-derived beam,
+proposal, and polish configuration differs between arms.
+
+**Conclusion:** capacity currently conflates structural degrees of freedom with
+search-effort intensity at the decision-oracle action boundary. The single next
+experiment should decouple oracle action configuration: hold effort-derived
+beam/proposal/polish settings constant while varying only `maxFilters`, then
+repeat the same sparse paired probe. No scheduler rule or shadow evaluation is
+justified first.

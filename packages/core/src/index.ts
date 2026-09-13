@@ -154,9 +154,11 @@ export {
   MAX10_BASELINE_PRESET,
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   addCapacityPressureDelta,
+  addFrontierUtilizationDelta,
   addSearchWorkDelta,
   capacityPressureDeltaFromTrace,
   createCapacityPressureDelta,
+  createFrontierUtilizationDelta,
   createSearchWorkDelta,
   resolveStructuralSearchConfig,
   runStructuralSearch,
@@ -164,6 +166,7 @@ export {
 } from './autoeq/v2/structuralSearch.js'
 export type {
   CapacityPressureDelta,
+  FrontierUtilizationDelta,
   SearchWorkDelta,
   SearchWorkTotals,
   StructuralSearchPreset,

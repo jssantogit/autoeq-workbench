@@ -777,6 +777,38 @@ export function addCapacityPressureDelta(
   }
 }
 
+export interface FrontierUtilizationDelta {
+  parentStatesObserved: number
+  parentFilterCountMax: number
+  generatedCandidateFilterCountMax: number
+  admittedCandidateFilterCountMax: number
+  polishedCandidateFilterCountMax: number
+  parentsAtCapacity: number
+  generatedCandidatesAtCapacity: number
+  admittedCandidatesAtCapacity: number
+  polishedCandidatesAtCapacity: number
+  candidatesWithinOneSlotOfCapacity: number
+}
+
+export function createFrontierUtilizationDelta(): FrontierUtilizationDelta {
+  return { parentStatesObserved: 0, parentFilterCountMax: 0, generatedCandidateFilterCountMax: 0, admittedCandidateFilterCountMax: 0, polishedCandidateFilterCountMax: 0, parentsAtCapacity: 0, generatedCandidatesAtCapacity: 0, admittedCandidatesAtCapacity: 0, polishedCandidatesAtCapacity: 0, candidatesWithinOneSlotOfCapacity: 0 }
+}
+
+export function addFrontierUtilizationDelta(left: FrontierUtilizationDelta, right: FrontierUtilizationDelta): FrontierUtilizationDelta {
+  return {
+    parentStatesObserved: left.parentStatesObserved + right.parentStatesObserved,
+    parentFilterCountMax: Math.max(left.parentFilterCountMax, right.parentFilterCountMax),
+    generatedCandidateFilterCountMax: Math.max(left.generatedCandidateFilterCountMax, right.generatedCandidateFilterCountMax),
+    admittedCandidateFilterCountMax: Math.max(left.admittedCandidateFilterCountMax, right.admittedCandidateFilterCountMax),
+    polishedCandidateFilterCountMax: Math.max(left.polishedCandidateFilterCountMax, right.polishedCandidateFilterCountMax),
+    parentsAtCapacity: left.parentsAtCapacity + right.parentsAtCapacity,
+    generatedCandidatesAtCapacity: left.generatedCandidatesAtCapacity + right.generatedCandidatesAtCapacity,
+    admittedCandidatesAtCapacity: left.admittedCandidatesAtCapacity + right.admittedCandidatesAtCapacity,
+    polishedCandidatesAtCapacity: left.polishedCandidatesAtCapacity + right.polishedCandidatesAtCapacity,
+    candidatesWithinOneSlotOfCapacity: left.candidatesWithinOneSlotOfCapacity + right.candidatesWithinOneSlotOfCapacity,
+  }
+}
+
 export interface StructuralSearchTraceEvent {
   type: 'start' | 'beam-generation' | 'beam-stop' | 'phase' | 'end'
   phase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap'
@@ -791,6 +823,7 @@ export interface StructuralSearchTraceEvent {
   nextStates?: number
   /** Raw capacity-gate accounting for this trace event; never a quality estimate. */
   capacityPressure?: CapacityPressureDelta
+  frontierUtilization?: FrontierUtilizationDelta
   acceptedSteps?: number
   /** Number of candidate polish calls attempted by a phase. */
   attempts?: number
@@ -1114,13 +1147,22 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     let polishedProposals = 0
     let duplicateStates = 0
     let capacityPressure = createCapacityPressureDelta()
+    let frontierUtilization = createFrontierUtilizationDelta()
 
     for (const parent of beam) {
       if (deadline.isExpired()) break
 
+      frontierUtilization.parentStatesObserved += 1
+      frontierUtilization.parentFilterCountMax = Math.max(frontierUtilization.parentFilterCountMax, parent.filters.length)
+      if (parent.filters.length === config.maxFilters) frontierUtilization.parentsAtCapacity += 1
       const solution = evaluateV2Solution(parent.filters, desiredDb, frequencies, sampleRateHz)
       const proposals = generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
       generatedProposals += proposals.length
+      for (const proposal of proposals) {
+        frontierUtilization.generatedCandidateFilterCountMax = Math.max(frontierUtilization.generatedCandidateFilterCountMax, proposal.filters.length)
+        if (proposal.filters.length === config.maxFilters) frontierUtilization.generatedCandidatesAtCapacity += 1
+        if (proposal.filters.length >= config.maxFilters - 1) frontierUtilization.candidatesWithinOneSlotOfCapacity += 1
+      }
       capacityPressure.additiveProposalsGenerated += proposals.filter(
         (proposal) => proposal.filters.length > parent.filters.length,
       ).length
@@ -1167,6 +1209,10 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         admitted = ordered.slice(0, config.proposalsPerParent)
       }
       admittedProposals += admitted.length
+      for (const proposal of admitted) {
+        frontierUtilization.admittedCandidateFilterCountMax = Math.max(frontierUtilization.admittedCandidateFilterCountMax, proposal.filters.length)
+        if (proposal.filters.length === config.maxFilters) frontierUtilization.admittedCandidatesAtCapacity += 1
+      }
 
       for (const proposal of admitted) {
         if (deadline.isExpired()) break
@@ -1182,6 +1228,8 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           sampleRateHz,
         )
         polishedProposals += 1
+        frontierUtilization.polishedCandidateFilterCountMax = Math.max(frontierUtilization.polishedCandidateFilterCountMax, polished.filters.length)
+        if (polished.filters.length === config.maxFilters) frontierUtilization.polishedCandidatesAtCapacity += 1
         const key = semanticFilterKey(polished.filters)
         if (visited.has(key)) {
           duplicateStates += 1
@@ -1207,6 +1255,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       duplicateStates,
       nextStates: nextStates.length,
       capacityPressure,
+      frontierUtilization,
     })
 
     if (nextStates.length === 0) {

@@ -19,9 +19,12 @@ import {
   createCapacityPressureDelta,
   createSearchWorkDelta,
   capacityPressureDeltaFromTrace,
+  createFrontierUtilizationDelta,
+  addFrontierUtilizationDelta,
   searchWorkDeltaFromTrace,
   measureResidualExpansionOpportunity,
   type CapacityPressureDelta,
+  type FrontierUtilizationDelta,
   type SearchWorkDelta,
   type SearchWorkTotals,
   type ResolvedStructuralSearchConfig,
@@ -77,6 +80,7 @@ export interface ScalableSearchStage {
   filterCount?: number
   capacityHeadroom?: number
   capacityPressure?: CapacityPressureDelta
+  frontierUtilization?: FrontierUtilizationDelta
   cumulativeCapacityPressure?: CapacityPressureDelta
   workDelta?: SearchWorkDelta
   cumulativeWork?: SearchWorkTotals
@@ -326,6 +330,7 @@ export function runScalableStructuralSearch(
       maxAbsDb: incumbent.maxAbsDb,
     }
     let capacityPressure = createCapacityPressureDelta()
+    let frontierUtilization = createFrontierUtilizationDelta()
     let workDelta: SearchWorkDelta = {
       ...createSearchWorkDelta(),
       structuralSearchInvocations: 1,
@@ -353,6 +358,7 @@ export function runScalableStructuralSearch(
           capacityPressure,
           capacityPressureDeltaFromTrace(event),
         )
+        frontierUtilization = addFrontierUtilizationDelta(frontierUtilization, event.frontierUtilization ?? createFrontierUtilizationDelta())
       },
     })
 
@@ -429,6 +435,7 @@ export function runScalableStructuralSearch(
       filterCount: before.filters.length,
       capacityHeadroom: Math.max(0, capacity - before.filters.length),
       capacityPressure,
+      frontierUtilization,
       cumulativeCapacityPressure,
       workDelta,
       cumulativeWork,

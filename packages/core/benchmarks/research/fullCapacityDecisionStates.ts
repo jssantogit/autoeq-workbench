@@ -94,15 +94,15 @@ export function runFullCapacityDecisionStateProbe(): unknown[] {
       liveStages: stages.map((stage) => ({
         stageIndex: stage.stageIndex, capacity: stage.capacity, filterCount: stage.filterCount,
         utilization: stage.filterCount === undefined ? null : stage.filterCount / stage.capacity,
-        action: stage.action, recentGain: stage.qualityDelta, capacityPressure: stage.capacityPressure,
+        action: stage.action, recentGain: stage.qualityDelta, capacityPressure: stage.capacityPressure, frontierUtilization: stage.frontierUtilization,
       })),
       snapshot: { currentCapacity, filterCount: source.filterCount, headroom: currentCapacity - source.filterCount,
         utilization: source.filterCount / currentCapacity, recentGain: source.qualityDelta,
-        residual: source.expansionOpportunity, pressure: source.capacityPressure },
+        residual: source.expansionOpportunity, pressure: source.capacityPressure, frontierUtilization: source.frontierUtilization },
       outcome: classifyDecisionOracleOutcome(pair.byAction['deepen-current-regime'].absoluteGain, pair.byAction['expand-capacity'].absoluteGain),
       deepenGain: pair.byAction['deepen-current-regime'].absoluteGain,
       expandGain: pair.byAction['expand-capacity'].absoluteGain,
-      workComparison: pair.workComparison,
+      workComparison: pair.workComparison, deepenFrontier: pair.byAction['deepen-current-regime'].frontierUtilization, expandFrontier: pair.byAction['expand-capacity'].frontierUtilization,
       startingViolation: structuralViolation(source.incumbent),
     })
   }

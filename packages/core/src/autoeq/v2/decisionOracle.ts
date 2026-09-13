@@ -4,6 +4,8 @@ import { DEFAULT_AUTOEQ_SETTINGS } from '../../config/autoeqSettings.js'
 import { resolveStandardAutoEqV2Config } from './config.js'
 import {
   addCapacityPressureDelta,
+  addFrontierUtilizationDelta,
+  createFrontierUtilizationDelta,
   addSearchWorkDelta,
   createCapacityPressureDelta,
   createSearchWorkDelta,
@@ -12,6 +14,7 @@ import {
   runStructuralSearch,
   searchWorkDeltaFromTrace,
   type CapacityPressureDelta,
+  type FrontierUtilizationDelta,
   type ResolvedStructuralSearchConfig,
   type ResidualExpansionOpportunity,
   type SearchWorkDelta,
@@ -102,6 +105,7 @@ export interface SchedulerDecisionArmResult {
   workDelta: SearchWorkDelta
   cumulativeWork: SearchWorkTotals
   elapsedMs: number
+  frontierUtilization: FrontierUtilizationDelta
 }
 
 export interface SchedulerDecisionWorkComparison {
@@ -323,6 +327,7 @@ export function evaluateSchedulerDecision(
   let incumbent = cloneResult(startingIncumbent)
   let candidate = cloneResult(startingIncumbent)
   let workDelta = createSearchWorkDelta()
+  let frontierUtilization = createFrontierUtilizationDelta()
   const startedAt = nowMs()
   const requestedQuantumMs = workBudget.stageQuantumMs ?? SCALABLE_STAGE_QUANTUM_MS
   const quantumMs = snapshot.remainingWallClockMs === undefined
@@ -354,6 +359,7 @@ export function evaluateSchedulerDecision(
           invocationWork,
           searchWorkDeltaFromTrace(trace),
         )
+        frontierUtilization = addFrontierUtilizationDelta(frontierUtilization, trace.frontierUtilization ?? createFrontierUtilizationDelta())
       },
     }
     candidate = cloneResult(run(structuralInput))
@@ -393,6 +399,7 @@ export function evaluateSchedulerDecision(
     workDelta,
     cumulativeWork,
     elapsedMs: Math.max(0, nowMs() - startedAt),
+    frontierUtilization,
   }
 }
 
