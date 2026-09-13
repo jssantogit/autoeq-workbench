@@ -722,6 +722,8 @@ export interface StructuralSearchTraceEvent {
   duplicateStates?: number
   nextStates?: number
   acceptedSteps?: number
+  /** Number of candidate polish calls attempted by a phase. */
+  attempts?: number
   filterCount: number
   rmseDb: number
   maxAbsDb: number
@@ -795,10 +797,14 @@ export function searchWorkDeltaFromTrace(
     delta.proposalsPolished = event.polishedProposals ?? 0
     delta.duplicateStates = event.duplicateStates ?? 0
   }
-  if (event.type === 'phase' && event.acceptedSteps !== undefined) {
-    if (event.phase === 'rescue') delta.rescueAttempts = event.acceptedSteps
-    if (event.phase === 'pair-add') delta.pairAddAttempts = event.acceptedSteps
-    if (event.phase === 'cap-swap') delta.capSwapAttempts = event.acceptedSteps
+  if (
+    event.type === 'phase' &&
+    (event.attempts !== undefined || event.acceptedSteps !== undefined)
+  ) {
+    const attempts = event.attempts ?? event.acceptedSteps ?? 0
+    if (event.phase === 'rescue') delta.rescueAttempts = attempts
+    if (event.phase === 'pair-add') delta.pairAddAttempts = attempts
+    if (event.phase === 'cap-swap') delta.capSwapAttempts = attempts
   }
   return delta
 }
@@ -1139,6 +1145,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
   const best = selectReferencePoint(beam)
   let rescued = best
   let rescueSteps = 0
+  let rescueAttempts = 0
   const epsilon = 1e-12
   stateTrace('phase', rescued, { phase: 'rescue', status: 'start' })
 
@@ -1178,6 +1185,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           q: candidate.q,
         }, bounds),
       ])
+      rescueAttempts += 1
       const polished = polishFilters(
         seeded,
         Math.max(config.localPolishEvaluations, seeded.length * 8),
@@ -1214,10 +1222,12 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     phase: 'rescue',
     status: 'end',
     acceptedSteps: rescueSteps,
+    attempts: rescueAttempts,
     reason: deadline.isExpired() ? 'deadline' : 'completed',
   })
 
   let pairAddSteps = 0
+  let pairAddAttempts = 0
   stateTrace('phase', rescued, { phase: 'pair-add', status: 'start' })
   while (
     rescued.filters.length <= config.maxFilters - 2 &&
@@ -1278,6 +1288,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         for (let seedOrder = 0; seedOrder < seedVariants.length; seedOrder += 1) {
           if (deadline.isExpired()) break
           const seeded = seedVariants[seedOrder]!
+          pairAddAttempts += 1
           const polished = polishFilters(
             seeded,
             Math.max(config.localPolishEvaluations, seeded.length * 24),
@@ -1325,10 +1336,12 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     phase: 'pair-add',
     status: 'end',
     acceptedSteps: pairAddSteps,
+    attempts: pairAddAttempts,
     reason: deadline.isExpired() ? 'deadline' : 'completed',
   })
 
   let capSwapSteps = 0
+  let capSwapAttempts = 0
   stateTrace('phase', rescued, { phase: 'cap-swap', status: 'start' })
   while (
     capSwapSteps < (config.workProfile === 'short-5s' ? 2 : 4) &&
@@ -1369,6 +1382,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
             q: candidate.q,
           }, bounds),
         ])
+        capSwapAttempts += 1
         const polished = polishFilters(
           seeded,
           Math.max(config.localPolishEvaluations, seeded.length * 8),
@@ -1407,6 +1421,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     phase: 'cap-swap',
     status: 'end',
     acceptedSteps: capSwapSteps,
+    attempts: capSwapAttempts,
     reason: deadline.isExpired() ? 'deadline' : 'completed',
   })
 

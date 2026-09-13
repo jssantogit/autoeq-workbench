@@ -383,18 +383,21 @@ describe('scalable structural search policy', () => {
         phase: 'rescue',
         status: 'end',
         acceptedSteps: 2,
+        attempts: 5,
       }))
       onTrace?.(traceEvent('phase', { phase: 'pair-add', status: 'start' }))
       onTrace?.(traceEvent('phase', {
         phase: 'pair-add',
         status: 'end',
         acceptedSteps: 1,
+        attempts: 4,
       }))
       onTrace?.(traceEvent('phase', { phase: 'cap-swap', status: 'start' }))
       onTrace?.(traceEvent('phase', {
         phase: 'cap-swap',
         status: 'end',
         acceptedSteps: 3,
+        attempts: 7,
       }))
       onTrace?.(traceEvent('end'))
       return { filters: [], rmseDb: 0, maxAbsDb: 0 }
@@ -418,10 +421,13 @@ describe('scalable structural search policy', () => {
       proposalsAdmitted: 3,
       proposalsPolished: 2,
       duplicateStates: 1,
-      rescueAttempts: 2,
-      pairAddAttempts: 1,
-      capSwapAttempts: 3,
+      rescueAttempts: 5,
+      pairAddAttempts: 4,
+      capSwapAttempts: 7,
     })
+    expect(stages[0]?.workDelta?.rescueAttempts).toBeGreaterThan(2)
+    expect(stages[0]?.workDelta?.pairAddAttempts).toBeGreaterThan(1)
+    expect(stages[0]?.workDelta?.capSwapAttempts).toBeGreaterThan(3)
     expect(stages[0]?.cumulativeWork).toEqual(stages[0]?.workDelta)
     expect(stages[0]?.improved).toBe(true)
     expect(stages[0]?.qualityDelta).toBeCloseTo(
