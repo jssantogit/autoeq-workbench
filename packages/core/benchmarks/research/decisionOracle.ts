@@ -93,6 +93,7 @@ export interface DecisionOracleWarmup {
   finalQuality: number
   absoluteGain: number
   gainHistory: number[]
+  workSinceMeaningfulImprovement: SearchWorkDelta
   effortLevel: number
   workDelta: SearchWorkDelta
   elapsedMs: number
@@ -290,6 +291,7 @@ function runWarmup(
   let candidate = cloneResult(startingIncumbent)
   let workDelta = createSearchWorkDelta()
   const gainHistory: number[] = []
+  let workSinceMeaningfulImprovement = createSearchWorkDelta()
   let effortLevel = 0
   for (let invocation = 0; invocation < warmupInvocations; invocation += 1) {
     const invocationStartedAt = nowMs()
@@ -320,6 +322,9 @@ function runWarmup(
       structuralViolation(before) - structuralViolation(nextIncumbent),
     )
     gainHistory.push(gain)
+    workSinceMeaningfulImprovement = gain > 0
+      ? createSearchWorkDelta()
+      : addSearchWorkDelta(workSinceMeaningfulImprovement, invocationWork)
     incumbent = cloneResult(nextIncumbent)
   }
   const startingQuality = structuralViolation(startingIncumbent)
@@ -332,6 +337,7 @@ function runWarmup(
     finalQuality,
     absoluteGain: Math.max(0, startingQuality - finalQuality),
     gainHistory,
+    workSinceMeaningfulImprovement,
     effortLevel,
     workDelta,
     elapsedMs: Math.max(0, nowMs() - startedAt),
@@ -410,6 +416,8 @@ export function runDecisionOracleProbes(
         ? 0
         : warmup.gainHistory.length - warmup.gainHistory.findLastIndex((gain) => gain > DECISION_ORACLE_RECENT_GAIN_SATURATION_THRESHOLD) - 1,
       recentGains: [...warmup.gainHistory],
+      recentGain: warmup.gainHistory.at(-1) ?? 0,
+      workSinceMeaningfulImprovement: { ...warmup.workSinceMeaningfulImprovement },
       cumulativeWork: { ...warmup.workDelta },
       remainingWallClockMs: resolved.decisionMs,
       stageIndex: warmup.gainHistory.length,
@@ -552,6 +560,9 @@ function compactRecord(record: DecisionOracleProbeRecord): Record<string, unknow
       effortLevel: record.snapshot.effortLevel,
       consecutiveNoImprovement: record.snapshot.consecutiveNoImprovement ?? null,
       recentGains: record.snapshot.recentGains ?? [],
+      recentGain: record.snapshot.recentGain ?? null,
+      workSinceMeaningfulImprovement: record.snapshot.workSinceMeaningfulImprovement ?? createSearchWorkDelta(),
+      expansionOpportunity: record.pair.snapshot.expansionOpportunity ?? null,
       cumulativeWork: record.snapshot.cumulativeWork ?? createSearchWorkDelta(),
       warmup: {
         absoluteGain: record.warmup.absoluteGain,

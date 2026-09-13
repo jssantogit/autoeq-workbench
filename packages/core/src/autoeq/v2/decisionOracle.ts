@@ -1,10 +1,15 @@
 import type { Filter } from '../../types/filter.js'
+import { cascadeMagnitudeDb } from '../../index.js'
+import { DEFAULT_AUTOEQ_SETTINGS } from '../../config/autoeqSettings.js'
+import { resolveStandardAutoEqV2Config } from './config.js'
 import {
   addSearchWorkDelta,
   createSearchWorkDelta,
+  measureResidualExpansionOpportunity,
   runStructuralSearch,
   searchWorkDeltaFromTrace,
   type ResolvedStructuralSearchConfig,
+  type ResidualExpansionOpportunity,
   type SearchWorkDelta,
   type SearchWorkTotals,
   type StructuralSearchInput,
@@ -53,6 +58,11 @@ export interface SchedulerDecisionSnapshot {
   effortLevel: number
   consecutiveNoImprovement?: number
   recentGains?: readonly number[]
+  /** Raw most-recent incumbent gain for this regime. */
+  recentGain?: number
+  /** Raw work accumulated since the last positive incumbent improvement. */
+  workSinceMeaningfulImprovement?: SearchWorkTotals
+  expansionOpportunity?: ResidualExpansionOpportunity
   cumulativeWork?: SearchWorkTotals
   remainingWallClockMs?: number
   stageIndex?: number
@@ -143,10 +153,34 @@ function cloneSnapshot(snapshot: SchedulerDecisionSnapshot): SchedulerDecisionSn
     recentGains: snapshot.recentGains === undefined
       ? undefined
       : [...snapshot.recentGains],
+    workSinceMeaningfulImprovement: snapshot.workSinceMeaningfulImprovement === undefined
+      ? undefined
+      : cloneWork(snapshot.workSinceMeaningfulImprovement),
+    expansionOpportunity: snapshot.expansionOpportunity === undefined
+      ? undefined
+      : { ...snapshot.expansionOpportunity },
     cumulativeWork: snapshot.cumulativeWork === undefined
       ? undefined
       : cloneWork(snapshot.cumulativeWork),
   }
+}
+
+function computeExpansionOpportunity(
+  snapshot: SchedulerDecisionSnapshot,
+): ResidualExpansionOpportunity {
+  const responseDb = cascadeMagnitudeDb(
+    snapshot.incumbent.filters,
+    snapshot.frequencies,
+    snapshot.sampleRateHz,
+  )
+  const residualDb = snapshot.desiredDb.map(
+    (desired, index) => desired - responseDb[index]!,
+  )
+  return measureResidualExpansionOpportunity(
+    snapshot.frequencies,
+    residualDb,
+    resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS),
+  )
 }
 
 function compareNumber(left: number, right: number): number {
@@ -364,6 +398,9 @@ export function evaluateSchedulerDecisionPair(
   options: SchedulerDecisionOptions = {},
 ): SchedulerDecisionPairResult {
   const captured = cloneSnapshot(snapshot)
+  // Recompute from the exact cloned incumbent before either continuation;
+  // callers cannot accidentally report stale or fabricated opportunity data.
+  captured.expansionOpportunity = computeExpansionOpportunity(captured)
   const deepen = evaluateSchedulerDecision(
     captured,
     'deepen-current-regime',

@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import {
   addSearchWorkDelta,
+  cascadeMagnitudeDb,
+  DEFAULT_AUTOEQ_SETTINGS,
   evaluateSchedulerDecision,
   evaluateSchedulerDecisionPair,
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   nextScalableCapacity,
+  resolveStandardAutoEqV2Config,
   resolveStructuralSearchConfig,
   structuralViolation,
   type Filter,
@@ -15,6 +18,8 @@ import {
   type StructuralSearchResult,
   type StructuralSearchTraceEvent,
 } from '../../../src/index.js'
+
+import { measureResidualExpansionOpportunity } from '../../../src/autoeq/v2/structuralSearch.js'
 
 const frequencies = [100, 1_000, 10_000]
 const desiredDb = [0, 0, 0]
@@ -59,6 +64,19 @@ function snapshot(
     effortLevel: 1,
     consecutiveNoImprovement: 2,
     recentGains: [0.2, 0.01],
+    recentGain: 0.01,
+    workSinceMeaningfulImprovement: {
+      structuralSearchInvocations: 2,
+      beamGenerations: 2,
+      proposalsGenerated: 4,
+      proposalsAdmitted: 3,
+      proposalsPolished: 3,
+      duplicateStates: 1,
+      rescueAttempts: 0,
+      pairAddAttempts: 0,
+      capSwapAttempts: 0,
+      reseedAttempts: 0,
+    },
     cumulativeWork: {
       structuralSearchInvocations: 4,
       beamGenerations: 4,
@@ -104,6 +122,38 @@ const emptyWork: SearchWorkDelta = {
 }
 
 describe('generic scheduler decision oracle', () => {
+  it('captures exact incumbent residual opportunity and preserves paired state telemetry', () => {
+    const state = snapshot({
+      expansionOpportunity: {
+        unresolvedResidualExtremaCount: 999,
+        residualMaxAbsDb: 999,
+      },
+    })
+    const pair = evaluateSchedulerDecisionPair(
+      state,
+      { structuralSearchInvocations: 1, stageQuantumMs: 1 },
+      { run: () => result([]), nowMs: () => 0 },
+    )
+    const responseDb = cascadeMagnitudeDb(
+      state.incumbent.filters,
+      state.frequencies,
+      state.sampleRateHz,
+    )
+    const expectedOpportunity = measureResidualExpansionOpportunity(
+      state.frequencies,
+      state.desiredDb.map((desired, index) => desired - responseDb[index]!),
+      resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS),
+    )
+
+    expect(pair.snapshot.expansionOpportunity).toEqual(expectedOpportunity)
+    expect(pair.snapshot.recentGain).toBe(state.recentGain)
+    expect(pair.snapshot.workSinceMeaningfulImprovement).toEqual(
+      state.workSinceMeaningfulImprovement,
+    )
+    expect(pair.arms[0]?.startingIncumbent).toEqual(pair.arms[1]?.startingIncumbent)
+    expect(pair.arms[0]?.startingIncumbent).toEqual(state.incumbent)
+  })
+
   it('branches both arms from the same incumbent and never accepts a regression', () => {
     const calls: Array<{ maxFilters: number; effort: number; seed: Filter[] }> = []
     const run: SchedulerDecisionSearchRunner = ({ config, seedFilters }) => {
