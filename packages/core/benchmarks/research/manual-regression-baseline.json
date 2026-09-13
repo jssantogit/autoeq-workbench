@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "implementationCommit": "45bbf3fa115dd0267aa6d6da876c40abaf98e8c2",
+  "implementationCommit": "798614e5e78d0639a3b373b179c7836350904cb1",
   "configuration": {
     "maxFilters": 10,
     "budgetSeconds": 60,
@@ -14,10 +14,10 @@
       "filterCount": 6
     },
     "titan-to-rsv": {
-      "rmseDb": 1.1596671074662055,
-      "maxAbsDb": 4.527876315732816,
-      "violation": 6.037168420977088,
-      "filterCount": 10
+      "rmseDb": 1.5539184897660359,
+      "maxAbsDb": 4.664871633847267,
+      "violation": 6.2198288451296895,
+      "filterCount": 8
     },
     "titan-to-s12-ultra": {
       "rmseDb": 1.2570822313435313,
