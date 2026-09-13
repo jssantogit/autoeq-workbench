@@ -1,0 +1,55 @@
+name: One-time Branch Consolidation Cleanup
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/branch-consolidation-cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify consolidated ancestry and delete non-main refs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CONSOLIDATION_ANCHOR: 41079fe2e68e065855744e728299b1c7ba264ad5
+        run: |
+          set -euo pipefail
+
+          git merge-base --is-ancestor "$CONSOLIDATION_ANCHOR" HEAD
+
+          mapfile -t refs < <(
+            gh api --paginate "repos/$GITHUB_REPOSITORY/git/matching-refs/heads/"               --jq '.[].ref'
+          )
+
+          deleted=0
+          failures=()
+
+          for ref in "${refs[@]}"; do
+            if [[ "$ref" == "refs/heads/main" ]]; then
+              continue
+            fi
+
+            short="${ref#refs/}"
+            echo "Deleting $ref"
+            if gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/$short"; then
+              deleted=$((deleted + 1))
+            else
+              failures+=("$ref")
+            fi
+          done
+
+          echo "Deleted branches: $deleted" >> "$GITHUB_STEP_SUMMARY"
+
+          if (( ${#failures[@]} > 0 )); then
+            printf 'Failed to delete:\n' >> "$GITHUB_STEP_SUMMARY"
+            printf -- '- %s\n' "${failures[@]}" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
