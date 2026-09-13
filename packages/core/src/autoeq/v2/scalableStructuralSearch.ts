@@ -252,7 +252,9 @@ export function runScalableStructuralSearch(
       effortLevel >= 2 &&
       consecutiveNoImprovement >= 1 &&
       incumbent.filters.length > 0
-    const remainingWallClockMs = input.remainingWallClockMs?.()
+    const remainingWallClockMs = schedulerPolicy === 'adaptive-resource'
+      ? input.remainingWallClockMs?.()
+      : undefined
     const adaptiveDecision = schedulerPolicy === 'adaptive-resource'
       ? decideAdaptiveSchedulerAction({
         currentCapacity: capacity,
