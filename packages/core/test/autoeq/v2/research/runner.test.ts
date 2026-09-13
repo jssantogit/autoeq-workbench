@@ -170,5 +170,10 @@ describe('research runner', () => {
       [2_000, 0.4],
       [3_000, 0.2],
     ])
+    expect(row.delivered).toMatchObject({
+      weightedMaeDb: null,
+      weightedMaeAvailable: false,
+      complexity: { filterCount: 0 },
+    })
   })
 })

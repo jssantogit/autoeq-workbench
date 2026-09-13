@@ -31,6 +31,7 @@ import {
   RESEARCH_NORMALIZATION,
 } from './corpus.js'
 import { aggregateResearchRuns } from './aggregate.js'
+import { calculateResearchDeliveredMetrics } from './deliveredMetrics.js'
 import {
   type ResearchArtifactFiles,
   writeResearchArtifacts,
@@ -320,6 +321,12 @@ export async function runResearchCell(
   const elapsedMs = performance.now() - startedAt
   const verified = verifyMetrics(result, prepared.desiredDb, prepared.frequenciesHz)
   const snapshot = telemetry.snapshot()
+  const delivered = calculateResearchDeliveredMetrics(
+    result.filters,
+    prepared.desiredDb,
+    prepared.frequenciesHz,
+    MVP_NUMERIC_POLICY.sampleRateHz,
+  )
 
   return {
     caseId: options.caseId,
@@ -341,6 +348,7 @@ export async function runResearchCell(
     filters: result.filters.map((filter) => ({ ...filter })),
     telemetryMode: snapshot.mode,
     phaseTimingMs: snapshot.phaseTimingMs,
+    delivered,
   }
 }
 
