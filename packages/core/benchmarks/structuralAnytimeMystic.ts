@@ -3,6 +3,8 @@ import { performance } from 'node:perf_hooks'
 import {
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   MVP_NUMERIC_POLICY,
+  calculateErrorMetrics,
+  cascadeMagnitudeDb,
   resolveStructuralSearchConfig,
   runStructuralSearch,
   type Filter,
@@ -33,8 +35,49 @@ let incumbent = {
 }
 let stageIndex = 0
 let checkpointIndex = 0
+let consecutiveNoImprovement = 0
+let reseedCursor = 0
 const stages = []
 const checkpoints = []
+
+function removalSeed(filters: readonly Filter[], cursor: number): {
+  seed: Filter[]
+  removedIndex: number | null
+  removedFilterId: string | null
+} {
+  if (filters.length === 0) {
+    return { seed: [], removedIndex: null, removedFilterId: null }
+  }
+
+  const ranked = filters.map((filter, index) => {
+    const seed = filters.filter((_, candidateIndex) => candidateIndex !== index)
+    const responseDb = cascadeMagnitudeDb(
+      seed,
+      prepared.frequenciesHz,
+      MVP_NUMERIC_POLICY.sampleRateHz,
+    )
+    const residualDb = prepared.desiredDb.map(
+      (desired, pointIndex) => desired - responseDb[pointIndex]!,
+    )
+    const metrics = calculateErrorMetrics(residualDb, prepared.frequenciesHz)
+    return {
+      index,
+      filter,
+      seed,
+      violation: violationOf(metrics),
+    }
+  }).sort((left, right) =>
+    left.violation - right.violation ||
+    left.index - right.index
+  )
+
+  const selected = ranked[cursor % ranked.length]!
+  return {
+    seed: selected.seed.map((filter) => ({ ...filter })),
+    removedIndex: selected.index,
+    removedFilterId: selected.filter.id,
+  }
+}
 
 while (performance.now() < finalDeadlineAt && checkpointIndex < CHECKPOINTS_MS.length) {
   const now = performance.now()
@@ -54,6 +97,18 @@ while (performance.now() < finalDeadlineAt && checkpointIndex < CHECKPOINTS_MS.l
     workProfile: 'full' as const,
   }
 
+  const useRemovalReseed =
+    effort >= 6 &&
+    consecutiveNoImprovement >= 2 &&
+    incumbentFilters.length > 0
+  const reseed = useRemovalReseed
+    ? removalSeed(incumbentFilters, reseedCursor++)
+    : {
+        seed: incumbentFilters.map((filter) => ({ ...filter })),
+        removedIndex: null,
+        removedFilterId: null,
+      }
+
   const stageStartedAt = performance.now()
   const candidate = runStructuralSearch({
     desiredDb: prepared.desiredDb,
@@ -65,7 +120,7 @@ while (performance.now() < finalDeadlineAt && checkpointIndex < CHECKPOINTS_MS.l
         performance.now() >= stageDeadlineAt ||
         performance.now() >= finalDeadlineAt,
     },
-    seedFilters: incumbentFilters,
+    seedFilters: reseed.seed,
   })
   const candidateViolation = violationOf(candidate)
   const incumbentViolationBefore = violationOf(incumbent)
@@ -77,10 +132,16 @@ while (performance.now() < finalDeadlineAt && checkpointIndex < CHECKPOINTS_MS.l
       rmseDb: candidate.rmseDb,
       maxAbsDb: candidate.maxAbsDb,
     }
+    consecutiveNoImprovement = 0
+  } else {
+    consecutiveNoImprovement += 1
   }
 
   const totalElapsedMs = performance.now() - startedAt
   stages.push({
+    seedStrategy: useRemovalReseed ? 'remove-one-reseed' : 'incumbent',
+    removedIndex: reseed.removedIndex,
+    removedFilterId: reseed.removedFilterId,
     stageIndex,
     effort,
     beamWidth: config.beamWidth,
