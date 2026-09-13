@@ -171,3 +171,93 @@ should first measure proposal exhaustion, marginal gain, and variance.  It must
 not tune a named ceiling, introduce a preset, or claim monotonicity from a
 single wall-clock run.  Only after those measurements should a bounded heuristic
 be considered.
+
+## Decision-oracle experiment (2026-09-13)
+
+The research-only harness is `packages/core/src/autoeq/v2/decisionOracle.ts`,
+with the sparse real-FR probe in
+`packages/core/benchmarks/research/decisionOracle.ts`.  The probe uses the
+approved manual-regression fixtures for RSV, Mystic 8, and S12 Ultra.  It does
+a warmup (three controlled invocations for the RSV saturation sample, one for
+the other samples), captures the resulting state, and then
+branches that state into one deepen and one expand continuation.  Both arms
+receive one structural-search invocation and a 100 ms deadline quantum.  The
+irregular requested ceiling is 17, so the expansion arm moves from 10 to 15
+through the generic progression rather than a named capacity path.
+
+### Snapshot semantics and fairness
+
+The cloned search state contains the prepared target and evaluation grid,
+sample rate, base structural-search configuration, incumbent filters and
+quality, current/requested maximum capacity, effort level, consecutive
+no-improvement count, recent gain history, cumulative raw `SearchWorkDelta`,
+and remaining decision quantum.  Telemetry-only fields are carried for
+analysis but do not choose an action.  Each arm receives a fresh filter clone;
+the comparator guard keeps the starting incumbent when a candidate is worse.
+
+Structural-search invocation count and the per-invocation deadline are the
+fairness boundary.  Proposal/beam/polish/phase counters remain unweighted raw
+dimensions.  They can differ because capacity and effort are the action under
+test; those differences are reported rather than hidden in a compute score.
+
+### Paired results
+
+The table uses `i/g/p/a/l/d/r/pa/c/rs` for invocations, beam generations,
+proposals generated/admitted/polished, duplicates, rescue, pair-add,
+cap-swap, and reseed attempts.  Values are normalized-violation gains; the
+oracle reports the full quality keys, relative gains, elapsed time, and
+cumulative work in JSONL.
+
+| Case (warmup) | Repeat | State class | Start V | Deepen gain / raw work | Expand gain / raw work | Preference |
+| --- | ---: | --- | ---: | --- | --- | --- |
+| RSV (3×100 ms) | 0 | saturating | 6.672 | 0.000 / `i1/g1/p8/a8/l7/d0/r0/pa0/c0/rs0` | 0.000 / `i1/g2/p27/a24/l17/d8/r0/pa0/c0/rs0` | tied |
+| RSV (3×100 ms) | 1 | saturating | 6.672 | 0.000 / `i1/g2/p16/a16/l9/d0/r0/pa0/c0/rs0` | 0.000 / `i1/g2/p27/a24/l17/d8/r0/pa0/c0/rs0` | tied |
+| Mystic 8 (1×100 ms) | 0 | productive current regime | 10.891 | 0.149 / `i1/g2/p17/a17/l17/d0/r0/pa0/c0/rs0` | 0.129 / `i1/g3/p31/a23/l16/d0/r0/pa0/c0/rs0` | deepen |
+| Mystic 8 (1×100 ms) | 1 | productive current regime | 10.891 | 0.149 / `i1/g2/p17/a17/l17/d0/r0/pa0/c0/rs0` | 0.158 / `i1/g3/p31/a23/l19/d0/r0/pa0/c0/rs0` | tied |
+| S12 Ultra (1×100 ms) | 0 | expansion-friendly | 12.368 | 2.163 / `i1/g2/p27/a24/l12/d0/r0/pa0/c0/rs0` | 3.357 / `i1/g2/p27/a16/l10/d0/r0/pa0/c0/rs0` | expand |
+| S12 Ultra (1×100 ms) | 1 | productive current regime | 12.368 | 2.163 / `i1/g2/p27/a24/l12/d0/r0/pa0/c0/rs0` | 2.163 / `i1/g2/p27/a16/l8/d0/r0/pa0/c0/rs0` | tied |
+
+The state class is descriptive: “saturating” means the latest warmup gain was
+at or below the report-only 0.05 normalized-violation threshold; an
+“expansion-friendly” label means expansion won that paired sample.  The
+preference threshold is a report-only 0.01 gain difference.  No row was
+inconclusive on invocation budget: both arms observed `i1`; mismatched raw
+dimensions are shown in the JSONL evidence and are not treated as equivalent
+work.
+
+### Variance and candidate signals
+
+RSV's saturated state was stable: both repeats were effectively tied despite
+the expand arm generating more proposals.  Mystic 8 was near the boundary:
+one repeat slightly favored deepen and the other was tied.  S12 Ultra produced
+the clearest expansion opportunity (expand won once and tied once), but the
+quality gain and polished-count path still varied.  These reversals are why a
+single wall-clock trajectory is not a scheduler rule.
+
+The smallest state subset supported by these probes is (1) capacity headroom,
+(2) the most recent same-capacity marginal gain rather than cumulative quality,
+and (3) a residual/opportunity indicator such as proposal exhaustion or
+unresolved structural error.  Filter count, effort level, and elapsed time
+remain useful context but are not independently predictive in this sparse
+sample.  Raw invocation equality is a validity gate; it is not a predictive
+feature.
+
+### Falsifiable scheduler hypothesis
+
+> When capacity headroom exists, expand after the current-capacity marginal
+> gain has diminished over the invested controlled work **unless** the current
+> residual/opportunity signal is still clearly productive; otherwise deepen.
+
+The next package should operationalize exactly one measurable definition of
+“diminished” and “clearly productive,” then compare that intervention with the
+current fixed controller.  This package does not make that production choice.
+
+### Limitations
+
+The warmup states are explicit one- or three-invocation snapshots rather than
+full controller checkpoints, and action-specific effort/capacity settings
+produce unequal proposal and polish counts.  The 100 ms probes are short and
+the real structural path has wall-clock variance; two repeats are enough to
+expose the Mystic/S12 boundary reversal but not to estimate a population
+effect.  No third diversification arm, comparator change, quality-weight
+tuning, or named capacity mode was introduced.
