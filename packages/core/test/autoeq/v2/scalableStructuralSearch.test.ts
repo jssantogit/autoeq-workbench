@@ -797,7 +797,7 @@ describe('research stage snapshot semantics', () => {
     const stages: ScalableSearchStage[] = []
     runScalableStructuralSearch(inputFor({ maxFilters: 17, seedFilters: [seed], deadline: deadlineAfterStages(1), onStage: (stage) => stages.push(stage) }))
     expect(stages[0]?.incumbent?.filters).toEqual([seed])
-    expect(stages[0]?.incumbent?.filters).not.toBe(stages[0]?.filters)
+    expect(stages[0]?.incumbent?.filters).not.toBe(seed)
     expect(stages[0]?.filterCount).toBe(1)
     expect(stages[0]?.capacityHeadroom).toBe(9)
   })

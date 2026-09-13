@@ -489,3 +489,50 @@ states after the existing controller reaches its current capacity while keeping
 its paired action boundary unchanged. If nonzero raw gate counts still fail to
 separate outcomes, reject raw pressure and only then consider a separately
 budgeted research-only shadow candidate evaluation.
+
+## Full-current-capacity decision-state experiment (2026-09-13)
+
+### Protocol
+
+`benchmarks/research/fullCapacityDecisionStates.ts` runs the unchanged legacy
+scalable controller over the predeclared RSV, Mystic 8, and S12 Ultra cases
+with irregular maximum capacity 17. It records every existing `onStage` event,
+including a cloned pre-action incumbent. A natural snapshot would be selected
+at the first stage whose incumbent is full or whose raw blocked-pressure delta
+is nonzero. No such event occurred. The approved fallback therefore cloned the
+last live incumbent and set *only the research oracle snapshot's*
+`currentCapacity` to its existing filter count. These records are explicitly
+`reconstructed-from-live-incumbent`, not live scheduler states; no filters,
+residuals, quality, proposals, or comparator values were changed.
+
+### Live utilization
+
+| Case | Live expansions (filter/capacity) | Naturally full/pressured? |
+| --- | --- | --- |
+| RSV | 0/10, 4/15 | no |
+| Mystic 8 | 0/10, 5/15 | no |
+| S12 Ultra | 0/10, 5/15 | no |
+
+All six observed live expansion actions occurred below 100% utilization (four
+were from an empty incumbent). Naturally full states were zero of the 12 live
+stages, and no blocked-add counter was nonzero. Thus the controller's capacity
+progression in this sparse trace is stage/time-policy driven rather than a
+response to exhausted structural slots. This is a first-class architectural
+finding; it is not a behavior defect claim and no scheduler change follows.
+
+### Reconstructed full-state paired evidence
+
+| Case | Full reconstructed filters/capacity | Recent gain | Residual extrema / max dB | Generated additive / blocked beam-rescue-pair | Deepen / expand gain | Outcome |
+| --- | --- | ---: | --- | --- | --- | --- |
+| RSV | 6 / 6 | 0.000009 | 26 / 4.751 | 13 / 0-0-0 | 0.004987 / 0.003546 | deepen |
+| Mystic 8 | 6 / 6 | 0.001859 | 18 / 7.586 | 14 / 0-0-0 | 0.724617 / 0.001859 | deepen |
+| S12 Ultra | 9 / 9 | 1.447189 | 21 / 5.509 | 11 / 0-0-0 | 0.082019 / 1.447189 | expand |
+
+Fullness and pressure remain separate: each reconstructed snapshot is 100%
+utilized but has zero raw blocked pressure because its source live stage was
+not itself full. Consequently this experiment cannot test whether *nonzero*
+pressure predicts expansion; it only shows that fullness alone does not do so
+(two deepen outcomes and one expand outcome). Shadow evaluation is not
+justified: condition (1), naturally saturated/high-pressure states, was not
+met. The next experiment, if approved, should extend the live envelope only to
+observe first natural saturation—not tune a scheduler or evaluate shadows.
