@@ -312,3 +312,24 @@ describe('generic scheduler decision oracle', () => {
     )
   })
 })
+
+describe('capacity-pressure oracle snapshot', () => {
+  it('clones raw pressure without consulting it for either arm', () => {
+    const state = snapshot({
+      capacityPressure: {
+        additiveProposalsGenerated: 3,
+        additiveMutationGatesBlockedByCapacity: 2,
+        rescueAddGatesBlockedByCapacity: 1,
+        pairAddGatesBlockedByCapacity: 1,
+      },
+    })
+    const pair = evaluateSchedulerDecisionPair(
+      state,
+      { structuralSearchInvocations: 1, stageQuantumMs: 1 },
+      { run: () => result([]), nowMs: () => 0 },
+    )
+    expect(pair.snapshot.capacityPressure).toEqual(state.capacityPressure)
+    expect(pair.byAction['deepen-current-regime'].capacityAfter).toBe(state.currentCapacity)
+    expect(pair.byAction['expand-capacity'].capacityAfter).toBe(nextScalableCapacity(10, 43))
+  })
+})

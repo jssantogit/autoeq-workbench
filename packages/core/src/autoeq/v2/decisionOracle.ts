@@ -3,11 +3,15 @@ import { cascadeMagnitudeDb } from '../../index.js'
 import { DEFAULT_AUTOEQ_SETTINGS } from '../../config/autoeqSettings.js'
 import { resolveStandardAutoEqV2Config } from './config.js'
 import {
+  addCapacityPressureDelta,
   addSearchWorkDelta,
+  createCapacityPressureDelta,
   createSearchWorkDelta,
   measureResidualExpansionOpportunity,
+  capacityPressureDeltaFromTrace,
   runStructuralSearch,
   searchWorkDeltaFromTrace,
+  type CapacityPressureDelta,
   type ResolvedStructuralSearchConfig,
   type ResidualExpansionOpportunity,
   type SearchWorkDelta,
@@ -63,6 +67,7 @@ export interface SchedulerDecisionSnapshot {
   /** Raw work accumulated since the last positive incumbent improvement. */
   workSinceMeaningfulImprovement?: SearchWorkTotals
   expansionOpportunity?: ResidualExpansionOpportunity
+  capacityPressure?: CapacityPressureDelta
   cumulativeWork?: SearchWorkTotals
   remainingWallClockMs?: number
   stageIndex?: number
@@ -159,6 +164,9 @@ function cloneSnapshot(snapshot: SchedulerDecisionSnapshot): SchedulerDecisionSn
     expansionOpportunity: snapshot.expansionOpportunity === undefined
       ? undefined
       : { ...snapshot.expansionOpportunity },
+    capacityPressure: snapshot.capacityPressure === undefined
+      ? undefined
+      : { ...snapshot.capacityPressure },
     cumulativeWork: snapshot.cumulativeWork === undefined
       ? undefined
       : cloneWork(snapshot.cumulativeWork),
@@ -401,6 +409,7 @@ export function evaluateSchedulerDecisionPair(
   // Recompute from the exact cloned incumbent before either continuation;
   // callers cannot accidentally report stale or fabricated opportunity data.
   captured.expansionOpportunity = computeExpansionOpportunity(captured)
+  captured.capacityPressure = captured.capacityPressure ?? createCapacityPressureDelta()
   const deepen = evaluateSchedulerDecision(
     captured,
     'deepen-current-regime',

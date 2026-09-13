@@ -13,11 +13,15 @@ import {
   type AdaptiveSchedulerPolicyParameters,
 } from './adaptiveScheduler.js'
 import {
+  addCapacityPressureDelta,
   addSearchWorkDelta,
   runStructuralSearch,
+  createCapacityPressureDelta,
   createSearchWorkDelta,
+  capacityPressureDeltaFromTrace,
   searchWorkDeltaFromTrace,
   measureResidualExpansionOpportunity,
+  type CapacityPressureDelta,
   type SearchWorkDelta,
   type SearchWorkTotals,
   type ResolvedStructuralSearchConfig,
@@ -68,6 +72,10 @@ export interface ScalableSearchStage {
   candidateQualityKey?: ScalableSearchQualityKey
   qualityAfterKey?: ScalableSearchQualityKey
   expansionOpportunity?: ResidualExpansionOpportunity
+  filterCount?: number
+  capacityHeadroom?: number
+  capacityPressure?: CapacityPressureDelta
+  cumulativeCapacityPressure?: CapacityPressureDelta
   workDelta?: SearchWorkDelta
   cumulativeWork?: SearchWorkTotals
 }
@@ -237,6 +245,7 @@ export function runScalableStructuralSearch(
   let reseedCursor = 0
   let stageIndex = 0
   let cumulativeWork = createSearchWorkDelta()
+  let cumulativeCapacityPressure = createCapacityPressureDelta()
   let recentGain = 0
   let stagesSinceMeaningfulImprovement = 0
   let workSinceMeaningfulImprovement = createSearchWorkDelta()
@@ -314,6 +323,7 @@ export function runScalableStructuralSearch(
       rmseDb: incumbent.rmseDb,
       maxAbsDb: incumbent.maxAbsDb,
     }
+    let capacityPressure = createCapacityPressureDelta()
     let workDelta: SearchWorkDelta = {
       ...createSearchWorkDelta(),
       structuralSearchInvocations: 1,
@@ -337,6 +347,10 @@ export function runScalableStructuralSearch(
       seedFilters,
       onTrace: (event) => {
         workDelta = addSearchWorkDelta(workDelta, searchWorkDeltaFromTrace(event))
+        capacityPressure = addCapacityPressureDelta(
+          capacityPressure,
+          capacityPressureDeltaFromTrace(event),
+        )
       },
     })
 
@@ -363,6 +377,10 @@ export function runScalableStructuralSearch(
       ? qualityDelta / Math.abs(qualityBefore)
       : undefined
     cumulativeWork = addSearchWorkDelta(cumulativeWork, workDelta)
+    cumulativeCapacityPressure = addCapacityPressureDelta(
+      cumulativeCapacityPressure,
+      capacityPressure,
+    )
 
     recentGain = qualityDelta > 0 ? qualityDelta : 0
     const meaningfulImprovement = recentGain >= adaptivePolicyParameters.meaningfulGainThreshold
@@ -401,6 +419,10 @@ export function runScalableStructuralSearch(
       candidateQualityKey: candidateKey,
       qualityAfterKey: afterKey,
       expansionOpportunity,
+      filterCount: before.filters.length,
+      capacityHeadroom: Math.max(0, capacity - before.filters.length),
+      capacityPressure,
+      cumulativeCapacityPressure,
       workDelta,
       cumulativeWork,
     })

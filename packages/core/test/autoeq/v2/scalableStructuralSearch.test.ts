@@ -441,6 +441,12 @@ describe('scalable structural search policy', () => {
         admittedProposals: 3,
         polishedProposals: 2,
         duplicateStates: 1,
+        capacityPressure: {
+          additiveProposalsGenerated: 2,
+          additiveMutationGatesBlockedByCapacity: 1,
+          rescueAddGatesBlockedByCapacity: 0,
+          pairAddGatesBlockedByCapacity: 0,
+        },
       }))
       onTrace?.(traceEvent('phase', { phase: 'rescue', status: 'start' }))
       onTrace?.(traceEvent('phase', {
@@ -448,6 +454,12 @@ describe('scalable structural search policy', () => {
         status: 'end',
         acceptedSteps: 2,
         attempts: 5,
+        capacityPressure: {
+          additiveProposalsGenerated: 0,
+          additiveMutationGatesBlockedByCapacity: 0,
+          rescueAddGatesBlockedByCapacity: 1,
+          pairAddGatesBlockedByCapacity: 0,
+        },
       }))
       onTrace?.(traceEvent('phase', { phase: 'pair-add', status: 'start' }))
       onTrace?.(traceEvent('phase', {
@@ -455,6 +467,12 @@ describe('scalable structural search policy', () => {
         status: 'end',
         acceptedSteps: 1,
         attempts: 4,
+        capacityPressure: {
+          additiveProposalsGenerated: 0,
+          additiveMutationGatesBlockedByCapacity: 0,
+          rescueAddGatesBlockedByCapacity: 0,
+          pairAddGatesBlockedByCapacity: 1,
+        },
       }))
       onTrace?.(traceEvent('phase', { phase: 'cap-swap', status: 'start' }))
       onTrace?.(traceEvent('phase', {
@@ -493,6 +511,15 @@ describe('scalable structural search policy', () => {
     expect(stages[0]?.workDelta?.pairAddAttempts).toBeGreaterThan(1)
     expect(stages[0]?.workDelta?.capSwapAttempts).toBeGreaterThan(3)
     expect(stages[0]?.cumulativeWork).toEqual(stages[0]?.workDelta)
+    expect(stages[0]?.filterCount).toBe(1)
+    expect(stages[0]?.capacityHeadroom).toBe(9)
+    expect(stages[0]?.capacityPressure).toEqual({
+      additiveProposalsGenerated: 2,
+      additiveMutationGatesBlockedByCapacity: 1,
+      rescueAddGatesBlockedByCapacity: 1,
+      pairAddGatesBlockedByCapacity: 1,
+    })
+    expect(stages[0]?.cumulativeCapacityPressure).toEqual(stages[0]?.capacityPressure)
     expect(stages[0]?.improved).toBe(true)
     expect(stages[0]?.qualityDelta).toBeCloseTo(
       (stages[0]?.qualityBefore ?? 0) - (stages[0]?.qualityAfter ?? 0),
@@ -716,5 +743,48 @@ describe('scalable structural search policy', () => {
     }))
 
     expect(explicit).toEqual(omitted)
+  })
+})
+
+describe('capacity-pressure scalable telemetry', () => {
+  it('sums raw capacity pressure while leaving stage action unchanged', () => {
+    resetMockRunner()
+    mockedRunStructuralSearch.mockImplementation(({ onTrace }) => {
+      onTrace?.(traceEvent('beam-generation', {
+        capacityPressure: {
+          additiveProposalsGenerated: 2,
+          additiveMutationGatesBlockedByCapacity: 1,
+          rescueAddGatesBlockedByCapacity: 0,
+          pairAddGatesBlockedByCapacity: 0,
+        },
+      }))
+      onTrace?.(traceEvent('phase', {
+        phase: 'pair-add', status: 'end',
+        capacityPressure: {
+          additiveProposalsGenerated: 0,
+          additiveMutationGatesBlockedByCapacity: 0,
+          rescueAddGatesBlockedByCapacity: 1,
+          pairAddGatesBlockedByCapacity: 1,
+        },
+      }))
+      return { filters: [filter('seed')], ...expectedMetrics([filter('seed')]) }
+    })
+    const stages: ScalableSearchStage[] = []
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 17,
+      seedFilters: [filter('seed')],
+      deadline: deadlineAfterStages(1),
+      onStage: (stage) => stages.push(stage),
+    }))
+    expect(stages[0]?.action).toBe('expand-capacity')
+    expect(stages[0]?.filterCount).toBe(1)
+    expect(stages[0]?.capacityHeadroom).toBe(9)
+    expect(stages[0]?.capacityPressure).toEqual({
+      additiveProposalsGenerated: 2,
+      additiveMutationGatesBlockedByCapacity: 1,
+      rescueAddGatesBlockedByCapacity: 1,
+      pairAddGatesBlockedByCapacity: 1,
+    })
+    expect(stages[0]?.cumulativeCapacityPressure).toEqual(stages[0]?.capacityPressure)
   })
 })

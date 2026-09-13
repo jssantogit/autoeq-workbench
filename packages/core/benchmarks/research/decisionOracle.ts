@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import {
   calculateErrorMetrics,
   cascadeMagnitudeDb,
+  createCapacityPressureDelta,
   createSearchWorkDelta,
   evaluateSchedulerDecisionPair,
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
@@ -12,9 +13,12 @@ import {
   resolveStructuralSearchConfig,
   resolveScalableEffortConfig,
   runStructuralSearch,
+  capacityPressureDeltaFromTrace,
   searchWorkDeltaFromTrace,
   structuralViolation,
+  addCapacityPressureDelta,
   addSearchWorkDelta,
+  type CapacityPressureDelta,
   type Filter,
   type SchedulerDecisionPairResult,
   type SchedulerDecisionSearchRunner,
@@ -96,6 +100,7 @@ export interface DecisionOracleWarmup {
   workSinceMeaningfulImprovement: SearchWorkDelta
   effortLevel: number
   workDelta: SearchWorkDelta
+  capacityPressure: CapacityPressureDelta
   elapsedMs: number
 }
 
@@ -290,12 +295,14 @@ function runWarmup(
   let incumbent = cloneResult(startingIncumbent)
   let candidate = cloneResult(startingIncumbent)
   let workDelta = createSearchWorkDelta()
+  let capacityPressure = createCapacityPressureDelta()
   const gainHistory: number[] = []
   let workSinceMeaningfulImprovement = createSearchWorkDelta()
   let effortLevel = 0
   for (let invocation = 0; invocation < warmupInvocations; invocation += 1) {
     const invocationStartedAt = nowMs()
     const deadlineAt = invocationStartedAt + warmupMs
+    let invocationCapacityPressure = createCapacityPressureDelta()
     let invocationWork = {
       ...createSearchWorkDelta(),
       structuralSearchInvocations: 1,
@@ -311,9 +318,14 @@ function runWarmup(
       seedFilters: cloneFilters(incumbent.filters),
       onTrace: (trace: StructuralSearchTraceEvent) => {
         invocationWork = addSearchWorkDelta(invocationWork, searchWorkDeltaFromTrace(trace))
+        invocationCapacityPressure = addCapacityPressureDelta(
+          invocationCapacityPressure,
+          capacityPressureDeltaFromTrace(trace),
+        )
       },
     }))
     workDelta = addSearchWorkDelta(workDelta, invocationWork)
+    capacityPressure = addCapacityPressureDelta(capacityPressure, invocationCapacityPressure)
     const nextIncumbent = compareQuality(candidate, incumbent) < 0
       ? candidate
       : incumbent
@@ -340,6 +352,7 @@ function runWarmup(
     workSinceMeaningfulImprovement,
     effortLevel,
     workDelta,
+    capacityPressure,
     elapsedMs: Math.max(0, nowMs() - startedAt),
   }
 }
@@ -419,6 +432,7 @@ export function runDecisionOracleProbes(
       recentGain: warmup.gainHistory.at(-1) ?? 0,
       workSinceMeaningfulImprovement: { ...warmup.workSinceMeaningfulImprovement },
       cumulativeWork: { ...warmup.workDelta },
+      capacityPressure: { ...warmup.capacityPressure },
       remainingWallClockMs: resolved.decisionMs,
       stageIndex: warmup.gainHistory.length,
     }
@@ -563,6 +577,7 @@ function compactRecord(record: DecisionOracleProbeRecord): Record<string, unknow
       recentGain: record.snapshot.recentGain ?? null,
       workSinceMeaningfulImprovement: record.snapshot.workSinceMeaningfulImprovement ?? createSearchWorkDelta(),
       expansionOpportunity: record.pair.snapshot.expansionOpportunity ?? null,
+      capacityPressure: record.pair.snapshot.capacityPressure ?? createCapacityPressureDelta(),
       cumulativeWork: record.snapshot.cumulativeWork ?? createSearchWorkDelta(),
       warmup: {
         absoluteGain: record.warmup.absoluteGain,
