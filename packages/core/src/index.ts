@@ -186,3 +186,19 @@ export type {
   ScalableStructuralSearchInput,
   ScalableStructuralSearchResult,
 } from './autoeq/v2/scalableStructuralSearch.js'
+
+export {
+  evaluateSchedulerDecision,
+  evaluateSchedulerDecisionPair,
+} from './autoeq/v2/decisionOracle.js'
+export type {
+  SchedulerDecisionAction,
+  SchedulerDecisionArmResult,
+  SchedulerDecisionOptions,
+  SchedulerDecisionPairResult,
+  SchedulerDecisionSearchRunner,
+  SchedulerDecisionSnapshot,
+  SchedulerDecisionWorkBudget,
+  SchedulerDecisionWorkComparison,
+  SchedulerDecisionWorkDimension,
+} from './autoeq/v2/decisionOracle.js'
