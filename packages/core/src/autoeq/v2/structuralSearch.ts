@@ -728,6 +728,81 @@ export interface StructuralSearchTraceEvent {
   violation: number
 }
 
+/**
+ * Raw deterministic work observed while running one structural-search stage.
+ *
+ * These counters intentionally remain unweighted.  They describe work that is
+ * already visible at the structural trace boundary; wall-clock timing and
+ * lower-level evaluator calls are separate concerns.
+ */
+export interface SearchWorkDelta {
+  structuralSearchInvocations: number
+  beamGenerations: number
+  proposalsGenerated: number
+  proposalsAdmitted: number
+  proposalsPolished: number
+  duplicateStates: number
+  rescueAttempts: number
+  pairAddAttempts: number
+  capSwapAttempts: number
+  reseedAttempts: number
+}
+
+export type SearchWorkTotals = SearchWorkDelta
+
+export function createSearchWorkDelta(): SearchWorkDelta {
+  return {
+    structuralSearchInvocations: 0,
+    beamGenerations: 0,
+    proposalsGenerated: 0,
+    proposalsAdmitted: 0,
+    proposalsPolished: 0,
+    duplicateStates: 0,
+    rescueAttempts: 0,
+    pairAddAttempts: 0,
+    capSwapAttempts: 0,
+    reseedAttempts: 0,
+  }
+}
+
+export function addSearchWorkDelta(
+  left: SearchWorkDelta,
+  right: SearchWorkDelta,
+): SearchWorkDelta {
+  return {
+    structuralSearchInvocations: left.structuralSearchInvocations + right.structuralSearchInvocations,
+    beamGenerations: left.beamGenerations + right.beamGenerations,
+    proposalsGenerated: left.proposalsGenerated + right.proposalsGenerated,
+    proposalsAdmitted: left.proposalsAdmitted + right.proposalsAdmitted,
+    proposalsPolished: left.proposalsPolished + right.proposalsPolished,
+    duplicateStates: left.duplicateStates + right.duplicateStates,
+    rescueAttempts: left.rescueAttempts + right.rescueAttempts,
+    pairAddAttempts: left.pairAddAttempts + right.pairAddAttempts,
+    capSwapAttempts: left.capSwapAttempts + right.capSwapAttempts,
+    reseedAttempts: left.reseedAttempts + right.reseedAttempts,
+  }
+}
+
+/** Convert one existing structural trace event into raw work counters. */
+export function searchWorkDeltaFromTrace(
+  event: StructuralSearchTraceEvent,
+): SearchWorkDelta {
+  const delta = createSearchWorkDelta()
+  if (event.type === 'beam-generation') {
+    delta.beamGenerations = 1
+    delta.proposalsGenerated = event.generatedProposals ?? 0
+    delta.proposalsAdmitted = event.admittedProposals ?? 0
+    delta.proposalsPolished = event.polishedProposals ?? 0
+    delta.duplicateStates = event.duplicateStates ?? 0
+  }
+  if (event.type === 'phase' && event.acceptedSteps !== undefined) {
+    if (event.phase === 'rescue') delta.rescueAttempts = event.acceptedSteps
+    if (event.phase === 'pair-add') delta.pairAddAttempts = event.acceptedSteps
+    if (event.phase === 'cap-swap') delta.capSwapAttempts = event.acceptedSteps
+  }
+  return delta
+}
+
 export interface StructuralSearchInput {
   desiredDb: readonly number[]
   frequencies: readonly number[]

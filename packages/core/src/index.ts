@@ -153,10 +153,15 @@ export type {
 export {
   MAX10_BASELINE_PRESET,
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
+  addSearchWorkDelta,
+  createSearchWorkDelta,
   resolveStructuralSearchConfig,
   runStructuralSearch,
+  searchWorkDeltaFromTrace,
 } from './autoeq/v2/structuralSearch.js'
 export type {
+  SearchWorkDelta,
+  SearchWorkTotals,
   StructuralSearchPreset,
   ResolvedStructuralSearchConfig,
   StructuralSearchInput,
@@ -175,6 +180,8 @@ export {
   structuralViolation,
 } from './autoeq/v2/scalableStructuralSearch.js'
 export type {
+  ScalableSearchAction,
+  ScalableSearchQualityKey,
   ScalableSearchStage,
   ScalableStructuralSearchInput,
   ScalableStructuralSearchResult,

@@ -5,7 +5,12 @@ import {
 import type { Filter } from '../../types/filter.js'
 import type { StandardV2Deadline } from './runtime.js'
 import {
+  addSearchWorkDelta,
   runStructuralSearch,
+  createSearchWorkDelta,
+  searchWorkDeltaFromTrace,
+  type SearchWorkDelta,
+  type SearchWorkTotals,
   type ResolvedStructuralSearchConfig,
   type StructuralSearchResult,
 } from './structuralSearch.js'
@@ -14,6 +19,18 @@ export const SCALABLE_BASE_CAPACITY = 10
 export const SCALABLE_CAPACITY_GROWTH = 1.5
 export const SCALABLE_STAGE_QUANTUM_MS = 5_000
 export const SCALABLE_MAX_EFFORT_LEVEL = 6
+
+export type ScalableSearchAction =
+  | 'explore-current-capacity'
+  | 'deepen'
+  | 'expand-capacity'
+  | 'reseed'
+
+export type ScalableSearchQualityKey = readonly [
+  violation: number,
+  rmseDb: number,
+  maxAbsDb: number,
+]
 
 export interface ScalableSearchStage {
   stageIndex: number
@@ -24,6 +41,17 @@ export interface ScalableSearchStage {
   candidateViolation: number
   incumbentViolation: number
   improved: boolean
+  action?: ScalableSearchAction
+  qualityBefore?: number
+  candidateQuality?: number
+  qualityAfter?: number
+  qualityDelta?: number
+  qualityRelativeDelta?: number
+  qualityBeforeKey?: ScalableSearchQualityKey
+  candidateQualityKey?: ScalableSearchQualityKey
+  qualityAfterKey?: ScalableSearchQualityKey
+  workDelta?: SearchWorkDelta
+  cumulativeWork?: SearchWorkTotals
 }
 
 export interface ScalableStructuralSearchInput {
@@ -118,6 +146,26 @@ function isScalableImprovement(
     )
 }
 
+function qualityKey(value: StructuralSearchResult): ScalableSearchQualityKey {
+  return [
+    structuralViolation(value),
+    value.rmseDb,
+    value.maxAbsDb,
+  ]
+}
+
+function actionForStage(
+  capacity: number,
+  maximum: number,
+  effortLevel: number,
+  useRemovalReseed: boolean,
+): ScalableSearchAction {
+  if (useRemovalReseed) return 'reseed'
+  if (capacity < maximum) return 'expand-capacity'
+  if (effortLevel > 0) return 'deepen'
+  return 'explore-current-capacity'
+}
+
 function rankRemovalSeeds(
   filters: readonly Filter[],
   desiredDb: readonly number[],
@@ -151,6 +199,7 @@ export function runScalableStructuralSearch(
   let consecutiveNoImprovement = 0
   let reseedCursor = 0
   let stageIndex = 0
+  let cumulativeWork = createSearchWorkDelta()
   let incumbent = evaluateFilters(
     input.seedFilters ?? [],
     input.desiredDb,
@@ -166,6 +215,12 @@ export function runScalableStructuralSearch(
       effortLevel >= 2 &&
       consecutiveNoImprovement >= 1 &&
       incumbent.filters.length > 0
+    const action = actionForStage(
+      capacity,
+      maximum,
+      effortLevel,
+      useRemovalReseed,
+    )
 
     let seedFilters = incumbent.filters.map((filter) => ({ ...filter }))
     let removedFilterId: string | undefined
@@ -185,6 +240,17 @@ export function runScalableStructuralSearch(
       }
     }
 
+    const before = {
+      filters: incumbent.filters.map((filter) => ({ ...filter })),
+      rmseDb: incumbent.rmseDb,
+      maxAbsDb: incumbent.maxAbsDb,
+    }
+    let workDelta: SearchWorkDelta = {
+      ...createSearchWorkDelta(),
+      structuralSearchInvocations: 1,
+      reseedAttempts: useRemovalReseed ? 1 : 0,
+    }
+
     const candidate = runStructuralSearch({
       desiredDb: input.desiredDb,
       frequencies: input.frequencies,
@@ -200,6 +266,9 @@ export function runScalableStructuralSearch(
           nowMs() >= stageDeadlineAt,
       },
       seedFilters,
+      onTrace: (event) => {
+        workDelta = addSearchWorkDelta(workDelta, searchWorkDeltaFromTrace(event))
+      },
     })
 
     const improved = isScalableImprovement(candidate, incumbent)
@@ -214,6 +283,18 @@ export function runScalableStructuralSearch(
       consecutiveNoImprovement += 1
     }
 
+    const beforeKey = qualityKey(before)
+    const candidateKey = qualityKey(candidate)
+    const afterKey = qualityKey(incumbent)
+    const qualityBefore = beforeKey[0]
+    const candidateQuality = candidateKey[0]
+    const qualityAfter = afterKey[0]
+    const qualityDelta = qualityBefore - qualityAfter
+    const qualityRelativeDelta = qualityBefore !== 0
+      ? qualityDelta / Math.abs(qualityBefore)
+      : undefined
+    cumulativeWork = addSearchWorkDelta(cumulativeWork, workDelta)
+
     input.onStage?.({
       stageIndex,
       capacity,
@@ -223,6 +304,17 @@ export function runScalableStructuralSearch(
       candidateViolation: structuralViolation(candidate),
       incumbentViolation: structuralViolation(incumbent),
       improved,
+      action,
+      qualityBefore,
+      candidateQuality,
+      qualityAfter,
+      qualityDelta,
+      qualityRelativeDelta,
+      qualityBeforeKey: beforeKey,
+      candidateQualityKey: candidateKey,
+      qualityAfterKey: afterKey,
+      workDelta,
+      cumulativeWork,
     })
 
     stageIndex += 1

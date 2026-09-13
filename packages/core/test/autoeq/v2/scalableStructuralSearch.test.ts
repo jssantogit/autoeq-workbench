@@ -11,8 +11,10 @@ import {
   SCALABLE_BASE_CAPACITY,
   structuralViolation,
   type Filter,
+  type SearchWorkDelta,
   type ScalableSearchStage,
   type ScalableStructuralSearchInput,
+  type StructuralSearchTraceEvent,
 } from '../../../src/index.js'
 
 import * as structuralSearch from '../../../src/autoeq/v2/structuralSearch.js'
@@ -76,6 +78,33 @@ function expectedMetrics(filters: readonly Filter[]) {
 
 function resetMockRunner(): void {
   mockedRunStructuralSearch.mockReset()
+}
+
+function traceEvent(
+  type: StructuralSearchTraceEvent['type'],
+  extra: Partial<StructuralSearchTraceEvent> = {},
+): StructuralSearchTraceEvent {
+  return {
+    type,
+    filterCount: 0,
+    rmseDb: 0,
+    maxAbsDb: 0,
+    violation: 0,
+    ...extra,
+  }
+}
+
+const emptyWork: SearchWorkDelta = {
+  structuralSearchInvocations: 1,
+  beamGenerations: 0,
+  proposalsGenerated: 0,
+  proposalsAdmitted: 0,
+  proposalsPolished: 0,
+  duplicateStates: 0,
+  rescueAttempts: 0,
+  pairAddAttempts: 0,
+  capSwapAttempts: 0,
+  reseedAttempts: 0,
 }
 
 describe('scalable structural search policy', () => {
@@ -335,5 +364,160 @@ describe('scalable structural search policy', () => {
     }
 
     expect(run()).toEqual(run())
+  })
+
+  it('accounts for trace work and reports marginal incumbent gain without changing the controller decision', () => {
+    resetMockRunner()
+    const seedFilters = [filter('seed')]
+    mockedRunStructuralSearch.mockImplementation(({ onTrace }) => {
+      onTrace?.(traceEvent('beam-generation', {
+        phase: 'beam',
+        generation: 0,
+        generatedProposals: 5,
+        admittedProposals: 3,
+        polishedProposals: 2,
+        duplicateStates: 1,
+      }))
+      onTrace?.(traceEvent('phase', { phase: 'rescue', status: 'start' }))
+      onTrace?.(traceEvent('phase', {
+        phase: 'rescue',
+        status: 'end',
+        acceptedSteps: 2,
+      }))
+      onTrace?.(traceEvent('phase', { phase: 'pair-add', status: 'start' }))
+      onTrace?.(traceEvent('phase', {
+        phase: 'pair-add',
+        status: 'end',
+        acceptedSteps: 1,
+      }))
+      onTrace?.(traceEvent('phase', { phase: 'cap-swap', status: 'start' }))
+      onTrace?.(traceEvent('phase', {
+        phase: 'cap-swap',
+        status: 'end',
+        acceptedSteps: 3,
+      }))
+      onTrace?.(traceEvent('end'))
+      return { filters: [], rmseDb: 0, maxAbsDb: 0 }
+    })
+    const stages: ScalableSearchStage[] = []
+
+    const result = runScalableStructuralSearch(inputFor({
+      maxFilters: 15,
+      seedFilters,
+      deadline: deadlineAfterStages(1),
+      onStage: (stage) => stages.push(stage),
+    }))
+
+    expect(result.stagesCompleted).toBe(1)
+    expect(stages[0]?.action).toBe('expand-capacity')
+    expect(stages[0]?.seedStrategy).toBe('incumbent')
+    expect(stages[0]?.workDelta).toEqual({
+      ...emptyWork,
+      beamGenerations: 1,
+      proposalsGenerated: 5,
+      proposalsAdmitted: 3,
+      proposalsPolished: 2,
+      duplicateStates: 1,
+      rescueAttempts: 2,
+      pairAddAttempts: 1,
+      capSwapAttempts: 3,
+    })
+    expect(stages[0]?.cumulativeWork).toEqual(stages[0]?.workDelta)
+    expect(stages[0]?.improved).toBe(true)
+    expect(stages[0]?.qualityDelta).toBeCloseTo(
+      (stages[0]?.qualityBefore ?? 0) - (stages[0]?.qualityAfter ?? 0),
+      12,
+    )
+    expect(stages[0]?.qualityBefore).toBeGreaterThan(0)
+    expect(stages[0]?.candidateQuality).toBe(0)
+    expect(stages[0]?.qualityAfter).toBe(0)
+    expect(stages[0]?.qualityBeforeKey).toBeDefined()
+    expect(stages[0]?.candidateQualityKey).toBeDefined()
+    expect(stages[0]?.qualityAfterKey).toBeDefined()
+  })
+
+  it('reports zero incumbent gain for a non-improving stage and accumulates raw work monotonically', () => {
+    resetMockRunner()
+    const seedFilters = [filter('seed')]
+    let invocation = 0
+    mockedRunStructuralSearch.mockImplementation(({ onTrace }) => {
+      invocation += 1
+      onTrace?.(traceEvent('beam-generation', {
+        phase: 'beam',
+        generation: invocation - 1,
+        generatedProposals: invocation,
+      }))
+      return { filters: [], rmseDb: 99, maxAbsDb: 99 }
+    })
+    const stages: ScalableSearchStage[] = []
+
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 15,
+      seedFilters,
+      deadline: deadlineAfterStages(2),
+      onStage: (stage) => stages.push(stage),
+    }))
+
+    expect(stages).toHaveLength(2)
+    expect(stages[0]?.improved).toBe(false)
+    expect(stages[0]?.qualityDelta).toBe(0)
+    expect(stages[0]?.workDelta).toEqual({
+      ...emptyWork,
+      beamGenerations: 1,
+      proposalsGenerated: 1,
+    })
+    expect(stages[1]?.qualityDelta).toBe(0)
+    expect(stages[1]?.workDelta).toEqual({
+      ...emptyWork,
+      beamGenerations: 1,
+      proposalsGenerated: 2,
+    })
+    expect(stages[1]?.cumulativeWork).toEqual({
+      structuralSearchInvocations: 2,
+      beamGenerations: 2,
+      proposalsGenerated: 3,
+      proposalsAdmitted: 0,
+      proposalsPolished: 0,
+      duplicateStates: 0,
+      rescueAttempts: 0,
+      pairAddAttempts: 0,
+      capSwapAttempts: 0,
+      reseedAttempts: 0,
+    })
+    expect(stages[1]?.cumulativeWork?.structuralSearchInvocations).toBeGreaterThan(
+      stages[0]?.cumulativeWork?.structuralSearchInvocations ?? 0,
+    )
+  })
+
+  it('labels removal reseeding as a generic action and counts the reseed work', () => {
+    resetMockRunner()
+    mockedRunStructuralSearch.mockImplementation(({ seedFilters, onTrace }) => {
+      onTrace?.(traceEvent('beam-generation', {
+        phase: 'beam',
+        generatedProposals: 1,
+      }))
+      return {
+        filters: (seedFilters ?? []).map((entry) => ({ ...entry })),
+        rmseDb: 99,
+        maxAbsDb: 99,
+      }
+    })
+    const stages: ScalableSearchStage[] = []
+
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 15,
+      seedFilters: [filter('a'), filter('b'), filter('c')],
+      deadline: deadlineAfterStages(5),
+      onStage: (stage) => stages.push(stage),
+    }))
+
+    expect(stages.slice(0, 3).map((stage) => stage.action)).toEqual([
+      'expand-capacity',
+      'explore-current-capacity',
+      'deepen',
+    ])
+    expect(stages.slice(3).map((stage) => stage.action)).toEqual(['reseed', 'reseed'])
+    expect(stages[3]?.workDelta?.reseedAttempts).toBe(1)
+    expect(stages[4]?.workDelta?.reseedAttempts).toBe(1)
   })
 })
