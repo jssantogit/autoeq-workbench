@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 import {
   AUTOEQ_PRODUCT_LIMITS,
+  createSearchWorkDelta,
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   MVP_NUMERIC_POLICY,
   nextScalableCapacity,
@@ -16,7 +17,9 @@ import {
 } from '../src/index.js'
 import type {
   Filter,
+  SearchWorkTotals,
   ScalableSearchStage,
+  ScalableSearchQualityKey,
   ScalableStructuralSearchInput,
   ScalableStructuralSearchResult,
 } from '../src/index.js'
@@ -40,6 +43,17 @@ export const SCALABLE_CAPACITY_LADDER_DEFAULT_CEILINGS = [
 export type ScalableCapacityLadderStage = ScalableSearchStage & {
   stageElapsedMs: number
   totalElapsedMs: number
+}
+
+export interface ScalableCapacityLadderEnvelopeRecord
+  extends ScalableCapacityLadderCellSelection {
+  type: 'envelope'
+  capacityCeiling: number
+}
+
+export type ScalableCapacityLadderStageRecord = ScalableCapacityLadderStage & {
+  type: 'stage'
+  capacityCeiling: number
 }
 
 export interface ScalableCapacityLadderCellSelection {
@@ -69,6 +83,19 @@ export interface ScalableCapacityLadderCell
   stages: ScalableCapacityLadderStage[]
 }
 
+export interface ScalableCapacityLadderFinalRecord
+  extends ScalableCapacityLadderCell {
+  type: 'final'
+  capacityCeiling: number
+  filters: Filter[]
+  rmseDb: number
+  maxAbsDb: number
+  maxAbs: number
+  currentQualityValue: number
+  currentQualityKey: ScalableSearchQualityKey
+  totalWork: SearchWorkTotals
+}
+
 export interface ScalableCapacityLadderRow {
   caseId: ManualRegressionCaseId
   cells: ScalableCapacityLadderCell[]
@@ -93,6 +120,11 @@ export interface RunScalableCapacityLadderOptions
   extends ScalableCapacityLadderOptions {
   nowMs?: () => number
   run?: ScalableCapacitySearchRunner
+  onEnvelope?: (envelope: ScalableCapacityLadderEnvelopeRecord) => void
+  onStage?: (
+    selection: ScalableCapacityLadderCellSelection,
+    stage: ScalableCapacityLadderStage,
+  ) => void
   onCell?: (cell: ScalableCapacityLadderCell) => void
 }
 
@@ -296,6 +328,7 @@ export function runScalableCapacityCell(options: ScalableCapacityLadderCellSelec
   nowMs?: () => number
   run?: ScalableCapacitySearchRunner
   seedFilters?: readonly Filter[]
+  onStage?: (stage: ScalableCapacityLadderStage) => void
 }): ScalableCapacityLadderCell {
   if (!Number.isFinite(options.budgetSeconds) || options.budgetSeconds <= 0) {
     throw new Error('budgetSeconds must be a positive number')
@@ -326,11 +359,13 @@ export function runScalableCapacityCell(options: ScalableCapacityLadderCellSelec
     nowMs,
     onStage: (stage) => {
       const totalElapsedMs = nowMs() - startedAt
-      stages.push({
+      const stageRecord = {
         ...stage,
         stageElapsedMs: totalElapsedMs - previousElapsedMs,
         totalElapsedMs,
-      })
+      }
+      stages.push(stageRecord)
+      options.onStage?.(stageRecord)
       previousElapsedMs = totalElapsedMs
     },
   })
@@ -352,16 +387,45 @@ export function runScalableCapacityCell(options: ScalableCapacityLadderCellSelec
   }
 }
 
+function createScalableCapacityFinalRecord(
+  cell: ScalableCapacityLadderCell,
+): ScalableCapacityLadderFinalRecord {
+  const lastStage = cell.stages[cell.stages.length - 1]
+  const currentQualityKey = lastStage?.qualityAfterKey ?? [
+    cell.finalViolation,
+    cell.finalRmseDb,
+    cell.finalMaxAbsDb,
+  ]
+  return {
+    type: 'final',
+    ...cell,
+    capacityCeiling: cell.finalMaxFilters,
+    filters: cell.finalFilters.map((filter) => ({ ...filter })),
+    rmseDb: cell.finalRmseDb,
+    maxAbsDb: cell.finalMaxAbsDb,
+    maxAbs: cell.finalMaxAbsDb,
+    currentQualityValue: currentQualityKey[0],
+    currentQualityKey,
+    totalWork: lastStage?.cumulativeWork ?? createSearchWorkDelta(),
+  }
+}
+
 export function runScalableCapacityLadder(
   options: RunScalableCapacityLadderOptions,
 ): ScalableCapacityLadderResult {
   const cells: ScalableCapacityLadderCell[] = []
   for (const selection of createScalableCapacityCells(options)) {
+    options.onEnvelope?.({
+      type: 'envelope',
+      ...selection,
+      capacityCeiling: selection.finalMaxFilters,
+    })
     const cell = runScalableCapacityCell({
       ...selection,
       seedFilters: options.seedFilters,
       nowMs: options.nowMs,
       run: options.run,
+      onStage: (stage) => options.onStage?.(selection, stage),
     })
     cells.push(cell)
     options.onCell?.(cell)
@@ -402,8 +466,24 @@ export function main(
     ...options,
     nowMs: dependencies.nowMs,
     run: dependencies.run,
+    onEnvelope: options.outputMode === 'jsonl'
+      ? (envelope) => writeLine(JSON.stringify(envelope))
+      : undefined,
+    onStage: options.outputMode === 'jsonl'
+      ? (selection, stage) => writeLine(JSON.stringify({
+        type: 'stage',
+        caseId: selection.caseId,
+        finalMaxFilters: selection.finalMaxFilters,
+        budgetSeconds: selection.budgetSeconds,
+        capacityCeiling: selection.finalMaxFilters,
+        ...stage,
+      }))
+      : undefined,
     onCell: options.outputMode === 'jsonl'
-      ? (cell) => writeLine(JSON.stringify({ type: 'cell', ...cell }))
+      ? (cell) => {
+        writeLine(JSON.stringify(createScalableCapacityFinalRecord(cell)))
+        writeLine(JSON.stringify({ type: 'cell', ...cell }))
+      }
       : undefined,
   })
 

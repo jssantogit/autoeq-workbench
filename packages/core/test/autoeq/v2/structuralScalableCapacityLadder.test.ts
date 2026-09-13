@@ -264,17 +264,138 @@ describe('scalable capacity ladder benchmark harness', () => {
       writeLine: (line) => lines.push(line),
     })
 
-    expect(lines).toHaveLength(2)
+    expect(lines).toHaveLength(4)
     expect(JSON.parse(lines[0]!)).toMatchObject({
-      type: 'cell',
+      type: 'envelope',
       caseId: 'titan-to-rsv',
       finalMaxFilters: 10,
       budgetSeconds: 0.01,
     })
     expect(JSON.parse(lines[1]!)).toMatchObject({
+      type: 'final',
+      caseId: 'titan-to-rsv',
+      finalMaxFilters: 10,
+      filters: [],
+      rmseDb: 0.2,
+      maxAbs: 0.6,
+      totalWork: expect.any(Object),
+      stagesCompleted: 0,
+    })
+    expect(JSON.parse(lines[2]!)).toMatchObject({
+      type: 'cell',
+      caseId: 'titan-to-rsv',
+      finalMaxFilters: 10,
+      budgetSeconds: 0.01,
+    })
+    expect(JSON.parse(lines[3]!)).toMatchObject({
       type: 'summary',
       finalCaps: [10],
       monotonicCases: 1,
+    })
+  })
+
+  it('streams the resource envelope and each stage before final and compatibility records', () => {
+    const lines: string[] = []
+    const stage: ScalableSearchStage = {
+      stageIndex: 0,
+      capacity: 10,
+      effortLevel: 0,
+      seedStrategy: 'incumbent',
+      candidateViolation: 0.8,
+      incumbentViolation: 1,
+      improved: true,
+      action: 'expand-capacity',
+      qualityBefore: 1,
+      candidateQuality: 0.8,
+      qualityAfter: 0.8,
+      qualityDelta: 0.2,
+      qualityBeforeKey: [1, 0.25, 0.75],
+      candidateQualityKey: [0.8, 0.2, 0.6],
+      qualityAfterKey: [0.8, 0.2, 0.6],
+      workDelta: {
+        structuralSearchInvocations: 1,
+        beamGenerations: 2,
+        proposalsGenerated: 4,
+        proposalsAdmitted: 3,
+        proposalsPolished: 2,
+        duplicateStates: 1,
+        rescueAttempts: 2,
+        pairAddAttempts: 1,
+        capSwapAttempts: 0,
+        reseedAttempts: 0,
+      },
+      cumulativeWork: {
+        structuralSearchInvocations: 1,
+        beamGenerations: 2,
+        proposalsGenerated: 4,
+        proposalsAdmitted: 3,
+        proposalsPolished: 2,
+        duplicateStates: 1,
+        rescueAttempts: 2,
+        pairAddAttempts: 1,
+        capSwapAttempts: 0,
+        reseedAttempts: 0,
+      },
+    }
+
+    main([
+      '--case', 'titan-to-rsv',
+      '--capacity', '37',
+      '--budget-seconds', '0.01',
+      '--jsonl',
+    ], {
+      nowMs: () => 0,
+      run: (input) => {
+        input.onStage?.(stage)
+        return {
+          filters: [],
+          rmseDb: 0.2,
+          maxAbsDb: 0.6,
+          stagesCompleted: 1,
+        }
+      },
+      writeLine: (line) => lines.push(line),
+    })
+
+    const records = lines.map((line) => JSON.parse(line) as Record<string, unknown>)
+    expect(records.map((record) => record.type)).toEqual([
+      'envelope',
+      'stage',
+      'final',
+      'cell',
+      'summary',
+    ])
+    expect(records[0]).toMatchObject({
+      type: 'envelope',
+      caseId: 'titan-to-rsv',
+      budgetSeconds: 0.01,
+      capacityCeiling: 37,
+    })
+    expect(records[1]).toMatchObject({
+      type: 'stage',
+      caseId: 'titan-to-rsv',
+      capacityCeiling: 37,
+      action: 'expand-capacity',
+      capacity: 10,
+      effortLevel: 0,
+      qualityBefore: 1,
+      candidateQuality: 0.8,
+      qualityAfter: 0.8,
+      qualityDelta: 0.2,
+      workDelta: stage.workDelta,
+      cumulativeWork: stage.cumulativeWork,
+      seedStrategy: 'incumbent',
+    })
+    expect(records[2]).toMatchObject({
+      type: 'final',
+      caseId: 'titan-to-rsv',
+      capacityCeiling: 37,
+      filters: [],
+      rmseDb: 0.2,
+      maxAbsDb: 0.6,
+      currentQualityKey: [0.8, 0.2, 0.6],
+      totalWork: stage.cumulativeWork,
+      stagesCompleted: 1,
     })
   })
 })
