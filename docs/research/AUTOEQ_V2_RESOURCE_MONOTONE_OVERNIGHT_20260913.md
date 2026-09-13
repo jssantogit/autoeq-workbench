@@ -105,6 +105,31 @@ were invented and no behavior was changed.  A future consolidation must decide w
 the controller intentionally ranks its lightweight structural result differently or
 should receive a shared structural-quality abstraction.
 
+## Accepted deterministic-test strengthening
+
+Commit `8fd0e2e` (`test: strengthen scalable search controller invariants`) adds
+sub-second controller tests with a Vitest-mocked lower-level structural runner.  The
+tests exercise actual `runScalableStructuralSearch()` scheduling and prove the current
+controller's bounded contract: seed/incumbent preservation under its comparator,
+generic capacity bounds/progression, continued stages after maximum capacity, effort
+progression, deterministic remove-one reseeding, deadline stopping, and repeatability.
+They do not claim that a real wall-clock structural search is deterministic across
+machines; that exception remains explicit in the V2 specification.
+
+Focused validation: 8 tests passed, core typecheck passed, and `git diff --check`
+passed for the test commit.
+
+## Package status at session cutoff
+
+Completed: bootstrap, starting-state record, focused causal code trace and short
+counterfactual, resource-monotonicity definition, quality-semantics audit, corpus
+inventory, and deterministic controller-test strengthening.  Not completed: a valid
+60-second trajectory capture, scheduler-policy experiment, anytime-harness migration,
+full time×capacity matrix, quantization pathology measurements, and a 64-filter profile.
+Those items were deliberately not represented as completed: exact 60-second commands
+cannot be observed to completion through this execution environment's command window,
+and changing a scheduler before those observations would violate the causal gate.
+
 ## Next evidence needed
 
 1. Run exact 60-second Max10/Max15 RSV trajectories with full stage telemetry and
