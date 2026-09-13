@@ -12,6 +12,7 @@ import {
   structuralViolation,
 } from '../src/index.js'
 import type {
+  Filter,
   ScalableSearchStage,
   ScalableStructuralSearchInput,
   ScalableStructuralSearchResult,
@@ -48,6 +49,7 @@ export interface ScalableCapacityLadderCell
   elapsedMs: number
   deadlineExpired: boolean
   finalFilterCount: number
+  finalFilters: Filter[]
   finalRmseDb: number
   finalMaxAbsDb: number
   finalViolation: number
@@ -237,6 +239,7 @@ export function runScalableCapacityCell(options: ScalableCapacityLadderCellSelec
     elapsedMs,
     deadlineExpired: nowMs() >= deadlineAt,
     finalFilterCount: result.filters.length,
+    finalFilters: result.filters.map((filter) => ({ ...filter })),
     finalRmseDb: result.rmseDb,
     finalMaxAbsDb: result.maxAbsDb,
     finalViolation: structuralViolation(result),

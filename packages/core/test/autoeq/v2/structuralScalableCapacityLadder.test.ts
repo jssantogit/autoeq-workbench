@@ -54,7 +54,14 @@ describe('scalable capacity ladder benchmark harness', () => {
         input.onStage?.(stage)
         now = 1_150
         return {
-          filters: [],
+          filters: [{
+            id: 'seed-1',
+            enabled: true,
+            type: 'PK',
+            frequencyHz: 1_000,
+            gainDb: 2,
+            q: 1,
+          }],
           rmseDb: 0.2,
           maxAbsDb: 0.6,
           stagesCompleted: 1,
@@ -68,7 +75,15 @@ describe('scalable capacity ladder benchmark harness', () => {
       budgetSeconds: 0.1,
       elapsedMs: 150,
       deadlineExpired: true,
-      finalFilterCount: 0,
+      finalFilterCount: 1,
+      finalFilters: [{
+        id: 'seed-1',
+        enabled: true,
+        type: 'PK',
+        frequencyHz: 1_000,
+        gainDb: 2,
+        q: 1,
+      }],
       finalRmseDb: 0.2,
       finalMaxAbsDb: 0.6,
       finalViolation: 0.8,
@@ -79,6 +94,34 @@ describe('scalable capacity ladder benchmark harness', () => {
       stageElapsedMs: 60,
       totalElapsedMs: 60,
     }])
+  })
+
+  it('preserves final filter IDs and parameters in the cell record', () => {
+    const finalFilter = {
+      id: 'rsv-peak-1',
+      enabled: true,
+      type: 'PK' as const,
+      frequencyHz: 2_500,
+      gainDb: -3.25,
+      q: 1.4,
+    }
+
+    const cell = runScalableCapacityCell({
+      caseId: 'titan-to-rsv',
+      finalMaxFilters: 10,
+      budgetSeconds: 0.01,
+      nowMs: () => 0,
+      run: () => ({
+        filters: [finalFilter],
+        rmseDb: 0.2,
+        maxAbsDb: 0.6,
+        stagesCompleted: 0,
+      }),
+    })
+
+    expect(cell.finalFilterCount).toBe(1)
+    expect(cell.finalFilters).toEqual([finalFilter])
+    expect(cell.finalFilters).not.toBe(finalFilter)
   })
 
   it('emits each completed cell before starting the next cell and returns an aggregate', () => {

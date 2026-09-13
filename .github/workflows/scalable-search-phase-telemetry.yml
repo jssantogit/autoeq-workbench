@@ -3,7 +3,34 @@ name: Scalable Search Capacity Ladder
 on:
   push:
     branches:
-      - research/scalable-search-phase-telemetry-20260912
+      - research/resource-monotone-overnight-20260913
+  workflow_dispatch:
+    inputs:
+      case_id:
+        description: Research case to run (push runs every matrix cell)
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - titan-to-rsv
+          - titan-to-mystic-8
+          - titan-to-s12-ultra
+      capacity:
+        description: Maximum filter capacity to run
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - '10'
+          - '15'
+          - '20'
+      budget_seconds:
+        description: Wall-clock budget for each independent cell
+        required: true
+        default: '60'
+        type: string
 
 permissions:
   contents: read
@@ -14,8 +41,35 @@ concurrency:
 
 jobs:
   ladder:
+    if: >-
+      github.event_name == 'push' ||
+      (inputs.case_id != '' &&
+      (inputs.case_id == 'all' || inputs.case_id == matrix.case_id) &&
+      (inputs.capacity == 'all' || inputs.capacity == matrix.max_filters))
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - case_id: titan-to-rsv
+            max_filters: '10'
+          - case_id: titan-to-rsv
+            max_filters: '15'
+          - case_id: titan-to-rsv
+            max_filters: '20'
+          - case_id: titan-to-mystic-8
+            max_filters: '10'
+          - case_id: titan-to-mystic-8
+            max_filters: '15'
+          - case_id: titan-to-mystic-8
+            max_filters: '20'
+          - case_id: titan-to-s12-ultra
+            max_filters: '10'
+          - case_id: titan-to-s12-ultra
+            max_filters: '15'
+          - case_id: titan-to-s12-ultra
+            max_filters: '20'
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -27,6 +81,29 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @autoeq-workbench/core typecheck
-      - run: pnpm --filter @autoeq-workbench/core test -- structuralSearch.test.ts
-      - name: Run nested anytime real-FR ladder
-        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralAnytimeMystic.ts
+      - run: |
+          pnpm --filter @autoeq-workbench/core exec vitest run \
+            test/autoeq/v2/structuralSearch.test.ts \
+            test/autoeq/v2/structuralScalableCapacityLadder.test.ts
+      - name: Run scalable capacity cell
+        env:
+          CASE_ID: ${{ matrix.case_id }}
+          MAX_FILTERS: ${{ matrix.max_filters }}
+          BUDGET_SECONDS: ${{ inputs.budget_seconds || '60' }}
+          ARTIFACT_DIR: ${{ github.workspace }}/scalable-search-artifacts/${{ matrix.case_id }}/max-${{ matrix.max_filters }}
+        run: |
+          set -o pipefail
+          mkdir -p "$ARTIFACT_DIR"
+          pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalableCapacityLadder.ts \
+            --case "$CASE_ID" \
+            --capacity "$MAX_FILTERS" \
+            --budget-seconds "$BUDGET_SECONDS" \
+            --jsonl | tee "$ARTIFACT_DIR/telemetry.jsonl"
+      - name: Upload scalable search telemetry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scalable-search-${{ matrix.case_id }}-max-${{ matrix.max_filters }}-${{ github.run_id }}
+          path: scalable-search-artifacts
+          if-no-files-found: warn
+          retention-days: 30
