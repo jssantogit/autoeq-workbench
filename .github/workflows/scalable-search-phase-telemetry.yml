@@ -1,4 +1,4 @@
-name: Scalable Search Phase Telemetry
+name: Scalable Search Capacity Ladder
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  trace:
+  ladder:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -24,9 +24,5 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @autoeq-workbench/core typecheck
       - run: pnpm --filter @autoeq-workbench/core test -- structuralSearch.test.ts
-      - name: Trace 60s Max10 stagnation phases
-        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalabilityTrace.ts
-      - name: Run time and capacity monotonicity matrix
-        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalabilityMatrix.ts
       - name: Run incumbent-preserving capacity ladder
         run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalableCapacityLadder.ts
