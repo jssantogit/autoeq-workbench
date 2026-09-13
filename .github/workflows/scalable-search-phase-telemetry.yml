@@ -24,7 +24,5 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @autoeq-workbench/core typecheck
       - run: pnpm --filter @autoeq-workbench/core test -- structuralSearch.test.ts
-      - name: Run incumbent-preserving capacity ladder
-        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalableCapacityLadder.ts
       - name: Run nested anytime Mystic ladder
         run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralAnytimeMystic.ts
