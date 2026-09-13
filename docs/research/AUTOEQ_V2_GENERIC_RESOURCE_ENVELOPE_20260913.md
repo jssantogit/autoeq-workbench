@@ -406,3 +406,86 @@ remaining-time reserve is unavailable to callers that do not provide the
 optional callback.  The policy uses marginal normalized-violation gain only;
 it has no residual-shape or proposal-exhaustion model.  The report therefore
 supports one falsifiable next experiment, not a scheduler rule for production.
+
+## Capacity-pressure instrumentation (2026-09-13)
+
+### Suppression architecture
+
+The instrumentation observes only existing capacity predicates in
+`packages/core/src/autoeq/v2/structuralSearch.ts`:
+
+1. The beam mutation generator's `current.length < bounds.maxFilters` gate
+   skips additive PK/shelf paths at a full parent. The split path has the same
+   capacity predicate. The trace records one **additive mutation gate blocked
+   by capacity** per full parent whose existing mutation pass reaches that
+   gate; it does not construct or score the skipped proposal.
+2. The rescue loop requires `rescued.filters.length < config.maxFilters`. When
+   its existing step/error conditions hold but the filter count is full, the
+   phase-end trace records one **rescue add gate blocked by capacity**.
+3. Pair-add requires `rescued.filters.length <= config.maxFilters - 2`. When
+   its existing error condition holds but fewer than two slots remain, the
+   phase-end trace records one **pair-add gate blocked by capacity**.
+
+No duplicate, invalid-bounds, gain/Q, quality, shortlist/proposal-limit,
+pruning, beam-retention, or comparator rejection contributes to these fields.
+Cap-swap/recycle phases are replacement work, not additive capacity suppression,
+and are intentionally excluded.
+
+### Measurement semantics and neutrality
+
+`CapacityPressureDelta` carries four unweighted raw fields:
+
+- `additiveProposalsGenerated`: actual additive proposals already constructed
+  by the beam mutation path (an available-work numerator/context, not a
+  quality claim);
+- `additiveMutationGatesBlockedByCapacity`: full-parent beam gates reached;
+- `rescueAddGatesBlockedByCapacity`: full-filter rescue gates reached; and
+- `pairAddGatesBlockedByCapacity`: pair-add gates reached with fewer than two
+  slots available.
+
+The blocked fields count reached gates rather than hypothetical candidates;
+the suppressed candidates are deliberately unscored. Consequently no ratio or
+weighted pressure score is reported. A caller that forms a future ratio must
+retain these raw fields and define a denominator for the exact gate population.
+
+The counters are produced solely while executing existing branches, then
+copied through `ScalableSearchStage.capacityPressure`,
+`cumulativeCapacityPressure`, and `SchedulerDecisionSnapshot.capacityPressure`.
+They are never read by the legacy or adaptive scheduler, comparator, admission,
+or beam logic. Deterministic observer/no-observer testing produced identical
+search results; the instrumentation does not call the deadline callback or
+construct blocked candidate state.
+
+### Sparse paired evidence
+
+Predeclared probe: RSV, Mystic 8, and S12 Ultra; requested irregular ceiling
+17; current capacity 10; one 250 ms warmup and two paired 250 ms repeats.
+Both arms began from the same cloned snapshot and received one structural
+search invocation. Raw output was recorded locally at
+`packages/core/.research-artifacts/capacity-pressure-20260913/paired-oracle.jsonl`.
+
+| Case | Recent gain | Residual extrema / max dB | Filters / capacity | Generated additive proposals | Blocked beam / rescue / pair | Oracle outcome |
+| --- | ---: | --- | --- | ---: | --- | --- |
+| RSV | 2.628 | 13 / 4.895 | 4 / 10 (ceiling 17) | 27 | 0 / 0 / 0 | tie (both repeats) |
+| Mystic 8 | 3.046 | 18 / 7.638 | 5 / 10 (ceiling 17) | 29 | 0 / 0 / 0 | tie (both repeats) |
+| S12 Ultra | 21.805 | 37 / 6.274 | 6 / 10 (ceiling 17) | 42 | 0 / 0 / 0 | tie (both repeats) |
+
+This sample does distinguish residual from capacity pressure: S12 has the
+largest residual signal but no capacity-blocked additive gate, because four
+filter slots remained within the current capacity. RSV and Mystic likewise
+had high residual structure and no observed current-capacity suppression.
+However it does **not** establish that pressure predicts expand value: every
+paired outcome was tied under this declared probe, and pressure was zero in
+every snapshot. This is a weak/inconclusive result, not a scheduler input.
+
+### Limitations and next experiment
+
+A blocked gate says only that an additive path was suppressed; it cannot say
+that its unbuilt candidate would have improved the incumbent. The sparse
+states also did not reach the current capacity, so they cannot test separation
+among nonzero pressure values. Do not add a shadow evaluation yet: first run
+one additional predeclared paired snapshot protocol that deliberately records
+states after the existing controller reaches its current capacity while keeping
+its paired action boundary unchanged. If nonzero raw gate counts still fail to
+separate outcomes, reject raw pressure and only then consider a separately
+budgeted research-only shadow candidate evaluation.
