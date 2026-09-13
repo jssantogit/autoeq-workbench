@@ -1162,7 +1162,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
         config: bounds,
         boundaryMode: 'mixed',
       }).filter((candidate) => candidate.type === 'PK')
-    ).slice(0, 6)
+    ).slice(0, 8)
 
     const improving: Array<{
       state: SearchState
