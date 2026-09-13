@@ -28,3 +28,5 @@ jobs:
         run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalabilityTrace.ts
       - name: Run time and capacity monotonicity matrix
         run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalabilityMatrix.ts
+      - name: Run incumbent-preserving capacity ladder
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalableCapacityLadder.ts
