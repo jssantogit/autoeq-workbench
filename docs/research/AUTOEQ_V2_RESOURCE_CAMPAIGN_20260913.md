@@ -1,6 +1,6 @@
 # AutoEQ V2 large-scale search/resource campaign
 
-Status: **bounded infrastructure and evidence gate** (2026-09-13)
+Status: **bounded infrastructure, gate, and one serial synthetic smoke cell** (2026-09-13)
 
 This report is the integrity boundary for the isolated research line.  It does
 not present an unrun timing matrix as evidence.  The campaign runner and probe
@@ -27,8 +27,8 @@ a predeclared campaign invocation is made.
 | Holdout real-FR cases | 3 | Titan → Storm, U12t, Trio; no policy tuning performed |
 | Synthetic ground-truth cases | 8 | Explicit deterministic A–H cascades, known complexity |
 | Derived algorithmic-FR stress cases | 0 | Not materialized; no fixture-pair selection was made |
-| New timing cells in this bounded handoff | 0 | Deliberately no indiscriminate matrix execution |
-| New failed/skipped timing cells | 0 | No timing campaign was started |
+| New timing cells in this bounded handoff | 1 | One predeclared serial synthetic threshold cell; not a repeat distribution |
+| New failed/skipped timing cells | 0 | No failed/skipped cell was recorded |
 | Invariant focused tests | 26 across the changed research groups | Deterministic harness correctness only, not search-quality evidence |
 
 The dedicated real robustness corpus search found only the approved static
@@ -64,6 +64,28 @@ their old ceilings.  That is limited natural evidence, not proof that fixed
 capacity can never bind.  The new fixed-capacity and synthetic helpers exist
 specifically to test that question without restarting matched continuations or
 turning a ceiling into a product mode.
+
+## Serial synthetic smoke evidence
+
+One predeclared, serial, fixed-capacity threshold cell was run after the
+infrastructure gate: synthetic D (the explicit 12-component dense known
+structure), with ceilings 11, 12, and 13; generic effort ramp; and continuing
+5/15/30-second labels.  It is one repeat only, so its differing wall-clock
+paths are not a capacity causal estimate and it must not be treated as a
+monotonicity result.  The raw append-only artifact remains uncommitted at
+`.research-artifacts/resource-envelope-generic-20260913-smoke-r0/`:
+`manifest.json` SHA-256 `b4de91993f11ce74f8ff82f4228c08233606606ebedc40b104afa8475f0ee141`;
+`runs.jsonl` SHA-256 `b0f65b8783d20609b7130f4b540413650fc372e5de8224e3d07811a02ed3bae3`.
+
+At the final label, all three ceilings reached their searched frontier and
+reported blocked additive pressure in quantum 1.  Their final structural
+violations were 0.3201 (11), 0.1998 (12), and 0.2274 (13); delivered filter
+counts were 11, 11, and 12 respectively.  Thus the synthetic generator can
+reach and explore the available range under pressure.  The 11-to-12 result is
+consistent with useful representation freedom, while 12-to-13 regressed on
+this single noisy trajectory.  This is deliberately reported as limited
+engineering evidence—not an allocator rule, a filter-count knee, or a claim
+that quality is monotonic in capacity.
 
 ## Resource and metric safeguards
 
