@@ -1,6 +1,7 @@
 import { performance } from 'node:perf_hooks'
 import { fileURLToPath } from 'node:url'
 import {
+  evaluateConfiguredContinuation,
   evaluateSchedulerDecisionPair,
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   MVP_NUMERIC_POLICY,
@@ -85,9 +86,11 @@ export function runFullCapacityDecisionStateProbe(): unknown[] {
       remainingWallClockMs: DECISION_QUANTUM_MS,
       stageIndex: source.stageIndex,
     }
-    const pair = evaluateSchedulerDecisionPair(snapshot, {
-      structuralSearchInvocations: 1, stageQuantumMs: DECISION_QUANTUM_MS,
-    })
+    const budget = { structuralSearchInvocations: 1, stageQuantumMs: DECISION_QUANTUM_MS }
+    const pair = evaluateSchedulerDecisionPair(snapshot, budget)
+    const control = evaluateConfiguredContinuation(snapshot, { capacity: currentCapacity, effortLevel: source.effortLevel }, budget)
+    const effortOnly = evaluateConfiguredContinuation(snapshot, { capacity: currentCapacity, effortLevel: Math.min(6, source.effortLevel + 1) }, budget)
+    const capacityOnly = evaluateConfiguredContinuation(snapshot, { capacity: Math.min(MAXIMUM_CAPACITY, Math.max(currentCapacity + 1, Math.ceil(currentCapacity * 1.5))), effortLevel: source.effortLevel }, budget)
     records.push({
       type: 'full-capacity-decision-state', caseId,
       snapshotOrigin: reconstructed ? 'reconstructed-from-live-incumbent' : 'naturally-full-or-pressured',
@@ -102,6 +105,7 @@ export function runFullCapacityDecisionStateProbe(): unknown[] {
       outcome: classifyDecisionOracleOutcome(pair.byAction['deepen-current-regime'].absoluteGain, pair.byAction['expand-capacity'].absoluteGain),
       deepenGain: pair.byAction['deepen-current-regime'].absoluteGain,
       expandGain: pair.byAction['expand-capacity'].absoluteGain,
+      factorized: { control, effortOnly, capacityOnly, capacityOnlyUsedNewSlot: capacityOnly.frontierUtilization.generatedCandidateFilterCountMax > currentCapacity },
       workComparison: pair.workComparison, deepenFrontier: pair.byAction['deepen-current-regime'].frontierUtilization, expandFrontier: pair.byAction['expand-capacity'].frontierUtilization,
       startingViolation: structuralViolation(source.incumbent),
     })

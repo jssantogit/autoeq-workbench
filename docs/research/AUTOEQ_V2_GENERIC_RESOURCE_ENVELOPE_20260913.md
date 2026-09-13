@@ -582,3 +582,32 @@ experiment should decouple oracle action configuration: hold effort-derived
 beam/proposal/polish settings constant while varying only `maxFilters`, then
 repeat the same sparse paired probe. No scheduler rule or shadow evaluation is
 justified first.
+
+## Factorized structural-capacity and effort oracle (2026-09-13)
+
+A research-only `evaluateConfiguredContinuation(snapshot, { capacity,
+effortLevel }, budget)` now evaluates independent resource axes. Legacy
+deepen/expand wrappers retain their prior mappings. The three-arm probe uses:
+control `{currentCapacity, currentEffort}`, effort-only `{currentCapacity,
+effort+1}`, and capacity-only `{nextCapacity, currentEffort}`.
+
+Configuration proof: control and capacity-only have identical effort-derived
+`beamWidth`, `proposalsPerParent`, and `localPolishEvaluations`; only
+`maxFilters` differs. Control and effort-only retain identical `maxFilters`.
+All arms preserve the comparator guard and cloned incumbent.
+
+| Case | Control gain | Effort-only gain | Capacity-only gain | Capacity-only new slot? |
+| --- | ---: | ---: | ---: | --- |
+| RSV | 0.0000 | 0.0477 | 0.1163 | yes (frontier 6 > old 4) |
+| Mystic 8 | 1.4856 | 1.4856 | 2.1775 | yes (frontier 9 > old 8) |
+| S12 Ultra | 0.0000 | 0.0000 | 1.3875 | yes (frontier 10 > old 8) |
+
+In this one sparse, reconstructed-state sample, capacity-only exceeds
+effort-only and actually consumes newly available slots in all rows. This is
+not a scheduler rule: wall-clock search remains variable and the states are
+reconstructed. It does establish that previous expand/deepen comparisons were
+confounded by the effort reset, while showing independent structural capacity
+value under held effort. The next experiment should repeat this exact
+factorized protocol from naturally captured live states; production scheduling
+should eventually treat structural capacity and search effort as independent
+resource axes.
