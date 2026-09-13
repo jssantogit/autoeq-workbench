@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "campaignId": "resource-envelope-generic-20260913-full-r1",
+  "immutableWave": 1,
+  "baseCommit": "f30dabef2c5e4eec12d31f0d122fd4681828fe9f",
+  "runner": { "serialTiming": true, "resumableJsonl": true, "rawArtifactDirectory": ".research-artifacts/resource-envelope-generic-20260913-full-r1", "requestedCheckpointsSeconds": [5, 15, 30], "recordActualElapsedWallClock": true },
+  "corpora": {
+    "synthetic": ["synthetic-a-easy-broadband", "synthetic-b-sparse-structural", "synthetic-c-mixed-shelf-peaks", "synthetic-d-dense-known-structure", "synthetic-e-high-q-valid", "synthetic-f-upper-frequency-structure", "synthetic-g-broad-deep-dip", "synthetic-h-alternating-structure"],
+    "development": ["titan-to-rsv", "titan-to-mystic-8", "titan-to-s12-ultra"],
+    "holdout": ["titan-to-storm", "titan-to-u12t", "titan-to-trio"]
+  },
+  "cells": [
+    { "family": "synthetic-fixed-capacity", "cases": "all synthetic", "capacities": "K-1,K,K+1 (K=known generating complexity; valid positive only)", "repeats": 3, "criticalCases": ["synthetic-d-dense-known-structure", "synthetic-e-high-q-valid", "synthetic-f-upper-frequency-structure", "synthetic-h-alternating-structure"], "criticalRepeats": 5, "trajectoryCount": 96, "effort": "existing generic ramp", "checkpoints": [5,15,30] },
+    { "family": "multi-quantum-factorial", "stateEligibility": "predeclared: frontier reaches ceiling OR blocked capacity pressure", "arms": ["C-hold","C+-hold","C-ramp","C+-ramp"], "quanta": [1,2,4,8,16], "eventQuantum": "exact positive integer", "repeats": 3, "criticalSubset": "first two eligible synthetic states ordered by case ID", "criticalRepeats": 5 },
+    { "family": "development-fixed-capacity", "cases": "development", "capacities": "deriveScalableCapacityLadder(43) programmatically", "repeats": 3, "effort": "generic ramp", "checkpoints": [5,15,30] },
+    { "family": "development-effort-curve", "cases": "development", "capacities": [10,23,43], "efforts": "0 through existing maximum inclusive", "repeats": 3, "checkpoints": [5,15,30] },
+    { "family": "legacy-development", "cases": "development", "horizons": [5,15,30], "repeats": 3, "record": "every expansion and first/never later use" },
+    { "family": "holdout-fixed-capacity", "cases": "holdout", "capacities": "same deriveScalableCapacityLadder(43)", "repeats": 3, "effort": "same generic ramp", "checkpoints": [5,15,30] },
+    { "family": "ceiling-64-stress", "cases": "synthetic-d plus highest-demand development and holdout plus E-or-H selected by pressure occurrence (tie: E)", "selection": "non-quality, from declared pressure/frontier signals", "repeats": 3, "checkpoints": [5,15,30] },
+    { "family": "representative-followups", "selection": "predeclared best/median/worst repeated outputs; low-Q real, high-Q real if present, E, F, dense synthetic, one development, one holdout", "quantization": "quantizeV2Filters float versus quantized", "sampleRateReplayHz": [44100,48000,96000], "sampleRateRedesign": ["synthetic-f", "one development lowest case ID", "one holdout lowest case ID"], "reseed": "eligible near-max effort poor-low-gain state, matched continuation/control/reseed", "bottleneck": "all synthetic binding plus real binding cells" }
+  ],
+  "analysis": ["aggregate repeated best/median/worst/spread/IQR", "delivered filter-count/error curves and descriptive knees", "rich delivered metrics", "comparator alignment warnings", "raw independent work-efficiency ratios", "synthetic generating-versus-delivered recovery", "40-question ledger", "development-only conclusions freeze before holdout", "no scheduler intervention absent repeated synthetic+development+holdout simple structure"],
+  "freezeRules": { "noNewWaveOneCellsAfterOutcomes": true, "holdoutUntouchedUntilDevelopmentFreeze": true, "noComparatorOrSchedulerModification": true, "rawJsonlUncommitted": true, "committedArtifacts": ["plan","aggregate summaries","artifact hashes","report","ledger"] }
+}
