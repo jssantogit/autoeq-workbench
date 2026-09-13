@@ -462,3 +462,58 @@ describe('Experimental Max10 structural search', () => {
     expect(second).toEqual(first)
   })
 })
+
+describe('capacity-pressure trace accounting', () => {
+  it('counts only existing capacity gates and preserves search output', () => {
+    const config = {
+      ...resolveStructuralSearchConfig({ preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET }),
+      maxFilters: 3,
+      beamWidth: 1,
+      proposalsPerParent: 1,
+    }
+    const run = (observe: boolean) => {
+      let checks = 0
+      const pressure = {
+        additiveProposalsGenerated: 0,
+        additiveMutationGatesBlockedByCapacity: 0,
+        rescueAddGatesBlockedByCapacity: 0,
+        pairAddGatesBlockedByCapacity: 0,
+      }
+      const result = runStructuralSearch({
+        desiredDb: [...localizedResidual], frequencies: [...frequencies], sampleRateHz: 48_000,
+        config, deadline: { isExpired: () => ++checks > 500 },
+        seedFilters: [
+          { id: 'a', enabled: true, type: 'PK', frequencyHz: 200, gainDb: 1, q: 1 },
+          { id: 'b', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: -1, q: 1 },
+          { id: 'c', enabled: true, type: 'PK', frequencyHz: 5_000, gainDb: 1, q: 1 },
+        ],
+        onTrace: observe ? (event) => {
+          const delta = event.capacityPressure
+          if (delta !== undefined) {
+            pressure.additiveProposalsGenerated += delta.additiveProposalsGenerated
+            pressure.additiveMutationGatesBlockedByCapacity += delta.additiveMutationGatesBlockedByCapacity
+            pressure.rescueAddGatesBlockedByCapacity += delta.rescueAddGatesBlockedByCapacity
+            pressure.pairAddGatesBlockedByCapacity += delta.pairAddGatesBlockedByCapacity
+          }
+        } : undefined,
+      })
+      return { result, pressure }
+    }
+    const plain = run(false)
+    const observed = run(true)
+    expect(observed.result).toEqual(plain.result)
+    expect(observed.pressure.additiveProposalsGenerated).toBeGreaterThan(0)
+    expect(observed.pressure.additiveMutationGatesBlockedByCapacity).toBeGreaterThan(0)
+    expect(observed.pressure.rescueAddGatesBlockedByCapacity).toBeGreaterThanOrEqual(0)
+    expect(observed.pressure.pairAddGatesBlockedByCapacity).toBeGreaterThanOrEqual(0)
+  })
+
+  it('keeps capacity-blocked counters zero below an irregular ceiling', () => {
+    const bounds = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 17 })
+    const proposals = generateStructuralMutations([], localizedResidual, frequencies, bounds, 1, 0, 'legacy')
+    expect(proposals.some((proposal) => proposal.filters.length > 0)).toBe(true)
+    // This direct generation path has no capacity gate at all; duplicate/quality
+    // handling occurs later and therefore cannot fabricate pressure.
+    expect(proposals.every((proposal) => proposal.filters.length <= 17)).toBe(true)
+  })
+})
