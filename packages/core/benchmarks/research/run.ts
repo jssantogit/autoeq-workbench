@@ -55,6 +55,8 @@ export const RESEARCH_CASE_IDS: readonly ResearchCaseId[] = [
 export const RESEARCH_BUDGETS = [5, 15, 30, 60] as const
 export const RESEARCH_ALL_BUDGETS = [5, 15, 30, 60, 120] as const
 export const RESEARCH_DEFAULT_OUTPUT_DIR = './autoeq-research'
+/** Baseline diagnostic sample; callers add capacity probes explicitly. */
+export const RESEARCH_DEFAULT_MAX_FILTERS = 10
 export const PUBLISHED_STANDARD_V2_COMMIT = '7c9ebbbe6eefeb131c6c698055c737b429f5b0c6'
 
 export type ResearchBudgetSeconds = (typeof RESEARCH_ALL_BUDGETS)[number]
@@ -135,11 +137,7 @@ function parseBudget(value: string, flag: string): ResearchBudgetSeconds {
 
 function parseCapacity(value: string): number[] {
   const values = value.split(',').map((part) => {
-    const parsed = parseInteger(part, '--capacity')
-    if (parsed !== 20 && parsed !== 40) {
-      throw new Error('--capacity supports only 20 and 40')
-    }
-    return parsed
+    return parseInteger(part.trim(), '--capacity')
   })
   if (values.length === 0 || new Set(values).size !== values.length) {
     throw new Error('--capacity requires unique comma-separated values')
@@ -220,11 +218,15 @@ export function parseResearchCliArgs(args: readonly string[]): ResearchCliOption
   const budgets: ResearchBudgetSeconds[] = preset === 'quick'
     ? [15, 30]
     : [5, 15, 30, 60]
+  const maxFilters = [...new Set([
+    RESEARCH_DEFAULT_MAX_FILTERS,
+    ...capacityMaxFilters,
+  ])]
   return {
     preset,
     cases: [...RESEARCH_CASE_IDS],
     budgets,
-    maxFilters: [10, ...capacityMaxFilters],
+    maxFilters,
     capacityMaxFilters,
     includeOracle120,
     repeats: repeats ?? (preset === 'quick' ? 1 : 5),
@@ -240,6 +242,10 @@ export function parseResearchCliArgs(args: readonly string[]): ResearchCliOption
 export function createResearchCells(options: ResearchCliOptions): ResearchCell[] {
   const cells: ResearchCell[] = []
   const seen = new Set<string>()
+  const defaultCapacity = options.maxFilters[0] ?? RESEARCH_DEFAULT_MAX_FILTERS
+  const profileCellKey = options.profile === undefined
+    ? undefined
+    : `${options.profile.caseId}|${options.profile.budgetSeconds}|${defaultCapacity}`
   const add = (caseId: ResearchCaseId, budgetSeconds: ResearchBudgetSeconds, maxFilters: number) => {
     const key = `${caseId}|${budgetSeconds}|${maxFilters}`
     if (seen.has(key)) return
@@ -248,9 +254,7 @@ export function createResearchCells(options: ResearchCliOptions): ResearchCell[]
       caseId,
       budgetSeconds,
       maxFilters,
-      telemetryMode: options.profile?.caseId === caseId &&
-          options.profile.budgetSeconds === budgetSeconds &&
-          maxFilters === 10
+      telemetryMode: key === profileCellKey
         ? 'deep'
         : 'light',
     })
@@ -260,9 +264,9 @@ export function createResearchCells(options: ResearchCliOptions): ResearchCell[]
     for (const budgetSeconds of options.budgets) {
       for (const maxFilters of options.maxFilters) add(caseId, budgetSeconds, maxFilters)
     }
-    if (options.includeOracle120) add(caseId, 120, 10)
+    if (options.includeOracle120) add(caseId, 120, defaultCapacity)
     if (options.profile !== undefined) {
-      add(options.profile.caseId, options.profile.budgetSeconds, 10)
+      add(options.profile.caseId, options.profile.budgetSeconds, defaultCapacity)
     }
   }
   return cells

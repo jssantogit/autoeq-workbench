@@ -34,6 +34,26 @@ describe('scalable capacity ladder benchmark harness', () => {
     ])
   })
 
+  it('accepts arbitrary irregular capacity ceilings without a preset', () => {
+    const options = parseScalableCapacityLadderArgs([
+      '--case', 'titan-to-rsv',
+      '--capacity', '43,17,64,37',
+      '--budget-seconds', '0.25',
+    ])
+
+    expect(options.finalCaps).toEqual([17, 37, 43, 64])
+  })
+
+  it('uses a small representative default ceiling sample', () => {
+    const options = parseScalableCapacityLadderArgs([])
+
+    expect(options.finalCaps.length).toBeGreaterThan(0)
+    expect(options.finalCaps.length).toBeLessThan(4)
+    expect(new Set(options.finalCaps).size).toBe(options.finalCaps.length)
+    expect(options.finalCaps.at(-1)).toBe(64)
+    expect(options.finalCaps).not.toEqual([10, 15, 20])
+  })
+
   it('loads a validated seed file and passes its filters to the run without emitting the path', () => {
     const seedFilters: Filter[] = [{
       id: 'seed-file-filter',

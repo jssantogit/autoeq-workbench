@@ -58,7 +58,7 @@ describe('research runner', () => {
 
     const full = parseResearchCliArgs([
       '--preset', 'full',
-      '--capacity', '20,40',
+      '--capacity', '17,43,64',
       '--oracle-120',
       '--repeats', '2',
       '--profile', 'titan-to-storm:30',
@@ -67,7 +67,7 @@ describe('research runner', () => {
     expect(full).toMatchObject({
       preset: 'full',
       budgets: [5, 15, 30, 60],
-      maxFilters: [10, 20, 40],
+      maxFilters: [10, 17, 43, 64],
       repeats: 2,
       includeOracle120: true,
     })
@@ -77,15 +77,23 @@ describe('research runner', () => {
       cell.maxFilters === 10 &&
       cell.telemetryMode === 'deep',
     )).toBe(true)
-    expect(cells.filter((cell) => cell.maxFilters === 20 || cell.maxFilters === 40)
+    expect(cells.filter((cell) => cell.maxFilters === 17 || cell.maxFilters === 43 || cell.maxFilters === 64)
       .every((cell) => cell.budgetSeconds !== 120)).toBe(true)
-    expect(cells).toHaveLength(3 * (4 * 3 + 1))
+    expect(cells).toHaveLength(3 * (4 * 4 + 1))
+  })
+
+  it('accepts arbitrary positive capacity ceilings as caller-supplied probes', () => {
+    const options = parseResearchCliArgs(['--capacity', '43,17,64'])
+
+    expect(options.capacityMaxFilters).toEqual([17, 43, 64])
+    expect(options.maxFilters).toEqual([10, 17, 43, 64])
   })
 
   it('rejects invalid CLI combinations and values', () => {
     expect(() => parseResearchCliArgs(['--preset', 'slow'])).toThrow()
     expect(() => parseResearchCliArgs(['--repeats', '0'])).toThrow()
     expect(() => parseResearchCliArgs(['--capacity', '20,wat'])).toThrow()
+    expect(() => parseResearchCliArgs(['--capacity', '17,17'])).toThrow()
     expect(() => parseResearchCliArgs(['--profile', 'unknown:30'])).toThrow()
     expect(() => parseResearchCliArgs(['--test-mode', '--write-baseline'])).toThrow()
     expect(() => parseResearchCliArgs(['--write-baseline'])).toThrow()

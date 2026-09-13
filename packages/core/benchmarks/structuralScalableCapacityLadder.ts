@@ -4,8 +4,10 @@ import { dirname, isAbsolute, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import {
+  AUTOEQ_PRODUCT_LIMITS,
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   MVP_NUMERIC_POLICY,
+  nextScalableCapacity,
   SCALABLE_BASE_CAPACITY,
   SCALABLE_CAPACITY_GROWTH,
   resolveStructuralSearchConfig,
@@ -25,7 +27,15 @@ import {
 } from './research/manualRegression.js'
 
 export const SCALABLE_CAPACITY_LADDER_DEFAULT_BUDGET_SECONDS = 60
-export const SCALABLE_CAPACITY_LADDER_DEFAULT_FINAL_CAPS = [10, 15, 20] as const
+/**
+ * A small diagnostic sample: the base capacity, its first natural growth
+ * point, and the product ceiling.  These are benchmark anchors, not modes.
+ */
+export const SCALABLE_CAPACITY_LADDER_DEFAULT_CEILINGS = [
+  SCALABLE_BASE_CAPACITY,
+  nextScalableCapacity(SCALABLE_BASE_CAPACITY, AUTOEQ_PRODUCT_LIMITS.hardMaxFilters),
+  AUTOEQ_PRODUCT_LIMITS.hardMaxFilters,
+] as const
 
 export type ScalableCapacityLadderStage = ScalableSearchStage & {
   stageElapsedMs: number
@@ -226,7 +236,7 @@ export function parseScalableCapacityLadderArgs(
 ): ScalableCapacityLadderOptions {
   const normalizedArgs = args[0] === '--' ? args.slice(1) : args
   let cases = knownCaseIds()
-  let finalCaps: number[] = [...SCALABLE_CAPACITY_LADDER_DEFAULT_FINAL_CAPS]
+  let finalCaps: number[] = [...SCALABLE_CAPACITY_LADDER_DEFAULT_CEILINGS]
   let budgetSeconds = SCALABLE_CAPACITY_LADDER_DEFAULT_BUDGET_SECONDS
   let outputMode: ScalableCapacityLadderOptions['outputMode'] = 'jsonl'
   let seedFilters: Filter[] | undefined
