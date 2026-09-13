@@ -745,6 +745,38 @@ export function retainParetoBeam(
   return states.filter((state) => selected.has(state.candidateId))
 }
 
+export interface CapacityPressureDelta {
+  /** Additive proposals actually constructed by the existing beam mutation path. */
+  additiveProposalsGenerated: number
+  /** Existing beam mutation gates reached with no filter slot; no candidate was built. */
+  additiveMutationGatesBlockedByCapacity: number
+  /** Existing rescue gate reached while unsolved but with no free filter slot. */
+  rescueAddGatesBlockedByCapacity: number
+  /** Existing pair-add gate reached while unsolved but fewer than two slots remained. */
+  pairAddGatesBlockedByCapacity: number
+}
+
+export function createCapacityPressureDelta(): CapacityPressureDelta {
+  return {
+    additiveProposalsGenerated: 0,
+    additiveMutationGatesBlockedByCapacity: 0,
+    rescueAddGatesBlockedByCapacity: 0,
+    pairAddGatesBlockedByCapacity: 0,
+  }
+}
+
+export function addCapacityPressureDelta(
+  left: CapacityPressureDelta,
+  right: CapacityPressureDelta,
+): CapacityPressureDelta {
+  return {
+    additiveProposalsGenerated: left.additiveProposalsGenerated + right.additiveProposalsGenerated,
+    additiveMutationGatesBlockedByCapacity: left.additiveMutationGatesBlockedByCapacity + right.additiveMutationGatesBlockedByCapacity,
+    rescueAddGatesBlockedByCapacity: left.rescueAddGatesBlockedByCapacity + right.rescueAddGatesBlockedByCapacity,
+    pairAddGatesBlockedByCapacity: left.pairAddGatesBlockedByCapacity + right.pairAddGatesBlockedByCapacity,
+  }
+}
+
 export interface StructuralSearchTraceEvent {
   type: 'start' | 'beam-generation' | 'beam-stop' | 'phase' | 'end'
   phase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap'
@@ -757,6 +789,8 @@ export interface StructuralSearchTraceEvent {
   polishedProposals?: number
   duplicateStates?: number
   nextStates?: number
+  /** Raw capacity-gate accounting for this trace event; never a quality estimate. */
+  capacityPressure?: CapacityPressureDelta
   acceptedSteps?: number
   /** Number of candidate polish calls attempted by a phase. */
   attempts?: number
@@ -822,6 +856,14 @@ export function addSearchWorkDelta(
 }
 
 /** Convert one existing structural trace event into raw work counters. */
+export function capacityPressureDeltaFromTrace(
+  event: StructuralSearchTraceEvent,
+): CapacityPressureDelta {
+  return event.capacityPressure === undefined
+    ? createCapacityPressureDelta()
+    : { ...event.capacityPressure }
+}
+
 export function searchWorkDeltaFromTrace(
   event: StructuralSearchTraceEvent,
 ): SearchWorkDelta {
@@ -1071,6 +1113,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     let admittedProposals = 0
     let polishedProposals = 0
     let duplicateStates = 0
+    let capacityPressure = createCapacityPressureDelta()
 
     for (const parent of beam) {
       if (deadline.isExpired()) break
@@ -1078,6 +1121,14 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       const solution = evaluateV2Solution(parent.filters, desiredDb, frequencies, sampleRateHz)
       const proposals = generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
       generatedProposals += proposals.length
+      capacityPressure.additiveProposalsGenerated += proposals.filter(
+        (proposal) => proposal.filters.length > parent.filters.length,
+      ).length
+      if (parent.filters.length >= config.maxFilters) {
+        // The generator's additive branches are skipped at this existing gate.
+        // Count the gate, not hypothetical candidates or their quality.
+        capacityPressure.additiveMutationGatesBlockedByCapacity += 1
+      }
       const ordered = orderStructuralProposals(proposals)
 
       let admitted: StructuralProposal[] = []
@@ -1155,6 +1206,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       polishedProposals,
       duplicateStates,
       nextStates: nextStates.length,
+      capacityPressure,
     })
 
     if (nextStates.length === 0) {
@@ -1182,6 +1234,10 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
   let rescued = best
   let rescueSteps = 0
   let rescueAttempts = 0
+  const rescueBlockedByCapacity =
+    rescueSteps < 5 &&
+    rescued.filters.length >= config.maxFilters &&
+    (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75)
   const epsilon = 1e-12
   stateTrace('phase', rescued, { phase: 'rescue', status: 'start' })
 
@@ -1259,11 +1315,18 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     status: 'end',
     acceptedSteps: rescueSteps,
     attempts: rescueAttempts,
+    capacityPressure: {
+      ...createCapacityPressureDelta(),
+      rescueAddGatesBlockedByCapacity: rescueBlockedByCapacity ? 1 : 0,
+    },
     reason: deadline.isExpired() ? 'deadline' : 'completed',
   })
 
   let pairAddSteps = 0
   let pairAddAttempts = 0
+  const pairAddBlockedByCapacity =
+    rescued.filters.length > config.maxFilters - 2 &&
+    (rescued.rmseDb > 0.25 || rescued.maxAbsDb > 0.75)
   stateTrace('phase', rescued, { phase: 'pair-add', status: 'start' })
   while (
     rescued.filters.length <= config.maxFilters - 2 &&
@@ -1373,6 +1436,10 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     status: 'end',
     acceptedSteps: pairAddSteps,
     attempts: pairAddAttempts,
+    capacityPressure: {
+      ...createCapacityPressureDelta(),
+      pairAddGatesBlockedByCapacity: pairAddBlockedByCapacity ? 1 : 0,
+    },
     reason: deadline.isExpired() ? 'deadline' : 'completed',
   })
 
