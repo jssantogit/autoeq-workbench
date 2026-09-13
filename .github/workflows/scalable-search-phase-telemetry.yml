@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: scalable-search-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ladder:
     runs-on: ubuntu-latest
