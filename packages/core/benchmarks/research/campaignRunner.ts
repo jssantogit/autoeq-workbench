@@ -1,5 +1,6 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
+import { cpus } from 'node:os'
 import { join } from 'node:path'
 
 /**
@@ -152,9 +153,7 @@ function runtimeInfo(): RuntimeInfo {
     node: process.version,
     platform: process.platform,
     arch: process.arch,
-    cpuCount: typeof process.availableParallelism === 'function'
-      ? process.availableParallelism()
-      : 1,
+    cpuCount: cpus().length,
   }
 }
 
