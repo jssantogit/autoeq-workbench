@@ -41,11 +41,6 @@ concurrency:
 
 jobs:
   ladder:
-    if: >-
-      github.event_name == 'push' ||
-      (inputs.case_id != '' &&
-      (inputs.case_id == 'all' || inputs.case_id == matrix.case_id) &&
-      (inputs.capacity == 'all' || inputs.capacity == matrix.max_filters))
     strategy:
       fail-fast: false
       matrix:
@@ -71,21 +66,49 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Select matrix cell
+        id: select
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REQUESTED_CASE: ${{ inputs.case_id || 'all' }}
+          REQUESTED_CAPACITY: ${{ inputs.capacity || 'all' }}
+          CELL_CASE: ${{ matrix.case_id }}
+          CELL_CAPACITY: ${{ matrix.max_filters }}
+        run: |
+          run_cell=false
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            run_cell=true
+          elif [[
+            ("$REQUESTED_CASE" == "all" || "$REQUESTED_CASE" == "$CELL_CASE") &&
+            ("$REQUESTED_CAPACITY" == "all" || "$REQUESTED_CAPACITY" == "$CELL_CAPACITY")
+          ]]; then
+            run_cell=true
+          fi
+          echo "run=$run_cell" >> "$GITHUB_OUTPUT"
+          echo "Selected=$run_cell case=$CELL_CASE capacity=$CELL_CAPACITY"
+
       - uses: actions/checkout@v4
+        if: steps.select.outputs.run == 'true'
       - uses: pnpm/action-setup@v4
+        if: steps.select.outputs.run == 'true'
         with:
           version: 10.34.5
       - uses: actions/setup-node@v4
+        if: steps.select.outputs.run == 'true'
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+        if: steps.select.outputs.run == 'true'
       - run: pnpm --filter @autoeq-workbench/core typecheck
+        if: steps.select.outputs.run == 'true'
       - run: |
           pnpm --filter @autoeq-workbench/core exec vitest run \
             test/autoeq/v2/structuralSearch.test.ts \
             test/autoeq/v2/structuralScalableCapacityLadder.test.ts
+        if: steps.select.outputs.run == 'true'
       - name: Run scalable capacity cell
+        if: steps.select.outputs.run == 'true'
         env:
           CASE_ID: ${{ matrix.case_id }}
           MAX_FILTERS: ${{ matrix.max_filters }}
@@ -100,7 +123,7 @@ jobs:
             --budget-seconds "$BUDGET_SECONDS" \
             --jsonl | tee "$ARTIFACT_DIR/telemetry.jsonl"
       - name: Upload scalable search telemetry
-        if: always()
+        if: always() && steps.select.outputs.run == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: scalable-search-${{ matrix.case_id }}-max-${{ matrix.max_filters }}-${{ github.run_id }}
