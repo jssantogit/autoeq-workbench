@@ -801,4 +801,35 @@ describe('research stage snapshot semantics', () => {
     expect(stages[0]?.filterCount).toBe(1)
     expect(stages[0]?.capacityHeadroom).toBe(9)
   })
+
+  it('captures a cloned natural pre-decision snapshot without changing the stage action', () => {
+    resetMockRunner()
+    const seed = filter('decision-seed')
+    mockedRunStructuralSearch.mockReturnValue({ filters: [seed], ...expectedMetrics([seed]) })
+    const snapshots: NonNullable<ScalableStructuralSearchInput['onDecision']> extends (
+      snapshot: infer Snapshot,
+    ) => void ? Snapshot[] : never = []
+    const stages: ScalableSearchStage[] = []
+    runScalableStructuralSearch(inputFor({
+      maxFilters: 17,
+      seedFilters: [seed],
+      deadline: deadlineAfterStages(1),
+      onDecision: (snapshot) => snapshots.push(snapshot),
+      onStage: (stage) => stages.push(stage),
+    }))
+
+    expect(snapshots).toHaveLength(1)
+    expect(snapshots[0]?.incumbent.filters).toEqual([seed])
+    expect(snapshots[0]?.incumbent.filters).not.toBe(seed)
+    expect(snapshots[0]?.currentCapacity).toBe(10)
+    expect(snapshots[0]?.maximumCapacity).toBe(17)
+    expect(snapshots[0]?.effortLevel).toBe(0)
+    expect(snapshots[0]?.resolvedConfig.maxFilters).toBe(10)
+    expect(snapshots[0]?.incumbentUtilization).toBe(0.1)
+    expect(snapshots[0]?.expansionOpportunity).toBeDefined()
+    expect(snapshots[0]?.frontierUtilization.parentStatesObserved).toBe(0)
+    expect(snapshots[0]?.capacityPressure.additiveProposalsGenerated).toBe(0)
+    expect(snapshots[0]?.cumulativeWork.structuralSearchInvocations).toBe(0)
+    expect(stages[0]?.action).toBe('expand-capacity')
+  })
 })

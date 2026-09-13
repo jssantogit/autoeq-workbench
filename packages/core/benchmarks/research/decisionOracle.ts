@@ -30,6 +30,15 @@ import {
 } from '../../src/index.js'
 
 import {
+  evaluateFactorizedSchedulerDecision,
+  type SchedulerDecisionFactorizedResult,
+} from '../../src/autoeq/v2/decisionOracle.js'
+import {
+  runScalableStructuralSearch,
+  type ScalableSearchDecisionSnapshot,
+} from '../../src/autoeq/v2/scalableStructuralSearch.js'
+
+import {
   loadManualRegressionCases,
   prepareManualRegressionDesired,
   type ManualRegressionCaseId,
@@ -113,6 +122,33 @@ export interface DecisionOracleProbeRecord {
   warmup: DecisionOracleWarmup
   snapshot: SchedulerDecisionSnapshot
   pair: SchedulerDecisionPairResult
+}
+
+/**
+ * Predeclared, outcome-blind natural-state sampling rule.  It selects at
+ * most one snapshot for each trajectory landmark; oracle results are not an
+ * input.  The legacy controller's next action is an expansion whenever there
+ * is capacity headroom, so a pre-decision state with headroom is the first
+ * available live-expansion landmark.
+ */
+export function naturalDecisionCaptureReasons(
+  snapshot: Pick<ScalableSearchDecisionSnapshot, 'stageIndex' | 'currentCapacity' | 'maximumCapacity' | 'recentGain'>,
+  captured: ReadonlySet<string>,
+): string[] {
+  const reasons: string[] = []
+  if (snapshot.stageIndex === 0 && !captured.has('first-post-initial')) {
+    reasons.push('first-post-initial')
+  }
+  if (snapshot.currentCapacity < snapshot.maximumCapacity && !captured.has('first-before-live-expansion')) {
+    reasons.push('first-before-live-expansion')
+  }
+  if (snapshot.stageIndex > 0 && snapshot.recentGain > 0 && !captured.has('first-after-improvement')) {
+    reasons.push('first-after-improvement')
+  }
+  if (snapshot.stageIndex > 0 && snapshot.recentGain <= DECISION_ORACLE_RECENT_GAIN_SATURATION_THRESHOLD && !captured.has('first-low-gain')) {
+    reasons.push('first-low-gain')
+  }
+  return reasons
 }
 
 function cloneFilters(filters: readonly Filter[]): Filter[] {

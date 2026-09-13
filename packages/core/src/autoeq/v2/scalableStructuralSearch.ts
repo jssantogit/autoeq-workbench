@@ -86,6 +86,35 @@ export interface ScalableSearchStage {
   cumulativeWork?: SearchWorkTotals
 }
 
+/**
+ * Immutable research telemetry captured immediately before a scheduler
+ * action is resolved.  The callback is observational and is never consulted
+ * by the controller policy.
+ */
+export interface ScalableSearchDecisionSnapshot {
+  desiredDb: readonly number[]
+  frequencies: readonly number[]
+  sampleRateHz: number
+  baseConfig: ResolvedStructuralSearchConfig
+  resolvedConfig: ResolvedStructuralSearchConfig
+  incumbent: StructuralSearchResult
+  currentCapacity: number
+  maximumCapacity: number
+  effortLevel: number
+  recentGains: readonly number[]
+  recentGain: number
+  stagesSinceMeaningfulImprovement: number
+  workSinceMeaningfulImprovement: SearchWorkTotals
+  incumbentUtilization: number
+  frontierUtilization: FrontierUtilizationDelta
+  capacityPressure: CapacityPressureDelta
+  cumulativeCapacityPressure: CapacityPressureDelta
+  expansionOpportunity: ResidualExpansionOpportunity
+  cumulativeWork: SearchWorkTotals
+  remainingWallClockMs?: number
+  stageIndex: number
+}
+
 export interface ScalableStructuralSearchInput {
   desiredDb: readonly number[]
   frequencies: readonly number[]
@@ -103,6 +132,7 @@ export interface ScalableStructuralSearchInput {
   remainingWallClockMs?: () => number
   nowMs?: () => number
   onStage?: (stage: ScalableSearchStage) => void
+  onDecision?: (snapshot: ScalableSearchDecisionSnapshot) => void
 }
 
 export interface ScalableStructuralSearchResult extends StructuralSearchResult {
@@ -252,7 +282,10 @@ export function runScalableStructuralSearch(
   let stageIndex = 0
   let cumulativeWork = createSearchWorkDelta()
   let cumulativeCapacityPressure = createCapacityPressureDelta()
+  let previousCapacityPressure = createCapacityPressureDelta()
+  let previousFrontierUtilization = createFrontierUtilizationDelta()
   let recentGain = 0
+  let recentGains: number[] = []
   let stagesSinceMeaningfulImprovement = 0
   let workSinceMeaningfulImprovement = createSearchWorkDelta()
   const schedulerPolicy = input.schedulerPolicy ?? 'legacy'
@@ -279,6 +312,38 @@ export function runScalableStructuralSearch(
       incumbentResidualDb,
       opportunityBounds,
     )
+    const remainingWallClockMs = input.remainingWallClockMs?.()
+    input.onDecision?.({
+      desiredDb: [...input.desiredDb],
+      frequencies: [...input.frequencies],
+      sampleRateHz: input.sampleRateHz,
+      baseConfig: { ...input.baseConfig },
+      resolvedConfig: resolveScalableEffortConfig(
+        input.baseConfig,
+        capacity,
+        effortLevel,
+      ),
+      incumbent: {
+        filters: incumbent.filters.map((filter) => ({ ...filter })),
+        rmseDb: incumbent.rmseDb,
+        maxAbsDb: incumbent.maxAbsDb,
+      },
+      currentCapacity: capacity,
+      maximumCapacity: maximum,
+      effortLevel,
+      recentGains: [...recentGains],
+      recentGain,
+      stagesSinceMeaningfulImprovement,
+      workSinceMeaningfulImprovement: { ...workSinceMeaningfulImprovement },
+      incumbentUtilization: incumbent.filters.length / capacity,
+      frontierUtilization: { ...previousFrontierUtilization },
+      capacityPressure: { ...previousCapacityPressure },
+      cumulativeCapacityPressure: { ...cumulativeCapacityPressure },
+      expansionOpportunity: { ...expansionOpportunity },
+      cumulativeWork: { ...cumulativeWork },
+      remainingWallClockMs,
+      stageIndex,
+    })
     const stageDeadlineAt = nowMs() + stageQuantumMs
     const atMaximumCapacity = capacity >= maximum
     const useRemovalReseed =
@@ -286,8 +351,8 @@ export function runScalableStructuralSearch(
       effortLevel >= 2 &&
       consecutiveNoImprovement >= 1 &&
       incumbent.filters.length > 0
-    const remainingWallClockMs = schedulerPolicy === 'adaptive-resource'
-      ? input.remainingWallClockMs?.()
+    const policyRemainingWallClockMs = schedulerPolicy === 'adaptive-resource'
+      ? remainingWallClockMs
       : undefined
     const adaptiveDecision = schedulerPolicy === 'adaptive-resource'
       ? decideAdaptiveSchedulerAction({
@@ -297,7 +362,7 @@ export function runScalableStructuralSearch(
         recentGain,
         stagesSinceMeaningfulImprovement,
         workSinceMeaningfulImprovement,
-        remainingWallClockMs,
+        remainingWallClockMs: policyRemainingWallClockMs,
       }, adaptivePolicyParameters)
       : undefined
     const action = useRemovalReseed
@@ -417,7 +482,7 @@ export function runScalableStructuralSearch(
       decisionReason: adaptiveDecision?.reason,
       stagesSinceMeaningfulImprovement,
       workSinceMeaningfulImprovement,
-      remainingWallClockMs,
+      remainingWallClockMs: policyRemainingWallClockMs,
       qualityBefore,
       candidateQuality,
       qualityAfter,
@@ -440,6 +505,10 @@ export function runScalableStructuralSearch(
       workDelta,
       cumulativeWork,
     })
+
+    previousCapacityPressure = { ...capacityPressure }
+    previousFrontierUtilization = { ...frontierUtilization }
+    recentGains = [...recentGains, recentGain]
 
     stageIndex += 1
     if (action === 'expand-capacity' && capacity < maximum) {

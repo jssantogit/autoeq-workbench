@@ -19,6 +19,10 @@ import {
   type StructuralSearchTraceEvent,
 } from '../../../src/index.js'
 
+import {
+  evaluateFactorizedSchedulerDecision,
+} from '../../../src/autoeq/v2/decisionOracle.js'
+
 import { measureResidualExpansionOpportunity } from '../../../src/autoeq/v2/structuralSearch.js'
 
 const frequencies = [100, 1_000, 10_000]
@@ -122,6 +126,74 @@ const emptyWork: SearchWorkDelta = {
 }
 
 describe('generic scheduler decision oracle', () => {
+  it('holds each factorized resource axis independently and reports slot use', () => {
+    const calls: Array<{
+      maxFilters: number
+      beamWidth: number
+      proposalsPerParent: number
+      localPolishEvaluations: number
+    }> = []
+    const run: SchedulerDecisionSearchRunner = ({ config, onTrace }) => {
+      calls.push({
+        maxFilters: config.maxFilters,
+        beamWidth: config.beamWidth,
+        proposalsPerParent: config.proposalsPerParent,
+        localPolishEvaluations: config.localPolishEvaluations,
+      })
+      onTrace?.(event('beam-generation', {
+        frontierUtilization: {
+          parentStatesObserved: 1,
+          parentFilterCountMax: config.maxFilters - 1,
+          generatedCandidateFilterCountMax: config.maxFilters,
+          admittedCandidateFilterCountMax: config.maxFilters,
+          polishedCandidateFilterCountMax: config.maxFilters,
+          parentsAtCapacity: 0,
+          generatedCandidatesAtCapacity: 1,
+          admittedCandidatesAtCapacity: 1,
+          polishedCandidatesAtCapacity: 1,
+          candidatesWithinOneSlotOfCapacity: 1,
+        },
+      }))
+      return result([])
+    }
+
+    const factorized = evaluateFactorizedSchedulerDecision(
+      snapshot({ currentCapacity: 10, maximumCapacity: 17, effortLevel: 1 }),
+      { structuralSearchInvocations: 1, stageQuantumMs: 1 },
+      { run, nowMs: () => 0 },
+    )
+    const control = factorized.byAction.control
+    const effortOnly = factorized.byAction['effort-only']
+    const capacityOnly = factorized.byAction['capacity-only']
+
+    expect(factorized.arms.map((arm) => arm.action)).toEqual([
+      'control',
+      'effort-only',
+      'capacity-only',
+    ])
+    expect(calls).toHaveLength(3)
+    expect(control.capacityAfter).toBe(10)
+    expect(control.effortLevelUsed).toBe(1)
+    expect(effortOnly.capacityAfter).toBe(10)
+    expect(effortOnly.effortLevelUsed).toBe(2)
+    expect(capacityOnly.capacityAfter).toBe(nextScalableCapacity(10, 17))
+    expect(capacityOnly.effortLevelUsed).toBe(1)
+    expect(control.resolvedConfig.maxFilters).toBe(10)
+    expect(effortOnly.resolvedConfig.maxFilters).toBe(10)
+    expect(capacityOnly.resolvedConfig.maxFilters).toBe(15)
+    expect(control.resolvedConfig.beamWidth).toBe(capacityOnly.resolvedConfig.beamWidth)
+    expect(control.resolvedConfig.proposalsPerParent).toBe(capacityOnly.resolvedConfig.proposalsPerParent)
+    expect(control.resolvedConfig.localPolishEvaluations).toBe(capacityOnly.resolvedConfig.localPolishEvaluations)
+    expect(control.additionalStructuralSlotsUsed).toBe(false)
+    expect(capacityOnly.additionalStructuralSlotsUsed).toBe(true)
+    expect(factorized.arms.map((arm) => arm.startingIncumbent)).toEqual([
+      snapshot().incumbent,
+      snapshot().incumbent,
+      snapshot().incumbent,
+    ])
+    expect(factorized.workComparison.requestedStructuralSearchInvocations).toBe(1)
+  })
+
   it('captures exact incumbent residual opportunity and preserves paired state telemetry', () => {
     const state = snapshot({
       expansionOpportunity: {

@@ -39,6 +39,16 @@ import {
 export type SchedulerDecisionAction =
   | 'deepen-current-regime'
   | 'expand-capacity'
+  | FactorizedSchedulerDecisionAction
+
+export type LegacySchedulerDecisionAction =
+  | 'deepen-current-regime'
+  | 'expand-capacity'
+
+export type FactorizedSchedulerDecisionAction =
+  | 'control'
+  | 'effort-only'
+  | 'capacity-only'
 
 /**
  * A controlled oracle quantum.  Structural-search invocations are the
@@ -59,6 +69,8 @@ export interface SchedulerDecisionSnapshot {
   frequencies: readonly number[]
   sampleRateHz: number
   baseConfig: ResolvedStructuralSearchConfig
+  /** Resolved configuration at the captured state, when live telemetry supplies it. */
+  resolvedConfig?: ResolvedStructuralSearchConfig
   incumbent: StructuralSearchResult
   currentCapacity: number
   maximumCapacity: number
@@ -70,7 +82,11 @@ export interface SchedulerDecisionSnapshot {
   /** Raw work accumulated since the last positive incumbent improvement. */
   workSinceMeaningfulImprovement?: SearchWorkTotals
   expansionOpportunity?: ResidualExpansionOpportunity
+  /** Alias for callers that classify expansionOpportunity as residual telemetry. */
+  residualTelemetry?: ResidualExpansionOpportunity
   capacityPressure?: CapacityPressureDelta
+  frontierUtilization?: FrontierUtilizationDelta
+  incumbentUtilization?: number
   cumulativeWork?: SearchWorkTotals
   remainingWallClockMs?: number
   stageIndex?: number
@@ -94,6 +110,8 @@ export interface SchedulerDecisionArmResult {
   capacityExpanded: boolean
   effortLevelBefore: number
   effortLevelUsed: number
+  configuration: SchedulerConfiguredContinuation
+  resolvedConfig: ResolvedStructuralSearchConfig
   startingIncumbent: StructuralSearchResult
   candidate: StructuralSearchResult
   finalIncumbent: StructuralSearchResult
@@ -106,11 +124,13 @@ export interface SchedulerDecisionArmResult {
   cumulativeWork: SearchWorkTotals
   elapsedMs: number
   frontierUtilization: FrontierUtilizationDelta
+  maximumFilterCountObserved: number
+  additionalStructuralSlotsUsed: boolean
 }
 
 export interface SchedulerDecisionWorkComparison {
   requestedStructuralSearchInvocations: number
-  actualByAction: Record<SchedulerDecisionAction, SearchWorkTotals>
+  actualByAction: Record<LegacySchedulerDecisionAction, SearchWorkTotals>
   equalDimensions: SchedulerDecisionWorkDimension[]
   mismatchedDimensions: SchedulerDecisionWorkDimension[]
   notes: string[]
@@ -119,8 +139,27 @@ export interface SchedulerDecisionWorkComparison {
 export interface SchedulerDecisionPairResult {
   snapshot: SchedulerDecisionSnapshot
   arms: [SchedulerDecisionArmResult, SchedulerDecisionArmResult]
-  byAction: Record<SchedulerDecisionAction, SchedulerDecisionArmResult>
+  byAction: Record<LegacySchedulerDecisionAction, SchedulerDecisionArmResult>
   workComparison: SchedulerDecisionWorkComparison
+}
+
+export interface SchedulerDecisionFactorizedWorkComparison {
+  requestedStructuralSearchInvocations: number
+  actualByAction: Record<FactorizedSchedulerDecisionAction, SearchWorkTotals>
+  equalDimensions: SchedulerDecisionWorkDimension[]
+  mismatchedDimensions: SchedulerDecisionWorkDimension[]
+  notes: string[]
+}
+
+export interface SchedulerDecisionFactorizedResult {
+  snapshot: SchedulerDecisionSnapshot
+  arms: [
+    SchedulerDecisionArmResult,
+    SchedulerDecisionArmResult,
+    SchedulerDecisionArmResult,
+  ]
+  byAction: Record<FactorizedSchedulerDecisionAction, SchedulerDecisionArmResult>
+  workComparison: SchedulerDecisionFactorizedWorkComparison
 }
 
 const WORK_DIMENSIONS: readonly SchedulerDecisionWorkDimension[] = [
@@ -158,6 +197,9 @@ function cloneSnapshot(snapshot: SchedulerDecisionSnapshot): SchedulerDecisionSn
     desiredDb: [...snapshot.desiredDb],
     frequencies: [...snapshot.frequencies],
     baseConfig: { ...snapshot.baseConfig },
+    resolvedConfig: snapshot.resolvedConfig === undefined
+      ? undefined
+      : { ...snapshot.resolvedConfig },
     incumbent: cloneResult(snapshot.incumbent),
     recentGains: snapshot.recentGains === undefined
       ? undefined
@@ -168,9 +210,15 @@ function cloneSnapshot(snapshot: SchedulerDecisionSnapshot): SchedulerDecisionSn
     expansionOpportunity: snapshot.expansionOpportunity === undefined
       ? undefined
       : { ...snapshot.expansionOpportunity },
+    residualTelemetry: snapshot.residualTelemetry === undefined
+      ? undefined
+      : { ...snapshot.residualTelemetry },
     capacityPressure: snapshot.capacityPressure === undefined
       ? undefined
       : { ...snapshot.capacityPressure },
+    frontierUtilization: snapshot.frontierUtilization === undefined
+      ? undefined
+      : { ...snapshot.frontierUtilization },
     cumulativeWork: snapshot.cumulativeWork === undefined
       ? undefined
       : cloneWork(snapshot.cumulativeWork),
@@ -254,7 +302,7 @@ function validateWorkBudget(workBudget: SchedulerDecisionWorkBudget): void {
 
 function actionCapacity(
   snapshot: SchedulerDecisionSnapshot,
-  action: SchedulerDecisionAction,
+  action: LegacySchedulerDecisionAction,
 ): number {
   return action === 'expand-capacity'
     ? nextScalableCapacity(snapshot.currentCapacity, snapshot.maximumCapacity)
@@ -263,7 +311,7 @@ function actionCapacity(
 
 function actionEffort(
   snapshot: SchedulerDecisionSnapshot,
-  action: SchedulerDecisionAction,
+  action: LegacySchedulerDecisionAction,
 ): number {
   return action === 'deepen-current-regime'
     ? Math.min(SCALABLE_MAX_EFFORT_LEVEL, snapshot.effortLevel + 1)
@@ -305,11 +353,51 @@ function workComparison(
   }
 }
 
+function factorizedWorkComparison(
+  workBudget: SchedulerDecisionWorkBudget,
+  arms: readonly SchedulerDecisionArmResult[],
+): SchedulerDecisionFactorizedWorkComparison {
+  const equalDimensions: SchedulerDecisionWorkDimension[] = []
+  const mismatchedDimensions: SchedulerDecisionWorkDimension[] = []
+  for (const dimension of WORK_DIMENSIONS) {
+    const first = arms[0]?.workDelta[dimension]
+    if (arms.every((arm) => arm.workDelta[dimension] === first)) {
+      equalDimensions.push(dimension)
+    } else {
+      mismatchedDimensions.push(dimension)
+    }
+  }
+  const notes = [
+    'All arms use the same requested structural-search invocation count and per-invocation deadline quantum.',
+    'Control holds capacity and effort; effort-only changes effort; capacity-only changes structural capacity.',
+  ]
+  if (mismatchedDimensions.length > 0) {
+    notes.push(
+      `Raw work differs for: ${mismatchedDimensions.join(', ')}. No weighted compute score is inferred.`,
+    )
+  }
+  return {
+    requestedStructuralSearchInvocations: workBudget.structuralSearchInvocations,
+    actualByAction: {
+      control: cloneWork(arms[0]!.workDelta),
+      'effort-only': cloneWork(arms[1]!.workDelta),
+      'capacity-only': cloneWork(arms[2]!.workDelta),
+    },
+    equalDimensions,
+    mismatchedDimensions,
+    notes,
+  }
+}
+
 /**
  * Evaluate one research continuation from a cloned scheduler snapshot.
  * Production scheduling never calls this function.
  */
-export interface SchedulerConfiguredContinuation { capacity: number; effortLevel: number }
+export interface SchedulerConfiguredContinuation {
+  capacity: number
+  effortLevel: number
+  action?: SchedulerDecisionAction
+}
 
 export function evaluateConfiguredContinuation(
   snapshot: SchedulerDecisionSnapshot,
@@ -325,6 +413,7 @@ export function evaluateConfiguredContinuation(
   const capacityBefore = snapshot.currentCapacity
   const capacityAfter = configuration.capacity
   const effortLevelUsed = configuration.effortLevel
+  const action = configuration.action ?? 'deepen-current-regime'
   assertPositiveSafeInteger(capacityAfter, 'configuration.capacity')
   if (!Number.isSafeInteger(effortLevelUsed) || effortLevelUsed < 0 || effortLevelUsed > SCALABLE_MAX_EFFORT_LEVEL) throw new Error('configuration.effortLevel is out of range')
   const startingIncumbent = cloneResult(snapshot.incumbent)
@@ -337,6 +426,11 @@ export function evaluateConfiguredContinuation(
   const quantumMs = snapshot.remainingWallClockMs === undefined
     ? requestedQuantumMs
     : Math.min(requestedQuantumMs, snapshot.remainingWallClockMs)
+  const resolvedConfig = resolveScalableEffortConfig(
+    snapshot.baseConfig,
+    capacityAfter,
+    effortLevelUsed,
+  )
 
   for (let invocation = 0; invocation < workBudget.structuralSearchInvocations; invocation += 1) {
     const invocationStartedAt = nowMs()
@@ -349,11 +443,7 @@ export function evaluateConfiguredContinuation(
       desiredDb: [...snapshot.desiredDb],
       frequencies: [...snapshot.frequencies],
       sampleRateHz: snapshot.sampleRateHz,
-      config: resolveScalableEffortConfig(
-        snapshot.baseConfig,
-        capacityAfter,
-        effortLevelUsed,
-      ),
+      config: { ...resolvedConfig },
       deadline: {
         isExpired: () => nowMs() >= deadlineAt,
       },
@@ -384,14 +474,25 @@ export function evaluateConfiguredContinuation(
     snapshot.cumulativeWork ?? createSearchWorkDelta(),
     workDelta,
   )
+  const maximumFilterCountObserved = Math.max(
+    startingIncumbent.filters.length,
+    candidate.filters.length,
+    incumbent.filters.length,
+    frontierUtilization.parentFilterCountMax,
+    frontierUtilization.generatedCandidateFilterCountMax,
+    frontierUtilization.admittedCandidateFilterCountMax,
+    frontierUtilization.polishedCandidateFilterCountMax,
+  )
 
   return {
-    action: 'deepen-current-regime',
+    action,
     capacityBefore,
     capacityAfter,
     capacityExpanded: capacityAfter > capacityBefore,
     effortLevelBefore: snapshot.effortLevel,
     effortLevelUsed,
+    configuration: { ...configuration, action },
+    resolvedConfig: { ...resolvedConfig },
     startingIncumbent,
     candidate,
     finalIncumbent: cloneResult(incumbent),
@@ -404,19 +505,92 @@ export function evaluateConfiguredContinuation(
     cumulativeWork,
     elapsedMs: Math.max(0, nowMs() - startedAt),
     frontierUtilization,
+    maximumFilterCountObserved,
+    additionalStructuralSlotsUsed: maximumFilterCountObserved > capacityBefore,
   }
 }
 
 export function evaluateSchedulerDecision(
   snapshot: SchedulerDecisionSnapshot,
-  action: SchedulerDecisionAction,
+  action: LegacySchedulerDecisionAction,
   workBudget: SchedulerDecisionWorkBudget,
   options: SchedulerDecisionOptions = {},
 ): SchedulerDecisionArmResult {
   return evaluateConfiguredContinuation(snapshot, {
     capacity: actionCapacity(snapshot, action),
     effortLevel: actionEffort(snapshot, action),
+    action,
   }, workBudget, options)
+}
+
+/**
+ * Run the factorized three-arm research protocol from one cloned snapshot.
+ * This is deliberately research-only; it does not select a production action.
+ */
+export function evaluateFactorizedSchedulerDecision(
+  snapshot: SchedulerDecisionSnapshot,
+  workBudget: SchedulerDecisionWorkBudget,
+  options: SchedulerDecisionOptions = {},
+): SchedulerDecisionFactorizedResult {
+  const captured = cloneSnapshot(snapshot)
+  // Recompute residual telemetry from the exact cloned incumbent before any
+  // continuation.  This keeps all three arms on one causal state.
+  captured.expansionOpportunity = computeExpansionOpportunity(captured)
+  captured.residualTelemetry = captured.expansionOpportunity
+  captured.capacityPressure = captured.capacityPressure ?? createCapacityPressureDelta()
+  const nextCapacity = nextScalableCapacity(
+    captured.currentCapacity,
+    captured.maximumCapacity,
+  )
+  const nextEffort = Math.min(
+    SCALABLE_MAX_EFFORT_LEVEL,
+    captured.effortLevel + 1,
+  )
+  const control = evaluateConfiguredContinuation(
+    cloneSnapshot(captured),
+    {
+      action: 'control',
+      capacity: captured.currentCapacity,
+      effortLevel: captured.effortLevel,
+    },
+    workBudget,
+    options,
+  )
+  const effortOnly = evaluateConfiguredContinuation(
+    cloneSnapshot(captured),
+    {
+      action: 'effort-only',
+      capacity: captured.currentCapacity,
+      effortLevel: nextEffort,
+    },
+    workBudget,
+    options,
+  )
+  const capacityOnly = evaluateConfiguredContinuation(
+    cloneSnapshot(captured),
+    {
+      action: 'capacity-only',
+      capacity: nextCapacity,
+      effortLevel: captured.effortLevel,
+    },
+    workBudget,
+    options,
+  )
+  const arms: [
+    SchedulerDecisionArmResult,
+    SchedulerDecisionArmResult,
+    SchedulerDecisionArmResult,
+  ] = [control, effortOnly, capacityOnly]
+  return {
+    snapshot: captured,
+    arms,
+    byAction: {
+      control,
+      'effort-only': effortOnly,
+      'capacity-only': capacityOnly,
+    },
+    workComparison: factorizedWorkComparison(workBudget, arms),
+  }
 }
 
 /**
