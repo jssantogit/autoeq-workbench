@@ -399,6 +399,42 @@ describe('Experimental Max10 structural search', () => {
     }).workProfile).toBe('full')
   })
 
+  it('emits opt-in phase telemetry without changing deterministic search output', () => {
+    const config = {
+      ...resolveStructuralSearchConfig({
+        preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
+      }),
+      maxFilters: 2,
+      beamWidth: 2,
+      proposalsPerParent: 4,
+    }
+
+    const run = (withTrace: boolean) => {
+      let deadlineChecks = 0
+      const events: Array<{ type: string; phase?: string; reason?: string }> = []
+      const result = runStructuralSearch({
+        desiredDb: [...localizedResidual],
+        frequencies: [...frequencies],
+        sampleRateHz: 48_000,
+        config,
+        deadline: { isExpired: () => ++deadlineChecks > 500 },
+        seedFilters: [],
+        onTrace: withTrace ? (event) => events.push(event) : undefined,
+      })
+      return { result, events }
+    }
+
+    const plain = run(false)
+    const traced = run(true)
+
+    expect(traced.result).toEqual(plain.result)
+    expect(traced.events[0]?.type).toBe('start')
+    expect(traced.events.some((event) => event.type === 'beam-generation')).toBe(true)
+    expect(traced.events.some(
+      (event) => event.type === 'phase' && event.phase === 'rescue',
+    )).toBe(true)
+  })
+
   it('returns bit-for-bit identical filters for repeated deterministic searches', () => {
     const config = {
       ...resolveStructuralSearchConfig({
