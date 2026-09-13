@@ -163,3 +163,19 @@ export type {
   StructuralSearchResult,
   StructuralSearchTraceEvent,
 } from './autoeq/v2/structuralSearch.js'
+
+export {
+  SCALABLE_BASE_CAPACITY,
+  SCALABLE_CAPACITY_GROWTH,
+  SCALABLE_STAGE_QUANTUM_MS,
+  SCALABLE_MAX_EFFORT_LEVEL,
+  nextScalableCapacity,
+  resolveScalableEffortConfig,
+  runScalableStructuralSearch,
+  structuralViolation,
+} from './autoeq/v2/scalableStructuralSearch.js'
+export type {
+  ScalableSearchStage,
+  ScalableStructuralSearchInput,
+  ScalableStructuralSearchResult,
+} from './autoeq/v2/scalableStructuralSearch.js'
