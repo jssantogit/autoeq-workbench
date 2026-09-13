@@ -4,7 +4,7 @@ import type { DockTab } from '../../state/uiStore'
 const tabs: { id: DockTab; label: string }[] = [
   { id: 'curves', label: 'Curves' },
   { id: 'equalizer', label: 'Equalizer' },
-  { id: 'details', label: 'Details' },
+  { id: 'tools', label: 'Tools' },
 ]
 
 interface DockTabsProps {

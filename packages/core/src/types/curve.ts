@@ -15,9 +15,12 @@ export interface Curve {
   metadata: CurveMetadata
 }
 
+export type NormalizationMode = 'hz' | 'db'
+
 export interface Normalization {
-  anchorHz: number
-  targetDb: number
+  mode: NormalizationMode
+  frequencyHz: number
+  levelDb: number
 }
 
 export interface PreparedCurve {

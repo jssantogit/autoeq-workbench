@@ -1,4 +1,5 @@
 import type { Curve, Filter } from '@autoeq-workbench/core'
+import { StrictMode } from 'react'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { uiStore } from '../../state/uiStore'
@@ -49,7 +50,15 @@ function installGraphMediaQuery(initialMatches: boolean) {
 
 describe('FrequencyResponseGraph SVG renderer', () => {
   beforeEach(() => {
-    uiStore.setState({ theme: 'light', curveAppearance: {}, inspectorEnabled: true })
+    uiStore.setState({
+      theme: 'light',
+      curveAppearance: {},
+      inspectorEnabled: true,
+      labelsEnabled: true,
+      graphZoomPreset: 'full',
+      smoothingLevel: 5,
+      baselineCurveId: null,
+    })
     Object.defineProperty(window, 'matchMedia', { configurable: true, value: undefined })
   })
 
@@ -64,19 +73,38 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(svg).toHaveClass('fr-graph')
     expect(svg).not.toHaveAttribute('role', 'img')
     expect(svg).toHaveStyle({ aspectRatio: '800 / 346', width: '100%', height: 'auto' })
+    expect(container.querySelectorAll('[data-squiglink-graph-root]')).toHaveLength(1)
     expect(container.querySelectorAll('[data-x-grid]')).toHaveLength(25)
     expect(container.querySelectorAll('[data-y-grid]')).toHaveLength(12)
-    expect(container.querySelector('[data-y-grid="0"]')).toHaveAttribute('data-emphasis', 'zero')
+    const zeroGrid = container.querySelector('[data-y-grid="0"]')
+    const adjacentGrid = container.querySelector('[data-y-grid="5"]')
+    expect(zeroGrid).not.toHaveAttribute('data-emphasis')
+    expect(zeroGrid).toHaveAttribute('stroke', adjacentGrid?.getAttribute('stroke'))
+    expect(zeroGrid).toHaveAttribute('stroke-width', adjacentGrid?.getAttribute('stroke-width'))
     const dbLabel = container.querySelector('[data-db-label]')
     expect(dbLabel).toHaveTextContent('dB')
-    expect(dbLabel).toHaveAttribute('x', '19')
-    expect(dbLabel).toHaveAttribute('y', '16')
-    expect(container.querySelectorAll('.graph-axis-label')).toHaveLength(23)
+    expect(dbLabel).toHaveAttribute('transform', 'translate(785 0) rotate(-90)')
+    expect(dbLabel).toHaveAttribute('x', '-10')
+    expect(dbLabel).toHaveAttribute('y', '-772')
+    expect(dbLabel).toHaveAttribute('text-anchor', 'end')
+    expect(container.querySelectorAll('.graph-axis-label')).toHaveLength(38)
+    expect([...container.querySelectorAll('[data-x-tick] text')].map((label) => label.textContent)).toEqual([
+      '20Hz', '30', '40', '50', '60', '80', '100', '150', '200', '300', '400', '500', '600', '800',
+      '1k', '1.5k', '2k', '3k', '4k', '5k', '6k', '8k', '10k', '15k', '20kHz',
+    ])
+    const xPositions = [20, 200, 2_000, 20_000].map((frequency) =>
+      Number(container.querySelector(`[data-x-tick="${frequency}"] text`)?.getAttribute('x')))
+    expect(xPositions[1]! - xPositions[0]!).toBeCloseTo(xPositions[2]! - xPositions[1]!, 6)
+    expect(xPositions[2]! - xPositions[1]!).toBeCloseTo(xPositions[3]! - xPositions[2]!, 6)
     expect([...container.querySelectorAll('[data-y-label]')].map((label) => label.textContent)).toEqual([
       '25', '20', '15', '10', '5', '0', '-5', '-10', '-15', '-20', '-25', '-30',
     ])
-    expect(container.querySelector('[data-y-label="25"]')).toHaveAttribute('dominant-baseline', 'hanging')
-    expect(container.querySelector('[data-y-label="-30"]')).toHaveAttribute('dominant-baseline', 'auto')
+    const yPositions = [25, 20, 15].map((db) =>
+      Number(container.querySelector(`[data-y-label="${db}"]`)?.getAttribute('y')))
+    expect(yPositions[1]! - yPositions[0]!).toBeCloseTo(yPositions[2]! - yPositions[1]!, 6)
+    expect(container.querySelector('[data-y-label="25"]')).toHaveAttribute('x', '18')
+    expect(container.querySelector('[data-y-label="25"]')).toHaveAttribute('dy', '-2')
+    expect(container.querySelector('[data-y-label="25"]')).toHaveAttribute('text-anchor', 'start')
     expect(container.querySelector('.graph-meta')).not.toBeInTheDocument()
     expect(container.querySelector('[class*="legend"]')).not.toBeInTheDocument()
     expect(container.innerHTML).not.toMatch(/sampling|dataZoom|toolbox|Reset View/)
@@ -85,27 +113,27 @@ describe('FrequencyResponseGraph SVG renderer', () => {
   it('renders visible series and internal names with effective styles while omitting hidden curves', () => {
     const store = createWorkspaceStore()
     store.getState().addCurve(curve('source', 'Studio left', 'fr'))
-    store.getState().addCurve(curve('target', 'Harman target', 'target', 1))
+    store.getState().addCurve(curve('target', 'Harman  target', 'target', 1))
     store.getState().addCurve(curve('reference', 'Archive target', 'target', 2))
     store.getState().addCurve(curve('comparison', 'Room comparison', 'fr', 3))
     store.getState().addCurve(curve('hidden', 'Hidden comparison', 'fr', 4))
     store.getState().setFilters([filter], 'manual')
     uiStore.setState({
       curveAppearance: {
-        source: { color: '#1565c0', visible: true },
-        target: { color: '#c62828', visible: true },
-        reference: { color: '#2e7d32', visible: true },
-        comparison: { color: '#6a1b9a', visible: true },
-        hidden: { color: '#00838f', visible: false },
+        source: { color: '#1565c0', visible: true, offsetDb: 0 },
+        target: { color: '#c62828', visible: true, offsetDb: 0 },
+        reference: { color: '#2e7d32', visible: true, offsetDb: 0 },
+        comparison: { color: '#6a1b9a', visible: true, offsetDb: 0 },
+        hidden: { color: '#00838f', visible: false, offsetDb: 0 },
       },
     })
 
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     const paths = [...container.querySelectorAll<SVGPathElement>('[data-series-name]')]
     expect(paths.map((path) => path.dataset.seriesName)).toEqual([
-      'Studio left', 'Studio left EQ', 'Harman target', 'Archive target', 'Room comparison',
+      'Studio left', 'Studio left EQ', 'Harman  target', 'Archive target', 'Room comparison',
     ])
-    for (const name of ['Harman target', 'Archive target']) {
+    for (const name of ['Harman  target', 'Archive target']) {
       const target = container.querySelector(`[data-series-name="${name}"]`)
       expect(target).toHaveAttribute('stroke', '#989894')
       expect(target).toHaveAttribute('stroke-dasharray')
@@ -113,24 +141,27 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-series-name="Studio left EQ"]')).toHaveAttribute('stroke', '#c62828')
     expect(container.querySelector('[data-series-name="Hidden comparison"]')).not.toBeInTheDocument()
     expect(screen.getByText('Studio left')).toHaveAttribute('fill', '#1565c0')
-    expect(screen.getByText('Harman target')).toHaveAttribute('fill', '#989894')
-    expect(screen.getByText('Studio left')).toHaveAttribute('x', '67')
-    expect(screen.getByText('Harman target')).toHaveAttribute('x', '102')
-    expect(container.querySelector('[data-target-label-sample="target"]')).toHaveAttribute('x1', '67')
-    expect(container.querySelector('[data-target-label-sample="target"]')).toHaveAttribute('stroke-dasharray', '7 5')
-    expect(container.querySelector('[data-target-label-sample="reference"]')).toBeInTheDocument()
+    const targetLabel = container.querySelector('[data-curve-label="target"]')
+    expect(targetLabel).toHaveTextContent('Harman target')
+    expect(targetLabel?.textContent).toBe('Harman  target')
+    expect(targetLabel).toHaveStyle({ whiteSpace: 'pre' })
+    expect(targetLabel).toHaveAttribute('fill', '#989894')
+    expect(container.querySelector('[data-target-label-sample]')).not.toBeInTheDocument()
+    expect([...container.querySelectorAll('[data-curve-label]')]
+      .every((label) => label.getAttribute('x') === '67')).toBe(true)
+    expect([...container.querySelectorAll('[data-curve-label]')]
+      .every((label) => label.getAttribute('font-size') === '12')).toBe(true)
     expect(screen.queryByText('Hidden comparison')).not.toBeInTheDocument()
 
     const yLabelX = Number(container.querySelector('[data-y-label="-30"]')?.getAttribute('x'))
     const annotations = [
       ...container.querySelectorAll('[data-curve-label]'),
-      ...container.querySelectorAll('[data-target-label-sample]'),
     ]
     const annotationXs = annotations
-      .map((label) => Number(label.getAttribute(label.tagName === 'line' ? 'x1' : 'x')))
+      .map((label) => Number(label.getAttribute('x')))
     expect(annotationXs.every((x) => x > yLabelX + 20)).toBe(true)
     expect(annotations.every((label) =>
-      Number(label.getAttribute(label.tagName === 'line' ? 'y1' : 'y')) < 322,
+      Number(label.getAttribute('y')) < 324,
     )).toBe(true)
   })
 
@@ -157,13 +188,13 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelectorAll('[data-y-grid]')).toHaveLength(12)
     expect([...container.querySelectorAll('[data-series-name]')].map((path) => path.getAttribute('d')))
       .toEqual(initialPaths)
-    expect(container.querySelector('.graph-axis-label--x')).toHaveAttribute('font-size', '13')
-    expect(container.querySelector('[data-y-label]')).toHaveAttribute('font-size', '12')
+    expect(container.querySelector('.graph-axis-label--x')).toHaveAttribute('font-size', '10')
+    expect(container.querySelector('[data-y-label]')).toHaveAttribute('font-size', '10')
 
     const labels = [...container.querySelectorAll('[data-curve-label]')]
-    expect(labels[0]).toHaveAttribute('font-size', '19')
-    expect(Number(labels[0]!.getAttribute('y')) - Number(labels[1]!.getAttribute('y'))).toBe(21)
-    expect(labels.every((label) => Number(label.getAttribute('y')) < 322)).toBe(true)
+    expect(labels[0]).toHaveAttribute('font-size', '12')
+    expect(Number(labels[0]!.getAttribute('y')) - Number(labels[1]!.getAttribute('y'))).toBe(16)
+    expect(labels.every((label) => Number(label.getAttribute('y')) < 324)).toBe(true)
 
     fireEvent.focus(screen.getByRole('slider', { name: 'Inspect graph frequency' }))
     const tooltip = container.querySelector('[data-inspector-tooltip-box]')
@@ -186,12 +217,12 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(tooltipNumbers).toHaveLength(6)
     expect(tooltipNames[0]?.lastChild).toHaveTextContent('Long cur...')
     expect(tooltipNames[0]?.querySelector('title')).toHaveTextContent('Long curve name 0')
-    expect(tooltipNumbers[0]).toHaveTextContent('0.20 dB')
+    expect(tooltipNumbers[0]).toHaveTextContent('0.19 dB')
     expect(tooltipNumbers[0]).toHaveAttribute('text-anchor', 'end')
     expect(tooltipNumbers[0]).toHaveAttribute('x', '233')
     expect(Number(tooltipNumbers[0]!.getAttribute('x'))).toBeLessThan(240)
     expect(screen.getByTestId('graph-inspector-status')).toHaveTextContent(
-      /Long curve name 0: 0\.20 dB/,
+      /Long curve name 0: 0\.19 dB/,
     )
 
     unmount()
@@ -203,7 +234,8 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     store.getState().addCurve(curve('source', 'Source', 'fr'))
     store.getState().addCurve(curve('target', 'Target', 'target'))
     uiStore.setState({ curveAppearance: {
-      source: { color: '#00796b', visible: true }, target: { color: '#ff0000', visible: true },
+      source: { color: '#00796b', visible: true, offsetDb: 0 },
+      target: { color: '#ff0000', visible: true, offsetDb: 0 },
     } })
     const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
     const initialPath = container.querySelector('[data-series-name="Source"]')?.getAttribute('d')
@@ -211,6 +243,50 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelector('[data-series-name="Source"]')).toHaveAttribute('d', initialPath)
     expect(container.querySelector('[data-series-name="Source"]')).toHaveAttribute('stroke', '#00796b')
     expect(container.querySelector('[data-series-name="Target"]')).toHaveAttribute('stroke', '#8f8e8a')
+  })
+
+  it('shares display offset but keeps source and equalized FR visibility independent', () => {
+    const store = createWorkspaceStore()
+    const source = curve('source', 'Source', 'fr')
+    store.getState().addCurve(source)
+    store.getState().setFilters([filter], 'manual')
+    uiStore.setState({ curveAppearance: {
+      source: { color: '#1565c0', visible: true, offsetDb: 0 },
+      'derived:fr-eq': { color: '#c62828', visible: true, offsetDb: 0 },
+    } })
+    const { container } = render(<FrequencyResponseGraph derived={deriveWorkspace(store.getState())} />)
+    const sourcePath = container.querySelector('[data-series-name="Source"]')?.getAttribute('d')
+    const equalizedPath = container.querySelector('[data-series-name="Source EQ"]')?.getAttribute('d')
+    const rawSnapshot = structuredClone(source.rawPoints)
+
+    act(() => uiStore.getState().setCurveOffset('source', 3))
+    expect(container.querySelector('[data-series-name="Source"]')).not.toHaveAttribute('d', sourcePath)
+    expect(container.querySelector('[data-series-name="Source EQ"]')).not.toHaveAttribute('d', equalizedPath)
+    expect(source.rawPoints).toEqual(rawSnapshot)
+
+    act(() => uiStore.getState().setCurveVisible('source', false))
+    expect(container.querySelector('[data-series-name="Source"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-series-name="Source EQ"]')).toBeInTheDocument()
+    act(() => uiStore.getState().setCurveVisible('derived:fr-eq', false))
+    expect(container.querySelector('[data-series-name="Source EQ"]')).not.toBeInTheDocument()
+    expect(source.rawPoints).toEqual(rawSnapshot)
+  })
+
+  it('keeps one owned D3 root through StrictMode updates and tears it down', () => {
+    const store = createWorkspaceStore()
+    const view = (derived: ReturnType<typeof deriveWorkspace>) => (
+      <StrictMode><FrequencyResponseGraph derived={derived} /></StrictMode>
+    )
+    const { container, rerender, unmount } = render(view(deriveWorkspace(store.getState())))
+    expect(container.querySelectorAll('[data-squiglink-graph-root]')).toHaveLength(1)
+
+    store.getState().addCurve(curve('source', 'Strict source', 'fr'))
+    rerender(view(deriveWorkspace(store.getState())))
+    expect(container.querySelectorAll('[data-squiglink-graph-root]')).toHaveLength(1)
+    expect(container.querySelector('[data-series-name="Strict source"]')).toBeInTheDocument()
+
+    unmount()
+    expect(container.querySelector('[data-squiglink-graph-root]')).toBeNull()
   })
 
   it('shows a clamped structured pointer inspector and crosshair, then hides on leave or disable', () => {
@@ -226,7 +302,7 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(screen.getByText('632 Hz')).toBeInTheDocument()
     expect(container.querySelector('[data-inspector-tooltip]')).toHaveTextContent(/Source:/)
     fireEvent.pointerMove(container.querySelector('[data-inspector-hit-area]')!, { clientX: 499 })
-    expect(container.querySelector('[data-inspector-tooltip]')).toHaveAttribute('transform', 'translate(611 30)')
+    expect(container.querySelector('[data-inspector-tooltip]')).toHaveAttribute('transform', 'translate(611 38)')
     fireEvent.pointerLeave(container.querySelector('[data-inspector-hit-area]')!)
     expect(container.querySelector('[data-inspector-crosshair]')).not.toBeInTheDocument()
     act(() => uiStore.getState().toggleInspector())
@@ -267,9 +343,9 @@ describe('FrequencyResponseGraph SVG renderer', () => {
     expect(container.querySelectorAll('[aria-label="Visible graph series"] text')).toHaveLength(9)
     expect(screen.getByText('+2 more')).toBeInTheDocument()
     expect(screen.getByText('Curve 0')).toHaveAttribute('x', '67')
-    expect(screen.getByText('Curve 0')).toHaveAttribute('y', '302')
-    expect(screen.getByText('Curve 7')).toHaveAttribute('y', '197')
-    expect(screen.getByText('+2 more')).toHaveAttribute('y', '182')
+    expect(screen.getByText('Curve 0')).toHaveAttribute('y', '304')
+    expect(screen.getByText('Curve 7')).toHaveAttribute('y', '192')
+    expect(screen.getByText('+2 more')).toHaveAttribute('y', '176')
   })
 
   it('keeps graph narration and selected-filter overlays out of the SVG', () => {

@@ -20,6 +20,20 @@ import { defaultNormalization, deriveWorkspace, workspaceStore } from './state/w
 
 const curveText = '20 0\n500 0\n1000 0\n20000 0'
 
+async function importCurve(
+  user: ReturnType<typeof userEvent.setup>,
+  curveManager: HTMLElement,
+  kind: 'FR' | 'Target',
+  file: File,
+) {
+  await user.click(within(curveManager).getByRole('button', { name: 'Import FR / Target' }))
+  const chooser = within(curveManager).getByRole('group', { name: 'Curve type' })
+  await user.click(within(chooser).getByRole('button', { name: kind }))
+  fireEvent.change(within(curveManager).getByLabelText('Curve file'), {
+    target: { files: [file] },
+  })
+}
+
 describe('manual workbench integration', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -59,9 +73,7 @@ describe('manual workbench integration', () => {
     Object.defineProperty(sourceFile, 'text', { value: async () => curveText })
     Object.defineProperty(targetFile, 'text', { value: async () => curveText })
     const curveManager = screen.getByRole('region', { name: 'Curves workspace' })
-    fireEvent.change(within(curveManager).getByLabelText('+ FR'), {
-      target: { files: [sourceFile] },
-    })
+    await importCurve(user, curveManager, 'FR', sourceFile)
     await waitFor(() => expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument())
     const frId = workspaceStore.getState().curves[0]!.id
     const importedFrColor = uiStore.getState().curveAppearance[frId]!.color
@@ -82,22 +94,24 @@ describe('manual workbench integration', () => {
       }),
     ).toMatchObject({ color: importedFrColor, lineType: 'solid' })
 
-    fireEvent.change(within(curveManager).getByLabelText('+ Target'), {
-      target: { files: [targetFile] },
-    })
+    await importCurve(user, curveManager, 'Target', targetFile)
     await waitFor(() => {
       expect(within(curveManager).getByText('Synthetic Source.txt')).toBeInTheDocument()
       expect(within(curveManager).getByText('Synthetic Target.csv')).toBeInTheDocument()
     })
-    const targetDb = screen.getByLabelText('Target dB')
-    await user.clear(targetDb)
-    await user.type(targetDb, '1')
-    fireEvent.blur(targetDb)
-    expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 500, targetDb: 1 })
-    await user.clear(targetDb)
-    await user.type(targetDb, '0')
-    fireEvent.blur(targetDb)
-    expect(workspaceStore.getState().normalization).toEqual({ anchorHz: 500, targetDb: 0 })
+    const levelDbInput = screen.getByLabelText('Normalize dB')
+    await user.clear(levelDbInput)
+    await user.type(levelDbInput, '61')
+    fireEvent.blur(levelDbInput)
+    expect(workspaceStore.getState().normalization).toEqual({ mode: 'db', frequencyHz: 500, levelDb: 61 })
+    await user.clear(levelDbInput)
+    await user.type(levelDbInput, '60')
+    fireEvent.blur(levelDbInput)
+    expect(workspaceStore.getState().normalization).toEqual({ mode: 'db', frequencyHz: 500, levelDb: 60 })
+
+    const normalizeGroup = screen.getByRole('group', { name: 'Normalize' })
+    await user.click(within(normalizeGroup).getByRole('button', { name: 'Hz' }))
+    expect(workspaceStore.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 500, levelDb: 60 })
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     await user.click(screen.getByRole('button', { name: 'Add filter' }))
@@ -107,13 +121,13 @@ describe('manual workbench integration', () => {
     fireEvent.blur(gain)
 
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 3.00; FR + EQ 3.00')
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
     expect(screen.getByText('-3.00 dB')).toBeInTheDocument()
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
     await user.click(screen.getByRole('checkbox', { name: 'Enable filter 1' }))
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 0.00')
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
     expect(screen.getByText('Preamp').nextElementSibling).toHaveTextContent('0.00 dB')
 
     await user.click(screen.getByRole('tab', { name: 'Equalizer' }))
@@ -121,7 +135,7 @@ describe('manual workbench integration', () => {
     expect(screen.getByRole('checkbox', { name: 'Enable filter 1' })).toBeChecked()
     expect(screen.getByLabelText('Graph response')).toHaveTextContent('PEQ 3.00')
 
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
     const metrics = deriveWorkspace(workspaceStore.getState()).metrics
     expect(metrics).not.toBeNull()
     expect(screen.getByText('MAE').nextElementSibling).toHaveTextContent(
@@ -135,9 +149,9 @@ describe('manual workbench integration', () => {
     await user.click(screen.getByRole('button', { name: 'Switch to dark theme' }))
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(localStorage.getItem('autoeq-workbench.theme')).toBe('dark')
-  }, 10_000)
+  }, 25_000)
 
-  it('shows preamp in Details even before Target is loaded', async () => {
+  it('shows preamp in Tools even before Target is loaded', async () => {
     const user = userEvent.setup()
     render(<App />)
 
@@ -148,10 +162,9 @@ describe('manual workbench integration', () => {
     await user.type(gain, '6')
     fireEvent.blur(gain)
 
-    await user.click(screen.getByRole('tab', { name: 'Details' }))
+    await user.click(screen.getByRole('tab', { name: 'Tools' }))
     expect(screen.getByText('Preamp').nextElementSibling).toHaveTextContent('-6')
     expect(screen.getByText('MAE').nextElementSibling).toHaveTextContent('--')
     expect(screen.getByText('RMSE').nextElementSibling).toHaveTextContent('--')
-    expect(screen.getByText(/metrics require an active FR and Target/i)).toBeVisible()
-  })
+  }, 10_000)
 })

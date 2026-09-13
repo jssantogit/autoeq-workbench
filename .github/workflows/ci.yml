@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, remake/squiglink-base]
+    branches: [main]
   pull_request:
 
 permissions:
@@ -25,3 +25,7 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - run: pnpm lint
+      - run: pnpm --filter @autoeq-workbench/core benchmark
+      - run: pnpm --filter @autoeq-workbench/core benchmark:v2
+      - run: pnpm --dir apps/web exec playwright install --with-deps chromium
+      - run: pnpm --filter ./apps/web e2e

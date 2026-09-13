@@ -1,29 +1,39 @@
+import { useEffect } from 'react'
 import { AppHeader } from './components/layout/AppHeader'
-import { UtilityRail } from './components/layout/UtilityRail'
 import { WorkbenchDock } from './components/layout/WorkbenchDock'
 import { CurvesTab } from './features/curves/CurvesTab'
 import { EqualizerTab } from './features/filters/EqualizerTab'
 import { FrequencyResponseGraph } from './features/graph/FrequencyResponseGraph'
-import { DetailsTab } from './features/metrics/DetailsTab'
+import { GraphToolbar } from './features/graph/GraphToolbar'
+import { ToolsTab } from './features/tools/ToolsTab'
+import { SquiglinkShell } from './squiglink/SquiglinkShell'
+import { initializeEqCompareRecorder } from './state/initializeEqCompareRecorder'
 import { deriveWorkspace, useWorkspaceStore } from './state/workspaceStore'
 
 function App() {
+  useEffect(() => initializeEqCompareRecorder(), [])
   const workspace = useWorkspaceStore((state) => state)
   const derived = deriveWorkspace(workspace)
 
   return (
-    <main className="workbench">
-      <AppHeader />
-
-      <UtilityRail />
-      <FrequencyResponseGraph derived={derived} />
-
-      <WorkbenchDock
-        curves={<CurvesTab />}
-        equalizer={<EqualizerTab />}
-        details={<DetailsTab derived={derived} />}
-      />
-    </main>
+    <SquiglinkShell
+      header={<AppHeader />}
+      primary={(
+        <div className="graphBox">
+          <GraphToolbar />
+          <div className="graph-sizer">
+            <FrequencyResponseGraph derived={derived} />
+          </div>
+        </div>
+      )}
+      secondary={(
+        <WorkbenchDock
+          curves={<CurvesTab derived={derived} />}
+          equalizer={<EqualizerTab derived={derived} />}
+          tools={<ToolsTab filters={workspace.filters} derived={derived} />}
+        />
+      )}
+    />
   )
 }
 
