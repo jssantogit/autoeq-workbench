@@ -26,5 +26,5 @@ jobs:
       - run: pnpm --filter @autoeq-workbench/core test -- structuralSearch.test.ts
       - name: Trace 60s Max10 stagnation phases
         run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalabilityTrace.ts
-      - name: Run Mystic pair-add oracle
-        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralPairAddOracle.ts
+      - name: Run time and capacity monotonicity matrix
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalabilityMatrix.ts
