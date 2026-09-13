@@ -7,6 +7,7 @@ interface NumberFieldProps
   onValueChange: (value: number) => void
   validate?: (value: number) => boolean
   unit?: string
+  unitPosition?: 'before' | 'after'
 }
 
 export function NumberField({
@@ -15,6 +16,7 @@ export function NumberField({
   onValueChange,
   validate = Number.isFinite,
   unit,
+  unitPosition = 'after',
   className = '',
   ...props
 }: NumberFieldProps) {
@@ -47,9 +49,12 @@ export function NumberField({
   }
 
   return (
-    <label className={`number-field${unit === undefined ? '' : ' number-field--with-unit'} ${className}`.trim()}>
+    <label className={`number-field${unit === undefined ? '' : ` number-field--with-unit number-field--unit-${unitPosition}`} ${className}`.trim()}>
       <span>{label}</span>
       <span className="number-field__control">
+        {unit !== undefined && unitPosition === 'before' && (
+          <span className="number-field__unit" aria-hidden="true">{unit}</span>
+        )}
         <input
           {...props}
           type="number"
@@ -63,7 +68,9 @@ export function NumberField({
           onBlur={(event) => commit(event.currentTarget.value)}
           onKeyDown={handleKeyDown}
         />
-        {unit !== undefined && <span className="number-field__unit" aria-hidden="true">{unit}</span>}
+        {unit !== undefined && unitPosition === 'after' && (
+          <span className="number-field__unit" aria-hidden="true">{unit}</span>
+        )}
       </span>
     </label>
   )

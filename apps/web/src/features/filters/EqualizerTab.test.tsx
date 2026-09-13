@@ -1,14 +1,20 @@
-import {
-  AUTOEQ_PRODUCT_LIMITS,
-  DEFAULT_AUTOEQ_SETTINGS,
-  type Curve,
-  type Filter,
-} from '@autoeq-workbench/core'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { DEFAULT_AUTOEQ_SETTINGS, type Curve, type Filter } from '@autoeq-workbench/core'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
-import { workspaceStore } from '../../state/workspaceStore'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { autoEqRunStore } from '../../state/autoeqRunStore'
+import { deriveWorkspace, workspaceStore } from '../../state/workspaceStore'
 import { EqualizerTab } from './EqualizerTab'
+
+const { cancelAutoEqMock, runAutoEqMock } = vi.hoisted(() => ({
+  cancelAutoEqMock: vi.fn(),
+  runAutoEqMock: vi.fn(),
+}))
+
+vi.mock('../../state/autoeqController', () => ({
+  cancelAutoEq: cancelAutoEqMock,
+  runAutoEq: runAutoEqMock,
+}))
 
 const curve = (id: string, name: string, kind: Curve['kind']): Curve => ({
   id,
@@ -30,8 +36,28 @@ const filter: Filter = {
   q: 1,
 }
 
+function renderEqualizer() {
+  return render(<EqualizerTab derived={deriveWorkspace(workspaceStore.getState())} />)
+}
+
+function setReadyCurves() {
+  workspaceStore.setState({
+    curves: [curve('fr-1', 'Measurement A', 'fr'), curve('target-1', 'Target A', 'target')],
+    activeFrId: 'fr-1',
+    activeTargetId: 'target-1',
+  })
+}
+
 describe('EqualizerTab', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   beforeEach(() => {
+    cancelAutoEqMock.mockReset()
+    runAutoEqMock.mockReset()
+    runAutoEqMock.mockResolvedValue(undefined)
+    autoEqRunStore.getState().reset()
     workspaceStore.setState({
       curves: [],
       activeFrId: null,
@@ -46,7 +72,35 @@ describe('EqualizerTab', () => {
     })
   })
 
-  it('lists each loaded curve only in its matching profile selector and updates active IDs', async () => {
+  it('uses the source composition and final action positions', () => {
+    renderEqualizer()
+
+    const panel = screen.getByRole('region', { name: 'Equalizer workspace' })
+    expect(panel).toHaveClass('extra-eq')
+    expect(within(panel).getByRole('heading', { name: 'Parametric Equalizer' })).toBeVisible()
+    expect(within(panel).getByRole('combobox', { name: 'FR' })).toBeDisabled()
+    expect(within(panel).getByRole('combobox', { name: 'Target' })).toBeDisabled()
+    expect(within(panel).getAllByRole('columnheader').map(({ textContent }) => textContent)).toEqual([
+      'Type',
+      'Frequency',
+      'Gain',
+      'Q',
+    ])
+    expect(within(panel).getByRole('button', { name: 'Add filter' })).toHaveTextContent('+')
+    expect(within(panel).getByRole('button', { name: 'Remove selected filter' })).toHaveTextContent('-')
+    expect(within(panel).getByRole('button', { name: 'Sort filters' })).toBeVisible()
+    expect(within(panel).getByRole('button', { name: 'Settings' })).toBeVisible()
+    expect(within(panel).getByRole('button', { name: 'AutoEQ' })).toBeDisabled()
+    expect(within(panel).getByRole('button', { name: 'Import' })).toBeVisible()
+    expect(within(panel).getByRole('combobox', { name: 'Export format' })).toBeVisible()
+    expect(within(panel).getByRole('combobox', { name: 'Export format' })).toHaveTextContent(
+      'Equalizer APOPowerampWavelet',
+    )
+    expect(within(panel).getByRole('button', { name: 'Export' })).toBeDisabled()
+    expect(within(panel).queryByText(/\/ 64 filters/)).not.toBeInTheDocument()
+  })
+
+  it('lists profiles separately and updates canonical active IDs', async () => {
     const user = userEvent.setup()
     workspaceStore.setState({
       curves: [
@@ -58,11 +112,11 @@ describe('EqualizerTab', () => {
       activeFrId: 'fr-1',
       activeTargetId: 'target-1',
     })
-    render(<EqualizerTab />)
+    renderEqualizer()
 
-    const profile = screen.getByRole('group', { name: 'Equalizer profile' })
-    const fr = within(profile).getByRole('combobox', { name: 'FR' })
-    const target = within(profile).getByRole('combobox', { name: 'Target' })
+    const selectors = screen.getByRole('group', { name: 'Equalizer profile' })
+    const fr = within(selectors).getByRole('combobox', { name: 'FR' })
+    const target = within(selectors).getByRole('combobox', { name: 'Target' })
     expect(within(fr).getAllByRole('option').map(({ textContent }) => textContent)).toEqual([
       'Measurement A',
       'Measurement B',
@@ -74,153 +128,93 @@ describe('EqualizerTab', () => {
 
     await user.selectOptions(fr, 'fr-2')
     await user.selectOptions(target, 'target-2')
-    expect(workspaceStore.getState()).toMatchObject({
-      activeFrId: 'fr-2',
-      activeTargetId: 'target-2',
-    })
+    expect(workspaceStore.getState()).toMatchObject({ activeFrId: 'fr-2', activeTargetId: 'target-2' })
   })
 
-  it('shows clear disabled placeholders when profile inputs are unavailable', () => {
-    render(<EqualizerTab />)
-
-    expect(screen.getByRole('combobox', { name: 'FR' })).toBeDisabled()
-    expect(screen.getByRole('combobox', { name: 'FR' })).toHaveDisplayValue('No FR loaded')
-    expect(screen.getByRole('combobox', { name: 'Target' })).toBeDisabled()
-    expect(screen.getByRole('combobox', { name: 'Target' })).toHaveDisplayValue('No Target loaded')
-  })
-
-  it('preserves filters across profile changes and keeps Auto EQ inert for Plan 2', async () => {
+  it('enables AutoEQ only for ready active coverage without adding another settings surface', async () => {
     const user = userEvent.setup()
+    setReadyCurves()
+    renderEqualizer()
+
+    const action = screen.getByRole('button', { name: 'AutoEQ' })
+    expect(action).toBeEnabled()
+    expect(screen.queryByText('Standard')).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'AutoEQ Settings' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }))
+    expect(screen.getAllByRole('region', { name: 'AutoEQ Settings' })).toHaveLength(1)
+  })
+
+  it('keeps AutoEQ disabled when active FR and Target do not cover the evaluation range', () => {
     workspaceStore.setState({
       curves: [
-        curve('fr-1', 'Measurement A', 'fr'),
-        curve('fr-2', 'Measurement B', 'fr'),
-        curve('target-1', 'Target A', 'target'),
+        {
+          ...curve('fr-1', 'Measurement A', 'fr'),
+          rawPoints: [
+            { frequencyHz: 40, db: 0 },
+            { frequencyHz: 10_000, db: 0 },
+          ],
+        },
+        {
+          ...curve('target-1', 'Target A', 'target'),
+          rawPoints: [
+            { frequencyHz: 40, db: 0 },
+            { frequencyHz: 10_000, db: 0 },
+          ],
+        },
       ],
       activeFrId: 'fr-1',
       activeTargetId: 'target-1',
+    })
+    const derived = deriveWorkspace(workspaceStore.getState())
+
+    expect(derived.status).toBe('coverage-error')
+    render(<EqualizerTab derived={derived} />)
+
+    expect(screen.getByRole('button', { name: 'AutoEQ' })).toBeDisabled()
+  })
+
+  it('turns the action into Cancel without a progress meter while running', async () => {
+    const user = userEvent.setup()
+    setReadyCurves()
+    autoEqRunStore.getState().start('run-1')
+    renderEqualizer()
+
+    expect(screen.queryByRole('button', { name: 'AutoEQ' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+    expect(screen.queryByText(/\d+%/)).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(cancelAutoEqMock).toHaveBeenCalledOnce()
+  })
+
+  it('shows a compact structured error without replacing prior filter rows', () => {
+    workspaceStore.setState({
       filters: [filter],
       selectedFilterId: filter.id,
       filterProvenance: 'manual',
+      solutionState: 'modified',
     })
-    render(<EqualizerTab />)
+    autoEqRunStore.getState().reject({
+      category: 'optimization',
+      message: 'AutoEQ optimization failed.',
+    })
+    renderEqualizer()
 
-    await user.selectOptions(screen.getByRole('combobox', { name: 'FR' }), 'fr-2')
-    expect(workspaceStore.getState().filters).toEqual([filter])
-
-    const before = workspaceStore.getState()
-    const autoEq = screen.getByRole('button', { name: 'Auto EQ' })
-    expect(autoEq).toBeDisabled()
-    expect(autoEq).toHaveAttribute('title', 'Auto EQ engine arrives in Plan 2')
-    await user.click(autoEq)
-    expect(workspaceStore.getState()).toEqual(before)
+    expect(screen.getByRole('alert')).toHaveTextContent('[optimization] AutoEQ optimization failed.')
+    expect(screen.getByRole('row', { name: 'Filter 1' })).toBeVisible()
+    expect(screen.getByLabelText('Filter 1 gain dB')).toHaveValue(2)
   })
 
-  it('uses separate FR and Target action rows so the mobile hierarchy cannot collapse to one row', () => {
-    render(<EqualizerTab />)
-
-    const profile = screen.getByRole('group', { name: 'Equalizer profile' })
-    const frRow = within(profile).getByRole('combobox', { name: 'FR' }).closest('.equalizer-profile__fr-row')
-    const targetRow = within(profile).getByRole('combobox', { name: 'Target' }).closest('.equalizer-profile__target-row')
-    expect(frRow).toBeInTheDocument()
-    expect(targetRow).toBeInTheDocument()
-    expect(frRow).not.toBe(targetRow)
-    expect(targetRow).toContainElement(within(profile).getByRole('button', { name: 'Auto EQ' }))
-  })
-
-  it('expands compact settings with accessible defaults and commits valid effective run settings', async () => {
+  it('toggles the validated constraints control', async () => {
     const user = userEvent.setup()
-    render(<EqualizerTab />)
+    renderEqualizer()
+    const toggle = screen.getByRole('button', { name: 'Settings' })
 
-    expect(screen.getByRole('heading', { name: 'Parametric Equalizer' })).toBeVisible()
-    const toggle = screen.getByRole('button', { name: 'AutoEQ settings' })
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
-    expect(toggle).toHaveAttribute('aria-controls', 'autoeq-settings')
     expect(screen.queryByRole('region', { name: 'AutoEQ Settings' })).not.toBeInTheDocument()
-
     await user.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
-    const settings = screen.getByRole('region', { name: 'AutoEQ Settings' })
-    expect(settings).toHaveAttribute('id', 'autoeq-settings')
-    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })).toHaveValue(20)
-    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum frequency Hz' })).toHaveValue(20_000)
-    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum gain dB' })).toHaveValue(-15)
-    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })).toHaveValue(15)
-    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum Q' })).toHaveValue(0.1)
-    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum Q' })).toHaveValue(12)
-    expect(within(settings).getByRole('spinbutton', { name: 'AutoEQ max filters' })).toHaveValue(10)
-    expect(within(settings).getAllByText('Hz')).toHaveLength(2)
-    expect(within(settings).getAllByText('dB')).toHaveLength(2)
-
-    const minimumFrequency = within(settings).getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })
-    const maximumGain = within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })
-    const maximumQ = within(settings).getByRole('spinbutton', { name: 'AutoEQ maximum Q' })
-    const maxFilters = within(settings).getByRole('spinbutton', { name: 'AutoEQ max filters' })
-
-    for (const [input, value] of [
-      [minimumFrequency, '30'],
-      [maximumGain, '12'],
-      [maximumQ, '10'],
-      [maxFilters, '12'],
-    ] as const) {
-      await user.clear(input)
-      await user.type(input, value)
-      fireEvent.blur(input)
-    }
-    expect(workspaceStore.getState().autoeqSettings).toMatchObject({
-      minFrequencyHz: 30,
-      maxGainDb: 12,
-      maxQ: 10,
-      maxFilters: 12,
-    })
-
-    await user.click(toggle)
-    expect(screen.queryByRole('region', { name: 'AutoEQ Settings' })).not.toBeInTheDocument()
-  })
-
-  it('keeps invalid cross-bound setting edits local', async () => {
-    const user = userEvent.setup()
-    render(<EqualizerTab />)
-    await user.click(screen.getByRole('button', { name: 'AutoEQ settings' }))
-    const minimumFrequency = screen.getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })
-
-    await user.clear(minimumFrequency)
-    await user.type(minimumFrequency, '20000')
-    fireEvent.blur(minimumFrequency)
-    expect(minimumFrequency).toHaveAttribute('aria-invalid', 'true')
-    expect(workspaceStore.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
-  })
-
-  it('enforces product hard bounds for gain, Q, and filter count', async () => {
-    const user = userEvent.setup()
-    render(<EqualizerTab />)
-    await user.click(screen.getByRole('button', { name: 'AutoEQ settings' }))
-    const minimumGain = screen.getByRole('spinbutton', { name: 'AutoEQ minimum gain dB' })
-    const maximumGain = screen.getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })
-    const minimumQ = screen.getByRole('spinbutton', { name: 'AutoEQ minimum Q' })
-    const maximumQ = screen.getByRole('spinbutton', { name: 'AutoEQ maximum Q' })
-    const maxFilters = screen.getByRole('spinbutton', { name: 'AutoEQ max filters' })
-
-    expect(minimumGain).toHaveAttribute('min', String(AUTOEQ_PRODUCT_LIMITS.minGainDb))
-    expect(maximumGain).toHaveAttribute('max', String(AUTOEQ_PRODUCT_LIMITS.maxGainDb))
-    expect(minimumQ).toHaveAttribute('min', String(AUTOEQ_PRODUCT_LIMITS.minQ))
-    expect(maximumQ).toHaveAttribute('max', String(AUTOEQ_PRODUCT_LIMITS.maxQ))
-    expect(maxFilters).toHaveAttribute('min', '0')
-    expect(maxFilters).toHaveAttribute('max', String(AUTOEQ_PRODUCT_LIMITS.hardMaxFilters))
-    expect(maxFilters).toHaveAttribute('step', '1')
-
-    for (const [input, value] of [
-      [minimumGain, '-20'],
-      [maximumGain, '25'],
-      [minimumQ, '0.01'],
-      [maximumQ, '20'],
-      [maxFilters, '65'],
-    ] as const) {
-      await user.clear(input)
-      await user.type(input, value)
-      fireEvent.blur(input)
-      expect(input).toHaveAttribute('aria-invalid', 'true')
-    }
-    expect(workspaceStore.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
+    expect(screen.getByRole('region', { name: 'AutoEQ Settings' })).toBeVisible()
   })
 })

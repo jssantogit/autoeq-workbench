@@ -114,6 +114,22 @@ describe('calculateErrorMetrics', () => {
     expect(frequencies).toEqual([100, 1000])
   })
 
+  it('validates dense arrays without materializing iterable copies', () => {
+    const residual = [1, -2, 3]
+    const frequencies = [100, 1_000, 10_000]
+    const rejectIteration = () => {
+      throw new Error('unexpected array iteration')
+    }
+    Object.defineProperty(residual, Symbol.iterator, { value: rejectIteration })
+    Object.defineProperty(frequencies, Symbol.iterator, { value: rejectIteration })
+
+    expect(calculateErrorMetrics(residual, frequencies)).toMatchObject({
+      maeDb: 2,
+      maxAbsDb: 3,
+      maxAbsFrequencyHz: 10_000,
+    })
+  })
+
   it.each([
     ['empty arrays', [], []],
     ['unequal arrays', [1], [100, 1000]],

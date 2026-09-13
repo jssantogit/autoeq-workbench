@@ -1,0 +1,590 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-09-12",
+  "purpose": "Consolidate all historical branch tips into main ancestry without re-applying rejected experimental trees.",
+  "canonicalTreeSource": {
+    "branch": "remake/squiglink-base",
+    "sha": "798614e5e78d0639a3b373b179c7836350904cb1",
+    "note": "Current validated product/Pages line with budget-profile integration."
+  },
+  "addedBeforeConsolidation": {
+    "branch": "research/manual-regression-curves-20260912",
+    "sha": "638a37e2c28b36c5805bb315b25c6875be5b5b69",
+    "note": "Only manual real-FR regression fixtures/tests/baseline/workflow are carried into the canonical head; the branch's experimental ancestry is preserved through merge ancestry."
+  },
+  "branchCount": 143,
+  "branches": [
+    {
+      "branch": "baseline/max10-budget-profiles-20260912",
+      "sha": "798614e5e78d0639a3b373b179c7836350904cb1"
+    },
+    {
+      "branch": "experiment/v2-adaptive-staged-third",
+      "sha": "42532afb75ebb17912e62696ca75ccb46de4a3b0"
+    },
+    {
+      "branch": "experiment/v2-direct-trial-pair-dedup",
+      "sha": "8062ec7600500a036d953e5e09d2dd6060a124ff"
+    },
+    {
+      "branch": "experiment/v2-gain-factor-cache",
+      "sha": "ebb660fef8fb2bbb523ae1e3f56c1e3e8fc4fda6"
+    },
+    {
+      "branch": "experiment/v2-joint-cycles-1",
+      "sha": "5dafaa50410b9fa3157c28a1f7757d676b33152a"
+    },
+    {
+      "branch": "experiment/v2-joint-cycles-2",
+      "sha": "5dafaa50410b9fa3157c28a1f7757d676b33152a"
+    },
+    {
+      "branch": "experiment/v2-joint-cycles-3",
+      "sha": "5dafaa50410b9fa3157c28a1f7757d676b33152a"
+    },
+    {
+      "branch": "experiment/v2-single-pass-replacement-trial",
+      "sha": "1555ddb344429272623fa32b9709c862b07ed6fb"
+    },
+    {
+      "branch": "experiment/v2-staged-joint-refine",
+      "sha": "1d3a35aaad1a7d35a18f5b3392f59bf8b43184ea"
+    },
+    {
+      "branch": "experiment/v2-staged-joint-refine-k2",
+      "sha": "2004148c220de3b6f03351def3d734fad1fcea52"
+    },
+    {
+      "branch": "experiment/v2-staged-joint-refine-k3",
+      "sha": "41f43cf29264af7e562c00d886e9489eb93ff5c1"
+    },
+    {
+      "branch": "experiment/v2-staged-k3-deferred-fast-publish",
+      "sha": "6a44e100ed1935da2f15658079bbaa982fe72b17"
+    },
+    {
+      "branch": "experiment/v2-staged-rank-telemetry",
+      "sha": "1d2f9e0fa97fb4423282d6fd8fb8169cd37f1832"
+    },
+    {
+      "branch": "experiment/v2-trusted-replacement-trials",
+      "sha": "111357498ad1d1c8134e821fe2f5d5f360f88acc"
+    },
+    {
+      "branch": "fix/max10-merge-prune",
+      "sha": "6d2e1b6b7195cbb39beb53783cb1aee89deb51b0"
+    },
+    {
+      "branch": "fix/max10-multiregion-pages",
+      "sha": "4cbdffbb9299420ce8f3cfa85c12fae72f28dca1"
+    },
+    {
+      "branch": "fix/max10-multiregion-search",
+      "sha": "06a1972c4c25c14516aac5b80bbbf975205e1a8d"
+    },
+    {
+      "branch": "fix/max10-semantic-shelves",
+      "sha": "1fe305776a0ec0b7f0bce84800d70894f2a5dcf3"
+    },
+    {
+      "branch": "fix/max10-structural-cleanup",
+      "sha": "0557357c2a80f47943776241dadd7acd63f25080"
+    },
+    {
+      "branch": "fix/research-bench-monotonicity-timeline",
+      "sha": "00fc52d56df90705ee7708b9e0c8a41a40b4cf49"
+    },
+    {
+      "branch": "fix/standard-v2-canonical-final-metrics",
+      "sha": "5dafaa50410b9fa3157c28a1f7757d676b33152a"
+    },
+    {
+      "branch": "fix/standard-v2-closeout-bugs",
+      "sha": "2431823a7185819e9964772d426a988ba7b0c289"
+    },
+    {
+      "branch": "handoff/codex-autoeq-v2-2026-09-05",
+      "sha": "a6fa1129c7c944ddbb80f96d21f82b6aea62b8a5"
+    },
+    {
+      "branch": "main",
+      "sha": "56430bf59795649a23008c5e30d80a3fd63b5173"
+    },
+    {
+      "branch": "merge/standard-v2-closeout",
+      "sha": "2431823a7185819e9964772d426a988ba7b0c289"
+    },
+    {
+      "branch": "perf/standard-v2-frequency-trig-cache",
+      "sha": "9f1abeaceab8eadba41690d41d587680f3631a35"
+    },
+    {
+      "branch": "perf/standard-v2-integrated-progressive",
+      "sha": "8062ec7600500a036d953e5e09d2dd6060a124ff"
+    },
+    {
+      "branch": "perf/standard-v2-lazy-removal-audit",
+      "sha": "9281fd31e5f7fd1092b97831e9a7c5cd946eb6b4"
+    },
+    {
+      "branch": "perf/standard-v2-primary-trial-metrics",
+      "sha": "c9d71024cc9b22fe33c240aa5e1ec22eae60027e"
+    },
+    {
+      "branch": "perf/standard-v2-progressive-checkpoints",
+      "sha": "c081a476366091bbabaadfc2fcd8816105958feb"
+    },
+    {
+      "branch": "perf/standard-v2-stability-exact-optimizations",
+      "sha": "0d748d0f95572b756a512b02886716520edb0b01"
+    },
+    {
+      "branch": "perf/standard-v2-trial-buffer",
+      "sha": "875e2db53839351a8e4f4858b335c7a23c9b564b"
+    },
+    {
+      "branch": "release/experimental-max10-pages",
+      "sha": "e7656a8ade3b7fa9239f40e7ff9d1dc1d1a2ad76"
+    },
+    {
+      "branch": "remake/squiglink-base",
+      "sha": "798614e5e78d0639a3b373b179c7836350904cb1"
+    },
+    {
+      "branch": "research/audit-achieved-archive-20260912",
+      "sha": "cd879cd783c58837521b75e4a7270efdb4778330"
+    },
+    {
+      "branch": "research/audit-cap-cleanup-20260912",
+      "sha": "4b86d8d6fa0ee8676f0171d21285ecfc98d20095"
+    },
+    {
+      "branch": "research/audit-cap-cleanup-quick-20260912",
+      "sha": "08f4ecc6d76a1cf186227be5c9bb3b07f4962dc6"
+    },
+    {
+      "branch": "research/audit-evidence-shelf-adds-only-20260912",
+      "sha": "19ff75c3bf986b039ffd30cad6a5a84d1d546d00"
+    },
+    {
+      "branch": "research/audit-live-frozen-20260912",
+      "sha": "92c636b48794cb6a8ac2ee8b1cb4ec5b8b4bb25e"
+    },
+    {
+      "branch": "research/audit-maxfilters-scaling-20260912",
+      "sha": "1ef6c53b325daa0240354afcaf1934b275ae90fe"
+    },
+    {
+      "branch": "research/audit-multiregion-20260912",
+      "sha": "a2c3e0b2259affca31ac361b6905826a01604cab"
+    },
+    {
+      "branch": "research/audit-multiregion-only-quick-20260912",
+      "sha": "8d1f480051a066721be42da1f9258cfc1c283626"
+    },
+    {
+      "branch": "research/audit-multiregion-quick-20260912",
+      "sha": "989c615cdfd6546b45cf62ba7e82b3fe636925c4"
+    },
+    {
+      "branch": "research/audit-pair-add-capacity-60s-20260912",
+      "sha": "45bbf3fa115dd0267aa6d6da876c40abaf98e8c2"
+    },
+    {
+      "branch": "research/audit-pair-add-capacity-scaling-20260912",
+      "sha": "6234b56ef4943f47d3b5357b7501c50b47bf7dc9"
+    },
+    {
+      "branch": "research/audit-polish-x4-15s-20260912",
+      "sha": "5b93c86aa2d60594a299cfc06b03f1c4504948b2"
+    },
+    {
+      "branch": "research/audit-polish-x6-15s-20260912",
+      "sha": "c123aedb4d36c549a58d819d870a296499c75c78"
+    },
+    {
+      "branch": "research/audit-portfolio-capacity-scaling-20260912",
+      "sha": "5ce989f90195f88e197cab1ec41374d2e4779b4a"
+    },
+    {
+      "branch": "research/audit-q31-frozen-20260912",
+      "sha": "6dda8b07f391148cbdf3bacbe1413ddeb5bd659f"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-drop-zero-gain-20260912",
+      "sha": "498845c309faa800328a7b8586b036d21dc5d118"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-rescue3-cap-swap-20260912",
+      "sha": "224ba7eb7a42eadb36f59308ded9c59252530e50"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-rescue3-postcap-swap1-20260912",
+      "sha": "c878bfdf3ce8d35f22774d14d933111371b30193"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-rescue3-postcap-swap2-20260912",
+      "sha": "435cde24ed387c307236a3c5f91b4241e2e63cea"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-rescue3-postcap-swap3-20260912",
+      "sha": "9be3abb60e8c8a0c7c0fddeddc1d05683dc5a812"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-rescue3-swap3-latepk2-violation-20260912",
+      "sha": "7eb492441701c0f44e6994272f893fe356308a0d"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-stagnation-rescue-20260912",
+      "sha": "133a52a2f3e3b7674e828dce8093937ab3d6c275"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-stress-all-candidates-20260912",
+      "sha": "1672a26b0a199ef2dfb19576752a34756b9c33b0"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-zero-plus-rescue-20260912",
+      "sha": "2b23e9dac14811c144358ceabc3320f960f36f71"
+    },
+    {
+      "branch": "research/audit-q31-x8-depth2-zero-plus-rescue3-20260912",
+      "sha": "a541b7917cac193ca739f7126597d22cfbd17685"
+    },
+    {
+      "branch": "research/audit-q31-x8-dual-order-atomic-deadline-20260912",
+      "sha": "0741e170fcc2662472485be3eca58cc9e54386bc"
+    },
+    {
+      "branch": "research/audit-q31-x8-dual-order-budget-profiles-20260912",
+      "sha": "8560a9d2e725bc4daabe6aef79d460cb9909fe64"
+    },
+    {
+      "branch": "research/audit-q31-x8-failure-topology-20260912",
+      "sha": "55c14e679bba1151a5f72e414dd7af0e02934f6c"
+    },
+    {
+      "branch": "research/audit-q31-x8-internal-feature-near-budget-20260912",
+      "sha": "9572aa47cd8a271272c0e795a988acae55c2913f"
+    },
+    {
+      "branch": "research/audit-q31-x8-mergebeam-swap4-interior-recycle-20260912",
+      "sha": "f0271272f3b52b42a80d58799da8d9907f0dba0a"
+    },
+    {
+      "branch": "research/audit-q31-x8-mergebeam-swap4-interior-recycle-rescue5-20260912",
+      "sha": "0738dff9a6237494b222a2d13c90a488e440c59e"
+    },
+    {
+      "branch": "research/audit-q31-x8-near-budget-pk-only-20260912",
+      "sha": "87956c01dea651c8520d1cee993e117c3bacf79e"
+    },
+    {
+      "branch": "research/audit-q31-x8-no-pk-split-20260912",
+      "sha": "ea1a167ee1c9c749ac09335ec0f3373db336b00a"
+    },
+    {
+      "branch": "research/audit-q31-x8-no-pk-split-stress-20260912",
+      "sha": "917b374575de76f8611e9668d8c3010b64ad1f31"
+    },
+    {
+      "branch": "research/audit-q31-x8-novelty-quarter-20260912",
+      "sha": "586a82366056b4c4bf0eda59b1ac8429dd37c5d6"
+    },
+    {
+      "branch": "research/audit-q31-x8-novelty-third-20260912",
+      "sha": "40fa62df46e66d47cc456efb55c24a945f935959"
+    },
+    {
+      "branch": "research/audit-q31-x8-p32-mergebeam-w2d2-swap4-20260912",
+      "sha": "3e55c22d76a05ded79987cf625825529fce7b217"
+    },
+    {
+      "branch": "research/audit-q31-x8-p32-postsolve-wide-merge-20260912",
+      "sha": "33c97fdf3435de7e9aa565de35d495435cd9f7ea"
+    },
+    {
+      "branch": "research/audit-q31-x8-p32-postsolve-wide-merge-swap4-20260912",
+      "sha": "dee02a20c49af71638d4463ae2799dcc36314fa3"
+    },
+    {
+      "branch": "research/audit-q31-x8-pk-split-depth1-20260912",
+      "sha": "d04f989f15cffbd5581dc6fc8d7043734bfcc90e"
+    },
+    {
+      "branch": "research/audit-q31-x8-pk-split-depth2-20260912",
+      "sha": "9c6782fc2114cf5691b437d3854b97fa1386947a"
+    },
+    {
+      "branch": "research/audit-q31-x8-public-corpus-20260912",
+      "sha": "faea6fa14533f2b6e00f2c067848f1d956148365"
+    },
+    {
+      "branch": "research/audit-q31-x8-public-corpus-smoke-20260912",
+      "sha": "cb35943ef68f9c7313b776b40b77a029b5cadaa2"
+    },
+    {
+      "branch": "research/audit-q31-x8-replace-near-budget-20260912",
+      "sha": "a96b6f6ec662cb395b9951a0ffd770be8b7b5b0f"
+    },
+    {
+      "branch": "research/audit-q31-x8-rescue3-swap3-latepk2-edge-recycle-20260912",
+      "sha": "b26ad78cdce3fc60a07636e6376b823b030eafe8"
+    },
+    {
+      "branch": "research/audit-q31-x8-rescue3-swap3-latepk2-edge-recycle-p32-20260912",
+      "sha": "479cdf473d88a6899f127ea0b4671a19e3ee4fc8"
+    },
+    {
+      "branch": "research/audit-q31-x8-rescue5-interior-dual-order-20260912",
+      "sha": "d0e11b186db5cea3ec48cd9402f94d2b5fb6c23a"
+    },
+    {
+      "branch": "research/audit-q31-x8-shelf-add-only-20260912",
+      "sha": "416216cb7a140cee7187c59a007e86b369585d61"
+    },
+    {
+      "branch": "research/audit-q31-x8-shelf-no-pk-to-shelf-20260912",
+      "sha": "f22fae3f4b33e1c695dd3f92c62b72fd9c1b23bf"
+    },
+    {
+      "branch": "research/audit-q31-x8-shelf-no-shelf-split-20260912",
+      "sha": "a7967379313b47c86818e7c7c1dac613a73b1d76"
+    },
+    {
+      "branch": "research/audit-q31-x8-shelf-semantic-20260912",
+      "sha": "3e7f1a72b57fa0ca2c24d0395cc1b7954b822f32"
+    },
+    {
+      "branch": "research/audit-q31-x8-short5-r3s2-natural-20260912",
+      "sha": "7b96649cfb861d2bbb8249583e538182a4ae8419"
+    },
+    {
+      "branch": "research/audit-q31-x8-short5-r5s2-natural-20260912",
+      "sha": "34b0347c88fdd03f266c87e7cec3eb801cff23bb"
+    },
+    {
+      "branch": "research/audit-q31-x8-short5-r5s2-near-deep-20260912",
+      "sha": "141a9ed0d8c431a61eb8e35ad2f7ab679dc02d03"
+    },
+    {
+      "branch": "research/audit-q31-x8-stagnation-fallback-stress-20260912",
+      "sha": "ad679811ee86ced804dfbd247da3208d76750572"
+    },
+    {
+      "branch": "research/audit-q31-x8-v2-corpus-20260912",
+      "sha": "326b5ff83b3c7ca95a1ef44ec271a45b97c3a808"
+    },
+    {
+      "branch": "research/audit-quota-only-quick-20260912",
+      "sha": "34fc8fef2ab0d051be75733c0efd831431bb74af"
+    },
+    {
+      "branch": "research/audit-replace-at-cap-20260912",
+      "sha": "ddc976c1bbbaa5090e5a9cebde1600b509cbc4a7"
+    },
+    {
+      "branch": "research/audit-replace-at-cap-full-20260912",
+      "sha": "1924335c8c343cc7822d2b223d37bf27c0bbb805"
+    },
+    {
+      "branch": "research/audit-replace-reserved-admission-20260912",
+      "sha": "97fa1c608c6a1aa17aeb2babc2494c4edcdf1c70"
+    },
+    {
+      "branch": "research/audit-scaled-polish-15s-20260912",
+      "sha": "0c18895edcded3125d3142331b1c0681bda7b031"
+    },
+    {
+      "branch": "research/audit-scaled-polish-deep-20260912",
+      "sha": "44a3b21ee2d0c55084c42bac972083e935980b5b"
+    },
+    {
+      "branch": "research/audit-scaled-polish-only-quick-20260912",
+      "sha": "247e098197c92dbd5ffcc987a1f439dbf1e4971f"
+    },
+    {
+      "branch": "research/audit-semantic-ranking-20260912",
+      "sha": "2c3a4e7a722129b8b2740afc435c62f0463f4b2b"
+    },
+    {
+      "branch": "research/audit-semantic-ranking-quick-20260912",
+      "sha": "e9482e766c1605cf54c3f94d72894202229e81b8"
+    },
+    {
+      "branch": "research/audit-shelf-type-discipline-only-20260912",
+      "sha": "b92ef4276a76e7deaad68b851e49559d768516b0"
+    },
+    {
+      "branch": "research/audit-shelves-only-20260912",
+      "sha": "7f40b474b2a8ce6cf8d6bbfdb97bdfb1cf1191ea"
+    },
+    {
+      "branch": "research/audit-staged-capacity-scaling-20260912",
+      "sha": "1aaac8711c1ca0b258afde88cdde3cc7db5c87c7"
+    },
+    {
+      "branch": "research/audit-width-q-plus-replace-20260912",
+      "sha": "336dd34facfce25504327c0d52a8532bdb3ff062"
+    },
+    {
+      "branch": "research/audit-width-q-seeds-only-20260912",
+      "sha": "52dd3cb845dad8ccaa574fd2d7a939cf0f8dd7e2"
+    },
+    {
+      "branch": "research/autoeq-research-bench-design",
+      "sha": "9a59fd90d732d43a364f8a73bf73e2c7288295f0"
+    },
+    {
+      "branch": "research/cache-removal-perf-2026-09-05",
+      "sha": "3ac1bb7760a0b4f3a6d81bfaca728ab9938db067"
+    },
+    {
+      "branch": "research/capacity-aware-solver-plan-2026-09-07",
+      "sha": "6ab956a1d35a1813d353cb8bd74d2d942ef6c239"
+    },
+    {
+      "branch": "research/capacity-aware-traversal-20260909",
+      "sha": "22a05fdcac88bdd603b7d80d7d96ffe10a28d606"
+    },
+    {
+      "branch": "research/coherent-only-warm-start-2026-09-05",
+      "sha": "d49fd8c7f23ab9f8e5cf076a91d1baa4e3d6c694"
+    },
+    {
+      "branch": "research/deliverable-retention-l2-2026-09-05",
+      "sha": "ada9a87adcf319bbe2bfb04f9e7e3adf3c6b37a2"
+    },
+    {
+      "branch": "research/geometry-depth-warm-start-2026-09-05",
+      "sha": "a51df157c02c44bb43e668691d5790dc81cc645f"
+    },
+    {
+      "branch": "research/integration-max10-budget-profiles-20260912",
+      "sha": "58685340a84e79c165987be6d7b5437d7fd96a60"
+    },
+    {
+      "branch": "research/local-worktree-snapshot-postcap-swap2-20260912",
+      "sha": "c8402e4267527e750d8562f9aca4b1737a8edbb8"
+    },
+    {
+      "branch": "research/manual-regression-curves-20260912",
+      "sha": "638a37e2c28b36c5805bb315b25c6875be5b5b69"
+    },
+    {
+      "branch": "research/oracle-diagnosis-v2-2026-09-07",
+      "sha": "f14b8cd0a44fa05a7313d2b6d9b31ce077f597da"
+    },
+    {
+      "branch": "research/oracle-diagnosis-v2-design-2026-09-07",
+      "sha": "91fa53cf7a7a150c32ee98b0ee4caf76e0a757d8"
+    },
+    {
+      "branch": "research/ranking-l2-2026-09-03",
+      "sha": "55d2f869a782d96ebfbc577595da23c5fc6dfcd3"
+    },
+    {
+      "branch": "research/ranking-l4-2026-09-03",
+      "sha": "e238af6203f3f78542320193f7b07767a4e3b202"
+    },
+    {
+      "branch": "research/ranking-l8-2026-09-03",
+      "sha": "dfa4d7bf347dc97c0e84ce5f53f0f3f58ce99278"
+    },
+    {
+      "branch": "research/run-canonical-integrated-2026-09-05",
+      "sha": "5dafaa50410b9fa3157c28a1f7757d676b33152a"
+    },
+    {
+      "branch": "research/run-combined-v2-2026-09-05",
+      "sha": "0d748d0f95572b756a512b02886716520edb0b01"
+    },
+    {
+      "branch": "research/run-direct-trial-dedup-ab-2026-09-05",
+      "sha": "5dafaa50410b9fa3157c28a1f7757d676b33152a"
+    },
+    {
+      "branch": "research/run-direct-trial-pair-dedup-2026-09-05",
+      "sha": "8062ec7600500a036d953e5e09d2dd6060a124ff"
+    },
+    {
+      "branch": "research/run-frequency-trig-v2-2026-09-05",
+      "sha": "875e2db53839351a8e4f4858b335c7a23c9b564b"
+    },
+    {
+      "branch": "research/run-gain-factor-cache-2026-09-05",
+      "sha": "8062ec7600500a036d953e5e09d2dd6060a124ff"
+    },
+    {
+      "branch": "research/run-integrated-progressive-2026-09-05",
+      "sha": "5dafaa50410b9fa3157c28a1f7757d676b33152a"
+    },
+    {
+      "branch": "research/run-lazy-removal-audit-v2-2026-09-05",
+      "sha": "9281fd31e5f7fd1092b97831e9a7c5cd946eb6b4"
+    },
+    {
+      "branch": "research/run-primary-metrics-v2-2026-09-05",
+      "sha": "875e2db53839351a8e4f4858b335c7a23c9b564b"
+    },
+    {
+      "branch": "research/run-progressive-v2-2026-09-05",
+      "sha": "5d06ab387902f8b68de14431b93393d918078801"
+    },
+    {
+      "branch": "research/run-single-pass-replacement-trial-2026-09-05",
+      "sha": "1555ddb344429272623fa32b9709c862b07ed6fb"
+    },
+    {
+      "branch": "research/run-staged-joint-refine-2026-09-05",
+      "sha": "acea33019bc1f5a30b6255670de94abb4757227f"
+    },
+    {
+      "branch": "research/run-staged-rank-telemetry-2026-09-05",
+      "sha": "1d2f9e0fa97fb4423282d6fd8fb8169cd37f1832"
+    },
+    {
+      "branch": "research/run-trial-buffer-v2-2026-09-05",
+      "sha": "875e2db53839351a8e4f4858b335c7a23c9b564b"
+    },
+    {
+      "branch": "research/run-trusted-replacement-trials-2026-09-05",
+      "sha": "111357498ad1d1c8134e821fe2f5d5f360f88acc"
+    },
+    {
+      "branch": "research/solver-diagnosis-2026-09-03",
+      "sha": "00fc52d56df90705ee7708b9e0c8a41a40b4cf49"
+    },
+    {
+      "branch": "research/solver-oracles-2026-09-06",
+      "sha": "d85c00aa1fcdcf97234349cfd428f2f2159095a0"
+    },
+    {
+      "branch": "research/solver-research-foundation-2026-09-06",
+      "sha": "0fae03589ec293094b905fcf2064991b1fd535cb"
+    },
+    {
+      "branch": "research/solver-research-program-design-2026-09-06",
+      "sha": "8ea7785a880326548abb9a95c84bfe8cf6ddc740"
+    },
+    {
+      "branch": "research/speed-precision-consistency-audit-20260912",
+      "sha": "df522a24c4d817794fc4e7c01dc089e1a7f693e5"
+    },
+    {
+      "branch": "research/storm-diagnosis-20260910",
+      "sha": "31cc11982ebd07e009788d5e2c5c3537e9e6b615"
+    },
+    {
+      "branch": "research/trial-view-perf-2026-09-05",
+      "sha": "0962dbb4c5bb67ebee95ca24217665e580e7bc7e"
+    },
+    {
+      "branch": "research/v1-real-corpus-probe-2026-09-05",
+      "sha": "ab82b9e2c58d4095419dcb9226aea3f1d4cef3c8"
+    },
+    {
+      "branch": "research/v2-joint-refine-duplicate-profile",
+      "sha": "8062ec7600500a036d953e5e09d2dd6060a124ff"
+    }
+  ]
+}

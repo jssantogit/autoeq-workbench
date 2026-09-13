@@ -1,12 +1,20 @@
 import {
+  AUTOEQ_PRODUCT_LIMITS,
   createEvaluationGrid,
   DEFAULT_AUTOEQ_SETTINGS,
   type AutoEqSettings,
   type Curve,
   type Filter,
+  type FilterDefinition,
 } from '@autoeq-workbench/core'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { createWorkspaceStore, defaultNormalization, deriveWorkspace } from './workspaceStore'
+import { createAutoEqResult } from '../test/autoEqFixture'
+import {
+  createWorkspaceStore,
+  defaultNormalization,
+  deriveWorkspace,
+  type FilterSnapshotState,
+} from './workspaceStore'
 
 const source: Curve = {
   id: 'source-1',
@@ -61,6 +69,7 @@ describe('workspace curve collection', () => {
       activeFrId: null,
       activeTargetId: null,
       normalization: defaultNormalization,
+      autoEqRun: null,
     })
   })
 
@@ -146,7 +155,7 @@ describe('workspace curve collection', () => {
     store.getState().addCurve(source)
     store.getState().addCurve(target)
     store.getState().setFilters([filter], 'autoeq')
-    store.getState().setNormalization({ anchorHz: 800, targetDb: 1 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 800, levelDb: 61 })
     store.getState().undo()
     expect(store.getState().canRedo).toBe(true)
 
@@ -188,6 +197,170 @@ describe('workspace curve collection', () => {
 })
 
 describe('workspace history and filters', () => {
+  it('applies an isolated AutoEQ result atomically in one undoable history step', () => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'manual')
+    store.getState().selectFilter(filter.id)
+    const result = createAutoEqResult(4)
+    const expectedManifest = structuredClone(result.manifest)
+
+    expect(store.getState().applyAutoEqResult(result)).toBe(true)
+
+    expect(store.getState()).toMatchObject({
+      filters: result.filters,
+      selectedFilterId: null,
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+      autoEqRun: { manifest: expectedManifest },
+    })
+    expect(store.getState().filters).not.toBe(result.filters)
+    expect(store.getState().autoEqRun!.manifest).not.toBe(result.manifest)
+    expect(store.getState().autoEqRun!.manifest.finalFilters).not.toBe(result.manifest.finalFilters)
+
+    result.filters[0]!.gainDb = 9
+    result.manifest.finalFilters[0]!.gainDb = 9
+    result.manifest.algorithmParameters.deadbandDb = 9
+    expect(store.getState().filters[0]!.gainDb).toBe(4)
+    expect(store.getState().autoEqRun!.manifest).toEqual(expectedManifest)
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      filters: [filter],
+      selectedFilterId: filter.id,
+      filterProvenance: 'manual',
+      solutionState: 'clean',
+      autoEqRun: null,
+    })
+    store.getState().redo()
+    expect(store.getState()).toMatchObject({
+      filters: [{ ...filter, id: 'autoeq-1', gainDb: 4 }],
+      selectedFilterId: null,
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+      autoEqRun: { manifest: expectedManifest },
+    })
+  })
+
+  it('preserves the AutoEQ run through modified and stale states but clears it on import', () => {
+    const store = createWorkspaceStore()
+    const result = createAutoEqResult()
+    expect(store.getState().applyAutoEqResult(result)).toBe(true)
+
+    store.getState().updateFilter('autoeq-1', { gainDb: 4 })
+    expect(store.getState()).toMatchObject({
+      filterProvenance: 'autoeq',
+      solutionState: 'modified',
+      autoEqRun: { manifest: result.manifest },
+    })
+    store.getState().addCurve(source)
+    store.getState().addCurve(target)
+    expect(store.getState()).toMatchObject({
+      activeFrId: source.id,
+      activeTargetId: target.id,
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 59 })
+    store.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxGainDb: 12 })
+    expect(store.getState()).toMatchObject({
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+
+    store.getState().replaceFiltersFromImport([
+      { enabled: true, type: 'PK', frequencyHz: 2_000, gainDb: 2, q: 1 },
+    ])
+    expect(store.getState()).toMatchObject({
+      filterProvenance: 'manual',
+      solutionState: 'clean',
+      autoEqRun: null,
+    })
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+    store.getState().redo()
+    expect(store.getState().autoEqRun).toBeNull()
+  })
+
+  it('rejects an inconsistent AutoEQ result atomically without adding history', () => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'manual')
+    const before = store.getState()
+    const result = createAutoEqResult()
+    result.manifest.finalFilters[0]!.gainDb = 9
+
+    expect(store.getState().applyAutoEqResult(result)).toBe(false)
+
+    expect(store.getState()).toBe(before)
+    const mismatchedMetrics = createAutoEqResult()
+    mismatchedMetrics.metrics.maeDb = 9
+    expect(store.getState().applyAutoEqResult(mismatchedMetrics)).toBe(false)
+    expect(store.getState()).toBe(before)
+    const missingMetrics = createAutoEqResult()
+    missingMetrics.metrics = {} as typeof missingMetrics.metrics
+    expect(store.getState().applyAutoEqResult(missingMetrics)).toBe(false)
+    expect(store.getState()).toBe(before)
+    const missingAlgorithmParameters = createAutoEqResult()
+    missingAlgorithmParameters.manifest.algorithmParameters = null as never
+    expect(store.getState().applyAutoEqResult(missingAlgorithmParameters)).toBe(false)
+    expect(store.getState()).toBe(before)
+    const malformedFilters = createAutoEqResult()
+    malformedFilters.filters = [null as never]
+    expect(store.getState().applyAutoEqResult(malformedFilters)).toBe(false)
+    expect(store.getState()).toBe(before)
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([])
+  })
+
+  it('stales a successful empty AutoEQ run when its settings change', () => {
+    const store = createWorkspaceStore()
+    const result = createAutoEqResult()
+    result.filters = []
+    result.manifest.finalFilters = []
+
+    store.getState().applyAutoEqResult(result)
+    expect(store.getState()).toMatchObject({
+      filters: [],
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+      autoEqRun: { manifest: result.manifest },
+    })
+
+    store.getState().setAutoEqSettings({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 8 })
+    expect(store.getState()).toMatchObject({
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+  })
+
+  it.each(['add', 'remove', 'toggle', 'reorder'] as const)(
+    'keeps the AutoEQ run and marks a clean solution modified on %s',
+    (operation) => {
+      const store = createWorkspaceStore()
+      const result = createAutoEqResult()
+      if (operation === 'reorder') {
+        const second = { ...result.filters[0]!, id: 'autoeq-2', frequencyHz: 2_000 }
+        result.filters.push(second)
+        result.manifest.finalFilters.push({ ...second })
+      }
+      store.getState().applyAutoEqResult(result)
+
+      if (operation === 'add') store.getState().addFilter('PK')
+      if (operation === 'remove') store.getState().removeFilter('autoeq-1')
+      if (operation === 'toggle') store.getState().toggleFilter('autoeq-1')
+      if (operation === 'reorder') store.getState().reorderFilter('autoeq-2', 'up')
+
+      expect(store.getState()).toMatchObject({
+        filterProvenance: 'autoeq',
+        solutionState: 'modified',
+        autoEqRun: { manifest: result.manifest },
+      })
+    },
+  )
+
   it('stores valid AutoEQ settings as copied undoable snapshots and rejects invalid updates', () => {
     const store = createWorkspaceStore()
     const settings: AutoEqSettings = { ...DEFAULT_AUTOEQ_SETTINGS, minFrequencyHz: 30, maxQ: 10 }
@@ -231,7 +404,7 @@ describe('workspace history and filters', () => {
   it('keeps normalization and filter undo/redo independent from curve collection', () => {
     const store = createWorkspaceStore()
     store.getState().setFilters([filter], 'autoeq')
-    store.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 58 })
     store.getState().updateFilter(filter.id, { gainDb: 6 })
 
     store.getState().undo()
@@ -240,7 +413,7 @@ describe('workspace history and filters', () => {
     expect(store.getState().normalization).toEqual(defaultNormalization)
     store.getState().redo()
     store.getState().redo()
-    expect(store.getState().normalization).toEqual({ anchorHz: 1_000, targetDb: -2 })
+    expect(store.getState().normalization).toEqual({ mode: 'hz', frequencyHz: 1_000, levelDb: 58 })
     expect(store.getState().filters[0]?.gainDb).toBe(6)
   })
 
@@ -257,10 +430,226 @@ describe('workspace history and filters', () => {
     expect(store.getState().selectedFilterId).toBe(filter.id)
   })
 
+  it('sorts filters stably in one history step without changing solution metadata or selection', () => {
+    const store = createWorkspaceStore()
+    const filters: Filter[] = [
+      { ...filter, id: 'high', frequencyHz: 2_000 },
+      { ...filter, id: 'low-first', frequencyHz: 100 },
+      { ...filter, id: 'low-second', frequencyHz: 100 },
+      { ...filter, id: 'middle', frequencyHz: 1_000 },
+    ]
+    store.getState().setFilters(filters, 'autoeq')
+    store.getState().updateFilter('middle', { gainDb: 4 })
+    store.getState().selectFilter('low-second')
+    const beforeSort = store.getState()
+
+    store.getState().sortFiltersByFrequency()
+
+    expect(store.getState().filters.map(({ id }) => id)).toEqual([
+      'low-first',
+      'low-second',
+      'middle',
+      'high',
+    ])
+    expect(store.getState()).toMatchObject({
+      filterProvenance: 'autoeq',
+      solutionState: 'modified',
+      selectedFilterId: 'low-second',
+    })
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      filters: beforeSort.filters,
+      filterProvenance: beforeSort.filterProvenance,
+      solutionState: beforeSort.solutionState,
+      selectedFilterId: beforeSort.selectedFilterId,
+    })
+    store.getState().undo()
+    expect(store.getState().filters.find(({ id }) => id === 'middle')?.gainDb).toBe(3)
+    store.getState().redo()
+    store.getState().redo()
+    expect(store.getState().filters.map(({ id }) => id)).toEqual([
+      'low-first',
+      'low-second',
+      'middle',
+      'high',
+    ])
+  })
+
+  it('does not record history when filters are already frequency-sorted', () => {
+    const store = createWorkspaceStore()
+    const sorted = [
+      { ...filter, id: 'low', frequencyHz: 100 },
+      { ...filter, id: 'high', frequencyHz: 2_000 },
+    ]
+    store.getState().setFilters(sorted, 'manual')
+    const beforeSort = store.getState()
+
+    store.getState().sortFiltersByFrequency()
+
+    expect(store.getState()).toBe(beforeSort)
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([])
+  })
+
+  it('atomically imports filter definitions with fresh IDs in one history step', () => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'autoeq')
+    store.getState().updateFilter(filter.id, { gainDb: 4 })
+    store.getState().selectFilter(filter.id)
+    const beforeImport = store.getState()
+    const imported: FilterDefinition[] = [
+      { enabled: false, type: 'LS', frequencyHz: 105, gainDb: -2.5, q: 0.7 },
+      { enabled: true, type: 'PK', frequencyHz: 2_500, gainDb: 6, q: 3.25 },
+    ]
+
+    store.getState().replaceFiltersFromImport(imported)
+
+    const afterImport = store.getState()
+    expect(afterImport.filters.map(({ id: _id, ...definition }) => definition)).toEqual(imported)
+    expect(new Set(afterImport.filters.map(({ id }) => id)).size).toBe(imported.length)
+    expect(afterImport.filters.every(({ id }) => id.startsWith('filter-'))).toBe(true)
+    expect(afterImport.filters.some(({ id }) => id === filter.id)).toBe(false)
+    expect(afterImport).toMatchObject({
+      filterProvenance: 'manual',
+      solutionState: 'clean',
+      selectedFilterId: null,
+    })
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      filters: beforeImport.filters,
+      filterProvenance: beforeImport.filterProvenance,
+      solutionState: beforeImport.solutionState,
+      selectedFilterId: beforeImport.selectedFilterId,
+    })
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([filter])
+    store.getState().redo()
+    store.getState().redo()
+    expect(store.getState()).toMatchObject({
+      filters: afterImport.filters,
+      filterProvenance: 'manual',
+      solutionState: 'clean',
+      selectedFilterId: null,
+    })
+  })
+
+  it('applies a copied filter snapshot in one undoable history step and redoes it deterministically', () => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'autoeq')
+    store.getState().updateFilter(filter.id, { gainDb: 4 })
+    store.getState().selectFilter(filter.id)
+    const beforeApply = store.getState()
+    const snapshot: FilterSnapshotState = {
+      filters: [
+        { ...filter, id: 'high', type: 'HS', frequencyHz: 8_000, gainDb: -2, q: 0.7 },
+        { ...filter, id: 'low', type: 'LS', frequencyHz: 120, gainDb: 1.5, q: 0.8 },
+      ],
+      filterProvenance: 'manual',
+      solutionState: 'stale',
+      autoEqRun: null,
+    }
+    const expectedFilters = snapshot.filters.map((item) => ({ ...item }))
+
+    store.getState().applyFilterSnapshot(snapshot)
+
+    expect(store.getState()).toMatchObject({
+      filters: expectedFilters,
+      filterProvenance: 'manual',
+      solutionState: 'stale',
+      selectedFilterId: null,
+    })
+    expect(store.getState().filters).not.toBe(snapshot.filters)
+    expect(store.getState().filters[0]).not.toBe(snapshot.filters[0])
+
+    snapshot.filters.reverse()
+    snapshot.filters[0]!.gainDb = 9
+    expect(store.getState().filters).toEqual(expectedFilters)
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      filters: beforeApply.filters,
+      filterProvenance: beforeApply.filterProvenance,
+      solutionState: beforeApply.solutionState,
+      selectedFilterId: beforeApply.selectedFilterId,
+    })
+
+    store.getState().redo()
+    expect(store.getState()).toMatchObject({
+      filters: expectedFilters,
+      filterProvenance: 'manual',
+      solutionState: 'stale',
+      selectedFilterId: null,
+    })
+
+    store.getState().undo()
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([filter])
+  })
+
+  it.each([
+    [
+      'invalid filter data',
+      [{ ...filter, frequencyHz: 0 }],
+    ],
+    [
+      'duplicate filter IDs',
+      [filter, { ...filter }],
+    ],
+    [
+      'an over-limit filter count',
+      Array.from({ length: AUTOEQ_PRODUCT_LIMITS.hardMaxFilters + 1 }, (_, index) => ({
+        ...filter,
+        id: `snapshot-${index}`,
+      })),
+    ],
+  ] satisfies [string, Filter[]][])('rejects a snapshot with %s atomically', (_label, filters) => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'manual')
+    store.getState().selectFilter(filter.id)
+    const beforeApply = store.getState()
+
+    store.getState().applyFilterSnapshot({
+      filters,
+      filterProvenance: 'autoeq',
+      solutionState: 'clean',
+      autoEqRun: null,
+    })
+
+    expect(store.getState()).toBe(beforeApply)
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([])
+  })
+
+  it.each([
+    ['an invalid definition', [{ enabled: true, type: 'PK', frequencyHz: 0, gainDb: 0, q: 1 }]],
+    [
+      'more than 64 definitions',
+      Array.from({ length: 65 }, () => ({
+        enabled: true,
+        type: 'PK' as const,
+        frequencyHz: 1_000,
+        gainDb: 0,
+        q: 1,
+      })),
+    ],
+  ] satisfies [string, FilterDefinition[]][])('rejects %s without changing state or history', (_label, imported) => {
+    const store = createWorkspaceStore()
+    store.getState().setFilters([filter], 'manual')
+    const beforeImport = store.getState()
+
+    store.getState().replaceFiltersFromImport(imported)
+
+    expect(store.getState()).toBe(beforeImport)
+    store.getState().undo()
+    expect(store.getState().filters).toEqual([])
+  })
+
   it('rejects invalid normalization and DSP edits', () => {
     const store = createWorkspaceStore()
     store.getState().setFilters([filter], 'manual')
-    store.getState().setNormalization({ anchorHz: 0, targetDb: 2 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 0, levelDb: 62 })
     store.getState().updateFilter(filter.id, { gainDb: Number.NaN })
 
     expect(store.getState().normalization).toEqual(defaultNormalization)
@@ -285,7 +674,7 @@ describe('workspace history and filters', () => {
     matchingStore.getState().addCurve(source)
     matchingStore.getState().addCurve(target)
     matchingStore.getState().setFilters([filter], 'autoeq')
-    matchingStore.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
+    matchingStore.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 58 })
     matchingStore.getState().undo()
     expect(matchingStore.getState()).toMatchObject({
       normalization: defaultNormalization,
@@ -297,11 +686,49 @@ describe('workspace history and filters', () => {
     changedStore.getState().addCurve(target)
     changedStore.getState().addCurve(extra)
     changedStore.getState().setFilters([filter], 'autoeq')
-    changedStore.getState().setNormalization({ anchorHz: 1_000, targetDb: -2 })
+    changedStore.getState().setNormalization({ mode: 'hz', frequencyHz: 1_000, levelDb: 58 })
     changedStore.getState().setActiveFr(extra.id)
     changedStore.getState().undo()
     expect(changedStore.getState()).toMatchObject({
       normalization: defaultNormalization,
+      solutionState: 'stale',
+    })
+  })
+
+  it('stales clean AutoEQ solution on normalization mode and value changes as single undoable edits', () => {
+    const store = createWorkspaceStore()
+    const result = createAutoEqResult()
+    store.getState().applyAutoEqResult(result)
+    expect(store.getState().solutionState).toBe('clean')
+
+    store.getState().setNormalization({ mode: 'db', frequencyHz: 500, levelDb: 60 })
+    expect(store.getState()).toMatchObject({
+      normalization: { mode: 'db', frequencyHz: 500, levelDb: 60 },
+      solutionState: 'stale',
+      autoEqRun: { manifest: result.manifest },
+    })
+
+    store.getState().undo()
+    expect(store.getState()).toMatchObject({
+      normalization: defaultNormalization,
+      solutionState: 'clean',
+    })
+
+    store.getState().redo()
+    expect(store.getState()).toMatchObject({
+      normalization: { mode: 'db', frequencyHz: 500, levelDb: 60 },
+      solutionState: 'stale',
+    })
+
+    store.getState().setNormalization({ mode: 'db', frequencyHz: 1000, levelDb: 60 })
+    expect(store.getState()).toMatchObject({
+      normalization: { mode: 'db', frequencyHz: 1000, levelDb: 60 },
+      solutionState: 'stale',
+    })
+
+    store.getState().setNormalization({ mode: 'db', frequencyHz: 1000, levelDb: 65 })
+    expect(store.getState()).toMatchObject({
+      normalization: { mode: 'db', frequencyHz: 1000, levelDb: 65 },
       solutionState: 'stale',
     })
   })
@@ -328,12 +755,12 @@ describe('deriveWorkspace', () => {
     store.getState().addCurve(source)
     store.getState().addCurve(target)
     store.getState().addCurve(extra)
-    store.getState().setNormalization({ anchorHz: 500, targetDb: 3 })
+    store.getState().setNormalization({ mode: 'hz', frequencyHz: 500, levelDb: 60 })
 
     const derived = deriveWorkspace(store.getState())
 
     expect(derived.measurementCurves).toHaveLength(3)
-    expect(derived.measurementCurves.every(({ db }) => Math.abs(db[1]! - 3) < 1e-10)).toBe(true)
+    expect(derived.measurementCurves.every(({ db }) => Math.abs(db[1]! - 0) < 1e-10)).toBe(true)
     expect([source, target, extra].map(({ rawPoints }) => rawPoints)).toEqual(snapshots)
   })
 

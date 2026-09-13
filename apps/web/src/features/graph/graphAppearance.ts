@@ -1,6 +1,6 @@
 import type { CurveAppearance, ThemeMode } from '../../state/uiStore'
 import { MEASUREMENT_CURVE_PALETTE } from '../../state/uiStore'
-import type { GraphSeries } from './graphSeries'
+import { EQUALIZED_FR_APPEARANCE_ID, type GraphSeries } from './graphSeries'
 
 export interface GraphAppearanceInput {
   theme: ThemeMode
@@ -55,7 +55,8 @@ export function seriesAppearance(
 
   const sourceColor = input.curveAppearance[series.sourceCurveId]?.color ?? '#1565c0'
   return {
-    color: pickEqualizedFrColor(sourceColor),
+    color: input.curveAppearance[EQUALIZED_FR_APPEARANCE_ID]?.color
+      ?? pickEqualizedFrColor(sourceColor),
     lineType: 'solid' as const,
     lineWidth: 1.6,
     opacity: 0.96,

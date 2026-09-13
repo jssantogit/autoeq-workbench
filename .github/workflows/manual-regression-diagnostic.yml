@@ -1,0 +1,39 @@
+name: Manual Real-FR Regression Diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/core/src/autoeq/v2/**'
+      - 'packages/core/src/config/**'
+      - 'packages/core/src/dsp/**'
+      - 'packages/core/benchmarks/manualRegressionScalability.ts'
+      - 'packages/core/benchmarks/research/manualRegression.ts'
+      - 'packages/core/benchmarks/research/manual-regression-baseline.json'
+      - 'packages/core/benchmarks/research/raw/manual/**'
+      - 'packages/core/test/autoeq/v2/manualRegression.test.ts'
+      - '.github/workflows/manual-regression-diagnostic.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - name: Verify manual regression fixtures
+        run: pnpm --filter @autoeq-workbench/core test -- manualRegression.test.ts
+      - name: Run Max10 60s manual regression diagnostic
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/manualRegressionScalability.ts

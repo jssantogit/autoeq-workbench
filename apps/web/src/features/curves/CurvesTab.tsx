@@ -1,46 +1,40 @@
-import { CurveAppearanceControls } from './CurveAppearanceControls'
-import { CurveImport } from './CurveImport'
+import { Fragment } from 'react'
+import { formatEqualizedFrName } from '../graph/graphSeries'
 import { useWorkspaceStore } from '../../state/workspaceStore'
+import type { WorkspaceDerived } from '../../state/workspaceStore'
+import { CurveImport } from './CurveImport'
+import { CurveManagerRow, DerivedCurveManagerRow } from './CurveManagerRow'
 
-export function CurvesTab() {
+export function CurvesTab({ derived }: { derived: WorkspaceDerived }) {
   const curves = useWorkspaceStore((state) => state.curves)
-  const frCurves = curves.filter(({ kind }) => kind === 'fr')
-  const targets = curves.filter(({ kind }) => kind === 'target')
+  const showEqualized = derived.hasFilters && derived.frEq !== null
 
   return (
-    <section className="curves-tab" aria-label="Curves workspace">
-      <div className="curve-upload-toolbar" role="toolbar" aria-label="Curve uploads">
-        <CurveImport kind="fr" />
-        <CurveImport kind="target" />
+    <section className="manage curves-tab" aria-label="Curves workspace">
+      <table className="manageTable" aria-label="Curve manager">
+        <colgroup>
+          <col className="remove" />
+          <col className="phoneId" />
+          <col className="key" />
+          <col className="calibrate" />
+          <col className="baselineButton" />
+          <col className="hideButton" />
+          <col className="lastColumn" />
+        </colgroup>
+        <tbody className="curves" aria-label={curves.length === 0 ? 'No curves loaded' : undefined}>
+          {curves.map((curve) => (
+            <Fragment key={curve.id}>
+              <CurveManagerRow curve={curve} />
+              {showEqualized && curve.id === derived.activeFrId && (
+                <DerivedCurveManagerRow name={formatEqualizedFrName(curve.name)} />
+              )}
+            </Fragment>
+          ))}
+        </tbody>
+      </table>
+      <div className="curve-upload-actions">
+        <CurveImport />
       </div>
-      <section className="curve-manager__section" aria-labelledby="fr-curves-heading">
-        <h3 className="curve-manager__heading" id="fr-curves-heading">FR</h3>
-        {frCurves.length === 0 ? (
-          <p className="curve-manager__empty">No FR loaded</p>
-        ) : (
-          <ul className="curve-manager" aria-label="Frequency response curves">
-            {frCurves.map((curve) => (
-              <li className="curve-manager__row" key={curve.id}>
-                <CurveAppearanceControls curve={curve} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-      <section className="curve-manager__section" aria-labelledby="target-curves-heading">
-        <h3 className="curve-manager__heading" id="target-curves-heading">TARGETS</h3>
-        {targets.length === 0 ? (
-          <p className="curve-manager__empty">No Target loaded</p>
-        ) : (
-          <ul className="curve-manager" aria-label="Target curves">
-            {targets.map((curve) => (
-              <li className="curve-manager__row" key={curve.id}>
-                <CurveAppearanceControls curve={curve} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
     </section>
   )
 }

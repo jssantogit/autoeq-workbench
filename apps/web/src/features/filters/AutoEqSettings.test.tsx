@@ -1,0 +1,116 @@
+import {
+  AUTOEQ_PRODUCT_LIMITS,
+  DEFAULT_AUTOEQ_SETTINGS,
+} from '@autoeq-workbench/core'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it } from 'vitest'
+import { uiStore } from '../../state/uiStore'
+import { workspaceStore } from '../../state/workspaceStore'
+import { AutoEqSettings } from './AutoEqSettings'
+
+describe('AutoEqSettings', () => {
+  beforeEach(() => {
+    workspaceStore.setState({ autoeqSettings: { ...DEFAULT_AUTOEQ_SETTINGS } })
+    uiStore.setState({ experimentalMax10Enabled: false })
+  })
+
+  it('edits the existing seven validated AutoEqSettings fields', async () => {
+    const user = userEvent.setup()
+    render(<AutoEqSettings />)
+
+    expect(screen.getAllByRole('spinbutton')).toHaveLength(7)
+    expect(screen.getAllByRole('columnheader').map(({ textContent }) => textContent)).toEqual(['Min', 'Max'])
+    const minimumFrequency = screen.getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })
+    const maximumGain = screen.getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })
+    const maximumQ = screen.getByRole('spinbutton', { name: 'AutoEQ maximum Q' })
+    const maxFilters = screen.getByRole('spinbutton', { name: 'AutoEQ max filters' })
+
+    for (const [input, value] of [
+      [minimumFrequency, '30'],
+      [maximumGain, '12'],
+      [maximumQ, '10'],
+      [maxFilters, '12'],
+    ] as const) {
+      await user.clear(input)
+      await user.type(input, value)
+      fireEvent.blur(input)
+    }
+
+    expect(workspaceStore.getState().autoeqSettings).toEqual({
+      ...DEFAULT_AUTOEQ_SETTINGS,
+      minFrequencyHz: 30,
+      maxGainDb: 12,
+      maxQ: 10,
+      maxFilters: 12,
+    })
+  })
+
+  it('uses product bounds and leaves invalid cross-bound edits uncommitted', async () => {
+    const user = userEvent.setup()
+    render(<AutoEqSettings />)
+
+    const minimumFrequency = screen.getByRole('spinbutton', { name: 'AutoEQ minimum frequency Hz' })
+    const minimumGain = screen.getByRole('spinbutton', { name: 'AutoEQ minimum gain dB' })
+    const maximumGain = screen.getByRole('spinbutton', { name: 'AutoEQ maximum gain dB' })
+    const minimumQ = screen.getByRole('spinbutton', { name: 'AutoEQ minimum Q' })
+    const maximumQ = screen.getByRole('spinbutton', { name: 'AutoEQ maximum Q' })
+    const maxFilters = screen.getByRole('spinbutton', { name: 'AutoEQ max filters' })
+
+    expect(minimumGain).toHaveAttribute('min', String(AUTOEQ_PRODUCT_LIMITS.minGainDb))
+    expect(maximumGain).toHaveAttribute('max', String(AUTOEQ_PRODUCT_LIMITS.maxGainDb))
+    expect(minimumQ).toHaveAttribute('min', String(AUTOEQ_PRODUCT_LIMITS.minQ))
+    expect(maximumQ).toHaveAttribute('max', String(AUTOEQ_PRODUCT_LIMITS.maxQ))
+    expect(maxFilters).toHaveAttribute('min', '0')
+    expect(maxFilters).toHaveAttribute('max', String(AUTOEQ_PRODUCT_LIMITS.hardMaxFilters))
+    expect(maxFilters).toHaveAttribute('step', '1')
+
+    await user.clear(minimumFrequency)
+    await user.type(minimumFrequency, String(DEFAULT_AUTOEQ_SETTINGS.maxFrequencyHz))
+    fireEvent.blur(minimumFrequency)
+    expect(minimumFrequency).toHaveAttribute('aria-invalid', 'true')
+    expect(workspaceStore.getState().autoeqSettings).toEqual(DEFAULT_AUTOEQ_SETTINGS)
+  })
+
+  it('exposes validated Experimental Max10 as opt-in and disables it outside Max10 bounds', async () => {
+    const user = userEvent.setup()
+    render(<AutoEqSettings />)
+
+    const experimental = screen.getByRole('switch', {
+      name: 'Use experimental Max10 Q31-B4-P8',
+    })
+    expect(experimental).toBeEnabled()
+    expect(experimental).not.toBeChecked()
+
+    await user.click(experimental)
+    expect(uiStore.getState().experimentalMax10Enabled).toBe(true)
+    expect(experimental).toBeChecked()
+
+    const maxFilters = screen.getByRole('spinbutton', { name: 'AutoEQ max filters' })
+    await user.clear(maxFilters)
+    await user.type(maxFilters, '12')
+    fireEvent.blur(maxFilters)
+
+    await waitFor(() => expect(experimental).toBeDisabled())
+    expect(experimental).not.toBeChecked()
+    expect(uiStore.getState().experimentalMax10Enabled).toBe(false)
+  })
+
+  it('offers the exact Time Limit options with a 60-second default', async () => {
+    const user = userEvent.setup()
+    render(<AutoEqSettings />)
+
+    const select = screen.getByRole('combobox', { name: 'AutoEQ time limit' })
+    expect(select).toHaveValue('60')
+    expect(within(select).getAllByRole('option').map((option) => option.textContent)).toEqual([
+      '5 s',
+      '15 s',
+      '30 s',
+      '60 s',
+      '120 s',
+    ])
+
+    await user.selectOptions(select, '30')
+    expect(workspaceStore.getState().autoeqSettings.timeLimitSeconds).toBe(30)
+  })
+})

@@ -9,16 +9,20 @@ import {
   desiredCorrection,
   MVP_NUMERIC_POLICY,
   isValidAutoEqSettings,
+  isValidAutoEqSettingsV1,
   prepareCurve,
   residualError,
   type Curve,
+  type AutoEqResult,
   type AutoEqSettings,
   type CurveKind,
   type ErrorMetrics,
   type Filter,
+  type FilterDefinition,
   type FilterType,
   type Normalization,
   type PreampResult,
+  type RunManifest,
 } from '@autoeq-workbench/core'
 import { createStore } from 'zustand/vanilla'
 import { useStore } from 'zustand'
@@ -27,9 +31,20 @@ import {
   restoreHistorySnapshot,
   type WorkspaceHistorySnapshot,
 } from './history'
+import { cloneAutoEqRunRecord, type AutoEqRunRecord } from './autoEqRun'
+import type { ValidatedWorkbenchSessionV1 } from '../session/workbenchSession'
+
+export type { AutoEqRunRecord } from './autoEqRun'
 
 export type SolutionState = 'clean' | 'modified' | 'stale'
 export type FilterProvenance = 'manual' | 'autoeq'
+
+export interface FilterSnapshotState {
+  filters: Filter[]
+  filterProvenance: FilterProvenance | null
+  solutionState: SolutionState
+  autoEqRun: AutoEqRunRecord | null
+}
 
 export interface WorkspaceState {
   curves: Curve[]
@@ -41,6 +56,7 @@ export interface WorkspaceState {
   selectedFilterId: string | null
   solutionState: SolutionState
   filterProvenance: FilterProvenance | null
+  autoEqRun: AutoEqRunRecord | null
   addCurve: (curve: Curve) => boolean
   setActiveFr: (id: string | null) => void
   setActiveTarget: (id: string | null) => void
@@ -49,6 +65,9 @@ export interface WorkspaceState {
   setNormalization: (value: Normalization) => void
   setAutoEqSettings: (settings: AutoEqSettings) => void
   setFilters: (filters: Filter[], provenance: FilterProvenance) => void
+  applyAutoEqResult: (result: AutoEqResult) => boolean
+  applyFilterSnapshot: (snapshot: FilterSnapshotState) => void
+  applySession: (session: ValidatedWorkbenchSessionV1) => void
   selectFilter: (id: string | null) => void
   addFilter: (type: FilterType) => void
   removeFilter: (id: string) => void
@@ -56,6 +75,8 @@ export interface WorkspaceState {
   toggleFilter: (id: string) => void
   updateFilter: (id: string, updates: Partial<Omit<Filter, 'id'>>) => void
   reorderFilter: (id: string, direction: 'up' | 'down') => void
+  sortFiltersByFrequency: () => void
+  replaceFiltersFromImport: (filters: readonly FilterDefinition[]) => void
   canUndo: boolean
   canRedo: boolean
   undo: () => void
@@ -90,8 +111,9 @@ export interface WorkspaceDerived {
 }
 
 export const defaultNormalization: Readonly<Normalization> = {
-  anchorHz: 500,
-  targetDb: 0,
+  mode: 'hz',
+  frequencyHz: 500,
+  levelDb: 60,
 }
 
 const initialState = {
@@ -103,6 +125,7 @@ const initialState = {
   selectedFilterId: null,
   solutionState: 'clean' as const,
   filterProvenance: null,
+  autoEqRun: null,
   canUndo: false,
   canRedo: false,
 }
@@ -123,6 +146,7 @@ function uniqueFilterId(filters: Filter[]): string {
 }
 
 function validFilter(filter: Filter): boolean {
+  if (typeof filter !== 'object' || filter === null) return false
   return (
     typeof filter.id === 'string' &&
     filter.id.length > 0 &&
@@ -140,6 +164,114 @@ function validFilter(filter: Filter): boolean {
   )
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function hasFiniteFields(value: unknown, fields: readonly string[]): boolean {
+  return isRecord(value) && fields.every((field) => Number.isFinite(value[field]))
+}
+
+function isValidRunManifest(manifest: RunManifest): boolean {
+  if (typeof manifest !== 'object' || manifest === null) return false
+  const versionFieldsAreValid = manifest.algorithmVersion === 'standard-v1'
+    ? manifest.schemaVersion === 2 &&
+      isValidAutoEqSettingsV1(manifest.autoeqSettings) &&
+      hasFiniteFields(manifest.algorithmParameters, [
+        'deadbandDb',
+        'huberDeltaDb',
+        'candidateThresholdDb',
+        'minObjectiveImprovement',
+        'pruneTolerance',
+        'filterCountWeight',
+        'highQWeight',
+        'gainWeight',
+        'cancellationWeight',
+      ])
+    : manifest.algorithmVersion === 'standard-v2' &&
+      manifest.schemaVersion === 3 &&
+      isValidAutoEqSettings(manifest.autoeqSettings) &&
+      manifest.algorithmParameters.targetRmseDb === 0.25 &&
+      manifest.algorithmParameters.targetMaxAbsDb === 0.75 &&
+      manifest.algorithmParameters.candidateResidualFloorDb === 0.15 &&
+      manifest.algorithmParameters.pkQScaleMultipliers.length === 3 &&
+      manifest.algorithmParameters.pkQScaleMultipliers[0] === 0.5 &&
+      manifest.algorithmParameters.pkQScaleMultipliers[1] === 1 &&
+      manifest.algorithmParameters.pkQScaleMultipliers[2] === 2 &&
+      manifest.algorithmParameters.maxExactCandidatesPerIteration === 8 &&
+      manifest.algorithmParameters.maxActiveSearchPaths === 3 &&
+      manifest.algorithmParameters.alternateRetentionRatio === 1.02 &&
+      manifest.algorithmParameters.maxJointRefinementCycles === 6 &&
+      (manifest.terminationReason === 'target-reached' ||
+        manifest.terminationReason === 'converged' ||
+        manifest.terminationReason === 'time-limit') &&
+      manifest.targetAchieved === (
+        manifest.metrics.rmseDb <= 0.25 && manifest.metrics.maxAbsDb <= 0.75
+      ) &&
+      (manifest.terminationReason !== 'target-reached' || manifest.targetAchieved)
+  const normalizationIsValid =
+    isRecord(manifest.normalization) &&
+    (manifest.normalization.mode === 'hz' || manifest.normalization.mode === 'db') &&
+    Number.isFinite(manifest.normalization.frequencyHz) &&
+    manifest.normalization.frequencyHz >= MVP_NUMERIC_POLICY.minFrequencyHz &&
+    manifest.normalization.frequencyHz <= MVP_NUMERIC_POLICY.maxFrequencyHz &&
+    Number.isFinite(manifest.normalization.levelDb) &&
+    manifest.normalization.levelDb >= 0 &&
+    manifest.normalization.levelDb <= 100
+
+  const auditIsValid =
+    isRecord(manifest.cancellationAudit) &&
+    Number.isFinite(manifest.cancellationAudit.totalScore) &&
+    Array.isArray(manifest.cancellationAudit.pairs) &&
+    manifest.cancellationAudit.pairs.every(
+      (pair: unknown) =>
+        isRecord(pair) &&
+        typeof pair.filterAId === 'string' &&
+        typeof pair.filterBId === 'string' &&
+        Number.isFinite(pair.score) &&
+        (pair.severity === 'moderate' || pair.severity === 'strong'),
+    )
+
+  return (
+    versionFieldsAreValid &&
+    manifest.profile === 'Standard' &&
+    Number.isFinite(manifest.sampleRateHz) &&
+    manifest.sampleRateHz > 0 &&
+    Number.isInteger(manifest.fitPointsPerOctave) &&
+    manifest.fitPointsPerOctave > 0 &&
+    normalizationIsValid &&
+    typeof manifest.sourceName === 'string' &&
+    typeof manifest.targetName === 'string' &&
+    Array.isArray(manifest.finalFilters) &&
+    manifest.finalFilters.length <= manifest.autoeqSettings.maxFilters &&
+    manifest.finalFilters.every(validFilter) &&
+    hasFiniteFields(manifest.metrics, [
+      'maeDb',
+      'rmseDb',
+      'maxAbsDb',
+      'maxAbsFrequencyHz',
+    ]) &&
+    Number.isFinite(manifest.preampDb) &&
+    auditIsValid
+  )
+}
+
+function validAutoEqResult(result: AutoEqResult): boolean {
+  if (!isRecord(result) || !isValidRunManifest(result.manifest)) return false
+  const { manifest } = result
+
+  return (
+    Array.isArray(result.filters) &&
+    result.filters.length <= manifest.autoeqSettings.maxFilters &&
+    result.filters.every(validFilter) &&
+    new Set(result.filters.map(({ id }) => id)).size === result.filters.length &&
+    JSON.stringify(result.filters) === JSON.stringify(manifest.finalFilters) &&
+    JSON.stringify(result.metrics) === JSON.stringify(manifest.metrics) &&
+    result.preampDb === manifest.preampDb &&
+    JSON.stringify(result.cancellationAudit) === JSON.stringify(manifest.cancellationAudit)
+  )
+}
+
 function afterManualEdit(state: WorkspaceState): SolutionState {
   if (state.solutionState === 'stale') return 'stale'
   return state.filterProvenance === 'autoeq' ? 'modified' : 'clean'
@@ -150,7 +282,8 @@ function manualProvenance(state: WorkspaceState): FilterProvenance {
 }
 
 function afterNormalizationChange(state: WorkspaceState): SolutionState {
-  return state.filters.length > 0 && state.filterProvenance === 'autoeq'
+  return state.filterProvenance === 'autoeq' &&
+    (state.filters.length > 0 || state.autoEqRun !== null)
     ? 'stale'
     : state.solutionState
 }
@@ -166,8 +299,8 @@ function curveCollectionUpdate(
   return {
     ...update,
     solutionState:
-      state.filters.length > 0 &&
       state.filterProvenance === 'autoeq' &&
+      (state.filters.length > 0 || state.autoEqRun !== null) &&
       selectedInputsChanged
         ? 'stale'
         : state.solutionState,
@@ -260,12 +393,17 @@ export function createWorkspaceStore() {
     setNormalization: (value) =>
       set((state) => {
         if (
-          !Number.isFinite(value.anchorHz) ||
-          value.anchorHz < MVP_NUMERIC_POLICY.minFrequencyHz ||
-          value.anchorHz > MVP_NUMERIC_POLICY.maxFrequencyHz ||
-          !Number.isFinite(value.targetDb) ||
-          (value.anchorHz === state.normalization.anchorHz &&
-            value.targetDb === state.normalization.targetDb)
+          !isRecord(value) ||
+          (value.mode !== 'hz' && value.mode !== 'db') ||
+          !Number.isFinite(value.frequencyHz) ||
+          value.frequencyHz < MVP_NUMERIC_POLICY.minFrequencyHz ||
+          value.frequencyHz > MVP_NUMERIC_POLICY.maxFrequencyHz ||
+          !Number.isFinite(value.levelDb) ||
+          value.levelDb < 0 ||
+          value.levelDb > 100 ||
+          (value.mode === state.normalization.mode &&
+            value.frequencyHz === state.normalization.frequencyHz &&
+            value.levelDb === state.normalization.levelDb)
         ) return state
         return record(state, {
           normalization: { ...value },
@@ -300,6 +438,7 @@ export function createWorkspaceStore() {
           filters: filters.map((filter) => ({ ...filter })),
           selectedFilterId,
           filterProvenance: replacesAutoEq ? 'autoeq' : provenance,
+          autoEqRun: replacesAutoEq ? state.autoEqRun : null,
           solutionState:
             provenance === 'autoeq'
               ? 'clean'
@@ -310,6 +449,68 @@ export function createWorkspaceStore() {
                   : 'clean',
         })
       }),
+    applyAutoEqResult: (result) => {
+      if (!validAutoEqResult(result)) return false
+      set((state) => record(state, {
+        filters: result.filters.map((filter) => ({ ...filter })),
+        selectedFilterId: null,
+        filterProvenance: 'autoeq',
+        solutionState: 'clean',
+        autoEqRun: cloneAutoEqRunRecord({ manifest: result.manifest }),
+      }))
+      return true
+    },
+    applyFilterSnapshot: (snapshot) =>
+      set((state) => {
+        if (
+          snapshot.filters.length > AUTOEQ_PRODUCT_LIMITS.hardMaxFilters ||
+          !snapshot.filters.every(validFilter) ||
+          new Set(snapshot.filters.map(({ id }) => id)).size !== snapshot.filters.length ||
+          ![null, 'manual', 'autoeq'].includes(snapshot.filterProvenance) ||
+          !['clean', 'modified', 'stale'].includes(snapshot.solutionState)
+        ) return state
+        return record(state, {
+          filters: snapshot.filters.map((filter) => ({ ...filter })),
+          filterProvenance: snapshot.filterProvenance,
+          solutionState: snapshot.solutionState,
+          autoEqRun: cloneAutoEqRunRecord(snapshot.autoEqRun),
+          selectedFilterId: null,
+        })
+      }),
+    applySession: (session) => {
+      past.length = 0
+      future.length = 0
+      set(() => ({
+        curves: session.curves.map((curve) => ({
+          id: curve.id,
+          name: curve.name,
+          kind: curve.kind,
+          rawPoints: curve.rawPoints.map((point) => ({
+            frequencyHz: point.frequencyHz,
+            db: point.db,
+          })),
+          metadata: { ...curve.metadata },
+        })),
+        activeFrId: session.activeFrId,
+        activeTargetId: session.activeTargetId,
+        normalization: { ...session.normalization },
+        autoeqSettings: { ...session.autoeqSettings },
+        filters: session.filters.map((filter) => ({
+          id: filter.id,
+          enabled: filter.enabled,
+          type: filter.type,
+          frequencyHz: filter.frequencyHz,
+          gainDb: filter.gainDb,
+          q: filter.q,
+        })),
+        selectedFilterId: null,
+        solutionState: session.solutionState,
+        filterProvenance: session.filterProvenance,
+        autoEqRun: cloneAutoEqRunRecord(session.autoEqRun),
+        canUndo: false,
+        canRedo: false,
+      }))
+    },
     selectFilter: (id) =>
       set((state) => ({
         selectedFilterId:
@@ -400,6 +601,54 @@ export function createWorkspaceStore() {
           filters,
           solutionState: afterManualEdit(state),
           filterProvenance: manualProvenance(state),
+        })
+      }),
+    sortFiltersByFrequency: () =>
+      set((state) => {
+        if (state.filters.every((filter, index) =>
+          index === 0 || state.filters[index - 1]!.frequencyHz <= filter.frequencyHz,
+        )) return state
+        return record(state, {
+          filters: [...state.filters].sort((left, right) => left.frequencyHz - right.frequencyHz),
+          solutionState: afterManualEdit(state),
+          filterProvenance: manualProvenance(state),
+        })
+      }),
+    replaceFiltersFromImport: (filters) =>
+      set((state) => {
+        if (
+          filters.length > AUTOEQ_PRODUCT_LIMITS.hardMaxFilters ||
+          !filters.every((filter) =>
+            validFilter({
+              id: 'import-validation',
+              enabled: filter.enabled,
+              type: filter.type,
+              frequencyHz: filter.frequencyHz,
+              gainDb: filter.gainDb,
+              q: filter.q,
+            }),
+          )
+        ) return state
+
+        const reservedFilters = [...state.filters]
+        const importedFilters = filters.map((filter) => {
+          const imported: Filter = {
+            id: uniqueFilterId(reservedFilters),
+            enabled: filter.enabled,
+            type: filter.type,
+            frequencyHz: filter.frequencyHz,
+            gainDb: filter.gainDb,
+            q: filter.q,
+          }
+          reservedFilters.push(imported)
+          return imported
+        })
+        return record(state, {
+          filters: importedFilters,
+          selectedFilterId: null,
+          filterProvenance: 'manual',
+          solutionState: 'clean',
+          autoEqRun: null,
         })
       }),
     undo: () =>

@@ -1,9 +1,9 @@
-import { parseCurveText, type Curve } from '@autoeq-workbench/core'
+import { parseCurveText, type Curve, type CurveKind } from '@autoeq-workbench/core'
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { uiStore } from '../../state/uiStore'
-import { workspaceStore } from '../../state/workspaceStore'
+import { deriveWorkspace, workspaceStore } from '../../state/workspaceStore'
 import { CurveImport } from './CurveImport'
 import { CurvesTab } from './CurvesTab'
 
@@ -39,6 +39,12 @@ function fileWithText(name: string, text: () => Promise<string>) {
   return file
 }
 
+async function chooseKind(user: ReturnType<typeof userEvent.setup>, kind: CurveKind) {
+  await user.click(screen.getByRole('button', { name: 'Import FR / Target' }))
+  const chooser = screen.getByRole('group', { name: 'Curve type' })
+  await user.click(within(chooser).getByRole('button', { name: kind === 'fr' ? 'FR' : 'Target' }))
+}
+
 describe('CurveImport', () => {
   beforeEach(() => {
     vi.mocked(parseCurveText).mockClear()
@@ -46,12 +52,29 @@ describe('CurveImport', () => {
     uiStore.setState({ curveAppearance: {} })
   })
 
+  it('uses one import entry point and requires an explicit kind before file selection', async () => {
+    const user = userEvent.setup()
+    render(<CurveImport />)
+
+    expect(screen.getByRole('button', { name: 'Import FR / Target' })).toBeVisible()
+    expect(screen.queryByText('Upload FR')).not.toBeInTheDocument()
+    expect(screen.queryByText('Upload Target')).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Curve type' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Import FR / Target' }))
+    const chooser = screen.getByRole('group', { name: 'Curve type' })
+    expect(within(chooser).getByRole('button', { name: 'FR' })).toBeVisible()
+    expect(within(chooser).getByRole('button', { name: 'Target' })).toBeVisible()
+  })
+
   it.each([
-    ['fr', '+ FR'],
-    ['target', '+ Target'],
-  ] as const)('adds a %s curve and registers appearance only after a successful parse', async (kind, label) => {
-    render(<CurveImport kind={kind} />)
-    fireEvent.change(screen.getByLabelText(label), {
+    ['fr', 'FR'],
+    ['target', 'Target'],
+  ] as const)('adds an explicitly selected %s curve and registers appearance', async (kind, _label) => {
+    const user = userEvent.setup()
+    render(<CurveImport />)
+    await chooseKind(user, kind)
+    fireEvent.change(screen.getByLabelText('Curve file'), {
       target: { files: [fileWithText('Measurement.txt', async () => '20 1\n20000 2')] },
     })
 
@@ -65,9 +88,21 @@ describe('CurveImport', () => {
     expect(uiStore.getState().curveAppearance[curve.id]).toMatchObject({ visible: true })
   })
 
+  it('does not infer a generic txt file as FR or Target', () => {
+    render(<CurveImport />)
+    fireEvent.change(screen.getByLabelText('Curve file'), {
+      target: { files: [fileWithText('generic.txt', async () => '20 1\n20000 2')] },
+    })
+
+    expect(parseCurveText).not.toHaveBeenCalled()
+    expect(workspaceStore.getState().curves).toEqual([])
+  })
+
   it('reports structured errors without adding or registering a curve', async () => {
-    render(<CurveImport kind="target" />)
-    fireEvent.change(screen.getByLabelText('+ Target'), {
+    const user = userEvent.setup()
+    render(<CurveImport />)
+    await chooseKind(user, 'target')
+    fireEvent.change(screen.getByLabelText('Curve file'), {
       target: { files: [fileWithText('broken.csv', async () => 'not curve data')] },
     })
 
@@ -77,11 +112,13 @@ describe('CurveImport', () => {
   })
 
   it('does not register appearance when the parsed curve ID is rejected as a duplicate', async () => {
+    const user = userEvent.setup()
     const duplicate = curves[0]!
     workspaceStore.setState({ curves: [duplicate], activeFrId: duplicate.id, activeTargetId: null })
     vi.mocked(parseCurveText).mockReturnValueOnce(duplicate)
-    render(<CurveImport kind="fr" />)
-    fireEvent.change(screen.getByLabelText('+ FR'), {
+    render(<CurveImport />)
+    await chooseKind(user, 'fr')
+    fireEvent.change(screen.getByLabelText('Curve file'), {
       target: { files: [fileWithText('duplicate.csv', async () => '20 1\n20000 2')] },
     })
 
@@ -90,11 +127,14 @@ describe('CurveImport', () => {
     expect(uiStore.getState().curveAppearance).toEqual({})
   })
 
-  it('ignores an older slow success after a newer selection fails', async () => {
+  it('ignores an older slow success after a newer explicit selection fails', async () => {
+    const user = userEvent.setup()
     const olderRead = deferred<string>()
-    render(<CurveImport kind="fr" />)
-    const input = screen.getByLabelText('+ FR')
+    render(<CurveImport />)
+    await chooseKind(user, 'fr')
+    const input = screen.getByLabelText('Curve file')
     fireEvent.change(input, { target: { files: [fileWithText('older.csv', () => olderRead.promise)] } })
+    await chooseKind(user, 'fr')
     fireEvent.change(input, { target: { files: [fileWithText('newer.csv', async () => 'bad')] } })
     expect(await screen.findByRole('alert')).toHaveTextContent('[parse]')
 
@@ -106,11 +146,14 @@ describe('CurveImport', () => {
     expect(uiStore.getState().curveAppearance).toEqual({})
   })
 
-  it('ignores an older slow error after a newer selection succeeds', async () => {
+  it('ignores an older slow error after a newer explicit selection succeeds', async () => {
+    const user = userEvent.setup()
     const olderRead = deferred<string>()
-    render(<CurveImport kind="fr" />)
-    const input = screen.getByLabelText('+ FR')
+    render(<CurveImport />)
+    await chooseKind(user, 'fr')
+    const input = screen.getByLabelText('Curve file')
     fireEvent.change(input, { target: { files: [fileWithText('older.csv', () => olderRead.promise)] } })
+    await chooseKind(user, 'fr')
     fireEvent.change(input, {
       target: { files: [fileWithText('newer.csv', async () => '20 2\n20000 4')] },
     })
@@ -136,68 +179,58 @@ describe('CurvesTab', () => {
     for (const curve of curves) uiStore.getState().registerCurve(curve.id)
   })
 
-  it('groups curves into compact semantic FR and target lists without active controls', () => {
-    render(<CurvesTab />)
+  it('renders the source manager table skeleton and one import action', () => {
+    render(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
     const workspace = screen.getByRole('region', { name: 'Curves workspace' })
-    const uploadToolbar = within(workspace).getByRole('toolbar', { name: 'Curve uploads' })
-    const frHeading = within(workspace).getByRole('heading', { name: 'FR' })
-    const targetHeading = within(workspace).getByRole('heading', { name: 'TARGETS' })
-    const frList = screen.getByRole('list', { name: 'Frequency response curves' })
-    const targetList = screen.getByRole('list', { name: 'Target curves' })
+    const table = within(workspace).getByRole('table', { name: 'Curve manager' })
 
-    expect(uploadToolbar.compareDocumentPosition(frHeading)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-    expect(frHeading.compareDocumentPosition(targetHeading)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-    expect(within(uploadToolbar).getByLabelText('+ FR')).toBeInTheDocument()
-    expect(within(uploadToolbar).getByLabelText('+ Target')).toBeInTheDocument()
-    expect(within(frHeading.closest('section')!).queryByLabelText('+ FR')).not.toBeInTheDocument()
-    expect(within(targetHeading.closest('section')!).queryByLabelText('+ Target')).not.toBeInTheDocument()
-    expect(screen.getAllByLabelText('+ FR')).toHaveLength(1)
-    expect(screen.getAllByLabelText('+ Target')).toHaveLength(1)
-    expect(within(frList).getAllByRole('listitem')).toHaveLength(2)
-    expect(within(frList).getByText('Source.csv')).toBeInTheDocument()
-    expect(within(frList).getByText('Overlay.csv')).toBeInTheDocument()
-    expect(within(frList).queryByText('Target.csv')).not.toBeInTheDocument()
-    expect(within(targetList).getAllByRole('listitem')).toHaveLength(1)
-    expect(within(targetList).getByText('Target.csv')).toBeInTheDocument()
-    expect(screen.queryByText(/active fr|active target/i)).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /set active|clear active/i })).not.toBeInTheDocument()
-    expect(screen.queryByRole('group', { name: 'NORMALIZE' })).not.toBeInTheDocument()
+    expect(within(workspace).getByRole('button', { name: 'Import FR / Target' })).toBeVisible()
+    expect(within(workspace).queryByText('Upload FR')).not.toBeInTheDocument()
+    expect(within(workspace).queryByText('Upload Target')).not.toBeInTheDocument()
+    expect(within(workspace).queryByText('Browse all curves')).not.toBeInTheDocument()
+    expect(table.querySelector(':scope > tbody > tr > td')).toBeInTheDocument()
+    expect(table.querySelectorAll(':scope > colgroup > col')).toHaveLength(7)
+    expect(Array.from(table.querySelectorAll(':scope > colgroup > col')).map((col) => col.className)).toEqual([
+      'remove',
+      'phoneId',
+      'key',
+      'calibrate',
+      'baselineButton',
+      'hideButton',
+      'lastColumn',
+    ])
+    expect(within(table).getAllByRole('row')).toHaveLength(3)
+    expect(within(table).getByText('Source.csv')).toBeInTheDocument()
+    expect(within(table).getByText('Target.csv')).toBeInTheDocument()
+    expect(within(table).getByText('Overlay.csv')).toBeInTheDocument()
+    expect(within(table).queryByRole('button', { name: /set .* active/i })).not.toBeInTheDocument()
+    expect(within(table).queryByText(/^FR$|^Target$/)).not.toBeInTheDocument()
   })
 
-  it('offers color only for FR rows and keeps visibility, rename, removal, and fallback functional', async () => {
+  it('offers color only for FR rows and keeps visibility, removal, and active fallback functional', async () => {
     const user = userEvent.setup()
-    render(<CurvesTab />)
-    const overlayRow = screen.getByText('Overlay.csv').closest('li')!
-    await user.click(within(overlayRow).getByLabelText('Actions for Overlay.csv'))
-    await user.click(within(overlayRow).getByLabelText('Show Overlay.csv'))
+    render(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
+    const overlayRow = screen.getByText('Overlay.csv').closest('tr')!
+    await user.click(within(overlayRow).getByRole('button', { name: 'Hide Overlay.csv' }))
     expect(uiStore.getState().curveAppearance['curve-2']?.visible).toBe(false)
     fireEvent.change(within(overlayRow).getByLabelText('Overlay.csv color'), {
       target: { value: '#123456' },
     })
     expect(uiStore.getState().curveAppearance['curve-2']?.color).toBe('#123456')
 
-    const rename = within(overlayRow).getByLabelText('Rename Overlay.csv')
-    await user.clear(rename)
-    await user.type(rename, 'Room reference')
-    await user.click(within(overlayRow).getByRole('button', { name: 'Save name' }))
-    expect(workspaceStore.getState().curves[2]?.name).toBe('Room reference')
+    const targetRow = screen.getByText('Target.csv').closest('tr')!
+    expect(within(targetRow).getByRole('img', { name: 'Target.csv fixed gray color' })).toBeInTheDocument()
+    expect(within(targetRow).getByRole('button', { name: 'Rename Target.csv' })).toBeInTheDocument()
+    expect(within(targetRow).getByRole('button', { name: 'Remove Target.csv' })).toBeInTheDocument()
 
-    const targetRow = screen.getByText('Target.csv').closest('li')!
-    await user.click(within(targetRow).getByLabelText('Actions for Target.csv'))
-    expect(within(targetRow).getByText('Rename')).toBeInTheDocument()
-    expect(within(targetRow).getByRole('button', { name: 'Remove' })).toBeInTheDocument()
-    expect(within(targetRow).queryByText('Change color')).not.toBeInTheDocument()
-    expect(within(targetRow).queryByRole('textbox', { name: /color/i })).not.toBeInTheDocument()
-
-    const sourceRow = screen.getByText('Source.csv').closest('li')!
-    await user.click(within(sourceRow).getByLabelText('Actions for Source.csv'))
-    await user.click(within(sourceRow).getByRole('button', { name: 'Remove' }))
+    const sourceRow = screen.getByText('Source.csv').closest('tr')!
+    await user.click(within(sourceRow).getByRole('button', { name: 'Remove Source.csv' }))
     expect(workspaceStore.getState().curves).toHaveLength(2)
     expect(workspaceStore.getState().activeFrId).toBe('curve-2')
     expect(uiStore.getState().curveAppearance['curve-0']).toBeUndefined()
   })
 
-  it('renders empty groups and six or more rows without mixing kinds', () => {
+  it('keeps an empty manager compact and renders six or more rows in the same table', () => {
     const manyCurves = Array.from({ length: 8 }, (_, index): Curve => ({
       ...curves[0]!,
       id: `many-${index}`,
@@ -205,16 +238,44 @@ describe('CurvesTab', () => {
       kind: index < 6 ? 'fr' : 'target',
     }))
     workspaceStore.setState({ curves: manyCurves, activeFrId: null, activeTargetId: null })
-    const { rerender } = render(<CurvesTab />)
+    const { rerender } = render(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
 
-    expect(within(screen.getByRole('list', { name: 'Frequency response curves' })).getAllByRole('listitem')).toHaveLength(6)
-    expect(within(screen.getByRole('list', { name: 'Target curves' })).getAllByRole('listitem')).toHaveLength(2)
+    expect(within(screen.getByRole('table', { name: 'Curve manager' })).getAllByRole('row')).toHaveLength(8)
 
     workspaceStore.setState({ curves: [], activeFrId: null, activeTargetId: null })
-    rerender(<CurvesTab />)
-    expect(screen.getByText('No FR loaded')).toHaveClass('curve-manager__empty')
-    expect(screen.getByText('No Target loaded')).toHaveClass('curve-manager__empty')
-    expect(screen.queryByRole('list', { name: 'Frequency response curves' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('list', { name: 'Target curves' })).not.toBeInTheDocument()
+    rerender(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
+    expect(screen.getByRole('button', { name: 'Import FR / Target' })).toBeVisible()
+    const emptyTable = screen.getByRole('table', { name: 'Curve manager' })
+    expect(within(emptyTable).queryAllByRole('row')).toHaveLength(0)
+    const emptyBody = emptyTable.querySelector('tbody.curves')
+    expect(emptyBody).toBeEmptyDOMElement()
+    expect(emptyBody).toHaveAttribute('aria-label', 'No curves loaded')
+    expect(emptyTable.nextElementSibling).toHaveClass('curve-upload-actions')
+  })
+
+  it('shows exactly one derived FR EQ after the active source without persisting it', () => {
+    workspaceStore.setState({
+      curves,
+      activeFrId: curves[0]!.id,
+      activeTargetId: curves[1]!.id,
+      filters: [{ id: 'filter', enabled: true, type: 'PK', frequencyHz: 1000, gainDb: 3, q: 1 }],
+    })
+    const { rerender } = render(
+      <CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />,
+    )
+    const rowNames = () => within(screen.getByRole('table', { name: 'Curve manager' }))
+      .getAllByRole('row').map((row) => row.getAttribute('aria-label'))
+
+    expect(rowNames()).toEqual(['Source.csv', 'Source.csv EQ', 'Target.csv', 'Overlay.csv'])
+    expect(workspaceStore.getState().curves).toEqual(curves)
+    workspaceStore.getState().setActiveFr('curve-2')
+    rerender(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
+    expect(rowNames()).toEqual(['Source.csv', 'Target.csv', 'Overlay.csv', 'Overlay.csv EQ'])
+    workspaceStore.getState().renameCurve('curve-2', 'Renamed overlay')
+    rerender(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
+    expect(rowNames()).toEqual(['Source.csv', 'Target.csv', 'Renamed overlay', 'Renamed overlay EQ'])
+    workspaceStore.getState().setFilters([], 'manual')
+    rerender(<CurvesTab derived={deriveWorkspace(workspaceStore.getState())} />)
+    expect(rowNames()).toEqual(['Source.csv', 'Target.csv', 'Renamed overlay'])
   })
 })

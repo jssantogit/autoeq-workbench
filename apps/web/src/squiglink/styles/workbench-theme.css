@@ -1,0 +1,70 @@
+:root,
+:root[data-theme='light'] {
+  --wb-bg: #f6f3ed;
+  --wb-surface: #fffdf8;
+  --wb-surface-muted: #eee9df;
+  --wb-text: #232323;
+  --wb-text-muted: #6f6b63;
+  --wb-border: #d7d0c4;
+  --wb-accent: #ffa03a;
+  --wb-accent-hover: #e98a27;
+  --wb-accent-text: #2b1807;
+  --wb-copper: #9a642b;
+}
+
+:root[data-theme='dark'] {
+  --wb-bg: #080c0e;
+  --wb-surface: #0e1417;
+  --wb-surface-muted: #151d21;
+  --wb-text: #eceae4;
+  --wb-text-muted: #a6a39c;
+  --wb-border: #293237;
+  --wb-accent: #ffa03a;
+  --wb-accent-hover: #e98a27;
+  --wb-accent-text: #2b1807;
+  --wb-copper: #9a642b;
+}
+
+.graphtool,
+.parts-primary { color: var(--wb-text); background: var(--wb-bg); }
+.header,
+.parts-secondary { color: var(--wb-text); background: var(--wb-surface); }
+.parts-secondary,
+.graphBox { border-color: var(--wb-border); }
+.tools-panel { color: var(--wb-text); background: var(--wb-surface); }
+.tools-section > h3 { color: var(--wb-text-muted); }
+
+.manageTable tr,
+.manageTable tbody.curves:empty { border-color: var(--wb-border); color: var(--wb-text-muted); background: var(--wb-surface-muted); }
+.curve-import__trigger,
+.curve-import__chooser button { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
+.curve-import__trigger:hover,
+.curve-import__chooser button:hover { border-color: var(--wb-accent-hover); color: var(--wb-text); }
+.manageTable td.button::before,
+.manageTable td.remove::before { border-color: transparent; background: var(--wb-surface); }
+.manageTable td.button::after,
+.manageTable td.remove::after { background: var(--wb-text); }
+.manageTable td.button.selected::before { border-color: var(--wb-border); }
+.manageTable td.button.selected::after { background: var(--wb-text-muted); }
+.manageTable td.remove::before { border-color: var(--wb-border); }
+.manageTable td.remove::after { background: var(--color-danger); }
+.curve-row-name__label { color: var(--wb-text); }
+.curve-row-rename input { border-color: var(--wb-border); color: var(--wb-text); background: var(--color-input); }
+.curve-row-color--target { background: var(--color-target); }
+.manageTable .number-field input { border-color: var(--wb-text-muted); color: var(--wb-text); background: var(--color-input); }
+
+.graph-toolbar { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-bg); }
+.graph-toolbar .zoom,
+.graph-toolbar .normalize,
+.graph-toolbar .smooth,
+.graph-toolbar .miscTools { border-color: var(--wb-border); }
+.graph-toolbar .zoom > span,
+.graph-toolbar .normalize > span,
+.graph-toolbar .smooth .number-field { color: var(--wb-text-muted); }
+.graph-toolbar button:not(.theme-toggle) { border-color: var(--wb-border); color: var(--wb-text); background: var(--wb-surface); }
+.graph-toolbar button:not(.theme-toggle):hover { border-color: var(--wb-accent-hover); color: var(--wb-text); }
+.graph-toolbar button[aria-pressed='true'] { border-color: var(--wb-accent); color: var(--wb-accent-text); background: var(--wb-accent); box-shadow: none; }
+
+@media (max-width: 1000px) {
+  .parts-secondary { border-color: var(--wb-border); }
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "implementationCommit": "45bbf3fa115dd0267aa6d6da876c40abaf98e8c2",
+  "configuration": {
+    "maxFilters": 10,
+    "budgetSeconds": 60,
+    "preset": "max10-q31-b4-p8-experimental"
+  },
+  "cases": {
+    "titan-to-mystic-8": {
+      "rmseDb": 2.1350321464098267,
+      "maxAbsDb": 7.468157677209715,
+      "violation": 9.957543569612954,
+      "filterCount": 6
+    },
+    "titan-to-rsv": {
+      "rmseDb": 1.1596671074662055,
+      "maxAbsDb": 4.527876315732816,
+      "violation": 6.037168420977088,
+      "filterCount": 10
+    },
+    "titan-to-s12-ultra": {
+      "rmseDb": 1.2570822313435313,
+      "maxAbsDb": 3.853013787144869,
+      "violation": 5.137351716193159,
+      "filterCount": 10
+    }
+  }
+}
