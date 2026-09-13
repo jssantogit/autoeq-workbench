@@ -8,6 +8,7 @@ import {
   resolveScalableEffortConfig,
   resolveStructuralSearchConfig,
   runScalableStructuralSearch,
+  SCALABLE_BASE_CAPACITY,
   structuralViolation,
   type Filter,
   type ScalableSearchStage,
@@ -87,6 +88,70 @@ describe('scalable structural search policy', () => {
     expect(nextScalableCapacity(64, 64)).toBe(64)
   })
 
+  it('supports generated arbitrary capacity ceilings with bounded strict progression', () => {
+    const maxima = Array.from({ length: 64 }, (_, index) => index + 1)
+
+    for (const maximum of maxima) {
+      let current = Math.min(10, maximum)
+      const progression = [current]
+
+      for (let stage = 0; current < maximum && stage < 256; stage += 1) {
+        const next = nextScalableCapacity(current, maximum)
+        expect(next).toBeGreaterThan(current)
+        expect(next).toBeLessThanOrEqual(maximum)
+        progression.push(next)
+        current = next
+      }
+
+      expect(current).toBe(maximum)
+      expect(progression.length).toBeLessThan(256)
+    }
+  })
+
+  it('runs the same bounded controller for generated ceilings without capacity modes', () => {
+    const maxima = Array.from({ length: 64 }, (_, index) => index + 1)
+    const run = (maximum: number) => {
+      resetMockRunner()
+      mockedRunStructuralSearch.mockImplementation(() => ({
+        filters: [],
+        rmseDb: 99,
+        maxAbsDb: 99,
+      }))
+      const stages: ScalableSearchStage[] = []
+      const result = runScalableStructuralSearch(inputFor({
+        maxFilters: maximum,
+        deadline: deadlineAfterStages(8),
+        onStage: (stage) => stages.push(stage),
+      }))
+      return {
+        result: {
+          filters: result.filters,
+          rmseDb: result.rmseDb,
+          maxAbsDb: result.maxAbsDb,
+          stagesCompleted: result.stagesCompleted,
+        },
+        stages,
+      }
+    }
+
+    for (const maximum of maxima) {
+      const first = run(maximum)
+      const second = run(maximum)
+      const capacities = first.stages.map((stage) => stage.capacity)
+      const firstMaximumIndex = capacities.findIndex((capacity) => capacity === maximum)
+
+      expect(first).toEqual(second)
+      expect(first.result.stagesCompleted).toBe(8)
+      expect(capacities.every((capacity) => capacity <= maximum)).toBe(true)
+      expect(firstMaximumIndex).toBeGreaterThanOrEqual(0)
+      expect(capacities.slice(0, firstMaximumIndex).every((capacity, index, values) =>
+        index === 0 || capacity > values[index - 1]!,
+      )).toBe(true)
+      expect(capacities[firstMaximumIndex]).toBe(maximum)
+      expect(capacities[0]).toBe(Math.min(SCALABLE_BASE_CAPACITY, maximum))
+    }
+  })
+
   it('deepens search effort monotonically while keeping the requested capacity', () => {
     const base = resolveStructuralSearchConfig({
       preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
@@ -132,6 +197,33 @@ describe('scalable structural search policy', () => {
     expect(result.filters).toEqual(seedFilters)
     expect(result.rmseDb).toBeCloseTo(expected.rmseDb, 12)
     expect(result.maxAbsDb).toBeCloseTo(expected.maxAbsDb, 12)
+  })
+
+  it('preserves the same incumbent for generated irregular capacity ceilings', () => {
+    const maxima = [1, 7, 11, 17, 31, 37, 43, 47, 63, 64]
+    const seedFilters = [filter('seed')]
+    const expected = expectedMetrics(seedFilters)
+
+    for (const maximum of maxima) {
+      resetMockRunner()
+      mockedRunStructuralSearch.mockImplementation(() => ({
+        filters: [],
+        rmseDb: 99,
+        maxAbsDb: 99,
+      }))
+
+      const result = runScalableStructuralSearch(inputFor({
+        maxFilters: maximum,
+        seedFilters,
+        deadline: deadlineAfterStages(1),
+      }))
+
+      expect(result.filters).toEqual(seedFilters)
+      expect(result.rmseDb).toBeCloseTo(expected.rmseDb, 12)
+      expect(result.maxAbsDb).toBeCloseTo(expected.maxAbsDb, 12)
+      expect(mockedRunStructuralSearch.mock.calls[0]?.[0].config.maxFilters)
+        .toBe(Math.min(10, maximum))
+    }
   })
 
   it('progresses only through generic capacity bounds and continues work after maximum capacity', () => {
