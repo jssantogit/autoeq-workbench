@@ -161,4 +161,5 @@ export type {
   ResolvedStructuralSearchConfig,
   StructuralSearchInput,
   StructuralSearchResult,
+  StructuralSearchTraceEvent,
 } from './autoeq/v2/structuralSearch.js'
