@@ -72,6 +72,8 @@ export interface ScalableSearchStage {
   candidateQualityKey?: ScalableSearchQualityKey
   qualityAfterKey?: ScalableSearchQualityKey
   expansionOpportunity?: ResidualExpansionOpportunity
+  /** Clone of the stage's pre-action incumbent for research snapshots. */
+  incumbent?: StructuralSearchResult
   filterCount?: number
   capacityHeadroom?: number
   capacityPressure?: CapacityPressureDelta
@@ -419,6 +421,11 @@ export function runScalableStructuralSearch(
       candidateQualityKey: candidateKey,
       qualityAfterKey: afterKey,
       expansionOpportunity,
+      incumbent: {
+        filters: before.filters.map((filter) => ({ ...filter })),
+        rmseDb: before.rmseDb,
+        maxAbsDb: before.maxAbsDb,
+      },
       filterCount: before.filters.length,
       capacityHeadroom: Math.max(0, capacity - before.filters.length),
       capacityPressure,

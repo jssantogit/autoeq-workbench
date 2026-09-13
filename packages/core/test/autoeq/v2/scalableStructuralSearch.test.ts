@@ -788,3 +788,17 @@ describe('capacity-pressure scalable telemetry', () => {
     expect(stages[0]?.cumulativeCapacityPressure).toEqual(stages[0]?.capacityPressure)
   })
 })
+
+describe('research stage snapshot semantics', () => {
+  it('reports a cloned pre-action incumbent independently of fullness and pressure', () => {
+    resetMockRunner()
+    const seed = filter('snapshot-seed')
+    mockedRunStructuralSearch.mockReturnValue({ filters: [seed], ...expectedMetrics([seed]) })
+    const stages: ScalableSearchStage[] = []
+    runScalableStructuralSearch(inputFor({ maxFilters: 17, seedFilters: [seed], deadline: deadlineAfterStages(1), onStage: (stage) => stages.push(stage) }))
+    expect(stages[0]?.incumbent?.filters).toEqual([seed])
+    expect(stages[0]?.incumbent?.filters).not.toBe(stages[0]?.filters)
+    expect(stages[0]?.filterCount).toBe(1)
+    expect(stages[0]?.capacityHeadroom).toBe(9)
+  })
+})
