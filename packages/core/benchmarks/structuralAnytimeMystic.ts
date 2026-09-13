@@ -102,8 +102,8 @@ function runCase(caseId: ManualRegressionCaseId) {
     }
 
     const useRemovalReseed =
-      effort >= 6 &&
-      consecutiveNoImprovement >= 2 &&
+      effort >= 2 &&
+      consecutiveNoImprovement >= 1 &&
       incumbentFilters.length > 0
     const reseed = useRemovalReseed
       ? removalSeed(incumbentFilters, reseedCursor++)
