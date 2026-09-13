@@ -151,6 +151,95 @@ export function naturalDecisionCaptureReasons(
   return reasons
 }
 
+/**
+ * Search-only fields used by the natural structural-demand capture protocol.
+ *
+ * This intentionally contains no oracle result, quality-arm, or scheduler
+ * recommendation field.  Capture is therefore a pure observation of the
+ * natural trajectory and cannot be tuned from causal outcomes.
+ */
+export interface NaturalStructuralDemandCaptureSnapshot {
+  elapsedMs: number
+  envelopeMs: number
+  stageIndex: number
+  currentCapacity: number
+  maximumCapacity: number
+  incumbentFilterCount: number
+  frontierGeneratedFilterCountMax: number
+  capacityPressure: CapacityPressureDelta
+}
+
+export type NaturalStructuralDemandCaptureReason =
+  | 'first-post-initial'
+  | 'first-before-live-expansion'
+  | 'first-meaningful-frontier-growth'
+  | 'first-frontier-at-ceiling'
+  | 'first-non-zero-capacity-pressure'
+  | 'first-newly-slot-relevant'
+  | 'late-budget-state'
+
+export const NATURAL_STRUCTURAL_DEMAND_CAPTURE_REASONS: readonly NaturalStructuralDemandCaptureReason[] = Object.freeze([
+  'first-post-initial',
+  'first-before-live-expansion',
+  'first-meaningful-frontier-growth',
+  'first-frontier-at-ceiling',
+  'first-non-zero-capacity-pressure',
+  'first-newly-slot-relevant',
+  'late-budget-state',
+])
+
+function hasCapacityPressure(value: CapacityPressureDelta): boolean {
+  // Proposal generation is useful context but is not a blocked-capacity
+  // event.  The pressure landmark is reserved for existing blocked gates.
+  return value.additiveMutationGatesBlockedByCapacity > 0 ||
+    value.rescueAddGatesBlockedByCapacity > 0 ||
+    value.pairAddGatesBlockedByCapacity > 0
+}
+
+/**
+ * Return the first occurrence of each predeclared natural trajectory
+ * landmark.  The helper is deliberately outcome-blind: only pre-decision
+ * search state is accepted, and absent landmarks are represented by no
+ * reason rather than inferred evidence.
+ */
+export function naturalStructuralDemandCaptureReasons(
+  snapshot: NaturalStructuralDemandCaptureSnapshot,
+  captured: ReadonlySet<string>,
+): NaturalStructuralDemandCaptureReason[] {
+  const reasons: NaturalStructuralDemandCaptureReason[] = []
+  const capture = (
+    reason: NaturalStructuralDemandCaptureReason,
+    condition: boolean,
+  ): void => {
+    if (condition && !captured.has(reason)) reasons.push(reason)
+  }
+
+  capture('first-post-initial', snapshot.stageIndex === 0)
+  capture(
+    'first-before-live-expansion',
+    snapshot.currentCapacity < snapshot.maximumCapacity,
+  )
+  capture(
+    'first-meaningful-frontier-growth',
+    snapshot.frontierGeneratedFilterCountMax > snapshot.incumbentFilterCount,
+  )
+  capture(
+    'first-frontier-at-ceiling',
+    snapshot.frontierGeneratedFilterCountMax >= snapshot.currentCapacity,
+  )
+  capture('first-non-zero-capacity-pressure', hasCapacityPressure(snapshot.capacityPressure))
+  capture(
+    'first-newly-slot-relevant',
+    snapshot.currentCapacity < snapshot.maximumCapacity &&
+      snapshot.frontierGeneratedFilterCountMax >= snapshot.currentCapacity,
+  )
+  capture(
+    'late-budget-state',
+    snapshot.elapsedMs >= snapshot.envelopeMs * 0.8,
+  )
+  return reasons
+}
+
 function cloneFilters(filters: readonly Filter[]): Filter[] {
   return filters.map((filter) => ({ ...filter }))
 }
