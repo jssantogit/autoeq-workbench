@@ -261,3 +261,148 @@ the real structural path has wall-clock variance; two repeats are enough to
 expose the Mystic/S12 boundary reversal but not to estimate a population
 effect.  No third diversification arm, comparator change, quality-weight
 tuning, or named capacity mode was introduced.
+
+## First adaptive scheduler intervention (2026-09-13)
+
+### Policy and parameters
+
+The first intervention is selectable only through the internal
+`ScalableStructuralSearchInput.schedulerPolicy` field.  The omitted/default
+value is `legacy`, which retains the existing geometric capacity progression;
+`adaptive-resource` is the research arm.  No product caller selects the
+adaptive arm by default.
+
+The adaptive decision is deliberately one rule over generic resource state:
+
+1. If there is no capacity headroom, continue the current regime and report
+   `no-capacity-headroom`.
+2. If a remaining-budget callback is supplied and less than one current
+   quantum plus one follow-up quantum remains, continue and report
+   `insufficient-time-reserve`.
+3. If the latest same-regime normalized-violation gain is at least `0.05`,
+   continue and report `productive-current-regime`.
+4. If fewer than `2` structural-search invocations (or stages) have been
+   invested since the last meaningful gain, continue and report
+   `insufficient-work-to-judge`.
+5. Otherwise expand through `nextScalableCapacity` and report
+   `stagnated-with-headroom`.
+
+The predeclared central parameters are `minimumInvocationsBeforeExpansion=2`,
+`meaningfulGainThreshold=0.05`, and `followUpQuanta=1`.  One scheduler quantum
+is the existing stage work boundary.  The research runner uses a 100 ms quantum
+for a short probe; its reserve is therefore 200 ms.  This quantum override is a
+research control, not a named capacity mode.  Raw work counters remain
+unweighted.  Regime-local work/gain counters reset when capacity expands.
+
+### Validation boundary
+
+The adaptive policy is covered by injected deterministic tests for productive
+current-regime work, insufficient work, stagnation, headroom, reserve,
+arbitrary ceilings, comparator preservation, legacy equivalence, and repeated
+runs.  The comparison harness is
+`packages/core/benchmarks/research/adaptiveSchedulerComparison.ts`.  It emits
+one compact JSONL record per run and one summary per policy/envelope, including
+quality keys, RMSE, max-absolute error, filter count, action traces with
+capacity/effort/reason, raw work dimensions, regime-local work, gains, elapsed
+runtime, and deadline use.
+
+### Sparse repeated design
+
+A single generic envelope was selected before looking at results: ceiling `17`,
+1,000 ms total budget, and 100 ms stage quantum.  Ceiling 17 is irregular with
+respect to the product ceiling and exercises generic progression (`10 -> 15 ->
+17`) without introducing a capacity-specific path.  All three approved,
+sanitary manual-regression cases were run: RSV, Mystic 8, and S12 Ultra.  The
+repeat count was predeclared as `3` (the harness accepts only 3–5), giving six
+runs per case: three unchanged legacy controls and three adaptive runs.  This
+is a sparse case/envelope comparison, not a capacity/time Cartesian sweep.
+
+Command:
+
+```text
+pnpm --filter @autoeq-workbench/core exec tsx benchmarks/research/adaptiveSchedulerComparison.ts --capacity 17 --budget-ms 1000 --stage-ms 100 --repeats 3 --jsonl
+```
+
+The command exited `0` and emitted 25 JSONL records (18 runs, 6 summaries,
+and one completion record).  Every run used ten structural-search invocations
+and reached the one-second deadline; small elapsed overages are normal
+process/deadline-check overhead.
+
+### Paired distributions
+
+Values below are normalized structural violation; lower is better.  `best`,
+`median`, `worst`, and `spread` are across the three declared repeats.
+
+| Case | Policy | Violation best | Median | Worst | Spread | RMSE median | maxAbs median | Filters median | Expansions median | Deepens median | Explore median | Reseeds median |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| RSV | legacy | 5.791 | 5.810 | 6.507 | 0.716 | 1.435 | 4.357 | 7 | 2 | 7 | 1 | 0 |
+| RSV | adaptive-resource | 5.994 | 6.150 | 6.157 | 0.163 | 1.537 | 4.612 | 7 | 1 | 7 | 2 | 0 |
+| Mystic 8 | legacy | 6.700 | 9.958 | 9.960 | 3.260 | 2.488 | 7.469 | 7 | 2 | 7 | 1 | 0 |
+| Mystic 8 | adaptive-resource | 9.960 | 9.960 | 10.688 | 0.728 | 2.489 | 7.470 | 7 | 1 | 7 | 2 | 0 |
+| S12 Ultra | legacy | 5.374 | 5.713 | 5.713 | 0.340 | 1.428 | 4.282 | 9 | 2 | 6 | 1 | 1 |
+| S12 Ultra | adaptive-resource | 5.212 | 5.402 | 5.402 | 0.190 | 1.264 | 4.052 | 10 | 0 | 9 | 1 | 0 |
+
+The legacy control's first two stages expand immediately (`10 -> 15 -> 17`),
+then deepen at the ceiling.  Adaptive generally spends additional quanta at
+the current capacity before expansion.  RSV adaptive expanded once (versus
+legacy twice) and had a worse median violation by `0.340`, but its spread was
+smaller by `0.553`.  Mystic adaptive likewise expanded once (versus twice), was
+effectively tied at the median (`+0.002` violation), and substantially reduced
+spread (`0.728` versus `3.260`), while its best run was worse.  S12 adaptive
+never expanded in these repeats, spent nine deepens at the base capacity, and
+improved median violation by `0.311` while reducing spread by `0.150`.  The
+result is mixed: lower variance did not imply uniformly better quality.
+
+### Work allocation
+
+Each policy consumed a median of ten structural invocations.  Median raw work
+(`proposalsGenerated / proposalsAdmitted / proposalsPolished`) was:
+
+| Case | Legacy | Adaptive | Allocation change |
+| --- | ---: | ---: | --- |
+| RSV | `181 / 171 / 130` | `222 / 199 / 138` | More proposals and polishing while deepening; one fewer expansion |
+| Mystic 8 | `246 / 189 / 119` | `273 / 205 / 125` | More proposals/admissions/polishing; one fewer expansion |
+| S12 Ultra | `264 / 210 / 96` | `214 / 205 / 96` | Fewer generated proposals; no expansion and more deepening |
+
+Other median raw counters remained small in this probe: duplicate states were
+`5/4/4` (legacy/adaptive) for RSV, `5/5/5` for Mystic, and `4/4/4` for S12;
+rescue, pair-add, and cap-swap attempts were zero.  Legacy S12 used one median
+reseed attempt; adaptive used none.  These are raw dimensions, not a combined
+compute score.  Full per-run work and trace records preserve all ten counters.
+
+### Decision traces and oracle agreement
+
+Adaptive decisions were explainable on every stage.  Across cases the common
+trace was `insufficient-work-to-judge` at a new capacity, followed by
+`productive-current-regime` when the latest gain cleared 0.05, then either
+additional deepening while evidence accumulated or `stagnated-with-headroom`
+when two invocations had produced little gain.  Near the deadline the reserve
+reason prevented a new expansion.  At ceiling 17, all later decisions were
+`no-capacity-headroom`; existing reseed behavior remained available but was
+never selected by the adaptive policy in the median traces.
+
+The earlier paired oracle found RSV effectively tied, Mystic 8 deepen/tie, and
+S12 Ultra expand/tie.  The adaptive traces agree with the RSV saturation result
+in not claiming expansion benefit, and they agree with the Mystic evidence in
+retaining current-regime work initially.  They disagree with the S12 expansion
+opportunity: the adaptive gate kept deepening at capacity 10, yet S12 quality
+was better in this short sample.  This disagreement is useful evidence that the
+one-snapshot oracle is noisy and that the 0.05 gain gate is not a sufficient
+opportunity model.  No oracle outcome was promoted to a golden assertion.
+
+### Decision and limitations
+
+Classification: **mixed; keep `adaptive-resource` experimental**.  The policy
+reduced action/path variance in these runs and improved the S12 median, but
+regressed RSV and did not improve Mystic's central tendency.  It is not
+recommended for broader product adoption or as the default scheduler yet.
+
+This experiment does not establish a causal quality advantage.  It uses one
+short envelope, three repeats, a 100 ms stage quantum, and independent search
+trajectories rather than paired identical random streams.  The structural
+search's proposal and polish counts differ by action, so invocation equality is
+the fairness boundary and raw counter mismatches are reported explicitly.  A
+remaining-time reserve is unavailable to callers that do not provide the
+optional callback.  The policy uses marginal normalized-violation gain only;
+it has no residual-shape or proposal-exhaustion model.  The report therefore
+supports one falsifiable next experiment, not a scheduler rule for production.
