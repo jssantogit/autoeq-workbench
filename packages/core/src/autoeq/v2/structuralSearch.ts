@@ -144,6 +144,42 @@ export interface ResidualFeature {
   residual: number
 }
 
+/**
+ * Raw residual evidence that may indicate useful structural work remains.
+ *
+ * This is telemetry only.  It deliberately reports the number of local
+ * residual extrema above the existing target max-absolute-error and the raw
+ * maximum residual; it is not a scheduler score or acceptance criterion.
+ */
+export interface ResidualExpansionOpportunity {
+  unresolvedResidualExtremaCount: number
+  residualMaxAbsDb: number
+}
+
+export function measureResidualExpansionOpportunity(
+  frequenciesHz: readonly number[],
+  residualDb: readonly number[],
+  bounds: StandardAutoEqV2Config,
+): ResidualExpansionOpportunity {
+  const metrics = calculateErrorMetrics(residualDb, frequenciesHz)
+  let unresolvedResidualExtremaCount = 0
+  const threshold = bounds.algorithm.targetMaxAbsDb
+
+  for (let index = 0; index < residualDb.length; index += 1) {
+    const magnitude = Math.abs(residualDb[index]!)
+    const left = index === 0 || magnitude >= Math.abs(residualDb[index - 1]!)
+    const right = index === residualDb.length - 1 || magnitude >= Math.abs(residualDb[index + 1]!)
+    if (left && right && magnitude > threshold) {
+      unresolvedResidualExtremaCount += 1
+    }
+  }
+
+  return {
+    unresolvedResidualExtremaCount,
+    residualMaxAbsDb: metrics.maxAbsDb,
+  }
+}
+
 export function selectResidualFeatures(
   frequenciesHz: readonly number[],
   residualDb: readonly number[],

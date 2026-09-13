@@ -3,8 +3,10 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   calculateErrorMetrics,
   cascadeMagnitudeDb,
+  DEFAULT_AUTOEQ_SETTINGS,
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   nextScalableCapacity,
+  resolveStandardAutoEqV2Config,
   resolveScalableEffortConfig,
   resolveStructuralSearchConfig,
   runScalableStructuralSearch,
@@ -109,6 +111,25 @@ const emptyWork: SearchWorkDelta = {
 }
 
 describe('scalable structural search policy', () => {
+  it('measures unresolved residual extrema and raw residual magnitude', () => {
+    const bounds = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
+    const opportunity = structuralSearch.measureResidualExpansionOpportunity(
+      [100, 200, 400, 800, 1_600],
+      [0.8, 0.2, -0.8, -1, -0.2],
+      bounds,
+    )
+
+    expect(opportunity.unresolvedResidualExtremaCount).toBe(2)
+    expect(opportunity.residualMaxAbsDb).toBeCloseTo(
+      calculateErrorMetrics(
+        [0.8, 0.2, -0.8, -1, -0.2],
+        [100, 200, 400, 800, 1_600],
+      ).maxAbsDb,
+      12,
+    )
+    expect(opportunity.residualMaxAbsDb).toBe(1)
+  })
+
   it('grows capacity geometrically without Max20/Max30-specific presets', () => {
     expect(nextScalableCapacity(10, 64)).toBe(15)
     expect(nextScalableCapacity(15, 64)).toBe(23)
@@ -365,6 +386,48 @@ describe('scalable structural search policy', () => {
     }
 
     expect(run()).toEqual(run())
+  })
+
+  it('records incumbent expansion opportunity without changing legacy actions or result', () => {
+    const seedFilters = [filter('seed')]
+    const run = (onStage?: (stage: ScalableSearchStage) => void) => {
+      resetMockRunner()
+      mockedRunStructuralSearch.mockImplementation(({ seedFilters: stageSeed }) => ({
+        filters: (stageSeed ?? []).map((entry) => ({ ...entry })),
+        ...expectedMetrics(stageSeed ?? []),
+      }))
+      const result = runScalableStructuralSearch(inputFor({
+        maxFilters: 15,
+        seedFilters,
+        deadline: deadlineAfterStages(3),
+        onStage,
+      }))
+      return {
+        filters: result.filters,
+        rmseDb: result.rmseDb,
+        maxAbsDb: result.maxAbsDb,
+        stagesCompleted: result.stagesCompleted,
+      }
+    }
+
+    const baseline = run()
+    const stages: ScalableSearchStage[] = []
+    const instrumented = run((stage) => stages.push(stage))
+    const responseDb = cascadeMagnitudeDb(seedFilters, testFrequencies, 48_000)
+    const opportunity = structuralSearch.measureResidualExpansionOpportunity(
+      testFrequencies,
+      testDesiredDb.map((desired, index) => desired - responseDb[index]!),
+      resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS),
+    )
+
+    expect(instrumented).toEqual(baseline)
+    expect(stages.map((stage) => stage.action)).toEqual([
+      'expand-capacity',
+      'explore-current-capacity',
+      'deepen',
+    ])
+    expect(stages.every((stage) => stage.expansionOpportunity !== undefined)).toBe(true)
+    expect(stages[0]?.expansionOpportunity).toEqual(opportunity)
   })
 
   it('accounts for trace work and reports marginal incumbent gain without changing the controller decision', () => {

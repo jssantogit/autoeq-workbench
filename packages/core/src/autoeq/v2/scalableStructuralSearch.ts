@@ -1,6 +1,8 @@
 import {
   calculateErrorMetrics,
   cascadeMagnitudeDb,
+  DEFAULT_AUTOEQ_SETTINGS,
+  resolveStandardAutoEqV2Config,
 } from '../../index.js'
 import type { Filter } from '../../types/filter.js'
 import type { StandardV2Deadline } from './runtime.js'
@@ -15,9 +17,11 @@ import {
   runStructuralSearch,
   createSearchWorkDelta,
   searchWorkDeltaFromTrace,
+  measureResidualExpansionOpportunity,
   type SearchWorkDelta,
   type SearchWorkTotals,
   type ResolvedStructuralSearchConfig,
+  type ResidualExpansionOpportunity,
   type StructuralSearchResult,
 } from './structuralSearch.js'
 
@@ -63,6 +67,7 @@ export interface ScalableSearchStage {
   qualityBeforeKey?: ScalableSearchQualityKey
   candidateQualityKey?: ScalableSearchQualityKey
   qualityAfterKey?: ScalableSearchQualityKey
+  expansionOpportunity?: ResidualExpansionOpportunity
   workDelta?: SearchWorkDelta
   cumulativeWork?: SearchWorkTotals
 }
@@ -237,6 +242,7 @@ export function runScalableStructuralSearch(
   let workSinceMeaningfulImprovement = createSearchWorkDelta()
   const schedulerPolicy = input.schedulerPolicy ?? 'legacy'
   const adaptivePolicyParameters = input.adaptivePolicyParameters ?? ADAPTIVE_RESOURCE_POLICY
+  const opportunityBounds = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
   let incumbent = evaluateFilters(
     input.seedFilters ?? [],
     input.desiredDb,
@@ -245,6 +251,19 @@ export function runScalableStructuralSearch(
   )
 
   while (!input.deadline.isExpired() && stageIndex < 256) {
+    const incumbentMagnitude = cascadeMagnitudeDb(
+      incumbent.filters,
+      input.frequencies,
+      input.sampleRateHz,
+    )
+    const incumbentResidualDb = input.desiredDb.map(
+      (desired, index) => desired - incumbentMagnitude[index]!,
+    )
+    const expansionOpportunity = measureResidualExpansionOpportunity(
+      input.frequencies,
+      incumbentResidualDb,
+      opportunityBounds,
+    )
     const stageDeadlineAt = nowMs() + stageQuantumMs
     const atMaximumCapacity = capacity >= maximum
     const useRemovalReseed =
@@ -381,6 +400,7 @@ export function runScalableStructuralSearch(
       qualityBeforeKey: beforeKey,
       candidateQualityKey: candidateKey,
       qualityAfterKey: afterKey,
+      expansionOpportunity,
       workDelta,
       cumulativeWork,
     })
