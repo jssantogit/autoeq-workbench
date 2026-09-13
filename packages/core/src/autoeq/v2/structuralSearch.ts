@@ -709,6 +709,25 @@ export function retainParetoBeam(
   return states.filter((state) => selected.has(state.candidateId))
 }
 
+export interface StructuralSearchTraceEvent {
+  type: 'start' | 'beam-generation' | 'beam-stop' | 'phase' | 'end'
+  phase?: 'beam' | 'rescue' | 'cap-swap'
+  status?: 'start' | 'end'
+  generation?: number
+  reason?: 'deadline' | 'no-next-states' | 'completed'
+  beamSize?: number
+  generatedProposals?: number
+  admittedProposals?: number
+  polishedProposals?: number
+  duplicateStates?: number
+  nextStates?: number
+  acceptedSteps?: number
+  filterCount: number
+  rmseDb: number
+  maxAbsDb: number
+  violation: number
+}
+
 export interface StructuralSearchInput {
   desiredDb: readonly number[]
   frequencies: readonly number[]
@@ -717,6 +736,7 @@ export interface StructuralSearchInput {
   deadline: StandardV2Deadline
   seedFilters?: readonly Filter[]
   isExpired?: () => boolean
+  onTrace?: (event: StructuralSearchTraceEvent) => void
 }
 
 export interface StructuralSearchResult {
@@ -885,6 +905,21 @@ export function pruneMarginalFilter(
 
 export function runStructuralSearch(input: StructuralSearchInput): StructuralSearchResult {
   const { desiredDb, frequencies, sampleRateHz, config, deadline } = input
+  const trace = (event: StructuralSearchTraceEvent): void => input.onTrace?.(event)
+  const stateTrace = (
+    type: StructuralSearchTraceEvent['type'],
+    state: Pick<SearchState, 'filters' | 'rmseDb' | 'maxAbsDb'>,
+    extra: Omit<StructuralSearchTraceEvent, 'type' | 'filterCount' | 'rmseDb' | 'maxAbsDb' | 'violation'> = {},
+  ): void => {
+    trace({
+      type,
+      ...extra,
+      filterCount: state.filters.length,
+      rmseDb: state.rmseDb,
+      maxAbsDb: state.maxAbsDb,
+      violation: Math.max(state.rmseDb / 0.25, state.maxAbsDb / 0.75),
+    })
+  }
 
   const bounds = resolveStandardAutoEqV2Config({
     ...DEFAULT_AUTOEQ_SETTINGS,
@@ -910,14 +945,22 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     cancellationScore
   }
   let beam: SearchState[] = [initialPolished]
+  let beamGeneration = 0
+  stateTrace('start', initialPolished, { phase: 'beam', status: 'start' })
 
   while (beam.length > 0 && !deadline.isExpired()) {
     const nextStates: SearchState[] = []
+    let generatedProposals = 0
+    let admittedProposals = 0
+    let polishedProposals = 0
+    let duplicateStates = 0
+
     for (const parent of beam) {
       if (deadline.isExpired()) break
 
       const solution = evaluateV2Solution(parent.filters, desiredDb, frequencies, sampleRateHz)
       const proposals = generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
+      generatedProposals += proposals.length
       const ordered = orderStructuralProposals(proposals)
 
       let admitted: StructuralProposal[] = []
@@ -955,6 +998,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       } else {
         admitted = ordered.slice(0, config.proposalsPerParent)
       }
+      admittedProposals += admitted.length
 
       for (const proposal of admitted) {
         if (deadline.isExpired()) break
@@ -969,8 +1013,12 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
           deadline,
           sampleRateHz,
         )
+        polishedProposals += 1
         const key = semanticFilterKey(polished.filters)
-        if (visited.has(key)) continue
+        if (visited.has(key)) {
+          duplicateStates += 1
+          continue
+        }
         visited.add(key)
 
         polished.candidateId = String(candidateCounter++).padStart(4, '0')
@@ -978,9 +1026,31 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       }
     }
 
-    if (nextStates.length === 0) break
+    const traceState = nextStates.length > 0
+      ? selectReferencePoint([...beam, ...nextStates])
+      : selectReferencePoint(beam)
+    stateTrace('beam-generation', traceState, {
+      phase: 'beam',
+      generation: beamGeneration,
+      beamSize: beam.length,
+      generatedProposals,
+      admittedProposals,
+      polishedProposals,
+      duplicateStates,
+      nextStates: nextStates.length,
+    })
+
+    if (nextStates.length === 0) {
+      stateTrace('beam-stop', traceState, {
+        phase: 'beam',
+        generation: beamGeneration,
+        reason: deadline.isExpired() ? 'deadline' : 'no-next-states',
+      })
+      break
+    }
     const combined = [...beam, ...nextStates]
     beam = retainParetoBeam(combined, config.beamWidth)
+    beamGeneration += 1
   }
 
   if (beam.length === 0) {
@@ -995,6 +1065,7 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
   let rescued = best
   let rescueSteps = 0
   const epsilon = 1e-12
+  stateTrace('phase', rescued, { phase: 'rescue', status: 'start' })
 
   while (
     rescueSteps < 5 &&
@@ -1064,7 +1135,15 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     rescueSteps += 1
   }
 
+  stateTrace('phase', rescued, {
+    phase: 'rescue',
+    status: 'end',
+    acceptedSteps: rescueSteps,
+    reason: deadline.isExpired() ? 'deadline' : 'completed',
+  })
+
   let capSwapSteps = 0
+  stateTrace('phase', rescued, { phase: 'cap-swap', status: 'start' })
   while (
     capSwapSteps < (config.workProfile === 'short-5s' ? 2 : 4) &&
     rescued.filters.length === config.maxFilters &&
@@ -1137,6 +1216,13 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     rescued = improving[0]!.state
     capSwapSteps += 1
   }
+
+  stateTrace('phase', rescued, {
+    phase: 'cap-swap',
+    status: 'end',
+    acceptedSteps: capSwapSteps,
+    reason: deadline.isExpired() ? 'deadline' : 'completed',
+  })
 
   const postSwapViolation = Math.max(
     rescued.rmseDb / 0.25,
@@ -1658,6 +1744,9 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     rescued = simplifyBest
   }
 
+  stateTrace('end', rescued, {
+    reason: deadline.isExpired() ? 'deadline' : 'completed',
+  })
   return {
     filters: rescued.filters,
     rmseDb: rescued.rmseDb,
