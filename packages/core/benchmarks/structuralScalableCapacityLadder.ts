@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { performance } from 'node:perf_hooks'
-import { resolve } from 'node:path'
+import { dirname, isAbsolute, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import {
@@ -176,12 +176,39 @@ export function loadScalableCapacitySeedFilters(filePath: string): Filter[] {
   if (filePath.trim().length === 0) {
     throw new Error('--seed-file requires a file path')
   }
+  const candidatePaths = isAbsolute(filePath)
+    ? [filePath]
+    : (() => {
+      const candidates = [resolve(filePath)]
+      let directory = process.cwd()
+      while (true) {
+        candidates.push(resolve(directory, filePath))
+        const parent = dirname(directory)
+        if (parent === directory) break
+        directory = parent
+      }
+      return [...new Set(candidates)]
+    })()
+  let text: string | undefined
+  let lastReadError: unknown
+  for (const candidatePath of candidatePaths) {
+    try {
+      text = readFileSync(candidatePath, 'utf8')
+      break
+    } catch (error: unknown) {
+      lastReadError = error
+    }
+  }
+  if (text === undefined) {
+    const detail = lastReadError instanceof Error ? `: ${lastReadError.message}` : ''
+    throw new Error(`--seed-file could not be read${detail}`)
+  }
   let parsed: unknown
   try {
-    parsed = JSON.parse(readFileSync(resolve(filePath), 'utf8')) as unknown
+    parsed = JSON.parse(text) as unknown
   } catch (error: unknown) {
     const detail = error instanceof Error ? `: ${error.message}` : ''
-    throw new Error(`--seed-file could not be read${detail}`)
+    throw new Error(`--seed-file contains invalid JSON${detail}`)
   }
   const values = Array.isArray(parsed)
     ? parsed

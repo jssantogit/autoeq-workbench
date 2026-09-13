@@ -88,6 +88,15 @@ describe('scalable capacity ladder benchmark harness', () => {
     expect(JSON.parse(lines[0]!)).not.toHaveProperty('seedFilters')
   })
 
+  it('resolves repository-root seed paths when launched from the core package', () => {
+    const filters = loadScalableCapacitySeedFilters(
+      'packages/core/benchmarks/research/resourceMonotoneSeeds/titan-to-rsv-max10-60s.json',
+    )
+
+    expect(filters).toHaveLength(10)
+    expect(filters[0]?.id).toBe('struct-add-pk-1')
+  })
+
   it('reports a completed cell with stage timing and controller telemetry', () => {
     let now = 1_000
     const stage: ScalableSearchStage = {
