@@ -1,0 +1,28 @@
+name: Scalable Search Phase Telemetry
+
+on:
+  push:
+    branches:
+      - research/scalable-search-phase-telemetry-20260912
+
+permissions:
+  contents: read
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @autoeq-workbench/core typecheck
+      - run: pnpm --filter @autoeq-workbench/core test -- structuralSearch.test.ts
+      - name: Trace 60s Max10 stagnation phases
+        run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalabilityTrace.ts
