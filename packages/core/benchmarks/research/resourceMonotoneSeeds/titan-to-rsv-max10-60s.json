@@ -1,0 +1,84 @@
+{
+  "filters": [
+    {
+      "id": "struct-add-pk-1",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 128,
+      "gainDb": -3.3,
+      "q": 0.52
+    },
+    {
+      "id": "struct-late-pk-4",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 708,
+      "gainDb": 0.7,
+      "q": 1.14
+    },
+    {
+      "id": "struct-late-pk-2",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 1960,
+      "gainDb": -1.4,
+      "q": 2.52
+    },
+    {
+      "id": "struct-late-pk",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 4064,
+      "gainDb": -5,
+      "q": 3.05
+    },
+    {
+      "id": "struct-late-pk-3",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 6545,
+      "gainDb": 2.4,
+      "q": 6.26
+    },
+    {
+      "id": "struct-late-pk-1",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 9458,
+      "gainDb": -5,
+      "q": 1.58
+    },
+    {
+      "id": "struct-add-pk",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 13768,
+      "gainDb": -10.9,
+      "q": 5.22
+    },
+    {
+      "id": "struct-add-pk-3",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 14274,
+      "gainDb": 3.4,
+      "q": 0.77
+    },
+    {
+      "id": "merge-struct-add-pk-1-struct-add-pk-split-low-split-high",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 16536,
+      "gainDb": -13.6,
+      "q": 5.61
+    },
+    {
+      "id": "merge-struct-add-pk-split-high-split-low-struct-add-pk-split-high-split-high",
+      "enabled": true,
+      "type": "PK",
+      "frequencyHz": 17807,
+      "gainDb": 6.9,
+      "q": 0.79
+    }
+  ]
+}

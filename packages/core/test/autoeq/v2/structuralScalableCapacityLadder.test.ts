@@ -1,13 +1,18 @@
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import {
   createScalableCapacityCells,
+  loadScalableCapacitySeedFilters,
   main,
   parseScalableCapacityLadderArgs,
   runScalableCapacityCell,
   runScalableCapacityLadder,
 } from '../../../benchmarks/structuralScalableCapacityLadder.js'
-import type { ScalableSearchStage } from '../../../src/index.js'
+import type { Filter, ScalableSearchStage } from '../../../src/index.js'
 
 describe('scalable capacity ladder benchmark harness', () => {
   it('selects a case, capacity, budget, and streaming output mode', () => {
@@ -27,6 +32,60 @@ describe('scalable capacity ladder benchmark harness', () => {
     expect(createScalableCapacityCells(options)).toEqual([
       { caseId: 'titan-to-rsv', finalMaxFilters: 15, budgetSeconds: 0.25 },
     ])
+  })
+
+  it('loads a validated seed file and passes its filters to the run without emitting the path', () => {
+    const seedFilters: Filter[] = [{
+      id: 'seed-file-filter',
+      enabled: true,
+      type: 'PK',
+      frequencyHz: 1_000,
+      gainDb: -2,
+      q: 1.2,
+    }]
+    const temporaryDirectory = mkdtempSync(join(tmpdir(), 'scalable-ladder-'))
+    const seedFile = join(temporaryDirectory, 'seed.json')
+    writeFileSync(seedFile, JSON.stringify({ filters: seedFilters }))
+    const lines: string[] = []
+    let observedSeedFilters: readonly Filter[] | undefined
+
+    try {
+      expect(loadScalableCapacitySeedFilters(seedFile)).toEqual(seedFilters)
+      const parsed = parseScalableCapacityLadderArgs([
+        '--case', 'titan-to-rsv',
+        '--capacity', '10',
+        '--budget-seconds', '0.01',
+        '--seed-file', seedFile,
+        '--jsonl',
+      ])
+
+      expect(parsed.seedFilters).toEqual(seedFilters)
+      main([
+        '--case', 'titan-to-rsv',
+        '--capacity', '10',
+        '--budget-seconds', '0.01',
+        '--seed-file', seedFile,
+        '--jsonl',
+      ], {
+        nowMs: () => 0,
+        run: (input) => {
+          observedSeedFilters = input.seedFilters
+          return {
+            filters: input.seedFilters?.map((filter) => ({ ...filter })) ?? [],
+            rmseDb: 0.2,
+            maxAbsDb: 0.6,
+            stagesCompleted: 0,
+          }
+        },
+        writeLine: (line) => lines.push(line),
+      })
+    } finally {
+      rmSync(temporaryDirectory, { recursive: true, force: true })
+    }
+
+    expect(observedSeedFilters).toEqual(seedFilters)
+    expect(JSON.parse(lines[0]!)).not.toHaveProperty('seedFile')
+    expect(JSON.parse(lines[0]!)).not.toHaveProperty('seedFilters')
   })
 
   it('reports a completed cell with stage timing and controller telemetry', () => {

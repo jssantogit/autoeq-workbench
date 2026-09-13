@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { performance } from 'node:perf_hooks'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -42,6 +43,7 @@ export interface ScalableCapacityLadderOptions {
   finalCaps: number[]
   budgetSeconds: number
   outputMode: 'json' | 'jsonl'
+  seedFilters?: Filter[]
 }
 
 export interface ScalableCapacityLadderCell
@@ -139,6 +141,59 @@ function parseCapacities(value: string | undefined): number[] {
   return values.sort((left, right) => left - right)
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function parseSeedFilter(value: unknown, index: number): Filter {
+  if (!isRecord(value)) {
+    throw new Error(`--seed-file filter ${index + 1} must be an object`)
+  }
+  const id = value.id
+  const enabled = value.enabled
+  const type = value.type
+  const frequencyHz = value.frequencyHz
+  const gainDb = value.gainDb
+  const q = value.q
+  if (
+    typeof id !== 'string' || id.trim().length === 0 ||
+    typeof enabled !== 'boolean' ||
+    (type !== 'PK' && type !== 'LS' && type !== 'HS') ||
+    typeof frequencyHz !== 'number' || !Number.isFinite(frequencyHz) || frequencyHz <= 0 ||
+    typeof gainDb !== 'number' || !Number.isFinite(gainDb) ||
+    typeof q !== 'number' || !Number.isFinite(q) || q <= 0
+  ) {
+    throw new Error(`--seed-file filter ${index + 1} is invalid`)
+  }
+  return { id, enabled, type, frequencyHz, gainDb, q }
+}
+
+/**
+ * Load a seed JSON file represented either as a filter array or as
+ * `{ "filters": [...] }`.
+ */
+export function loadScalableCapacitySeedFilters(filePath: string): Filter[] {
+  if (filePath.trim().length === 0) {
+    throw new Error('--seed-file requires a file path')
+  }
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(readFileSync(resolve(filePath), 'utf8')) as unknown
+  } catch (error: unknown) {
+    const detail = error instanceof Error ? `: ${error.message}` : ''
+    throw new Error(`--seed-file could not be read${detail}`)
+  }
+  const values = Array.isArray(parsed)
+    ? parsed
+    : isRecord(parsed) && Array.isArray(parsed.filters)
+      ? parsed.filters
+      : undefined
+  if (values === undefined) {
+    throw new Error('--seed-file must contain a filter array or an object with a filters array')
+  }
+  return values.map(parseSeedFilter)
+}
+
 export function parseScalableCapacityLadderArgs(
   args: readonly string[],
 ): ScalableCapacityLadderOptions {
@@ -147,8 +202,10 @@ export function parseScalableCapacityLadderArgs(
   let finalCaps: number[] = [...SCALABLE_CAPACITY_LADDER_DEFAULT_FINAL_CAPS]
   let budgetSeconds = SCALABLE_CAPACITY_LADDER_DEFAULT_BUDGET_SECONDS
   let outputMode: ScalableCapacityLadderOptions['outputMode'] = 'jsonl'
+  let seedFilters: Filter[] | undefined
   let caseSelected = false
   let capacitySelected = false
+  let seedFileSelected = false
 
   for (let index = 0; index < normalizedArgs.length; index += 1) {
     const argument = normalizedArgs[index]!
@@ -162,6 +219,14 @@ export function parseScalableCapacityLadderArgs(
       capacitySelected = true
     } else if (argument === '--budget-seconds' || argument === '--budget') {
       budgetSeconds = parsePositiveNumber(normalizedArgs[++index], argument)
+    } else if (argument === '--seed-file') {
+      if (seedFileSelected) throw new Error('--seed-file may be provided only once')
+      const seedFile = normalizedArgs[++index]
+      if (seedFile === undefined || seedFile.trim().length === 0) {
+        throw new Error('--seed-file requires a file path')
+      }
+      seedFilters = loadScalableCapacitySeedFilters(seedFile)
+      seedFileSelected = true
     } else if (argument === '--jsonl') {
       outputMode = 'jsonl'
     } else if (argument === '--json') {
@@ -171,7 +236,7 @@ export function parseScalableCapacityLadderArgs(
     }
   }
 
-  return { cases, finalCaps, budgetSeconds, outputMode }
+  return { cases, finalCaps, budgetSeconds, outputMode, seedFilters }
 }
 
 export function createScalableCapacityCells(
@@ -193,6 +258,7 @@ export function createScalableCapacityCells(
 export function runScalableCapacityCell(options: ScalableCapacityLadderCellSelection & {
   nowMs?: () => number
   run?: ScalableCapacitySearchRunner
+  seedFilters?: readonly Filter[]
 }): ScalableCapacityLadderCell {
   if (!Number.isFinite(options.budgetSeconds) || options.budgetSeconds <= 0) {
     throw new Error('budgetSeconds must be a positive number')
@@ -219,6 +285,7 @@ export function runScalableCapacityCell(options: ScalableCapacityLadderCellSelec
     maxFilters: options.finalMaxFilters,
     baseConfig,
     deadline: { isExpired: () => nowMs() >= deadlineAt },
+    seedFilters: options.seedFilters?.map((filter) => ({ ...filter })),
     nowMs,
     onStage: (stage) => {
       const totalElapsedMs = nowMs() - startedAt
@@ -255,6 +322,7 @@ export function runScalableCapacityLadder(
   for (const selection of createScalableCapacityCells(options)) {
     const cell = runScalableCapacityCell({
       ...selection,
+      seedFilters: options.seedFilters,
       nowMs: options.nowMs,
       run: options.run,
     })

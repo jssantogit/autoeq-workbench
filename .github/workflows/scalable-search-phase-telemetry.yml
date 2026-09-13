@@ -31,6 +31,14 @@ on:
         required: true
         default: '60'
         type: string
+      seed_file:
+        description: Optional JSON filter seed for selected cells
+        required: true
+        default: ''
+        type: choice
+        options:
+          - ''
+          - packages/core/benchmarks/research/resourceMonotoneSeeds/titan-to-rsv-max10-60s.json
 
 permissions:
   contents: read
@@ -113,15 +121,20 @@ jobs:
           CASE_ID: ${{ matrix.case_id }}
           MAX_FILTERS: ${{ matrix.max_filters }}
           BUDGET_SECONDS: ${{ inputs.budget_seconds || '60' }}
+          SEED_FILE: ${{ inputs.seed_file || '' }}
           ARTIFACT_DIR: ${{ github.workspace }}/scalable-search-artifacts/${{ matrix.case_id }}/max-${{ matrix.max_filters }}
         run: |
           set -o pipefail
           mkdir -p "$ARTIFACT_DIR"
-          pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalableCapacityLadder.ts \
+          command=(pnpm --filter @autoeq-workbench/core exec tsx benchmarks/structuralScalableCapacityLadder.ts \
             --case "$CASE_ID" \
             --capacity "$MAX_FILTERS" \
             --budget-seconds "$BUDGET_SECONDS" \
-            --jsonl | tee "$ARTIFACT_DIR/telemetry.jsonl"
+            --jsonl)
+          if [[ -n "$SEED_FILE" ]]; then
+            command+=(--seed-file "$SEED_FILE")
+          fi
+          "${command[@]}" | tee "$ARTIFACT_DIR/telemetry.jsonl"
       - name: Upload scalable search telemetry
         if: always() && steps.select.outputs.run == 'true'
         uses: actions/upload-artifact@v4
