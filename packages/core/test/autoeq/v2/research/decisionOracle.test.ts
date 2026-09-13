@@ -16,10 +16,10 @@ describe('decision-oracle research probe support', () => {
       recentGain: 0,
     }, captured)).toEqual([
       'first-post-initial',
-      'first-before-live-expansion',
+      'first-headroom-before-legacy-expansion',
     ])
     captured.add('first-post-initial')
-    captured.add('first-before-live-expansion')
+    captured.add('first-headroom-before-legacy-expansion')
     expect(naturalDecisionCaptureReasons({
       stageIndex: 1,
       currentCapacity: 15,

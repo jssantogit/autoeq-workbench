@@ -124,6 +124,7 @@ export interface SchedulerDecisionArmResult {
   cumulativeWork: SearchWorkTotals
   elapsedMs: number
   frontierUtilization: FrontierUtilizationDelta
+  capacityPressure: CapacityPressureDelta
   maximumFilterCountObserved: number
   additionalStructuralSlotsUsed: boolean
 }
@@ -421,6 +422,7 @@ export function evaluateConfiguredContinuation(
   let candidate = cloneResult(startingIncumbent)
   let workDelta = createSearchWorkDelta()
   let frontierUtilization = createFrontierUtilizationDelta()
+  let capacityPressure = createCapacityPressureDelta()
   const startedAt = nowMs()
   const requestedQuantumMs = workBudget.stageQuantumMs ?? SCALABLE_STAGE_QUANTUM_MS
   const quantumMs = snapshot.remainingWallClockMs === undefined
@@ -452,6 +454,10 @@ export function evaluateConfiguredContinuation(
         invocationWork = addSearchWorkDelta(
           invocationWork,
           searchWorkDeltaFromTrace(trace),
+        )
+        capacityPressure = addCapacityPressureDelta(
+          capacityPressure,
+          capacityPressureDeltaFromTrace(trace),
         )
         frontierUtilization = addFrontierUtilizationDelta(frontierUtilization, trace.frontierUtilization ?? createFrontierUtilizationDelta())
       },
@@ -505,6 +511,7 @@ export function evaluateConfiguredContinuation(
     cumulativeWork,
     elapsedMs: Math.max(0, nowMs() - startedAt),
     frontierUtilization,
+    capacityPressure,
     maximumFilterCountObserved,
     additionalStructuralSlotsUsed: maximumFilterCountObserved > capacityBefore,
   }

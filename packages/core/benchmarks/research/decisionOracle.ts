@@ -129,7 +129,8 @@ export interface DecisionOracleProbeRecord {
  * most one snapshot for each trajectory landmark; oracle results are not an
  * input.  The legacy controller's next action is an expansion whenever there
  * is capacity headroom, so a pre-decision state with headroom is the first
- * available live-expansion landmark.
+ * available legacy-expansion landmark.  The name explicitly includes
+ * `legacy` because expansion timing is policy-specific.
  */
 export function naturalDecisionCaptureReasons(
   snapshot: Pick<ScalableSearchDecisionSnapshot, 'stageIndex' | 'currentCapacity' | 'maximumCapacity' | 'recentGain'>,
@@ -139,8 +140,8 @@ export function naturalDecisionCaptureReasons(
   if (snapshot.stageIndex === 0 && !captured.has('first-post-initial')) {
     reasons.push('first-post-initial')
   }
-  if (snapshot.currentCapacity < snapshot.maximumCapacity && !captured.has('first-before-live-expansion')) {
-    reasons.push('first-before-live-expansion')
+  if (snapshot.currentCapacity < snapshot.maximumCapacity && !captured.has('first-headroom-before-legacy-expansion')) {
+    reasons.push('first-headroom-before-legacy-expansion')
   }
   if (snapshot.stageIndex > 0 && snapshot.recentGain > 0 && !captured.has('first-after-improvement')) {
     reasons.push('first-after-improvement')
@@ -171,7 +172,7 @@ export interface NaturalStructuralDemandCaptureSnapshot {
 
 export type NaturalStructuralDemandCaptureReason =
   | 'first-post-initial'
-  | 'first-before-live-expansion'
+  | 'first-headroom-before-legacy-expansion'
   | 'first-meaningful-frontier-growth'
   | 'first-frontier-at-ceiling'
   | 'first-non-zero-capacity-pressure'
@@ -180,7 +181,7 @@ export type NaturalStructuralDemandCaptureReason =
 
 export const NATURAL_STRUCTURAL_DEMAND_CAPTURE_REASONS: readonly NaturalStructuralDemandCaptureReason[] = Object.freeze([
   'first-post-initial',
-  'first-before-live-expansion',
+  'first-headroom-before-legacy-expansion',
   'first-meaningful-frontier-growth',
   'first-frontier-at-ceiling',
   'first-non-zero-capacity-pressure',
@@ -216,7 +217,7 @@ export function naturalStructuralDemandCaptureReasons(
 
   capture('first-post-initial', snapshot.stageIndex === 0)
   capture(
-    'first-before-live-expansion',
+    'first-headroom-before-legacy-expansion',
     snapshot.currentCapacity < snapshot.maximumCapacity,
   )
   capture(

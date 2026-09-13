@@ -71,7 +71,7 @@ describe('natural structural-demand capture protocol', () => {
     const first = naturalStructuralDemandCaptureReasons(snapshot, captured)
     expect(first).toEqual([
       'first-post-initial',
-      'first-before-live-expansion',
+      'first-headroom-before-legacy-expansion',
       'first-meaningful-frontier-growth',
       'first-frontier-at-ceiling',
       'first-non-zero-capacity-pressure',
@@ -100,12 +100,12 @@ describe('natural structural-demand capture protocol', () => {
     for (const [, snapshot, reason] of cases) {
       expect(naturalStructuralDemandCaptureReasons(snapshot, new Set([
         'first-post-initial',
-        'first-before-live-expansion',
+        'first-headroom-before-legacy-expansion',
       ]))).toContain(reason)
     }
     expect(naturalStructuralDemandCaptureReasons(
       captureSnapshot({ stageIndex: 1, elapsedMs: 799, envelopeMs: 1_000 }),
-      new Set(['first-post-initial', 'first-before-live-expansion']),
+      new Set(['first-post-initial', 'first-headroom-before-legacy-expansion']),
     )).not.toContain('late-budget-state')
   })
 
@@ -142,6 +142,22 @@ describe('natural structural-demand capture protocol', () => {
       finalFilterCount: 11,
       finalQuality: [0.5, 0.5, 0.5],
     }).classification).not.toBe('productively-used')
+  })
+
+  it('classifies a full ceiling as no-headroom rather than failed intervention', () => {
+    const result = classifyCapacityOnlySlotUse({
+      oldCapacity: 10,
+      newCapacity: 10,
+      startingFilterCount: 10,
+      generatedFrontierMaxFilterCount: 10,
+      admittedFrontierMaxFilterCount: 10,
+      polishedFrontierMaxFilterCount: 10,
+      finalFilterCount: 10,
+      finalQuality: [1, 1, 1],
+      controlFinalQuality: [1, 1, 1],
+    })
+    expect(result.capacityExpanded).toBe(false)
+    expect(result.classification).toBe('no-headroom')
   })
 
   it('labels factorized outcomes descriptively without fitting a threshold', () => {

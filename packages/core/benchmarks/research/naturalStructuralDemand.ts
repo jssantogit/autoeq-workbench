@@ -76,6 +76,7 @@ export const NATURAL_STRUCTURAL_DEMAND_ENVELOPES: readonly NaturalStructuralDema
 ])
 
 export type CapacityOnlySlotUseClassification =
+  | 'no-headroom'
   | 'available-but-unused'
   | 'explored'
   | 'productively-used'
@@ -159,8 +160,10 @@ export function classifyCapacityOnlySlotUse(
     polishedCandidateExceededOldCapacity,
     finalFilterCountExceededOldCapacity,
     finalImprovementDependsOnUnavailableState,
-    classification: !candidateExceededOldCapacity
-      ? 'available-but-unused'
+    classification: !(observation.newCapacity > observation.oldCapacity)
+      ? 'no-headroom'
+      : !candidateExceededOldCapacity
+        ? 'available-but-unused'
       : finalImprovementDependsOnUnavailableState
         ? 'productively-used'
         : 'explored',
