@@ -23,6 +23,9 @@ describe('deterministic synthetic ground-truth corpus', () => {
     ])
     expect(second).toEqual(first)
     for (const value of first) {
+      // The equality checks provenance: knownStructuralComplexity records the
+      // number of filters used to generate this fixture, not a proof that the
+      // delivered response cannot be represented with fewer filters.
       expect(value.knownStructuralComplexity).toBe(value.truthFilters.length)
       expect(value.desiredDb).toHaveLength(value.frequenciesHz.length)
       expect(value.seed).toBeGreaterThan(0)

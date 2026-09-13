@@ -27,7 +27,9 @@ export interface SyntheticGroundTruthCase {
   sampleRateHz: number
   frequenciesHz: number[]
   desiredDb: number[]
+  /** Filters used to generate the response; this is not a minimality claim. */
   truthFilters: Filter[]
+  /** Count of generating filters, used to center below/at/above probes. */
   knownStructuralComplexity: number
 }
 
@@ -175,7 +177,7 @@ export function loadSyntheticGroundTruthCorpus(): SyntheticGroundTruthCase[] {
   return SYNTHETIC_CORPUS.map(cloneCase)
 }
 
-/** Resource probes around the known representation requirement, not modes. */
+/** Resource probes around known generating complexity, not proven minimal complexity or modes. */
 export function createSyntheticCapacityProbeSequence(
   value: Pick<SyntheticGroundTruthCase, 'knownStructuralComplexity'>,
 ): number[] {
@@ -192,6 +194,7 @@ export interface SyntheticCapacityThresholdProbeOptions extends Omit<FixedCapaci
 
 export interface SyntheticCapacityThresholdProbeResult {
   caseId: string
+  /** Known generating complexity, not an empirically proven minimum. */
   knownStructuralComplexity: number
   ceilings: number[]
   trajectories: FixedCapacityTrajectoryResult[]

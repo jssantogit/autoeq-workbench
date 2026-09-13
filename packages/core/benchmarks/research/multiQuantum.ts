@@ -22,6 +22,8 @@ import {
 
 export const MULTI_QUANTUM_CHECKPOINTS = [1, 2, 4, 8, 16] as const
 export type MultiQuantumCheckpoint = (typeof MULTI_QUANTUM_CHECKPOINTS)[number]
+/** A continuation event's exact one-based invocation quantum. */
+export type MultiQuantumEventQuantum = number
 export type MultiQuantumArmId = 'C-hold' | 'C+-hold' | 'C-ramp' | 'C+-ramp'
 
 export interface MultiQuantumCheckpointRecord {
@@ -48,10 +50,11 @@ export interface MultiQuantumCheckpointRecord {
   capSwapAttempts: number
   reseedAttempts: number
   cumulativeWork: SearchWorkTotals
-  firstGeneratedAboveInitialCapacity?: MultiQuantumCheckpoint | null
-  firstAdmittedAboveInitialCapacity?: MultiQuantumCheckpoint | null
-  firstPolishedAboveInitialCapacity?: MultiQuantumCheckpoint | null
-  firstIncumbentAboveInitialCapacity?: MultiQuantumCheckpoint | null
+  /** Exact event quantum; unlike `quantum`, this need not be a checkpoint. */
+  firstGeneratedAboveInitialCapacity?: MultiQuantumEventQuantum | null
+  firstAdmittedAboveInitialCapacity?: MultiQuantumEventQuantum | null
+  firstPolishedAboveInitialCapacity?: MultiQuantumEventQuantum | null
+  firstIncumbentAboveInitialCapacity?: MultiQuantumEventQuantum | null
   productiveNewSlotComparedWithControl?: boolean
 }
 
@@ -63,7 +66,7 @@ export interface MultiQuantumArmResult {
   initialEffortLevel: number
   checkpoints: MultiQuantumCheckpointRecord[]
   finalIncumbent: StructuralSearchResult
-  firstProductiveNewSlotQuantum: MultiQuantumCheckpoint | null
+  firstProductiveNewSlotQuantum: MultiQuantumEventQuantum | null
 }
 
 export interface FactorizedMultiQuantumResult {
@@ -175,10 +178,10 @@ function checkpointRecord(
   frontierUtilization: FrontierUtilizationDelta,
   capacityPressure: CapacityPressureDelta,
   initialCapacity: number,
-  firstGeneratedAboveInitialCapacity: MultiQuantumCheckpoint | null,
-  firstAdmittedAboveInitialCapacity: MultiQuantumCheckpoint | null,
-  firstPolishedAboveInitialCapacity: MultiQuantumCheckpoint | null,
-  firstIncumbentAboveInitialCapacity: MultiQuantumCheckpoint | null,
+  firstGeneratedAboveInitialCapacity: MultiQuantumEventQuantum | null,
+  firstAdmittedAboveInitialCapacity: MultiQuantumEventQuantum | null,
+  firstPolishedAboveInitialCapacity: MultiQuantumEventQuantum | null,
+  firstIncumbentAboveInitialCapacity: MultiQuantumEventQuantum | null,
 ): MultiQuantumCheckpointRecord {
   const work = arm.cumulativeWork
   return {
@@ -237,14 +240,13 @@ function runArm(
     ? createCapacityPressureDelta()
     : { ...continuation.capacityPressure }
   const checkpoints: MultiQuantumCheckpointRecord[] = []
-  let firstGeneratedAboveInitialCapacity: MultiQuantumCheckpoint | null = null
-  let firstAdmittedAboveInitialCapacity: MultiQuantumCheckpoint | null = null
-  let firstPolishedAboveInitialCapacity: MultiQuantumCheckpoint | null = null
-  let firstIncumbentAboveInitialCapacity: MultiQuantumCheckpoint | null = null
+  let firstGeneratedAboveInitialCapacity: MultiQuantumEventQuantum | null = null
+  let firstAdmittedAboveInitialCapacity: MultiQuantumEventQuantum | null = null
+  let firstPolishedAboveInitialCapacity: MultiQuantumEventQuantum | null = null
+  let firstIncumbentAboveInitialCapacity: MultiQuantumEventQuantum | null = null
   const startedAt = options.nowMs?.() ?? 0
 
   for (let quantum = 1; quantum <= MULTI_QUANTUM_CHECKPOINTS.at(-1)!; quantum += 1) {
-    const checkpoint = quantum as MultiQuantumCheckpoint
     const effortLevel = effortAt(effortSchedule, initialEffortLevel, quantum)
     const action: SchedulerConfiguredContinuation['action'] = id === 'C-hold'
       ? 'control'
@@ -262,10 +264,10 @@ function runArm(
     )
     frontierUtilization = addFrontierUtilizationDelta(frontierUtilization, arm.frontierUtilization)
     capacityPressure = addCapacityPressureDelta(capacityPressure, arm.capacityPressure)
-    if (firstGeneratedAboveInitialCapacity === null && frontierUtilization.generatedCandidateFilterCountMax > initialCapacity) firstGeneratedAboveInitialCapacity = checkpoint
-    if (firstAdmittedAboveInitialCapacity === null && frontierUtilization.admittedCandidateFilterCountMax > initialCapacity) firstAdmittedAboveInitialCapacity = checkpoint
-    if (firstPolishedAboveInitialCapacity === null && frontierUtilization.polishedCandidateFilterCountMax > initialCapacity) firstPolishedAboveInitialCapacity = checkpoint
-    if (firstIncumbentAboveInitialCapacity === null && arm.finalIncumbent.filters.length > initialCapacity) firstIncumbentAboveInitialCapacity = checkpoint
+    if (firstGeneratedAboveInitialCapacity === null && frontierUtilization.generatedCandidateFilterCountMax > initialCapacity) firstGeneratedAboveInitialCapacity = quantum
+    if (firstAdmittedAboveInitialCapacity === null && frontierUtilization.admittedCandidateFilterCountMax > initialCapacity) firstAdmittedAboveInitialCapacity = quantum
+    if (firstPolishedAboveInitialCapacity === null && frontierUtilization.polishedCandidateFilterCountMax > initialCapacity) firstPolishedAboveInitialCapacity = quantum
+    if (firstIncumbentAboveInitialCapacity === null && arm.finalIncumbent.filters.length > initialCapacity) firstIncumbentAboveInitialCapacity = quantum
     continuation = nextContinuationSnapshot(
       continuation,
       arm,
@@ -274,9 +276,9 @@ function runArm(
       frontierUtilization,
       capacityPressure,
     )
-    if (isCheckpoint(checkpoint)) {
+    if (isCheckpoint(quantum)) {
       checkpoints.push(checkpointRecord(
-        checkpoint,
+        quantum,
         Math.max(0, (options.nowMs?.() ?? 0) - startedAt),
         effortSchedule,
         effortLevel,
@@ -307,10 +309,11 @@ function runArm(
 function annotateProductiveCapacityUse(
   arms: readonly MultiQuantumArmResult[],
 ): void {
-  const control = arms.find((arm) => arm.id === 'C-hold')
-  if (control === undefined) return
   for (const arm of arms) {
     if (arm.capacityCondition !== 'C+') continue
+    const controlId = arm.effortSchedule === 'hold' ? 'C-hold' : 'C-ramp'
+    const control = arms.find((candidate) => candidate.id === controlId)
+    if (control === undefined) continue
     arm.firstProductiveNewSlotQuantum = null
     for (let index = 0; index < arm.checkpoints.length; index += 1) {
       const checkpoint = arm.checkpoints[index]!

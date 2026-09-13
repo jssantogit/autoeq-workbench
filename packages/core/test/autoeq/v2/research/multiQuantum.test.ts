@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import {
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
@@ -86,5 +86,105 @@ describe('multi-quantum factorized research continuation', () => {
     expect(result.byArm['C+-hold']!.checkpoints.at(-1)!.firstGeneratedAboveInitialCapacity).toBe(2)
     expect(result.byArm['C-hold']!.checkpoints[0]!.effortLevel).toBe(1)
     expect(result.byArm['C-ramp']!.checkpoints.map((checkpoint) => checkpoint.effortLevel)).toEqual([1, 2, 4, 6, 6])
+  })
+
+  it('matches ramp capacity against ramp effort, not against the hold control', () => {
+    const run = ({ config, seedFilters, onTrace }: {
+      config: SchedulerDecisionSnapshot['baseConfig']
+      seedFilters?: readonly Filter[]
+      onTrace?: (trace: StructuralSearchTraceEvent) => void
+    }): StructuralSearchResult => {
+      const filters = [...(seedFilters ?? [])]
+      if (filters.length < config.maxFilters) {
+        filters.push(filter(`generated-${filters.length}-${config.maxFilters}`))
+      }
+      // Quality is intentionally a function of effort only.  The expanded
+      // capacity arm may reach an extra slot, but that slot has no causal
+      // value in this runner.
+      const effortOnlyQuality = 1 / config.proposalsPerParent
+      return {
+        filters,
+        rmseDb: effortOnlyQuality,
+        maxAbsDb: effortOnlyQuality,
+      }
+    }
+
+    const result = runFactorizedMultiQuantumContinuation(snapshot(), {
+      maximumCapacity: 8,
+      stageQuantumMs: 1,
+      nowMs: () => 0,
+      run,
+    })
+
+    const ramp = result.byArm['C+-ramp']!
+    const rampControl = result.byArm['C-ramp']!
+    const holdControl = result.byArm['C-hold']!
+    expect(ramp.checkpoints.map(({ finalQuality }) => finalQuality)).toEqual(
+      rampControl.checkpoints.map(({ finalQuality }) => finalQuality),
+    )
+    expect(ramp.checkpoints[1]!.finalQuality[0]).toBeLessThan(holdControl.checkpoints[1]!.finalQuality[0])
+    expect(ramp.checkpoints[1]!.frontierMaxFilterCount).toBeGreaterThan(ramp.initialCapacity)
+    expect(ramp.checkpoints.every(({ productiveNewSlotComparedWithControl }) => productiveNewSlotComparedWithControl === false)).toBe(true)
+    expect(ramp.firstProductiveNewSlotQuantum).toBeNull()
+  })
+
+  it('reports an above-capacity event at its exact quantum, separate from checkpoints', () => {
+    const eventSnapshot = snapshot()
+    eventSnapshot.incumbent = {
+      filters: [filter('seed-a'), filter('seed-b')],
+      rmseDb: 1,
+      maxAbsDb: 1,
+    }
+    let call = 0
+    const run = ({ config, seedFilters, onTrace }: {
+      config: SchedulerDecisionSnapshot['baseConfig']
+      seedFilters?: readonly Filter[]
+      onTrace?: (trace: StructuralSearchTraceEvent) => void
+    }): StructuralSearchResult => {
+      const armIndex = Math.floor(call / 16)
+      const quantum = (call % 16) + 1
+      call += 1
+      const filters = [...(seedFilters ?? [])]
+      // The first expanded-arm candidate is deliberately held until quantum
+      // 3, which is not itself a checkpoint observation.
+      if (armIndex === 1 && quantum === 3 && filters.length < config.maxFilters) {
+        filters.push(filter('generated-at-three'))
+      }
+      onTrace?.({
+        type: 'beam-generation',
+        filterCount: filters.length,
+        rmseDb: filters.length > 2 ? 0.5 : 1,
+        maxAbsDb: filters.length > 2 ? 0.5 : 1,
+        violation: filters.length > 2 ? 0.5 : 1,
+        frontierUtilization: {
+          parentStatesObserved: 1,
+          parentFilterCountMax: (seedFilters ?? []).length,
+          generatedCandidateFilterCountMax: filters.length,
+          admittedCandidateFilterCountMax: filters.length,
+          polishedCandidateFilterCountMax: filters.length,
+          parentsAtCapacity: 0,
+          generatedCandidatesAtCapacity: 0,
+          admittedCandidatesAtCapacity: 0,
+          polishedCandidatesAtCapacity: 0,
+          candidatesWithinOneSlotOfCapacity: 0,
+        },
+      })
+      const quality = filters.length > 2 ? 0.5 : 1
+      return { filters, rmseDb: quality, maxAbsDb: quality }
+    }
+
+    const result = runFactorizedMultiQuantumContinuation(eventSnapshot, {
+      maximumCapacity: 8,
+      stageQuantumMs: 1,
+      nowMs: () => 0,
+      run,
+    })
+    const expanded = result.byArm['C+-hold']!
+    expect(result.checkpoints).toEqual([1, 2, 4, 8, 16])
+    expect(expanded.checkpoints[0]!.firstGeneratedAboveInitialCapacity).toBeNull()
+    expect(expanded.checkpoints[1]!.firstGeneratedAboveInitialCapacity).toBeNull()
+    expect(expanded.checkpoints[2]!.firstGeneratedAboveInitialCapacity).toBe(3)
+    expectTypeOf(expanded.checkpoints[2]!.firstGeneratedAboveInitialCapacity)
+      .toEqualTypeOf<number | null | undefined>()
   })
 })
