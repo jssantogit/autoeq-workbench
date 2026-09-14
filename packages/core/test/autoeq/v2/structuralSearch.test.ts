@@ -563,3 +563,22 @@ it('exposes the VNext runner as an explicit core research selector', async () =>
   const core = await import('../../../src/index.js')
   expect(typeof core.runStructuralSearchVNext).toBe('function')
 })
+
+describe('VNext identity hardening', () => {
+  it('uses multiset structural difference independently of canonical order and IDs', async () => {
+    const { structuralFilterDifference } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const hs = { id: 'hs', enabled: true, type: 'HS' as const, frequencyHz: 12_000, gainDb: 2, q: 0.7 }
+    const pk = { id: 'new-pk', enabled: true, type: 'PK' as const, frequencyHz: 1_000, gainDb: -3, q: 2 }
+    const diff = structuralFilterDifference([hs], [pk, { ...hs, id: 'other' }])
+    expect(diff.added).toEqual([pk])
+    expect(diff.removed).toEqual([])
+  })
+
+  it('consumes structurally identical duplicates as a multiset', async () => {
+    const { structuralFilterDifference } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const pk = { id: 'a', enabled: true, type: 'PK' as const, frequencyHz: 1_000, gainDb: 1, q: 1 }
+    const diff = structuralFilterDifference([pk, { ...pk, id: 'b' }], [{ ...pk, id: 'c' }])
+    expect(diff.added).toEqual([])
+    expect(diff.removed).toHaveLength(1)
+  })
+})
