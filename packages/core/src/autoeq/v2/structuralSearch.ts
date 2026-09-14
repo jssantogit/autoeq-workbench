@@ -1231,6 +1231,14 @@ export function pruneMarginalFilter(
 }
 
 export function runStructuralSearch(input: StructuralSearchInput): StructuralSearchResult {
+  return runStructuralSearchInternal(input, 'baseline')
+}
+
+export function runStructuralSearchVNext(input: StructuralSearchInput): StructuralSearchResult {
+  return runStructuralSearchInternal(input, 'vnext')
+}
+
+function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'baseline' | 'vnext'): StructuralSearchResult {
   const { desiredDb, frequencies, sampleRateHz, config, deadline } = input
   const trace = (event: StructuralSearchTraceEvent): void => input.onTrace?.(event)
   const stateTrace = (
@@ -1402,7 +1410,9 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
       break
     }
     const combined = [...beam, ...nextStates]
-    beam = retainParetoBeam(combined, config.beamWidth)
+    beam = policy === 'vnext'
+      ? retainDiverseStructuralBeam(combined, config.beamWidth, bounds, config.featureRegionCount ?? 1)
+      : retainParetoBeam(combined, config.beamWidth)
     beamGeneration += 1
   }
 
@@ -2249,8 +2259,8 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
  * trial is quantized and jointly polished before the existing comparator is
  * allowed to replace the incumbent.
  */
-export function runStructuralSearchVNext(input: StructuralSearchInput): StructuralSearchResult {
-  const baseline = runStructuralSearch(input)
+function deprecatedPostDeadlineVNext(input: StructuralSearchInput): StructuralSearchResult {
+  const baseline = runStructuralSearchInternal(input, 'baseline')
   if (input.deadline.isExpired() || baseline.filters.length === 0) return baseline
 
   const bounds = resolveStandardAutoEqV2Config({
