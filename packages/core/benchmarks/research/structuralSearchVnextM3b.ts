@@ -311,6 +311,7 @@ export interface M3BDeterministicPass {
 
 export interface M3BDeterministicFidelityEvidence {
   maxGenerations: number
+  config: ResolvedStructuralSearchConfig
   equivalent: boolean
   telemetryOff: M3BDeterministicPass
   telemetryOn: M3BDeterministicPass
@@ -862,6 +863,7 @@ export function runM3bDeterministicTelemetryFidelity(options: {
   const mismatch = firstMismatch(telemetryOff, telemetryOn)
   return {
     maxGenerations,
+    config: { ...config },
     equivalent: mismatch === null,
     telemetryOff,
     telemetryOn,
@@ -1096,16 +1098,20 @@ function writeArtifacts(outputDir: string, result: M3BCampaignResult): void {
     `- M3 aggregate source: \`${result.frozenM3Source.path}\` (SHA-256 ${result.frozenM3Source.sha256 ?? 'UNAVAILABLE'}; evidence ${result.frozenM3Source.evidenceSha256 ?? 'UNAVAILABLE'}).`,
     `- M3 generation source: \`${result.frozenM3Source.rawPath}\` (SHA-256 ${result.frozenM3Source.rawSha256 ?? 'UNAVAILABLE'}; ${result.frozenM3Source.rawTrajectoryCount} frozen real trajectories parsed).`,
     `- Generation-level source for this closeout: ${result.frozenM3Source.generationObservationsAvailable ? 'the frozen M3 raw real trajectories' : 'UNAVAILABLE; no paired M3b fallback is used'}.`,
+    '- The normalized committed aggregate is reviewable; the original raw M3 generation trace is identified above by SHA-256 but is not independently reconstructable from GitHub alone. This is a provenance limitation, not a reason to commit raw timing data.',
     '- Existing M3 per-signal values are not rewritten. Per-signal S1–S4 totals are overlapping observations, not independent-event denominators.',
     '- The unique-event table counts each generation with any S1–S4 signal exactly once by exact signal mask; non-plateau generations remain in the completed-generation denominator.',
     '',
     '## Deterministic telemetry-fidelity proof',
     '',
+    `- Resolved structural-search config: C${result.deterministicFidelity.config.maxFilters}/e${result.resourceEnvelope.effortLevel}, preset \`${result.deterministicFidelity.config.preset}\`, beamWidth ${result.deterministicFidelity.config.beamWidth}, proposalsPerParent ${result.deterministicFidelity.config.proposalsPerParent}, localPolishEvaluations ${result.deterministicFidelity.config.localPolishEvaluations}.`,
     `- Imposed boundary: ${result.deterministicFidelity.maxGenerations} completed generation opportunities (no wall-clock expiration).`,
     `- Equivalent: **${result.deterministicFidelity.equivalent ? 'yes' : 'no'}**${result.deterministicFidelity.mismatch === null ? '' : ` (first mismatch: ${result.deterministicFidelity.mismatch})`}.`,
     `- OFF/ON completed generations: ${result.deterministicFidelity.telemetryOff.completedGenerations}/${result.deterministicFidelity.telemetryOn.completedGenerations}.`,
+    `- OFF/ON reference states and retained semantic beam states/signatures identical: ${JSON.stringify(result.deterministicFidelity.telemetryOff.generations) === JSON.stringify(result.deterministicFidelity.telemetryOn.generations) ? 'yes' : 'no'}.`,
+    `- OFF/ON ordinary work counters identical: ${JSON.stringify(result.deterministicFidelity.telemetryOff.work) === JSON.stringify(result.deterministicFidelity.telemetryOn.work) ? 'yes' : 'no'}.`,
     `- OFF/ON final results identical: ${JSON.stringify(result.deterministicFidelity.telemetryOff.result) === JSON.stringify(result.deterministicFidelity.telemetryOn.result) ? 'yes' : 'no'}.`,
-    `- OFF/ON retained semantic states/signatures identical: ${JSON.stringify(result.deterministicFidelity.telemetryOff.generations) === JSON.stringify(result.deterministicFidelity.telemetryOn.generations) ? 'yes' : 'no'}.`,
+    `- OFF/ON natural stop semantics identical: ${result.deterministicFidelity.telemetryOff.naturalStopGeneration === result.deterministicFidelity.telemetryOn.naturalStopGeneration ? 'yes' : 'no'}.`,
     '',
     '## Wall-clock paired measurement',
     '',
@@ -1113,7 +1119,10 @@ function writeArtifacts(outputDir: string, result: M3BCampaignResult): void {
     '| --- | ---: | ---: | ---: | ---: |',
     ...wallClockRows.map(({ label, off, on, delta }) => `| ${label} | ${off.median} | ${on.median} | ${delta.median} | ${delta.spread} |`),
     `- Execution order: ${result.wallClock.executionOrderCounts['off-first']} OFF-first pairs and ${result.wallClock.executionOrderCounts['on-first']} ON-first pairs. No artificial floating pass threshold is applied; quality deltas are descriptive.`,
-    `- Wall-clock question: ${result.fidelityClassification === 'M3_TELEMETRY_WALLCLOCK_PERTURBATION_MATERIAL' ? 'yes, the paired campaign observed ordinary-work path differences inside the same 30-second envelope; the magnitude and direction vary by pair.' : 'no material ordinary-work path difference was observed in the paired campaign.'}`,
+    `- OFF/ON work-path differences: ${result.fidelityClassification === 'M3_TELEMETRY_WALLCLOCK_PERTURBATION_MATERIAL' ? 'observed inside the same 30-second envelope; their magnitude and direction varied by pair.' : 'not observed in the paired campaign.'}`,
+    '- Exact wall-clock equivalence was not demonstrated; this campaign did not include an OFF/OFF null-variance control.',
+    '- The paired measurements do not isolate telemetry overhead from ordinary wall-clock trajectory variance; they are descriptive and do not causally attribute the observed differences to telemetry.',
+    `- Median ON−OFF deltas: ${result.wallClock.deltaOnMinusOff.completedOrdinaryBeamGenerations.median} generations, ${result.wallClock.deltaOnMinusOff.finalRmseDb.median} RMSE dB, ${result.wallClock.deltaOnMinusOff.finalMaxAbsDb.median} maxAbs dB.`,
     '',
     '## Unique real-generation structural events',
     '',
@@ -1137,11 +1146,11 @@ function writeArtifacts(outputDir: string, result: M3BCampaignResult): void {
     '',
     '## Required interpretation boundary',
     '',
-    `1. **M3 telemetry fidelity:** \`${result.fidelityClassification}\`. Deterministic logical equivalence is required; wall-clock work-path differences are reported descriptively and do not authorize a policy change.`,
+    `1. **M3 telemetry fidelity:** \`${result.fidelityClassification}\`. Deterministic logical equivalence is required; wall-clock work-path differences are reported descriptively and do not authorize a policy change.${result.fidelityClassification === 'M3_TELEMETRY_WALLCLOCK_PERTURBATION_MATERIAL' ? ' This predeclared MATERIAL value is a conservative operational classification meaning “wall-clock equivalence not established”, not causal attribution of the differences to telemetry.' : ''}`,
     `2. **S3 classification:** \`${result.s3Classification}\`. S3-only versus combined masks and all retrospective outcomes are shown above; no epsilon, fitted subset, or trigger is introduced.`,
     '3. **Policy boundary:** M3b implements no search behavior, candidate, admission, beam, comparator, polish, scheduler, resource, quantization, or challenger change.',
     '',
-    'Raw timing/generation traces are local research data and are intentionally not part of the committed aggregate evidence.',
+    'Raw timing/generation traces remain local research data and are intentionally not part of the committed aggregate evidence; the normalized committed aggregate is the reviewable artifact.',
   ]
   writeFileSync(resolve(outputDir, 'final-report.md'), `${reportLines.join('\n')}\n`, 'utf8')
   writeFileSync(resolve(outputDir, 'summary.md'), `${reportLines[0]}\n${reportLines[1]}\n${reportLines[2]}\n${reportLines[3]}\n${reportLines[4]}\n${reportLines[5]}\n\nFidelity: ${result.fidelityClassification}\nS3: ${result.s3Classification}\n`, 'utf8')
@@ -1208,6 +1217,7 @@ export function runStructuralSearchM3b(options: M3BRunnerOptions = {}): M3BCampa
   const uniqueStructuralEvents = uniqueStructuralAnalysis(generationRows)
   const deterministicFidelity = runM3bDeterministicTelemetryFidelity({
     maxGenerations: options.deterministicMaxGenerations ?? 4,
+    config: envelope.config,
   })
   const wallClock = aggregateWallClock(pairs)
   const fidelityClassification = classifyFidelity(deterministicFidelity, pairs)

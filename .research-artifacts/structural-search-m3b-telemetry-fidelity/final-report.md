@@ -1,7 +1,7 @@
 # Structural Search M3b — telemetry fidelity and unique-event closeout
 
 - Frozen boundary: `f5052b2b1bfdf12b013db5c34c5fda65304091c3`
-- Evidence SHA-256: `eb2acf8ac2ec1d0102c7cb91c05a78c7f86f56885b5e0dbff560fddf44ac1943`
+- Evidence SHA-256: `ce7be18312fadf820dc5b49938455e9a7d4c9d559132effe046eb097584515ec`
 - Protocol: six real cases, C43, effort 6, 30-second OFF/ON paired trajectories, 3 repeats.
 - Search policy: frozen ordinary baseline only; M3/M3b observers cannot affect decisions.
 - Synthetic D/E/F/H matrix was not rerun. M1, M2, M3, scheduler/resource policy, and Standard-v1 remain frozen.
@@ -11,16 +11,20 @@
 - M3 aggregate source: `.research-artifacts/structural-search-m3-stagnation-census/aggregate.json` (SHA-256 767e3341dcf69ec6629d65e7a31a5aeee34efd7c3898739ef3d4fec6761b26c4; evidence 9927d848d72069de1255a40a12c672079d43741c1568193c97a342233d4fe703).
 - M3 generation source: `.research-artifacts/structural-search-m3-stagnation-census/raw-timing.jsonl` (SHA-256 8d143ac7194ff5ff6b0a37095cf13330f878c28e73e9617d381e45bdbc0b675b; 18 frozen real trajectories parsed).
 - Generation-level source for this closeout: the frozen M3 raw real trajectories.
+- The normalized committed aggregate is reviewable; the original raw M3 generation trace is identified above by SHA-256 but is not independently reconstructable from GitHub alone. This is a provenance limitation, not a reason to commit raw timing data.
 - Existing M3 per-signal values are not rewritten. Per-signal S1–S4 totals are overlapping observations, not independent-event denominators.
 - The unique-event table counts each generation with any S1–S4 signal exactly once by exact signal mask; non-plateau generations remain in the completed-generation denominator.
 
 ## Deterministic telemetry-fidelity proof
 
+- Resolved structural-search config: C43/e6, preset `max10-q31-b4-p8-experimental`, beamWidth 16, proposalsPerParent 32, localPolishEvaluations 120.
 - Imposed boundary: 4 completed generation opportunities (no wall-clock expiration).
 - Equivalent: **yes**.
 - OFF/ON completed generations: 4/4.
+- OFF/ON reference states and retained semantic beam states/signatures identical: yes.
+- OFF/ON ordinary work counters identical: yes.
 - OFF/ON final results identical: yes.
-- OFF/ON retained semantic states/signatures identical: yes.
+- OFF/ON natural stop semantics identical: yes.
 
 ## Wall-clock paired measurement
 
@@ -35,7 +39,10 @@
 | delivered filters | 14.5 | 14.5 | 0 | 2 |
 | actual elapsed ms | 30003.329632499983 | 30004.575690000027 | 2.1626539999851957 | 222.30453899998975 |
 - Execution order: 9 OFF-first pairs and 9 ON-first pairs. No artificial floating pass threshold is applied; quality deltas are descriptive.
-- Wall-clock question: yes, the paired campaign observed ordinary-work path differences inside the same 30-second envelope; the magnitude and direction vary by pair.
+- OFF/ON work-path differences: observed inside the same 30-second envelope; their magnitude and direction varied by pair.
+- Exact wall-clock equivalence was not demonstrated; this campaign did not include an OFF/OFF null-variance control.
+- The paired measurements do not isolate telemetry overhead from ordinary wall-clock trajectory variance; they are descriptive and do not causally attribute the observed differences to telemetry.
+- Median ON−OFF deltas: 0 generations, 0 RMSE dB, 0 maxAbs dB.
 
 ## Unique real-generation structural events
 
@@ -64,8 +71,8 @@
 
 ## Required interpretation boundary
 
-1. **M3 telemetry fidelity:** `M3_TELEMETRY_WALLCLOCK_PERTURBATION_MATERIAL`. Deterministic logical equivalence is required; wall-clock work-path differences are reported descriptively and do not authorize a policy change.
+1. **M3 telemetry fidelity:** `M3_TELEMETRY_WALLCLOCK_PERTURBATION_MATERIAL`. Deterministic logical equivalence is required; wall-clock work-path differences are reported descriptively and do not authorize a policy change. This predeclared MATERIAL value is a conservative operational classification meaning “wall-clock equivalence not established”, not causal attribution of the differences to telemetry.
 2. **S3 classification:** `INCONCLUSIVE`. S3-only versus combined masks and all retrospective outcomes are shown above; no epsilon, fitted subset, or trigger is introduced.
 3. **Policy boundary:** M3b implements no search behavior, candidate, admission, beam, comparator, polish, scheduler, resource, quantization, or challenger change.
 
-Raw timing/generation traces are local research data and are intentionally not part of the committed aggregate evidence.
+Raw timing/generation traces remain local research data and are intentionally not part of the committed aggregate evidence; the normalized committed aggregate is the reviewable artifact.

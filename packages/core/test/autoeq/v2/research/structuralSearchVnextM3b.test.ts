@@ -106,6 +106,7 @@ describe('structural-search M3b telemetry fidelity', () => {
     const result = runStructuralSearchM3b({
       runBaseline: fakeRunner,
       nowMs: () => 0,
+      deterministicMaxGenerations: 1,
       writeArtifacts: false,
     })
 
@@ -113,5 +114,8 @@ describe('structural-search M3b telemetry fidelity', () => {
     expect(calls).toHaveLength(36)
     expect(result.wallClock.executionOrderCounts).toEqual({ 'off-first': 9, 'on-first': 9 })
     expect(result.pairs.every((pair) => pair.executionOrder.includes('off') && pair.executionOrder.includes('on'))).toBe(true)
+    expect((result.deterministicFidelity as unknown as { config: unknown }).config).toEqual(
+      result.resourceEnvelope.config,
+    )
   })
 })

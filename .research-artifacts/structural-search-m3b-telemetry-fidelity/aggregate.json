@@ -157,6 +157,23 @@
   },
   "deterministicFidelity": {
     "maxGenerations": 4,
+    "config": {
+      "preset": "max10-q31-b4-p8-experimental",
+      "beamWidth": 16,
+      "proposalsPerParent": 32,
+      "localPolishEvaluations": 120,
+      "maxFilters": 43,
+      "featureRegionCount": 6,
+      "minFeatureSeparationOctaves": 0.5,
+      "candidatePolicy": "semantic",
+      "selectionMetric": "violation",
+      "mergeProximityOctaves": 0.08533333333333333,
+      "marginalPruneTolerance": 0.01,
+      "structuralCleanupMinFilters": 8,
+      "structuralCleanupMaxSteps": 3,
+      "admission": "q31-b4-p8",
+      "workProfile": "full"
+    },
     "equivalent": true,
     "telemetryOff": {
       "result": {
@@ -166,49 +183,49 @@
             "enabled": true,
             "type": "PK",
             "frequencyHz": 39,
-            "gainDb": 4.5,
-            "q": 1.03
+            "gainDb": 4.6,
+            "q": 7.06
           },
           {
             "id": "struct-add-pk-1",
             "enabled": true,
             "type": "PK",
-            "frequencyHz": 92,
-            "gainDb": -5.5,
-            "q": 1.55
+            "frequencyHz": 96,
+            "gainDb": -4.5,
+            "q": 3.94
           },
           {
             "id": "struct-add-pk-2",
             "enabled": true,
             "type": "PK",
-            "frequencyHz": 250,
-            "gainDb": 5.3,
-            "q": 1.55
+            "frequencyHz": 262,
+            "gainDb": 4.9,
+            "q": 4.1
           },
           {
             "id": "struct-add-pk-3",
             "enabled": true,
             "type": "PK",
-            "frequencyHz": 561,
-            "gainDb": -4.2,
-            "q": 1.55
+            "frequencyHz": 578,
+            "gainDb": -4.6,
+            "q": 2.44
           }
         ],
-        "rmseDb": 2.3993138872383426,
-        "maxAbsDb": 4.214783934516524
+        "rmseDb": 2.3469057518147762,
+        "maxAbsDb": 4.126557737163753
       },
       "generations": [
         {
           "generation": 0,
           "reference": {
-            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.3,\"q\":1.73}]",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.2,\"q\":5.93}]",
             "structuralSignature": "PK:0",
-            "rmseDb": 3.6925197136151073,
-            "maxAbsDb": 4.240531259327114
+            "rmseDb": 3.656323767665427,
+            "maxAbsDb": 4.026088257525504
           },
           "retainedBeamSemanticKeys": [
             "[]",
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.3,\"q\":1.73}]"
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.2,\"q\":5.93}]"
           ],
           "retainedBeamSignatures": [
             "",
@@ -218,52 +235,66 @@
         {
           "generation": 1,
           "reference": {
-            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":1.55}]",
-            "structuralSignature": "PK:0|PK:0",
-            "rmseDb": 3.316805926605146,
-            "maxAbsDb": 4.259927908982414
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":6.9},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.5,\"q\":4.29}]",
+            "structuralSignature": "PK:0|PK:1",
+            "rmseDb": 3.274975199546397,
+            "maxAbsDb": 4.0486173334219835
           },
           "retainedBeamSemanticKeys": [
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":2.4,\"q\":2.67},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":38,\"gainDb\":2.1,\"q\":2.45}]",
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":1.55}]"
+            "[]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":38,\"gainDb\":3.5,\"q\":8.39},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":40,\"gainDb\":2.1,\"q\":12}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":6.9},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.5,\"q\":4.29}]"
           ],
           "retainedBeamSignatures": [
+            "",
             "PK:0|PK:0",
-            "PK:0|PK:0"
+            "PK:0|PK:1"
           ]
         },
         {
           "generation": 2,
           "reference": {
-            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.8,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":103,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":223,\"gainDb\":4.3,\"q\":1.55}]",
-            "structuralSignature": "PK:0|PK:0|PK:0",
-            "rmseDb": 2.8961519787687613,
-            "maxAbsDb": 4.224627943659818
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.21},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.8,\"q\":4.58},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":233,\"gainDb\":4.5,\"q\":2.72}]",
+            "structuralSignature": "PK:0|PK:1|PK:2",
+            "rmseDb": 2.8516486632914813,
+            "maxAbsDb": 4.107890435213917
           },
           "retainedBeamSemanticKeys": [
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.8,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":103,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":223,\"gainDb\":4.3,\"q\":1.55}]",
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":40,\"gainDb\":2.3,\"q\":1.88},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":41,\"gainDb\":2,\"q\":0.94},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":2.19}]"
+            "[]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":100,\"gainDb\":-4,\"q\":12}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.21},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":95,\"gainDb\":-2.3,\"q\":5.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":100,\"gainDb\":-2.3,\"q\":10.66}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.21},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.8,\"q\":4.58},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":233,\"gainDb\":4.5,\"q\":2.72}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":40,\"gainDb\":4.1,\"q\":12}]"
           ],
           "retainedBeamSignatures": [
-            "PK:0|PK:0|PK:0",
-            "PK:0|PK:0|PK:0"
+            "",
+            "PK:0",
+            "PK:0|PK:1|PK:1",
+            "PK:0|PK:1|PK:2",
+            "PK:1"
           ]
         },
         {
           "generation": 3,
           "reference": {
-            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":250,\"gainDb\":5.3,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":561,\"gainDb\":-4.2,\"q\":1.55}]",
-            "structuralSignature": "PK:0|PK:0|PK:0|PK:0",
-            "rmseDb": 2.3993138872383426,
-            "maxAbsDb": 4.214783934516524
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.06},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.5,\"q\":3.94},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":262,\"gainDb\":4.9,\"q\":4.1},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":578,\"gainDb\":-4.6,\"q\":2.44}]",
+            "structuralSignature": "PK:0|PK:1|PK:2|PK:2",
+            "rmseDb": 2.3469057518147762,
+            "maxAbsDb": 4.126557737163753
           },
           "retainedBeamSemanticKeys": [
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":250,\"gainDb\":5.3,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":561,\"gainDb\":-4.2,\"q\":1.55}]",
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":42,\"gainDb\":4.5,\"q\":0.86},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":94,\"gainDb\":-5.2,\"q\":2.19}]"
+            "[]",
+            "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":119,\"gainDb\":4.1,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":100,\"gainDb\":-6.4,\"q\":12}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":6.47},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":93,\"gainDb\":-2.4,\"q\":4.48},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":102,\"gainDb\":-2.4,\"q\":2.24},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":240,\"gainDb\":4.5,\"q\":4.29}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.06},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.5,\"q\":3.94},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":262,\"gainDb\":4.9,\"q\":4.1},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":578,\"gainDb\":-4.6,\"q\":2.44}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.7,\"q\":8.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":100,\"gainDb\":-4,\"q\":12}]"
           ],
           "retainedBeamSignatures": [
-            "PK:0|PK:0",
-            "PK:0|PK:0|PK:0|PK:0"
+            "",
+            "LS:1|PK:1",
+            "PK:0|PK:1",
+            "PK:0|PK:1|PK:1|PK:2",
+            "PK:0|PK:1|PK:2|PK:2"
           ]
         }
       ],
@@ -273,25 +304,32 @@
           "PK:0"
         ],
         [
+          "",
           "PK:0|PK:0",
-          "PK:0|PK:0"
+          "PK:0|PK:1"
         ],
         [
-          "PK:0|PK:0|PK:0",
-          "PK:0|PK:0|PK:0"
+          "",
+          "PK:0",
+          "PK:0|PK:1|PK:1",
+          "PK:0|PK:1|PK:2",
+          "PK:1"
         ],
         [
-          "PK:0|PK:0",
-          "PK:0|PK:0|PK:0|PK:0"
+          "",
+          "LS:1|PK:1",
+          "PK:0|PK:1",
+          "PK:0|PK:1|PK:1|PK:2",
+          "PK:0|PK:1|PK:2|PK:2"
         ]
       ],
       "work": {
         "structuralSearchInvocations": 0,
         "beamGenerations": 4,
-        "proposalsGenerated": 31,
-        "proposalsAdmitted": 21,
-        "proposalsPolished": 21,
-        "duplicateStates": 2,
+        "proposalsGenerated": 40,
+        "proposalsAdmitted": 40,
+        "proposalsPolished": 40,
+        "duplicateStates": 6,
         "rescueAttempts": 0,
         "pairAddAttempts": 0,
         "capSwapAttempts": 0,
@@ -308,49 +346,49 @@
             "enabled": true,
             "type": "PK",
             "frequencyHz": 39,
-            "gainDb": 4.5,
-            "q": 1.03
+            "gainDb": 4.6,
+            "q": 7.06
           },
           {
             "id": "struct-add-pk-1",
             "enabled": true,
             "type": "PK",
-            "frequencyHz": 92,
-            "gainDb": -5.5,
-            "q": 1.55
+            "frequencyHz": 96,
+            "gainDb": -4.5,
+            "q": 3.94
           },
           {
             "id": "struct-add-pk-2",
             "enabled": true,
             "type": "PK",
-            "frequencyHz": 250,
-            "gainDb": 5.3,
-            "q": 1.55
+            "frequencyHz": 262,
+            "gainDb": 4.9,
+            "q": 4.1
           },
           {
             "id": "struct-add-pk-3",
             "enabled": true,
             "type": "PK",
-            "frequencyHz": 561,
-            "gainDb": -4.2,
-            "q": 1.55
+            "frequencyHz": 578,
+            "gainDb": -4.6,
+            "q": 2.44
           }
         ],
-        "rmseDb": 2.3993138872383426,
-        "maxAbsDb": 4.214783934516524
+        "rmseDb": 2.3469057518147762,
+        "maxAbsDb": 4.126557737163753
       },
       "generations": [
         {
           "generation": 0,
           "reference": {
-            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.3,\"q\":1.73}]",
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.2,\"q\":5.93}]",
             "structuralSignature": "PK:0",
-            "rmseDb": 3.6925197136151073,
-            "maxAbsDb": 4.240531259327114
+            "rmseDb": 3.656323767665427,
+            "maxAbsDb": 4.026088257525504
           },
           "retainedBeamSemanticKeys": [
             "[]",
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.3,\"q\":1.73}]"
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.2,\"q\":5.93}]"
           ],
           "retainedBeamSignatures": [
             "",
@@ -360,52 +398,66 @@
         {
           "generation": 1,
           "reference": {
-            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":1.55}]",
-            "structuralSignature": "PK:0|PK:0",
-            "rmseDb": 3.316805926605146,
-            "maxAbsDb": 4.259927908982414
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":6.9},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.5,\"q\":4.29}]",
+            "structuralSignature": "PK:0|PK:1",
+            "rmseDb": 3.274975199546397,
+            "maxAbsDb": 4.0486173334219835
           },
           "retainedBeamSemanticKeys": [
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":2.4,\"q\":2.67},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":38,\"gainDb\":2.1,\"q\":2.45}]",
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":1.55}]"
+            "[]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":38,\"gainDb\":3.5,\"q\":8.39},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":40,\"gainDb\":2.1,\"q\":12}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":6.9},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.5,\"q\":4.29}]"
           ],
           "retainedBeamSignatures": [
+            "",
             "PK:0|PK:0",
-            "PK:0|PK:0"
+            "PK:0|PK:1"
           ]
         },
         {
           "generation": 2,
           "reference": {
-            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.8,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":103,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":223,\"gainDb\":4.3,\"q\":1.55}]",
-            "structuralSignature": "PK:0|PK:0|PK:0",
-            "rmseDb": 2.8961519787687613,
-            "maxAbsDb": 4.224627943659818
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.21},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.8,\"q\":4.58},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":233,\"gainDb\":4.5,\"q\":2.72}]",
+            "structuralSignature": "PK:0|PK:1|PK:2",
+            "rmseDb": 2.8516486632914813,
+            "maxAbsDb": 4.107890435213917
           },
           "retainedBeamSemanticKeys": [
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.8,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":103,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":223,\"gainDb\":4.3,\"q\":1.55}]",
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":40,\"gainDb\":2.3,\"q\":1.88},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":41,\"gainDb\":2,\"q\":0.94},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":2.19}]"
+            "[]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":100,\"gainDb\":-4,\"q\":12}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.21},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":95,\"gainDb\":-2.3,\"q\":5.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":100,\"gainDb\":-2.3,\"q\":10.66}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.21},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.8,\"q\":4.58},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":233,\"gainDb\":4.5,\"q\":2.72}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":40,\"gainDb\":4.1,\"q\":12}]"
           ],
           "retainedBeamSignatures": [
-            "PK:0|PK:0|PK:0",
-            "PK:0|PK:0|PK:0"
+            "",
+            "PK:0",
+            "PK:0|PK:1|PK:1",
+            "PK:0|PK:1|PK:2",
+            "PK:1"
           ]
         },
         {
           "generation": 3,
           "reference": {
-            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":250,\"gainDb\":5.3,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":561,\"gainDb\":-4.2,\"q\":1.55}]",
-            "structuralSignature": "PK:0|PK:0|PK:0|PK:0",
-            "rmseDb": 2.3993138872383426,
-            "maxAbsDb": 4.214783934516524
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.06},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.5,\"q\":3.94},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":262,\"gainDb\":4.9,\"q\":4.1},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":578,\"gainDb\":-4.6,\"q\":2.44}]",
+            "structuralSignature": "PK:0|PK:1|PK:2|PK:2",
+            "rmseDb": 2.3469057518147762,
+            "maxAbsDb": 4.126557737163753
           },
           "retainedBeamSemanticKeys": [
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":250,\"gainDb\":5.3,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":561,\"gainDb\":-4.2,\"q\":1.55}]",
-            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":42,\"gainDb\":4.5,\"q\":0.86},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":94,\"gainDb\":-5.2,\"q\":2.19}]"
+            "[]",
+            "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":119,\"gainDb\":4.1,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":100,\"gainDb\":-6.4,\"q\":12}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":6.47},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":93,\"gainDb\":-2.4,\"q\":4.48},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":102,\"gainDb\":-2.4,\"q\":2.24},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":240,\"gainDb\":4.5,\"q\":4.29}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.6,\"q\":7.06},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":96,\"gainDb\":-4.5,\"q\":3.94},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":262,\"gainDb\":4.9,\"q\":4.1},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":578,\"gainDb\":-4.6,\"q\":2.44}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.7,\"q\":8.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":100,\"gainDb\":-4,\"q\":12}]"
           ],
           "retainedBeamSignatures": [
-            "PK:0|PK:0",
-            "PK:0|PK:0|PK:0|PK:0"
+            "",
+            "LS:1|PK:1",
+            "PK:0|PK:1",
+            "PK:0|PK:1|PK:1|PK:2",
+            "PK:0|PK:1|PK:2|PK:2"
           ]
         }
       ],
@@ -415,25 +467,32 @@
           "PK:0"
         ],
         [
+          "",
           "PK:0|PK:0",
-          "PK:0|PK:0"
+          "PK:0|PK:1"
         ],
         [
-          "PK:0|PK:0|PK:0",
-          "PK:0|PK:0|PK:0"
+          "",
+          "PK:0",
+          "PK:0|PK:1|PK:1",
+          "PK:0|PK:1|PK:2",
+          "PK:1"
         ],
         [
-          "PK:0|PK:0",
-          "PK:0|PK:0|PK:0|PK:0"
+          "",
+          "LS:1|PK:1",
+          "PK:0|PK:1",
+          "PK:0|PK:1|PK:1|PK:2",
+          "PK:0|PK:1|PK:2|PK:2"
         ]
       ],
       "work": {
         "structuralSearchInvocations": 0,
         "beamGenerations": 4,
-        "proposalsGenerated": 31,
-        "proposalsAdmitted": 21,
-        "proposalsPolished": 21,
-        "duplicateStates": 2,
+        "proposalsGenerated": 40,
+        "proposalsAdmitted": 40,
+        "proposalsPolished": 40,
+        "duplicateStates": 6,
         "rescueAttempts": 0,
         "pairAddAttempts": 0,
         "capSwapAttempts": 0,
@@ -1641,5 +1700,5 @@
   },
   "fidelityClassification": "M3_TELEMETRY_WALLCLOCK_PERTURBATION_MATERIAL",
   "s3Classification": "INCONCLUSIVE",
-  "evidenceSha256": "eb2acf8ac2ec1d0102c7cb91c05a78c7f86f56885b5e0dbff560fddf44ac1943"
+  "evidenceSha256": "ce7be18312fadf820dc5b49938455e9a7d4c9d559132effe046eb097584515ec"
 }
