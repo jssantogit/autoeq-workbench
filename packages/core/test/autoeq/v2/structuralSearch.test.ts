@@ -18,6 +18,7 @@ import {
   selectShelfEvidence,
   simplifyStructuralState,
   type StructuralProposal,
+  type StructuralSearchBaselineEvaluation,
   type StructuralSearchM3TelemetryEvent,
 } from '../../../src/autoeq/v2/structuralSearch.js'
 import type { Filter } from '../../../src/types/filter.js'
@@ -488,6 +489,41 @@ describe('Experimental Max10 structural search', () => {
       expect(event.signals.S3).toBe(event.unresolved && !event.newlyGeneratedStructuralSignatureSurvived)
       expect(event.signals.S4).toBe(event.unresolved && !event.referenceSignatureChanged && !event.newlyGeneratedStructuralSignatureSurvived)
     }
+  })
+
+  it('keeps the frozen baseline trajectory unchanged while observing evaluated states', () => {
+    const config = {
+      ...resolveStructuralSearchConfig({ preset: MAX10_BASELINE_PRESET }),
+      maxFilters: 2,
+      beamWidth: 2,
+      proposalsPerParent: 4,
+    }
+    const input = {
+      desiredDb: [...localizedResidual],
+      frequencies: [...frequencies],
+      sampleRateHz: 48_000,
+      config,
+      seedFilters: [],
+    }
+    const makeDeadline = () => {
+      let deadlineChecks = 0
+      return { isExpired: () => ++deadlineChecks > 500 }
+    }
+    const baseline = runStructuralSearch({ ...input, deadline: makeDeadline() })
+    const events: StructuralSearchBaselineEvaluation[] = []
+    const observed = runStructuralSearch({
+      ...input,
+      deadline: makeDeadline(),
+      onBaselineEvaluation: (event) => events.push(event),
+    })
+
+    expect(observed).toEqual(baseline)
+    expect(events[0]).toMatchObject({ stage: 'initial', generation: 0 })
+    expect(events.some((event) => event.stage === 'ordinary-polished')).toBe(true)
+    expect(events.some((event) => event.stage === 'ordinary-next-state')).toBe(true)
+    expect(events.some((event) => event.stage === 'retained-beam')).toBe(true)
+    expect(events.at(-1)).toMatchObject({ stage: 'final' })
+    expect(events.every((event) => event.state.filterCount === event.state.filters.length)).toBe(true)
   })
 
   it('returns bit-for-bit identical filters for repeated deterministic searches', () => {

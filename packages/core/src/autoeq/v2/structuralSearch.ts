@@ -1165,6 +1165,45 @@ export interface StructuralSearchBaselineStateEvent {
 }
 
 /**
+ * Observer-only evaluation emitted by the frozen baseline.  The observer
+ * receives defensive copies and is never consulted for admission, beam
+ * retention, rescue, or termination decisions.
+ */
+export type StructuralSearchBaselineEvaluationStage =
+  | 'initial'
+  | 'ordinary-polished'
+  | 'ordinary-next-state'
+  | 'retained-beam'
+  | 'rescue-polished'
+  | 'rescue-accepted'
+  | 'pair-add-polished'
+  | 'pair-add-accepted'
+  | 'cap-swap-polished'
+  | 'cap-swap-accepted'
+  | 'edge-compress-polished'
+  | 'edge-compress-accepted'
+  | 'interior-recycle-polished'
+  | 'interior-recycle-accepted'
+  | 'post-interior-swap-polished'
+  | 'post-interior-swap-accepted'
+  | 'postsolve-polished'
+  | 'postsolve-accepted'
+  | 'final'
+
+export interface StructuralSearchBaselineEvaluation {
+  stage: StructuralSearchBaselineEvaluationStage
+  generation: number
+  state: {
+    candidateId: string
+    filterCount: number
+    filters: Filter[]
+    rmseDb: number
+    maxAbsDb: number
+    cancellationScore: number
+  }
+}
+
+/**
  * Immutable, observer-only state used by the M4 two-phase candidate oracle.
  *
  * The baseline search never consumes this information.  It is emitted only
@@ -1477,6 +1516,8 @@ export interface StructuralSearchInput {
   onBaselineTelemetry?: (event: StructuralSearchM3TelemetryEvent) => void
   /** M3b-only state observer; ignored by every non-baseline policy. */
   onBaselineState?: (event: StructuralSearchBaselineStateEvent) => void
+  /** C3-only evaluated-state observer; ignored by every non-baseline policy. */
+  onBaselineEvaluation?: (event: StructuralSearchBaselineEvaluation) => void
   /**
    * M4-only deterministic generation sampler.  Returning true requests a
    * complete immutable snapshot for that generation.  It is consulted before
@@ -1760,6 +1801,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
   }
   const onBaselineTelemetry = policy === 'baseline' ? input.onBaselineTelemetry : undefined
   const onBaselineState = policy === 'baseline' ? input.onBaselineState : undefined
+  const onBaselineEvaluation = policy === 'baseline' ? input.onBaselineEvaluation : undefined
   const onBaselineSnapshot = policy === 'baseline' ? input.onBaselineSnapshot : undefined
   const captureBaselineGeneration = policy === 'baseline'
     ? input.captureBaselineGeneration
@@ -1788,9 +1830,28 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     maxAbsDb: metrics.maxAbsDb,
     cancellationScore
   }
+  const observeBaselineEvaluation = (
+    stage: StructuralSearchBaselineEvaluationStage,
+    state: SearchState,
+  ): void => {
+    if (onBaselineEvaluation === undefined) return
+    onBaselineEvaluation({
+      stage,
+      generation: beamGeneration,
+      state: {
+        candidateId: state.candidateId,
+        filterCount: state.filters.length,
+        filters: state.filters.map((filter) => ({ ...filter })),
+        rmseDb: state.rmseDb,
+        maxAbsDb: state.maxAbsDb,
+        cancellationScore: state.cancellationScore,
+      },
+    })
+  }
   let beam: SearchState[] = [initialPolished]
   const stateProvenance = new Map<string, StructuralImprovementPhase>([[initialPolished.candidateId, 'beam']])
   let beamGeneration = 0
+  observeBaselineEvaluation('initial', initialPolished)
   let incumbentProvenance: StructuralIncumbentProvenance = { state: initialPolished, phase: 'beam' }
   let m2StallEpisodeActive = false
   let m2FrontierMax = beam.length
@@ -1998,6 +2059,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           deadline,
           sampleRateHz,
         )
+        observeBaselineEvaluation('ordinary-polished', polished)
         polishedProposals += 1
         const polishedCapture = baselineParentCapture === undefined ? undefined : {
             proposal,
@@ -2021,6 +2083,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         visited.add(key)
 
         polished.candidateId = String(candidateCounter++).padStart(4, '0')
+        observeBaselineEvaluation('ordinary-next-state', polished)
         if (polishedCapture !== undefined) polishedCapture.acceptedNextState = true
         stateProvenance.set(polished.candidateId, 'beam')
         nextStates.push(polished)
@@ -2059,7 +2122,8 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     ): void => {
       if (
         retainedBeam.length === 0 ||
-        (onBaselineState === undefined && onBaselineTelemetry === undefined && onBaselineSnapshot === undefined)
+        (onBaselineState === undefined && onBaselineTelemetry === undefined &&
+          onBaselineSnapshot === undefined && onBaselineEvaluation === undefined)
       ) return
 
       if (
@@ -2084,6 +2148,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       }
 
       const reference = selectReferencePoint(retainedBeam)
+      for (const state of retainedBeam) observeBaselineEvaluation('retained-beam', state)
       onBaselineState?.({
         type: 'ordinary-baseline-generation',
         generation: beamGeneration,
@@ -2386,6 +2451,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
   }
 
   if (beam.length === 0) {
+    observeBaselineEvaluation('final', initialPolished)
     return {
       filters: initialPolished.filters,
       rmseDb: initialPolished.rmseDb,
@@ -2450,6 +2516,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         deadline,
         sampleRateHz,
       )
+      observeBaselineEvaluation('rescue-polished', polished)
       const paretoImproves =
         polished.rmseDb <= rescued.rmseDb + epsilon &&
         polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
@@ -2470,6 +2537,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         left.rank - right.rank
     })
     rescued = improving[0]!.state
+    observeBaselineEvaluation('rescue-accepted', rescued)
     if (policy === 'vnext' || policy === 'm2') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'rescue')
     rescueSteps += 1
   }
@@ -2561,6 +2629,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
             deadline,
             sampleRateHz,
           )
+          observeBaselineEvaluation('pair-add-polished', polished)
           const paretoImproves =
             polished.rmseDb <= rescued.rmseDb + epsilon &&
             polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
@@ -2593,6 +2662,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         left.seedOrder - right.seedOrder
     })
     rescued = improving[0]!.state
+    observeBaselineEvaluation('pair-add-accepted', rescued)
     if (policy === 'vnext' || policy === 'm2') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'pair-add')
     pairAddSteps += 1
   }
@@ -2660,6 +2730,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           deadline,
           sampleRateHz,
         )
+        observeBaselineEvaluation('cap-swap-polished', polished)
         const paretoImproves =
           polished.rmseDb <= rescued.rmseDb + epsilon &&
           polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
@@ -2682,6 +2753,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         left.replacementIndex - right.replacementIndex
     })
     rescued = improving[0]!.state
+    observeBaselineEvaluation('cap-swap-accepted', rescued)
     if (policy === 'vnext' || policy === 'm2') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'cap-swap')
     capSwapSteps += 1
   }
@@ -2710,6 +2782,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         deliveredFilterCount: rescued.filters.length,
       }),
     })
+    observeBaselineEvaluation('final', rescued)
     return {
       filters: rescued.filters,
       rmseDb: rescued.rmseDb,
@@ -2794,6 +2867,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
             deadline,
             sampleRateHz,
           )
+          observeBaselineEvaluation('edge-compress-polished', polished)
           const paretoImproves =
             polished.rmseDb <= rescued.rmseDb + epsilon &&
             polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
@@ -2826,6 +2900,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           left.pkIndex - right.pkIndex
       })
       rescued = improving[0]!.state
+      observeBaselineEvaluation('edge-compress-accepted', rescued)
     }
   }
 
@@ -2841,6 +2916,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         deliveredFilterCount: rescued.filters.length,
       }),
     })
+    observeBaselineEvaluation('final', rescued)
     return {
       filters: rescued.filters,
       rmseDb: rescued.rmseDb,
@@ -2941,6 +3017,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
               deadline,
               sampleRateHz,
             )
+            observeBaselineEvaluation('interior-recycle-polished', polished)
             const paretoImproves =
               polished.rmseDb <= rescued.rmseDb + epsilon &&
               polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
@@ -2981,6 +3058,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           left.seedOrder - right.seedOrder
       })
       rescued = improving[0]!.state
+      observeBaselineEvaluation('interior-recycle-accepted', rescued)
       interiorRecycled = true
     }
   }
@@ -2995,6 +3073,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       deadline,
       sampleRateHz,
     )
+    observeBaselineEvaluation('interior-recycle-polished', deepPolished)
     const rescuedViolation = Math.max(
       rescued.rmseDb / 0.25,
       rescued.maxAbsDb / 0.75,
@@ -3005,6 +3084,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     )
     if (deepViolation < rescuedViolation - epsilon) {
       rescued = deepPolished
+      observeBaselineEvaluation('interior-recycle-accepted', rescued)
     }
 
     if (
@@ -3065,6 +3145,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
             deadline,
             sampleRateHz,
           )
+          observeBaselineEvaluation('post-interior-swap-polished', polished)
           const paretoImproves =
             polished.rmseDb <= rescued.rmseDb + epsilon &&
             polished.maxAbsDb <= rescued.maxAbsDb + epsilon &&
@@ -3095,6 +3176,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
             left.replacementIndex - right.replacementIndex
         })
         rescued = improving[0]!.state
+        observeBaselineEvaluation('post-interior-swap-accepted', rescued)
       }
     }
   }
@@ -3113,6 +3195,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       deadline,
       sampleRateHz,
     )
+    observeBaselineEvaluation('postsolve-polished', deepPolished)
     const rescuedViolation = Math.max(
       rescued.rmseDb / 0.25,
       rescued.maxAbsDb / 0.75,
@@ -3123,6 +3206,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     )
     if (deepViolation < rescuedViolation - epsilon) {
       rescued = deepPolished
+      observeBaselineEvaluation('postsolve-accepted', rescued)
     }
 
     let simplifyBeam: Array<{ state: SearchState; pathKey: string }> = [
@@ -3183,6 +3267,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
               deadline,
               sampleRateHz,
             )
+            observeBaselineEvaluation('postsolve-polished', polished)
             const paretoImproves =
               polished.rmseDb <= node.state.rmseDb + epsilon &&
               polished.maxAbsDb <= node.state.maxAbsDb + epsilon &&
@@ -3219,6 +3304,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       simplifyBeam = next.slice(0, 2)
 
       for (const node of simplifyBeam) {
+        observeBaselineEvaluation('postsolve-accepted', node.state)
         const nodeViolation = Math.max(
           node.state.rmseDb / 0.25,
           node.state.maxAbsDb / 0.75,
@@ -3247,6 +3333,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       deliveredFilterCount: rescued.filters.length,
     } : {}),
   })
+  observeBaselineEvaluation('final', rescued)
   return {
     filters: rescued.filters,
     rmseDb: rescued.rmseDb,
