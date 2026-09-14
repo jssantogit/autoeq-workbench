@@ -18,6 +18,7 @@ import {
   selectShelfEvidence,
   simplifyStructuralState,
   type StructuralProposal,
+  type StructuralSearchM3TelemetryEvent,
 } from '../../../src/autoeq/v2/structuralSearch.js'
 import type { Filter } from '../../../src/types/filter.js'
 
@@ -437,6 +438,58 @@ describe('Experimental Max10 structural search', () => {
     )).toBe(true)
   })
 
+  it('emits completed ordinary baseline structural telemetry without changing the result', () => {
+    const config = {
+      ...resolveStructuralSearchConfig({ preset: MAX10_BASELINE_PRESET }),
+      maxFilters: 2,
+      beamWidth: 2,
+      proposalsPerParent: 4,
+    }
+    const run = (observe: boolean) => {
+      let deadlineChecks = 0
+      const events: StructuralSearchM3TelemetryEvent[] = []
+      const traceEvents: unknown[] = []
+      const result = runStructuralSearch({
+        desiredDb: [...localizedResidual],
+        frequencies: [...frequencies],
+        sampleRateHz: 48_000,
+        config,
+        deadline: { isExpired: () => ++deadlineChecks > 500 },
+        seedFilters: [],
+        onBaselineTelemetry: observe ? (event) => events.push(event) : undefined,
+        onTrace: (event) => traceEvents.push(event),
+      })
+      return { result, events, traceEvents }
+    }
+
+    const plain = run(false)
+    const observed = run(true)
+    expect(observed.result).toEqual(plain.result)
+    expect(observed.traceEvents).toEqual(plain.traceEvents)
+    expect(observed.events.length).toBeGreaterThan(0)
+    const generation = observed.events[0]!
+    expect(generation.type).toBe('ordinary-baseline-generation')
+    expect(generation.referenceSignature).toEqual(expect.any(String))
+    expect(generation.retainedBeamSignatures).toEqual(expect.any(Array))
+    expect(generation.generatedStructuralSignatures).toEqual(expect.any(Array))
+    expect(generation.admittedStructuralSignatures).toEqual(expect.any(Array))
+    expect(generation.survivingStructuralSignatures).toEqual(expect.any(Array))
+    expect(generation.signals).toEqual(expect.objectContaining({
+      S0: expect.any(Boolean),
+      S1: expect.any(Boolean),
+      S2: expect.any(Boolean),
+      S3: expect.any(Boolean),
+      S4: expect.any(Boolean),
+    }))
+    for (const event of observed.events) {
+      expect(event.signals.S0).toBe(event.unresolved && !event.numericReferenceImprovement)
+      expect(event.signals.S1).toBe(event.unresolved && !event.referenceSignatureChanged)
+      expect(event.signals.S2).toBe(event.unresolved && !event.retainedBeamSignatureSetChanged)
+      expect(event.signals.S3).toBe(event.unresolved && !event.newlyGeneratedStructuralSignatureSurvived)
+      expect(event.signals.S4).toBe(event.unresolved && !event.referenceSignatureChanged && !event.newlyGeneratedStructuralSignatureSurvived)
+    }
+  })
+
   it('returns bit-for-bit identical filters for repeated deterministic searches', () => {
     const config = {
       ...resolveStructuralSearchConfig({
@@ -529,6 +582,37 @@ describe('structural-search-vnext primitives', () => {
     ], bounds, 6)).toBe(structuralSignature([
       { id: 'second', enabled: true, type: 'PK', frequencyHz: 1_010, gainDb: -4, q: 8 },
     ], bounds, 6))
+  })
+
+  it('keeps multi-filter structural signatures independent of order and IDs', async () => {
+    const { structuralSignature } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const bounds = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
+    const first = [
+      { id: 'left-a', enabled: true, type: 'PK' as const, frequencyHz: 220, gainDb: 4, q: 1 },
+      { id: 'shelf-a', enabled: true, type: 'HS' as const, frequencyHz: 8_000, gainDb: -2, q: 0.7 },
+      { id: 'right-a', enabled: true, type: 'PK' as const, frequencyHz: 8_500, gainDb: 1, q: 4 },
+    ]
+    const reordered = [
+      { ...first[2]!, id: 'right-b', gainDb: -8 },
+      { ...first[0]!, id: 'left-b', frequencyHz: 230 },
+      { ...first[1]!, id: 'shelf-b', q: 3 },
+    ]
+    expect(structuralSignature(first, bounds, 6)).toBe(structuralSignature(reordered, bounds, 6))
+  })
+
+  it('does not emit the M3 baseline callback for experimental policies', async () => {
+    const { runStructuralSearchVNext } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const events: unknown[] = []
+    let checks = 0
+    runStructuralSearchVNext({
+      desiredDb: [...localizedResidual],
+      frequencies: [...frequencies],
+      sampleRateHz: 48_000,
+      config: { ...resolveStructuralSearchConfig({ preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET }), maxFilters: 2 },
+      deadline: { isExpired: () => ++checks > 20 },
+      onBaselineTelemetry: (event) => events.push(event),
+    })
+    expect(events).toEqual([])
   })
 
   it('retains a viable distinct signature within a fixed beam width deterministically', async () => {

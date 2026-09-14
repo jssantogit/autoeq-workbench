@@ -742,6 +742,34 @@ function compareKeys(left: readonly (number | string)[], right: readonly (number
   return 0
 }
 
+/**
+ * Compare only the existing reference quality ordering, not candidate identity
+ * or structural tie-breakers.  The success bit is taken from
+ * referenceSelectorKey, so M3 does not introduce a new target threshold.
+ */
+function referenceNumericKey(point: SearchState): readonly number[] {
+  const selector = referenceSelectorKey(point)
+  return [
+    selector[0] as number,
+    Math.max(point.rmseDb / 0.25, point.maxAbsDb / 0.75),
+    point.rmseDb,
+    point.maxAbsDb,
+  ]
+}
+
+function sameStructuralSignatureSet(
+  left: ReadonlySet<string>,
+  right: ReadonlySet<string>,
+): boolean {
+  if (left.size !== right.size) return false
+  for (const value of left) if (!right.has(value)) return false
+  return true
+}
+
+function sortedStructuralSignatures(values: ReadonlySet<string>): string[] {
+  return [...values].sort((left, right) => left.localeCompare(right))
+}
+
 export type StructuralImprovementPhase = 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement' | 'm2-challenger'
 
 export interface StructuralIncumbentProvenance {
@@ -1058,6 +1086,45 @@ export interface StructuralSearchTraceEvent {
   violation: number
 }
 
+/** Predeclared diagnostic signals for the M3 structural-stagnation census. */
+export type StructuralSearchM3Signal = 'S0' | 'S1' | 'S2' | 'S3' | 'S4'
+
+export type StructuralSearchM3Signals = Record<StructuralSearchM3Signal, boolean>
+
+/**
+ * Shadow-only observation emitted after one ordinary baseline generation has
+ * completed.  This callback is intentionally separate from search tracing so
+ * the M3 census cannot be mistaken for a search policy or admission result.
+ */
+export interface StructuralSearchM3TelemetryEvent {
+  type: 'ordinary-baseline-generation'
+  generation: number
+  referenceRmseDb: number
+  referenceMaxAbsDb: number
+  referenceViolation: number
+  /** The filter count of the selected reference/deliverable state. */
+  deliveredFilterCount: number
+  referenceFilterCount: number
+  referenceSignature: string
+  retainedBeamSignatures: string[]
+  retainedBeamSignatureCount: number
+  generatedStructuralSignatures: string[]
+  admittedStructuralSignatures: string[]
+  survivingStructuralSignatures: string[]
+  referenceSignatureChanged: boolean
+  retainedBeamSignatureSetChanged: boolean
+  newlyGeneratedStructuralSignatureSurvived: boolean
+  /** Quality ordering uses the existing reference comparator semantics. */
+  numericReferenceImprovement: boolean
+  /** Existing target-success semantics; no fitted threshold is introduced. */
+  unresolved: boolean
+  signals: StructuralSearchM3Signals
+  frontierMaxFilterCount: number
+  capacityPressure: CapacityPressureDelta
+  ordinaryWorkCounters: SearchWorkDelta
+  frontierUtilization: FrontierUtilizationDelta
+}
+
 /**
  * Raw deterministic work observed while running one structural-search stage.
  *
@@ -1154,6 +1221,8 @@ export interface StructuralSearchInput {
   seedFilters?: readonly Filter[]
   isExpired?: () => boolean
   onTrace?: (event: StructuralSearchTraceEvent) => void
+  /** M3-only shadow callback; ignored by every non-baseline policy. */
+  onBaselineTelemetry?: (event: StructuralSearchM3TelemetryEvent) => void
 }
 
 export interface StructuralSearchResult {
@@ -1424,6 +1493,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       violation: Math.max(state.rmseDb / 0.25, state.maxAbsDb / 0.75),
     })
   }
+  const onBaselineTelemetry = policy === 'baseline' ? input.onBaselineTelemetry : undefined
 
   const bounds = resolveStandardAutoEqV2Config({
     ...DEFAULT_AUTOEQ_SETTINGS,
@@ -1454,6 +1524,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
   let incumbentProvenance: StructuralIncumbentProvenance = { state: initialPolished, phase: 'beam' }
   let m2StallEpisodeActive = false
   let m2FrontierMax = beam.length
+  const telemetryRegionCount = Math.max(1, config.featureRegionCount ?? 1)
+  let previousTelemetryReference = initialPolished
+  let previousTelemetryBeamSignatures = new Set([
+    structuralSignature(initialPolished.filters, bounds, telemetryRegionCount),
+  ])
   stateTrace('start', initialPolished, { phase: 'beam', status: 'start' })
 
   while (beam.length > 0 && !deadline.isExpired()) {
@@ -1467,6 +1542,8 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     let vnextAdmittedRegions = new Set<number>()
     let vnextGeneratedSignatures = new Set<string>()
     let vnextAdmittedSignatures = new Set<string>()
+    const baselineGeneratedStructuralSignatures = new Set<string>()
+    const baselineAdmittedStructuralSignatures = new Set<string>()
     const candidateSourceCounts: Partial<Record<StructuralMutation, number>> = {}
     const vnextPoolsByParent = new Map<string, StructuralCandidatePoolEntry[]>()
     let capacityPressure = createCapacityPressureDelta()
@@ -1484,6 +1561,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           config.featureRegionCount, config.minFeatureSeparationOctaves, config.candidatePolicy, config.mergeProximityOctaves)
         : generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
       generatedProposals += proposals.length
+      if (onBaselineTelemetry !== undefined) for (const proposal of proposals) {
+        baselineGeneratedStructuralSignatures.add(
+          structuralSignature(proposal.filters, bounds, telemetryRegionCount),
+        )
+      }
       if (policy === 'vnext') for (const proposal of proposals) {
         candidateSourceCounts[proposal.mutation] = (candidateSourceCounts[proposal.mutation] ?? 0) + 1
       }
@@ -1583,6 +1665,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         } else admitted = ordered.slice(0, config.proposalsPerParent)
       }
       admittedProposals += admitted.length
+      if (onBaselineTelemetry !== undefined) for (const proposal of admitted) {
+        baselineAdmittedStructuralSignatures.add(
+          structuralSignature(proposal.filters, bounds, telemetryRegionCount),
+        )
+      }
       if (policy === 'vnext') for (const proposal of admitted) {
         const entry = vnextPool.find(candidate => proposalKey(candidate.proposal) === proposalKey(proposal))
         if (entry?.metadata !== undefined) vnextAdmittedRegions.add(entry.metadata.residualRegion)
@@ -1647,6 +1734,92 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     const traceState = nextStates.length > 0
       ? selectReferencePoint([...beam, ...nextStates])
       : selectReferencePoint(beam)
+
+    const emitBaselineGeneration = (retainedBeam: readonly SearchState[]): void => {
+      if (onBaselineTelemetry === undefined || retainedBeam.length === 0) return
+
+      const reference = selectReferencePoint(retainedBeam)
+      const referenceSignature = structuralSignature(
+        reference.filters,
+        bounds,
+        telemetryRegionCount,
+      )
+      const retainedSignatures = new Set(
+        retainedBeam.map((state) => structuralSignature(state.filters, bounds, telemetryRegionCount)),
+      )
+      const survivingSignatures = new Set(
+        [...baselineGeneratedStructuralSignatures].filter((signature) => retainedSignatures.has(signature)),
+      )
+      const referenceSignatureChanged = referenceSignature !== structuralSignature(
+        previousTelemetryReference.filters,
+        bounds,
+        telemetryRegionCount,
+      )
+      const retainedBeamSignatureSetChanged = !sameStructuralSignatureSet(
+        retainedSignatures,
+        previousTelemetryBeamSignatures,
+      )
+      const numericReferenceImprovement = compareKeys(
+        referenceNumericKey(reference),
+        referenceNumericKey(previousTelemetryReference),
+      ) < 0
+      const unresolved = referenceSelectorKey(reference)[0] !== 0
+      const newlyGeneratedStructuralSignatureSurvived = [...survivingSignatures].some(
+        (signature) => !previousTelemetryBeamSignatures.has(signature),
+      )
+      const signals: StructuralSearchM3Signals = {
+        S0: unresolved && !numericReferenceImprovement,
+        S1: unresolved && !referenceSignatureChanged,
+        S2: unresolved && !retainedBeamSignatureSetChanged,
+        S3: unresolved && !newlyGeneratedStructuralSignatureSurvived,
+        S4: unresolved && !referenceSignatureChanged && !newlyGeneratedStructuralSignatureSurvived,
+      }
+      const ordinaryWorkCounters = createSearchWorkDelta()
+      ordinaryWorkCounters.beamGenerations = 1
+      ordinaryWorkCounters.proposalsGenerated = generatedProposals
+      ordinaryWorkCounters.proposalsAdmitted = admittedProposals
+      ordinaryWorkCounters.proposalsPolished = polishedProposals
+      ordinaryWorkCounters.duplicateStates = duplicateStates
+      const frontierMaxFilterCount = Math.max(
+        reference.filters.length,
+        ...retainedBeam.map((state) => state.filters.length),
+        frontierUtilization.parentFilterCountMax,
+        frontierUtilization.generatedCandidateFilterCountMax,
+        frontierUtilization.admittedCandidateFilterCountMax,
+        frontierUtilization.polishedCandidateFilterCountMax,
+      )
+
+      onBaselineTelemetry({
+        type: 'ordinary-baseline-generation',
+        generation: beamGeneration,
+        referenceRmseDb: reference.rmseDb,
+        referenceMaxAbsDb: reference.maxAbsDb,
+        referenceViolation: Math.max(reference.rmseDb / 0.25, reference.maxAbsDb / 0.75),
+        deliveredFilterCount: reference.filters.length,
+        referenceFilterCount: reference.filters.length,
+        referenceSignature,
+        retainedBeamSignatures: sortedStructuralSignatures(retainedSignatures),
+        retainedBeamSignatureCount: retainedSignatures.size,
+        generatedStructuralSignatures: sortedStructuralSignatures(baselineGeneratedStructuralSignatures),
+        admittedStructuralSignatures: sortedStructuralSignatures(baselineAdmittedStructuralSignatures),
+        survivingStructuralSignatures: sortedStructuralSignatures(survivingSignatures),
+        referenceSignatureChanged,
+        retainedBeamSignatureSetChanged,
+        newlyGeneratedStructuralSignatureSurvived,
+        numericReferenceImprovement,
+        unresolved,
+        signals,
+        frontierMaxFilterCount,
+        capacityPressure: { ...capacityPressure },
+        ordinaryWorkCounters,
+        frontierUtilization: {
+          ...frontierUtilization,
+        },
+      })
+
+      previousTelemetryReference = reference
+      previousTelemetryBeamSignatures = retainedSignatures
+    }
     stateTrace('beam-generation', traceState, {
       phase: 'beam',
       generation: beamGeneration,
@@ -1773,6 +1946,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       }
     }
     if (nextStates.length === 0) {
+      emitBaselineGeneration(beam)
       if (policy === 'm2' && m2Intervention) {
         stateTrace('phase', traceState, {
           phase: 'm2-challenger', status: 'end',
@@ -1800,6 +1974,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     beam = policy === 'vnext'
       ? retainDiverseStructuralBeam(combined, config.beamWidth, bounds, config.featureRegionCount ?? 1)
       : retainParetoBeam(combined, config.beamWidth)
+    emitBaselineGeneration(beam)
     if (policy === 'm2') m2FrontierMax = Math.max(m2FrontierMax, beam.length)
     if (policy === 'vnext') {
       for (const state of beam) {

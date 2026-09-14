@@ -1,0 +1,2538 @@
+{
+  "schemaVersion": 1,
+  "frozenBoundary": "f5052b2b1bfdf12b013db5c34c5fda65304091c3",
+  "resourceEnvelope": {
+    "structuralCeiling": 43,
+    "effortLevel": 6,
+    "beamWidth": 16,
+    "proposalsPerParent": 32,
+    "localPolishEvaluations": 120,
+    "preset": "max10-q31-b4-p8-experimental",
+    "schedulerPolicy": "direct-structural-search",
+    "seedSemantics": "empty-filters-deterministic",
+    "deadlinePolicy": "one-continuing-trajectory-with-30-second-budget",
+    "config": {
+      "preset": "max10-q31-b4-p8-experimental",
+      "beamWidth": 16,
+      "proposalsPerParent": 32,
+      "localPolishEvaluations": 120,
+      "maxFilters": 43,
+      "featureRegionCount": 6,
+      "minFeatureSeparationOctaves": 0.5,
+      "candidatePolicy": "semantic",
+      "selectionMetric": "violation",
+      "mergeProximityOctaves": 0.08533333333333333,
+      "marginalPruneTolerance": 0.01,
+      "structuralCleanupMinFilters": 8,
+      "structuralCleanupMaxSteps": 3,
+      "admission": "q31-b4-p8",
+      "workProfile": "full"
+    }
+  },
+  "aggregate": {
+    "real": {
+      "family": "real",
+      "caseCount": 6,
+      "trajectoryCount": 18,
+      "signals": {
+        "S0": {
+          "occurrenceCount": 8,
+          "trajectoriesWithOccurrence": 8,
+          "casesWithOccurrence": 5,
+          "repeatsWithOccurrence": 8,
+          "firstOccurrenceGeneration": {
+            "best": 22,
+            "median": 30.5,
+            "worst": 32,
+            "spread": 10
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 30001.846632,
+            "median": 30002.998267000024,
+            "worst": 30045.695631999988,
+            "spread": 43.84899999998743
+          },
+          "persistence": {
+            "occurrenceRunCount": 8,
+            "median": 1,
+            "max": 1
+          },
+          "numericImprovingOccurrences": 0,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 0,
+            "finalMaxAbsImprovesFurther": 0,
+            "additionalFiltersUltimatelyDelivered": 0
+          },
+          "futureProgress": {
+            "occurrenceCount": 8,
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0,
+            "finalRmseImprovesFurther": 0,
+            "finalMaxAbsImprovesFurther": 0,
+            "additionalFiltersUltimatelyDelivered": 0
+          }
+        },
+        "S1": {
+          "occurrenceCount": 8,
+          "trajectoriesWithOccurrence": 8,
+          "casesWithOccurrence": 5,
+          "repeatsWithOccurrence": 8,
+          "firstOccurrenceGeneration": {
+            "best": 22,
+            "median": 30.5,
+            "worst": 32,
+            "spread": 10
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 30001.846632,
+            "median": 30002.998267000024,
+            "worst": 30045.695631999988,
+            "spread": 43.84899999998743
+          },
+          "persistence": {
+            "occurrenceRunCount": 8,
+            "median": 1,
+            "max": 1
+          },
+          "numericImprovingOccurrences": 0,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 0,
+            "finalMaxAbsImprovesFurther": 0,
+            "additionalFiltersUltimatelyDelivered": 0
+          },
+          "futureProgress": {
+            "occurrenceCount": 8,
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0,
+            "finalRmseImprovesFurther": 0,
+            "finalMaxAbsImprovesFurther": 0,
+            "additionalFiltersUltimatelyDelivered": 0
+          }
+        },
+        "S2": {
+          "occurrenceCount": 9,
+          "trajectoriesWithOccurrence": 9,
+          "casesWithOccurrence": 5,
+          "repeatsWithOccurrence": 9,
+          "firstOccurrenceGeneration": {
+            "best": 22,
+            "median": 23,
+            "worst": 32,
+            "spread": 10
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 30001.846632,
+            "median": 30003.655709000013,
+            "worst": 30346.026016999997,
+            "spread": 344.1793849999958
+          },
+          "persistence": {
+            "occurrenceRunCount": 9,
+            "median": 1,
+            "max": 1
+          },
+          "numericImprovingOccurrences": 2,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 0,
+            "finalMaxAbsImprovesFurther": 0,
+            "additionalFiltersUltimatelyDelivered": 0
+          },
+          "futureProgress": {
+            "occurrenceCount": 9,
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0,
+            "finalRmseImprovesFurther": 0,
+            "finalMaxAbsImprovesFurther": 0,
+            "additionalFiltersUltimatelyDelivered": 0
+          }
+        },
+        "S3": {
+          "occurrenceCount": 39,
+          "trajectoriesWithOccurrence": 13,
+          "casesWithOccurrence": 5,
+          "repeatsWithOccurrence": 13,
+          "firstOccurrenceGeneration": {
+            "best": 0,
+            "median": 15,
+            "worst": 23,
+            "spread": 23
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 8.178960999997798,
+            "median": 8913.942031999999,
+            "worst": 30002.601633000013,
+            "spread": 29994.422672000015
+          },
+          "persistence": {
+            "occurrenceRunCount": 30,
+            "median": 1,
+            "max": 3
+          },
+          "numericImprovingOccurrences": 32,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 30,
+            "survivingNovelStructuralSignatureLater": 30
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 19,
+            "finalMaxAbsImprovesFurther": 30,
+            "additionalFiltersUltimatelyDelivered": 29
+          },
+          "futureProgress": {
+            "occurrenceCount": 39,
+            "referenceSignatureLaterChanges": 30,
+            "survivingNovelStructuralSignatureLater": 30,
+            "finalRmseImprovesFurther": 19,
+            "finalMaxAbsImprovesFurther": 30,
+            "additionalFiltersUltimatelyDelivered": 29
+          }
+        },
+        "S4": {
+          "occurrenceCount": 7,
+          "trajectoriesWithOccurrence": 7,
+          "casesWithOccurrence": 5,
+          "repeatsWithOccurrence": 7,
+          "firstOccurrenceGeneration": {
+            "best": 22,
+            "median": 30,
+            "worst": 32,
+            "spread": 10
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 30001.846632,
+            "median": 30003.202863,
+            "worst": 30045.695631999988,
+            "spread": 43.84899999998743
+          },
+          "persistence": {
+            "occurrenceRunCount": 7,
+            "median": 1,
+            "max": 1
+          },
+          "numericImprovingOccurrences": 0,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 0,
+            "finalMaxAbsImprovesFurther": 0,
+            "additionalFiltersUltimatelyDelivered": 0
+          },
+          "futureProgress": {
+            "occurrenceCount": 7,
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0,
+            "finalRmseImprovesFurther": 0,
+            "finalMaxAbsImprovesFurther": 0,
+            "additionalFiltersUltimatelyDelivered": 0
+          }
+        }
+      }
+    },
+    "synthetic": {
+      "family": "synthetic",
+      "caseCount": 4,
+      "trajectoryCount": 36,
+      "signals": {
+        "S0": {
+          "occurrenceCount": 27,
+          "trajectoriesWithOccurrence": 15,
+          "casesWithOccurrence": 3,
+          "repeatsWithOccurrence": 9,
+          "firstOccurrenceGeneration": {
+            "best": 1,
+            "median": 2,
+            "worst": 5,
+            "spread": 4
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 17.272730999975465,
+            "median": 99.36699899996165,
+            "worst": 623.6926530000055,
+            "spread": 606.41992200003
+          },
+          "persistence": {
+            "occurrenceRunCount": 15,
+            "median": 2,
+            "max": 2
+          },
+          "numericImprovingOccurrences": 0,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 3,
+            "survivingNovelStructuralSignatureLater": 3
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 21,
+            "finalMaxAbsImprovesFurther": 21,
+            "additionalFiltersUltimatelyDelivered": 3
+          },
+          "futureProgress": {
+            "occurrenceCount": 27,
+            "referenceSignatureLaterChanges": 3,
+            "survivingNovelStructuralSignatureLater": 3,
+            "finalRmseImprovesFurther": 21,
+            "finalMaxAbsImprovesFurther": 21,
+            "additionalFiltersUltimatelyDelivered": 3
+          }
+        },
+        "S1": {
+          "occurrenceCount": 27,
+          "trajectoriesWithOccurrence": 15,
+          "casesWithOccurrence": 3,
+          "repeatsWithOccurrence": 9,
+          "firstOccurrenceGeneration": {
+            "best": 1,
+            "median": 2,
+            "worst": 5,
+            "spread": 4
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 17.272730999975465,
+            "median": 99.36699899996165,
+            "worst": 623.6926530000055,
+            "spread": 606.41992200003
+          },
+          "persistence": {
+            "occurrenceRunCount": 15,
+            "median": 2,
+            "max": 2
+          },
+          "numericImprovingOccurrences": 0,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 3,
+            "survivingNovelStructuralSignatureLater": 3
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 21,
+            "finalMaxAbsImprovesFurther": 21,
+            "additionalFiltersUltimatelyDelivered": 3
+          },
+          "futureProgress": {
+            "occurrenceCount": 27,
+            "referenceSignatureLaterChanges": 3,
+            "survivingNovelStructuralSignatureLater": 3,
+            "finalRmseImprovesFurther": 21,
+            "finalMaxAbsImprovesFurther": 21,
+            "additionalFiltersUltimatelyDelivered": 3
+          }
+        },
+        "S2": {
+          "occurrenceCount": 24,
+          "trajectoriesWithOccurrence": 12,
+          "casesWithOccurrence": 3,
+          "repeatsWithOccurrence": 9,
+          "firstOccurrenceGeneration": {
+            "best": 2,
+            "median": 2.5,
+            "worst": 5,
+            "spread": 3
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 53.01488499995321,
+            "median": 142.32190350000747,
+            "worst": 623.6926530000055,
+            "spread": 570.6777680000523
+          },
+          "persistence": {
+            "occurrenceRunCount": 12,
+            "median": 2,
+            "max": 2
+          },
+          "numericImprovingOccurrences": 0,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 18,
+            "finalMaxAbsImprovesFurther": 18,
+            "additionalFiltersUltimatelyDelivered": 0
+          },
+          "futureProgress": {
+            "occurrenceCount": 24,
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0,
+            "finalRmseImprovesFurther": 18,
+            "finalMaxAbsImprovesFurther": 18,
+            "additionalFiltersUltimatelyDelivered": 0
+          }
+        },
+        "S3": {
+          "occurrenceCount": 24,
+          "trajectoriesWithOccurrence": 12,
+          "casesWithOccurrence": 3,
+          "repeatsWithOccurrence": 9,
+          "firstOccurrenceGeneration": {
+            "best": 2,
+            "median": 2.5,
+            "worst": 5,
+            "spread": 3
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 53.01488499995321,
+            "median": 142.32190350000747,
+            "worst": 623.6926530000055,
+            "spread": 570.6777680000523
+          },
+          "persistence": {
+            "occurrenceRunCount": 12,
+            "median": 2,
+            "max": 2
+          },
+          "numericImprovingOccurrences": 0,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 18,
+            "finalMaxAbsImprovesFurther": 18,
+            "additionalFiltersUltimatelyDelivered": 0
+          },
+          "futureProgress": {
+            "occurrenceCount": 24,
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0,
+            "finalRmseImprovesFurther": 18,
+            "finalMaxAbsImprovesFurther": 18,
+            "additionalFiltersUltimatelyDelivered": 0
+          }
+        },
+        "S4": {
+          "occurrenceCount": 24,
+          "trajectoriesWithOccurrence": 12,
+          "casesWithOccurrence": 3,
+          "repeatsWithOccurrence": 9,
+          "firstOccurrenceGeneration": {
+            "best": 2,
+            "median": 2.5,
+            "worst": 5,
+            "spread": 3
+          },
+          "firstOccurrenceElapsedMs": {
+            "best": 53.01488499995321,
+            "median": 142.32190350000747,
+            "worst": 623.6926530000055,
+            "spread": 570.6777680000523
+          },
+          "persistence": {
+            "occurrenceRunCount": 12,
+            "median": 2,
+            "max": 2
+          },
+          "numericImprovingOccurrences": 0,
+          "structuralNoveltyAfterOccurrence": {
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0
+          },
+          "subsequentBaselineQualityProgress": {
+            "finalRmseImprovesFurther": 18,
+            "finalMaxAbsImprovesFurther": 18,
+            "additionalFiltersUltimatelyDelivered": 0
+          },
+          "futureProgress": {
+            "occurrenceCount": 24,
+            "referenceSignatureLaterChanges": 0,
+            "survivingNovelStructuralSignatureLater": 0,
+            "finalRmseImprovesFurther": 18,
+            "finalMaxAbsImprovesFurther": 18,
+            "additionalFiltersUltimatelyDelivered": 0
+          }
+        }
+      }
+    },
+    "byCase": [
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "family": "real",
+        "structuralCeilings": [
+          43
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 2,
+            "trajectoriesWithOccurrence": 2,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 2,
+            "firstOccurrenceGeneration": {
+              "best": 30,
+              "median": 30.5,
+              "worst": 31,
+              "spread": 1
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30002.533708999996,
+              "median": 30002.868285999997,
+              "worst": 30003.202863,
+              "spread": 0.6691540000028908
+            },
+            "persistence": {
+              "occurrenceRunCount": 2,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 2,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S1": {
+            "occurrenceCount": 2,
+            "trajectoriesWithOccurrence": 2,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 2,
+            "firstOccurrenceGeneration": {
+              "best": 30,
+              "median": 30.5,
+              "worst": 31,
+              "spread": 1
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30002.533708999996,
+              "median": 30002.868285999997,
+              "worst": 30003.202863,
+              "spread": 0.6691540000028908
+            },
+            "persistence": {
+              "occurrenceRunCount": 2,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 2,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S2": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 30,
+              "median": 30,
+              "worst": 30,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30003.202863,
+              "median": 30003.202863,
+              "worst": 30003.202863,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 7,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 15,
+              "median": 15,
+              "worst": 15,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 8913.942031999999,
+              "median": 8978.667686,
+              "worst": 10853.400992,
+              "spread": 1939.4589600000018
+            },
+            "persistence": {
+              "occurrenceRunCount": 7,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 6,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 6,
+              "survivingNovelStructuralSignatureLater": 6
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 5
+            },
+            "futureProgress": {
+              "occurrenceCount": 7,
+              "referenceSignatureLaterChanges": 6,
+              "survivingNovelStructuralSignatureLater": 6,
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 5
+            }
+          },
+          "S4": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 30,
+              "median": 30,
+              "worst": 30,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30003.202863,
+              "median": 30003.202863,
+              "worst": 30003.202863,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "family": "real",
+        "structuralCeilings": [
+          43
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S1": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S2": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S4": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "caseLabel": "Titan → S12 Ultra",
+        "family": "real",
+        "structuralCeilings": [
+          43
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 22,
+              "median": 22,
+              "worst": 22,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30031.35467099998,
+              "median": 30031.35467099998,
+              "worst": 30031.35467099998,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S1": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 22,
+              "median": 22,
+              "worst": 22,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30031.35467099998,
+              "median": 30031.35467099998,
+              "worst": 30031.35467099998,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S2": {
+            "occurrenceCount": 3,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 22,
+              "median": 22,
+              "worst": 22,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30003.655709000013,
+              "median": 30031.35467099998,
+              "worst": 30346.026016999997,
+              "spread": 342.3703079999832
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 2,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 3,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 16,
+              "median": 16,
+              "worst": 16,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 14009.494028000016,
+              "median": 15130.950257999997,
+              "worst": 16513.90771899998,
+              "spread": 2504.413690999965
+            },
+            "persistence": {
+              "occurrenceRunCount": 6,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 5,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 3,
+              "survivingNovelStructuralSignatureLater": 3
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 3,
+              "additionalFiltersUltimatelyDelivered": 3
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 3,
+              "survivingNovelStructuralSignatureLater": 3,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 3,
+              "additionalFiltersUltimatelyDelivered": 3
+            }
+          },
+          "S4": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 22,
+              "median": 22,
+              "worst": 22,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30031.35467099998,
+              "median": 30031.35467099998,
+              "worst": 30031.35467099998,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "family": "real",
+        "structuralCeilings": [
+          43
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 3,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 32,
+              "median": 32,
+              "worst": 32,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30001.846632,
+              "median": 30002.79367100005,
+              "worst": 30045.695631999988,
+              "spread": 43.84899999998743
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 3,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S1": {
+            "occurrenceCount": 3,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 32,
+              "median": 32,
+              "worst": 32,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30001.846632,
+              "median": 30002.79367100005,
+              "worst": 30045.695631999988,
+              "spread": 43.84899999998743
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 3,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S2": {
+            "occurrenceCount": 3,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 32,
+              "median": 32,
+              "worst": 32,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30001.846632,
+              "median": 30002.79367100005,
+              "worst": 30045.695631999988,
+              "spread": 43.84899999998743
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 3,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 9,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 0,
+              "median": 0,
+              "worst": 0,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 8.178960999997798,
+              "median": 8.781500000040978,
+              "worst": 9.102077000017744,
+              "spread": 0.9231160000199452
+            },
+            "persistence": {
+              "occurrenceRunCount": 6,
+              "median": 1.5,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 6,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 6,
+              "survivingNovelStructuralSignatureLater": 6
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 6
+            },
+            "futureProgress": {
+              "occurrenceCount": 9,
+              "referenceSignatureLaterChanges": 6,
+              "survivingNovelStructuralSignatureLater": 6,
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 6
+            }
+          },
+          "S4": {
+            "occurrenceCount": 3,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 32,
+              "median": 32,
+              "worst": 32,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30001.846632,
+              "median": 30002.79367100005,
+              "worst": 30045.695631999988,
+              "spread": 43.84899999998743
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 3,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "family": "real",
+        "structuralCeilings": [
+          43
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 23,
+              "median": 23,
+              "worst": 23,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30002.601633000013,
+              "median": 30002.601633000013,
+              "worst": 30002.601633000013,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S1": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 23,
+              "median": 23,
+              "worst": 23,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30002.601633000013,
+              "median": 30002.601633000013,
+              "worst": 30002.601633000013,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S2": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 23,
+              "median": 23,
+              "worst": 23,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30002.601633000013,
+              "median": 30002.601633000013,
+              "worst": 30002.601633000013,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 23,
+              "median": 23,
+              "worst": 23,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30002.601633000013,
+              "median": 30002.601633000013,
+              "worst": 30002.601633000013,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S4": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 23,
+              "median": 23,
+              "worst": 23,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30002.601633000013,
+              "median": 30002.601633000013,
+              "worst": 30002.601633000013,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "family": "real",
+        "structuralCeilings": [
+          43
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 23,
+              "median": 23,
+              "worst": 23,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30006.142017000006,
+              "median": 30006.142017000006,
+              "worst": 30006.142017000006,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S1": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 23,
+              "median": 23,
+              "worst": 23,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30006.142017000006,
+              "median": 30006.142017000006,
+              "worst": 30006.142017000006,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S2": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 23,
+              "median": 23,
+              "worst": 23,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30006.142017000006,
+              "median": 30006.142017000006,
+              "worst": 30006.142017000006,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 16,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 8,
+              "median": 8,
+              "worst": 8,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 1284.0083829999785,
+              "median": 1379.9768829999957,
+              "worst": 1648.1102679999894,
+              "spread": 364.10188500001095
+            },
+            "persistence": {
+              "occurrenceRunCount": 10,
+              "median": 1,
+              "max": 3
+            },
+            "numericImprovingOccurrences": 15,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 15,
+              "survivingNovelStructuralSignatureLater": 15
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 7,
+              "finalMaxAbsImprovesFurther": 15,
+              "additionalFiltersUltimatelyDelivered": 15
+            },
+            "futureProgress": {
+              "occurrenceCount": 16,
+              "referenceSignatureLaterChanges": 15,
+              "survivingNovelStructuralSignatureLater": 15,
+              "finalRmseImprovesFurther": 7,
+              "finalMaxAbsImprovesFurther": 15,
+              "additionalFiltersUltimatelyDelivered": 15
+            }
+          },
+          "S4": {
+            "occurrenceCount": 1,
+            "trajectoriesWithOccurrence": 1,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 1,
+            "firstOccurrenceGeneration": {
+              "best": 23,
+              "median": 23,
+              "worst": 23,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 30006.142017000006,
+              "median": 30006.142017000006,
+              "worst": 30006.142017000006,
+              "spread": 0
+            },
+            "persistence": {
+              "occurrenceRunCount": 1,
+              "median": 1,
+              "max": 1
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 1,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      },
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "family": "synthetic",
+        "knownStructuralComplexity": 12,
+        "structuralCeilings": [
+          11,
+          12,
+          13
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S1": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S2": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S4": {
+            "occurrenceCount": 0,
+            "trajectoriesWithOccurrence": 0,
+            "casesWithOccurrence": 0,
+            "repeatsWithOccurrence": 0,
+            "firstOccurrenceGeneration": null,
+            "firstOccurrenceElapsedMs": null,
+            "persistence": {
+              "occurrenceRunCount": 0,
+              "median": null,
+              "max": 0
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 0,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      },
+      {
+        "caseId": "synthetic-e-high-q-valid",
+        "caseLabel": "Synthetic E",
+        "family": "synthetic",
+        "knownStructuralComplexity": 3,
+        "structuralCeilings": [
+          2,
+          3,
+          4
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 2,
+              "median": 2,
+              "worst": 2,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 95.81707699992694,
+              "median": 99.36699899996165,
+              "worst": 105.47553799999878,
+              "spread": 9.658461000071838
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S1": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 2,
+              "median": 2,
+              "worst": 2,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 95.81707699992694,
+              "median": 99.36699899996165,
+              "worst": 105.47553799999878,
+              "spread": 9.658461000071838
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S2": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 2,
+              "median": 2,
+              "worst": 2,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 95.81707699992694,
+              "median": 99.36699899996165,
+              "worst": 105.47553799999878,
+              "spread": 9.658461000071838
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 2,
+              "median": 2,
+              "worst": 2,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 95.81707699992694,
+              "median": 99.36699899996165,
+              "worst": 105.47553799999878,
+              "spread": 9.658461000071838
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S4": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 2,
+              "median": 2,
+              "worst": 2,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 95.81707699992694,
+              "median": 99.36699899996165,
+              "worst": 105.47553799999878,
+              "spread": 9.658461000071838
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 0,
+              "finalMaxAbsImprovesFurther": 0,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      },
+      {
+        "caseId": "synthetic-f-upper-frequency-structure",
+        "caseLabel": "Synthetic F",
+        "family": "synthetic",
+        "knownStructuralComplexity": 3,
+        "structuralCeilings": [
+          2,
+          3,
+          4
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 15,
+            "trajectoriesWithOccurrence": 9,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 1,
+              "median": 2,
+              "worst": 3,
+              "spread": 2
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 17.272730999975465,
+              "median": 54.01415399997495,
+              "worst": 183.82299999997485,
+              "spread": 166.5502689999994
+            },
+            "persistence": {
+              "occurrenceRunCount": 9,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 3,
+              "survivingNovelStructuralSignatureLater": 3
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 15,
+              "finalMaxAbsImprovesFurther": 15,
+              "additionalFiltersUltimatelyDelivered": 3
+            },
+            "futureProgress": {
+              "occurrenceCount": 15,
+              "referenceSignatureLaterChanges": 3,
+              "survivingNovelStructuralSignatureLater": 3,
+              "finalRmseImprovesFurther": 15,
+              "finalMaxAbsImprovesFurther": 15,
+              "additionalFiltersUltimatelyDelivered": 3
+            }
+          },
+          "S1": {
+            "occurrenceCount": 15,
+            "trajectoriesWithOccurrence": 9,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 1,
+              "median": 2,
+              "worst": 3,
+              "spread": 2
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 17.272730999975465,
+              "median": 54.01415399997495,
+              "worst": 183.82299999997485,
+              "spread": 166.5502689999994
+            },
+            "persistence": {
+              "occurrenceRunCount": 9,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 3,
+              "survivingNovelStructuralSignatureLater": 3
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 15,
+              "finalMaxAbsImprovesFurther": 15,
+              "additionalFiltersUltimatelyDelivered": 3
+            },
+            "futureProgress": {
+              "occurrenceCount": 15,
+              "referenceSignatureLaterChanges": 3,
+              "survivingNovelStructuralSignatureLater": 3,
+              "finalRmseImprovesFurther": 15,
+              "finalMaxAbsImprovesFurther": 15,
+              "additionalFiltersUltimatelyDelivered": 3
+            }
+          },
+          "S2": {
+            "occurrenceCount": 12,
+            "trajectoriesWithOccurrence": 6,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 2,
+              "median": 2.5,
+              "worst": 3,
+              "spread": 1
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 53.01488499995321,
+              "median": 122.03715400001965,
+              "worst": 183.82299999997485,
+              "spread": 130.80811500002164
+            },
+            "persistence": {
+              "occurrenceRunCount": 6,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 12,
+              "finalMaxAbsImprovesFurther": 12,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 12,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 12,
+              "finalMaxAbsImprovesFurther": 12,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 12,
+            "trajectoriesWithOccurrence": 6,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 2,
+              "median": 2.5,
+              "worst": 3,
+              "spread": 1
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 53.01488499995321,
+              "median": 122.03715400001965,
+              "worst": 183.82299999997485,
+              "spread": 130.80811500002164
+            },
+            "persistence": {
+              "occurrenceRunCount": 6,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 12,
+              "finalMaxAbsImprovesFurther": 12,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 12,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 12,
+              "finalMaxAbsImprovesFurther": 12,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S4": {
+            "occurrenceCount": 12,
+            "trajectoriesWithOccurrence": 6,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 2,
+              "median": 2.5,
+              "worst": 3,
+              "spread": 1
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 53.01488499995321,
+              "median": 122.03715400001965,
+              "worst": 183.82299999997485,
+              "spread": 130.80811500002164
+            },
+            "persistence": {
+              "occurrenceRunCount": 6,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 12,
+              "finalMaxAbsImprovesFurther": 12,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 12,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 12,
+              "finalMaxAbsImprovesFurther": 12,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "family": "synthetic",
+        "knownStructuralComplexity": 6,
+        "structuralCeilings": [
+          5,
+          6,
+          7
+        ],
+        "signals": {
+          "S0": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 5,
+              "median": 5,
+              "worst": 5,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 600.8845379999839,
+              "median": 606.1599230000284,
+              "worst": 623.6926530000055,
+              "spread": 22.808115000021644
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S1": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 5,
+              "median": 5,
+              "worst": 5,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 600.8845379999839,
+              "median": 606.1599230000284,
+              "worst": 623.6926530000055,
+              "spread": 22.808115000021644
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S2": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 5,
+              "median": 5,
+              "worst": 5,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 600.8845379999839,
+              "median": 606.1599230000284,
+              "worst": 623.6926530000055,
+              "spread": 22.808115000021644
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S3": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 5,
+              "median": 5,
+              "worst": 5,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 600.8845379999839,
+              "median": 606.1599230000284,
+              "worst": 623.6926530000055,
+              "spread": 22.808115000021644
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          },
+          "S4": {
+            "occurrenceCount": 6,
+            "trajectoriesWithOccurrence": 3,
+            "casesWithOccurrence": 1,
+            "repeatsWithOccurrence": 3,
+            "firstOccurrenceGeneration": {
+              "best": 5,
+              "median": 5,
+              "worst": 5,
+              "spread": 0
+            },
+            "firstOccurrenceElapsedMs": {
+              "best": 600.8845379999839,
+              "median": 606.1599230000284,
+              "worst": 623.6926530000055,
+              "spread": 22.808115000021644
+            },
+            "persistence": {
+              "occurrenceRunCount": 3,
+              "median": 2,
+              "max": 2
+            },
+            "numericImprovingOccurrences": 0,
+            "structuralNoveltyAfterOccurrence": {
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0
+            },
+            "subsequentBaselineQualityProgress": {
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            },
+            "futureProgress": {
+              "occurrenceCount": 6,
+              "referenceSignatureLaterChanges": 0,
+              "survivingNovelStructuralSignatureLater": 0,
+              "finalRmseImprovesFurther": 6,
+              "finalMaxAbsImprovesFurther": 6,
+              "additionalFiltersUltimatelyDelivered": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  "decisionBoundary": {
+    "conclusion": "INCONCLUSIVE",
+    "rule": "mixed-real-coverage",
+    "structuralSignals": [
+      "S1",
+      "S2",
+      "S3",
+      "S4"
+    ],
+    "recommendedFutureSignal": null,
+    "missingInformation": [
+      "Structural signals did not occur in all 6 real cases; broader or repeated real trajectories are needed before selecting an intervention."
+    ]
+  },
+  "conclusion": "INCONCLUSIVE",
+  "evidenceSha256": "9927d848d72069de1255a40a12c672079d43741c1568193c97a342233d4fe703"
+}
