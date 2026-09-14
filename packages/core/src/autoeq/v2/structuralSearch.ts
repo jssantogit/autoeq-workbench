@@ -112,6 +112,12 @@ export interface StructuralCandidatePoolEntry {
   signature: string
 }
 
+interface M2StructuralChallenger {
+  proposal: StructuralProposal
+  source: 'residual-extremum' | 'shelf-evidence'
+  residualRegion: number
+}
+
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value))
 }
@@ -736,7 +742,7 @@ function compareKeys(left: readonly (number | string)[], right: readonly (number
   return 0
 }
 
-export type StructuralImprovementPhase = 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement'
+export type StructuralImprovementPhase = 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement' | 'm2-challenger'
 
 export interface StructuralIncumbentProvenance {
   state: SearchState
@@ -1000,7 +1006,7 @@ export function addFrontierUtilizationDelta(left: FrontierUtilizationDelta, righ
 
 export interface StructuralSearchTraceEvent {
   type: 'start' | 'beam-generation' | 'beam-stop' | 'phase' | 'end'
-  phase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement'
+  phase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement' | 'm2-challenger'
   status?: 'start' | 'end'
   generation?: number
   reason?: 'deadline' | 'no-next-states' | 'completed'
@@ -1029,6 +1035,23 @@ export interface StructuralSearchTraceEvent {
   acceptedSteps?: number
   /** Number of candidate polish calls attempted by a phase. */
   attempts?: number
+  /** M2-only split accounting: ordinary work is never folded into challenger work. */
+  ordinaryBeamGenerations?: number
+  ordinaryProposalsGenerated?: number
+  ordinaryProposalsAdmitted?: number
+  ordinaryProposalsPolished?: number
+  stallEvents?: number
+  challengerCandidatesConstructed?: number
+  challengerPolishAttempts?: number
+  challengerAcceptedIntoBeam?: number
+  challengerIncumbentImprovements?: number
+  challengerSource?: 'residual-extremum' | 'shelf-evidence'
+  challengerResidualRegion?: number
+  finalIncumbentPhase?: StructuralImprovementPhase
+  /** Largest retained beam observed by the M2 trace. */
+  frontierMax?: number
+  /** Alias for the delivered state filter count used by M2 reports. */
+  deliveredFilterCount?: number
   filterCount: number
   rmseDb: number
   maxAbsDb: number
@@ -1297,6 +1320,75 @@ export function pruneMarginalFilter(
   )
 }
 
+/**
+ * Select the single bounded M2 challenger after a natural ordinary-search
+ * stall.  Unlike M1, this helper is called for one reference parent only and
+ * never constructs a standing mutation pool or reserves beam capacity.
+ */
+function constructM2StructuralChallenger(
+  filters: readonly Filter[],
+  residualDb: readonly number[],
+  frequenciesHz: readonly number[],
+  bounds: StandardAutoEqV2Config,
+  featureRegionCount: number,
+  minFeatureSeparationOctaves: number,
+  visited: ReadonlySet<string>,
+): M2StructuralChallenger | undefined {
+  if (filters.length >= bounds.maxFilters) return undefined
+
+  const regions = Math.max(1, featureRegionCount)
+  const minLog = Math.log2(bounds.minFrequencyHz)
+  const span = Math.max(Number.EPSILON, Math.log2(bounds.maxFrequencyHz) - minLog)
+  const residualRegion = (frequencyHz: number): number => Math.min(
+    regions - 1,
+    Math.max(0, Math.floor(((Math.log2(frequencyHz) - minLog) / span) * regions)),
+  )
+
+  // Interior extrema are preferred so an isolated edge spike cannot turn
+  // into a shelf merely because a generation stalled.
+  const features = selectResidualFeatures(
+    frequenciesHz,
+    residualDb,
+    bounds,
+    regions,
+    Math.max(0, minFeatureSeparationOctaves),
+    false,
+  )
+  for (const feature of features) {
+    const proposal = addProposal(filters, 'add-pk', 'PK', feature.frequencyHz, feature.residual, bounds)
+    if (structuralFilterDifference(filters, proposal.filters).added.length === 0) continue
+    if (visited.has(semanticFilterKey(proposal.filters))) continue
+    return {
+      proposal,
+      source: 'residual-extremum',
+      residualRegion: residualRegion(feature.frequencyHz),
+    }
+  }
+
+  // A sustained edge residual is the only fallback to a shelf.  This keeps
+  // the challenger tied to existing evidence while retaining one-candidate
+  // boundedness.
+  for (const shelf of selectShelfEvidence(frequenciesHz, residualDb, bounds)) {
+    const proposal = addProposal(
+      filters,
+      shelf.type === 'LS' ? 'add-ls' : 'add-hs',
+      shelf.type,
+      shelf.frequencyHz,
+      shelf.residual,
+      bounds,
+    )
+    if (structuralFilterDifference(filters, proposal.filters).added.length === 0) continue
+    if (visited.has(semanticFilterKey(proposal.filters))) continue
+    return {
+      proposal,
+      source: 'shelf-evidence',
+      residualRegion: residualRegion(shelf.frequencyHz),
+    }
+  }
+
+  return undefined
+}
+
 export function runStructuralSearch(input: StructuralSearchInput): StructuralSearchResult {
   return runStructuralSearchInternal(input, 'baseline')
 }
@@ -1305,7 +1397,17 @@ export function runStructuralSearchVNext(input: StructuralSearchInput): Structur
   return runStructuralSearchInternal(input, 'vnext')
 }
 
-function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'baseline' | 'vnext'): StructuralSearchResult {
+/** Explicit research-only M2 selector; baseline and M1 selectors are controls. */
+export function runStructuralSearchVNextM2(input: StructuralSearchInput): StructuralSearchResult {
+  return runStructuralSearchInternal(input, 'm2')
+}
+
+/** Short alias for callers that identify the experiment by milestone. */
+export function runStructuralSearchM2(input: StructuralSearchInput): StructuralSearchResult {
+  return runStructuralSearchVNextM2(input)
+}
+
+function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'baseline' | 'vnext' | 'm2'): StructuralSearchResult {
   const { desiredDb, frequencies, sampleRateHz, config, deadline } = input
   const trace = (event: StructuralSearchTraceEvent): void => input.onTrace?.(event)
   const stateTrace = (
@@ -1350,9 +1452,12 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
   const stateProvenance = new Map<string, StructuralImprovementPhase>([[initialPolished.candidateId, 'beam']])
   let beamGeneration = 0
   let incumbentProvenance: StructuralIncumbentProvenance = { state: initialPolished, phase: 'beam' }
+  let m2StallEpisodeActive = false
+  let m2FrontierMax = beam.length
   stateTrace('start', initialPolished, { phase: 'beam', status: 'start' })
 
   while (beam.length > 0 && !deadline.isExpired()) {
+    const ordinaryReferenceBefore = policy === 'm2' ? selectReferencePoint(beam) : undefined
     const nextStates: SearchState[] = []
     let generatedProposals = 0
     let admittedProposals = 0
@@ -1435,7 +1540,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         // The frozen baseline scored its complete ordered proposal set without
         // cooperative checks at this boundary.  Keep that path byte-for-byte in
         // behavior; only VNext may stop its additional admission work early.
-        const prePolishScored: PrePolishScore[] = policy === 'baseline'
+        const prePolishScored: PrePolishScore[] = policy !== 'vnext'
           ? ordered.map(scoreProposal)
           : []
         if (policy === 'vnext') for (const [lexicalRank, proposal] of ordered.entries()) {
@@ -1517,6 +1622,28 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       }
     }
 
+    const ordinaryReferenceAfter = nextStates.length > 0
+      ? selectReferencePoint([...beam, ...nextStates])
+      : selectReferencePoint(beam)
+    const ordinaryImproved = ordinaryReferenceBefore !== undefined &&
+      compareKeys(referenceSelectorKey(ordinaryReferenceAfter), referenceSelectorKey(ordinaryReferenceBefore)) < 0
+    const m2Stall = policy === 'm2' &&
+      !deadline.isExpired() &&
+      (nextStates.length === 0 || !ordinaryImproved)
+    const m2Intervention = m2Stall && !m2StallEpisodeActive
+    if (policy === 'm2') {
+      if (!m2Stall) m2StallEpisodeActive = false
+      else if (m2Intervention) m2StallEpisodeActive = true
+    }
+
+    let m2ChallengerCandidateId: string | undefined
+    let m2ChallengerSource: M2StructuralChallenger['source'] | undefined
+    let m2ChallengerResidualRegion: number | undefined
+    let m2ChallengerCandidatesConstructed = 0
+    let m2ChallengerPolishAttempts = 0
+    let m2ChallengerAcceptedIntoBeam = 0
+    let m2ChallengerIncumbentImprovements = 0
+
     const traceState = nextStates.length > 0
       ? selectReferencePoint([...beam, ...nextStates])
       : selectReferencePoint(beam)
@@ -1530,10 +1657,65 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       duplicateStates,
       ...(policy === 'vnext' ? { residualRegionsGenerated: vnextRegions.size, structuralSignaturesGenerated: vnextGeneratedSignatures.size, structuralSignaturesAdmitted: vnextAdmittedSignatures.size, structuralSignaturesRetained: new Set(beam.map(state => structuralSignature(state.filters, bounds, config.featureRegionCount ?? 1))).size } : {}),
       ...(policy === 'vnext' ? { candidateSourceCounts, residualRegionsAdmitted: vnextAdmittedRegions.size, bestImprovementPhase: incumbentProvenance.phase, finalImprovementPhase: incumbentProvenance.phase } : {}),
+      ...(policy === 'm2' ? {
+        ordinaryBeamGenerations: 1,
+        ordinaryProposalsGenerated: generatedProposals,
+        ordinaryProposalsAdmitted: admittedProposals,
+        ordinaryProposalsPolished: polishedProposals,
+        stallEvents: m2Intervention ? 1 : 0,
+        frontierMax: beam.length,
+        finalIncumbentPhase: incumbentProvenance.phase,
+      } : {}),
       nextStates: nextStates.length,
       capacityPressure,
       frontierUtilization,
     })
+
+    // M2 gets at most one challenger after a completed natural stall.  It is
+    // deliberately not a replacement and never changes normal admission or
+    // the fixed Pareto beam width.
+    if (m2Intervention && !deadline.isExpired()) {
+      const parent = selectReferencePoint(beam)
+      const solution = evaluateV2Solution(parent.filters, desiredDb, frequencies, sampleRateHz)
+      const challenger = constructM2StructuralChallenger(
+        parent.filters,
+        solution.residualDb,
+        frequencies,
+        bounds,
+        config.featureRegionCount ?? 1,
+        config.minFeatureSeparationOctaves ?? 0,
+        visited,
+      )
+      if (challenger !== undefined) {
+        m2ChallengerCandidatesConstructed = 1
+        m2ChallengerSource = challenger.source
+        m2ChallengerResidualRegion = challenger.residualRegion
+        if (!deadline.isExpired()) {
+          m2ChallengerPolishAttempts = 1
+          const polished = polishFilters(
+            challenger.proposal.filters,
+            localPolishEvaluationBudget(config.localPolishEvaluations, challenger.proposal.filters.length),
+            bounds,
+            desiredDb,
+            frequencies,
+            deadline,
+            sampleRateHz,
+          )
+          // A challenger whose polish crossed the external deadline is not
+          // admitted; no work may be credited after deadline expiry.
+          if (!deadline.isExpired()) {
+            const key = semanticFilterKey(polished.filters)
+            if (!visited.has(key)) {
+              visited.add(key)
+              polished.candidateId = String(candidateCounter++).padStart(4, '0')
+              stateProvenance.set(polished.candidateId, 'm2-challenger')
+              nextStates.push(polished)
+              m2ChallengerCandidateId = polished.candidateId
+            }
+          }
+        }
+      }
+    }
 
     // A stalled VNext generation spends ordinary proposal budget on a bounded
     // one-for-one basin escape before the unchanged late rescue phases.
@@ -1591,6 +1773,22 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       }
     }
     if (nextStates.length === 0) {
+      if (policy === 'm2' && m2Intervention) {
+        stateTrace('phase', traceState, {
+          phase: 'm2-challenger', status: 'end',
+          stallEvents: 1,
+          challengerCandidatesConstructed: m2ChallengerCandidatesConstructed,
+          challengerPolishAttempts: m2ChallengerPolishAttempts,
+          challengerAcceptedIntoBeam: 0,
+          challengerIncumbentImprovements: 0,
+          ...(m2ChallengerSource === undefined ? {} : {
+            challengerSource: m2ChallengerSource,
+            challengerResidualRegion: m2ChallengerResidualRegion,
+          }),
+          frontierMax: beam.length,
+          finalIncumbentPhase: incumbentProvenance.phase,
+        })
+      }
       stateTrace('beam-stop', traceState, {
         phase: 'beam',
         generation: beamGeneration,
@@ -1602,10 +1800,49 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     beam = policy === 'vnext'
       ? retainDiverseStructuralBeam(combined, config.beamWidth, bounds, config.featureRegionCount ?? 1)
       : retainParetoBeam(combined, config.beamWidth)
+    if (policy === 'm2') m2FrontierMax = Math.max(m2FrontierMax, beam.length)
     if (policy === 'vnext') {
       for (const state of beam) {
         const phase = stateProvenance.get(state.candidateId) ?? 'beam'
         incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, state, phase)
+      }
+    }
+    if (policy === 'm2') {
+      if (m2ChallengerCandidateId !== undefined && beam.some((state) => state.candidateId === m2ChallengerCandidateId)) {
+        m2ChallengerAcceptedIntoBeam = 1
+        const challengerState = beam.find((state) => state.candidateId === m2ChallengerCandidateId)!
+        if (ordinaryReferenceBefore !== undefined &&
+          compareKeys(referenceSelectorKey(challengerState), referenceSelectorKey(ordinaryReferenceBefore)) < 0) {
+          m2ChallengerIncumbentImprovements = 1
+          incumbentProvenance = updateStructuralIncumbentProvenance(
+            incumbentProvenance,
+            challengerState,
+            'm2-challenger',
+          )
+        }
+      }
+      for (const state of beam) {
+        const phase = stateProvenance.get(state.candidateId) ?? 'beam'
+        incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, state, phase)
+      }
+      if (m2Intervention) {
+        const interventionState = m2ChallengerCandidateId === undefined
+          ? traceState
+          : (beam.find((state) => state.candidateId === m2ChallengerCandidateId) ?? traceState)
+        stateTrace('phase', interventionState, {
+          phase: 'm2-challenger', status: 'end',
+          stallEvents: 1,
+          challengerCandidatesConstructed: m2ChallengerCandidatesConstructed,
+          challengerPolishAttempts: m2ChallengerPolishAttempts,
+          challengerAcceptedIntoBeam: m2ChallengerAcceptedIntoBeam,
+          challengerIncumbentImprovements: m2ChallengerIncumbentImprovements,
+          ...(m2ChallengerSource === undefined ? {} : {
+            challengerSource: m2ChallengerSource,
+            challengerResidualRegion: m2ChallengerResidualRegion,
+          }),
+          frontierMax: beam.length,
+          finalIncumbentPhase: incumbentProvenance.phase,
+        })
       }
     }
     beamGeneration += 1
@@ -1696,7 +1933,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         left.rank - right.rank
     })
     rescued = improving[0]!.state
-    if (policy === 'vnext') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'rescue')
+    if (policy === 'vnext' || policy === 'm2') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'rescue')
     rescueSteps += 1
   }
 
@@ -1819,7 +2056,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         left.seedOrder - right.seedOrder
     })
     rescued = improving[0]!.state
-    if (policy === 'vnext') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'pair-add')
+    if (policy === 'vnext' || policy === 'm2') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'pair-add')
     pairAddSteps += 1
   }
   stateTrace('phase', rescued, {
@@ -1908,7 +2145,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         left.replacementIndex - right.replacementIndex
     })
     rescued = improving[0]!.state
-    if (policy === 'vnext') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'cap-swap')
+    if (policy === 'vnext' || policy === 'm2') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'cap-swap')
     capSwapSteps += 1
   }
 
@@ -1925,10 +2162,16 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     rescued.maxAbsDb / 0.75,
   )
   if (config.workProfile === 'short-5s' && postSwapViolation > 1.6) {
-    if (policy === 'vnext') stateTrace('end', rescued, {
+    if (policy === 'vnext' || policy === 'm2') stateTrace('end', rescued, {
       reason: deadline.isExpired() ? 'deadline' : 'completed',
-      bestImprovementPhase: incumbentProvenance.phase,
-      finalImprovementPhase: incumbentProvenance.phase,
+      ...(policy === 'vnext' ? {
+        bestImprovementPhase: incumbentProvenance.phase,
+        finalImprovementPhase: incumbentProvenance.phase,
+      } : {
+        finalIncumbentPhase: incumbentProvenance.phase,
+        frontierMax: m2FrontierMax,
+        deliveredFilterCount: rescued.filters.length,
+      }),
     })
     return {
       filters: rescued.filters,
@@ -2050,10 +2293,16 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
   }
 
   if (config.workProfile === 'short-5s' && postSwapViolation > 1) {
-    if (policy === 'vnext') stateTrace('end', rescued, {
+    if (policy === 'vnext' || policy === 'm2') stateTrace('end', rescued, {
       reason: deadline.isExpired() ? 'deadline' : 'completed',
-      bestImprovementPhase: incumbentProvenance.phase,
-      finalImprovementPhase: incumbentProvenance.phase,
+      ...(policy === 'vnext' ? {
+        bestImprovementPhase: incumbentProvenance.phase,
+        finalImprovementPhase: incumbentProvenance.phase,
+      } : {
+        finalIncumbentPhase: incumbentProvenance.phase,
+        frontierMax: m2FrontierMax,
+        deliveredFilterCount: rescued.filters.length,
+      }),
     })
     return {
       filters: rescued.filters,
@@ -2455,6 +2704,10 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     ...(policy === 'vnext' ? {
       bestImprovementPhase: incumbentProvenance.phase,
       finalImprovementPhase: incumbentProvenance.phase,
+    } : policy === 'm2' ? {
+      finalIncumbentPhase: incumbentProvenance.phase,
+      frontierMax: m2FrontierMax,
+      deliveredFilterCount: rescued.filters.length,
     } : {}),
   })
   return {

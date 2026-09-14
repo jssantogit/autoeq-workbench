@@ -566,6 +566,11 @@ it('exposes the VNext runner as an explicit core research selector', async () =>
   expect(typeof core.runStructuralSearchVNext).toBe('function')
 })
 
+it('exposes the protected-progress M2 runner as an explicit core research selector', async () => {
+  const core = await import('../../../src/index.js')
+  expect(typeof core.runStructuralSearchVNextM2).toBe('function')
+})
+
 describe('VNext identity hardening', () => {
   it('uses multiset structural difference independently of canonical order and IDs', async () => {
     const { structuralFilterDifference } = await import('../../../src/autoeq/v2/structuralSearch.js')
@@ -682,5 +687,119 @@ describe('VNext pre-benchmark correctness mechanisms', () => {
     expect(typeof generation.residualRegionsAdmitted).toBe('number')
     expect(typeof generation.structuralSignaturesRetained).toBe('number')
     expect(typeof generation.bestImprovementPhase).toBe('string')
+  })
+})
+
+describe('M2 protected-progress mechanism gate', () => {
+  const runWithCheckpointDeadline = (
+    runner: (input: Parameters<typeof runStructuralSearch>[0]) => ReturnType<typeof runStructuralSearch>,
+    config: ReturnType<typeof resolveStructuralSearchConfig>,
+  ) => {
+    let expired = false
+    const events: Array<Record<string, unknown>> = []
+    const result = runner({
+      desiredDb: [...localizedResidual],
+      frequencies: [...frequencies],
+      sampleRateHz: 48_000,
+      config: { ...config, maxFilters: 3, proposalsPerParent: 1 },
+      deadline: { isExpired: () => expired },
+      onTrace: (event) => {
+        events.push(event as unknown as Record<string, unknown>)
+        if (event.type === 'beam-generation' && event.generation === 1) expired = true
+      },
+    })
+    return { result, events }
+  }
+
+  it('matches baseline ordinary output and emits zero experimental work when no stall intervention is reached', async () => {
+    const { runStructuralSearchVNextM2 } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const config = resolveStructuralSearchConfig({ preset: MAX10_BASELINE_PRESET })
+    const baseline = runWithCheckpointDeadline(runStructuralSearch, config)
+    const m2 = runWithCheckpointDeadline(runStructuralSearchVNextM2, config)
+
+    expect(m2.result).toEqual(baseline.result)
+    expect(m2.events.some((event) => event.phase === 'm2-challenger')).toBe(false)
+    const start = m2.events.find((event) => event.type === 'start')!
+    const generation = m2.events.find((event) => event.type === 'beam-generation' && event.generation === 0)!
+    expect(generation.nextStates).toBeGreaterThan(0)
+    expect(generation.violation).toBeLessThan(start.violation)
+    expect(generation.stallEvents).toBe(0)
+    expect(generation.ordinaryProposalsGenerated).toBe(generation.generatedProposals)
+    expect(generation.ordinaryProposalsAdmitted).toBe(generation.admittedProposals)
+    expect(generation.ordinaryProposalsPolished).toBe(generation.polishedProposals)
+  })
+
+  it('constructs at most one residual challenger only after a completed ordinary stall and resumes ordinary progression', async () => {
+    const { runStructuralSearchVNextM2 } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const config = {
+      ...resolveStructuralSearchConfig({ preset: MAX10_BASELINE_PRESET }),
+      maxFilters: 3,
+      proposalsPerParent: 0,
+    }
+    let stopAfterResume = false
+    const events: Array<Record<string, unknown>> = []
+    runStructuralSearchVNextM2({
+      desiredDb: [...localizedResidual],
+      frequencies: [...frequencies],
+      sampleRateHz: 48_000,
+      config,
+      seedFilters: [{ id: 'seed', enabled: true, type: 'PK', frequencyHz: 200, gainDb: 0, q: 1 }],
+      deadline: { isExpired: () => stopAfterResume },
+      onTrace: (event) => {
+        events.push(event as unknown as Record<string, unknown>)
+        if (event.type === 'beam-generation' && event.generation === 1) stopAfterResume = true
+      },
+    })
+
+    const stall = events.find((event) => event.type === 'beam-generation' && event.stallEvents === 1)!
+    const interventionIndex = events.findIndex((event) => event.phase === 'm2-challenger')
+    const stallIndex = events.indexOf(stall)
+    expect(interventionIndex).toBeGreaterThan(stallIndex)
+    const intervention = events[interventionIndex]!
+    expect(intervention.challengerCandidatesConstructed).toBeLessThanOrEqual(1)
+    expect(intervention.challengerPolishAttempts).toBeLessThanOrEqual(1)
+    expect(intervention.challengerAcceptedIntoBeam).toBeLessThanOrEqual(1)
+    expect(intervention.challengerCandidatesConstructed).toBe(1)
+    expect(intervention.challengerAcceptedIntoBeam).toBe(1)
+    expect(intervention.challengerIncumbentImprovements).toBe(1)
+    expect((intervention.frontierMax as number)).toBeLessThanOrEqual(config.beamWidth)
+
+    const resumed = events.find((event) => event.type === 'beam-generation' && event.generation === 1)!
+    expect(resumed.ordinaryBeamGenerations).toBe(1)
+    expect(resumed.challengerCandidatesConstructed).toBeUndefined()
+    expect(events.filter((event) => event.phase === 'm2-challenger')).toHaveLength(1)
+  })
+
+  it('uses no extra beam capacity and performs no challenger work after deadline expiry', async () => {
+    const { runStructuralSearchVNextM2 } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const config = {
+      ...resolveStructuralSearchConfig({ preset: MAX10_BASELINE_PRESET }),
+      maxFilters: 3,
+      proposalsPerParent: 0,
+    }
+    let expired = false
+    const events: Array<Record<string, unknown>> = []
+    runStructuralSearchVNextM2({
+      desiredDb: [...localizedResidual],
+      frequencies: [...frequencies],
+      sampleRateHz: 48_000,
+      config,
+      seedFilters: [{ id: 'seed', enabled: true, type: 'PK', frequencyHz: 200, gainDb: 0, q: 1 }],
+      deadline: { isExpired: () => expired },
+      onTrace: (event) => {
+        events.push(event as unknown as Record<string, unknown>)
+        if (event.phase === 'm2-challenger') expired = true
+      },
+    })
+
+    for (const event of events.filter((candidate) => candidate.type === 'beam-generation')) {
+      expect(event.beamSize).toBeLessThanOrEqual(config.beamWidth)
+      expect(event.frontierMax).toBeLessThanOrEqual(config.beamWidth)
+    }
+    const interventionIndex = events.findIndex((event) => event.phase === 'm2-challenger')
+    expect(interventionIndex).toBeGreaterThanOrEqual(0)
+    expect(events.slice(interventionIndex + 1).some((event) => event.type === 'beam-generation')).toBe(false)
+    expect(events.slice(interventionIndex + 1).filter((event) => event.phase === 'rescue' || event.phase === 'pair-add' || event.phase === 'cap-swap')
+      .every((event) => (event.attempts ?? 0) === 0 && (event.acceptedSteps ?? 0) === 0)).toBe(true)
   })
 })
