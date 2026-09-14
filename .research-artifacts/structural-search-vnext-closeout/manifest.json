@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "artifact": "structural-search-vnext-closeout",
+  "status": "CLOSED",
+  "purpose": "Documentation and evidence consolidation for the frozen M1-M4 structural-search VNext program.",
+  "selectedAlgorithm": "FROZEN_BASELINE",
+  "finalCausalEvidence": {
+    "commit": "51bce1042fb7d5a3d75810a984ffe748e15e7e68",
+    "evidenceSha256": "3e1dbd7ae3b13adc913b8e2c173fd59fc039fde4cce262c70ff0121d1fa73185",
+    "sourceArtifact": ".research-artifacts/structural-search-m4-candidate-oracle-causal-closeout/"
+  },
+  "actions": {
+    "m5Started": false,
+    "newStructuralSearchCampaignStarted": false,
+    "frozenEvidenceModified": false,
+    "gatesRecalculated": false,
+    "benchmarkGoldensModified": false,
+    "standardV1Modified": false,
+    "productionChangeAuthorized": false
+  },
+  "resourceBoundary": {
+    "schedulerResearch": "CLOSED",
+    "resourceAllocationResearch": "CLOSED",
+    "supportedFilterCeiling": 64,
+    "ceilingIsOptimizationTarget": false,
+    "ceilingIsNamedMode": false
+  },
+  "files": [
+    "final-report.md",
+    "manifest.json",
+    "evidence-index.json"
+  ],
+  "evidenceIndex": "evidence-index.json"
+}
