@@ -1200,6 +1200,8 @@ export interface StructuralSearchCandidateSnapshot {
   postPolish: StructuralSearchStateSnapshot | null
   coordinateTrials: number
   polishEvaluationBudget: number
+  /** True only when ordinary visited/dedup admitted this polished state. */
+  acceptedNextState: boolean
 }
 
 export interface StructuralSearchParentSnapshot {
@@ -1220,6 +1222,10 @@ export interface StructuralSearchGenerationSnapshot {
   referenceBefore: StructuralSearchStateSnapshot
   referenceAfter: StructuralSearchStateSnapshot
   beamBefore: StructuralSearchStateSnapshot[]
+  /** Semantic states present before ordinary work for this generation. */
+  visitedSemanticKeysBefore: string[]
+  /** Exact ordinary states accepted after polish and visited/dedup. */
+  nextStates: StructuralSearchStateSnapshot[]
   retainedBeam: StructuralSearchStateSnapshot[]
   parents: StructuralSearchParentSnapshot[]
 }
@@ -1243,6 +1249,7 @@ interface StructuralSearchCandidateCapture {
   postPolish: SearchState | null
   coordinateTrials: number
   polishEvaluationBudget: number
+  acceptedNextState: boolean
 }
 
 interface StructuralSearchParentCapture {
@@ -1319,6 +1326,7 @@ function snapshotCandidateCapture(
       : snapshotSearchState(capture.postPolish, bounds, regionCount),
     coordinateTrials: capture.coordinateTrials,
     polishEvaluationBudget: capture.polishEvaluationBudget,
+    acceptedNextState: capture.acceptedNextState,
   }
 }
 
@@ -1328,6 +1336,8 @@ function snapshotBaselineGeneration(
   desiredDb: readonly number[],
   sampleRateHz: number,
   beamBefore: readonly SearchState[],
+  visitedSemanticKeysBefore: readonly string[],
+  nextStates: readonly SearchState[],
   retainedBeam: readonly SearchState[],
   parents: readonly StructuralSearchParentCapture[],
   bounds: StandardAutoEqV2Config,
@@ -1344,6 +1354,8 @@ function snapshotBaselineGeneration(
     referenceBefore: snapshotSearchState(referenceBefore, bounds, regionCount),
     referenceAfter: snapshotSearchState(referenceAfter, bounds, regionCount),
     beamBefore: beamBefore.map((state) => snapshotSearchState(state, bounds, regionCount)),
+    visitedSemanticKeysBefore: [...visitedSemanticKeysBefore],
+    nextStates: nextStates.map((state) => snapshotSearchState(state, bounds, regionCount)),
     retainedBeam: retainedBeam.map((state) => snapshotSearchState(state, bounds, regionCount)),
     parents: parents.map((capture) => ({
       parent: snapshotSearchState(capture.parent, bounds, regionCount),
@@ -1357,6 +1369,7 @@ function snapshotBaselineGeneration(
         postPolish: null,
         coordinateTrials: 0,
         polishEvaluationBudget: 0,
+        acceptedNextState: false,
       }, bounds, regionCount)),
       polishedCandidates: capture.polishedCandidates.map((candidate) =>
         snapshotCandidateCapture(candidate, bounds, regionCount)),
@@ -1816,6 +1829,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     // only when the end-of-generation sampler selects this generation.
     const baselineParentCaptures: StructuralSearchParentCapture[] = []
     const baselineBeamBefore = beam
+    const baselineVisitedSemanticKeysBefore = onBaselineSnapshot === undefined ? [] : [...visited]
     let capacityPressure = createCapacityPressureDelta()
     let frontierUtilization = createFrontierUtilizationDelta()
 
@@ -1985,8 +1999,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           sampleRateHz,
         )
         polishedProposals += 1
-        if (baselineParentCapture !== undefined) {
-          baselineParentCapture.polishedCandidates.push({
+        const polishedCapture = baselineParentCapture === undefined ? undefined : {
             proposal,
             semanticKey: semanticFilterKey(polished.filters),
             prePolish: baselineParentCapture.prePolishScores.find((score) =>
@@ -1995,8 +2008,9 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
             postPolish: polished,
             coordinateTrials: polished.coordinateTrials ?? 0,
             polishEvaluationBudget,
-          })
-        }
+            acceptedNextState: false,
+          }
+        if (polishedCapture !== undefined && baselineParentCapture !== undefined) baselineParentCapture.polishedCandidates.push(polishedCapture)
         frontierUtilization.polishedCandidateFilterCountMax = Math.max(frontierUtilization.polishedCandidateFilterCountMax, polished.filters.length)
         if (polished.filters.length === config.maxFilters) frontierUtilization.polishedCandidatesAtCapacity += 1
         const key = semanticFilterKey(polished.filters)
@@ -2007,6 +2021,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         visited.add(key)
 
         polished.candidateId = String(candidateCounter++).padStart(4, '0')
+        if (polishedCapture !== undefined) polishedCapture.acceptedNextState = true
         stateProvenance.set(polished.candidateId, 'beam')
         nextStates.push(polished)
       }
@@ -2059,6 +2074,8 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           desiredDb,
           sampleRateHz,
           baselineBeamBefore,
+          baselineVisitedSemanticKeysBefore,
+          nextStates,
           retainedBeam,
           baselineParentCaptures,
           bounds,

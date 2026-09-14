@@ -46,6 +46,8 @@ function snapshot(filters: Filter[] = parentFilters): StructuralSearchGeneration
     referenceBefore: parent,
     referenceAfter: parent,
     beamBefore: [parent],
+    visitedSemanticKeysBefore: ['parent-semantic'],
+    nextStates: [],
     retainedBeam: [parent],
     parents: [{
       parent,
@@ -163,6 +165,18 @@ describe('structural-search M4 candidate-oracle diagnostics', () => {
       }],
       retainedBeam: expect.any(Array),
     })
+    expect(captured[0]!.visitedSemanticKeysBefore).toEqual([
+      captured[0]!.beamBefore[0]!.semanticKey,
+    ])
+    expect(captured[0]!.nextStates).toEqual(expect.any(Array))
+    expect(captured[0]!.parents[0]).toMatchObject({
+      prePolishCandidates: expect.arrayContaining([
+        expect.objectContaining({ prePolish: expect.objectContaining({ lexicalRank: expect.any(Number) }) }),
+      ]),
+      polishedCandidates: expect.arrayContaining([
+        expect.objectContaining({ acceptedNextState: expect.any(Boolean) }),
+      ]),
+    })
     const evaluation = evaluateM4GenerationSnapshot(captured[0]!, bounds, {
       localPolishEvaluations: config.localPolishEvaluations,
       beamWidth: config.beamWidth,
@@ -174,6 +188,14 @@ describe('structural-search M4 candidate-oracle diagnostics', () => {
       candidate.work.coordinateTrials <= candidate.work.polishEvaluationBudget,
     )).toBe(true)
     expect(evaluation.candidates.every((candidate) => candidate.prePolish.comparatorKey.length > 0)).toBe(true)
+    expect(evaluation.candidates.every((candidate) =>
+      ['ORDINARY_ALREADY_GENERATED', 'NOVEL_Q31_REJECTED', 'VISITED_DUPLICATE', 'EXACT_BEAM_REJECTED', 'REFERENCE_NONIMPROVING', 'ONLINE_FEASIBLE_ORACLE_WIN']
+        .includes(candidate.causalClassification),
+    )).toBe(true)
+    expect(evaluation.candidates.every((candidate) =>
+      candidate.parentLocalQ31Admissible === null || typeof candidate.parentLocalQ31Admissible === 'boolean',
+    )).toBe(true)
+    expect(evaluation.candidates.every((candidate) => typeof candidate.ordinaryGenerated === 'boolean')).toBe(true)
   })
 
   it('uses the same bounded equal-work polish budget for every oracle candidate', () => {
