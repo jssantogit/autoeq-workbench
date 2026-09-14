@@ -6,17 +6,18 @@
 - Evidence SHA-256: `e3adfcac1ae2251e8aa9ce2743558a6c61e9c590427a63dd3ed658a2cda9eb0e`.
 - Engines: baseline `runStructuralSearch`; VNext `runStructuralSearchVNext`.
 - Fixed envelope: structural ceiling 43, effort 6, nominal checkpoints 5/15/30 seconds, three serial repeats. Synthetic probes use their frozen below/at/above known-generating-complexity envelope; K is not a minimum-complexity claim.
-- Corpus/input hashes and the full best/median/worst cells are in `manifest.json` and `aggregate.json`. Raw timing is in the deliberately uncommitted `raw-timing.jsonl`.
+- Corpus/input hashes and the full best/median/worst cells are in `manifest.json` and `aggregate.json`. The evidence SHA hashes committed aggregate evidence only; it deliberately does not hash the uncommitted `raw-timing.jsonl`.
+- The frozen plan said “continuing labels 5/15/30”, but the implemented runner executed one independent run per nominal checkpoint. The 5/15/30 cells are therefore not one continuing trajectory. The final 30-second acceptance-gate result remains valid because every 30-second cell is itself a complete equal-envelope run.
 
 ## Final real-FR medians (30 s)
 
 | Case | Baseline RMSE / maxAbs | VNext RMSE / maxAbs | Baseline → VNext filters | Diagnosis |
 | --- | ---: | ---: | ---: | --- |
 | Titan → RSV | 0.5729 / 1.7079 | 1.0583 / 3.1751 | 15 → 8 | useful baseline work displaced by diversification |
-| Titan → Mystic 8 | 1.4788 / 4.4380 | 1.2734 / 3.8691 | 11 → 10 | win; retained diversity, not replacement |
+| Titan → Mystic 8 | 1.4788 / 4.4380 | 1.2734 / 3.8691 | 11 → 10 | win; integrated VNext path; replacement ruled out |
 | Titan → S12 Ultra | 0.8045 / 2.4236 | 1.2575 / 4.0349 | 18 → 9 | useful baseline work displaced by diversification |
 | Titan → Storm | 1.0118 / 3.0382 | 1.5017 / 4.8036 | 13 → 7 | useful baseline work displaced by diversification |
-| Titan → U12t | 0.8697 / 2.6162 | 0.8121 / 2.3960 | 15 → 11 | win; retained diversity, not replacement |
+| Titan → U12t | 0.8697 / 2.6162 | 0.8121 / 2.3960 | 15 → 11 | win; integrated VNext path; replacement ruled out |
 | Titan → Trio | 0.5747 / 1.7304 | 0.7281 / 2.2191 | 15 → 10 | useful baseline work displaced by diversification |
 
 The complete 5/15/30 best/median/worst metric, violation, delivered-filter, frontier, elapsed-time, and raw-work summaries are committed in `aggregate.json` and rendered in `summary.md`.
@@ -36,7 +37,7 @@ The full frozen probe-envelope cells are in `aggregate.json`; no per-family tuni
 
 At final real checkpoints VNext used more proposal work while generally ending with a smaller frontier: RSV 2,235 vs 1,644 proposals and frontier 10 vs 15; S12 1,974 vs 1,728 and 9 vs 19; Storm 2,827 vs 1,741 and 9 vs 15; Trio 2,186 vs 1,512 and 10 vs 19. This is displacement evidence rather than extra ordinary baseline-equivalent work.
 
-Aggregate VNext telemetry: 68,477 add-PK, 5,860 add-LS, 3,981 add-HS, 71,733 remove, 39,678 split, 7,117 type-mutation, and 3,973 merge proposals; 7,014 residual regions generated/admitted; 71,092 signatures generated/admitted and 21,609 retained; five stall/diversification events; 69 replacement/polish attempts; zero accepted replacements and zero accepted-replacement gain. Final improvement phases were beam (147) and cap-swap (15), never replacement. Thus the two wins are causally compatible with diverse beam retention, while the failed cells have no replacement/basin-escape evidence.
+Aggregate VNext telemetry: 68,477 add-PK, 5,860 add-LS, 3,981 add-HS, 71,733 remove, 39,678 split, 7,117 type-mutation, and 3,973 merge proposals; 7,014 residual regions generated/admitted; 71,092 signatures generated/admitted and 21,609 retained; five stall/diversification events; 69 replacement/polish attempts; zero accepted replacements and zero accepted-replacement gain. Final improvement phases were beam (147) and cap-swap (15), never replacement. Replacement is ruled out for the two wins because no replacement was accepted. They are attributable only to the integrated VNext generation/admission/beam path; M1 does not isolate region-aware generation, diversity admission, or diverse beam retention as the causal component.
 
 ## Quantized delivery and complexity
 
