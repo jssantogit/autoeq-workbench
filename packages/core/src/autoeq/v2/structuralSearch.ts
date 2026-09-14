@@ -1315,6 +1315,10 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         capacityPressure.additiveMutationGatesBlockedByCapacity += 1
       }
       const ordered = orderStructuralProposals(proposals)
+      const vnextPool = policy === 'vnext'
+        ? createRegionAwareCandidatePool(parent.filters, solution.residualDb, frequencies, bounds,
+          config.featureRegionCount ?? 1, proposals.length)
+        : []
 
       let admitted: StructuralProposal[] = []
 
@@ -1349,7 +1353,9 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         const selected = selectQuotaProposals(prePolishScored, rmseRanked, 6, 2, config.proposalsPerParent)
         admitted = selected.map(s => s.proposal)
       } else {
-        admitted = ordered.slice(0, config.proposalsPerParent)
+        admitted = policy === 'vnext'
+          ? admitDiverseStructuralCandidates(vnextPool, config.proposalsPerParent).map(entry => entry.proposal)
+          : ordered.slice(0, config.proposalsPerParent)
       }
       admittedProposals += admitted.length
       for (const proposal of admitted) {
@@ -1401,6 +1407,35 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       frontierUtilization,
     })
 
+    // A stalled VNext generation spends ordinary proposal budget on a bounded
+    // one-for-one basin escape before the unchanged late rescue phases.
+    if (nextStates.length === 0 && policy === 'vnext' && !deadline.isExpired()) {
+      const parent = selectReferencePoint(beam)
+      const solution = evaluateV2Solution(parent.filters, desiredDb, frequencies, sampleRateHz)
+      const candidates = admitDiverseStructuralCandidates(createRegionAwareCandidatePool(
+        parent.filters, solution.residualDb, frequencies, bounds,
+        config.featureRegionCount ?? 1, config.proposalsPerParent,
+      ).filter(entry => entry.proposal.mutation === 'add-pk'), config.proposalsPerParent)
+      const victims = parent.filters.map((_, index) => ({ index, state: evaluateStructuralFilters(
+        parent.filters.filter((__, candidateIndex) => candidateIndex !== index), `vnext-victim-${index}`,
+        bounds, desiredDb, frequencies, sampleRateHz,
+      ) })).sort((left, right) => compareKeys(referenceSelectorKey(left.state), referenceSelectorKey(right.state)) || left.index - right.index)
+        .slice(0, config.proposalsPerParent)
+      let attempts = 0
+      for (const victim of victims) for (const candidate of candidates) {
+        if (deadline.isExpired() || attempts >= config.proposalsPerParent) break
+        const replacement = candidate.proposal.filters.at(-1)
+        if (replacement === undefined) continue
+        const kept = parent.filters.filter((_, index) => index !== victim.index)
+        const polished = polishFilters(canonical([...kept, { ...replacement, id: uniqueId(kept, `vnext-replace-${attempts}`) }]),
+          localPolishEvaluationBudget(config.localPolishEvaluations, parent.filters.length), bounds, desiredDb, frequencies, deadline, sampleRateHz)
+        attempts += 1
+        if (compareKeys(referenceSelectorKey(polished), referenceSelectorKey(parent)) < 0) {
+          polished.candidateId = String(candidateCounter++).padStart(4, '0'); nextStates.push(polished)
+        }
+      }
+      if (attempts > 0) stateTrace('phase', nextStates[0] ?? parent, { phase: 'vnext-replacement', status: 'end', attempts, acceptedSteps: nextStates.length })
+    }
     if (nextStates.length === 0) {
       stateTrace('beam-stop', traceState, {
         phase: 'beam',
