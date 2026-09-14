@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 2,
+  "corpusVersion": "fresh-real-corpus-v1.1",
+  "historicalV1Status": "CORPUS_V1_INSUFFICIENT",
+  "status": "CORPUS_V1_1_READY",
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "caseCount": 18,
+  "requiredCaseCount": 18,
+  "normalization": {
+    "mode": "hz",
+    "frequencyHz": 500,
+    "levelDb": 60
+  },
+  "terminalClosureCurveCount": 36,
+  "replacements": [],
+  "casesSha256": "42343713a40651798f361d049deb21258a0134321da337b69adbaf921aff0a0c",
+  "provenanceSha256": "e06bbc97281b86d455447c35918e71a3d861ebfe47f1d445ab86f6230bf79e00",
+  "solverExecuted": false,
+  "rawMeasurementsCommitted": false
+}
