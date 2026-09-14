@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "status": "CORPUS_V1_INSUFFICIENT",
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "caseCount": 0,
+  "requiredCaseCount": 18,
+  "normalization": {
+    "mode": "hz",
+    "frequencyHz": 500,
+    "levelDb": 60
+  },
+  "shortageReason": "All 36 deterministically selected processed curves failed exact current-V2 20–20000 Hz coverage: their terminal frequency was below 20000 Hz.",
+  "casesSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "provenanceSha256": "25506ae9d2463224616339446bc03bafbf372721ff34e29bd1b72e0a74dcaa7f",
+  "solverExecuted": false,
+  "rawMeasurementsCommitted": false
+}

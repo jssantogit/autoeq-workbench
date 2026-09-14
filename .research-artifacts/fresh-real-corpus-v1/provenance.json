@@ -1,0 +1,233 @@
+{
+  "repository": "jaakkopasanen/AutoEq",
+  "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+  "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96",
+  "collections": [
+    "Super Review",
+    "ToneDeafMonk",
+    "oratory1990",
+    "HypetheSonics"
+  ],
+  "rawDataPolicy": "external cache only; AutoEq MIT does not assert third-party measurement redistribution rights",
+  "selectedCandidatePairs": [
+    {
+      "source": "Super Review|711|kz asx",
+      "target": "Super Review|711|lg tone ultra"
+    },
+    {
+      "source": "Super Review|711|fiio fh11",
+      "target": "Super Review|711|truthear nova"
+    },
+    {
+      "source": "Super Review|711|softears enigma",
+      "target": "Super Review|711|canpur cp622b"
+    },
+    {
+      "source": "Super Review|711|fiio fh1",
+      "target": "Super Review|711|tanchjim hana"
+    },
+    {
+      "source": "Super Review|711|hisenior okavango",
+      "target": "Super Review|711|tin hifi t5s"
+    },
+    {
+      "source": "Super Review|711|crinear meta",
+      "target": "Super Review|711|sennheiser ie 300"
+    },
+    {
+      "source": "Super Review|711|kiwi ears aether",
+      "target": "oratory1990|GRAS 43AC|sony ier z1r"
+    },
+    {
+      "source": "Super Review|711|shuoer cadenza 12",
+      "target": "oratory1990|GRAS 43AC|beyerdynamic xelento"
+    },
+    {
+      "source": "Super Review|711|empire ears valkyrie mkii",
+      "target": "oratory1990|GRAS 43AC|sony ier m9"
+    },
+    {
+      "source": "Super Review|711|thieaudio monarch mkiii",
+      "target": "oratory1990|GRAS 43AC|sony wf 1000x"
+    },
+    {
+      "source": "Super Review|711|kz zex",
+      "target": "oratory1990|GRAS 43AC|sony mh750"
+    },
+    {
+      "source": "Super Review|711|binary acoustics x gizaudio chopin",
+      "target": "oratory1990|GRAS 43AC|moondrop x crinacle blessing2 dusk"
+    },
+    {
+      "source": "HypetheSonics|GRAS RA0045|sennheiser momentum true wireless 2",
+      "target": "ToneDeafMonk|711|simgot audio ew200"
+    },
+    {
+      "source": "HypetheSonics|GRAS RA0045|zero audio carbo tenore",
+      "target": "ToneDeafMonk|711|qkz x hbb khan"
+    },
+    {
+      "source": "HypetheSonics|GRAS RA0045|moondrop kxxx",
+      "target": "ToneDeafMonk|711|kefine klean"
+    },
+    {
+      "source": "HypetheSonics|GRAS RA0045|final audio f7200",
+      "target": "ToneDeafMonk|711|hiby yves"
+    },
+    {
+      "source": "HypetheSonics|GRAS RA0045|1more quad driver",
+      "target": "ToneDeafMonk|711|shuoer ej07"
+    },
+    {
+      "source": "HypetheSonics|GRAS RA0045|1more aero",
+      "target": "ToneDeafMonk|711|ikko oh10"
+    }
+  ],
+  "cases": [],
+  "skipped": [
+    {
+      "identity": "Super Review|711|kz asx",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|lg tone ultra",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|fiio fh11",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|truthear nova",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|softears enigma",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|canpur cp622b",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|fiio fh1",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|tanchjim hana",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|hisenior okavango",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|tin hifi t5s",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|crinear meta",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|sennheiser ie 300",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|kiwi ears aether",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "oratory1990|GRAS 43AC|sony ier z1r",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|shuoer cadenza 12",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "oratory1990|GRAS 43AC|beyerdynamic xelento",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|empire ears valkyrie mkii",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "oratory1990|GRAS 43AC|sony ier m9",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|thieaudio monarch mkiii",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "oratory1990|GRAS 43AC|sony wf 1000x",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|kz zex",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "oratory1990|GRAS 43AC|sony mh750",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "Super Review|711|binary acoustics x gizaudio chopin",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "oratory1990|GRAS 43AC|moondrop x crinacle blessing2 dusk",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "HypetheSonics|GRAS RA0045|sennheiser momentum true wireless 2",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "ToneDeafMonk|711|simgot audio ew200",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "HypetheSonics|GRAS RA0045|zero audio carbo tenore",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "ToneDeafMonk|711|qkz x hbb khan",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "HypetheSonics|GRAS RA0045|moondrop kxxx",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "ToneDeafMonk|711|kefine klean",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "HypetheSonics|GRAS RA0045|final audio f7200",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "ToneDeafMonk|711|hiby yves",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "HypetheSonics|GRAS RA0045|1more quad driver",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "ToneDeafMonk|711|shuoer ej07",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "HypetheSonics|GRAS RA0045|1more aero",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    },
+    {
+      "identity": "ToneDeafMonk|711|ikko oh10",
+      "reason": "Error: coverage: requires 20–20000 Hz"
+    }
+  ]
+}

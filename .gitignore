@@ -8,3 +8,4 @@ coverage/
 *.log
 *.tsbuildinfo
 .worktrees/
+.research-cache/
