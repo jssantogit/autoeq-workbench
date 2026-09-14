@@ -722,7 +722,7 @@ describe('M2 protected-progress mechanism gate', () => {
     const start = m2.events.find((event) => event.type === 'start')!
     const generation = m2.events.find((event) => event.type === 'beam-generation' && event.generation === 0)!
     expect(generation.nextStates).toBeGreaterThan(0)
-    expect(generation.violation).toBeLessThan(start.violation)
+    expect(generation.violation as number).toBeLessThan(start.violation as number)
     expect(generation.stallEvents).toBe(0)
     expect(generation.ordinaryProposalsGenerated).toBe(generation.generatedProposals)
     expect(generation.ordinaryProposalsAdmitted).toBe(generation.admittedProposals)
