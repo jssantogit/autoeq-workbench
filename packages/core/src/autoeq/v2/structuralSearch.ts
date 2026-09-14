@@ -1485,7 +1485,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           polished.candidateId = String(candidateCounter++).padStart(4, '0'); nextStates.push(polished)
         }
       }
-      if (attempts > 0) stateTrace('phase', nextStates[0] ?? parent, { phase: 'vnext-replacement', status: 'end', attempts, acceptedSteps: nextStates.length })
+      if (attempts > 0) stateTrace('phase', nextStates[0] ?? parent, {
+        phase: 'vnext-replacement', status: 'end', attempts, acceptedSteps: nextStates.length,
+        stallDiversifications: 1, replacementAttempts: attempts,
+        replacementPolished: attempts, replacementAccepted: nextStates.length,
+      })
     }
     if (nextStates.length === 0) {
       stateTrace('beam-stop', traceState, {
