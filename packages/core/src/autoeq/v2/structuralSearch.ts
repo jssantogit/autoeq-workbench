@@ -1424,7 +1424,15 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       let attempts = 0
       for (const victim of victims) for (const candidate of candidates) {
         if (deadline.isExpired() || attempts >= config.proposalsPerParent) break
-        const replacement = candidate.proposal.filters.at(-1)
+        // Proposals are canonicalized, so position is not candidate identity.
+        // Find the structurally added filter without IDs or ordering.
+        const replacement = candidate.proposal.filters.find(proposed => !parent.filters.some(existing =>
+          existing.type === proposed.type &&
+          existing.frequencyHz === proposed.frequencyHz &&
+          existing.gainDb === proposed.gainDb &&
+          existing.q === proposed.q &&
+          existing.enabled === proposed.enabled,
+        ))
         if (replacement === undefined) continue
         const kept = parent.filters.filter((_, index) => index !== victim.index)
         const polished = polishFilters(canonical([...kept, { ...replacement, id: uniqueId(kept, `vnext-replace-${attempts}`) }]),
