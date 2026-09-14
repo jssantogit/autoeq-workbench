@@ -7,10 +7,16 @@ import {
   M1_STRUCTURAL_CEILING,
   M1_SYNTHETIC_CASES,
   createM1ResourceEnvelope,
+  isM1CliInvocation,
   runStructuralSearchVnextM1,
 } from '../../../../benchmarks/research/structuralSearchVnext.js'
 
 describe('structural-search VNext M1 benchmark runner', () => {
+  it('recognizes the explicit package-script CLI marker without running on import', () => {
+    expect(isM1CliInvocation(['node', 'tsx', '--m1-runner'])).toBe(true)
+    expect(isM1CliInvocation(['node', 'tsx'])).toBe(false)
+  })
+
   it('declares the frozen campaign envelope without scheduler policy', () => {
     expect(M1_STRUCTURAL_CEILING).toBe(43)
     expect(M1_EFFORT_LEVEL).toBe(6)

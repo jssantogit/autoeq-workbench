@@ -1044,6 +1044,32 @@ function writeM1Artifacts(
   writeFileSync(resolve(outputDir, 'aggregate.json'), `${JSON.stringify(aggregate, null, 2)}\n`, 'utf8')
   writeFileSync(resolve(outputDir, 'quantized-delivery.json'), `${JSON.stringify(result.quantizedDelivery, null, 2)}\n`, 'utf8')
   writeFileSync(resolve(outputDir, 'complexity-sanity.json'), `${JSON.stringify(result.complexitySanity, null, 2)}\n`, 'utf8')
+  const summaryLines = [
+    '# Structural Search VNext M1',
+    '',
+    `- Frozen implementation: \`${result.frozenImplementationSha}\``,
+    `- Evidence SHA-256: \`${result.evidenceSha256}\``,
+    `- Envelope: structural ceiling ${M1_STRUCTURAL_CEILING}, effort ${M1_EFFORT_LEVEL}, checkpoints ${M1_CHECKPOINT_SECONDS.join('/')}, repeats ${M1_REPEAT_COUNT}`,
+    `- Engines: baseline \`runStructuralSearch\`; VNext \`runStructuralSearchVNext\``,
+    '',
+    '## Quality (best / median / worst)',
+    '',
+    '| Engine | Case | Ceiling | Checkpoint | RMSE | maxAbs | Violation | Filters | Frontier max | Elapsed ms |',
+    '| --- | --- | ---: | ---: | --- | --- | --- | --- | --- | --- |',
+    ...result.aggregates.map((row) =>
+      `| ${row.engine} | ${row.caseLabel} | ${row.structuralCeiling} | ${row.checkpointSeconds}s | ${row.rmseDb.best.toFixed(4)} / ${row.rmseDb.median.toFixed(4)} / ${row.rmseDb.worst.toFixed(4)} | ${row.maxAbsDb.best.toFixed(4)} / ${row.maxAbsDb.median.toFixed(4)} / ${row.maxAbsDb.worst.toFixed(4)} | ${row.structuralViolation.best.toFixed(3)} / ${row.structuralViolation.median.toFixed(3)} / ${row.structuralViolation.worst.toFixed(3)} | ${row.deliveredFilterCount.best} / ${row.deliveredFilterCount.median} / ${row.deliveredFilterCount.worst} | ${row.frontierMaxFilterCount.best} / ${row.frontierMaxFilterCount.median} / ${row.frontierMaxFilterCount.worst} | ${row.actualElapsedMs.best.toFixed(1)} / ${row.actualElapsedMs.median.toFixed(1)} / ${row.actualElapsedMs.worst.toFixed(1)} |`,
+    ),
+    '',
+    '## Mechanism and delivery',
+    '',
+    '- Full mechanism counters: `aggregate.json` (`vnextMechanismTelemetry`).',
+    '- Quantized delivery is present only for final real-case VNext float wins: `quantized-delivery.json`.',
+    '- Complexity representatives: `complexity-sanity.json`.',
+    '',
+    `- Frozen acceptance gate: **${result.acceptanceGate.pass ? 'PASS' : 'FAIL'}**`,
+    '',
+  ]
+  writeFileSync(resolve(outputDir, 'summary.md'), `${summaryLines.join('\n')}\n`, 'utf8')
   writeFileSync(resolve(outputDir, 'manifest.json'), `${JSON.stringify({
     schemaVersion: result.schemaVersion,
     frozenImplementationSha: result.frozenImplementationSha,
@@ -1127,12 +1153,27 @@ export function runStructuralSearchVnextM1(options: M1RunnerOptions = {}): M1Cam
   return result
 }
 
-function isMain(): boolean {
-  const entry = process.argv[1]
-  return entry !== undefined && resolve(entry) === resolve(fileURLToPath(import.meta.url))
+/**
+ * The package script supplies a marker because pnpm/tsx may place the tsx
+ * launcher, rather than this source path, in argv[1].  The path check keeps
+ * direct `tsx benchmarks/research/structuralSearchVnext.ts` invocation useful.
+ */
+export function isM1CliInvocation(
+  argv: readonly string[] = process.argv,
+  moduleUrl: string = import.meta.url,
+): boolean {
+  if (argv.includes('--m1-runner')) return true
+  const modulePath = resolve(fileURLToPath(moduleUrl))
+  return argv.slice(1).some((argument) => {
+    try {
+      return resolve(argument) === modulePath
+    } catch {
+      return false
+    }
+  })
 }
 
-if (isMain()) {
+if (isM1CliInvocation()) {
   const result = runStructuralSearchVnextM1()
   process.stdout.write(`${JSON.stringify({
     frozenImplementationSha: result.frozenImplementationSha,
