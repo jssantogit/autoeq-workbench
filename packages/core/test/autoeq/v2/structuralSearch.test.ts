@@ -517,3 +517,44 @@ describe('capacity-pressure trace accounting', () => {
     expect(proposals.every((proposal) => proposal.filters.length <= 17)).toBe(true)
   })
 })
+
+describe('structural-search-vnext primitives', () => {
+  it('uses an ID-independent coarse structural signature', async () => {
+    const { structuralSignature } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const bounds = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
+    expect(structuralSignature([
+      { id: 'first', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 1, q: 1 },
+    ], bounds, 6)).toBe(structuralSignature([
+      { id: 'second', enabled: true, type: 'PK', frequencyHz: 1_010, gainDb: -4, q: 8 },
+    ], bounds, 6))
+  })
+
+  it('retains a viable distinct signature within a fixed beam width deterministically', async () => {
+    const { retainDiverseStructuralBeam } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const bounds = resolveStandardAutoEqV2Config(DEFAULT_AUTOEQ_SETTINGS)
+    const states = [
+      { candidateId: 'a', filters: [{ id: 'a', enabled: true, type: 'PK' as const, frequencyHz: 1_000, gainDb: 1, q: 1 }], rmseDb: 0.4, maxAbsDb: 1, cancellationScore: 0 },
+      { candidateId: 'b', filters: [{ id: 'b', enabled: true, type: 'PK' as const, frequencyHz: 1_010, gainDb: 2, q: 2 }], rmseDb: 0.41, maxAbsDb: 1.01, cancellationScore: 0 },
+      { candidateId: 'c', filters: [{ id: 'c', enabled: true, type: 'HS' as const, frequencyHz: 8_000, gainDb: 1, q: 0.7 }], rmseDb: 0.45, maxAbsDb: 1.1, cancellationScore: 0 },
+    ]
+    const retained = retainDiverseStructuralBeam(states, 2, bounds, 6)
+    expect(retained).toHaveLength(2)
+    expect(retained.map((state: { candidateId: string }) => state.candidateId)).toEqual(['a', 'c'])
+  })
+})
+
+  it('keeps the supplied incumbent or improves it through bounded VNext replacement', async () => {
+    const { runStructuralSearchVNext } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const config = { ...resolveStructuralSearchConfig({ preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET }), maxFilters: 3, proposalsPerParent: 3 }
+    let checks = 0
+    const result = runStructuralSearchVNext({
+      desiredDb: [...localizedResidual], frequencies: [...frequencies], sampleRateHz: 48_000,
+      config, deadline: { isExpired: () => ++checks > 2_000 },
+      seedFilters: [{ id: 'seed', enabled: true, type: 'PK', frequencyHz: 60, gainDb: 0.8, q: 1 }],
+    })
+    const start = evaluateV2Solution([{ id: 'seed', enabled: true, type: 'PK', frequencyHz: 60, gainDb: 0.75, q: 1 }], localizedResidual, frequencies, 48_000)
+    expect(Math.max(result.rmseDb / 0.25, result.maxAbsDb / 0.75)).toBeLessThanOrEqual(
+      Math.max(start.metrics.rmseDb / 0.25, start.metrics.maxAbsDb / 0.75) + 1e-12,
+    )
+    expect(result.filters.length).toBeLessThanOrEqual(config.maxFilters)
+  })

@@ -95,6 +95,20 @@ export interface StructuralProposal {
   filters: Filter[]
 }
 
+export interface StructuralCandidateMetadata {
+  mutationFamily: StructuralMutation
+  residualRegion: number
+  sign: -1 | 0 | 1
+  filterType: Filter['type']
+  structuralRegion: number
+}
+
+export interface StructuralCandidatePoolEntry {
+  proposal: StructuralProposal
+  metadata: StructuralCandidateMetadata
+  signature: string
+}
+
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value))
 }
@@ -745,6 +759,127 @@ export function retainParetoBeam(
   return states.filter((state) => selected.has(state.candidateId))
 }
 
+/**
+ * A deliberately coarse, ID-independent description of topology for the
+ * research-only VNext explorer.  Its buckets derive from the active fit span
+ * and existing feature-region budget; it is not a quality metric.
+ */
+export function structuralSignature(
+  filters: readonly Filter[],
+  bounds: StandardAutoEqV2Config,
+  regionCount: number,
+): string {
+  const regions = Math.max(1, regionCount)
+  const minLog = Math.log2(bounds.minFrequencyHz)
+  const span = Math.max(Number.EPSILON, Math.log2(bounds.maxFrequencyHz) - minLog)
+  const order: Record<Filter['type'], number> = { LS: 0, PK: 1, HS: 2 }
+  return filters
+    .map((filter) => {
+      const position = (Math.log2(clamp(filter.frequencyHz, bounds.minFrequencyHz, bounds.maxFrequencyHz)) - minLog) / span
+      const region = Math.min(regions - 1, Math.max(0, Math.floor(position * regions)))
+      return `${filter.type}:${region}`
+    })
+    .sort((left, right) => {
+      const [leftType, leftRegion] = left.split(':')
+      const [rightType, rightRegion] = right.split(':')
+      return order[leftType as Filter['type']] - order[rightType as Filter['type']] ||
+        Number(leftRegion) - Number(rightRegion)
+    })
+    .join('|')
+}
+
+/**
+ * Preserve one best representative for every useful topology before filling
+ * remaining slots by the frozen reference ordering.  This is only used by
+ * the explicit experimental path; retainParetoBeam remains the baseline.
+ */
+export function retainDiverseStructuralBeam(
+  states: readonly SearchState[],
+  beamWidth: number,
+  bounds: StandardAutoEqV2Config,
+  regionCount: number,
+): SearchState[] {
+  if (beamWidth <= 0 || states.length === 0) return []
+  const ordered = [...states].sort((left, right) =>
+    compareKeys(referenceSelectorKey(left), referenceSelectorKey(right)))
+  const selected: SearchState[] = []
+  const signatures = new Set<string>()
+  for (const state of ordered) {
+    const signature = structuralSignature(state.filters, bounds, regionCount)
+    if (!signatures.has(signature)) {
+      selected.push(state)
+      signatures.add(signature)
+      if (selected.length === beamWidth) return selected
+    }
+  }
+  for (const state of ordered) {
+    if (!selected.some((selectedState) => selectedState.candidateId === state.candidateId)) {
+      selected.push(state)
+      if (selected.length === beamWidth) break
+    }
+  }
+  return selected
+}
+
+/** Build bounded, annotated VNext evidence from the existing mutation path. */
+export function createRegionAwareCandidatePool(
+  filters: readonly Filter[],
+  residualDb: readonly number[],
+  frequenciesHz: readonly number[],
+  bounds: StandardAutoEqV2Config,
+  regionCount: number,
+  maxEntries: number,
+): StructuralCandidatePoolEntry[] {
+  const regions = Math.max(1, regionCount)
+  const minLog = Math.log2(bounds.minFrequencyHz)
+  const span = Math.max(Number.EPSILON, Math.log2(bounds.maxFrequencyHz) - minLog)
+  const regionFor = (frequencyHz: number): number => Math.min(regions - 1, Math.max(0,
+    Math.floor(((Math.log2(frequencyHz) - minLog) / span) * regions)))
+  return orderStructuralProposals(generateStructuralMutations(
+    filters, residualDb, frequenciesHz, bounds, regions,
+    Math.log2(bounds.maxFrequencyHz / bounds.minFrequencyHz) / regions, 'semantic',
+  )).slice(0, maxEntries).map((proposal) => {
+    const changed = proposal.filters.at(-1) ?? filters.at(-1)
+    const frequencyHz = changed?.frequencyHz ?? bounds.minFrequencyHz
+    const nearest = frequenciesHz.reduce((best, frequency, index) =>
+      Math.abs(Math.log2(frequency / frequencyHz)) < Math.abs(Math.log2(frequenciesHz[best]! / frequencyHz)) ? index : best, 0)
+    const residual = residualDb[nearest] ?? 0
+    return {
+      proposal,
+      metadata: {
+        mutationFamily: proposal.mutation,
+        residualRegion: regionFor(frequencyHz),
+        sign: residual === 0 ? 0 : residual > 0 ? 1 : -1,
+        filterType: changed?.type ?? 'PK',
+        structuralRegion: regionFor(frequencyHz),
+      },
+      signature: structuralSignature(proposal.filters, bounds, regions),
+    }
+  })
+}
+
+/** Diversity first; callers fill no more than their existing proposal budget. */
+export function admitDiverseStructuralCandidates(
+  entries: readonly StructuralCandidatePoolEntry[],
+  maxEntries: number,
+): StructuralCandidatePoolEntry[] {
+  const selected: StructuralCandidatePoolEntry[] = []
+  const regions = new Set<number>()
+  const families = new Set<StructuralMutation>()
+  const signatures = new Set<string>()
+  for (const entry of entries) {
+    if (selected.length === maxEntries) return selected
+    if (!regions.has(entry.metadata.residualRegion) || !families.has(entry.metadata.mutationFamily) || !signatures.has(entry.signature)) {
+      selected.push(entry); regions.add(entry.metadata.residualRegion); families.add(entry.metadata.mutationFamily); signatures.add(entry.signature)
+    }
+  }
+  for (const entry of entries) {
+    if (selected.length === maxEntries) break
+    if (!selected.includes(entry)) selected.push(entry)
+  }
+  return selected
+}
+
 export interface CapacityPressureDelta {
   /** Additive proposals actually constructed by the existing beam mutation path. */
   additiveProposalsGenerated: number
@@ -811,7 +946,7 @@ export function addFrontierUtilizationDelta(left: FrontierUtilizationDelta, righ
 
 export interface StructuralSearchTraceEvent {
   type: 'start' | 'beam-generation' | 'beam-stop' | 'phase' | 'end'
-  phase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap'
+  phase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement'
   status?: 'start' | 'end'
   generation?: number
   reason?: 'deadline' | 'no-next-states' | 'completed'
@@ -2105,6 +2240,82 @@ export function runStructuralSearch(input: StructuralSearchInput): StructuralSea
     rmseDb: rescued.rmseDb,
     maxAbsDb: rescued.maxAbsDb,
   }
+}
+
+/**
+ * Experimental basin escape.  The frozen search is first allowed to establish
+ * its incumbent.  While work remains, a bounded set of least-damaging filter
+ * removals is crossed with candidates from distinct residual regions.  Every
+ * trial is quantized and jointly polished before the existing comparator is
+ * allowed to replace the incumbent.
+ */
+export function runStructuralSearchVNext(input: StructuralSearchInput): StructuralSearchResult {
+  const baseline = runStructuralSearch(input)
+  if (input.deadline.isExpired() || baseline.filters.length === 0) return baseline
+
+  const bounds = resolveStandardAutoEqV2Config({
+    ...DEFAULT_AUTOEQ_SETTINGS,
+    maxFilters: input.config.maxFilters,
+  })
+  const incumbent = evaluateStructuralFilters(
+    baseline.filters, 'vnext-incumbent', bounds,
+    input.desiredDb, input.frequencies, input.sampleRateHz,
+  )
+  const residual = evaluateV2Solution(
+    incumbent.filters, input.desiredDb, input.frequencies, input.sampleRateHz,
+  ).residualDb
+  const regionCount = input.config.featureRegionCount ?? 1
+  const candidateLimit = Math.max(1, input.config.proposalsPerParent)
+  const candidates = rankV2CandidateShortlist(generateV2Candidates({
+    frequencies: input.frequencies,
+    residualDb: residual,
+    config: bounds,
+    boundaryMode: 'mixed',
+  }).filter(candidate => candidate.type === 'PK'))
+  const distinctCandidates = candidates.filter((candidate, index, all) => {
+    const filter = { id: 'candidate', enabled: true, type: candidate.type, frequencyHz: candidate.frequencyHz, gainDb: candidate.gainDb, q: candidate.q }
+    const signature = structuralSignature([filter], bounds, regionCount)
+    return all.slice(0, index).every(previous => structuralSignature([{
+      id: 'previous', enabled: true, type: previous.type, frequencyHz: previous.frequencyHz, gainDb: previous.gainDb, q: previous.q,
+    }], bounds, regionCount) !== signature)
+  }).slice(0, candidateLimit)
+
+  const victims = incumbent.filters.map((_, index) => {
+    const without = incumbent.filters.filter((__, candidateIndex) => candidateIndex !== index)
+    return {
+      index,
+      damage: evaluateStructuralFilters(without, `vnext-victim-${index}`, bounds,
+        input.desiredDb, input.frequencies, input.sampleRateHz),
+    }
+  }).sort((left, right) =>
+    compareKeys(referenceSelectorKey(left.damage), referenceSelectorKey(right.damage)) || left.index - right.index,
+  ).slice(0, candidateLimit)
+
+  let best = incumbent
+  let attempts = 0
+  for (const victim of victims) {
+    for (const candidate of distinctCandidates) {
+      if (input.deadline.isExpired() || attempts >= candidateLimit) break
+      const retained = incumbent.filters.filter((_, index) => index !== victim.index)
+      const seeded = canonical([...retained, projectFilter({
+        id: uniqueId(retained, `vnext-replace-${victim.index}-${attempts}`),
+        enabled: true, type: candidate.type, frequencyHz: candidate.frequencyHz,
+        gainDb: candidate.gainDb, q: candidate.q,
+      }, bounds)])
+      const polished = polishFilters(seeded,
+        localPolishEvaluationBudget(input.config.localPolishEvaluations, seeded.length),
+        bounds, input.desiredDb, input.frequencies, input.deadline, input.sampleRateHz)
+      attempts += 1
+      if (compareKeys(referenceSelectorKey(polished), referenceSelectorKey(best)) < 0) best = polished
+    }
+  }
+  input.onTrace?.({
+    type: 'phase', phase: 'vnext-replacement', status: 'end', attempts,
+    acceptedSteps: best.candidateId === incumbent.candidateId ? 0 : 1,
+    filterCount: best.filters.length, rmseDb: best.rmseDb, maxAbsDb: best.maxAbsDb,
+    violation: Math.max(best.rmseDb / 0.25, best.maxAbsDb / 0.75),
+  })
+  return { filters: best.filters, rmseDb: best.rmseDb, maxAbsDb: best.maxAbsDb }
 }
 
 export function polishFilters(
