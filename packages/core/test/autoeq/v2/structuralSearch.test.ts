@@ -558,3 +558,8 @@ describe('structural-search-vnext primitives', () => {
     )
     expect(result.filters.length).toBeLessThanOrEqual(config.maxFilters)
   })
+
+it('exposes the VNext runner as an explicit core research selector', async () => {
+  const core = await import('../../../src/index.js')
+  expect(typeof core.runStructuralSearchVNext).toBe('function')
+})

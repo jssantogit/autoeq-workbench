@@ -162,6 +162,7 @@ export {
   createSearchWorkDelta,
   resolveStructuralSearchConfig,
   runStructuralSearch,
+  runStructuralSearchVNext,
   searchWorkDeltaFromTrace,
 } from './autoeq/v2/structuralSearch.js'
 export type {
