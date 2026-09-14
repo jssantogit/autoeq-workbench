@@ -9,6 +9,7 @@ import {
 import {
   M4_DETERMINISTIC_GENERATION_BOUND,
   M4_SNAPSHOT_STRIDE,
+  aggregateM4OracleEvidence,
   evaluateM4GenerationSnapshot,
   generateM4OracleCandidates,
   selectM4SnapshotGeneration,
@@ -56,6 +57,64 @@ function snapshot(filters: Filter[] = parentFilters): StructuralSearchGeneration
       admittedProposals: [],
       prePolishCandidates: [],
       polishedCandidates: [],
+    }],
+  }
+}
+
+function q31Proposal(index: number): { mutation: 'add-pk'; filters: Filter[] } {
+  return {
+    mutation: 'add-pk',
+    filters: [{
+      id: `ordinary-${index}`,
+      enabled: true,
+      type: 'PK',
+      frequencyHz: 100 + index * 100,
+      gainDb: 0,
+      q: 1,
+    }],
+  }
+}
+
+function q31Snapshot(
+  ordinaryCount: number,
+  ordinaryMetrics: (index: number) => { rmseDb: number; maxAbsDb: number },
+  overrides: {
+    visitedSemanticKeysBefore?: string[]
+    nextStates?: StructuralSearchGenerationSnapshot['nextStates']
+  } = {},
+): StructuralSearchGenerationSnapshot {
+  const base = snapshot([])
+  const ordinary = Array.from({ length: ordinaryCount }, (_, index) => {
+    const proposal = q31Proposal(index)
+    const metrics = ordinaryMetrics(index)
+    return {
+      proposal,
+      semanticKey: JSON.stringify(proposal.filters.map(({ id: _id, ...filter }) => filter)),
+      prePolish: {
+        filters: proposal.filters,
+        ...metrics,
+        cancellationScore: 0,
+        filterCount: proposal.filters.length,
+        lexicalRank: index,
+        semanticKey: JSON.stringify(proposal.filters.map(({ id: _id, ...filter }) => filter)),
+        comparatorKey: [metrics.rmseDb, metrics.maxAbsDb, proposal.filters.length, 0, index],
+      },
+      postPolish: null,
+      coordinateTrials: 0,
+      polishEvaluationBudget: 0,
+      acceptedNextState: false,
+    }
+  })
+  const proposals = ordinary.map((entry) => entry.proposal)
+  return {
+    ...base,
+    visitedSemanticKeysBefore: overrides.visitedSemanticKeysBefore ?? base.visitedSemanticKeysBefore,
+    nextStates: overrides.nextStates ?? base.nextStates,
+    parents: [{
+      ...base.parents[0]!,
+      generatedProposals: proposals,
+      admittedProposals: proposals,
+      prePolishCandidates: ordinary,
     }],
   }
 }
@@ -109,7 +168,7 @@ describe('structural-search M4 candidate-oracle diagnostics', () => {
   })
 
   it('keeps family-local candidate absence separate from generation-global absence', () => {
-    const evaluation = evaluateM4GenerationSnapshot(snapshot([]), bounds)
+    const evaluation = evaluateM4GenerationSnapshot(snapshot([]), bounds, { proposalsPerParent: 8 })
 
     expect(evaluation.byFamily.O4_TOPOLOGY_SUBSTITUTION.familyLocalCandidateAbsence).toBe(1)
     expect(evaluation.byFamily.O4_TOPOLOGY_SUBSTITUTION.classifications.NO_STRUCTURAL_CANDIDATE).toBe(1)
@@ -180,6 +239,7 @@ describe('structural-search M4 candidate-oracle diagnostics', () => {
     const evaluation = evaluateM4GenerationSnapshot(captured[0]!, bounds, {
       localPolishEvaluations: config.localPolishEvaluations,
       beamWidth: config.beamWidth,
+      proposalsPerParent: config.proposalsPerParent,
     })
     expect(instrumented).toEqual(baseline)
     expect(evaluation.metrics).toHaveProperty('candidatesGenerated')
@@ -214,6 +274,7 @@ describe('structural-search M4 candidate-oracle diagnostics', () => {
     const evaluation = evaluateM4GenerationSnapshot(captured[0]!, bounds, {
       localPolishEvaluations: config.localPolishEvaluations,
       beamWidth: config.beamWidth,
+      proposalsPerParent: config.proposalsPerParent,
     })
 
     expect(evaluation.candidates.length).toBeGreaterThan(0)
@@ -246,5 +307,147 @@ describe('structural-search M4 candidate-oracle diagnostics', () => {
     })
     expect(gated).toEqual(baseline)
     expect(captured).toEqual([])
+  })
+
+  it('admits a qualifying novel oracle into an unused parent-local q31 slot', () => {
+    const evaluation = evaluateM4GenerationSnapshot(
+      q31Snapshot(7, () => ({ rmseDb: 0, maxAbsDb: 0 })),
+      bounds,
+      { proposalsPerParent: 8 },
+    )
+    const oracle = evaluation.candidates.find((candidate) => candidate.family === 'O1_RESIDUAL_EXTREMUM_PK')
+
+    expect(oracle).toBeDefined()
+    expect(oracle!.parentLocalQ31Admissible).toBe(true)
+    expect(oracle!.parentLocalQ31DisplacedProposalKey).toBeNull()
+  })
+
+  it('replays full parent-local q31 competition and reports a displaced ordinary proposal', () => {
+    const evaluation = evaluateM4GenerationSnapshot(
+      q31Snapshot(8, () => ({ rmseDb: 100, maxAbsDb: 100 })),
+      bounds,
+      { proposalsPerParent: 8 },
+    )
+    const oracle = evaluation.candidates.find((candidate) => candidate.family === 'O1_RESIDUAL_EXTREMUM_PK')
+
+    expect(oracle).toBeDefined()
+    expect(oracle!.parentLocalQ31Admissible).toBe(true)
+    expect(oracle!.parentLocalQ31DisplacedProposalKey).not.toBeNull()
+  })
+
+  it('rejects a tail-rank oracle from a full parent-local q31 admission', () => {
+    const evaluation = evaluateM4GenerationSnapshot(
+      q31Snapshot(8, () => ({ rmseDb: 0, maxAbsDb: 0 })),
+      bounds,
+      { proposalsPerParent: 8 },
+    )
+    const oracle = evaluation.candidates.find((candidate) => candidate.family === 'O1_RESIDUAL_EXTREMUM_PK')
+
+    expect(oracle).toBeDefined()
+    expect(oracle!.parentLocalQ31Admissible).toBe(false)
+    expect(oracle!.parentLocalQ31DisplacedProposalKey).toBeNull()
+  })
+
+  it('classifies an oracle polish already present in visited state as a visited duplicate', () => {
+    const ordinary = q31Snapshot(7, () => ({ rmseDb: 0, maxAbsDb: 0 }))
+    const firstEvaluation = evaluateM4GenerationSnapshot(ordinary, bounds, { proposalsPerParent: 8 })
+    const polishedSemanticKey = firstEvaluation.candidates.find((candidate) =>
+      candidate.family === 'O1_RESIDUAL_EXTREMUM_PK')!.polished.semanticKey
+    const evaluation = evaluateM4GenerationSnapshot({
+      ...ordinary,
+      visitedSemanticKeysBefore: [...ordinary.visitedSemanticKeysBefore, polishedSemanticKey],
+    }, bounds, { proposalsPerParent: 8 })
+    const oracle = evaluation.candidates.find((candidate) => candidate.family === 'O1_RESIDUAL_EXTREMUM_PK')
+
+    expect(oracle).toMatchObject({
+      visitedBeforeGeneration: true,
+      semanticallyNovel: false,
+      causalClassification: 'VISITED_DUPLICATE',
+    })
+  })
+
+  it('reconstructs the exact beam from beamBefore and ordinary nextStates only', () => {
+    const ordinary = q31Snapshot(7, () => ({ rmseDb: 0, maxAbsDb: 0 }))
+    const firstEvaluation = evaluateM4GenerationSnapshot(ordinary, bounds, { proposalsPerParent: 8 })
+    const oracle = firstEvaluation.candidates.find((candidate) => candidate.family === 'O1_RESIDUAL_EXTREMUM_PK')!
+    const unacceptedPolishedProposal = q31Proposal(100)
+    const exactInput: StructuralSearchGenerationSnapshot = {
+      ...ordinary,
+      parents: [{
+        ...ordinary.parents[0]!,
+        admittedProposals: [...ordinary.parents[0]!.admittedProposals, unacceptedPolishedProposal],
+        polishedCandidates: [{
+          proposal: unacceptedPolishedProposal,
+          semanticKey: 'unaccepted-polished',
+          prePolish: null,
+          postPolish: {
+            ...ordinary.referenceBefore,
+            candidateId: 'unaccepted-polished',
+            filters: [],
+            rmseDb: 0,
+            maxAbsDb: 0,
+            cancellationScore: 0,
+            semanticKey: 'unaccepted-polished',
+          },
+          coordinateTrials: 0,
+          polishEvaluationBudget: 0,
+          acceptedNextState: false,
+        }],
+      }],
+    }
+    const evaluation = evaluateM4GenerationSnapshot(exactInput, bounds, { proposalsPerParent: 8 })
+    const replayed = evaluation.candidates.find((candidate) => candidate.family === 'O1_RESIDUAL_EXTREMUM_PK')
+
+    expect(replayed).toBeDefined()
+    expect(replayed!.exactBeamSurvives).toBe(oracle.exactBeamSurvives)
+    expect(replayed!.exactReferenceImproves).toBe(oracle.exactReferenceImproves)
+    expect(replayed!.wouldSurviveFrozenParetoBeam).toBe(false)
+  })
+
+  it('computes the online-feasibility gate from de-duplicated deterministic cells', () => {
+    const observedSnapshot = q31Snapshot(7, () => ({ rmseDb: 0, maxAbsDb: 0 }))
+    const source = evaluateM4GenerationSnapshot(
+      observedSnapshot,
+      bounds,
+      { proposalsPerParent: 8 },
+    )
+    const result = {
+      ...source,
+      candidates: source.candidates.map((candidate, index) => index === 0
+        ? {
+            ...candidate,
+            classification: 'ORACLE_WIN' as const,
+            causalClassification: 'ONLINE_FEASIBLE_ORACLE_WIN' as const,
+            ordinaryGenerated: false,
+            ordinaryAdmitted: false,
+            parentLocalQ31Admissible: true,
+            semanticallyNovel: true,
+            exactBeamSurvives: true,
+            exactReferenceImproves: true,
+          }
+        : candidate),
+    }
+    const observation = (repeatIndex: number) => ({
+      caseId: 'case-a',
+      family: 'real' as const,
+      split: 'development' as const,
+      repeatIndex,
+      snapshot: observedSnapshot,
+      result,
+    })
+    const aggregate = aggregateM4OracleEvidence([
+      observation(0),
+      observation(0),
+      observation(1),
+    ])
+
+    expect(aggregate.causalCloseout.protocolCount.O1_RESIDUAL_EXTREMUM_PK.historicalOracleWin).toBe(3)
+    expect(aggregate.causalCloseout.deterministicCount.O1_RESIDUAL_EXTREMUM_PK.historicalOracleWin).toBe(1)
+    expect(aggregate.causalCloseout.onlineCoverage).toMatchObject({
+      developmentCases: 1,
+      holdoutCases: 0,
+      overallCases: 1,
+      distinctCaseGenerationCells: 1,
+    })
   })
 })

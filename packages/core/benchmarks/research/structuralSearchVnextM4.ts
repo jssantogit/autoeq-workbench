@@ -63,7 +63,7 @@ export const M4_EFFORT_LEVEL = M3_EFFORT_LEVEL
 export const M4_RUNNER_SCHEMA_VERSION = 1 as const
 export const M4_DEFAULT_OUTPUT_DIR = resolve(
   fileURLToPath(new URL('../../../..', import.meta.url)),
-  '.research-artifacts/structural-search-m4-candidate-oracle',
+  '.research-artifacts/structural-search-m4-candidate-oracle-causal-closeout',
 )
 
 export const M4_ORACLE_FAMILIES = Object.freeze([
@@ -279,6 +279,7 @@ export interface M4AggregateEvidence {
 export interface M4CausalFamilyTotals {
   historicalOracleWin: number
   ordinaryGeneratedDuplicates: number
+  ordinaryGeneratedNotAdmittedDuplicates: number
   ordinaryAdmittedDuplicates: number
   novelCandidates: number
   parentLocalQ31Admissible: number
@@ -678,6 +679,7 @@ function parentLocalQ31Admission(
   parent: StructuralSearchGenerationSnapshot['parents'][number] | undefined,
   candidate: M4OracleCandidate,
   pre: M4CandidateMetrics,
+  targetCount: number,
 ): { admissible: boolean | null; displacedProposalKey: string | null; reason: M4CandidateComparison['parentLocalQ31SelectionReason'] } {
   if (parent === undefined) return { admissible: null, displacedProposalKey: null, reason: 'parent-unavailable' }
   const ordinary = parent.prePolishCandidates
@@ -704,9 +706,9 @@ function parentLocalQ31Admission(
   const rank = (left: typeof inserted, right: typeof inserted) =>
     left.rmseDb - right.rmseDb || left.maxAbsDb - right.maxAbsDb || left.filterCount - right.filterCount ||
     left.cancellationScore - right.cancellationScore || left.lexicalRank - right.lexicalRank
-  const selectedWithout = selectQuotaProposals(ordinary, [...ordinary].sort(rank), 6, 2, parent.admittedProposals.length)
+  const selectedWithout = selectQuotaProposals(ordinary, [...ordinary].sort(rank), 6, 2, targetCount)
   const withCandidate = [...ordinary, inserted]
-  const selectedWith = selectQuotaProposals(withCandidate, [...withCandidate].sort(rank), 6, 2, parent.admittedProposals.length)
+  const selectedWith = selectQuotaProposals(withCandidate, [...withCandidate].sort(rank), 6, 2, targetCount)
   const admissible = selectedWith.some((entry) => entry.key === inserted.key)
   const selectedWithKeys = new Set(selectedWith.map((entry) => entry.key))
   const displaced = selectedWithout.find((entry) => !selectedWithKeys.has(entry.key))
@@ -963,7 +965,7 @@ function buildWinLocations(
 export function evaluateM4GenerationSnapshot(
   snapshot: StructuralSearchGenerationSnapshot,
   bounds: StandardAutoEqV2Config = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 10 }),
-  options: { localPolishEvaluations?: number; beamWidth?: number } = {},
+  options: { localPolishEvaluations?: number; beamWidth?: number; proposalsPerParent: number },
 ): M4GenerationOracleResult {
   const beamWidth = options.beamWidth ?? 4
   const basePolishEvaluations = options.localPolishEvaluations ?? 24
@@ -1041,7 +1043,7 @@ export function evaluateM4GenerationSnapshot(
       semanticFilterKey(proposal.filters) === candidate.semanticKey) ?? false
     const ordinaryAdmitted = parent?.admittedProposals.some((proposal) =>
       semanticFilterKey(proposal.filters) === candidate.semanticKey) ?? false
-    const q31 = parentLocalQ31Admission(parent, candidate, pre)
+    const q31 = parentLocalQ31Admission(parent, candidate, pre, options.proposalsPerParent)
     const polishedSemanticKey = semanticFilterKey(polished.filters)
     const visitedBeforeGeneration = snapshot.visitedSemanticKeysBefore.includes(polishedSemanticKey)
     const duplicatesOrdinaryNextState = snapshot.nextStates.some((state) => state.semanticKey === polishedSemanticKey)
@@ -1191,14 +1193,15 @@ function mergeResultsIntoGroup(
 
 function emptyCausalFamilyTotals(): M4CausalFamilyTotals {
   return {
-    historicalOracleWin: 0, ordinaryGeneratedDuplicates: 0, ordinaryAdmittedDuplicates: 0,
+    historicalOracleWin: 0, ordinaryGeneratedDuplicates: 0,
+    ordinaryGeneratedNotAdmittedDuplicates: 0, ordinaryAdmittedDuplicates: 0,
     novelCandidates: 0, parentLocalQ31Admissible: 0, visitedDuplicates: 0,
     exactBeamSurvivors: 0, exactReferenceImprovers: 0, onlineFeasibleOracleWin: 0,
   }
 }
 
 function causalCloseout(observations: readonly M4SnapshotObservation[]): M4CausalCloseout {
-  const real = observations.filter((row) => row.family === 'real')
+  const all = observations
   const families = () => Object.fromEntries(M4_ORACLE_FAMILIES.map((family) => [family, emptyCausalFamilyTotals()])) as Record<M4OracleFamily, M4CausalFamilyTotals>
   const classifications = () => Object.fromEntries([
     'ORDINARY_ALREADY_GENERATED', 'NOVEL_Q31_REJECTED', 'VISITED_DUPLICATE', 'EXACT_BEAM_REJECTED', 'REFERENCE_NONIMPROVING', 'ONLINE_FEASIBLE_ORACLE_WIN',
@@ -1211,7 +1214,12 @@ function causalCloseout(observations: readonly M4SnapshotObservation[]): M4Causa
       const target = byFamily[candidate.family]
       target.historicalOracleWin += 1
       target.ordinaryGeneratedDuplicates += Number(candidate.ordinaryGenerated)
-      target.ordinaryAdmittedDuplicates += Number(candidate.ordinaryAdmitted)
+      target.ordinaryGeneratedNotAdmittedDuplicates += Number(
+        candidate.ordinaryGenerated && !candidate.ordinaryAdmitted,
+      )
+      target.ordinaryAdmittedDuplicates += Number(
+        candidate.ordinaryGenerated && candidate.ordinaryAdmitted,
+      )
       target.novelCandidates += Number(!candidate.ordinaryGenerated)
       target.parentLocalQ31Admissible += Number(candidate.parentLocalQ31Admissible === true)
       target.visitedDuplicates += Number(!candidate.semanticallyNovel)
@@ -1222,17 +1230,24 @@ function causalCloseout(observations: readonly M4SnapshotObservation[]): M4Causa
     }
     return { byFamily, totals }
   }
-  const protocol = summarize(real)
-  // Corrected M4 has byte-identical repeats; repeat 0 is the predeclared deterministic representative.
-  const deterministic = summarize(real.filter((row) => row.repeatIndex === 0))
-  const online = real.flatMap((row) => row.result.candidates
+  const protocol = summarize(all)
+  // Corrected M4 has byte-identical repeats; repeat 0 is the predeclared
+  // deterministic representative.  De-duplicate by case×generation before
+  // computing the feasibility gate so protocol multiplicity cannot inflate it.
+  const deterministicRows = [...new Map([...all]
+    .filter((row) => row.repeatIndex === 0)
+    .sort((left, right) => left.caseId.localeCompare(right.caseId) ||
+      left.snapshot.generation - right.snapshot.generation)
+    .map((row) => [`${row.caseId}|${row.snapshot.generation}`, row] as const)).values()]
+  const deterministic = summarize(deterministicRows)
+  const online = deterministicRows.filter((row) => row.family === 'real').flatMap((row) => row.result.candidates
     .filter((candidate) => candidate.classification === 'ORACLE_WIN' && candidate.causalClassification === 'ONLINE_FEASIBLE_ORACLE_WIN')
     .map((candidate) => ({ caseId: row.caseId, generation: row.snapshot.generation, family: candidate.family, split: row.split })))
   const cells = new Set(online.map((row) => `${row.caseId}|${row.generation}`))
   const developmentCases = new Set(online.filter((row) => row.split === 'development').map((row) => row.caseId)).size
   const holdoutCases = new Set(online.filter((row) => row.split === 'holdout').map((row) => row.caseId)).size
   const overallCases = new Set(online.map((row) => row.caseId)).size
-  const conclusion = observations.length === 0 ? 'INCONCLUSIVE' :
+  const conclusion = deterministicRows.every((row) => row.family !== 'real') ? 'INCONCLUSIVE' :
     developmentCases >= 2 && holdoutCases >= 2 && overallCases >= 4 && cells.size >= 2
       ? 'ONLINE_STRUCTURAL_INJECTION_SUPPORTED' : 'ONLINE_STRUCTURAL_INJECTION_NOT_SUPPORTED'
   return {
@@ -1443,8 +1458,64 @@ function renderWinLocalization(group: M4AggregateGroup): string[] {
     `- ORACLE_WIN by family: ${familyWins}.`,
     `- Win locations (case/repeat/generation/phase): ${locations.length === 0 ? 'none' : locations.join('; ')}.`,
     `- Pre-polish-qualified wins: ${prePolishQualifiedWins}; wins emerging only after equal-work polish: ${polishedEmergentWins}.`,
-    `- Dominant failure stage among candidate events: ${dominantFailureStage(group)}.`,
+    `- Candidate-stage failure counts are descriptive only; the largest losing class (${dominantFailureStage(group)}) is not treated as an architectural bottleneck.`,
   ]
+}
+
+function renderCausalRecommendation(closeout: M4CausalCloseout): string {
+  const deterministic = closeout.deterministicCount
+  const ordinaryAdmitted = M4_ORACLE_FAMILIES.reduce(
+    (total, family) => total + deterministic[family].ordinaryAdmittedDuplicates,
+    0,
+  )
+  const ordinaryNotAdmitted = M4_ORACLE_FAMILIES.reduce(
+    (total, family) => total + deterministic[family].ordinaryGeneratedNotAdmittedDuplicates,
+    0,
+  )
+  const novel = M4_ORACLE_FAMILIES.reduce(
+    (total, family) => total + deterministic[family].novelCandidates,
+    0,
+  )
+  const q31Rejected = deterministicClassificationCount(
+    closeout.deterministicClassificationTotals,
+    'NOVEL_Q31_REJECTED',
+  )
+  return `- Architectural recommendation: keep the oracle shadow-only and do not start M5 or authorize online structural injection. De-duplicated useful fates are ${novel} novel candidates (${q31Rejected} q31-rejected), ${ordinaryAdmitted} ordinary-generated-and-admitted duplicates, and ${ordinaryNotAdmitted} ordinary-generated-but-not-admitted duplicates; no useful candidate was localized to visited, exact-beam, or reference rejection. The online gate remains ${closeout.onlineCoverage.conclusion} (${closeout.onlineCoverage.developmentCases}/3 development, ${closeout.onlineCoverage.holdoutCases}/3 holdout, ${closeout.onlineCoverage.overallCases}/6 overall, ${closeout.onlineCoverage.distinctCaseGenerationCells} case×generation cells).`
+}
+
+function deterministicClassificationCount(
+  totals: Record<M4CausalClassification, number>,
+  classification: M4CausalClassification,
+): number {
+  return totals[classification]
+}
+
+function renderCausalFamilyTable(
+  label: string,
+  values: Record<M4OracleFamily, M4CausalFamilyTotals>,
+): string[] {
+  const rows: Array<[string, keyof M4CausalFamilyTotals]> = [
+    ['historical ORACLE_WIN', 'historicalOracleWin'],
+    ['ordinary-generated duplicates', 'ordinaryGeneratedDuplicates'],
+    ['ordinary-generated + admitted', 'ordinaryAdmittedDuplicates'],
+    ['ordinary-generated + not admitted', 'ordinaryGeneratedNotAdmittedDuplicates'],
+    ['novel candidates', 'novelCandidates'],
+    ['parent-local q31-admissible', 'parentLocalQ31Admissible'],
+    ['visited duplicates', 'visitedDuplicates'],
+    ['exact beam survivors', 'exactBeamSurvivors'],
+    ['exact reference improvers', 'exactReferenceImprovers'],
+    ['ONLINE_FEASIBLE_ORACLE_WIN', 'onlineFeasibleOracleWin'],
+  ]
+  const lines = [
+    `### ${label} causal totals by oracle family`,
+    '',
+    `| metric | ${M4_ORACLE_FAMILIES.join(' | ')} |`,
+    `| --- | ${M4_ORACLE_FAMILIES.map(() => '---').join(' | ')} |`,
+  ]
+  for (const [metric, key] of rows) {
+    lines.push(`| ${metric} | ${M4_ORACLE_FAMILIES.map((family) => String(values[family][key])).join(' | ')} |`)
+  }
+  return lines
 }
 
 export function renderM4FinalReport(result: Pick<M4CampaignResult, 'protocol' | 'aggregate' | 'conclusion' | 'evidenceSha256'>): string {
@@ -1503,6 +1574,12 @@ export function renderM4FinalReport(result: Pick<M4CampaignResult, 'protocol' | 
     `- Protocol causal classes (historical ORACLE_WIN events): ${Object.entries(result.aggregate.causalCloseout.classificationTotals).map(([key, value]) => `${key}=${value}`).join('; ')}.`,
     `- De-duplicated deterministic causal classes (repeat 0): ${Object.entries(result.aggregate.causalCloseout.deterministicClassificationTotals).map(([key, value]) => `${key}=${value}`).join('; ')}.`,
     `- Online-feasible locations: ${result.aggregate.causalCloseout.onlineLocations.length === 0 ? 'none' : result.aggregate.causalCloseout.onlineLocations.map((row) => `${row.caseId}@g${row.generation}[${row.family}]`).join('; ')}.`,
+    '',
+    ...renderCausalFamilyTable('Protocol', result.aggregate.causalCloseout.protocolCount),
+    '',
+    ...renderCausalFamilyTable('De-duplicated deterministic', result.aggregate.causalCloseout.deterministicCount),
+    '',
+    renderCausalRecommendation(result.aggregate.causalCloseout),
     '',
     'This milestone is diagnostic/shadow only. It does not authorize an online M4/M5 search policy.',
   ]
@@ -1605,6 +1682,7 @@ export function runStructuralSearchM4(options: M4RunnerOptions = {}): M4Campaign
         const result = evaluateM4GenerationSnapshot(snapshot, bounds, {
           localPolishEvaluations: config.localPolishEvaluations,
           beamWidth: config.beamWidth,
+          proposalsPerParent: config.proposalsPerParent,
         })
         observations.push({
           caseId: prepared.id,
@@ -1667,26 +1745,35 @@ export function runStructuralSearchM4(options: M4RunnerOptions = {}): M4Campaign
     writeFileSync(resolve(outputDir, 'evidence-sha256.txt'), `${evidenceSha256}\n`)
     const audit = observations.flatMap((observation) => observation.result.candidates
       .filter((candidate) => candidate.classification === 'ORACLE_WIN' || candidate.causalClassification === 'ONLINE_FEASIBLE_ORACLE_WIN')
-      .map((candidate) => ({
-        caseId: observation.caseId,
-        repeatIndex: observation.repeatIndex,
-        generation: observation.snapshot.generation,
-        family: candidate.family,
-        parentCandidateId: observation.snapshot.parents.find((parent) => parent.parent.candidateId ===
-          generateM4OracleCandidates(observation.snapshot, bounds).find((oracle) => oracle.semanticKey === candidate.semanticKey)?.parentCandidateId)?.parent.candidateId ?? null,
-        proposalSemanticKey: candidate.semanticKey,
-        polishedSemanticKey: candidate.polished.semanticKey,
-        ordinaryGenerated: candidate.ordinaryGenerated,
-        ordinaryAdmitted: candidate.ordinaryAdmitted,
-        parentLocalQ31Admissible: candidate.parentLocalQ31Admissible,
-        parentLocalQ31DisplacedProposalKey: candidate.parentLocalQ31DisplacedProposalKey,
-        visitedBeforeGeneration: candidate.visitedBeforeGeneration,
-        duplicatesOrdinaryNextState: candidate.duplicatesOrdinaryNextState,
-        exactBeamSurvives: candidate.exactBeamSurvives,
-        exactReferenceImproves: candidate.exactReferenceImproves,
-        historicalClassification: candidate.classification,
-        causalClassification: candidate.causalClassification,
-      })))
+      .map((candidate) => {
+        const oracle = generateM4OracleCandidates(observation.snapshot, bounds)
+          .find((entry) => entry.semanticKey === candidate.semanticKey)
+        const parent = observation.snapshot.parents.find((entry) =>
+          entry.parent.candidateId === oracle?.parentCandidateId)
+        return {
+          caseId: observation.caseId,
+          ...(observation.caseLabel === undefined ? {} : { caseLabel: observation.caseLabel }),
+          split: observation.split,
+          repeatIndex: observation.repeatIndex,
+          generation: observation.snapshot.generation,
+          family: candidate.family,
+          parentSemanticKey: parent?.parent.semanticKey ?? null,
+          parentCandidateId: parent?.parent.candidateId ?? null,
+          proposalSemanticKey: candidate.semanticKey,
+          polishedSemanticKey: candidate.polished.semanticKey,
+          ordinaryGenerated: candidate.ordinaryGenerated,
+          ordinaryAdmitted: candidate.ordinaryAdmitted,
+          ordinaryGeneratedNotAdmitted: candidate.ordinaryGenerated && !candidate.ordinaryAdmitted,
+          parentLocalQ31Admissible: candidate.parentLocalQ31Admissible,
+          parentLocalQ31DisplacedProposalKey: candidate.parentLocalQ31DisplacedProposalKey,
+          visitedBeforeGeneration: candidate.visitedBeforeGeneration,
+          duplicatesOrdinaryNextState: candidate.duplicatesOrdinaryNextState,
+          exactBeamSurvives: candidate.exactBeamSurvives,
+          exactReferenceImproves: candidate.exactReferenceImproves,
+          historicalClassification: candidate.classification,
+          causalClassification: candidate.causalClassification,
+        }
+      }))
     writeFileSync(resolve(outputDir, 'candidate-win-audit.json'), JSON.stringify(audit, null, 2) + '\n')
     writeFileSync(resolve(outputDir, 'final-report.md'), renderM4FinalReport(result))
     result.outputDir = outputDir

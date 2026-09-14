@@ -1,0 +1,1583 @@
+{
+  "real": {
+    "family": "real",
+    "snapshotCount": 54,
+    "caseCount": 6,
+    "repeatCount": 18,
+    "generationCount": 54,
+    "competitiveCaseCount": 5,
+    "competitiveRepeatCount": 15,
+    "competitiveGenerationCount": 24,
+    "winsByCase": [
+      "titan-to-mystic-8",
+      "titan-to-rsv",
+      "titan-to-storm",
+      "titan-to-trio",
+      "titan-to-u12t"
+    ],
+    "trajectoryCoverage": [
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "a6c835c67244d184dad025fcc2de6b1879759c39dbd9ee5e6505067eda63777c"
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "a6c835c67244d184dad025fcc2de6b1879759c39dbd9ee5e6505067eda63777c"
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "a6c835c67244d184dad025fcc2de6b1879759c39dbd9ee5e6505067eda63777c"
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "783b3433708a71ddd67505463469ac2b6e4ba9fec0866a0e5eda5c60964c5948"
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "783b3433708a71ddd67505463469ac2b6e4ba9fec0866a0e5eda5c60964c5948"
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "783b3433708a71ddd67505463469ac2b6e4ba9fec0866a0e5eda5c60964c5948"
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "caseLabel": "Titan → S12 Ultra",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "e0143f6c1ce3ed444699a8fd9818072664d99706cfc77b5ae447f8d15d535be7"
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "caseLabel": "Titan → S12 Ultra",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "e0143f6c1ce3ed444699a8fd9818072664d99706cfc77b5ae447f8d15d535be7"
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "caseLabel": "Titan → S12 Ultra",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "e0143f6c1ce3ed444699a8fd9818072664d99706cfc77b5ae447f8d15d535be7"
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "0123b3dbecabaf7798e29b9e075304788514fc943cfc1010f6fe5fbabbf82507"
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "0123b3dbecabaf7798e29b9e075304788514fc943cfc1010f6fe5fbabbf82507"
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "0123b3dbecabaf7798e29b9e075304788514fc943cfc1010f6fe5fbabbf82507"
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "4aa568a0a1f48e40efa063231fd02ee9f2cadd7d01c785c75026255f27de238a"
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "4aa568a0a1f48e40efa063231fd02ee9f2cadd7d01c785c75026255f27de238a"
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "4aa568a0a1f48e40efa063231fd02ee9f2cadd7d01c785c75026255f27de238a"
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "44ff7dc6be265db90aa28b66c4925c67646f137b2cc05f67c7a90a91c5a2e5c7"
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "44ff7dc6be265db90aa28b66c4925c67646f137b2cc05f67c7a90a91c5a2e5c7"
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "44ff7dc6be265db90aa28b66c4925c67646f137b2cc05f67c7a90a91c5a2e5c7"
+      }
+    ],
+    "repeatIdentityByCase": {
+      "titan-to-mystic-8": {
+        "caseId": "titan-to-mystic-8",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "a6c835c67244d184dad025fcc2de6b1879759c39dbd9ee5e6505067eda63777c",
+          "a6c835c67244d184dad025fcc2de6b1879759c39dbd9ee5e6505067eda63777c",
+          "a6c835c67244d184dad025fcc2de6b1879759c39dbd9ee5e6505067eda63777c"
+        ]
+      },
+      "titan-to-rsv": {
+        "caseId": "titan-to-rsv",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "783b3433708a71ddd67505463469ac2b6e4ba9fec0866a0e5eda5c60964c5948",
+          "783b3433708a71ddd67505463469ac2b6e4ba9fec0866a0e5eda5c60964c5948",
+          "783b3433708a71ddd67505463469ac2b6e4ba9fec0866a0e5eda5c60964c5948"
+        ]
+      },
+      "titan-to-s12-ultra": {
+        "caseId": "titan-to-s12-ultra",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "e0143f6c1ce3ed444699a8fd9818072664d99706cfc77b5ae447f8d15d535be7",
+          "e0143f6c1ce3ed444699a8fd9818072664d99706cfc77b5ae447f8d15d535be7",
+          "e0143f6c1ce3ed444699a8fd9818072664d99706cfc77b5ae447f8d15d535be7"
+        ]
+      },
+      "titan-to-storm": {
+        "caseId": "titan-to-storm",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "0123b3dbecabaf7798e29b9e075304788514fc943cfc1010f6fe5fbabbf82507",
+          "0123b3dbecabaf7798e29b9e075304788514fc943cfc1010f6fe5fbabbf82507",
+          "0123b3dbecabaf7798e29b9e075304788514fc943cfc1010f6fe5fbabbf82507"
+        ]
+      },
+      "titan-to-trio": {
+        "caseId": "titan-to-trio",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "4aa568a0a1f48e40efa063231fd02ee9f2cadd7d01c785c75026255f27de238a",
+          "4aa568a0a1f48e40efa063231fd02ee9f2cadd7d01c785c75026255f27de238a",
+          "4aa568a0a1f48e40efa063231fd02ee9f2cadd7d01c785c75026255f27de238a"
+        ]
+      },
+      "titan-to-u12t": {
+        "caseId": "titan-to-u12t",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "44ff7dc6be265db90aa28b66c4925c67646f137b2cc05f67c7a90a91c5a2e5c7",
+          "44ff7dc6be265db90aa28b66c4925c67646f137b2cc05f67c7a90a91c5a2e5c7",
+          "44ff7dc6be265db90aa28b66c4925c67646f137b2cc05f67c7a90a91c5a2e5c7"
+        ]
+      }
+    },
+    "winLocations": [
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 0,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 16,
+        "prePolishQualifiedWins": 16,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 1,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 16,
+        "prePolishQualifiedWins": 16,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 2,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 16,
+        "prePolishQualifiedWins": 16,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "split": "development",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "split": "development",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "split": "development",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O3_SHELF_EVIDENCE",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 5,
+        "prePolishQualifiedWins": 5,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O3_SHELF_EVIDENCE",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 5,
+        "prePolishQualifiedWins": 5,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O3_SHELF_EVIDENCE",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 5,
+        "prePolishQualifiedWins": 5,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      }
+    ],
+    "byFamily": {
+      "O1_RESIDUAL_EXTREMUM_PK": {
+        "familyLocalCandidateAbsence": 0,
+        "candidatesGenerated": 174,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 174,
+        "prePolishCandidatesBeatingWorstOrdinary": 162,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 171,
+        "polishedCandidatesBeatingBestOrdinary": 12,
+        "candidatesWouldSurviveFrozenParetoBeam": 15,
+        "candidatesImprovingReferenceRmse": 12,
+        "candidatesImprovingReferenceMaxAbs": 12,
+        "candidatesImprovingBoth": 9,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 0,
+          "PREPOLISH_REJECTED": 12,
+          "POLISH_FAILURE": 3,
+          "BEAM_REJECTED": 150,
+          "REFERENCE_NONIMPROVING": 3,
+          "ORACLE_WIN": 6
+        }
+      },
+      "O2_RESIDUAL_REGION_PK": {
+        "familyLocalCandidateAbsence": 0,
+        "candidatesGenerated": 174,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 174,
+        "prePolishCandidatesBeatingWorstOrdinary": 171,
+        "prePolishCandidatesBeatingBestOrdinary": 66,
+        "polishedCandidatesBeatingWorstOrdinary": 171,
+        "polishedCandidatesBeatingBestOrdinary": 42,
+        "candidatesWouldSurviveFrozenParetoBeam": 72,
+        "candidatesImprovingReferenceRmse": 96,
+        "candidatesImprovingReferenceMaxAbs": 39,
+        "candidatesImprovingBoth": 36,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 0,
+          "PREPOLISH_REJECTED": 3,
+          "POLISH_FAILURE": 3,
+          "BEAM_REJECTED": 99,
+          "REFERENCE_NONIMPROVING": 30,
+          "ORACLE_WIN": 39
+        }
+      },
+      "O3_SHELF_EVIDENCE": {
+        "familyLocalCandidateAbsence": 3,
+        "candidatesGenerated": 138,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 138,
+        "prePolishCandidatesBeatingWorstOrdinary": 135,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 123,
+        "polishedCandidatesBeatingBestOrdinary": 3,
+        "candidatesWouldSurviveFrozenParetoBeam": 15,
+        "candidatesImprovingReferenceRmse": 21,
+        "candidatesImprovingReferenceMaxAbs": 3,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 3,
+          "PREPOLISH_REJECTED": 3,
+          "POLISH_FAILURE": 12,
+          "BEAM_REJECTED": 108,
+          "REFERENCE_NONIMPROVING": 12,
+          "ORACLE_WIN": 3
+        }
+      },
+      "O4_TOPOLOGY_SUBSTITUTION": {
+        "familyLocalCandidateAbsence": 18,
+        "candidatesGenerated": 429,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 429,
+        "prePolishCandidatesBeatingWorstOrdinary": 429,
+        "prePolishCandidatesBeatingBestOrdinary": 54,
+        "polishedCandidatesBeatingWorstOrdinary": 429,
+        "polishedCandidatesBeatingBestOrdinary": 39,
+        "candidatesWouldSurviveFrozenParetoBeam": 66,
+        "candidatesImprovingReferenceRmse": 99,
+        "candidatesImprovingReferenceMaxAbs": 45,
+        "candidatesImprovingBoth": 27,
+        "topologySubstitutionWins": 39,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 18,
+          "PREPOLISH_REJECTED": 0,
+          "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 363,
+          "REFERENCE_NONIMPROVING": 27,
+          "ORACLE_WIN": 39
+        }
+      }
+    },
+    "generationGlobalDecomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 0,
+      "PREPOLISH_REJECTED": 18,
+      "POLISH_FAILURE": 18,
+      "BEAM_REJECTED": 720,
+      "REFERENCE_NONIMPROVING": 72,
+      "ORACLE_WIN": 87
+    },
+    "decomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 0,
+      "PREPOLISH_REJECTED": 18,
+      "POLISH_FAILURE": 18,
+      "BEAM_REJECTED": 720,
+      "REFERENCE_NONIMPROVING": 72,
+      "ORACLE_WIN": 87
+    }
+  },
+  "synthetic": {
+    "family": "synthetic",
+    "snapshotCount": 36,
+    "caseCount": 4,
+    "repeatCount": 12,
+    "generationCount": 36,
+    "competitiveCaseCount": 2,
+    "competitiveRepeatCount": 6,
+    "competitiveGenerationCount": 6,
+    "winsByCase": [
+      "synthetic-d-dense-known-structure",
+      "synthetic-h-alternating-structure"
+    ],
+    "trajectoryCoverage": [
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "26d9145c7aa23da5807f8dae4044c99c331c282a1116a0be007287e5564e67ef"
+      },
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "26d9145c7aa23da5807f8dae4044c99c331c282a1116a0be007287e5564e67ef"
+      },
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "26d9145c7aa23da5807f8dae4044c99c331c282a1116a0be007287e5564e67ef"
+      },
+      {
+        "caseId": "synthetic-e-high-q-valid",
+        "caseLabel": "Synthetic E",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          19
+        ],
+        "terminalGeneration": 19,
+        "terminalReason": "natural-stop",
+        "samplingAdequate": true,
+        "fingerprint": "043ec5882d68bd9d74f812e5b5d1d6c9b6b7a941f52150c7365fb4b23f5ffcd2"
+      },
+      {
+        "caseId": "synthetic-e-high-q-valid",
+        "caseLabel": "Synthetic E",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          19
+        ],
+        "terminalGeneration": 19,
+        "terminalReason": "natural-stop",
+        "samplingAdequate": true,
+        "fingerprint": "043ec5882d68bd9d74f812e5b5d1d6c9b6b7a941f52150c7365fb4b23f5ffcd2"
+      },
+      {
+        "caseId": "synthetic-e-high-q-valid",
+        "caseLabel": "Synthetic E",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          19
+        ],
+        "terminalGeneration": 19,
+        "terminalReason": "natural-stop",
+        "samplingAdequate": true,
+        "fingerprint": "043ec5882d68bd9d74f812e5b5d1d6c9b6b7a941f52150c7365fb4b23f5ffcd2"
+      },
+      {
+        "caseId": "synthetic-f-upper-frequency-structure",
+        "caseLabel": "Synthetic F",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "ff2a768cd60d17e65511779e562131d6ed653b767b1b2856a585edf3c1d15938"
+      },
+      {
+        "caseId": "synthetic-f-upper-frequency-structure",
+        "caseLabel": "Synthetic F",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "ff2a768cd60d17e65511779e562131d6ed653b767b1b2856a585edf3c1d15938"
+      },
+      {
+        "caseId": "synthetic-f-upper-frequency-structure",
+        "caseLabel": "Synthetic F",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "ff2a768cd60d17e65511779e562131d6ed653b767b1b2856a585edf3c1d15938"
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "21afa0b7c2d8037543b7d3205b55096084cc8a13cb0b64b8d5e135515979ee0f"
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "21afa0b7c2d8037543b7d3205b55096084cc8a13cb0b64b8d5e135515979ee0f"
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "21afa0b7c2d8037543b7d3205b55096084cc8a13cb0b64b8d5e135515979ee0f"
+      }
+    ],
+    "repeatIdentityByCase": {
+      "synthetic-d-dense-known-structure": {
+        "caseId": "synthetic-d-dense-known-structure",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "26d9145c7aa23da5807f8dae4044c99c331c282a1116a0be007287e5564e67ef",
+          "26d9145c7aa23da5807f8dae4044c99c331c282a1116a0be007287e5564e67ef",
+          "26d9145c7aa23da5807f8dae4044c99c331c282a1116a0be007287e5564e67ef"
+        ]
+      },
+      "synthetic-e-high-q-valid": {
+        "caseId": "synthetic-e-high-q-valid",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "043ec5882d68bd9d74f812e5b5d1d6c9b6b7a941f52150c7365fb4b23f5ffcd2",
+          "043ec5882d68bd9d74f812e5b5d1d6c9b6b7a941f52150c7365fb4b23f5ffcd2",
+          "043ec5882d68bd9d74f812e5b5d1d6c9b6b7a941f52150c7365fb4b23f5ffcd2"
+        ]
+      },
+      "synthetic-f-upper-frequency-structure": {
+        "caseId": "synthetic-f-upper-frequency-structure",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "ff2a768cd60d17e65511779e562131d6ed653b767b1b2856a585edf3c1d15938",
+          "ff2a768cd60d17e65511779e562131d6ed653b767b1b2856a585edf3c1d15938",
+          "ff2a768cd60d17e65511779e562131d6ed653b767b1b2856a585edf3c1d15938"
+        ]
+      },
+      "synthetic-h-alternating-structure": {
+        "caseId": "synthetic-h-alternating-structure",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "21afa0b7c2d8037543b7d3205b55096084cc8a13cb0b64b8d5e135515979ee0f",
+          "21afa0b7c2d8037543b7d3205b55096084cc8a13cb0b64b8d5e135515979ee0f",
+          "21afa0b7c2d8037543b7d3205b55096084cc8a13cb0b64b8d5e135515979ee0f"
+        ]
+      }
+    },
+    "winLocations": [
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK",
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK",
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK",
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      }
+    ],
+    "byFamily": {
+      "O1_RESIDUAL_EXTREMUM_PK": {
+        "familyLocalCandidateAbsence": 12,
+        "candidatesGenerated": 39,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 39,
+        "prePolishCandidatesBeatingWorstOrdinary": 33,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 39,
+        "polishedCandidatesBeatingBestOrdinary": 12,
+        "candidatesWouldSurviveFrozenParetoBeam": 12,
+        "candidatesImprovingReferenceRmse": 12,
+        "candidatesImprovingReferenceMaxAbs": 6,
+        "candidatesImprovingBoth": 6,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 12,
+          "PREPOLISH_REJECTED": 6,
+          "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 27,
+          "REFERENCE_NONIMPROVING": 0,
+          "ORACLE_WIN": 6
+        }
+      },
+      "O2_RESIDUAL_REGION_PK": {
+        "familyLocalCandidateAbsence": 12,
+        "candidatesGenerated": 39,
+        "semanticDuplicatesRejected": 12,
+        "validCandidates": 27,
+        "prePolishCandidatesBeatingWorstOrdinary": 27,
+        "prePolishCandidatesBeatingBestOrdinary": 6,
+        "polishedCandidatesBeatingWorstOrdinary": 24,
+        "polishedCandidatesBeatingBestOrdinary": 3,
+        "candidatesWouldSurviveFrozenParetoBeam": 3,
+        "candidatesImprovingReferenceRmse": 3,
+        "candidatesImprovingReferenceMaxAbs": 0,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 12,
+          "PREPOLISH_REJECTED": 0,
+          "POLISH_FAILURE": 3,
+          "BEAM_REJECTED": 21,
+          "REFERENCE_NONIMPROVING": 0,
+          "ORACLE_WIN": 3
+        }
+      },
+      "O3_SHELF_EVIDENCE": {
+        "familyLocalCandidateAbsence": 27,
+        "candidatesGenerated": 12,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 12,
+        "prePolishCandidatesBeatingWorstOrdinary": 6,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 6,
+        "polishedCandidatesBeatingBestOrdinary": 0,
+        "candidatesWouldSurviveFrozenParetoBeam": 3,
+        "candidatesImprovingReferenceRmse": 0,
+        "candidatesImprovingReferenceMaxAbs": 3,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 27,
+          "PREPOLISH_REJECTED": 6,
+          "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 3,
+          "REFERENCE_NONIMPROVING": 3,
+          "ORACLE_WIN": 0
+        }
+      },
+      "O4_TOPOLOGY_SUBSTITUTION": {
+        "familyLocalCandidateAbsence": 24,
+        "candidatesGenerated": 54,
+        "semanticDuplicatesRejected": 9,
+        "validCandidates": 45,
+        "prePolishCandidatesBeatingWorstOrdinary": 45,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 45,
+        "polishedCandidatesBeatingBestOrdinary": 0,
+        "candidatesWouldSurviveFrozenParetoBeam": 0,
+        "candidatesImprovingReferenceRmse": 0,
+        "candidatesImprovingReferenceMaxAbs": 3,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 24,
+          "PREPOLISH_REJECTED": 0,
+          "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 45,
+          "REFERENCE_NONIMPROVING": 0,
+          "ORACLE_WIN": 0
+        }
+      }
+    },
+    "generationGlobalDecomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 12,
+      "PREPOLISH_REJECTED": 12,
+      "POLISH_FAILURE": 3,
+      "BEAM_REJECTED": 96,
+      "REFERENCE_NONIMPROVING": 3,
+      "ORACLE_WIN": 9
+    },
+    "decomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 12,
+      "PREPOLISH_REJECTED": 12,
+      "POLISH_FAILURE": 3,
+      "BEAM_REJECTED": 96,
+      "REFERENCE_NONIMPROVING": 3,
+      "ORACLE_WIN": 9
+    }
+  },
+  "byFamily": {
+    "O1_RESIDUAL_EXTREMUM_PK": {
+      "familyLocalCandidateAbsence": 12,
+      "candidatesGenerated": 213,
+      "semanticDuplicatesRejected": 0,
+      "validCandidates": 213,
+      "prePolishCandidatesBeatingWorstOrdinary": 195,
+      "prePolishCandidatesBeatingBestOrdinary": 0,
+      "polishedCandidatesBeatingWorstOrdinary": 210,
+      "polishedCandidatesBeatingBestOrdinary": 24,
+      "candidatesWouldSurviveFrozenParetoBeam": 27,
+      "candidatesImprovingReferenceRmse": 24,
+      "candidatesImprovingReferenceMaxAbs": 18,
+      "candidatesImprovingBoth": 15,
+      "topologySubstitutionWins": 0,
+      "classifications": {
+        "NO_STRUCTURAL_CANDIDATE": 12,
+        "PREPOLISH_REJECTED": 18,
+        "POLISH_FAILURE": 3,
+        "BEAM_REJECTED": 177,
+        "REFERENCE_NONIMPROVING": 3,
+        "ORACLE_WIN": 12
+      }
+    },
+    "O2_RESIDUAL_REGION_PK": {
+      "familyLocalCandidateAbsence": 12,
+      "candidatesGenerated": 213,
+      "semanticDuplicatesRejected": 12,
+      "validCandidates": 201,
+      "prePolishCandidatesBeatingWorstOrdinary": 198,
+      "prePolishCandidatesBeatingBestOrdinary": 72,
+      "polishedCandidatesBeatingWorstOrdinary": 195,
+      "polishedCandidatesBeatingBestOrdinary": 45,
+      "candidatesWouldSurviveFrozenParetoBeam": 75,
+      "candidatesImprovingReferenceRmse": 99,
+      "candidatesImprovingReferenceMaxAbs": 39,
+      "candidatesImprovingBoth": 36,
+      "topologySubstitutionWins": 0,
+      "classifications": {
+        "NO_STRUCTURAL_CANDIDATE": 12,
+        "PREPOLISH_REJECTED": 3,
+        "POLISH_FAILURE": 6,
+        "BEAM_REJECTED": 120,
+        "REFERENCE_NONIMPROVING": 30,
+        "ORACLE_WIN": 42
+      }
+    },
+    "O3_SHELF_EVIDENCE": {
+      "familyLocalCandidateAbsence": 30,
+      "candidatesGenerated": 150,
+      "semanticDuplicatesRejected": 0,
+      "validCandidates": 150,
+      "prePolishCandidatesBeatingWorstOrdinary": 141,
+      "prePolishCandidatesBeatingBestOrdinary": 0,
+      "polishedCandidatesBeatingWorstOrdinary": 129,
+      "polishedCandidatesBeatingBestOrdinary": 3,
+      "candidatesWouldSurviveFrozenParetoBeam": 18,
+      "candidatesImprovingReferenceRmse": 21,
+      "candidatesImprovingReferenceMaxAbs": 6,
+      "candidatesImprovingBoth": 0,
+      "topologySubstitutionWins": 0,
+      "classifications": {
+        "NO_STRUCTURAL_CANDIDATE": 30,
+        "PREPOLISH_REJECTED": 9,
+        "POLISH_FAILURE": 12,
+        "BEAM_REJECTED": 111,
+        "REFERENCE_NONIMPROVING": 15,
+        "ORACLE_WIN": 3
+      }
+    },
+    "O4_TOPOLOGY_SUBSTITUTION": {
+      "familyLocalCandidateAbsence": 42,
+      "candidatesGenerated": 483,
+      "semanticDuplicatesRejected": 9,
+      "validCandidates": 474,
+      "prePolishCandidatesBeatingWorstOrdinary": 474,
+      "prePolishCandidatesBeatingBestOrdinary": 54,
+      "polishedCandidatesBeatingWorstOrdinary": 474,
+      "polishedCandidatesBeatingBestOrdinary": 39,
+      "candidatesWouldSurviveFrozenParetoBeam": 66,
+      "candidatesImprovingReferenceRmse": 99,
+      "candidatesImprovingReferenceMaxAbs": 48,
+      "candidatesImprovingBoth": 27,
+      "topologySubstitutionWins": 39,
+      "classifications": {
+        "NO_STRUCTURAL_CANDIDATE": 42,
+        "PREPOLISH_REJECTED": 0,
+        "POLISH_FAILURE": 0,
+        "BEAM_REJECTED": 408,
+        "REFERENCE_NONIMPROVING": 27,
+        "ORACLE_WIN": 39
+      }
+    }
+  },
+  "generationGlobalDecomposition": {
+    "NO_STRUCTURAL_CANDIDATE": 12,
+    "PREPOLISH_REJECTED": 30,
+    "POLISH_FAILURE": 21,
+    "BEAM_REJECTED": 816,
+    "REFERENCE_NONIMPROVING": 75,
+    "ORACLE_WIN": 96
+  },
+  "decomposition": {
+    "NO_STRUCTURAL_CANDIDATE": 12,
+    "PREPOLISH_REJECTED": 30,
+    "POLISH_FAILURE": 21,
+    "BEAM_REJECTED": 816,
+    "REFERENCE_NONIMPROVING": 75,
+    "ORACLE_WIN": 96
+  },
+  "decisionBoundary": {
+    "conclusion": "STRUCTURAL_CANDIDATE_SIGNAL_SUPPORTED",
+    "rule": {
+      "developmentCaseCount": 3,
+      "holdoutCaseCount": 3,
+      "requiredRealCaseCount": 6,
+      "requiredRealRepeatCount": 3,
+      "requiredSnapshotPhases": 3,
+      "minimumDevelopmentWinningCases": 2,
+      "minimumHoldoutWinningCases": 2,
+      "minimumOverallWinningCases": 4,
+      "minimumWinningRepeats": 2,
+      "minimumWinningGenerations": 2,
+      "requiredFamilies": [
+        "O1_RESIDUAL_EXTREMUM_PK",
+        "O2_RESIDUAL_REGION_PK",
+        "O3_SHELF_EVIDENCE",
+        "O4_TOPOLOGY_SUBSTITUTION"
+      ]
+    },
+    "developmentWinningCases": 2,
+    "holdoutWinningCases": 3,
+    "overallWinningCases": 5,
+    "winningRepeats": 15,
+    "winningGenerations": 24,
+    "samplingAdequate": true,
+    "candidateCoverageSufficient": true,
+    "missingInformation": []
+  },
+  "causalCloseout": {
+    "protocolCount": {
+      "O1_RESIDUAL_EXTREMUM_PK": {
+        "historicalOracleWin": 12,
+        "ordinaryGeneratedDuplicates": 12,
+        "ordinaryGeneratedNotAdmittedDuplicates": 0,
+        "ordinaryAdmittedDuplicates": 12,
+        "novelCandidates": 0,
+        "parentLocalQ31Admissible": 12,
+        "visitedDuplicates": 0,
+        "exactBeamSurvivors": 12,
+        "exactReferenceImprovers": 12,
+        "onlineFeasibleOracleWin": 0
+      },
+      "O2_RESIDUAL_REGION_PK": {
+        "historicalOracleWin": 42,
+        "ordinaryGeneratedDuplicates": 0,
+        "ordinaryGeneratedNotAdmittedDuplicates": 0,
+        "ordinaryAdmittedDuplicates": 0,
+        "novelCandidates": 42,
+        "parentLocalQ31Admissible": 39,
+        "visitedDuplicates": 0,
+        "exactBeamSurvivors": 42,
+        "exactReferenceImprovers": 42,
+        "onlineFeasibleOracleWin": 39
+      },
+      "O3_SHELF_EVIDENCE": {
+        "historicalOracleWin": 3,
+        "ordinaryGeneratedDuplicates": 3,
+        "ordinaryGeneratedNotAdmittedDuplicates": 0,
+        "ordinaryAdmittedDuplicates": 3,
+        "novelCandidates": 0,
+        "parentLocalQ31Admissible": 3,
+        "visitedDuplicates": 0,
+        "exactBeamSurvivors": 3,
+        "exactReferenceImprovers": 3,
+        "onlineFeasibleOracleWin": 0
+      },
+      "O4_TOPOLOGY_SUBSTITUTION": {
+        "historicalOracleWin": 39,
+        "ordinaryGeneratedDuplicates": 0,
+        "ordinaryGeneratedNotAdmittedDuplicates": 0,
+        "ordinaryAdmittedDuplicates": 0,
+        "novelCandidates": 39,
+        "parentLocalQ31Admissible": 39,
+        "visitedDuplicates": 0,
+        "exactBeamSurvivors": 39,
+        "exactReferenceImprovers": 39,
+        "onlineFeasibleOracleWin": 39
+      }
+    },
+    "deterministicCount": {
+      "O1_RESIDUAL_EXTREMUM_PK": {
+        "historicalOracleWin": 4,
+        "ordinaryGeneratedDuplicates": 4,
+        "ordinaryGeneratedNotAdmittedDuplicates": 0,
+        "ordinaryAdmittedDuplicates": 4,
+        "novelCandidates": 0,
+        "parentLocalQ31Admissible": 4,
+        "visitedDuplicates": 0,
+        "exactBeamSurvivors": 4,
+        "exactReferenceImprovers": 4,
+        "onlineFeasibleOracleWin": 0
+      },
+      "O2_RESIDUAL_REGION_PK": {
+        "historicalOracleWin": 14,
+        "ordinaryGeneratedDuplicates": 0,
+        "ordinaryGeneratedNotAdmittedDuplicates": 0,
+        "ordinaryAdmittedDuplicates": 0,
+        "novelCandidates": 14,
+        "parentLocalQ31Admissible": 13,
+        "visitedDuplicates": 0,
+        "exactBeamSurvivors": 14,
+        "exactReferenceImprovers": 14,
+        "onlineFeasibleOracleWin": 13
+      },
+      "O3_SHELF_EVIDENCE": {
+        "historicalOracleWin": 1,
+        "ordinaryGeneratedDuplicates": 1,
+        "ordinaryGeneratedNotAdmittedDuplicates": 0,
+        "ordinaryAdmittedDuplicates": 1,
+        "novelCandidates": 0,
+        "parentLocalQ31Admissible": 1,
+        "visitedDuplicates": 0,
+        "exactBeamSurvivors": 1,
+        "exactReferenceImprovers": 1,
+        "onlineFeasibleOracleWin": 0
+      },
+      "O4_TOPOLOGY_SUBSTITUTION": {
+        "historicalOracleWin": 13,
+        "ordinaryGeneratedDuplicates": 0,
+        "ordinaryGeneratedNotAdmittedDuplicates": 0,
+        "ordinaryAdmittedDuplicates": 0,
+        "novelCandidates": 13,
+        "parentLocalQ31Admissible": 13,
+        "visitedDuplicates": 0,
+        "exactBeamSurvivors": 13,
+        "exactReferenceImprovers": 13,
+        "onlineFeasibleOracleWin": 13
+      }
+    },
+    "classificationTotals": {
+      "ORDINARY_ALREADY_GENERATED": 15,
+      "NOVEL_Q31_REJECTED": 3,
+      "VISITED_DUPLICATE": 0,
+      "EXACT_BEAM_REJECTED": 0,
+      "REFERENCE_NONIMPROVING": 0,
+      "ONLINE_FEASIBLE_ORACLE_WIN": 78
+    },
+    "deterministicClassificationTotals": {
+      "ORDINARY_ALREADY_GENERATED": 5,
+      "NOVEL_Q31_REJECTED": 1,
+      "VISITED_DUPLICATE": 0,
+      "EXACT_BEAM_REJECTED": 0,
+      "REFERENCE_NONIMPROVING": 0,
+      "ONLINE_FEASIBLE_ORACLE_WIN": 26
+    },
+    "onlineCoverage": {
+      "developmentCases": 1,
+      "holdoutCases": 3,
+      "overallCases": 4,
+      "distinctCaseGenerationCells": 6,
+      "conclusion": "ONLINE_STRUCTURAL_INJECTION_NOT_SUPPORTED"
+    },
+    "onlineLocations": [
+      {
+        "caseId": "titan-to-mystic-8",
+        "generation": 10,
+        "family": "O4_TOPOLOGY_SUBSTITUTION"
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "generation": 20,
+        "family": "O2_RESIDUAL_REGION_PK"
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "generation": 20,
+        "family": "O4_TOPOLOGY_SUBSTITUTION"
+      },
+      {
+        "caseId": "titan-to-storm",
+        "generation": 20,
+        "family": "O4_TOPOLOGY_SUBSTITUTION"
+      },
+      {
+        "caseId": "titan-to-trio",
+        "generation": 20,
+        "family": "O2_RESIDUAL_REGION_PK"
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "generation": 10,
+        "family": "O2_RESIDUAL_REGION_PK"
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "generation": 10,
+        "family": "O4_TOPOLOGY_SUBSTITUTION"
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "generation": 20,
+        "family": "O2_RESIDUAL_REGION_PK"
+      }
+    ]
+  }
+}
