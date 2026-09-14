@@ -582,3 +582,15 @@ describe('VNext identity hardening', () => {
     expect(diff.removed).toHaveLength(1)
   })
 })
+
+it('reports bounded VNext diversity telemetry inside beam generations', async () => {
+  const { runStructuralSearchVNext } = await import('../../../src/autoeq/v2/structuralSearch.js')
+  const events: Array<Record<string, unknown>> = []
+  let checks = 0
+  runStructuralSearchVNext({ desiredDb: [...localizedResidual], frequencies: [...frequencies], sampleRateHz: 48_000,
+    config: { ...resolveStructuralSearchConfig({ preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET }), maxFilters: 2 },
+    deadline: { isExpired: () => ++checks > 400 }, onTrace: event => events.push(event as unknown as Record<string, unknown>) })
+  const beam = events.find(event => event.type === 'beam-generation')!
+  expect(typeof beam.structuralSignaturesGenerated).toBe('number')
+  expect(typeof beam.structuralSignaturesAdmitted).toBe('number')
+})
