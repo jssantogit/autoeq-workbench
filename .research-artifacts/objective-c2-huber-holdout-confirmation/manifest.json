@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "artifact": "objective-c2-huber-holdout-confirmation",
+  "status": "HUBER_PREFERENCE_NOT_CONFIRMED",
+  "combinedInterpretation": "C2_CLOSED_HOLDOUT_NOT_CONFIRMED",
+  "researchQuestion": "Does the frozen HUBER-075 preference signal generalize to untouched Batch B holdout under the exact frozen baseline state-pool census?",
+  "c2a": {
+    "commit": "e042f312d414308c09819bef6ab45567846e959f",
+    "evidenceSha256": "7678c3c0ba37fc35e46ba5ed9644552b4262334e8561f2dc4e03e885f87ccfd8",
+    "classification": "ROBUST_LOSS_PREFERENCE_SIGNAL_SUPPORTED",
+    "developmentCoverage": "2/3",
+    "frozenCandidate": "HUBER-075"
+  },
+  "protocolFreezeCommit": "8b4ebc3ba6a828154cfce6f7cfa6712aaf8fb3f8",
+  "frozenBoundary": "04f49e2bd20e1c2928dfef7a1ae52412a12c3eb7",
+  "c3EvidenceSha256": "6028c10e63deff45b9963e6d914eccd3705a6825267e8d5f0cdb2c811b56d685",
+  "corpus": {
+    "version": "fresh-real-corpus-v1.2",
+    "commit": "fc3932c72e3c3931dc062c523c2205389639264b",
+    "classification": "CORPUS_V1_2_READY",
+    "evidenceSha256": "13c7ff43614d7e257b0231f9238102afff5413964077017a2db7741d87b659b1",
+    "casesSha256": "4f78db0448d7d6aa82cff65134e64219f9ee94946e189b209ac4fd077dce3ff2",
+    "provenanceSha256": "9e27cc9340a85e60f124b8d226f5810ee84b9fcc5a13bdb56b2895da51384696"
+  },
+  "caseIds": [
+    "frc1.1-14-00025d5729a1",
+    "frc1.1-13-000225a01a6d",
+    "frc1.1-17-00036da52192"
+  ],
+  "caseCount": 3,
+  "split": {
+    "batchBDevelopment": [
+      "frc1.1-08-0000f6762889",
+      "frc1.1-11-000279686a75",
+      "frc1.1-07-0000c470a9b3"
+    ],
+    "batchBHoldout": [
+      "frc1.1-14-00025d5729a1",
+      "frc1.1-13-000225a01a6d",
+      "frc1.1-17-00036da52192"
+    ],
+    "batchC": [
+      "frc1.1-05-0000a93dae04",
+      "frc1.1-18-0003c77fd5b4",
+      "frc1.1-01-000013d2c2cd",
+      "frc1.1-16-0003622f8ec5",
+      "frc1.1-02-00002f5caf38",
+      "frc1.1-04-00007c13a25b"
+    ]
+  },
+  "huber": {
+    "candidate": "HUBER-075",
+    "deltaDb": 0.75
+  },
+  "protocol": {
+    "selectedAlgorithm": "FROZEN_BASELINE",
+    "caseIds": [
+      "frc1.1-14-00025d5729a1",
+      "frc1.1-13-000225a01a6d",
+      "frc1.1-17-00036da52192"
+    ],
+    "batchBDevelopmentCaseIds": [
+      "frc1.1-08-0000f6762889",
+      "frc1.1-11-000279686a75",
+      "frc1.1-07-0000c470a9b3"
+    ],
+    "batchBHoldoutCaseIds": [
+      "frc1.1-14-00025d5729a1",
+      "frc1.1-13-000225a01a6d",
+      "frc1.1-17-00036da52192"
+    ],
+    "batchCCaseIds": [
+      "frc1.1-05-0000a93dae04",
+      "frc1.1-18-0003c77fd5b4",
+      "frc1.1-01-000013d2c2cd",
+      "frc1.1-16-0003622f8ec5",
+      "frc1.1-02-00002f5caf38",
+      "frc1.1-04-00007c13a25b"
+    ],
+    "batchBDevelopmentExecuted": false,
+    "batchBHoldoutExecuted": true,
+    "batchCExecuted": false,
+    "oldStructuralVNextCasesExecuted": false,
+    "maxGenerations": 31,
+    "naturalTermination": "allowed-earlier-than-generation-bound",
+    "observerMode": "C3-observer-off-on-fidelity-per-case",
+    "wallClockTermination": false,
+    "searchPolicyChanged": false,
+    "lossesAffectSearch": false,
+    "statePool": "all observer-evaluated states; semantic quantized filter-state key deduplication; no extra polish/evaluation"
+  },
+  "thresholds": {
+    "exactN": 0.25,
+    "correlationStrictUpperBound": 0.995
+  },
+  "holdoutCoverage": {
+    "huberPreferenceDivergence": 1,
+    "total": 3
+  },
+  "fidelityPass": true,
+  "provenancePass": true,
+  "classification": "HUBER_PREFERENCE_NOT_CONFIRMED",
+  "batchCExecuted": false,
+  "evidenceSha256": "1de4d0ac26eb1d24724e01b4dbeae38a6a10343cb8a671c06ccc3e79229d751a",
+  "evidenceHashScope": [
+    "aggregate-evidence.json",
+    "loss-census/frc1.1-14-00025d5729a1.json",
+    "loss-census/frc1.1-13-000225a01a6d.json",
+    "loss-census/frc1.1-17-00036da52192.json"
+  ],
+  "files": [
+    "manifest.json",
+    "aggregate-evidence.json",
+    "loss-census/frc1.1-14-00025d5729a1.json",
+    "loss-census/frc1.1-13-000225a01a6d.json",
+    "loss-census/frc1.1-17-00036da52192.json",
+    "evidence-sha256.txt",
+    "final-report.md"
+  ]
+}
