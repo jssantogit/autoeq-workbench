@@ -22,6 +22,8 @@
 Development / holdout / overall wins: **0/3**, **0/3**, **0/6** (gate requires 2/3, 2/3, and 4/6).
 Worse in both median RMSE and maxAbs: **titan-to-rsv**.
 
+At the final 30-second real-FR cells, Mystic 8, S12 Ultra, Storm, and Trio are median-identical to baseline on both metrics. U12t has equal median RMSE and a slightly lower median maxAbs. Thus RSV is the only dual-metric median regression: M2 avoided M1's broad displacement failure, but produced no quality improvement.
+
 ## Continuing-trajectory checkpoint observations
 
 These are observations at the first trace event at or after each nominal checkpoint, not exact 5.000/15.000-second snapshots. Values are median RMSE / maxAbs; elapsed values are median `observedElapsedMs`.
@@ -76,6 +78,16 @@ Aggregate M2 telemetry: **54** stall events; **21** challengers constructed; **2
 Final incumbent phases: beam **45**, cap-swap **9**.
 Protected-progress gate: **FAIL** — 18 no-intervention runs and 18 no-accepted-challenger runs diverged from baseline on titan-to-rsv, titan-to-u12t (tolerance 1e-9).
 
+### Interpretation erratum: trigger reachability and protected progress
+
+The aggregate counts above are valid cumulative final-trajectory counts, not checkpoint triple-counting. All stall/challenger activity occurred only in the synthetic probes: all 54 stall events and all 21 challenger construction/polish attempts; none occurred in the real corpus.
+
+At the final 30-second real-FR cells there were 6 cases × 3 repeats = 18 M2 trajectories, with 0 stall events, 0 challengers constructed, 0 challenger polish attempts, 0 challengers accepted into the beam, and 0 challenger incumbent improvements. The real quality result therefore does not test whether a stall-triggered challenger can improve a real case. It is mostly a comparison of the baseline-like M2 ordinary path against baseline under independent wall-clock executions.
+
+The synthetic probes supply the actual challenger-mechanism evidence: challenger opportunities occurred, 21 challengers were constructed and polished, 0 entered the beam, and 0 improved the incumbent. This is negative evidence for the specific current challenger construction/admission mechanism on those probes, not a general conclusion about all possible structural interventions.
+
+The protected-progress gate value remains **FAIL**. It compares independent wall-clock runs by repeat index with tolerance `1e-9`; baseline itself exhibits nonzero wall-clock/run-to-run variation, including RSV and U12t. Consequently, the real campaign cannot distinguish M2 policy-path overhead, ordinary wall-clock trajectory variance, or another timing-sensitive execution difference. Protected-progress equivalence was not demonstrated under real wall-clock execution; the result does not causally prove that M2 structurally altered the ordinary search path. The deterministic mechanism tests remain the appropriate evidence for logical no-stall-path equivalence.
+
 ## M1 control
 
 | Case | M1 control 30s median RMSE / maxAbs | observedElapsedMs |
@@ -103,6 +115,8 @@ Complexity sanity: no systematic pathology flagged; it is not an optimization th
 
 ## Acceptance, failure localization, and recommendation
 
-**Overall M2 acceptance gate: FAIL.** The quality component has zero real wins (required 2 development, 2 holdout, 4 total); Titan → RSV is worse in both RMSE and maxAbs. The protected-progress gate also fails because trajectories diverged when no challenger was accepted, while mechanistic and delivery evidence are absent because there are no wins. This is campaign evidence, not a reason to tune the frozen M2 mechanism.
-Failure localization: M2 does not preserve ordinary-search equivalence on the no-intervention/no-accepted-challenger path (observed divergence in Titan → RSV and Titan → U12t); its only tradeoff failure is Titan → RSV. No correctness defect was observed in the campaign execution.
-Architectural recommendation for the next milestone: keep baseline as production default and retain M1 as a control. Only under a newly approved design, investigate an architecture that proves exact ordinary-path preservation when protected-progress intervention does not admit a challenger before a new quality campaign.
+**Overall M2 acceptance gate: FAIL.** The quality component has zero real wins (required 2 development, 2 holdout, 4 total); Titan → RSV is worse in both RMSE and maxAbs. The protected-progress gate also formally fails, but under independent real wall-clock runs it is evidence that equivalence was not demonstrated, not causal proof of an ordinary-path structural change. This is campaign evidence, not a reason to tune the frozen M2 mechanism.
+
+Failure localization: real-corpus trigger reachability was zero, while the synthetic probes reached the trigger but admitted 0/21 challengers. The only real dual-metric median regression is Titan → RSV. No correctness defect was observed in the campaign execution.
+
+Architectural conclusion: M2 rejects the current exact-stall-triggered challenger design as a quality-improving architecture. The real corpus did not reach the intervention trigger, while synthetic probes reached it but accepted 0/21 challengers. The experiment therefore identifies trigger reachability and challenger usefulness as the next structural-search questions. It does not justify reopening resource/scheduler allocation. Keep baseline as production default; retain M1 and M2 as frozen research controls. Do not propose or implement M3 in this commit.
