@@ -1,0 +1,1645 @@
+{
+  "schemaVersion": 1,
+  "frozenBoundary": "f5052b2b1bfdf12b013db5c34c5fda65304091c3",
+  "resourceEnvelope": {
+    "structuralCeiling": 43,
+    "effortLevel": 6,
+    "beamWidth": 16,
+    "proposalsPerParent": 32,
+    "localPolishEvaluations": 120,
+    "preset": "max10-q31-b4-p8-experimental",
+    "schedulerPolicy": "direct-structural-search",
+    "seedSemantics": "empty-filters-deterministic",
+    "deadlinePolicy": "one-continuing-trajectory-with-30-second-budget",
+    "config": {
+      "preset": "max10-q31-b4-p8-experimental",
+      "beamWidth": 16,
+      "proposalsPerParent": 32,
+      "localPolishEvaluations": 120,
+      "maxFilters": 43,
+      "featureRegionCount": 6,
+      "minFeatureSeparationOctaves": 0.5,
+      "candidatePolicy": "semantic",
+      "selectionMetric": "violation",
+      "mergeProximityOctaves": 0.08533333333333333,
+      "marginalPruneTolerance": 0.01,
+      "structuralCleanupMinFilters": 8,
+      "structuralCleanupMaxSteps": 3,
+      "admission": "q31-b4-p8",
+      "workProfile": "full"
+    }
+  },
+  "frozenM3Source": {
+    "path": ".research-artifacts/structural-search-m3-stagnation-census/aggregate.json",
+    "rawPath": ".research-artifacts/structural-search-m3-stagnation-census/raw-timing.jsonl",
+    "sha256": "767e3341dcf69ec6629d65e7a31a5aeee34efd7c3898739ef3d4fec6761b26c4",
+    "rawSha256": "8d143ac7194ff5ff6b0a37095cf13330f878c28e73e9617d381e45bdbc0b675b",
+    "evidenceSha256": "9927d848d72069de1255a40a12c672079d43741c1568193c97a342233d4fe703",
+    "rawTrajectoryCount": 18,
+    "generationObservationsAvailable": true
+  },
+  "wallClock": {
+    "pairCount": 18,
+    "executionOrderCounts": {
+      "off-first": 9,
+      "on-first": 9
+    },
+    "off": {
+      "completedOrdinaryBeamGenerations": 461,
+      "generatedProposals": 35413,
+      "admittedProposals": 34628,
+      "polishedProposals": 34418,
+      "finalRmseDb": {
+        "best": 0.4762859954163281,
+        "median": 0.8377071023207703,
+        "worst": 1.4791729221679293,
+        "spread": 1.0028869267516012
+      },
+      "finalMaxAbsDb": {
+        "best": 1.449612475690795,
+        "median": 2.5199256184364875,
+        "worst": 4.437983365891071,
+        "spread": 2.988370890200276
+      },
+      "deliveredFilterCount": {
+        "best": 10,
+        "median": 14.5,
+        "worst": 18,
+        "spread": 8
+      },
+      "actualElapsedMs": {
+        "best": 30000.764055000007,
+        "median": 30003.329632499983,
+        "worst": 30026.78209400001,
+        "spread": 26.018039000002318
+      }
+    },
+    "on": {
+      "completedOrdinaryBeamGenerations": 463,
+      "generatedProposals": 35762,
+      "admittedProposals": 34953,
+      "polishedProposals": 34638,
+      "finalRmseDb": {
+        "best": 0.4762859954163281,
+        "median": 0.8383896039368337,
+        "worst": 1.4791729221679293,
+        "spread": 1.0028869267516012
+      },
+      "finalMaxAbsDb": {
+        "best": 1.452363828657141,
+        "median": 2.521625002380528,
+        "worst": 4.437983365891071,
+        "spread": 2.98561953723393
+      },
+      "deliveredFilterCount": {
+        "best": 10,
+        "median": 14.5,
+        "worst": 18,
+        "spread": 8
+      },
+      "actualElapsedMs": {
+        "best": 30002.908208999957,
+        "median": 30004.575690000027,
+        "worst": 30204.40613300004,
+        "spread": 201.497924000083
+      }
+    },
+    "deltaOnMinusOff": {
+      "completedOrdinaryBeamGenerations": {
+        "best": -2,
+        "median": 0,
+        "worst": 4,
+        "spread": 6
+      },
+      "generatedProposals": {
+        "best": -256,
+        "median": 34.5,
+        "worst": 303,
+        "spread": 559
+      },
+      "admittedProposals": {
+        "best": -256,
+        "median": 30.5,
+        "worst": 284,
+        "spread": 540
+      },
+      "polishedProposals": {
+        "best": -263,
+        "median": 21.5,
+        "worst": 275,
+        "spread": 538
+      },
+      "finalRmseDb": {
+        "best": -0.17632289795319156,
+        "median": 0,
+        "worst": 0.008578329107195082,
+        "spread": 0.18490122706038664
+      },
+      "finalMaxAbsDb": {
+        "best": -0.5572445377107216,
+        "median": 0,
+        "worst": 0.009163952457191371,
+        "spread": 0.566408490167913
+      },
+      "deliveredFilterCount": {
+        "best": -1,
+        "median": 0,
+        "worst": 1,
+        "spread": 2
+      },
+      "actualElapsedMs": {
+        "best": -23.200731000004453,
+        "median": 2.1626539999851957,
+        "worst": 199.1038079999853,
+        "spread": 222.30453899998975
+      }
+    }
+  },
+  "deterministicFidelity": {
+    "maxGenerations": 4,
+    "equivalent": true,
+    "telemetryOff": {
+      "result": {
+        "filters": [
+          {
+            "id": "struct-add-pk",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 39,
+            "gainDb": 4.5,
+            "q": 1.03
+          },
+          {
+            "id": "struct-add-pk-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 92,
+            "gainDb": -5.5,
+            "q": 1.55
+          },
+          {
+            "id": "struct-add-pk-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 250,
+            "gainDb": 5.3,
+            "q": 1.55
+          },
+          {
+            "id": "struct-add-pk-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 561,
+            "gainDb": -4.2,
+            "q": 1.55
+          }
+        ],
+        "rmseDb": 2.3993138872383426,
+        "maxAbsDb": 4.214783934516524
+      },
+      "generations": [
+        {
+          "generation": 0,
+          "reference": {
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.3,\"q\":1.73}]",
+            "structuralSignature": "PK:0",
+            "rmseDb": 3.6925197136151073,
+            "maxAbsDb": 4.240531259327114
+          },
+          "retainedBeamSemanticKeys": [
+            "[]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.3,\"q\":1.73}]"
+          ],
+          "retainedBeamSignatures": [
+            "",
+            "PK:0"
+          ]
+        },
+        {
+          "generation": 1,
+          "reference": {
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":1.55}]",
+            "structuralSignature": "PK:0|PK:0",
+            "rmseDb": 3.316805926605146,
+            "maxAbsDb": 4.259927908982414
+          },
+          "retainedBeamSemanticKeys": [
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":2.4,\"q\":2.67},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":38,\"gainDb\":2.1,\"q\":2.45}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":1.55}]"
+          ],
+          "retainedBeamSignatures": [
+            "PK:0|PK:0",
+            "PK:0|PK:0"
+          ]
+        },
+        {
+          "generation": 2,
+          "reference": {
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.8,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":103,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":223,\"gainDb\":4.3,\"q\":1.55}]",
+            "structuralSignature": "PK:0|PK:0|PK:0",
+            "rmseDb": 2.8961519787687613,
+            "maxAbsDb": 4.224627943659818
+          },
+          "retainedBeamSemanticKeys": [
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.8,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":103,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":223,\"gainDb\":4.3,\"q\":1.55}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":40,\"gainDb\":2.3,\"q\":1.88},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":41,\"gainDb\":2,\"q\":0.94},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":2.19}]"
+          ],
+          "retainedBeamSignatures": [
+            "PK:0|PK:0|PK:0",
+            "PK:0|PK:0|PK:0"
+          ]
+        },
+        {
+          "generation": 3,
+          "reference": {
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":250,\"gainDb\":5.3,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":561,\"gainDb\":-4.2,\"q\":1.55}]",
+            "structuralSignature": "PK:0|PK:0|PK:0|PK:0",
+            "rmseDb": 2.3993138872383426,
+            "maxAbsDb": 4.214783934516524
+          },
+          "retainedBeamSemanticKeys": [
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":250,\"gainDb\":5.3,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":561,\"gainDb\":-4.2,\"q\":1.55}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":42,\"gainDb\":4.5,\"q\":0.86},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":94,\"gainDb\":-5.2,\"q\":2.19}]"
+          ],
+          "retainedBeamSignatures": [
+            "PK:0|PK:0",
+            "PK:0|PK:0|PK:0|PK:0"
+          ]
+        }
+      ],
+      "retainedBeamSignatures": [
+        [
+          "",
+          "PK:0"
+        ],
+        [
+          "PK:0|PK:0",
+          "PK:0|PK:0"
+        ],
+        [
+          "PK:0|PK:0|PK:0",
+          "PK:0|PK:0|PK:0"
+        ],
+        [
+          "PK:0|PK:0",
+          "PK:0|PK:0|PK:0|PK:0"
+        ]
+      ],
+      "work": {
+        "structuralSearchInvocations": 0,
+        "beamGenerations": 4,
+        "proposalsGenerated": 31,
+        "proposalsAdmitted": 21,
+        "proposalsPolished": 21,
+        "duplicateStates": 2,
+        "rescueAttempts": 0,
+        "pairAddAttempts": 0,
+        "capSwapAttempts": 0,
+        "reseedAttempts": 0
+      },
+      "completedGenerations": 4,
+      "naturalStopGeneration": null
+    },
+    "telemetryOn": {
+      "result": {
+        "filters": [
+          {
+            "id": "struct-add-pk",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 39,
+            "gainDb": 4.5,
+            "q": 1.03
+          },
+          {
+            "id": "struct-add-pk-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 92,
+            "gainDb": -5.5,
+            "q": 1.55
+          },
+          {
+            "id": "struct-add-pk-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 250,
+            "gainDb": 5.3,
+            "q": 1.55
+          },
+          {
+            "id": "struct-add-pk-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 561,
+            "gainDb": -4.2,
+            "q": 1.55
+          }
+        ],
+        "rmseDb": 2.3993138872383426,
+        "maxAbsDb": 4.214783934516524
+      },
+      "generations": [
+        {
+          "generation": 0,
+          "reference": {
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.3,\"q\":1.73}]",
+            "structuralSignature": "PK:0",
+            "rmseDb": 3.6925197136151073,
+            "maxAbsDb": 4.240531259327114
+          },
+          "retainedBeamSemanticKeys": [
+            "[]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.3,\"q\":1.73}]"
+          ],
+          "retainedBeamSignatures": [
+            "",
+            "PK:0"
+          ]
+        },
+        {
+          "generation": 1,
+          "reference": {
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":1.55}]",
+            "structuralSignature": "PK:0|PK:0",
+            "rmseDb": 3.316805926605146,
+            "maxAbsDb": 4.259927908982414
+          },
+          "retainedBeamSemanticKeys": [
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":2.4,\"q\":2.67},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":38,\"gainDb\":2.1,\"q\":2.45}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":1.55}]"
+          ],
+          "retainedBeamSignatures": [
+            "PK:0|PK:0",
+            "PK:0|PK:0"
+          ]
+        },
+        {
+          "generation": 2,
+          "reference": {
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.8,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":103,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":223,\"gainDb\":4.3,\"q\":1.55}]",
+            "structuralSignature": "PK:0|PK:0|PK:0",
+            "rmseDb": 2.8961519787687613,
+            "maxAbsDb": 4.224627943659818
+          },
+          "retainedBeamSemanticKeys": [
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":36,\"gainDb\":4.8,\"q\":1.33},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":103,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":223,\"gainDb\":4.3,\"q\":1.55}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":40,\"gainDb\":2.3,\"q\":1.88},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":41,\"gainDb\":2,\"q\":0.94},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-4.5,\"q\":2.19}]"
+          ],
+          "retainedBeamSignatures": [
+            "PK:0|PK:0|PK:0",
+            "PK:0|PK:0|PK:0"
+          ]
+        },
+        {
+          "generation": 3,
+          "reference": {
+            "semanticKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":250,\"gainDb\":5.3,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":561,\"gainDb\":-4.2,\"q\":1.55}]",
+            "structuralSignature": "PK:0|PK:0|PK:0|PK:0",
+            "rmseDb": 2.3993138872383426,
+            "maxAbsDb": 4.214783934516524
+          },
+          "retainedBeamSemanticKeys": [
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":39,\"gainDb\":4.5,\"q\":1.03},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":92,\"gainDb\":-5.5,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":250,\"gainDb\":5.3,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":561,\"gainDb\":-4.2,\"q\":1.55}]",
+            "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":42,\"gainDb\":4.5,\"q\":0.86},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":94,\"gainDb\":-5.2,\"q\":2.19}]"
+          ],
+          "retainedBeamSignatures": [
+            "PK:0|PK:0",
+            "PK:0|PK:0|PK:0|PK:0"
+          ]
+        }
+      ],
+      "retainedBeamSignatures": [
+        [
+          "",
+          "PK:0"
+        ],
+        [
+          "PK:0|PK:0",
+          "PK:0|PK:0"
+        ],
+        [
+          "PK:0|PK:0|PK:0",
+          "PK:0|PK:0|PK:0"
+        ],
+        [
+          "PK:0|PK:0",
+          "PK:0|PK:0|PK:0|PK:0"
+        ]
+      ],
+      "work": {
+        "structuralSearchInvocations": 0,
+        "beamGenerations": 4,
+        "proposalsGenerated": 31,
+        "proposalsAdmitted": 21,
+        "proposalsPolished": 21,
+        "duplicateStates": 2,
+        "rescueAttempts": 0,
+        "pairAddAttempts": 0,
+        "capSwapAttempts": 0,
+        "reseedAttempts": 0
+      },
+      "completedGenerations": 4,
+      "naturalStopGeneration": null
+    },
+    "mismatch": null
+  },
+  "uniqueStructuralEvents": {
+    "completedGenerationCount": 486,
+    "uniqueStructuralEventCount": 40,
+    "events": [
+      {
+        "caseId": "titan-to-rsv",
+        "repeatIndex": 0,
+        "generation": 15,
+        "elapsedMs": 10853.400992,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "repeatIndex": 0,
+        "generation": 19,
+        "elapsedMs": 18432.845256,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "repeatIndex": 0,
+        "generation": 30,
+        "elapsedMs": 30003.202863,
+        "exactSignalMask": "S1+S2+S3+S4",
+        "rawSignals": {
+          "S0": true,
+          "S1": true,
+          "S2": true,
+          "S3": true,
+          "S4": true
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": false,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "repeatIndex": 1,
+        "generation": 15,
+        "elapsedMs": 8913.942031999999,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "repeatIndex": 1,
+        "generation": 19,
+        "elapsedMs": 16447.023219000002,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "repeatIndex": 2,
+        "generation": 15,
+        "elapsedMs": 8978.667686,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "repeatIndex": 2,
+        "generation": 19,
+        "elapsedMs": 16676.731333999996,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "repeatIndex": 2,
+        "generation": 31,
+        "elapsedMs": 30002.533708999996,
+        "exactSignalMask": "S1",
+        "rawSignals": {
+          "S0": true,
+          "S1": true,
+          "S2": false,
+          "S3": false,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": false,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "repeatIndex": 0,
+        "generation": 16,
+        "elapsedMs": 14009.494028000016,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "repeatIndex": 0,
+        "generation": 22,
+        "elapsedMs": 30346.026016999997,
+        "exactSignalMask": "S2+S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": true,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "repeatIndex": 1,
+        "generation": 16,
+        "elapsedMs": 16513.90771899998,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "repeatIndex": 1,
+        "generation": 22,
+        "elapsedMs": 30031.35467099998,
+        "exactSignalMask": "S1+S2+S3+S4",
+        "rawSignals": {
+          "S0": true,
+          "S1": true,
+          "S2": true,
+          "S3": true,
+          "S4": true
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": false,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "repeatIndex": 2,
+        "generation": 16,
+        "elapsedMs": 15130.950257999997,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "repeatIndex": 2,
+        "generation": 22,
+        "elapsedMs": 30003.655709000013,
+        "exactSignalMask": "S2+S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": true,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-storm",
+        "repeatIndex": 0,
+        "generation": 0,
+        "elapsedMs": 8.781500000040978,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-storm",
+        "repeatIndex": 0,
+        "generation": 1,
+        "elapsedMs": 31.036461999989115,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-storm",
+        "repeatIndex": 0,
+        "generation": 32,
+        "elapsedMs": 30001.846632,
+        "exactSignalMask": "S1+S2+S3+S4",
+        "rawSignals": {
+          "S0": true,
+          "S1": true,
+          "S2": true,
+          "S3": true,
+          "S4": true
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": false,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-storm",
+        "repeatIndex": 1,
+        "generation": 0,
+        "elapsedMs": 8.178960999997798,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-storm",
+        "repeatIndex": 1,
+        "generation": 1,
+        "elapsedMs": 45.67026899999473,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-storm",
+        "repeatIndex": 1,
+        "generation": 32,
+        "elapsedMs": 30002.79367100005,
+        "exactSignalMask": "S1+S2+S3+S4",
+        "rawSignals": {
+          "S0": true,
+          "S1": true,
+          "S2": true,
+          "S3": true,
+          "S4": true
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": false,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-storm",
+        "repeatIndex": 2,
+        "generation": 0,
+        "elapsedMs": 9.102077000017744,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-storm",
+        "repeatIndex": 2,
+        "generation": 1,
+        "elapsedMs": 33.18880800000625,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-storm",
+        "repeatIndex": 2,
+        "generation": 32,
+        "elapsedMs": 30045.695631999988,
+        "exactSignalMask": "S1+S2+S3+S4",
+        "rawSignals": {
+          "S0": true,
+          "S1": true,
+          "S2": true,
+          "S3": true,
+          "S4": true
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": false,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "repeatIndex": 0,
+        "generation": 23,
+        "elapsedMs": 30002.601633000013,
+        "exactSignalMask": "S1+S2+S3+S4",
+        "rawSignals": {
+          "S0": true,
+          "S1": true,
+          "S2": true,
+          "S3": true,
+          "S4": true
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": false,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 0,
+        "generation": 8,
+        "elapsedMs": 1284.0083829999785,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 0,
+        "generation": 11,
+        "elapsedMs": 2980.80203599995,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 0,
+        "generation": 13,
+        "elapsedMs": 3709.343688999943,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 0,
+        "generation": 14,
+        "elapsedMs": 4127.003073999949,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 0,
+        "generation": 15,
+        "elapsedMs": 4460.492880999984,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 1,
+        "generation": 8,
+        "elapsedMs": 1379.9768829999957,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 1,
+        "generation": 11,
+        "elapsedMs": 3280.9493820000207,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 1,
+        "generation": 13,
+        "elapsedMs": 4009.8808050000225,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 1,
+        "generation": 14,
+        "elapsedMs": 4449.050534999988,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 1,
+        "generation": 15,
+        "elapsedMs": 4800.425266000035,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 1,
+        "generation": 23,
+        "elapsedMs": 30006.142017000006,
+        "exactSignalMask": "S1+S2+S3+S4",
+        "rawSignals": {
+          "S0": true,
+          "S1": true,
+          "S2": true,
+          "S3": true,
+          "S4": true
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": false,
+        "referenceTopologyLaterChanged": false,
+        "structuralNoveltyLaterSurvived": false,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": false,
+        "finalDeliveredFilterCountIncreased": false
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 2,
+        "generation": 8,
+        "elapsedMs": 1648.1102679999894,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 2,
+        "generation": 11,
+        "elapsedMs": 3807.9826889999676,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": true,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 2,
+        "generation": 13,
+        "elapsedMs": 4720.6118429999915,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 2,
+        "generation": 14,
+        "elapsedMs": 5258.170803999994,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      },
+      {
+        "caseId": "titan-to-trio",
+        "repeatIndex": 2,
+        "generation": 15,
+        "elapsedMs": 5682.310649999999,
+        "exactSignalMask": "S3",
+        "rawSignals": {
+          "S0": false,
+          "S1": false,
+          "S2": false,
+          "S3": true,
+          "S4": false
+        },
+        "anyStructuralPlateau": true,
+        "numericImprovement": true,
+        "referenceTopologyLaterChanged": true,
+        "structuralNoveltyLaterSurvived": true,
+        "rmseLaterImproved": false,
+        "maxAbsLaterImproved": true,
+        "finalDeliveredFilterCountIncreased": true
+      }
+    ],
+    "exactSignalMaskCounts": {
+      "S3": 30,
+      "S1+S2+S3+S4": 7,
+      "S1": 1,
+      "S2+S3": 2
+    },
+    "bySignal": {
+      "S0": {
+        "total": 0,
+        "only": 0,
+        "combined": 0
+      },
+      "S1": {
+        "total": 8,
+        "only": 1,
+        "combined": 7
+      },
+      "S2": {
+        "total": 9,
+        "only": 0,
+        "combined": 9
+      },
+      "S3": {
+        "total": 39,
+        "only": 30,
+        "combined": 9
+      },
+      "S4": {
+        "total": 7,
+        "only": 0,
+        "combined": 7
+      }
+    },
+    "perSignal": {
+      "S0": {
+        "occurrenceCount": 8,
+        "trajectoriesWithOccurrence": 8,
+        "casesWithOccurrence": 5,
+        "repeatsWithOccurrence": 8,
+        "firstOccurrenceGeneration": {
+          "best": 22,
+          "median": 30.5,
+          "worst": 32,
+          "spread": 10
+        },
+        "firstOccurrenceElapsedMs": {
+          "best": 30001.846632,
+          "median": 30002.998267000024,
+          "worst": 30045.695631999988,
+          "spread": 43.84899999998743
+        },
+        "persistence": {
+          "occurrenceRunCount": 8,
+          "median": 1,
+          "max": 1
+        },
+        "numericImprovingOccurrences": 0,
+        "structuralNoveltyAfterOccurrence": {
+          "referenceSignatureLaterChanges": 0,
+          "survivingNovelStructuralSignatureLater": 0
+        },
+        "subsequentBaselineQualityProgress": {
+          "finalRmseImprovesFurther": 0,
+          "finalMaxAbsImprovesFurther": 0,
+          "additionalFiltersUltimatelyDelivered": 0
+        },
+        "futureProgress": {
+          "occurrenceCount": 8,
+          "referenceSignatureLaterChanges": 0,
+          "survivingNovelStructuralSignatureLater": 0,
+          "finalRmseImprovesFurther": 0,
+          "finalMaxAbsImprovesFurther": 0,
+          "additionalFiltersUltimatelyDelivered": 0
+        }
+      },
+      "S1": {
+        "occurrenceCount": 8,
+        "trajectoriesWithOccurrence": 8,
+        "casesWithOccurrence": 5,
+        "repeatsWithOccurrence": 8,
+        "firstOccurrenceGeneration": {
+          "best": 22,
+          "median": 30.5,
+          "worst": 32,
+          "spread": 10
+        },
+        "firstOccurrenceElapsedMs": {
+          "best": 30001.846632,
+          "median": 30002.998267000024,
+          "worst": 30045.695631999988,
+          "spread": 43.84899999998743
+        },
+        "persistence": {
+          "occurrenceRunCount": 8,
+          "median": 1,
+          "max": 1
+        },
+        "numericImprovingOccurrences": 0,
+        "structuralNoveltyAfterOccurrence": {
+          "referenceSignatureLaterChanges": 0,
+          "survivingNovelStructuralSignatureLater": 0
+        },
+        "subsequentBaselineQualityProgress": {
+          "finalRmseImprovesFurther": 0,
+          "finalMaxAbsImprovesFurther": 0,
+          "additionalFiltersUltimatelyDelivered": 0
+        },
+        "futureProgress": {
+          "occurrenceCount": 8,
+          "referenceSignatureLaterChanges": 0,
+          "survivingNovelStructuralSignatureLater": 0,
+          "finalRmseImprovesFurther": 0,
+          "finalMaxAbsImprovesFurther": 0,
+          "additionalFiltersUltimatelyDelivered": 0
+        }
+      },
+      "S2": {
+        "occurrenceCount": 9,
+        "trajectoriesWithOccurrence": 9,
+        "casesWithOccurrence": 5,
+        "repeatsWithOccurrence": 9,
+        "firstOccurrenceGeneration": {
+          "best": 22,
+          "median": 23,
+          "worst": 32,
+          "spread": 10
+        },
+        "firstOccurrenceElapsedMs": {
+          "best": 30001.846632,
+          "median": 30003.655709000013,
+          "worst": 30346.026016999997,
+          "spread": 344.1793849999958
+        },
+        "persistence": {
+          "occurrenceRunCount": 9,
+          "median": 1,
+          "max": 1
+        },
+        "numericImprovingOccurrences": 2,
+        "structuralNoveltyAfterOccurrence": {
+          "referenceSignatureLaterChanges": 0,
+          "survivingNovelStructuralSignatureLater": 0
+        },
+        "subsequentBaselineQualityProgress": {
+          "finalRmseImprovesFurther": 0,
+          "finalMaxAbsImprovesFurther": 0,
+          "additionalFiltersUltimatelyDelivered": 0
+        },
+        "futureProgress": {
+          "occurrenceCount": 9,
+          "referenceSignatureLaterChanges": 0,
+          "survivingNovelStructuralSignatureLater": 0,
+          "finalRmseImprovesFurther": 0,
+          "finalMaxAbsImprovesFurther": 0,
+          "additionalFiltersUltimatelyDelivered": 0
+        }
+      },
+      "S3": {
+        "occurrenceCount": 39,
+        "trajectoriesWithOccurrence": 13,
+        "casesWithOccurrence": 5,
+        "repeatsWithOccurrence": 13,
+        "firstOccurrenceGeneration": {
+          "best": 0,
+          "median": 15,
+          "worst": 23,
+          "spread": 23
+        },
+        "firstOccurrenceElapsedMs": {
+          "best": 8.178960999997798,
+          "median": 8913.942031999999,
+          "worst": 30002.601633000013,
+          "spread": 29994.422672000015
+        },
+        "persistence": {
+          "occurrenceRunCount": 30,
+          "median": 1,
+          "max": 3
+        },
+        "numericImprovingOccurrences": 32,
+        "structuralNoveltyAfterOccurrence": {
+          "referenceSignatureLaterChanges": 30,
+          "survivingNovelStructuralSignatureLater": 30
+        },
+        "subsequentBaselineQualityProgress": {
+          "finalRmseImprovesFurther": 19,
+          "finalMaxAbsImprovesFurther": 30,
+          "additionalFiltersUltimatelyDelivered": 29
+        },
+        "futureProgress": {
+          "occurrenceCount": 39,
+          "referenceSignatureLaterChanges": 30,
+          "survivingNovelStructuralSignatureLater": 30,
+          "finalRmseImprovesFurther": 19,
+          "finalMaxAbsImprovesFurther": 30,
+          "additionalFiltersUltimatelyDelivered": 29
+        }
+      },
+      "S4": {
+        "occurrenceCount": 7,
+        "trajectoriesWithOccurrence": 7,
+        "casesWithOccurrence": 5,
+        "repeatsWithOccurrence": 7,
+        "firstOccurrenceGeneration": {
+          "best": 22,
+          "median": 30,
+          "worst": 32,
+          "spread": 10
+        },
+        "firstOccurrenceElapsedMs": {
+          "best": 30001.846632,
+          "median": 30003.202863,
+          "worst": 30045.695631999988,
+          "spread": 43.84899999998743
+        },
+        "persistence": {
+          "occurrenceRunCount": 7,
+          "median": 1,
+          "max": 1
+        },
+        "numericImprovingOccurrences": 0,
+        "structuralNoveltyAfterOccurrence": {
+          "referenceSignatureLaterChanges": 0,
+          "survivingNovelStructuralSignatureLater": 0
+        },
+        "subsequentBaselineQualityProgress": {
+          "finalRmseImprovesFurther": 0,
+          "finalMaxAbsImprovesFurther": 0,
+          "additionalFiltersUltimatelyDelivered": 0
+        },
+        "futureProgress": {
+          "occurrenceCount": 7,
+          "referenceSignatureLaterChanges": 0,
+          "survivingNovelStructuralSignatureLater": 0,
+          "finalRmseImprovesFurther": 0,
+          "finalMaxAbsImprovesFurther": 0,
+          "additionalFiltersUltimatelyDelivered": 0
+        }
+      }
+    },
+    "s3": {
+      "containingGenerationCount": 39,
+      "onlyGenerationCount": 30,
+      "combinedGenerationCount": 9,
+      "firstOccurrenceByCase": {
+        "titan-to-rsv": {
+          "firstGeneration": {
+            "best": 15,
+            "median": 15,
+            "worst": 15,
+            "spread": 0
+          },
+          "firstElapsedMs": {
+            "best": 8913.942031999999,
+            "median": 8978.667686,
+            "worst": 10853.400992,
+            "spread": 1939.4589600000018
+          }
+        },
+        "titan-to-s12-ultra": {
+          "firstGeneration": {
+            "best": 16,
+            "median": 16,
+            "worst": 16,
+            "spread": 0
+          },
+          "firstElapsedMs": {
+            "best": 14009.494028000016,
+            "median": 15130.950257999997,
+            "worst": 16513.90771899998,
+            "spread": 2504.413690999965
+          }
+        },
+        "titan-to-storm": {
+          "firstGeneration": {
+            "best": 0,
+            "median": 0,
+            "worst": 0,
+            "spread": 0
+          },
+          "firstElapsedMs": {
+            "best": 8.178960999997798,
+            "median": 8.781500000040978,
+            "worst": 9.102077000017744,
+            "spread": 0.9231160000199452
+          }
+        },
+        "titan-to-u12t": {
+          "firstGeneration": {
+            "best": 23,
+            "median": 23,
+            "worst": 23,
+            "spread": 0
+          },
+          "firstElapsedMs": {
+            "best": 30002.601633000013,
+            "median": 30002.601633000013,
+            "worst": 30002.601633000013,
+            "spread": 0
+          }
+        },
+        "titan-to-trio": {
+          "firstGeneration": {
+            "best": 8,
+            "median": 8,
+            "worst": 8,
+            "spread": 0
+          },
+          "firstElapsedMs": {
+            "best": 1284.0083829999785,
+            "median": 1379.9768829999957,
+            "worst": 1648.1102679999894,
+            "spread": 364.10188500001095
+          }
+        }
+      },
+      "persistence": {
+        "occurrenceRunCount": 30,
+        "median": 1,
+        "max": 3
+      },
+      "futureProgress": {
+        "referenceSignatureLaterChange": {
+          "count": 30,
+          "denominator": 39,
+          "fraction": 0.7692307692307693
+        },
+        "survivingStructuralNoveltyLater": {
+          "count": 30,
+          "denominator": 39,
+          "fraction": 0.7692307692307693
+        },
+        "rmseLaterImprovement": {
+          "count": 19,
+          "denominator": 39,
+          "fraction": 0.48717948717948717
+        },
+        "maxAbsLaterImprovement": {
+          "count": 30,
+          "denominator": 39,
+          "fraction": 0.7692307692307693
+        },
+        "additionalDeliveredFilters": {
+          "count": 29,
+          "denominator": 39,
+          "fraction": 0.7435897435897436
+        }
+      }
+    }
+  },
+  "fidelityClassification": "M3_TELEMETRY_WALLCLOCK_PERTURBATION_MATERIAL",
+  "s3Classification": "INCONCLUSIVE",
+  "evidenceSha256": "eb2acf8ac2ec1d0102c7cb91c05a78c7f86f56885b5e0dbff560fddf44ac1943"
+}

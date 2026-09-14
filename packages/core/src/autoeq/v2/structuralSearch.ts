@@ -1126,6 +1126,28 @@ export interface StructuralSearchM3TelemetryEvent {
 }
 
 /**
+ * Observer-only state checkpoint used by bounded research fidelity fixtures.
+ *
+ * This deliberately contains semantic search state rather than candidate IDs,
+ * and is emitted only for the frozen baseline policy.  The callback receives
+ * defensive filter copies so an observer cannot mutate the search state.
+ */
+export interface StructuralSearchBaselineStateEvent {
+  type: 'ordinary-baseline-generation'
+  generation: number
+  reference: {
+    filters: Filter[]
+    rmseDb: number
+    maxAbsDb: number
+  }
+  retainedBeam: Array<{
+    filters: Filter[]
+    rmseDb: number
+    maxAbsDb: number
+  }>
+}
+
+/**
  * Raw deterministic work observed while running one structural-search stage.
  *
  * These counters intentionally remain unweighted.  They describe work that is
@@ -1223,6 +1245,8 @@ export interface StructuralSearchInput {
   onTrace?: (event: StructuralSearchTraceEvent) => void
   /** M3-only shadow callback; ignored by every non-baseline policy. */
   onBaselineTelemetry?: (event: StructuralSearchM3TelemetryEvent) => void
+  /** M3b-only state observer; ignored by every non-baseline policy. */
+  onBaselineState?: (event: StructuralSearchBaselineStateEvent) => void
 }
 
 export interface StructuralSearchResult {
@@ -1494,6 +1518,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     })
   }
   const onBaselineTelemetry = policy === 'baseline' ? input.onBaselineTelemetry : undefined
+  const onBaselineState = policy === 'baseline' ? input.onBaselineState : undefined
 
   const bounds = resolveStandardAutoEqV2Config({
     ...DEFAULT_AUTOEQ_SETTINGS,
@@ -1736,9 +1761,26 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       : selectReferencePoint(beam)
 
     const emitBaselineGeneration = (retainedBeam: readonly SearchState[]): void => {
-      if (onBaselineTelemetry === undefined || retainedBeam.length === 0) return
+      if (retainedBeam.length === 0 || (onBaselineState === undefined && onBaselineTelemetry === undefined)) return
 
       const reference = selectReferencePoint(retainedBeam)
+      onBaselineState?.({
+        type: 'ordinary-baseline-generation',
+        generation: beamGeneration,
+        reference: {
+          filters: reference.filters.map((filter) => ({ ...filter })),
+          rmseDb: reference.rmseDb,
+          maxAbsDb: reference.maxAbsDb,
+        },
+        retainedBeam: retainedBeam.map((state) => ({
+          filters: state.filters.map((filter) => ({ ...filter })),
+          rmseDb: state.rmseDb,
+          maxAbsDb: state.maxAbsDb,
+        })),
+      })
+
+      if (onBaselineTelemetry === undefined) return
+
       const referenceSignature = structuralSignature(
         reference.filters,
         bounds,

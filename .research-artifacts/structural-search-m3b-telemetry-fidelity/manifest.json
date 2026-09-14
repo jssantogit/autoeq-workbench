@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "frozenBoundary": "f5052b2b1bfdf12b013db5c34c5fda65304091c3",
+  "sourceBoundary": "M3 aggregate is read-only; M3b does not modify M1/M2/M3 evidence.",
+  "protocol": {
+    "cases": [
+      "titan-to-rsv",
+      "titan-to-mystic-8",
+      "titan-to-s12-ultra",
+      "titan-to-storm",
+      "titan-to-u12t",
+      "titan-to-trio"
+    ],
+    "trajectorySeconds": 30,
+    "repeatCount": 3,
+    "modes": [
+      "off",
+      "on"
+    ],
+    "executionOrder": "alternating by case and repeat index",
+    "syntheticMatrix": "not rerun"
+  },
+  "resourceEnvelope": {
+    "structuralCeiling": 43,
+    "effortLevel": 6,
+    "semantics": "C43/e6 frozen baseline, one continuing trajectory per case/mode/repeat"
+  },
+  "corpusHashes": {
+    "dunu-titan-s2.txt": "baa46f7ff6516597d6483a50739a32d0484fea1a509797e717e32b7f39305e7f",
+    "subtonic-storm.txt": "13b3c259cb3b5c106eacac80aa5180c0ffb42d15196ff5e2bcce7d31aae6ed1a",
+    "64-audio-u12t.txt": "593b25ea63fd02e886dd9f1892df9d9d4e17c41ce95fdfbc52492979c61c769e",
+    "64-audio-trio.txt": "d172c28fd5884ecb40338eb43b75a486c09842abfac185b16be7e56122c90f20",
+    "letshuoer-mystic-8.txt": "471e6514e2f9d70b6b9456831cd475bf992b899643476b663c8b554698d77ce3",
+    "softears-rsv.txt": "953499465e21ee0823f0c9534d4aa0057c1f827100743e8b6474bf632bb2842e",
+    "letshuoer-s12-ultra.txt": "39adcb3b0a366ec7f3d62d93f730f45df487b721dc6a51da823a8ee500f59a52"
+  },
+  "frozenM3Source": {
+    "path": ".research-artifacts/structural-search-m3-stagnation-census/aggregate.json",
+    "rawPath": ".research-artifacts/structural-search-m3-stagnation-census/raw-timing.jsonl",
+    "sha256": "767e3341dcf69ec6629d65e7a31a5aeee34efd7c3898739ef3d4fec6761b26c4",
+    "rawSha256": "8d143ac7194ff5ff6b0a37095cf13330f878c28e73e9617d381e45bdbc0b675b",
+    "evidenceSha256": "9927d848d72069de1255a40a12c672079d43741c1568193c97a342233d4fe703",
+    "rawTrajectoryCount": 18,
+    "generationObservationsAvailable": true
+  },
+  "rawTimingPath": "raw-timing.jsonl",
+  "aggregatePath": "aggregate.json",
+  "reportPath": "final-report.md",
+  "evidenceSha256": "eb2acf8ac2ec1d0102c7cb91c05a78c7f86f56885b5e0dbff560fddf44ac1943"
+}
