@@ -47,6 +47,11 @@ import type {
   ResearchRunRow,
 } from './types.js'
 
+// C2a is an explicitly invoked development-only census.  Re-exporting its
+// runner keeps the established research entrypoint discoverable without
+// changing the default research plan or its case selection.
+export { runC2Census } from './c2RobustLossDevCensus.js'
+
 export const RESEARCH_CASE_IDS: readonly ResearchCaseId[] = [
   'titan-to-storm',
   'titan-to-u12t',

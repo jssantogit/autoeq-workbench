@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "artifact": "objective-c2-robust-loss-dev-census",
+  "status": "ROBUST_LOSS_PREFERENCE_SIGNAL_SUPPORTED",
+  "researchQuestion": "Does robust fit loss materially change preference among already evaluated FROZEN_BASELINE states on Batch B development cases?",
+  "frozenBoundary": "04f49e2bd20e1c2928dfef7a1ae52412a12c3eb7",
+  "c3EvidenceSha256": "6028c10e63deff45b9963e6d914eccd3705a6825267e8d5f0cdb2c811b56d685",
+  "corpus": {
+    "commit": "fc3932c72e3c3931dc062c523c2205389639264b",
+    "classification": "CORPUS_V1_2_READY",
+    "evidenceSha256": "13c7ff43614d7e257b0231f9238102afff5413964077017a2db7741d87b659b1",
+    "casesSha256": "4f78db0448d7d6aa82cff65134e64219f9ee94946e189b209ac4fd077dce3ff2",
+    "provenanceSha256": "9e27cc9340a85e60f124b8d226f5810ee84b9fcc5a13bdb56b2895da51384696"
+  },
+  "caseIds": [
+    "frc1.1-08-0000f6762889",
+    "frc1.1-11-000279686a75",
+    "frc1.1-07-0000c470a9b3"
+  ],
+  "caseCount": 3,
+  "split": {
+    "batchBDevelopment": [
+      "frc1.1-08-0000f6762889",
+      "frc1.1-11-000279686a75",
+      "frc1.1-07-0000c470a9b3"
+    ],
+    "batchBHoldout": [
+      "frc1.1-14-00025d5729a1",
+      "frc1.1-13-000225a01a6d",
+      "frc1.1-17-00036da52192"
+    ],
+    "batchC": [
+      "frc1.1-05-0000a93dae04",
+      "frc1.1-18-0003c77fd5b4",
+      "frc1.1-01-000013d2c2cd",
+      "frc1.1-16-0003622f8ec5",
+      "frc1.1-02-00002f5caf38",
+      "frc1.1-04-00007c13a25b"
+    ]
+  },
+  "resolvedSearchConfig": {
+    "preset": "max10-q31-b4-p8-experimental",
+    "beamWidth": 16,
+    "proposalsPerParent": 32,
+    "localPolishEvaluations": 120,
+    "maxFilters": 43,
+    "featureRegionCount": 6,
+    "minFeatureSeparationOctaves": 0.5,
+    "candidatePolicy": "semantic",
+    "selectionMetric": "violation",
+    "mergeProximityOctaves": 0.08533333333333333,
+    "marginalPruneTolerance": 0.01,
+    "structuralCleanupMinFilters": 8,
+    "structuralCleanupMaxSteps": 3,
+    "admission": "q31-b4-p8",
+    "workProfile": "full"
+  },
+  "protocol": {
+    "selectedAlgorithm": "FROZEN_BASELINE",
+    "caseIds": [
+      "frc1.1-08-0000f6762889",
+      "frc1.1-11-000279686a75",
+      "frc1.1-07-0000c470a9b3"
+    ],
+    "batchBDevelopmentCaseIds": [
+      "frc1.1-08-0000f6762889",
+      "frc1.1-11-000279686a75",
+      "frc1.1-07-0000c470a9b3"
+    ],
+    "batchBHoldoutCaseIds": [
+      "frc1.1-14-00025d5729a1",
+      "frc1.1-13-000225a01a6d",
+      "frc1.1-17-00036da52192"
+    ],
+    "batchCCaseIds": [
+      "frc1.1-05-0000a93dae04",
+      "frc1.1-18-0003c77fd5b4",
+      "frc1.1-01-000013d2c2cd",
+      "frc1.1-16-0003622f8ec5",
+      "frc1.1-02-00002f5caf38",
+      "frc1.1-04-00007c13a25b"
+    ],
+    "deterministicGenerationBound": 31,
+    "naturalTermination": "allowed-earlier-than-generation-bound",
+    "trajectoryCount": 3,
+    "observerMode": "C3-observer-off-on-fidelity-per-case",
+    "wallClockTermination": false,
+    "batchBHoldoutExecuted": false,
+    "batchCExecuted": false,
+    "oldStructuralVNextCasesExecuted": false,
+    "searchPolicyChanged": false,
+    "lossesAffectSearch": false
+  },
+  "developmentCoverage": {
+    "robustLossDivergence": 2,
+    "total": 3
+  },
+  "classification": "ROBUST_LOSS_PREFERENCE_SIGNAL_SUPPORTED",
+  "frozenC2bCandidate": "HUBER-075",
+  "evidenceSha256": "7678c3c0ba37fc35e46ba5ed9644552b4262334e8561f2dc4e03e885f87ccfd8",
+  "evidenceHashScope": [
+    "aggregate-evidence.json",
+    "loss-census/frc1.1-08-0000f6762889.json",
+    "loss-census/frc1.1-11-000279686a75.json",
+    "loss-census/frc1.1-07-0000c470a9b3.json"
+  ],
+  "files": [
+    "manifest.json",
+    "aggregate-evidence.json",
+    "loss-census/frc1.1-08-0000f6762889.json",
+    "loss-census/frc1.1-11-000279686a75.json",
+    "loss-census/frc1.1-07-0000c470a9b3.json",
+    "evidence-sha256.txt",
+    "final-report.md"
+  ]
+}
