@@ -1,7 +1,16 @@
+import { createHash } from 'node:crypto'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { resolve } from 'node:path'
+
 import { calculateErrorMetrics } from '../../src/metrics/errorMetrics.js'
 import { cascadeMagnitudeDb } from '../../src/dsp/cascade.js'
 import { auditCancellations } from '../../src/autoeq/cancellation.js'
+import { createEvaluationGrid } from '../../src/config/numericPolicy.js'
+import { desiredCorrection, prepareCurve } from '../../src/curves/derive.js'
+import { parseCurveText } from '../../src/io/parseCurve.js'
 import type { Filter } from '../../src/types/filter.js'
+import type { Curve, Normalization } from '../../src/types/curve.js'
 import {
   MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET,
   referenceSelectorKey,
@@ -65,6 +74,193 @@ export const C3_OLD_STRUCTURAL_VNEXT_CASE_IDS = Object.freeze([
 export const C3_MAX_GENERATIONS = 31 as const
 export const C3_STRUCTURAL_CEILING = 43 as const
 export const C3_EFFORT_LEVEL = 6 as const
+export const C3_NORMALIZATION = Object.freeze({
+  mode: 'hz',
+  frequencyHz: 500,
+  levelDb: 60,
+} as const satisfies Normalization)
+export const C3_ARTIFACT_RELATIVE_DIR = '.research-artifacts/objective-c3-filter-knee-census-v1.2' as const
+const C3_REPOSITORY_ROOT = resolve(fileURLToPath(new URL('../../../..', import.meta.url)))
+const C3_CORPUS_ARTIFACT_DIR = resolve(C3_REPOSITORY_ROOT, '.research-artifacts/fresh-real-corpus-v1-metadata-repair')
+const C3_CACHE_DIR = resolve(C3_REPOSITORY_ROOT, '.research-cache/fresh-real-corpus-v1.2')
+
+type CurveArtifact = {
+  collection: string
+  form: string
+  model: string
+  processedName: string
+  deviceFamily: string
+  rig: string
+  sourceUrls: string[]
+  path: string
+  blobSha: string
+  identity: string
+  upstreamSha256: string
+  byteLength: number
+  originalTerminalFrequencyHz: number
+  originalTerminalDb: number
+  canonicalTerminalFrequencyHz: number
+  canonicalTerminalDb: number
+  transformation: string | null
+  originalParsedPointsSha256: string
+  canonicalParsedPointsSha256: string
+  parserCanonicalizerVersion: number
+}
+
+type CorpusCaseArtifact = {
+  id: string
+  source: CurveArtifact
+  target: CurveArtifact
+  pairing: string
+  normalization: typeof C3_NORMALIZATION
+  batch: 'A' | 'B' | 'C'
+  split: 'development' | 'holdout'
+}
+
+type FrozenCorpusArtifact = {
+  manifest: Record<string, unknown>
+  cases: CorpusCaseArtifact[]
+  provenance: { cases: CorpusCaseArtifact[]; repository: string; commit: string; tree: string }
+  manifestSha256: string
+  casesSha256: string
+  provenanceSha256: string
+}
+
+function sha256(value: Uint8Array | string): string {
+  return createHash('sha256').update(value).digest('hex')
+}
+
+function readFrozenCorpusArtifact(): FrozenCorpusArtifact {
+  const manifestBytes = readFileSync(resolve(C3_CORPUS_ARTIFACT_DIR, 'manifest.json'))
+  const casesBytes = readFileSync(resolve(C3_CORPUS_ARTIFACT_DIR, 'cases.json'))
+  const provenanceBytes = readFileSync(resolve(C3_CORPUS_ARTIFACT_DIR, 'provenance.json'))
+  const evidenceSha = readFileSync(resolve(C3_CORPUS_ARTIFACT_DIR, 'evidence-sha256.txt'), 'utf8').trim()
+  const manifestSha256 = sha256(manifestBytes)
+  if (manifestSha256 !== C3_CORPUS_EVIDENCE_SHA256 || evidenceSha !== C3_CORPUS_EVIDENCE_SHA256) {
+    throw new Error('C3 corpus evidence SHA-256 does not match the frozen V1.2 artifact')
+  }
+  const manifest = JSON.parse(manifestBytes.toString('utf8')) as Record<string, unknown>
+  const cases = JSON.parse(casesBytes.toString('utf8')) as CorpusCaseArtifact[]
+  const provenance = JSON.parse(provenanceBytes.toString('utf8')) as FrozenCorpusArtifact['provenance']
+  const casesSha256 = sha256(JSON.stringify(cases))
+  const provenanceSha256 = sha256(JSON.stringify(provenance))
+  if (manifest.status !== C3_CORPUS_CLASSIFICATION || manifest.corpusVersion !== C3_CORPUS_VERSION) {
+    throw new Error('C3 corpus classification/version mismatch')
+  }
+  if (manifest.casesSha256 !== casesSha256 || manifest.provenanceSha256 !== provenanceSha256) {
+    throw new Error('C3 corpus cases/provenance hash mismatch')
+  }
+  if (
+    provenance.repository !== 'jaakkopasanen/AutoEq' ||
+    provenance.commit !== C3_UPSTREAM_COMMIT ||
+    provenance.tree !== C3_UPSTREAM_TREE ||
+    JSON.stringify(provenance.cases) !== JSON.stringify(cases)
+  ) {
+    throw new Error('C3 corpus provenance does not match the frozen cases')
+  }
+  if (cases.length !== 18 || cases.some((value) => value.normalization.frequencyHz !== 500 || value.normalization.levelDb !== 60)) {
+    throw new Error('C3 frozen corpus must contain 18 V1.2 cases with the 500 Hz/60 dB normalization')
+  }
+  return { manifest, cases, provenance, manifestSha256, casesSha256, provenanceSha256 }
+}
+
+async function verifyPinnedUpstream(): Promise<void> {
+  const response = await fetch(`https://api.github.com/repos/jaakkopasanen/AutoEq/git/commits/${C3_UPSTREAM_COMMIT}`, {
+    redirect: 'error',
+    headers: { Accept: 'application/vnd.github+json' },
+  })
+  if (!response.ok) throw new Error(`Unable to verify pinned upstream commit: HTTP ${response.status}`)
+  const commit = await response.json() as { sha?: string; tree?: { sha?: string } }
+  if (commit.sha !== C3_UPSTREAM_COMMIT || commit.tree?.sha !== C3_UPSTREAM_TREE) {
+    throw new Error('Pinned upstream commit/tree verification failed')
+  }
+}
+
+async function fetchPinnedRaw(path: string): Promise<{ bytes: Buffer; sha256: string }> {
+  const cachePath = resolve(C3_CACHE_DIR, sha256(path))
+  let bytes: Buffer
+  if (existsSync(cachePath)) {
+    bytes = readFileSync(cachePath)
+  } else {
+    const url = `https://raw.githubusercontent.com/${'jaakkopasanen/AutoEq'}/${C3_UPSTREAM_COMMIT}/${path.split('/').map(encodeURIComponent).join('/')}`
+    const response = await fetch(url, { redirect: 'error' })
+    if (!response.ok) throw new Error(`Unable to reacquire ${path}: HTTP ${response.status}`)
+    bytes = Buffer.from(await response.arrayBuffer())
+    if (bytes.length === 0) throw new Error(`Pinned raw curve is empty: ${path}`)
+    mkdirSync(C3_CACHE_DIR, { recursive: true })
+    writeFileSync(cachePath, bytes)
+  }
+  return { bytes, sha256: sha256(bytes) }
+}
+
+function pointsAsPairs(curve: Curve): number[][] {
+  return curve.rawPoints.map((point) => [point.frequencyHz, point.db])
+}
+
+function verifyCurveMetadata(curve: Curve, artifact: CurveArtifact, raw: { bytes: Buffer; sha256: string }): Curve {
+  if (raw.sha256 !== artifact.upstreamSha256 || raw.bytes.byteLength !== artifact.byteLength) {
+    throw new Error(`Raw hash/length mismatch for frozen curve ${artifact.path}`)
+  }
+  const original = curve.rawPoints
+  const originalTerminal = original.at(-1)!
+  if (
+    originalTerminal.frequencyHz !== artifact.originalTerminalFrequencyHz ||
+    originalTerminal.db !== artifact.originalTerminalDb ||
+    sha256(JSON.stringify(pointsAsPairs(curve))) !== artifact.originalParsedPointsSha256
+  ) {
+    throw new Error(`Original parsed-point provenance mismatch for ${artifact.path}`)
+  }
+  const grid = createEvaluationGrid()
+  const penultimate = grid.at(-2)!
+  if (originalTerminal.frequencyHz < penultimate) {
+    throw new Error(`Frozen curve ${artifact.path} does not cover the V2 terminal closure boundary`)
+  }
+  const canonical = originalTerminal.frequencyHz >= 20_000
+    ? curve
+    : {
+        ...curve,
+        rawPoints: [...curve.rawPoints, { frequencyHz: 20_000, db: originalTerminal.db }],
+      }
+  const canonicalTerminal = canonical.rawPoints.at(-1)!
+  if (
+    canonicalTerminal.frequencyHz !== artifact.canonicalTerminalFrequencyHz ||
+    canonicalTerminal.db !== artifact.canonicalTerminalDb ||
+    (canonical.rawPoints.length !== original.length + (originalTerminal.frequencyHz < 20_000 ? 1 : 0)) ||
+    sha256(JSON.stringify(pointsAsPairs(canonical))) !== artifact.canonicalParsedPointsSha256 ||
+    artifact.parserCanonicalizerVersion !== 2
+  ) {
+    throw new Error(`Terminal closure provenance mismatch for ${artifact.path}`)
+  }
+  const expectedTransformation = originalTerminal.frequencyHz < 20_000 ? 'terminal-flat-hold-to-v2-max' : null
+  if (artifact.transformation !== expectedTransformation) {
+    throw new Error(`Terminal closure transformation mismatch for ${artifact.path}`)
+  }
+  return canonical
+}
+
+async function reacquireCurve(artifact: CurveArtifact, kind: Curve['kind']): Promise<Curve> {
+  const raw = await fetchPinnedRaw(artifact.path)
+  const parsed = parseCurveText(raw.bytes.toString('utf8'), { name: artifact.processedName, kind })
+  return verifyCurveMetadata(parsed, artifact, raw)
+}
+
+async function prepareFrozenCase(artifact: CorpusCaseArtifact): Promise<C3PreparedSearchGrid & { id: string; batch: string; split: string; source: CurveArtifact; target: CurveArtifact }> {
+  const source = await reacquireCurve(artifact.source, 'fr')
+  const target = await reacquireCurve(artifact.target, 'target')
+  const frequenciesHz = createEvaluationGrid()
+  const sourcePrepared = prepareCurve(source, C3_NORMALIZATION, frequenciesHz)
+  const targetPrepared = prepareCurve(target, C3_NORMALIZATION, frequenciesHz)
+  return {
+    id: artifact.id,
+    batch: artifact.batch,
+    split: artifact.split,
+    source: artifact.source,
+    target: artifact.target,
+    frequenciesHz,
+    desiredDb: desiredCorrection(sourcePrepared.db, targetPrepared.db),
+    sampleRateHz: 48_000,
+  }
+}
 
 export function resolveC3SearchConfig(): ResolvedStructuralSearchConfig {
   const base = resolveStructuralSearchConfig({
@@ -528,4 +724,501 @@ export function selectGeometricKnee(frontier: readonly C3FrontierPoint[]): C3Kne
     return { status: 'NO_UNIQUE_KNEE', reason: 'TIED_MAXIMUM' }
   }
   return { status: 'UNIQUE_KNEE', N_knee: bestN, distance: bestDistance }
+}
+
+export interface C3CaseEvidence {
+  id: string
+  split: 'development' | 'holdout'
+  batch: 'A'
+  source: Pick<CurveArtifact, 'identity' | 'path' | 'upstreamSha256' | 'canonicalParsedPointsSha256' | 'transformation'>
+  target: Pick<CurveArtifact, 'identity' | 'path' | 'upstreamSha256' | 'canonicalParsedPointsSha256' | 'transformation'>
+  normalization: typeof C3_NORMALIZATION
+  trajectory: {
+    maxGenerations: number
+    completedGenerationCount: number
+    terminalGeneration: number
+    terminalReason: 'natural-stop' | 'generation-bound'
+    result: {
+      filterCount: number
+      rmseDb: number
+      maxAbsDb: number
+      maeDb: number
+      filterStateKey: string
+    }
+    traceSha256: string
+    observationSha256: string
+    workCounters: Record<string, number>
+  }
+  observerFidelity: {
+    equivalent: boolean
+    resultEqual: boolean
+    completedGenerationCountEqual: boolean
+    retainedBeamSequenceEqual: boolean
+    workCountersEqual: boolean
+    naturalTerminationEqual: boolean
+    ordinaryDecisionTraceEqual: boolean
+  }
+  finalFrontier: {
+    exactCountSeries: C3FrontierPoint[]
+    cumulative: C3FrontierPoint[]
+  }
+  temporalDiagnostic: {
+    g10: C3KneeResult
+    g20: C3KneeResult
+    g30Final: C3KneeResult
+    finalKneeRepresentedAtG10: boolean
+    finalKneeRepresentedAtG20: boolean
+    movementN: { g10ToG20: number | null; g20ToFinal: number | null }
+  }
+  knee: C3KneeResult
+  classification: 'KNEE_CASE' | 'NO_KNEE_CASE'
+  secondary: C3KneeVsFinalMetrics
+  frontierInvariants: { exactCountsUnique: boolean; sortedCounts: boolean; cumulativeMonotone: boolean; representativesEvaluated: boolean }
+}
+
+export interface C3SyntheticSanityEvidence {
+  id: string
+  knownGeneratingComplexity: number
+  N_knee: number | null
+  N_final: number
+  uniqueKnee: boolean
+}
+
+export interface C3CensusResult {
+  manifest: Record<string, unknown>
+  aggregate: Record<string, unknown>
+  cases: C3CaseEvidence[]
+  synthetic: C3SyntheticSanityEvidence[]
+  evidenceSha256: string
+  outputDir: string
+}
+
+function compactState(state: C3ObservedState): C3FrontierPoint {
+  return {
+    N: state.filters.length,
+    normalizedViolation: Math.max(state.rmseDb / 0.25, state.maxAbsDb / 0.75),
+    rmseDb: state.rmseDb,
+    maxAbsDb: state.maxAbsDb,
+    maeDb: state.maeDb,
+    filterStateKey: state.filterStateKey,
+    stage: state.stage,
+    generation: state.generation,
+    filters: [],
+    representativeFilterCount: state.filters.length,
+  }
+}
+
+function compactFrontier(frontier: readonly (C3ExactFrontierPoint | C3FrontierPoint)[]): C3FrontierPoint[] {
+  return frontier.map((point) => ({
+    N: point.N,
+    normalizedViolation: point.normalizedViolation,
+    rmseDb: point.rmseDb,
+    maxAbsDb: point.maxAbsDb,
+    maeDb: point.maeDb,
+    filterStateKey: point.filterStateKey,
+    stage: point.stage,
+    generation: point.generation,
+    filters: [],
+    representativeFilterCount: 'representativeFilterCount' in point ? point.representativeFilterCount : point.N,
+  }))
+}
+
+function verifyFrontierInvariants(
+  exact: readonly C3ExactFrontierPoint[],
+  cumulative: readonly C3FrontierPoint[],
+): C3CaseEvidence['frontierInvariants'] {
+  const exactCounts = exact.map((point) => point.N)
+  const cumulativeCounts = cumulative.map((point) => point.N)
+  const exactCountsUnique = new Set(exactCounts).size === exactCounts.length
+  const sortedCounts = exactCounts.every((N, index) => index === 0 || N > exactCounts[index - 1]!) &&
+    cumulativeCounts.every((N, index) => index === 0 || N > cumulativeCounts[index - 1]!)
+  const cumulativeMonotone = cumulative.every((point, index) =>
+    index === 0 || point.normalizedViolation <= cumulative[index - 1]!.normalizedViolation)
+  const exactKeys = new Set(exact.map((point) => point.filterStateKey))
+  const representativesEvaluated = cumulative.every((point) =>
+    point.representativeFilterCount <= point.N && exactKeys.has(point.filterStateKey))
+  return { exactCountsUnique, sortedCounts, cumulativeMonotone, representativesEvaluated }
+}
+
+function stateResultMetrics(result: StructuralSearchResult, grid: C3PreparedSearchGrid): C3CaseEvidence['trajectory']['result'] {
+  const filters = result.filters.map((filter) => ({ ...filter }))
+  const response = cascadeMagnitudeDb(filters, grid.frequenciesHz, grid.sampleRateHz)
+  const metrics = calculateErrorMetrics(grid.desiredDb.map((desired, index) => desired - response[index]!), grid.frequenciesHz)
+  return {
+    filterCount: filters.length,
+    rmseDb: metrics.rmseDb,
+    maxAbsDb: metrics.maxAbsDb,
+    maeDb: metrics.maeDb,
+    filterStateKey: JSON.stringify(filters.map(({ id: _id, ...filter }) => filter)),
+  }
+}
+
+function trajectoryHash(trajectory: C3DeterministicTrajectory): { traceSha256: string; observationSha256: string } {
+  return {
+    traceSha256: sha256(JSON.stringify(trajectory.trace)),
+    observationSha256: sha256(JSON.stringify(trajectory.observations.map((state) => ({
+      filterStateKey: state.filterStateKey,
+      rmseDb: state.rmseDb,
+      maxAbsDb: state.maxAbsDb,
+      maeDb: state.maeDb,
+      stage: state.stage,
+      generation: state.generation,
+    })))),
+  }
+}
+
+function movementN(
+  first: C3KneeResult,
+  second: C3KneeResult,
+): number | null {
+  return first.status === 'UNIQUE_KNEE' && second.status === 'UNIQUE_KNEE'
+    ? second.N_knee! - first.N_knee!
+    : null
+}
+
+async function runOneC3Case(
+  artifact: CorpusCaseArtifact,
+  config: ResolvedStructuralSearchConfig,
+): Promise<C3CaseEvidence> {
+  const prepared = await prepareFrozenCase(artifact)
+  const fidelity = runC3ObserverFidelity(prepared, { config, maxGenerations: C3_MAX_GENERATIONS })
+  if (!fidelity.equivalent) throw new Error(`C3 observer fidelity failed for ${artifact.id}`)
+  const trajectory = fidelity.on
+  const exact = computeExactCountSeries(trajectory.observations)
+  const cumulative = computeCumulativeFrontier(exact)
+  const knee = selectGeometricKnee(cumulative)
+  const g10 = computePrefixKnee(trajectory.observations, 'g10')
+  const g20 = computePrefixKnee(trajectory.observations, 'g20')
+  const g30Final = computePrefixKnee(trajectory.observations, 'g30-final')
+  const finalMetrics = stateResultMetrics(trajectory.result, prepared)
+  const secondary = summarizeKneeVsFinal(cumulative, knee, finalMetrics.filterCount, prepared)
+  const invariants = verifyFrontierInvariants(exact, cumulative)
+  if (!Object.values(invariants).every(Boolean)) throw new Error(`C3 frontier invariants failed for ${artifact.id}`)
+  const hashes = trajectoryHash(trajectory)
+  return {
+    id: artifact.id,
+    split: artifact.split,
+    batch: 'A',
+    source: {
+      identity: artifact.source.identity,
+      path: artifact.source.path,
+      upstreamSha256: artifact.source.upstreamSha256,
+      canonicalParsedPointsSha256: artifact.source.canonicalParsedPointsSha256,
+      transformation: artifact.source.transformation,
+    },
+    target: {
+      identity: artifact.target.identity,
+      path: artifact.target.path,
+      upstreamSha256: artifact.target.upstreamSha256,
+      canonicalParsedPointsSha256: artifact.target.canonicalParsedPointsSha256,
+      transformation: artifact.target.transformation,
+    },
+    normalization: C3_NORMALIZATION,
+    trajectory: {
+      maxGenerations: C3_MAX_GENERATIONS,
+      completedGenerationCount: trajectory.completedGenerationCount,
+      terminalGeneration: trajectory.terminalGeneration,
+      terminalReason: trajectory.terminalReason,
+      result: finalMetrics,
+      ...hashes,
+      workCounters: workCounters(trajectory.trace),
+    },
+    observerFidelity: {
+      equivalent: fidelity.equivalent,
+      resultEqual: fidelity.resultEqual,
+      completedGenerationCountEqual: fidelity.completedGenerationCountEqual,
+      retainedBeamSequenceEqual: fidelity.retainedBeamSequenceEqual,
+      workCountersEqual: fidelity.workCountersEqual,
+      naturalTerminationEqual: fidelity.naturalTerminationEqual,
+      ordinaryDecisionTraceEqual: fidelity.traceEqual,
+    },
+    finalFrontier: {
+      exactCountSeries: compactFrontier(exact),
+      cumulative: compactFrontier(cumulative),
+    },
+    temporalDiagnostic: {
+      g10: g10.knee,
+      g20: g20.knee,
+      g30Final: g30Final.knee,
+      finalKneeRepresentedAtG10: knee.status === 'UNIQUE_KNEE' && g10.frontier.some((point) => point.N === knee.N_knee),
+      finalKneeRepresentedAtG20: knee.status === 'UNIQUE_KNEE' && g20.frontier.some((point) => point.N === knee.N_knee),
+      movementN: { g10ToG20: movementN(g10.knee, g20.knee), g20ToFinal: movementN(g20.knee, g30Final.knee) },
+    },
+    knee,
+    classification: knee.status === 'UNIQUE_KNEE' && knee.N_knee! < finalMetrics.filterCount ? 'KNEE_CASE' : 'NO_KNEE_CASE',
+    secondary,
+    frontierInvariants: invariants,
+  }
+}
+
+function writeJson(path: string, value: unknown): void {
+  writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, 'utf8')
+}
+
+function hashEvidenceFiles(outputDir: string, relativePaths: readonly string[]): string {
+  const hash = createHash('sha256')
+  for (const relativePath of [...relativePaths].sort()) {
+    hash.update(`${relativePath}\n`)
+    hash.update(readFileSync(resolve(outputDir, relativePath)))
+    hash.update('\n')
+  }
+  return hash.digest('hex')
+}
+
+function renderC3Report(
+  config: ResolvedStructuralSearchConfig,
+  cases: readonly C3CaseEvidence[],
+  synthetic: readonly C3SyntheticSanityEvidence[],
+  classification: string,
+  coverage: { development: number; holdout: number; overall: number },
+): string {
+  const format = (value: number | null | undefined): string => value === null || value === undefined ? 'none' : value.toFixed(6)
+  const lines = [
+    '# C3 filter-count/error knee census — Fresh Real Corpus V1.2',
+    '',
+    `- Frozen corpus commit: \`${C3_CORPUS_COMMIT}\` (${C3_CORPUS_CLASSIFICATION}).`,
+    `- Corpus evidence SHA-256: \`${C3_CORPUS_EVIDENCE_SHA256}\`.`,
+    `- Upstream: \`jaakkopasanen/AutoEq\` commit \`${C3_UPSTREAM_COMMIT}\`, tree \`${C3_UPSTREAM_TREE}\`.`,
+    '- Selected algorithm: **FROZEN_BASELINE**; this census adds observation only and does not implement a production knee selector.',
+    `- Resolved envelope: C${config.maxFilters}/e${C3_EFFORT_LEVEL}, preset \`${config.preset}\`, beam ${config.beamWidth}, proposals/parent ${config.proposalsPerParent}, polish ${config.localPolishEvaluations}, admission \`${config.admission}\`, work profile \`${config.workProfile}\`.`,
+    '- Execution: one deterministic generation-work-bounded trajectory per case, maximum 31 completed ordinary generations (natural termination is retained).',
+    '',
+    '## Batch A cases',
+    '',
+    '| Case | Split | N_min | N_knee | N_final | Filters saved | Violation knee/final | RMSE knee/final | maxAbs knee/final | MAE knee/final | Classification |',
+    '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
+    ...cases.map((value) => {
+      const first = value.finalFrontier.cumulative[0]
+      return `| ${value.id} | ${value.split} | ${first?.N ?? 'none'} | ${value.secondary.N_knee ?? 'none'} | ${value.secondary.N_final} | ${value.secondary.filtersSaved ?? 'none'} | ${format(value.secondary.violationKnee)} / ${format(value.secondary.violationFinal)} | ${format(value.secondary.rmseKnee)} / ${format(value.secondary.rmseFinal)} | ${format(value.secondary.maxAbsKnee)} / ${format(value.secondary.maxAbsFinal)} | ${format(value.secondary.maeKnee)} / ${format(value.secondary.maeFinal)} | ${value.classification} |`
+    }),
+    '',
+    '## Temporal diagnostic',
+    '',
+    '| Case | g10 knee | g20 knee | final knee | movement g10→g20 | movement g20→final | final N represented at g10 | final N represented at g20 |',
+    '| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |',
+    ...cases.map((value) => `| ${value.id} | ${value.temporalDiagnostic.g10.N_knee ?? 'none'} | ${value.temporalDiagnostic.g20.N_knee ?? 'none'} | ${value.knee.N_knee ?? 'none'} | ${value.temporalDiagnostic.movementN.g10ToG20 ?? 'none'} | ${value.temporalDiagnostic.movementN.g20ToFinal ?? 'none'} | ${value.temporalDiagnostic.finalKneeRepresentedAtG10 ? 'yes' : 'no'} | ${value.temporalDiagnostic.finalKneeRepresentedAtG20 ? 'yes' : 'no'} |`),
+    '',
+    '## Gate',
+    '',
+    `- Development KNEE_CASE coverage: ${coverage.development}/3.`,
+    `- Holdout KNEE_CASE coverage: ${coverage.holdout}/3.`,
+    `- Overall KNEE_CASE coverage: ${coverage.overall}/6.`,
+    `- Final C3 classification: **${classification}**.`,
+    '- Gate: supported requires development ≥2/3, holdout ≥2/3, overall ≥4/6, observer OFF/ON equivalence, and all frontier invariants.',
+    '',
+    '## Synthetic sanity (D/E/F/H)',
+    '',
+    '| Case | Known generating complexity | N_knee | N_final | Unique knee |',
+    '| --- | ---: | ---: | ---: | --- |',
+    ...synthetic.map((value) => `| ${value.id} | ${value.knownGeneratingComplexity} | ${value.N_knee ?? 'none'} | ${value.N_final} | ${value.uniqueKnee ? 'yes' : 'no'} |`),
+    '',
+    '- Synthetic results are sanity checks only and do not move the real-case gate.',
+    '- Secondary cancellation/Q/gain metrics are recorded in each per-case frontier artifact and do not move the knee.',
+    '',
+    `- Interpretation: ${classification === 'KNEE_SIGNAL_SUPPORTED' ? 'stop after the census; a later milestone may implement exactly this geometric selector for a direct frozen-baseline benchmark.' : classification === 'KNEE_SIGNAL_NOT_SUPPORTED' ? 'close C3 immediately; next research hypothesis is C2 objective/loss research using untouched Batch B.' : 'evidence is inconclusive; report the exact instrumentation/evidence limitation and do not automatically rerun.'}`,
+    '',
+  ]
+  return `${lines.join('\n').trimEnd()}\n`
+}
+
+function assertC3CaseEvidence(caseEvidence: readonly C3CaseEvidence[]): void {
+  assertC3BatchACaseIds(caseEvidence.map((value) => value.id))
+  if (caseEvidence.length !== 6 || new Set(caseEvidence.map((value) => value.id)).size !== 6) {
+    throw new Error('C3 artifact must contain exactly six distinct Batch A cases')
+  }
+  if (caseEvidence.some((value) => value.batch !== 'A')) throw new Error('C3 artifact contains a non-Batch-A case')
+}
+
+/** Execute and commit the complete C3 V1.2 census artifact set. */
+export async function runC3Census(
+  outputDir = resolve(C3_REPOSITORY_ROOT, C3_ARTIFACT_RELATIVE_DIR),
+): Promise<C3CensusResult> {
+  const corpus = readFrozenCorpusArtifact()
+  const selectedIds = [...C3_BATCH_A_CASE_IDS]
+  assertC3BatchACaseIds(selectedIds)
+  const selected = corpus.cases.filter((value) => selectedIds.includes(value.id as (typeof C3_BATCH_A_CASE_IDS)[number]))
+  if (selected.length !== 6 || selected.some((value) => value.batch !== 'A')) {
+    throw new Error('Frozen corpus Batch A selection is incomplete or contaminated')
+  }
+  await verifyPinnedUpstream()
+  const config = resolveC3SearchConfig()
+  const cases: C3CaseEvidence[] = []
+  for (const artifact of selected) {
+    console.log(`C3 real case ${artifact.id} (${artifact.split})`)
+    cases.push(await runOneC3Case(artifact, config))
+  }
+  assertC3CaseEvidence(cases)
+  // Freeze the complete real result before beginning the synthetic sanity pass.
+  const frozenRealEvidence = JSON.parse(JSON.stringify(cases)) as C3CaseEvidence[]
+
+  const syntheticIds = new Set([
+    'synthetic-d-dense-known-structure',
+    'synthetic-e-high-q-valid',
+    'synthetic-f-upper-frequency-structure',
+    'synthetic-h-alternating-structure',
+  ])
+  const { loadSyntheticGroundTruthCorpus } = await import('./syntheticCorpus.js')
+  const synthetic: C3SyntheticSanityEvidence[] = []
+  for (const value of loadSyntheticGroundTruthCorpus().filter((candidate) => syntheticIds.has(candidate.id))) {
+    const trajectory = runC3DeterministicBaseline({
+      frequenciesHz: value.frequenciesHz,
+      desiredDb: value.desiredDb,
+      sampleRateHz: value.sampleRateHz,
+    }, { config, maxGenerations: C3_MAX_GENERATIONS })
+    const frontier = computeCumulativeFrontier(computeExactCountSeries(trajectory.observations))
+    const knee = selectGeometricKnee(frontier)
+    synthetic.push({
+      id: value.id,
+      knownGeneratingComplexity: value.knownStructuralComplexity,
+      N_knee: knee.N_knee ?? null,
+      N_final: trajectory.result.filters.length,
+      uniqueKnee: knee.status === 'UNIQUE_KNEE',
+    })
+  }
+  synthetic.sort((left, right) => left.id.localeCompare(right.id))
+
+  const development = frozenRealEvidence.filter((value) => value.split === 'development')
+  const holdout = frozenRealEvidence.filter((value) => value.split === 'holdout')
+  const developmentCoverage = development.filter((value) => value.classification === 'KNEE_CASE').length
+  const holdoutCoverage = holdout.filter((value) => value.classification === 'KNEE_CASE').length
+  const overallCoverage = frozenRealEvidence.filter((value) => value.classification === 'KNEE_CASE').length
+  const fidelityPass = frozenRealEvidence.every((value) => Object.values(value.observerFidelity).every(Boolean))
+  const invariantsPass = frozenRealEvidence.every((value) => Object.values(value.frontierInvariants).every(Boolean))
+  const evidenceValid = fidelityPass && invariantsPass
+  const classification = !evidenceValid
+    ? 'INCONCLUSIVE'
+    : developmentCoverage >= 2 && holdoutCoverage >= 2 && overallCoverage >= 4
+      ? 'KNEE_SIGNAL_SUPPORTED'
+      : 'KNEE_SIGNAL_NOT_SUPPORTED'
+
+  const caseSummaries = frozenRealEvidence.map((value) => ({
+    id: value.id,
+    split: value.split,
+    N_min: value.finalFrontier.cumulative[0]?.N ?? null,
+    N_knee: value.secondary.N_knee,
+    N_final: value.secondary.N_final,
+    filtersSaved: value.secondary.filtersSaved,
+    violationKnee: value.secondary.violationKnee,
+    violationFinal: value.secondary.violationFinal,
+    rmseKnee: value.secondary.rmseKnee,
+    rmseFinal: value.secondary.rmseFinal,
+    maxAbsKnee: value.secondary.maxAbsKnee,
+    maxAbsFinal: value.secondary.maxAbsFinal,
+    maeKnee: value.secondary.maeKnee,
+    maeFinal: value.secondary.maeFinal,
+    classification: value.classification,
+    observerFidelity: value.observerFidelity,
+    frontierInvariants: value.frontierInvariants,
+    frontierPath: `frontiers/${value.id}.json`,
+  }))
+  const aggregate: Record<string, unknown> = {
+    schemaVersion: 1,
+    artifact: 'objective-c3-filter-knee-census-v1.2',
+    corpus: {
+      commit: C3_CORPUS_COMMIT,
+      classification: C3_CORPUS_CLASSIFICATION,
+      evidenceSha256: C3_CORPUS_EVIDENCE_SHA256,
+      casesSha256: corpus.casesSha256,
+      provenanceSha256: corpus.provenanceSha256,
+      upstream: { repository: 'jaakkopasanen/AutoEq', commit: C3_UPSTREAM_COMMIT, tree: C3_UPSTREAM_TREE },
+    },
+    protocol: {
+      selectedAlgorithm: 'FROZEN_BASELINE',
+      caseIds: selectedIds,
+      developmentCaseIds: [...C3_BATCH_A_DEVELOPMENT_IDS],
+      holdoutCaseIds: [...C3_BATCH_A_HOLDOUT_IDS],
+      deterministicGenerationBound: C3_MAX_GENERATIONS,
+      naturalTermination: 'allowed-earlier-than-generation-bound',
+      trajectoryCount: 6,
+      observerMode: 'frontier-observer-on-primary-with-off-on-fidelity-per-case',
+      wallClockTermination: false,
+      batchBExecuted: false,
+      batchCExecuted: false,
+      oldStructuralVNextCasesExecuted: false,
+    },
+    normalization: C3_NORMALIZATION,
+    resolvedSearchConfig: config,
+    cases: caseSummaries,
+    synthetic,
+    coverage: { development: developmentCoverage, holdout: holdoutCoverage, overall: overallCoverage },
+    observerFidelity: { pass: fidelityPass, allCases: frozenRealEvidence.map((value) => ({ id: value.id, ...value.observerFidelity })) },
+    frontierInvariants: { pass: invariantsPass },
+    classification,
+  }
+
+  mkdirSync(outputDir, { recursive: true })
+  mkdirSync(resolve(outputDir, 'frontiers'), { recursive: true })
+  for (const value of frozenRealEvidence) {
+    writeJson(resolve(outputDir, 'frontiers', `${value.id}.json`), {
+      schemaVersion: 1,
+      caseId: value.id,
+      split: value.split,
+      batch: value.batch,
+      source: value.source,
+      target: value.target,
+      normalization: value.normalization,
+      trajectory: value.trajectory,
+      observerFidelity: value.observerFidelity,
+      finalFrontier: value.finalFrontier,
+      temporalDiagnostic: value.temporalDiagnostic,
+      knee: value.knee,
+      classification: value.classification,
+      secondary: value.secondary,
+      frontierInvariants: value.frontierInvariants,
+    })
+  }
+  writeJson(resolve(outputDir, 'aggregate-evidence.json'), aggregate)
+  const evidencePaths = [
+    'aggregate-evidence.json',
+    ...frozenRealEvidence.map((value) => `frontiers/${value.id}.json`),
+  ]
+  const evidenceSha256 = hashEvidenceFiles(outputDir, evidencePaths)
+  const report = renderC3Report(config, frozenRealEvidence, synthetic, classification, {
+    development: developmentCoverage,
+    holdout: holdoutCoverage,
+    overall: overallCoverage,
+  })
+  writeFileSync(resolve(outputDir, 'final-report.md'), report, 'utf8')
+  writeFileSync(resolve(outputDir, 'evidence-sha256.txt'), `${evidenceSha256}\n`, 'utf8')
+  const manifest: Record<string, unknown> = {
+    schemaVersion: 1,
+    artifact: 'objective-c3-filter-knee-census-v1.2',
+    status: classification,
+    researchQuestion: 'Does the frozen structural baseline exhibit a reproducible, parameter-free filter-count/error knee on fresh real cases?',
+    corpus: {
+      commit: C3_CORPUS_COMMIT,
+      classification: C3_CORPUS_CLASSIFICATION,
+      evidenceSha256: C3_CORPUS_EVIDENCE_SHA256,
+      casesSha256: corpus.casesSha256,
+      provenanceSha256: corpus.provenanceSha256,
+    },
+    upstream: { repository: 'jaakkopasanen/AutoEq', commit: C3_UPSTREAM_COMMIT, tree: C3_UPSTREAM_TREE },
+    normalization: C3_NORMALIZATION,
+    caseIds: selectedIds,
+    caseCount: 6,
+    split: { development: [...C3_BATCH_A_DEVELOPMENT_IDS], holdout: [...C3_BATCH_A_HOLDOUT_IDS] },
+    resolvedSearchConfig: config,
+    protocol: aggregate.protocol,
+    coverage: aggregate.coverage,
+    synthetic,
+    evidenceSha256,
+    evidenceHashScope: evidencePaths,
+    files: ['manifest.json', 'aggregate-evidence.json', ...evidencePaths.slice(1), 'evidence-sha256.txt', 'final-report.md'],
+  }
+  writeJson(resolve(outputDir, 'manifest.json'), manifest)
+  return { manifest, aggregate, cases: frozenRealEvidence, synthetic, evidenceSha256, outputDir }
+}
+
+const isMain = process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+if (isMain) {
+  runC3Census().then((result) => {
+    console.log(JSON.stringify({
+      outputDir: result.outputDir,
+      evidenceSha256: result.evidenceSha256,
+      classification: result.manifest.status,
+    }, null, 2))
+  }).catch((error: unknown) => {
+    console.error(error instanceof Error ? error.stack ?? error.message : String(error))
+    process.exitCode = 1
+  })
 }

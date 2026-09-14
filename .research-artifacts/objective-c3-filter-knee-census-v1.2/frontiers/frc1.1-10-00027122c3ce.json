@@ -1,0 +1,613 @@
+{
+  "schemaVersion": 1,
+  "caseId": "frc1.1-10-00027122c3ce",
+  "split": "development",
+  "batch": "A",
+  "source": {
+    "identity": "Super Review|in-ear|711|co-donguri shizuku",
+    "path": "measurements/Super Review/data/in-ear/Co-Donguri Shizuku.csv",
+    "upstreamSha256": "2971b677c8951a8cb9bb21cb542a1605bc36be339cf275ba2674bc2b746129f1",
+    "canonicalParsedPointsSha256": "21cc625585a606e9a701d23d58c46644386786f57ea77aaf7cfc511e0357cedc",
+    "transformation": "terminal-flat-hold-to-v2-max"
+  },
+  "target": {
+    "identity": "oratory1990|in-ear|GRAS 45BC-10|shuoer s12 pro",
+    "path": "measurements/oratory1990/data/in-ear/Shuoer S12 Pro.csv",
+    "upstreamSha256": "983db47ab6e0a70f4d00363d6cd68b4b838b18ce7454903b3633ec00371cc850",
+    "canonicalParsedPointsSha256": "b5786cdd6ba5ae8d27069114d35e333094114ff87885f52feaa6f25dce839e74",
+    "transformation": "terminal-flat-hold-to-v2-max"
+  },
+  "normalization": {
+    "mode": "hz",
+    "frequencyHz": 500,
+    "levelDb": 60
+  },
+  "trajectory": {
+    "maxGenerations": 31,
+    "completedGenerationCount": 31,
+    "terminalGeneration": 30,
+    "terminalReason": "generation-bound",
+    "result": {
+      "filterCount": 15,
+      "rmseDb": 0.9820149254709855,
+      "maxAbsDb": 3.163006034119141,
+      "maeDb": 0.7261207127365757,
+      "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":134,\"gainDb\":-0.3,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":142,\"gainDb\":-0.9,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]"
+    },
+    "traceSha256": "f75cbe3ec02b3a85969b3655d0d90ebcaf65a0fe4db31e3a5b4159fc6e993f77",
+    "observationSha256": "220e988e365abff16a5047915aeada8194f5e6d3bf422a434298b3fbe0bc8286",
+    "workCounters": {
+      "beamGenerations": 31,
+      "proposalsGenerated": 3469,
+      "proposalsAdmitted": 3375,
+      "proposalsPolished": 3375,
+      "duplicateStates": 1147,
+      "rescueAttempts": 0,
+      "pairAddAttempts": 0,
+      "capSwapAttempts": 0
+    }
+  },
+  "observerFidelity": {
+    "equivalent": true,
+    "resultEqual": true,
+    "completedGenerationCountEqual": true,
+    "retainedBeamSequenceEqual": true,
+    "workCountersEqual": true,
+    "naturalTerminationEqual": true,
+    "ordinaryDecisionTraceEqual": true
+  },
+  "finalFrontier": {
+    "exactCountSeries": [
+      {
+        "N": 0,
+        "normalizedViolation": 36.23372000159143,
+        "rmseDb": 4.951577500474535,
+        "maxAbsDb": 27.17529000119357,
+        "maeDb": 3.1041128207444686,
+        "filterStateKey": "[]",
+        "stage": "initial",
+        "generation": 0,
+        "filters": [],
+        "representativeFilterCount": 0
+      },
+      {
+        "N": 1,
+        "normalizedViolation": 16.233720001591422,
+        "rmseDb": 4.008059782437126,
+        "maxAbsDb": 12.175290001193567,
+        "maeDb": 2.8960368839174997,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":15,\"q\":0.61}]",
+        "stage": "ordinary-polished",
+        "generation": 2,
+        "filters": [],
+        "representativeFilterCount": 1
+      },
+      {
+        "N": 2,
+        "normalizedViolation": 14.553724815769844,
+        "rmseDb": 3.638431203942461,
+        "maxAbsDb": 10.749755818151105,
+        "maeDb": 2.7148768820833005,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18741,\"gainDb\":15,\"q\":2.35},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19713,\"gainDb\":15,\"q\":1.87}]",
+        "stage": "ordinary-polished",
+        "generation": 3,
+        "filters": [],
+        "representativeFilterCount": 2
+      },
+      {
+        "N": 3,
+        "normalizedViolation": 12.728750321407398,
+        "rmseDb": 3.1244587787505624,
+        "maxAbsDb": 9.54656274105555,
+        "maeDb": 2.3861730950368263,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3673,\"gainDb\":-8.7,\"q\":2.67},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":1.93},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":14,\"q\":1.68}]",
+        "stage": "ordinary-polished",
+        "generation": 4,
+        "filters": [],
+        "representativeFilterCount": 3
+      },
+      {
+        "N": 4,
+        "normalizedViolation": 11.978397137186228,
+        "rmseDb": 2.8623252873157505,
+        "maxAbsDb": 8.983797852889671,
+        "maeDb": 2.1827636331468843,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3767,\"gainDb\":-7.7,\"q\":2.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15454,\"gainDb\":-11.8,\"q\":1.97},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":0.91},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19572,\"gainDb\":14.9,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 9,
+        "filters": [],
+        "representativeFilterCount": 4
+      },
+      {
+        "N": 5,
+        "normalizedViolation": 8.42960297730457,
+        "rmseDb": 2.1074007443261427,
+        "maxAbsDb": 5.144470935533352,
+        "maeDb": 1.7964079795991352,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4198,\"gainDb\":-9.9,\"q\":1.79},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":9806,\"gainDb\":13.2,\"q\":1.69},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":13868,\"gainDb\":-13.2,\"q\":1.36},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":1.28},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19572,\"gainDb\":15,\"q\":1.25}]",
+        "stage": "ordinary-polished",
+        "generation": 8,
+        "filters": [],
+        "representativeFilterCount": 5
+      },
+      {
+        "N": 6,
+        "normalizedViolation": 7.5932817392871135,
+        "rmseDb": 1.8983204348217784,
+        "maxAbsDb": 5.4458712126384174,
+        "maeDb": 1.3436260715400101,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":381,\"gainDb\":-1.4,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4198,\"gainDb\":-9.8,\"q\":1.83},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10093,\"gainDb\":13.5,\"q\":1.69},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":13768,\"gainDb\":-13.5,\"q\":1.36},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":1.31},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19572,\"gainDb\":15,\"q\":1.22}]",
+        "stage": "ordinary-polished",
+        "generation": 9,
+        "filters": [],
+        "representativeFilterCount": 6
+      },
+      {
+        "N": 7,
+        "normalizedViolation": 7.7402785828077745,
+        "rmseDb": 1.9350696457019436,
+        "maxAbsDb": 4.921775092383688,
+        "maeDb": 1.6497642735268554,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3864,\"gainDb\":-7.2,\"q\":1.51},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4663,\"gainDb\":-5.3,\"q\":5.96},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10020,\"gainDb\":10,\"q\":1.69},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12902,\"gainDb\":-8.6,\"q\":4.21},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15232,\"gainDb\":-6.8,\"q\":1.79},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18821,\"gainDb\":15,\"q\":1.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":15,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 10,
+        "filters": [],
+        "representativeFilterCount": 7
+      },
+      {
+        "N": 8,
+        "normalizedViolation": 7.591359932390407,
+        "rmseDb": 1.8978399830976018,
+        "maxAbsDb": 5.438819391848895,
+        "maeDb": 1.3468716051414402,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":389,\"gainDb\":-1.4,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4183,\"gainDb\":-9.8,\"q\":1.89},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":9527,\"gainDb\":5.2,\"q\":1.39},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10094,\"gainDb\":7.1,\"q\":2.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":13669,\"gainDb\":-6.5,\"q\":1.48},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":14586,\"gainDb\":-5.4,\"q\":1.25},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":1.25},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19572,\"gainDb\":15,\"q\":1.17}]",
+        "stage": "ordinary-polished",
+        "generation": 9,
+        "filters": [],
+        "representativeFilterCount": 8
+      },
+      {
+        "N": 9,
+        "normalizedViolation": 5.188211109286181,
+        "rmseDb": 1.2970527773215452,
+        "maxAbsDb": 3.3436877829226077,
+        "maeDb": 1.0989651997090817,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1479,\"gainDb\":4.1,\"q\":1.17},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2831,\"gainDb\":-7.5,\"q\":1.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4563,\"gainDb\":-9.2,\"q\":3.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.8,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-12.9,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16022,\"gainDb\":-8.6,\"q\":1.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":7.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":13.2,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":15,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 18,
+        "filters": [],
+        "representativeFilterCount": 9
+      },
+      {
+        "N": 10,
+        "normalizedViolation": 4.296366984397058,
+        "rmseDb": 1.0413298581246746,
+        "maxAbsDb": 3.2222752382977933,
+        "maeDb": 0.7520188849288665,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":374,\"gainDb\":-1.3,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1511,\"gainDb\":4,\"q\":1.3},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-6.8,\"q\":1.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4563,\"gainDb\":-8,\"q\":3.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-13.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":15,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 18,
+        "filters": [],
+        "representativeFilterCount": 10
+      },
+      {
+        "N": 11,
+        "normalizedViolation": 4.275967593808873,
+        "rmseDb": 1.052979615772103,
+        "maxAbsDb": 3.2069756953566544,
+        "maeDb": 0.7404612566184616,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":518,\"gainDb\":-1.1,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1308,\"gainDb\":4.5,\"q\":1},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-6.8,\"q\":1.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4563,\"gainDb\":-8,\"q\":3.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.5,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":7.1,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 17,
+        "filters": [],
+        "representativeFilterCount": 11
+      },
+      {
+        "N": 12,
+        "normalizedViolation": 4.217748654092895,
+        "rmseDb": 1.0509369291234116,
+        "maxAbsDb": 3.163311490569671,
+        "maeDb": 0.8374373864206475,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":282,\"gainDb\":-1.8,\"q\":0.64},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.6,\"q\":1.39},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 20,
+        "filters": [],
+        "representativeFilterCount": 12
+      },
+      {
+        "N": 13,
+        "normalizedViolation": 4.217462903098599,
+        "rmseDb": 0.9761663257778935,
+        "maxAbsDb": 3.1630971773239493,
+        "maeDb": 0.7247546546091932,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":169,\"gainDb\":-1,\"q\":0.64},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":282,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.6,\"q\":1.39},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 24,
+        "filters": [],
+        "representativeFilterCount": 13
+      },
+      {
+        "N": 14,
+        "normalizedViolation": 4.2173415951431155,
+        "rmseDb": 0.9820872837255538,
+        "maxAbsDb": 3.163006196357337,
+        "maeDb": 0.7262847154619069,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":140,\"gainDb\":-1.2,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 23,
+        "filters": [],
+        "representativeFilterCount": 14
+      },
+      {
+        "N": 15,
+        "normalizedViolation": 4.217341378825521,
+        "rmseDb": 0.9820149254709855,
+        "maxAbsDb": 3.163006034119141,
+        "maeDb": 0.7261207127365757,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":134,\"gainDb\":-0.3,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":142,\"gainDb\":-0.9,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 24,
+        "filters": [],
+        "representativeFilterCount": 15
+      },
+      {
+        "N": 16,
+        "normalizedViolation": 4.217341640118055,
+        "rmseDb": 0.9819803115897109,
+        "maxAbsDb": 3.163006230088541,
+        "maeDb": 0.7260361791092349,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":134,\"gainDb\":-0.3,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":138,\"gainDb\":-0.3,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":144,\"gainDb\":-0.6,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 25,
+        "filters": [],
+        "representativeFilterCount": 16
+      },
+      {
+        "N": 17,
+        "normalizedViolation": 4.217341634213266,
+        "rmseDb": 0.9035979376192848,
+        "maxAbsDb": 3.1630062256599496,
+        "maeDb": 0.5680094983430813,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":24,\"gainDb\":0.2,\"q\":0.7},{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":99,\"gainDb\":-0.7,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":143,\"gainDb\":-0.1,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":155,\"gainDb\":-1,\"q\":0.64},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":282,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 29,
+        "filters": [],
+        "representativeFilterCount": 17
+      },
+      {
+        "N": 18,
+        "normalizedViolation": 4.217341633645563,
+        "rmseDb": 0.9037185171245207,
+        "maxAbsDb": 3.1630062252341724,
+        "maeDb": 0.5683301511272701,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":24,\"gainDb\":0.1,\"q\":0.7},{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":25,\"gainDb\":0.1,\"q\":0.7},{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":99,\"gainDb\":-0.7,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":143,\"gainDb\":-0.1,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":155,\"gainDb\":-1,\"q\":0.64},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":282,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 30,
+        "filters": [],
+        "representativeFilterCount": 18
+      },
+      {
+        "N": 19,
+        "normalizedViolation": 4.217341644259533,
+        "rmseDb": 0.907585565741768,
+        "maxAbsDb": 3.16300623319465,
+        "maeDb": 0.57244969719698,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":20,\"gainDb\":0.2,\"q\":0.7},{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":22,\"gainDb\":1.2,\"q\":0.7},{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":32,\"gainDb\":-0.5,\"q\":0.7},{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":99,\"gainDb\":-0.7,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":143,\"gainDb\":-0.1,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":155,\"gainDb\":-1,\"q\":0.64},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":282,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 29,
+        "filters": [],
+        "representativeFilterCount": 19
+      }
+    ],
+    "cumulative": [
+      {
+        "N": 0,
+        "normalizedViolation": 36.23372000159143,
+        "rmseDb": 4.951577500474535,
+        "maxAbsDb": 27.17529000119357,
+        "maeDb": 3.1041128207444686,
+        "filterStateKey": "[]",
+        "stage": "initial",
+        "generation": 0,
+        "filters": [],
+        "representativeFilterCount": 0
+      },
+      {
+        "N": 1,
+        "normalizedViolation": 16.233720001591422,
+        "rmseDb": 4.008059782437126,
+        "maxAbsDb": 12.175290001193567,
+        "maeDb": 2.8960368839174997,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":15,\"q\":0.61}]",
+        "stage": "ordinary-polished",
+        "generation": 2,
+        "filters": [],
+        "representativeFilterCount": 1
+      },
+      {
+        "N": 2,
+        "normalizedViolation": 14.553724815769844,
+        "rmseDb": 3.638431203942461,
+        "maxAbsDb": 10.749755818151105,
+        "maeDb": 2.7148768820833005,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":18741,\"gainDb\":15,\"q\":2.35},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19713,\"gainDb\":15,\"q\":1.87}]",
+        "stage": "ordinary-polished",
+        "generation": 3,
+        "filters": [],
+        "representativeFilterCount": 2
+      },
+      {
+        "N": 3,
+        "normalizedViolation": 12.728750321407398,
+        "rmseDb": 3.1244587787505624,
+        "maxAbsDb": 9.54656274105555,
+        "maeDb": 2.3861730950368263,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3673,\"gainDb\":-8.7,\"q\":2.67},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":1.93},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":14,\"q\":1.68}]",
+        "stage": "ordinary-polished",
+        "generation": 4,
+        "filters": [],
+        "representativeFilterCount": 3
+      },
+      {
+        "N": 4,
+        "normalizedViolation": 11.978397137186228,
+        "rmseDb": 2.8623252873157505,
+        "maxAbsDb": 8.983797852889671,
+        "maeDb": 2.1827636331468843,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":3767,\"gainDb\":-7.7,\"q\":2.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15454,\"gainDb\":-11.8,\"q\":1.97},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":0.91},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19572,\"gainDb\":14.9,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 9,
+        "filters": [],
+        "representativeFilterCount": 4
+      },
+      {
+        "N": 5,
+        "normalizedViolation": 8.42960297730457,
+        "rmseDb": 2.1074007443261427,
+        "maxAbsDb": 5.144470935533352,
+        "maeDb": 1.7964079795991352,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4198,\"gainDb\":-9.9,\"q\":1.79},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":9806,\"gainDb\":13.2,\"q\":1.69},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":13868,\"gainDb\":-13.2,\"q\":1.36},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":1.28},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19572,\"gainDb\":15,\"q\":1.25}]",
+        "stage": "ordinary-polished",
+        "generation": 8,
+        "filters": [],
+        "representativeFilterCount": 5
+      },
+      {
+        "N": 6,
+        "normalizedViolation": 7.5932817392871135,
+        "rmseDb": 1.8983204348217784,
+        "maxAbsDb": 5.4458712126384174,
+        "maeDb": 1.3436260715400101,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":381,\"gainDb\":-1.4,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4198,\"gainDb\":-9.8,\"q\":1.83},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10093,\"gainDb\":13.5,\"q\":1.69},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":13768,\"gainDb\":-13.5,\"q\":1.36},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":1.31},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19572,\"gainDb\":15,\"q\":1.22}]",
+        "stage": "ordinary-polished",
+        "generation": 9,
+        "filters": [],
+        "representativeFilterCount": 6
+      },
+      {
+        "N": 7,
+        "normalizedViolation": 7.5932817392871135,
+        "rmseDb": 1.8983204348217784,
+        "maxAbsDb": 5.4458712126384174,
+        "maeDb": 1.3436260715400101,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":381,\"gainDb\":-1.4,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4198,\"gainDb\":-9.8,\"q\":1.83},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10093,\"gainDb\":13.5,\"q\":1.69},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":13768,\"gainDb\":-13.5,\"q\":1.36},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":1.31},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19572,\"gainDb\":15,\"q\":1.22}]",
+        "stage": "ordinary-polished",
+        "generation": 9,
+        "filters": [],
+        "representativeFilterCount": 6
+      },
+      {
+        "N": 8,
+        "normalizedViolation": 7.591359932390407,
+        "rmseDb": 1.8978399830976018,
+        "maxAbsDb": 5.438819391848895,
+        "maeDb": 1.3468716051414402,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":389,\"gainDb\":-1.4,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4183,\"gainDb\":-9.8,\"q\":1.89},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":9527,\"gainDb\":5.2,\"q\":1.39},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10094,\"gainDb\":7.1,\"q\":2.55},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":13669,\"gainDb\":-6.5,\"q\":1.48},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":14586,\"gainDb\":-5.4,\"q\":1.25},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19014,\"gainDb\":15,\"q\":1.25},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19572,\"gainDb\":15,\"q\":1.17}]",
+        "stage": "ordinary-polished",
+        "generation": 9,
+        "filters": [],
+        "representativeFilterCount": 8
+      },
+      {
+        "N": 9,
+        "normalizedViolation": 5.188211109286181,
+        "rmseDb": 1.2970527773215452,
+        "maxAbsDb": 3.3436877829226077,
+        "maeDb": 1.0989651997090817,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1479,\"gainDb\":4.1,\"q\":1.17},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2831,\"gainDb\":-7.5,\"q\":1.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4563,\"gainDb\":-9.2,\"q\":3.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.8,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-12.9,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":16022,\"gainDb\":-8.6,\"q\":1.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":7.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":13.2,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":15,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 18,
+        "filters": [],
+        "representativeFilterCount": 9
+      },
+      {
+        "N": 10,
+        "normalizedViolation": 4.296366984397058,
+        "rmseDb": 1.0413298581246746,
+        "maxAbsDb": 3.2222752382977933,
+        "maeDb": 0.7520188849288665,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":374,\"gainDb\":-1.3,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1511,\"gainDb\":4,\"q\":1.3},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-6.8,\"q\":1.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4563,\"gainDb\":-8,\"q\":3.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-13.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":15,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 18,
+        "filters": [],
+        "representativeFilterCount": 10
+      },
+      {
+        "N": 11,
+        "normalizedViolation": 4.275967593808873,
+        "rmseDb": 1.052979615772103,
+        "maxAbsDb": 3.2069756953566544,
+        "maeDb": 0.7404612566184616,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"LS\",\"frequencyHz\":518,\"gainDb\":-1.1,\"q\":0.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1308,\"gainDb\":4.5,\"q\":1},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-6.8,\"q\":1.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4563,\"gainDb\":-8,\"q\":3.7},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.5,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":7.1,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 17,
+        "filters": [],
+        "representativeFilterCount": 11
+      },
+      {
+        "N": 12,
+        "normalizedViolation": 4.217748654092895,
+        "rmseDb": 1.0509369291234116,
+        "maxAbsDb": 3.163311490569671,
+        "maeDb": 0.8374373864206475,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":282,\"gainDb\":-1.8,\"q\":0.64},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.6,\"q\":1.39},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 20,
+        "filters": [],
+        "representativeFilterCount": 12
+      },
+      {
+        "N": 13,
+        "normalizedViolation": 4.217462903098599,
+        "rmseDb": 0.9761663257778935,
+        "maxAbsDb": 3.1630971773239493,
+        "maeDb": 0.7247546546091932,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":169,\"gainDb\":-1,\"q\":0.64},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":282,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.6,\"q\":1.39},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 24,
+        "filters": [],
+        "representativeFilterCount": 13
+      },
+      {
+        "N": 14,
+        "normalizedViolation": 4.2173415951431155,
+        "rmseDb": 0.9820872837255538,
+        "maxAbsDb": 3.163006196357337,
+        "maeDb": 0.7262847154619069,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":140,\"gainDb\":-1.2,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 23,
+        "filters": [],
+        "representativeFilterCount": 14
+      },
+      {
+        "N": 15,
+        "normalizedViolation": 4.217341378825521,
+        "rmseDb": 0.9820149254709855,
+        "maxAbsDb": 3.163006034119141,
+        "maeDb": 0.7261207127365757,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":134,\"gainDb\":-0.3,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":142,\"gainDb\":-0.9,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 24,
+        "filters": [],
+        "representativeFilterCount": 15
+      },
+      {
+        "N": 16,
+        "normalizedViolation": 4.217341378825521,
+        "rmseDb": 0.9820149254709855,
+        "maxAbsDb": 3.163006034119141,
+        "maeDb": 0.7261207127365757,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":134,\"gainDb\":-0.3,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":142,\"gainDb\":-0.9,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 24,
+        "filters": [],
+        "representativeFilterCount": 15
+      },
+      {
+        "N": 17,
+        "normalizedViolation": 4.217341378825521,
+        "rmseDb": 0.9820149254709855,
+        "maxAbsDb": 3.163006034119141,
+        "maeDb": 0.7261207127365757,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":134,\"gainDb\":-0.3,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":142,\"gainDb\":-0.9,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 24,
+        "filters": [],
+        "representativeFilterCount": 15
+      },
+      {
+        "N": 18,
+        "normalizedViolation": 4.217341378825521,
+        "rmseDb": 0.9820149254709855,
+        "maxAbsDb": 3.163006034119141,
+        "maeDb": 0.7261207127365757,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":134,\"gainDb\":-0.3,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":142,\"gainDb\":-0.9,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 24,
+        "filters": [],
+        "representativeFilterCount": 15
+      },
+      {
+        "N": 19,
+        "normalizedViolation": 4.217341378825521,
+        "rmseDb": 0.9820149254709855,
+        "maxAbsDb": 3.163006034119141,
+        "maeDb": 0.7261207127365757,
+        "filterStateKey": "[{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":134,\"gainDb\":-0.3,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":142,\"gainDb\":-0.9,\"q\":0.99},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":299,\"gainDb\":-1.3,\"q\":0.59},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":1234,\"gainDb\":4.5,\"q\":0.92},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":2935,\"gainDb\":-7.8,\"q\":1.65},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4433,\"gainDb\":-5.2,\"q\":4.8},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":4697,\"gainDb\":-5.2,\"q\":5.23},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":10239,\"gainDb\":10.6,\"q\":1.66},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":12995,\"gainDb\":-11.7,\"q\":5.02},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":15566,\"gainDb\":-8.4,\"q\":1.76},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":17947,\"gainDb\":8.8,\"q\":3.09},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":19181,\"gainDb\":12.9,\"q\":1.52},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.15},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":3.8,\"q\":1.63},{\"enabled\":true,\"type\":\"PK\",\"frequencyHz\":20000,\"gainDb\":7.5,\"q\":1.15}]",
+        "stage": "ordinary-polished",
+        "generation": 24,
+        "filters": [],
+        "representativeFilterCount": 15
+      }
+    ]
+  },
+  "temporalDiagnostic": {
+    "g10": {
+      "status": "UNIQUE_KNEE",
+      "N_knee": 1,
+      "distance": 0.5782958111113983
+    },
+    "g20": {
+      "status": "UNIQUE_KNEE",
+      "N_knee": 1,
+      "distance": 0.5621874447982498
+    },
+    "g30Final": {
+      "status": "UNIQUE_KNEE",
+      "N_knee": 5,
+      "distance": 0.6052762699102541
+    },
+    "finalKneeRepresentedAtG10": true,
+    "finalKneeRepresentedAtG20": true,
+    "movementN": {
+      "g10ToG20": 0,
+      "g20ToFinal": 4
+    }
+  },
+  "knee": {
+    "status": "UNIQUE_KNEE",
+    "N_knee": 5,
+    "distance": 0.6052762699102541
+  },
+  "classification": "KNEE_CASE",
+  "secondary": {
+    "N_knee": 5,
+    "N_final": 15,
+    "filtersSaved": 10,
+    "violationKnee": 8.42960297730457,
+    "violationFinal": 4.217341378825521,
+    "rmseKnee": 2.1074007443261427,
+    "rmseFinal": 0.9820149254709855,
+    "maxAbsKnee": 5.144470935533352,
+    "maxAbsFinal": 3.163006034119141,
+    "maeKnee": 1.7964079795991352,
+    "maeFinal": 0.7261207127365757,
+    "fractionFrontierImprovementCapturedAtKnee": 0.8684341646470963,
+    "residualImprovementAfterKnee": 4.212261598479049,
+    "kneeSecondary": {
+      "cancellationScore": 0,
+      "qP50": 1.36,
+      "qP90": 1.75,
+      "qMax": 1.79,
+      "maxAbsGainDb": 15,
+      "sumAbsGainDb": 66.3,
+      "opposingNearbyCancellationPairCount": 0
+    },
+    "finalSecondary": {
+      "cancellationScore": 0,
+      "qP50": 1.63,
+      "qP90": 4.9319999999999995,
+      "qMax": 5.23,
+      "maxAbsGainDb": 12.9,
+      "sumAbsGainDb": 92.7,
+      "opposingNearbyCancellationPairCount": 0
+    }
+  },
+  "frontierInvariants": {
+    "exactCountsUnique": true,
+    "sortedCounts": true,
+    "cumulativeMonotone": true,
+    "representativesEvaluated": true
+  }
+}

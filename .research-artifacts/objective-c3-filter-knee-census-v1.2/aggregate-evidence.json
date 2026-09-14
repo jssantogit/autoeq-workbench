@@ -1,0 +1,371 @@
+{
+  "schemaVersion": 1,
+  "artifact": "objective-c3-filter-knee-census-v1.2",
+  "corpus": {
+    "commit": "fc3932c72e3c3931dc062c523c2205389639264b",
+    "classification": "CORPUS_V1_2_READY",
+    "evidenceSha256": "13c7ff43614d7e257b0231f9238102afff5413964077017a2db7741d87b659b1",
+    "casesSha256": "4f78db0448d7d6aa82cff65134e64219f9ee94946e189b209ac4fd077dce3ff2",
+    "provenanceSha256": "9e27cc9340a85e60f124b8d226f5810ee84b9fcc5a13bdb56b2895da51384696",
+    "upstream": {
+      "repository": "jaakkopasanen/AutoEq",
+      "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+      "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+    }
+  },
+  "protocol": {
+    "selectedAlgorithm": "FROZEN_BASELINE",
+    "caseIds": [
+      "frc1.1-12-0002977aa8bc",
+      "frc1.1-09-0001b6618e24",
+      "frc1.1-10-00027122c3ce",
+      "frc1.1-03-00003906daac",
+      "frc1.1-15-000323cd8787",
+      "frc1.1-06-0000c6497763"
+    ],
+    "developmentCaseIds": [
+      "frc1.1-12-0002977aa8bc",
+      "frc1.1-09-0001b6618e24",
+      "frc1.1-10-00027122c3ce"
+    ],
+    "holdoutCaseIds": [
+      "frc1.1-03-00003906daac",
+      "frc1.1-15-000323cd8787",
+      "frc1.1-06-0000c6497763"
+    ],
+    "deterministicGenerationBound": 31,
+    "naturalTermination": "allowed-earlier-than-generation-bound",
+    "trajectoryCount": 6,
+    "observerMode": "frontier-observer-on-primary-with-off-on-fidelity-per-case",
+    "wallClockTermination": false,
+    "batchBExecuted": false,
+    "batchCExecuted": false,
+    "oldStructuralVNextCasesExecuted": false
+  },
+  "normalization": {
+    "mode": "hz",
+    "frequencyHz": 500,
+    "levelDb": 60
+  },
+  "resolvedSearchConfig": {
+    "preset": "max10-q31-b4-p8-experimental",
+    "beamWidth": 16,
+    "proposalsPerParent": 32,
+    "localPolishEvaluations": 120,
+    "maxFilters": 43,
+    "featureRegionCount": 6,
+    "minFeatureSeparationOctaves": 0.5,
+    "candidatePolicy": "semantic",
+    "selectionMetric": "violation",
+    "mergeProximityOctaves": 0.08533333333333333,
+    "marginalPruneTolerance": 0.01,
+    "structuralCleanupMinFilters": 8,
+    "structuralCleanupMaxSteps": 3,
+    "admission": "q31-b4-p8",
+    "workProfile": "full"
+  },
+  "cases": [
+    {
+      "id": "frc1.1-12-0002977aa8bc",
+      "split": "development",
+      "N_min": 0,
+      "N_knee": 5,
+      "N_final": 17,
+      "filtersSaved": 12,
+      "violationKnee": 6.039225604464817,
+      "violationFinal": 6.033729952934313,
+      "rmseKnee": 1.5043050440683947,
+      "rmseFinal": 1.4294212301642237,
+      "maxAbsKnee": 4.5294192033486125,
+      "maxAbsFinal": 4.525297464700735,
+      "maeKnee": 1.141462299417101,
+      "maeFinal": 1.0384479611315176,
+      "classification": "KNEE_CASE",
+      "observerFidelity": {
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      "frontierInvariants": {
+        "exactCountsUnique": true,
+        "sortedCounts": true,
+        "cumulativeMonotone": true,
+        "representativesEvaluated": true
+      },
+      "frontierPath": "frontiers/frc1.1-12-0002977aa8bc.json"
+    },
+    {
+      "id": "frc1.1-09-0001b6618e24",
+      "split": "development",
+      "N_min": 0,
+      "N_knee": 6,
+      "N_final": 16,
+      "filtersSaved": 10,
+      "violationKnee": 7.980604696538346,
+      "violationFinal": 2.5953603694507996,
+      "rmseKnee": 1.943390566556088,
+      "rmseFinal": 0.6408640617779296,
+      "maxAbsKnee": 5.985453522403759,
+      "maxAbsFinal": 1.9465202770880996,
+      "maeKnee": 1.6349121691328923,
+      "maeFinal": 0.4402577031396697,
+      "classification": "KNEE_CASE",
+      "observerFidelity": {
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      "frontierInvariants": {
+        "exactCountsUnique": true,
+        "sortedCounts": true,
+        "cumulativeMonotone": true,
+        "representativesEvaluated": true
+      },
+      "frontierPath": "frontiers/frc1.1-09-0001b6618e24.json"
+    },
+    {
+      "id": "frc1.1-10-00027122c3ce",
+      "split": "development",
+      "N_min": 0,
+      "N_knee": 5,
+      "N_final": 15,
+      "filtersSaved": 10,
+      "violationKnee": 8.42960297730457,
+      "violationFinal": 4.217341378825521,
+      "rmseKnee": 2.1074007443261427,
+      "rmseFinal": 0.9820149254709855,
+      "maxAbsKnee": 5.144470935533352,
+      "maxAbsFinal": 3.163006034119141,
+      "maeKnee": 1.7964079795991352,
+      "maeFinal": 0.7261207127365757,
+      "classification": "KNEE_CASE",
+      "observerFidelity": {
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      "frontierInvariants": {
+        "exactCountsUnique": true,
+        "sortedCounts": true,
+        "cumulativeMonotone": true,
+        "representativesEvaluated": true
+      },
+      "frontierPath": "frontiers/frc1.1-10-00027122c3ce.json"
+    },
+    {
+      "id": "frc1.1-03-00003906daac",
+      "split": "holdout",
+      "N_min": 0,
+      "N_knee": 3,
+      "N_final": 16,
+      "filtersSaved": 13,
+      "violationKnee": 8.47271338783906,
+      "violationFinal": 5.201724980618269,
+      "rmseKnee": 2.103084355044432,
+      "rmseFinal": 1.3004312451545672,
+      "maxAbsKnee": 6.354535040879295,
+      "maxAbsFinal": 3.893310326773786,
+      "maeKnee": 1.4011029156245192,
+      "maeFinal": 0.9234427931116109,
+      "classification": "KNEE_CASE",
+      "observerFidelity": {
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      "frontierInvariants": {
+        "exactCountsUnique": true,
+        "sortedCounts": true,
+        "cumulativeMonotone": true,
+        "representativesEvaluated": true
+      },
+      "frontierPath": "frontiers/frc1.1-03-00003906daac.json"
+    },
+    {
+      "id": "frc1.1-15-000323cd8787",
+      "split": "holdout",
+      "N_min": 0,
+      "N_knee": 3,
+      "N_final": 21,
+      "filtersSaved": 18,
+      "violationKnee": 9.625480504252552,
+      "violationFinal": 2.1366787548280954,
+      "rmseKnee": 2.406370126063138,
+      "rmseFinal": 0.5284593805163221,
+      "maxAbsKnee": 6.098071125156109,
+      "maxAbsFinal": 1.6025090661210717,
+      "maeKnee": 2.076340026861962,
+      "maeFinal": 0.4089581493449102,
+      "classification": "KNEE_CASE",
+      "observerFidelity": {
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      "frontierInvariants": {
+        "exactCountsUnique": true,
+        "sortedCounts": true,
+        "cumulativeMonotone": true,
+        "representativesEvaluated": true
+      },
+      "frontierPath": "frontiers/frc1.1-15-000323cd8787.json"
+    },
+    {
+      "id": "frc1.1-06-0000c6497763",
+      "split": "holdout",
+      "N_min": 0,
+      "N_knee": 5,
+      "N_final": 15,
+      "filtersSaved": 10,
+      "violationKnee": 7.947361924554916,
+      "violationFinal": 3.3933594236628224,
+      "rmseKnee": 1.893181718448156,
+      "rmseFinal": 0.8447285639261884,
+      "maxAbsKnee": 5.960521443416187,
+      "maxAbsFinal": 2.545019567747117,
+      "maeKnee": 1.3948269659964792,
+      "maeFinal": 0.641991203909601,
+      "classification": "KNEE_CASE",
+      "observerFidelity": {
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      "frontierInvariants": {
+        "exactCountsUnique": true,
+        "sortedCounts": true,
+        "cumulativeMonotone": true,
+        "representativesEvaluated": true
+      },
+      "frontierPath": "frontiers/frc1.1-06-0000c6497763.json"
+    }
+  ],
+  "synthetic": [
+    {
+      "id": "synthetic-d-dense-known-structure",
+      "knownGeneratingComplexity": 12,
+      "N_knee": 9,
+      "N_final": 11,
+      "uniqueKnee": true
+    },
+    {
+      "id": "synthetic-e-high-q-valid",
+      "knownGeneratingComplexity": 3,
+      "N_knee": 3,
+      "N_final": 3,
+      "uniqueKnee": true
+    },
+    {
+      "id": "synthetic-f-upper-frequency-structure",
+      "knownGeneratingComplexity": 3,
+      "N_knee": 3,
+      "N_final": 7,
+      "uniqueKnee": true
+    },
+    {
+      "id": "synthetic-h-alternating-structure",
+      "knownGeneratingComplexity": 6,
+      "N_knee": 6,
+      "N_final": 14,
+      "uniqueKnee": true
+    }
+  ],
+  "coverage": {
+    "development": 3,
+    "holdout": 3,
+    "overall": 6
+  },
+  "observerFidelity": {
+    "pass": true,
+    "allCases": [
+      {
+        "id": "frc1.1-12-0002977aa8bc",
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      {
+        "id": "frc1.1-09-0001b6618e24",
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      {
+        "id": "frc1.1-10-00027122c3ce",
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      {
+        "id": "frc1.1-03-00003906daac",
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      {
+        "id": "frc1.1-15-000323cd8787",
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      },
+      {
+        "id": "frc1.1-06-0000c6497763",
+        "equivalent": true,
+        "resultEqual": true,
+        "completedGenerationCountEqual": true,
+        "retainedBeamSequenceEqual": true,
+        "workCountersEqual": true,
+        "naturalTerminationEqual": true,
+        "ordinaryDecisionTraceEqual": true
+      }
+    ]
+  },
+  "frontierInvariants": {
+    "pass": true
+  },
+  "classification": "KNEE_SIGNAL_SUPPORTED"
+}

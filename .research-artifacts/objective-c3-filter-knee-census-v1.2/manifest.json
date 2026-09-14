@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "artifact": "objective-c3-filter-knee-census-v1.2",
+  "status": "KNEE_SIGNAL_SUPPORTED",
+  "researchQuestion": "Does the frozen structural baseline exhibit a reproducible, parameter-free filter-count/error knee on fresh real cases?",
+  "corpus": {
+    "commit": "fc3932c72e3c3931dc062c523c2205389639264b",
+    "classification": "CORPUS_V1_2_READY",
+    "evidenceSha256": "13c7ff43614d7e257b0231f9238102afff5413964077017a2db7741d87b659b1",
+    "casesSha256": "4f78db0448d7d6aa82cff65134e64219f9ee94946e189b209ac4fd077dce3ff2",
+    "provenanceSha256": "9e27cc9340a85e60f124b8d226f5810ee84b9fcc5a13bdb56b2895da51384696"
+  },
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "normalization": {
+    "mode": "hz",
+    "frequencyHz": 500,
+    "levelDb": 60
+  },
+  "caseIds": [
+    "frc1.1-12-0002977aa8bc",
+    "frc1.1-09-0001b6618e24",
+    "frc1.1-10-00027122c3ce",
+    "frc1.1-03-00003906daac",
+    "frc1.1-15-000323cd8787",
+    "frc1.1-06-0000c6497763"
+  ],
+  "caseCount": 6,
+  "split": {
+    "development": [
+      "frc1.1-12-0002977aa8bc",
+      "frc1.1-09-0001b6618e24",
+      "frc1.1-10-00027122c3ce"
+    ],
+    "holdout": [
+      "frc1.1-03-00003906daac",
+      "frc1.1-15-000323cd8787",
+      "frc1.1-06-0000c6497763"
+    ]
+  },
+  "resolvedSearchConfig": {
+    "preset": "max10-q31-b4-p8-experimental",
+    "beamWidth": 16,
+    "proposalsPerParent": 32,
+    "localPolishEvaluations": 120,
+    "maxFilters": 43,
+    "featureRegionCount": 6,
+    "minFeatureSeparationOctaves": 0.5,
+    "candidatePolicy": "semantic",
+    "selectionMetric": "violation",
+    "mergeProximityOctaves": 0.08533333333333333,
+    "marginalPruneTolerance": 0.01,
+    "structuralCleanupMinFilters": 8,
+    "structuralCleanupMaxSteps": 3,
+    "admission": "q31-b4-p8",
+    "workProfile": "full"
+  },
+  "protocol": {
+    "selectedAlgorithm": "FROZEN_BASELINE",
+    "caseIds": [
+      "frc1.1-12-0002977aa8bc",
+      "frc1.1-09-0001b6618e24",
+      "frc1.1-10-00027122c3ce",
+      "frc1.1-03-00003906daac",
+      "frc1.1-15-000323cd8787",
+      "frc1.1-06-0000c6497763"
+    ],
+    "developmentCaseIds": [
+      "frc1.1-12-0002977aa8bc",
+      "frc1.1-09-0001b6618e24",
+      "frc1.1-10-00027122c3ce"
+    ],
+    "holdoutCaseIds": [
+      "frc1.1-03-00003906daac",
+      "frc1.1-15-000323cd8787",
+      "frc1.1-06-0000c6497763"
+    ],
+    "deterministicGenerationBound": 31,
+    "naturalTermination": "allowed-earlier-than-generation-bound",
+    "trajectoryCount": 6,
+    "observerMode": "frontier-observer-on-primary-with-off-on-fidelity-per-case",
+    "wallClockTermination": false,
+    "batchBExecuted": false,
+    "batchCExecuted": false,
+    "oldStructuralVNextCasesExecuted": false
+  },
+  "coverage": {
+    "development": 3,
+    "holdout": 3,
+    "overall": 6
+  },
+  "synthetic": [
+    {
+      "id": "synthetic-d-dense-known-structure",
+      "knownGeneratingComplexity": 12,
+      "N_knee": 9,
+      "N_final": 11,
+      "uniqueKnee": true
+    },
+    {
+      "id": "synthetic-e-high-q-valid",
+      "knownGeneratingComplexity": 3,
+      "N_knee": 3,
+      "N_final": 3,
+      "uniqueKnee": true
+    },
+    {
+      "id": "synthetic-f-upper-frequency-structure",
+      "knownGeneratingComplexity": 3,
+      "N_knee": 3,
+      "N_final": 7,
+      "uniqueKnee": true
+    },
+    {
+      "id": "synthetic-h-alternating-structure",
+      "knownGeneratingComplexity": 6,
+      "N_knee": 6,
+      "N_final": 14,
+      "uniqueKnee": true
+    }
+  ],
+  "evidenceSha256": "6028c10e63deff45b9963e6d914eccd3705a6825267e8d5f0cdb2c811b56d685",
+  "evidenceHashScope": [
+    "aggregate-evidence.json",
+    "frontiers/frc1.1-12-0002977aa8bc.json",
+    "frontiers/frc1.1-09-0001b6618e24.json",
+    "frontiers/frc1.1-10-00027122c3ce.json",
+    "frontiers/frc1.1-03-00003906daac.json",
+    "frontiers/frc1.1-15-000323cd8787.json",
+    "frontiers/frc1.1-06-0000c6497763.json"
+  ],
+  "files": [
+    "manifest.json",
+    "aggregate-evidence.json",
+    "frontiers/frc1.1-12-0002977aa8bc.json",
+    "frontiers/frc1.1-09-0001b6618e24.json",
+    "frontiers/frc1.1-10-00027122c3ce.json",
+    "frontiers/frc1.1-03-00003906daac.json",
+    "frontiers/frc1.1-15-000323cd8787.json",
+    "frontiers/frc1.1-06-0000c6497763.json",
+    "evidence-sha256.txt",
+    "final-report.md"
+  ]
+}
