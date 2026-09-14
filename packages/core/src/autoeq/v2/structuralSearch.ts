@@ -394,6 +394,21 @@ function addProposal(
   return { mutation, filters: canonical([...filters, newFilter]) }
 }
 
+/**
+ * M4 diagnostic adapter for the existing bounded additive-construction
+ * primitive.  It does not participate in ordinary generation or admission.
+ */
+export function createStructuralEvidenceProposal(
+  filters: readonly Filter[],
+  mutation: Extract<StructuralMutation, 'add-pk' | 'add-ls' | 'add-hs'>,
+  frequencyHz: number,
+  residual: number,
+  bounds: StandardAutoEqV2Config,
+): StructuralProposal {
+  const type = mutation === 'add-pk' ? 'PK' : mutation === 'add-ls' ? 'LS' : 'HS'
+  return addProposal(filters, mutation, type, frequencyHz, residual, bounds)
+}
+
 function generateStructuralMutationsCurrent(
   filters: readonly Filter[],
   residualDb: readonly number[],
@@ -716,6 +731,8 @@ export interface SearchState {
   rmseDb: number
   maxAbsDb: number
   cancellationScore: number
+  /** Equal-work diagnostic counter; absent on historical in-memory states. */
+  coordinateTrials?: number
 }
 
 function dominates(left: SearchState, right: SearchState): boolean {
@@ -1148,6 +1165,206 @@ export interface StructuralSearchBaselineStateEvent {
 }
 
 /**
+ * Immutable, observer-only state used by the M4 two-phase candidate oracle.
+ *
+ * The baseline search never consumes this information.  It is emitted only
+ * after ordinary generation work has completed, and only when the caller's
+ * deterministic sampling predicate selects the generation.
+ */
+export interface StructuralSearchStateSnapshot {
+  candidateId: string
+  filters: Filter[]
+  rmseDb: number
+  maxAbsDb: number
+  cancellationScore: number
+  semanticKey: string
+  comparatorKey: readonly (number | string)[]
+  structuralSignature: string
+}
+
+export interface StructuralSearchPrePolishSnapshot {
+  filters: Filter[]
+  rmseDb: number
+  maxAbsDb: number
+  cancellationScore: number
+  filterCount: number
+  lexicalRank: number
+  semanticKey: string
+  comparatorKey: readonly (number | string)[]
+}
+
+export interface StructuralSearchCandidateSnapshot {
+  proposal: StructuralProposal
+  semanticKey: string
+  prePolish: StructuralSearchPrePolishSnapshot | null
+  postPolish: StructuralSearchStateSnapshot | null
+  coordinateTrials: number
+  polishEvaluationBudget: number
+}
+
+export interface StructuralSearchParentSnapshot {
+  parent: StructuralSearchStateSnapshot
+  residualDb: number[]
+  generatedProposals: StructuralProposal[]
+  admittedProposals: StructuralProposal[]
+  prePolishCandidates: StructuralSearchCandidateSnapshot[]
+  polishedCandidates: StructuralSearchCandidateSnapshot[]
+}
+
+export interface StructuralSearchGenerationSnapshot {
+  type: 'ordinary-baseline-generation'
+  generation: number
+  frequencies: number[]
+  desiredDb: number[]
+  sampleRateHz: number
+  referenceBefore: StructuralSearchStateSnapshot
+  referenceAfter: StructuralSearchStateSnapshot
+  beamBefore: StructuralSearchStateSnapshot[]
+  retainedBeam: StructuralSearchStateSnapshot[]
+  parents: StructuralSearchParentSnapshot[]
+}
+
+interface StructuralSearchPrePolishScore {
+  key: string
+  proposal: StructuralProposal
+  lexicalRank: number
+  quantized: Filter[]
+  rmseDb: number
+  maxAbsDb: number
+  filterCount: number
+  cancellationScore: number
+  semanticKey: string
+}
+
+interface StructuralSearchCandidateCapture {
+  proposal: StructuralProposal
+  semanticKey: string
+  prePolish: StructuralSearchPrePolishScore | null
+  postPolish: SearchState | null
+  coordinateTrials: number
+  polishEvaluationBudget: number
+}
+
+interface StructuralSearchParentCapture {
+  parent: SearchState
+  residualDb: readonly number[]
+  generatedProposals: readonly StructuralProposal[]
+  admittedProposals: StructuralProposal[]
+  prePolishScores: StructuralSearchPrePolishScore[]
+  polishedCandidates: StructuralSearchCandidateCapture[]
+}
+
+function cloneStructuralProposal(proposal: StructuralProposal): StructuralProposal {
+  return {
+    mutation: proposal.mutation,
+    filters: proposal.filters.map((filter) => ({ ...filter })),
+  }
+}
+
+function snapshotSearchState(
+  state: SearchState,
+  bounds: StandardAutoEqV2Config,
+  regionCount: number,
+): StructuralSearchStateSnapshot {
+  return {
+    candidateId: state.candidateId,
+    filters: state.filters.map((filter) => ({ ...filter })),
+    rmseDb: state.rmseDb,
+    maxAbsDb: state.maxAbsDb,
+    cancellationScore: state.cancellationScore,
+    semanticKey: semanticFilterKey(state.filters),
+    comparatorKey: [...referenceSelectorKey(state)],
+    structuralSignature: structuralSignature(state.filters, bounds, regionCount),
+  }
+}
+
+function snapshotPrePolish(
+  score: StructuralSearchPrePolishScore,
+): StructuralSearchPrePolishSnapshot {
+  return {
+    filters: score.quantized.map((filter) => ({ ...filter })),
+    rmseDb: score.rmseDb,
+    maxAbsDb: score.maxAbsDb,
+    cancellationScore: score.cancellationScore,
+    filterCount: score.filterCount,
+    lexicalRank: score.lexicalRank,
+    semanticKey: score.semanticKey,
+    // Q31 admission's frozen pre-polish ordering: RMSE, maxAbs, count,
+    // cancellation, then lexical rank.  Candidate identity is not a quality
+    // component at this level.
+    comparatorKey: [
+      score.rmseDb,
+      score.maxAbsDb,
+      score.filterCount,
+      score.cancellationScore,
+      score.lexicalRank,
+      score.semanticKey,
+    ],
+  }
+}
+
+function snapshotCandidateCapture(
+  capture: StructuralSearchCandidateCapture,
+  bounds: StandardAutoEqV2Config,
+  regionCount: number,
+): StructuralSearchCandidateSnapshot {
+  return {
+    proposal: cloneStructuralProposal(capture.proposal),
+    semanticKey: capture.semanticKey,
+    prePolish: capture.prePolish === null
+      ? null
+      : snapshotPrePolish(capture.prePolish),
+    postPolish: capture.postPolish === null
+      ? null
+      : snapshotSearchState(capture.postPolish, bounds, regionCount),
+    coordinateTrials: capture.coordinateTrials,
+    polishEvaluationBudget: capture.polishEvaluationBudget,
+  }
+}
+
+function snapshotBaselineGeneration(
+  generation: number,
+  frequencies: readonly number[],
+  desiredDb: readonly number[],
+  sampleRateHz: number,
+  beamBefore: readonly SearchState[],
+  retainedBeam: readonly SearchState[],
+  parents: readonly StructuralSearchParentCapture[],
+  bounds: StandardAutoEqV2Config,
+  regionCount: number,
+): StructuralSearchGenerationSnapshot {
+  const referenceBefore = selectReferencePoint(beamBefore)
+  const referenceAfter = selectReferencePoint(retainedBeam)
+  return {
+    type: 'ordinary-baseline-generation',
+    generation,
+    frequencies: [...frequencies],
+    desiredDb: [...desiredDb],
+    sampleRateHz,
+    referenceBefore: snapshotSearchState(referenceBefore, bounds, regionCount),
+    referenceAfter: snapshotSearchState(referenceAfter, bounds, regionCount),
+    beamBefore: beamBefore.map((state) => snapshotSearchState(state, bounds, regionCount)),
+    retainedBeam: retainedBeam.map((state) => snapshotSearchState(state, bounds, regionCount)),
+    parents: parents.map((capture) => ({
+      parent: snapshotSearchState(capture.parent, bounds, regionCount),
+      residualDb: [...capture.residualDb],
+      generatedProposals: capture.generatedProposals.map(cloneStructuralProposal),
+      admittedProposals: capture.admittedProposals.map(cloneStructuralProposal),
+      prePolishCandidates: capture.prePolishScores.map((score) => snapshotCandidateCapture({
+        proposal: score.proposal,
+        semanticKey: score.semanticKey,
+        prePolish: score,
+        postPolish: null,
+        coordinateTrials: 0,
+        polishEvaluationBudget: 0,
+      }, bounds, regionCount)),
+      polishedCandidates: capture.polishedCandidates.map((candidate) =>
+        snapshotCandidateCapture(candidate, bounds, regionCount)),
+    })),
+  }
+}
+
+/**
  * Raw deterministic work observed while running one structural-search stage.
  *
  * These counters intentionally remain unweighted.  They describe work that is
@@ -1247,6 +1464,17 @@ export interface StructuralSearchInput {
   onBaselineTelemetry?: (event: StructuralSearchM3TelemetryEvent) => void
   /** M3b-only state observer; ignored by every non-baseline policy. */
   onBaselineState?: (event: StructuralSearchBaselineStateEvent) => void
+  /**
+   * M4-only deterministic generation sampler.  Returning true requests a
+   * complete immutable snapshot for that generation.  It is consulted before
+   * ordinary generation work, so a work-bounded replay can select its known
+   * terminal generation without retaining unselected ledgers.  The optional
+   * second argument is true for the final completed generation before a
+   * deadline or natural stop.
+   */
+  captureBaselineGeneration?: (generation: number, isFinal: boolean) => boolean
+  /** M4-only snapshot sink; ignored by every non-baseline policy. */
+  onBaselineSnapshot?: (event: StructuralSearchGenerationSnapshot) => void
 }
 
 export interface StructuralSearchResult {
@@ -1519,6 +1747,10 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
   }
   const onBaselineTelemetry = policy === 'baseline' ? input.onBaselineTelemetry : undefined
   const onBaselineState = policy === 'baseline' ? input.onBaselineState : undefined
+  const onBaselineSnapshot = policy === 'baseline' ? input.onBaselineSnapshot : undefined
+  const captureBaselineGeneration = policy === 'baseline'
+    ? input.captureBaselineGeneration
+    : undefined
 
   const bounds = resolveStandardAutoEqV2Config({
     ...DEFAULT_AUTOEQ_SETTINGS,
@@ -1557,6 +1789,13 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
   stateTrace('start', initialPolished, { phase: 'beam', status: 'start' })
 
   while (beam.length > 0 && !deadline.isExpired()) {
+    // Ask the deterministic sampler before ordinary work begins.  This keeps
+    // the M4 ledger out of unselected generations; callers that need a known
+    // final generation (for example, a work-bounded replay) should select it
+    // from this pre-generation predicate.  The end-of-generation call below
+    // only confirms the final flag before immutable copies are made.
+    const baselineSnapshotSelected = onBaselineSnapshot !== undefined &&
+      (captureBaselineGeneration === undefined || captureBaselineGeneration(beamGeneration, false))
     const ordinaryReferenceBefore = policy === 'm2' ? selectReferencePoint(beam) : undefined
     const nextStates: SearchState[] = []
     let generatedProposals = 0
@@ -1571,10 +1810,16 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     const baselineAdmittedStructuralSignatures = new Set<string>()
     const candidateSourceCounts: Partial<Record<StructuralMutation, number>> = {}
     const vnextPoolsByParent = new Map<string, StructuralCandidatePoolEntry[]>()
+    // This is a lightweight reference ledger only.  It points at proposal,
+    // score, and polished-state objects already produced by ordinary work;
+    // no extra scoring/polish is performed.  Deep immutable copies are made
+    // only when the end-of-generation sampler selects this generation.
+    const baselineParentCaptures: StructuralSearchParentCapture[] = []
+    const baselineBeamBefore = beam
     let capacityPressure = createCapacityPressureDelta()
     let frontierUtilization = createFrontierUtilizationDelta()
 
-    for (const parent of beam) {
+    for (const [parentIndex, parent] of beam.entries()) {
       if (deadline.isExpired()) break
 
       frontierUtilization.parentStatesObserved += 1
@@ -1585,6 +1830,17 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         ? generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds,
           config.featureRegionCount, config.minFeatureSeparationOctaves, config.candidatePolicy, config.mergeProximityOctaves)
         : generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
+      const baselineParentCapture: StructuralSearchParentCapture | undefined = !baselineSnapshotSelected
+        ? undefined
+        : {
+            parent,
+            residualDb: solution.residualDb,
+            generatedProposals: proposals,
+            admittedProposals: [],
+            prePolishScores: [],
+            polishedCandidates: [],
+          }
+      if (baselineParentCapture !== undefined) baselineParentCaptures.push(baselineParentCapture)
       generatedProposals += proposals.length
       if (onBaselineTelemetry !== undefined) for (const proposal of proposals) {
         baselineGeneratedStructuralSignatures.add(
@@ -1621,11 +1877,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       let admitted: StructuralProposal[] = []
 
       if (config.admission === 'q31-b4-p8') {
-        type PrePolishScore = {
-          key: string; proposal: StructuralProposal; lexicalRank: number; quantized: Filter[]
-          rmseDb: number; maxAbsDb: number; filterCount: number; cancellationScore: number; semanticKey: string
-        }
-        const scoreProposal = (proposal: StructuralProposal, lexicalRank: number): PrePolishScore => {
+        const scoreProposal = (proposal: StructuralProposal, lexicalRank: number): StructuralSearchPrePolishScore => {
           const quantized = quantizeV2Filters(proposal.filters, bounds)
           const magnitude = cascadeMagnitudeDb(quantized, frequencies, sampleRateHz)
           const residualDb = desiredDb.map((desired, index) => desired - magnitude[index]!)
@@ -1647,7 +1899,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         // The frozen baseline scored its complete ordered proposal set without
         // cooperative checks at this boundary.  Keep that path byte-for-byte in
         // behavior; only VNext may stop its additional admission work early.
-        const prePolishScored: PrePolishScore[] = policy !== 'vnext'
+        const prePolishScored: StructuralSearchPrePolishScore[] = policy !== 'vnext'
           ? ordered.map(scoreProposal)
           : []
         if (policy === 'vnext') for (const [lexicalRank, proposal] of ordered.entries()) {
@@ -1680,6 +1932,9 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           }
           admitted = diverse
         } else admitted = selected.map(s => s.proposal)
+        if (baselineParentCapture !== undefined) {
+          baselineParentCapture.prePolishScores.push(...prePolishScored)
+        }
       } else {
         if (policy === 'vnext') {
           admitted = admitDiverseStructuralCandidates(vnextPool, config.proposalsPerParent).map(entry => entry.proposal)
@@ -1688,6 +1943,9 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
             admitted.push(proposal); seen.add(proposalKey(proposal))
           }
         } else admitted = ordered.slice(0, config.proposalsPerParent)
+      }
+      if (baselineParentCapture !== undefined) {
+        baselineParentCapture.admittedProposals.push(...admitted)
       }
       admittedProposals += admitted.length
       if (onBaselineTelemetry !== undefined) for (const proposal of admitted) {
@@ -1709,9 +1967,13 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         if (deadline.isExpired()) break
         if (proposal.filters.length > config.maxFilters) continue
 
+        const polishEvaluationBudget = localPolishEvaluationBudget(
+          config.localPolishEvaluations,
+          proposal.filters.length,
+        )
         const polished = polishFilters(
           proposal.filters,
-          Math.max(config.localPolishEvaluations, proposal.filters.length * 8),
+          polishEvaluationBudget,
           bounds,
           desiredDb,
           frequencies,
@@ -1719,6 +1981,18 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           sampleRateHz,
         )
         polishedProposals += 1
+        if (baselineParentCapture !== undefined) {
+          baselineParentCapture.polishedCandidates.push({
+            proposal,
+            semanticKey: semanticFilterKey(polished.filters),
+            prePolish: baselineParentCapture.prePolishScores.find((score) =>
+              proposalKey(score.proposal) === proposalKey(proposal),
+            ) ?? null,
+            postPolish: polished,
+            coordinateTrials: polished.coordinateTrials ?? 0,
+            polishEvaluationBudget,
+          })
+        }
         frontierUtilization.polishedCandidateFilterCountMax = Math.max(frontierUtilization.polishedCandidateFilterCountMax, polished.filters.length)
         if (polished.filters.length === config.maxFilters) frontierUtilization.polishedCandidatesAtCapacity += 1
         const key = semanticFilterKey(polished.filters)
@@ -1760,8 +2034,32 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       ? selectReferencePoint([...beam, ...nextStates])
       : selectReferencePoint(beam)
 
-    const emitBaselineGeneration = (retainedBeam: readonly SearchState[]): void => {
-      if (retainedBeam.length === 0 || (onBaselineState === undefined && onBaselineTelemetry === undefined)) return
+    const emitBaselineGeneration = (
+      retainedBeam: readonly SearchState[],
+      isFinal = false,
+    ): void => {
+      if (
+        retainedBeam.length === 0 ||
+        (onBaselineState === undefined && onBaselineTelemetry === undefined && onBaselineSnapshot === undefined)
+      ) return
+
+      if (
+        onBaselineSnapshot !== undefined &&
+        baselineSnapshotSelected &&
+        (captureBaselineGeneration === undefined || captureBaselineGeneration(beamGeneration, isFinal))
+      ) {
+        onBaselineSnapshot(snapshotBaselineGeneration(
+          beamGeneration,
+          frequencies,
+          desiredDb,
+          sampleRateHz,
+          baselineBeamBefore,
+          retainedBeam,
+          baselineParentCaptures,
+          bounds,
+          telemetryRegionCount,
+        ))
+      }
 
       const reference = selectReferencePoint(retainedBeam)
       onBaselineState?.({
@@ -1988,7 +2286,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       }
     }
     if (nextStates.length === 0) {
-      emitBaselineGeneration(beam)
+      emitBaselineGeneration(beam, true)
       if (policy === 'm2' && m2Intervention) {
         stateTrace('phase', traceState, {
           phase: 'm2-challenger', status: 'end',
@@ -2016,7 +2314,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     beam = policy === 'vnext'
       ? retainDiverseStructuralBeam(combined, config.beamWidth, bounds, config.featureRegionCount ?? 1)
       : retainParetoBeam(combined, config.beamWidth)
-    emitBaselineGeneration(beam)
+    emitBaselineGeneration(beam, deadline.isExpired())
     if (policy === 'm2') m2FrontierMax = Math.max(m2FrontierMax, beam.length)
     if (policy === 'vnext') {
       for (const state of beam) {
@@ -2956,7 +3254,8 @@ const cancellationScore = auditCancellations(quantized, frequencies, sampleRateH
       filters: quantized,
       rmseDb: metrics.rmseDb,
       maxAbsDb: metrics.maxAbsDb,
-      cancellationScore
+      cancellationScore,
+      coordinateTrials: 0,
     }
   }
   let continuation = createJointRefineContinuationV2({
@@ -2976,7 +3275,8 @@ const cancellationScore = auditCancellations(quantized, frequencies, sampleRateH
     filters: deliveredFilters,
     rmseDb: solution.metrics.rmseDb,
     maxAbsDb: solution.metrics.maxAbsDb,
-    cancellationScore: solution.cancellationAudit.totalScore
+    cancellationScore: solution.cancellationAudit.totalScore,
+    coordinateTrials: continuation.coordinateTrials,
   }
 }
 

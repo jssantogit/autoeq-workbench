@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "frozenBoundary": "956be9ddcea4152276744df3565274352b9a9f80",
+  "protocol": {
+    "structuralCeiling": 43,
+    "effortLevel": 6,
+    "trajectorySeconds": 30,
+    "executionModel": "generation-work-bounded-replay",
+    "deterministicGenerationBound": 4,
+    "repeatCount": 3,
+    "snapshotSampling": "first completed generation; every 10th completed generation; final completed generation before deadline",
+    "baselinePolicy": "frozen-ordinary-search",
+    "oraclePolicy": "offline-shadow-only",
+    "noOracleBeamAdmission": true,
+    "config": {
+      "preset": "max10-q31-b4-p8-experimental",
+      "beamWidth": 16,
+      "proposalsPerParent": 32,
+      "localPolishEvaluations": 120,
+      "maxFilters": 43,
+      "featureRegionCount": 6,
+      "minFeatureSeparationOctaves": 0.5,
+      "candidatePolicy": "semantic",
+      "selectionMetric": "violation",
+      "mergeProximityOctaves": 0.08533333333333333,
+      "marginalPruneTolerance": 0.01,
+      "structuralCleanupMinFilters": 8,
+      "structuralCleanupMaxSteps": 3,
+      "admission": "q31-b4-p8",
+      "workProfile": "full"
+    }
+  },
+  "observationCount": 60,
+  "aggregateSha256": "a462f32140413b14b987587a379062dd63fe71ecf9be2d1b3a166284e8042ee9",
+  "evidenceSha256": "3ac87d9d1c9556f902654825eb6de46f80c7837ce853da6e23487ad97a774d29"
+}

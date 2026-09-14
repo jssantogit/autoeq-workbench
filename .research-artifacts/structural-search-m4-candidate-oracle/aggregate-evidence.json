@@ -1,0 +1,357 @@
+{
+  "real": {
+    "family": "real",
+    "snapshotCount": 36,
+    "caseCount": 6,
+    "repeatCount": 18,
+    "generationCount": 36,
+    "competitiveCaseCount": 3,
+    "competitiveRepeatCount": 9,
+    "competitiveGenerationCount": 9,
+    "winsByCase": [
+      "titan-to-mystic-8",
+      "titan-to-s12-ultra",
+      "titan-to-storm"
+    ],
+    "byFamily": {
+      "O1_RESIDUAL_EXTREMUM_PK": {
+        "candidatesGenerated": 36,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 36,
+        "prePolishCandidatesBeatingWorstOrdinary": 21,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 33,
+        "polishedCandidatesBeatingBestOrdinary": 9,
+        "candidatesWouldSurviveFrozenParetoBeam": 15,
+        "candidatesImprovingReferenceRmse": 9,
+        "candidatesImprovingReferenceMaxAbs": 9,
+        "candidatesImprovingBoth": 3,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 0,
+          "PREPOLISH_REJECTED": 15,
+          "POLISH_FAILURE": 3,
+          "BEAM_REJECTED": 9,
+          "REFERENCE_NONIMPROVING": 6,
+          "ORACLE_WIN": 3
+        }
+      },
+      "O2_RESIDUAL_REGION_PK": {
+        "candidatesGenerated": 36,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 36,
+        "prePolishCandidatesBeatingWorstOrdinary": 33,
+        "prePolishCandidatesBeatingBestOrdinary": 24,
+        "polishedCandidatesBeatingWorstOrdinary": 33,
+        "polishedCandidatesBeatingBestOrdinary": 9,
+        "candidatesWouldSurviveFrozenParetoBeam": 12,
+        "candidatesImprovingReferenceRmse": 9,
+        "candidatesImprovingReferenceMaxAbs": 6,
+        "candidatesImprovingBoth": 3,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 0,
+          "PREPOLISH_REJECTED": 3,
+          "POLISH_FAILURE": 3,
+          "BEAM_REJECTED": 21,
+          "REFERENCE_NONIMPROVING": 3,
+          "ORACLE_WIN": 6
+        }
+      },
+      "O3_SHELF_EVIDENCE": {
+        "candidatesGenerated": 39,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 39,
+        "prePolishCandidatesBeatingWorstOrdinary": 36,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 24,
+        "polishedCandidatesBeatingBestOrdinary": 0,
+        "candidatesWouldSurviveFrozenParetoBeam": 9,
+        "candidatesImprovingReferenceRmse": 3,
+        "candidatesImprovingReferenceMaxAbs": 3,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 0,
+          "PREPOLISH_REJECTED": 3,
+          "POLISH_FAILURE": 12,
+          "BEAM_REJECTED": 15,
+          "REFERENCE_NONIMPROVING": 9,
+          "ORACLE_WIN": 0
+        }
+      },
+      "O4_TOPOLOGY_SUBSTITUTION": {
+        "candidatesGenerated": 54,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 54,
+        "prePolishCandidatesBeatingWorstOrdinary": 39,
+        "prePolishCandidatesBeatingBestOrdinary": 9,
+        "polishedCandidatesBeatingWorstOrdinary": 54,
+        "polishedCandidatesBeatingBestOrdinary": 3,
+        "candidatesWouldSurviveFrozenParetoBeam": 6,
+        "candidatesImprovingReferenceRmse": 6,
+        "candidatesImprovingReferenceMaxAbs": 0,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 3,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 18,
+          "PREPOLISH_REJECTED": 15,
+          "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 33,
+          "REFERENCE_NONIMPROVING": 3,
+          "ORACLE_WIN": 3
+        }
+      }
+    },
+    "decomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 0,
+      "PREPOLISH_REJECTED": 36,
+      "POLISH_FAILURE": 18,
+      "BEAM_REJECTED": 78,
+      "REFERENCE_NONIMPROVING": 21,
+      "ORACLE_WIN": 12
+    }
+  },
+  "synthetic": {
+    "family": "synthetic",
+    "snapshotCount": 24,
+    "caseCount": 4,
+    "repeatCount": 12,
+    "generationCount": 24,
+    "competitiveCaseCount": 3,
+    "competitiveRepeatCount": 9,
+    "competitiveGenerationCount": 15,
+    "winsByCase": [
+      "synthetic-d-dense-known-structure",
+      "synthetic-e-high-q-valid",
+      "synthetic-h-alternating-structure"
+    ],
+    "byFamily": {
+      "O1_RESIDUAL_EXTREMUM_PK": {
+        "candidatesGenerated": 39,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 39,
+        "prePolishCandidatesBeatingWorstOrdinary": 30,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 39,
+        "polishedCandidatesBeatingBestOrdinary": 21,
+        "candidatesWouldSurviveFrozenParetoBeam": 21,
+        "candidatesImprovingReferenceRmse": 30,
+        "candidatesImprovingReferenceMaxAbs": 12,
+        "candidatesImprovingBoth": 9,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 0,
+          "PREPOLISH_REJECTED": 9,
+          "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 15,
+          "REFERENCE_NONIMPROVING": 0,
+          "ORACLE_WIN": 15
+        }
+      },
+      "O2_RESIDUAL_REGION_PK": {
+        "candidatesGenerated": 39,
+        "semanticDuplicatesRejected": 6,
+        "validCandidates": 33,
+        "prePolishCandidatesBeatingWorstOrdinary": 30,
+        "prePolishCandidatesBeatingBestOrdinary": 12,
+        "polishedCandidatesBeatingWorstOrdinary": 30,
+        "polishedCandidatesBeatingBestOrdinary": 9,
+        "candidatesWouldSurviveFrozenParetoBeam": 9,
+        "candidatesImprovingReferenceRmse": 18,
+        "candidatesImprovingReferenceMaxAbs": 3,
+        "candidatesImprovingBoth": 3,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 0,
+          "PREPOLISH_REJECTED": 3,
+          "POLISH_FAILURE": 3,
+          "BEAM_REJECTED": 18,
+          "REFERENCE_NONIMPROVING": 0,
+          "ORACLE_WIN": 9
+        }
+      },
+      "O3_SHELF_EVIDENCE": {
+        "candidatesGenerated": 15,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 15,
+        "prePolishCandidatesBeatingWorstOrdinary": 9,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 9,
+        "polishedCandidatesBeatingBestOrdinary": 0,
+        "candidatesWouldSurviveFrozenParetoBeam": 6,
+        "candidatesImprovingReferenceRmse": 3,
+        "candidatesImprovingReferenceMaxAbs": 3,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 12,
+          "PREPOLISH_REJECTED": 6,
+          "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 3,
+          "REFERENCE_NONIMPROVING": 6,
+          "ORACLE_WIN": 0
+        }
+      },
+      "O4_TOPOLOGY_SUBSTITUTION": {
+        "candidatesGenerated": 57,
+        "semanticDuplicatesRejected": 3,
+        "validCandidates": 54,
+        "prePolishCandidatesBeatingWorstOrdinary": 48,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 54,
+        "polishedCandidatesBeatingBestOrdinary": 3,
+        "candidatesWouldSurviveFrozenParetoBeam": 3,
+        "candidatesImprovingReferenceRmse": 15,
+        "candidatesImprovingReferenceMaxAbs": 3,
+        "candidatesImprovingBoth": 3,
+        "topologySubstitutionWins": 3,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 12,
+          "PREPOLISH_REJECTED": 6,
+          "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 45,
+          "REFERENCE_NONIMPROVING": 0,
+          "ORACLE_WIN": 3
+        }
+      }
+    },
+    "decomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 0,
+      "PREPOLISH_REJECTED": 24,
+      "POLISH_FAILURE": 3,
+      "BEAM_REJECTED": 81,
+      "REFERENCE_NONIMPROVING": 6,
+      "ORACLE_WIN": 27
+    }
+  },
+  "byFamily": {
+    "O1_RESIDUAL_EXTREMUM_PK": {
+      "candidatesGenerated": 75,
+      "semanticDuplicatesRejected": 0,
+      "validCandidates": 75,
+      "prePolishCandidatesBeatingWorstOrdinary": 51,
+      "prePolishCandidatesBeatingBestOrdinary": 0,
+      "polishedCandidatesBeatingWorstOrdinary": 72,
+      "polishedCandidatesBeatingBestOrdinary": 30,
+      "candidatesWouldSurviveFrozenParetoBeam": 36,
+      "candidatesImprovingReferenceRmse": 39,
+      "candidatesImprovingReferenceMaxAbs": 21,
+      "candidatesImprovingBoth": 12,
+      "topologySubstitutionWins": 0,
+      "classifications": {
+        "NO_STRUCTURAL_CANDIDATE": 0,
+        "PREPOLISH_REJECTED": 24,
+        "POLISH_FAILURE": 3,
+        "BEAM_REJECTED": 24,
+        "REFERENCE_NONIMPROVING": 6,
+        "ORACLE_WIN": 18
+      }
+    },
+    "O2_RESIDUAL_REGION_PK": {
+      "candidatesGenerated": 75,
+      "semanticDuplicatesRejected": 6,
+      "validCandidates": 69,
+      "prePolishCandidatesBeatingWorstOrdinary": 63,
+      "prePolishCandidatesBeatingBestOrdinary": 36,
+      "polishedCandidatesBeatingWorstOrdinary": 63,
+      "polishedCandidatesBeatingBestOrdinary": 18,
+      "candidatesWouldSurviveFrozenParetoBeam": 21,
+      "candidatesImprovingReferenceRmse": 27,
+      "candidatesImprovingReferenceMaxAbs": 9,
+      "candidatesImprovingBoth": 6,
+      "topologySubstitutionWins": 0,
+      "classifications": {
+        "NO_STRUCTURAL_CANDIDATE": 0,
+        "PREPOLISH_REJECTED": 6,
+        "POLISH_FAILURE": 6,
+        "BEAM_REJECTED": 39,
+        "REFERENCE_NONIMPROVING": 3,
+        "ORACLE_WIN": 15
+      }
+    },
+    "O3_SHELF_EVIDENCE": {
+      "candidatesGenerated": 54,
+      "semanticDuplicatesRejected": 0,
+      "validCandidates": 54,
+      "prePolishCandidatesBeatingWorstOrdinary": 45,
+      "prePolishCandidatesBeatingBestOrdinary": 0,
+      "polishedCandidatesBeatingWorstOrdinary": 33,
+      "polishedCandidatesBeatingBestOrdinary": 0,
+      "candidatesWouldSurviveFrozenParetoBeam": 15,
+      "candidatesImprovingReferenceRmse": 6,
+      "candidatesImprovingReferenceMaxAbs": 6,
+      "candidatesImprovingBoth": 0,
+      "topologySubstitutionWins": 0,
+      "classifications": {
+        "NO_STRUCTURAL_CANDIDATE": 12,
+        "PREPOLISH_REJECTED": 9,
+        "POLISH_FAILURE": 12,
+        "BEAM_REJECTED": 18,
+        "REFERENCE_NONIMPROVING": 15,
+        "ORACLE_WIN": 0
+      }
+    },
+    "O4_TOPOLOGY_SUBSTITUTION": {
+      "candidatesGenerated": 111,
+      "semanticDuplicatesRejected": 3,
+      "validCandidates": 108,
+      "prePolishCandidatesBeatingWorstOrdinary": 87,
+      "prePolishCandidatesBeatingBestOrdinary": 9,
+      "polishedCandidatesBeatingWorstOrdinary": 108,
+      "polishedCandidatesBeatingBestOrdinary": 6,
+      "candidatesWouldSurviveFrozenParetoBeam": 9,
+      "candidatesImprovingReferenceRmse": 21,
+      "candidatesImprovingReferenceMaxAbs": 3,
+      "candidatesImprovingBoth": 3,
+      "topologySubstitutionWins": 6,
+      "classifications": {
+        "NO_STRUCTURAL_CANDIDATE": 30,
+        "PREPOLISH_REJECTED": 21,
+        "POLISH_FAILURE": 0,
+        "BEAM_REJECTED": 78,
+        "REFERENCE_NONIMPROVING": 3,
+        "ORACLE_WIN": 6
+      }
+    }
+  },
+  "decomposition": {
+    "NO_STRUCTURAL_CANDIDATE": 0,
+    "PREPOLISH_REJECTED": 60,
+    "POLISH_FAILURE": 21,
+    "BEAM_REJECTED": 159,
+    "REFERENCE_NONIMPROVING": 27,
+    "ORACLE_WIN": 39
+  },
+  "decisionBoundary": {
+    "conclusion": "INCONCLUSIVE",
+    "rule": {
+      "developmentCaseCount": 3,
+      "holdoutCaseCount": 3,
+      "requiredRealCaseCount": 6,
+      "requiredRealRepeatCount": 3,
+      "requiredSnapshotPhases": 3,
+      "minimumDevelopmentWinningCases": 2,
+      "minimumHoldoutWinningCases": 2,
+      "minimumOverallWinningCases": 4,
+      "minimumWinningRepeats": 2,
+      "minimumWinningGenerations": 2,
+      "requiredFamilies": [
+        "O1_RESIDUAL_EXTREMUM_PK",
+        "O2_RESIDUAL_REGION_PK",
+        "O3_SHELF_EVIDENCE",
+        "O4_TOPOLOGY_SUBSTITUTION"
+      ]
+    },
+    "developmentWinningCases": 2,
+    "holdoutWinningCases": 1,
+    "overallWinningCases": 3,
+    "winningRepeats": 9,
+    "winningGenerations": 9,
+    "samplingAdequate": false,
+    "candidateCoverageSufficient": false,
+    "missingInformation": [
+      "real sampling lacks first/middle/final snapshots for all six cases and three repeats"
+    ]
+  }
+}
