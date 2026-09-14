@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "artifact": "structural-search-vnext-closeout",
+  "finalSelection": "FROZEN_BASELINE",
+  "finalCausalClassification": "ONLINE_STRUCTURAL_INJECTION_NOT_SUPPORTED",
+  "finalCausalCommit": "51bce1042fb7d5a3d75810a984ffe748e15e7e68",
+  "finalCausalEvidenceSha256": "3e1dbd7ae3b13adc913b8e2c173fd59fc039fde4cce262c70ff0121d1fa73185",
+  "milestones": [
+    {
+      "id": "M1",
+      "classification": "FAIL",
+      "commit": "ab2c41b9e4a473ff9d11cb54f875e9655737ccc6",
+      "evidenceSha256": "e3adfcac1ae2251e8aa9ce2743558a6c61e9c590427a63dd3ed658a2cda9eb0e",
+      "frozenImplementationSha": "b735583a0554b6998146ab2fab0c14595cb01649",
+      "sourceArtifact": ".research-artifacts/structural-search-vnext-m1/",
+      "summary": "Broad always-on structural diversity: development 1/3, holdout 1/3, overall 2/6; 69 replacement attempts, 0 accepted."
+    },
+    {
+      "id": "M2",
+      "classification": "FAIL",
+      "commit": "95eb9c146375ba82b254149a808ab63b6553298f",
+      "evidenceSha256": "2eb204bb143b345a2a842dd83e37ecbc998bdba9a9762272ec5475357840dcdd",
+      "frozenImplementationSha": "b735583a0554b6998146ab2fab0c14595cb01649",
+      "sourceArtifact": ".research-artifacts/structural-search-vnext-m2-protected-progress/",
+      "summary": "Protected exact-stall intervention: development 0/3, holdout 0/3, overall 0/6; 21 challengers, 0 accepted, 0 incumbent improvements."
+    },
+    {
+      "id": "M3",
+      "classification": "INCONCLUSIVE",
+      "commit": "adca74b6ca19f3b5d30c932096f5da81aed62518",
+      "evidenceSha256": "9927d848d72069de1255a40a12c672079d43741c1568193c97a342233d4fe703",
+      "frozenBoundary": "f5052b2b1bfdf12b013db5c34c5fda65304091c3",
+      "sourceArtifact": ".research-artifacts/structural-search-m3-stagnation-census/",
+      "summary": "Structural-stagnation census: S3 is earlier than exact stall, but structural no-novelty often occurs during productive ordinary search."
+    },
+    {
+      "id": "M3b",
+      "classification": "M3_TELEMETRY_WALLCLOCK_PERTURBATION_MATERIAL",
+      "s3Classification": "INCONCLUSIVE",
+      "commit": "956be9ddcea4152276744df3565274352b9a9f80",
+      "evidenceSha256": "ce7be18312fadf820dc5b49938455e9a7d4c9d559132effe046eb097584515ec",
+      "frozenBoundary": "f5052b2b1bfdf12b013db5c34c5fda65304091c3",
+      "sourceArtifact": ".research-artifacts/structural-search-m3b-telemetry-fidelity/",
+      "summary": "Deterministic OFF/ON equivalence confirmed; real wall-clock equivalence not established; unique-event normalization corrected overlapping signals."
+    },
+    {
+      "id": "M4-candidate-oracle-corrected",
+      "classification": "STRUCTURAL_CANDIDATE_SIGNAL_SUPPORTED",
+      "commit": "e08594e0477cf697c75ad99f7afc706a9c403b48",
+      "frozenBoundary": "956be9ddcea4152276744df3565274352b9a9f80",
+      "evidenceSha256": "fceb99fffed81d400c73ed651d78d507dd2ba1ebbf805c156b1cd4c66baeccc0",
+      "sourceArtifact": ".research-artifacts/structural-search-m4-candidate-oracle/",
+      "summary": "Corrected shadow-only deterministic census: development 2/3, holdout 3/3, overall 5/6; samples generations 0/10/20."
+    },
+    {
+      "id": "M4-causal-closeout",
+      "classification": "ONLINE_STRUCTURAL_INJECTION_NOT_SUPPORTED",
+      "commit": "51bce1042fb7d5a3d75810a984ffe748e15e7e68",
+      "frozenBoundary": "956be9ddcea4152276744df3565274352b9a9f80",
+      "evidenceSha256": "3e1dbd7ae3b13adc913b8e2c173fd59fc039fde4cce262c70ff0121d1fa73185",
+      "sourceArtifact": ".research-artifacts/structural-search-m4-candidate-oracle-causal-closeout/",
+      "aggregateSha256": "cf06ffdf2166fac5161e0e50457ca6bfd1e4407cb0474266ea37daac240133b8",
+      "summary": "De-duplicated causal closeout: online-feasible development 1/3, holdout 3/3, overall 4/6; O2 13 and O4 13."
+    }
+  ],
+  "supersededHistoricalEvidence": [
+    {
+      "id": "M4-candidate-oracle-initial-inadequate-sampling",
+      "commit": "331d93c65cef5cbf0bb5c26faf2f3efe9340d350",
+      "evidenceSha256": "3ac87d9d1c9556f902654825eb6de46f80c7837ce853da6e23487ad97a774d29",
+      "supersededBy": "e08594e0477cf697c75ad99f7afc706a9c403b48",
+      "note": "Deterministic generation bound 4; sampling-inadequate partial evidence, retained here only for provenance and not used for interpretation."
+    }
+  ],
+  "sourceBoundary": "All entries reference immutable historical artifacts; this closeout does not rewrite or recalculate them."
+}
