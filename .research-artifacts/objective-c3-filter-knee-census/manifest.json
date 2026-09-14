@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "artifact": "objective-c3-filter-knee-census",
+  "frozenBoundary": "b243d5cc4fd94a26ee38873e37d90900b946f9c0",
+  "status": "FRESH_REAL_CORPUS_INSUFFICIENT",
+  "evidenceSha256": "a078e271aa892935567f979a6de9463a09c1690713a9dc595c57ab13f7b0c93e",
+  "researchQuestion": "C3 data-driven filter-count/error knee census for FROZEN_BASELINE",
+  "stoppedBefore": [
+    "freezing a new 3 development / 3 holdout real corpus",
+    "any C3 knee computation",
+    "any observer or runner implementation",
+    "any production selection change"
+  ],
+  "files": [
+    "corpus-inventory.json",
+    "final-report.md",
+    "evidence-sha256.txt",
+    "manifest.json"
+  ]
+}
