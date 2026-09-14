@@ -788,6 +788,23 @@ export function structuralSignature(
     .join('|')
 }
 
+/** ID/order-independent multiset diff used by all VNext candidate identity. */
+export function structuralFilterDifference(
+  before: readonly Filter[], after: readonly Filter[],
+): { added: Filter[]; removed: Filter[] } {
+  const key = (filter: Filter) => JSON.stringify({ enabled: filter.enabled, type: filter.type, frequencyHz: filter.frequencyHz, gainDb: filter.gainDb, q: filter.q })
+  const consume = (source: readonly Filter[], against: readonly Filter[]): Filter[] => {
+    const counts = new Map<string, number>()
+    for (const filter of against) counts.set(key(filter), (counts.get(key(filter)) ?? 0) + 1)
+    return source.filter(filter => {
+      const filterKey = key(filter); const count = counts.get(filterKey) ?? 0
+      if (count === 0) return true
+      counts.set(filterKey, count - 1); return false
+    })
+  }
+  return { added: consume(after, before), removed: consume(before, after) }
+}
+
 /**
  * Preserve one best representative for every useful topology before filling
  * remaining slots by the frozen reference ordering.  This is only used by
@@ -829,22 +846,25 @@ export function createRegionAwareCandidatePool(
   bounds: StandardAutoEqV2Config,
   regionCount: number,
   maxEntries: number,
+  generated?: readonly StructuralProposal[],
 ): StructuralCandidatePoolEntry[] {
   const regions = Math.max(1, regionCount)
   const minLog = Math.log2(bounds.minFrequencyHz)
   const span = Math.max(Number.EPSILON, Math.log2(bounds.maxFrequencyHz) - minLog)
   const regionFor = (frequencyHz: number): number => Math.min(regions - 1, Math.max(0,
     Math.floor(((Math.log2(frequencyHz) - minLog) / span) * regions)))
-  return orderStructuralProposals(generateStructuralMutations(
-    filters, residualDb, frequenciesHz, bounds, regions,
-    Math.log2(bounds.maxFrequencyHz / bounds.minFrequencyHz) / regions, 'semantic',
-  )).slice(0, maxEntries).map((proposal) => {
-    const changed = proposal.filters.at(-1) ?? filters.at(-1)
-    const frequencyHz = changed?.frequencyHz ?? bounds.minFrequencyHz
+  const proposals = generated ?? generateStructuralMutations(filters, residualDb, frequenciesHz, bounds, regions,
+    Math.log2(bounds.maxFrequencyHz / bounds.minFrequencyHz) / regions, 'semantic')
+  return orderStructuralProposals(proposals).slice(0, maxEntries).flatMap((proposal) => {
+    const diff = structuralFilterDifference(filters, proposal.filters)
+    // Only additive proposals have an unambiguous residual-targeted candidate.
+    if (!proposal.mutation.startsWith('add-') || diff.added.length !== 1) return []
+    const changed = diff.added[0]!
+    const frequencyHz = changed.frequencyHz
     const nearest = frequenciesHz.reduce((best, frequency, index) =>
       Math.abs(Math.log2(frequency / frequencyHz)) < Math.abs(Math.log2(frequenciesHz[best]! / frequencyHz)) ? index : best, 0)
     const residual = residualDb[nearest] ?? 0
-    return {
+    return [{
       proposal,
       metadata: {
         mutationFamily: proposal.mutation,
@@ -854,7 +874,7 @@ export function createRegionAwareCandidatePool(
         structuralRegion: regionFor(frequencyHz),
       },
       signature: structuralSignature(proposal.filters, bounds, regions),
-    }
+    }]
   })
 }
 
@@ -1299,7 +1319,10 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       frontierUtilization.parentFilterCountMax = Math.max(frontierUtilization.parentFilterCountMax, parent.filters.length)
       if (parent.filters.length === config.maxFilters) frontierUtilization.parentsAtCapacity += 1
       const solution = evaluateV2Solution(parent.filters, desiredDb, frequencies, sampleRateHz)
-      const proposals = generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
+      const proposals = policy === 'vnext'
+        ? generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds,
+          config.featureRegionCount, config.minFeatureSeparationOctaves, config.candidatePolicy, config.mergeProximityOctaves)
+        : generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
       generatedProposals += proposals.length
       for (const proposal of proposals) {
         frontierUtilization.generatedCandidateFilterCountMax = Math.max(frontierUtilization.generatedCandidateFilterCountMax, proposal.filters.length)
@@ -1317,7 +1340,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       const ordered = orderStructuralProposals(proposals)
       const vnextPool = policy === 'vnext'
         ? createRegionAwareCandidatePool(parent.filters, solution.residualDb, frequencies, bounds,
-          config.featureRegionCount ?? 1, proposals.length)
+          config.featureRegionCount ?? 1, proposals.length, proposals)
         : []
 
       let admitted: StructuralProposal[] = []
@@ -1351,7 +1374,14 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           a.lexicalRank - b.lexicalRank
         )
         const selected = selectQuotaProposals(prePolishScored, rmseRanked, 6, 2, config.proposalsPerParent)
-        admitted = selected.map(s => s.proposal)
+        if (policy === 'vnext') {
+          const diverse = admitDiverseStructuralCandidates(vnextPool, config.proposalsPerParent).map(entry => entry.proposal)
+          const seen = new Set(diverse.map(proposalKey))
+          for (const item of selected) if (diverse.length < config.proposalsPerParent && !seen.has(proposalKey(item.proposal))) {
+            diverse.push(item.proposal); seen.add(proposalKey(item.proposal))
+          }
+          admitted = diverse
+        } else admitted = selected.map(s => s.proposal)
       } else {
         admitted = policy === 'vnext'
           ? admitDiverseStructuralCandidates(vnextPool, config.proposalsPerParent).map(entry => entry.proposal)
@@ -1426,13 +1456,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         if (deadline.isExpired() || attempts >= config.proposalsPerParent) break
         // Proposals are canonicalized, so position is not candidate identity.
         // Find the structurally added filter without IDs or ordering.
-        const replacement = candidate.proposal.filters.find(proposed => !parent.filters.some(existing =>
-          existing.type === proposed.type &&
-          existing.frequencyHz === proposed.frequencyHz &&
-          existing.gainDb === proposed.gainDb &&
-          existing.q === proposed.q &&
-          existing.enabled === proposed.enabled,
-        ))
+        const replacement = structuralFilterDifference(parent.filters, candidate.proposal.filters).added[0]
         if (replacement === undefined) continue
         const kept = parent.filters.filter((_, index) => index !== victim.index)
         const polished = polishFilters(canonical([...kept, { ...replacement, id: uniqueId(kept, `vnext-replace-${attempts}`) }]),
