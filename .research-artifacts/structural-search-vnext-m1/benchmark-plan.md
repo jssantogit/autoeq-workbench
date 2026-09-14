@@ -1,0 +1,3 @@
+# M1 frozen benchmark plan
+
+Start SHA: `0ed233823e57cb0654722f1ad6585ec3cf16def9`. Compare frozen `baseline` and explicit `structural-search-vnext` selectors serially at structural ceiling 43, effort 6, continuing labels 5/15/30, three repeats each. Real corpus: Titan→RSV, Mystic 8, S12 Ultra, Storm, U12t, Trio. Synthetic sanity: D/E/F/H at their established structural probe envelope. Record median/best/worst RMSE, maxAbs, violation, delivered count, frontier max, raw work and elapsed time; inspect complexity. Quantized delta is recorded only for real VNext float wins. Gate: >=4/6 (>=2 former dev and >=2 former holdout) RMSE improvements, no case worse in both RMSE/maxAbs, trace evidence of diversity/replacement, delivery direction survives, no systematic pathology.
