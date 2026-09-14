@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 3,
+  "corpusVersion": "fresh-real-corpus-v1.2",
+  "historicalV1Status": "CORPUS_V1_INSUFFICIENT",
+  "historicalV11Status": "CORPUS_V1_1_PROVENANCE_INVALID",
+  "status": "CORPUS_V1_2_READY",
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "caseCount": 18,
+  "requiredCaseCount": 18,
+  "metadataAudit": {
+    "eligibleBeforeStrictResolution": 1540,
+    "eligibleAfterStrictResolution": 1526,
+    "unresolvedByCollection": {},
+    "rigMismatchCount": 0,
+    "oldFamilyVariantCollisionCount": 178
+  },
+  "normalization": {
+    "mode": "hz",
+    "frequencyHz": 500,
+    "levelDb": 60
+  },
+  "terminalClosureCurveCount": 36,
+  "replacements": [],
+  "casesSha256": "4f78db0448d7d6aa82cff65134e64219f9ee94946e189b209ac4fd077dce3ff2",
+  "provenanceSha256": "9e27cc9340a85e60f124b8d226f5810ee84b9fcc5a13bdb56b2895da51384696",
+  "solverExecuted": false,
+  "rawMeasurementsCommitted": false
+}

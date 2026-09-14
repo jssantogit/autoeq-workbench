@@ -1,0 +1,1085 @@
+[
+  {
+    "id": "frc1.1-12-0002977aa8bc",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "qdc Anole VX (on-off-off)",
+      "processedName": "qdc Anole VX (on-off-off)",
+      "deviceFamily": "qdc anole vx",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/QDC%20Anole%20VX%20(100)%20L.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/qdc Anole VX (on-off-off).csv",
+      "blobSha": "3cc84daf38e72b251bc3c6de49b3d1c12a552292",
+      "identity": "Super Review|in-ear|711|qdc anole vx (on-off-off)",
+      "upstreamSha256": "c8a12c18b45d4b565fb8c7b68270bdcc463323d5ff8b0b62be97ae5b0b06b8f3",
+      "byteLength": 8923,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -44.04,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -44.04,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "9f33827951f79036acf78595ef7d609814e87a2f0b1b686fa1f82890061fbd76",
+      "canonicalParsedPointsSha256": "b64c2005977c68af2ffb41e1c0cef2916f97ffb7e1a4f9c3de2d285d6696935a",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "oratory1990",
+      "form": "in-ear",
+      "model": "Mackie MP-360",
+      "processedName": "Mackie MP-360",
+      "deviceFamily": "mackie mp 360",
+      "rig": "GRAS 43AC",
+      "sourceUrls": [
+        "https://www.dropbox.com/s/q55wmtphk70ofcf/Mackie%20MP-360.pdf?dl=1"
+      ],
+      "path": "measurements/oratory1990/data/in-ear/Mackie MP-360.csv",
+      "blobSha": "12766596ee6e0539dbf7565deb89f3d423fe3cbb",
+      "identity": "oratory1990|in-ear|GRAS 43AC|mackie mp-360",
+      "upstreamSha256": "c21e5ed066ccaec952aec67e6b569b19d4f4f4301c93631dc124250768a4a64a",
+      "byteLength": 8843,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -20.4,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -20.4,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "916a94b7a8ab2046a51b68f8f73e38a2e8729a15a7981653ad76ba9429a6f902",
+      "canonicalParsedPointsSha256": "4a94bab9a7e0aa4dbed13b50ba4bbac385a129c60d23b63cf1efec2d027f11ec",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "A",
+    "split": "development"
+  },
+  {
+    "id": "frc1.1-09-0001b6618e24",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Phonak PFE 112",
+      "processedName": "Phonak PFE 112",
+      "deviceFamily": "phonak pfe 112",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Phonak%20Audeo%20PFE%20112%20L.txt",
+        "https://superreview.squig.link/data/Phonak%20Audeo%20PFE%20112%20R.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Phonak PFE 112.csv",
+      "blobSha": "25d98df360f79cf4741cff9eb886e83ec8c3ac54",
+      "identity": "Super Review|in-ear|711|phonak pfe 112",
+      "upstreamSha256": "3347e3eb9225d26462121f809445cba8756e821fa60ba0c906258f8435c4ee8d",
+      "byteLength": 8731,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -65.06,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -65.06,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "16f762b8bd86fc67005f3a6f373d66e41e36b36288515a188def057c79502554",
+      "canonicalParsedPointsSha256": "531684df6e4139764f02091780725e4c44f0f54fbfe591b39a9697959136d54c",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "oratory1990",
+      "form": "in-ear",
+      "model": "FiiO FA7",
+      "processedName": "FiiO FA7",
+      "deviceFamily": "fiio fa7",
+      "rig": "GRAS 43AC",
+      "sourceUrls": [
+        "https://www.dropbox.com/s/13jx6v9c9k4drfn/Fiio%20FA7.pdf?dl=1"
+      ],
+      "path": "measurements/oratory1990/data/in-ear/FiiO FA7.csv",
+      "blobSha": "9c413608d2fd47b04f1e679922a4f89f9d8c04ed",
+      "identity": "oratory1990|in-ear|GRAS 43AC|fiio fa7",
+      "upstreamSha256": "d5b8a343f8215ee804501b75eebae2b4a817a326694a63ab925bc307a32a6d0e",
+      "byteLength": 8676,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -5.27,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -5.27,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "2f00a75b310212ba451bb895916312fb17c71c99ca4e2dd218aa3fdfa171a805",
+      "canonicalParsedPointsSha256": "49392f528f1a19c3b36cf39f48e1e767b0c25ccdbff6454ddc7e3329b2028b93",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "A",
+    "split": "development"
+  },
+  {
+    "id": "frc1.1-10-00027122c3ce",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Co-Donguri Shizuku",
+      "processedName": "Co-Donguri Shizuku",
+      "deviceFamily": "co donguri shizuku",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Co-Donguri%20Shizuku%20L.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Co-Donguri Shizuku.csv",
+      "blobSha": "a47fcc051674bb51d10deb5cc70a742096060997",
+      "identity": "Super Review|in-ear|711|co-donguri shizuku",
+      "upstreamSha256": "2971b677c8951a8cb9bb21cb542a1605bc36be339cf275ba2674bc2b746129f1",
+      "byteLength": 8915,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -31.37,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -31.37,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "68b71bcbc5f38852a04876ad9408d50bd4a9444316b39c468cddb368df383ebb",
+      "canonicalParsedPointsSha256": "21cc625585a606e9a701d23d58c46644386786f57ea77aaf7cfc511e0357cedc",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "oratory1990",
+      "form": "in-ear",
+      "model": "Shuoer S12 Pro",
+      "processedName": "Shuoer S12 Pro",
+      "deviceFamily": "shuoer s12 pro",
+      "rig": "GRAS 45BC-10",
+      "sourceUrls": [
+        "https://www.dropbox.com/scl/fi/wrokq4lzvnldx8381si60/Shuoer-S12-Pro.pdf?rlkey=gyx31p9q55vk34fsp0j5a8yyo&dl=1"
+      ],
+      "path": "measurements/oratory1990/data/in-ear/Shuoer S12 Pro.csv",
+      "blobSha": "c28943e072fa248ef979ff772567d217014b5ac5",
+      "identity": "oratory1990|in-ear|GRAS 45BC-10|shuoer s12 pro",
+      "upstreamSha256": "983db47ab6e0a70f4d00363d6cd68b4b838b18ce7454903b3633ec00371cc850",
+      "byteLength": 8723,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -6.6,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -6.6,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "f015fc950371a08d6dd80e8107617171fcded687d2cb3895c333d4ff040203c3",
+      "canonicalParsedPointsSha256": "b5786cdd6ba5ae8d27069114d35e333094114ff87885f52feaa6f25dce839e74",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "A",
+    "split": "development"
+  },
+  {
+    "id": "frc1.1-03-00003906daac",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Co-Donguri Brass",
+      "processedName": "Co-Donguri Brass",
+      "deviceFamily": "co donguri brass",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Co-Donguri%20Brass%20L.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Co-Donguri Brass.csv",
+      "blobSha": "45cbe35cce7e6fdc4cf016661937150ede1129ee",
+      "identity": "Super Review|in-ear|711|co-donguri brass",
+      "upstreamSha256": "45dcc9b0611f7d1b65db5993f8efa2510c5a34b6182212d5477c4baadbadab00",
+      "byteLength": 8786,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -30.26,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -30.26,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "a3dd5e0f833c52569af72ad89747853066e2221fadfe7146eee47ccb23746883",
+      "canonicalParsedPointsSha256": "d72ae4dbb68c6271a1bd2fac4aee066615360886d3bb873f100ac868dec00a51",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Hisenior Okavango (on-on)",
+      "processedName": "Hisenior Okavango (on-on)",
+      "deviceFamily": "hisenior okavango",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Hisenior%20Okavango%2011%20L.txt",
+        "https://superreview.squig.link/data/Hisenior%20Okavango%2011%20R.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Hisenior Okavango (on-on).csv",
+      "blobSha": "be12ebf9d76508800a16d9976f558caf0d97c8ab",
+      "identity": "Super Review|in-ear|711|hisenior okavango (on-on)",
+      "upstreamSha256": "8642c7e5ad06e9860607fa6ad01d1d979a836ecd67ec486f16baa755ae0e0d62",
+      "byteLength": 8701,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -30.39,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -30.39,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "fccec13d6b7571e1f9751aa8ff1e907f24f8338207fd3d4b1682fc2e7860749c",
+      "canonicalParsedPointsSha256": "a063150a6711b7d5cbb25f56f3e018df5e94d5fa6d45da0f9ef73416a1494388",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "same-collection/same-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "A",
+    "split": "holdout"
+  },
+  {
+    "id": "frc1.1-15-000323cd8787",
+    "source": {
+      "collection": "HypetheSonics",
+      "form": "in-ear",
+      "model": "Noble Audio Kublai Khan",
+      "processedName": "Noble Audio Kublai Khan",
+      "deviceFamily": "noble audio kublai khan",
+      "rig": "GRAS RA0045",
+      "sourceUrls": [
+        "https://www.hypethesonics.com/dbc/SPLdata/Kublai Khan L.txt",
+        "https://www.hypethesonics.com/dbc/SPLdata/Kublai Khan R.txt"
+      ],
+      "path": "measurements/HypetheSonics/data/in-ear/GRAS RA0045/Noble Audio Kublai Khan.csv",
+      "blobSha": "c695b97b141ff78659bc54b7ad0ebc653639b74d",
+      "identity": "HypetheSonics|in-ear|GRAS RA0045|noble audio kublai khan",
+      "upstreamSha256": "bda3fcb35ca730ddc3b7316e1f2859ef7a6bc6780f907cd2c807fc0791703441",
+      "byteLength": 8918,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -12.31,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -12.31,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "13fb58a3315811dc9256a7ed8323186c136c07c37249e46abcd084910700a57a",
+      "canonicalParsedPointsSha256": "bbed9de87240a2855fa3556318b8bc0611ad7557fa83f1e006832cbefe7fdf8c",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "NiceHCK Himalaya (brass filter)",
+      "processedName": "NiceHCK Himalaya (brass filter)",
+      "deviceFamily": "nicehck himalaya",
+      "rig": "711",
+      "sourceUrls": [
+        "https://tonedeafmonk.squig.link/data/NICEHCK%20HIMALAYA%20BRASS%20L.txt",
+        "https://tonedeafmonk.squig.link/data/NICEHCK%20HIMALAYA%20BRASS%20R.txt"
+      ],
+      "path": "measurements/ToneDeafMonk/data/in-ear/NiceHCK Himalaya (brass filter).csv",
+      "blobSha": "dd0eeeac8dda6d2ed3c68f3acae62dc824b0ffd8",
+      "identity": "ToneDeafMonk|in-ear|711|nicehck himalaya (brass filter)",
+      "upstreamSha256": "69f63af24543f0268c49b5590f7fcdb8224b4b9324cb0abb82fd4ae1e39fec68",
+      "byteLength": 8740,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -24.82,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -24.82,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "e672ac8d00cca00cb06d93c19d2236a0d69a9dbeee8e458536b0e59752a31059",
+      "canonicalParsedPointsSha256": "26de0e0dd8101126892b09fcfa780847277a191fbc4be959fd50ca1fa4bf6bbb",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "A",
+    "split": "holdout"
+  },
+  {
+    "id": "frc1.1-06-0000c6497763",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "CCA CRA+",
+      "processedName": "CCA CRA+",
+      "deviceFamily": "cca cra",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/CCA%20CRA%20Plus%20L.txt",
+        "https://superreview.squig.link/data/CCA%20CRA%20Plus%20R.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/CCA CRA+.csv",
+      "blobSha": "bfe441cd45df3fae8e459564f9f43619ab069f98",
+      "identity": "Super Review|in-ear|711|cca cra+",
+      "upstreamSha256": "cdbe7a92247762d6007182843596d864d3c8e1e10eea56f1f094c25b3b69dd37",
+      "byteLength": 8682,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -24.81,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -24.81,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "7ca794beebfc1d26270b488738fa3a505226411335dc10c1a5d960aa76954302",
+      "canonicalParsedPointsSha256": "6b4940b3b15ca7ac234e3005b44a08db555e50449ecf71adfac55e5261421746",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Audiosense T180",
+      "processedName": "Audiosense T180",
+      "deviceFamily": "audiosense t180",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Audiosense%20T180%20L.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Audiosense T180.csv",
+      "blobSha": "110038dc294324afac3ff052e17d5c3c16241b74",
+      "identity": "Super Review|in-ear|711|audiosense t180",
+      "upstreamSha256": "0ea72205a873da1d41d6e19fca0638ac908a33cb79c55bb5b107e86c66c89155",
+      "byteLength": 8766,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -35.63,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -35.63,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "82a07de6f67d808acec9f7a098f3ea28f3ee06d09430688e0676a504ecfea8e8",
+      "canonicalParsedPointsSha256": "91cd73bfacba8924b7aee1664b7668001588990a2c1fe92c50822f19685e664f",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "same-collection/same-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "A",
+    "split": "holdout"
+  },
+  {
+    "id": "frc1.1-08-0000f6762889",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "QKZ x HBB Hades",
+      "processedName": "QKZ x HBB Hades",
+      "deviceFamily": "qkz x hbb hades",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/QKZ%20Hades%20L.txt",
+        "https://superreview.squig.link/data/QKZ%20Hades%20R.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/QKZ x HBB Hades.csv",
+      "blobSha": "42007622bb8221db3aca5c771e2d024c56c81d87",
+      "identity": "Super Review|in-ear|711|qkz x hbb hades",
+      "upstreamSha256": "858c62e96b32666ee65b962bf5794550b8b053bda0a72426db6c297a461d5824",
+      "byteLength": 9006,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -26.99,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -26.99,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "2fc70d66a76b7e3caea72d1688a0ace81c411feb627662edcb133e5558068605",
+      "canonicalParsedPointsSha256": "ea6f2d2857ca7b9f2b1cf0875002bb970b122ef6f11d4fb6c08017aef89178d8",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "oratory1990",
+      "form": "in-ear",
+      "model": "Brainwavz M5",
+      "processedName": "Brainwavz M5",
+      "deviceFamily": "brainwavz m5",
+      "rig": "GRAS 45BC",
+      "sourceUrls": [
+        "https://www.dropbox.com/s/jhgx25cx8arpl67/Brainwavz%20M5.pdf?dl=1"
+      ],
+      "path": "measurements/oratory1990/data/in-ear/Brainwavz M5.csv",
+      "blobSha": "ffa552b82ed9a91129288936bd39d7548ffdfc74",
+      "identity": "oratory1990|in-ear|GRAS 45BC|brainwavz m5",
+      "upstreamSha256": "90ee78587d83f79e973fe3585b2190e950087f83d2e9a92393ab3376a0afe913",
+      "byteLength": 9145,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -6.23,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -6.23,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "6a756a7f18babcf76444f90664bed04cfa51eb2b79ff785a37e6b11793b240ed",
+      "canonicalParsedPointsSha256": "bca66e94d1c12ecf6066448857156512b855e2932ba7b165a493e8175e043027",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "B",
+    "split": "development"
+  },
+  {
+    "id": "frc1.1-11-000279686a75",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "64 Audio Nio (Fir Audio black module)",
+      "processedName": "64 Audio Nio (Fir Audio black module)",
+      "deviceFamily": "64 audio nio",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/64%20Audio%20Nio%20(Fir%20black)%20L.txt",
+        "https://superreview.squig.link/data/64%20Audio%20Nio%20(Fir%20black)%20R.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/64 Audio Nio (Fir Audio black module).csv",
+      "blobSha": "da347dbb8e990aceb735a2d85d944ac279c3f0cf",
+      "identity": "Super Review|in-ear|711|64 audio nio (fir audio black module)",
+      "upstreamSha256": "081f24690fe42013c9e6ce648656b0ef578fa4e2335fa9286d1de9acff2c59b3",
+      "byteLength": 8725,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -22.34,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -22.34,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "ef90917c7e562967b8eb952fbdb2c4e8b2478cd713b305051b1c8eee674426fd",
+      "canonicalParsedPointsSha256": "1191be389d1897e7eaf38f1ead10ec753d7ba9d82a91ebf3833ca492bb98ab06",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "oratory1990",
+      "form": "in-ear",
+      "model": "AKG K3003",
+      "processedName": "AKG K3003",
+      "deviceFamily": "akg k3003",
+      "rig": "GRAS 43AC",
+      "sourceUrls": [
+        "https://www.dropbox.com/s/sdjp3fyrvdqp1e8/AKG%20K3003.pdf",
+        "https://www.dropbox.com/s/sdjp3fyrvdqp1e8/AKG%20K3003.pdf?dl=1"
+      ],
+      "path": "measurements/oratory1990/data/in-ear/AKG K3003.csv",
+      "blobSha": "e3aa01dd89bdaede66d89effbe59440fd7ec604b",
+      "identity": "oratory1990|in-ear|GRAS 43AC|akg k3003",
+      "upstreamSha256": "442104521ec5ff83ab1436e087a4130b0c1745eb02f9e628f3c8e8fe913ab318",
+      "byteLength": 8710,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -17.28,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -17.28,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "20ac33a26270969c228d6cbcf630f81de8978c6e03d6777e7f75c57ecde4466f",
+      "canonicalParsedPointsSha256": "ccab70d6346de6f46887e663c35dc6e9c697bd56cd544e3abf39b63d15e114ea",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "B",
+    "split": "development"
+  },
+  {
+    "id": "frc1.1-07-0000c470a9b3",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "64 Audio U18t (m15 Apex module)",
+      "processedName": "64 Audio U18t (m15 Apex module)",
+      "deviceFamily": "64 audio u18t",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/64%20Audio%20U18t%20(m15)%20L.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/64 Audio U18t (m15 Apex module).csv",
+      "blobSha": "c46acaf397461a03435915c7ad5650c2f383cf76",
+      "identity": "Super Review|in-ear|711|64 audio u18t (m15 apex module)",
+      "upstreamSha256": "2b0a6ada71eaaaa4731ebeb194898f882bb1d818f8f997a6245be676e0a36781",
+      "byteLength": 8684,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -30.09,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -30.09,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "acefcaa25582cbe6c32d8fc5bf437ecf996340271b208bcc4b46a14322dc5587",
+      "canonicalParsedPointsSha256": "9ca39f04f899be5e39981b8bfa6cd3bca0a26416378681321ec77b7105d603a9",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "oratory1990",
+      "form": "in-ear",
+      "model": "Etymotic ER2SE",
+      "processedName": "Etymotic ER2SE",
+      "deviceFamily": "etymotic er2se",
+      "rig": "GRAS 43AC",
+      "sourceUrls": [
+        "https://www.dropbox.com/s/98na0gm3sz9kiwj/Etymotic%20ER-2SE.pdf?dl=1"
+      ],
+      "path": "measurements/oratory1990/data/in-ear/Etymotic ER2SE.csv",
+      "blobSha": "d824e714074b71d7d3cbc48e76dee815dfa5bb2e",
+      "identity": "oratory1990|in-ear|GRAS 43AC|etymotic er2se",
+      "upstreamSha256": "1021e2a4a4bcfc2573149e813c17c465f4ef02160ab334d6a03f239e33662620",
+      "byteLength": 9101,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -23.09,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -23.09,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "4a1c27165dd1618cfb4a41084aeb845d50837c13627e240dab1a154b934390a9",
+      "canonicalParsedPointsSha256": "fd9241d0444efc08e65a9190dc776270961ae21d3480a8d31165373d2ca70892",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "B",
+    "split": "development"
+  },
+  {
+    "id": "frc1.1-14-00025d5729a1",
+    "source": {
+      "collection": "HypetheSonics",
+      "form": "in-ear",
+      "model": "Westone W60",
+      "processedName": "Westone W60",
+      "deviceFamily": "westone w60",
+      "rig": "Bruel & Kjaer 5128",
+      "sourceUrls": [
+        "https://www.hypethesonics.com/hatsdbc/SPLdata/W60 L.txt",
+        "https://www.hypethesonics.com/hatsdbc/SPLdata/W60 R.txt"
+      ],
+      "path": "measurements/HypetheSonics/data/in-ear/Bruel & Kjaer 5128/Westone W60.csv",
+      "blobSha": "11c878e10d39335866dd36788e179191ac562c21",
+      "identity": "HypetheSonics|in-ear|Bruel & Kjaer 5128|westone w60",
+      "upstreamSha256": "4fbf485fd539a12d5d24c88bbdd85ac388f5faf9aa7459b17180158d0b7a3a88",
+      "byteLength": 9141,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -22.17,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -22.17,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "db283ddf45512b638f5ad73b2417249ee9637d919de980ef70bbb71db5d3dac4",
+      "canonicalParsedPointsSha256": "a5aa82d64fb42279b6c9f95b82fb7af2b45e1963f63b5c739b334841f2e90431",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "NF ACOUS NA20",
+      "processedName": "NF ACOUS NA20",
+      "deviceFamily": "nf acous na20",
+      "rig": "711",
+      "sourceUrls": [
+        "https://tonedeafmonk.squig.link/data/NFACOUS%20NA20%20L.txt",
+        "https://tonedeafmonk.squig.link/data/NFACOUS%20NA20%20R.txt"
+      ],
+      "path": "measurements/ToneDeafMonk/data/in-ear/NF ACOUS NA20.csv",
+      "blobSha": "d40038d5f31f19c5b3ae95541b46d66fc4d5388e",
+      "identity": "ToneDeafMonk|in-ear|711|nf acous na20",
+      "upstreamSha256": "eb0b490a1ee10ad18d2ab5e74e8a110d33cbf49a4af9e16fbaf0ec8857c2ec42",
+      "byteLength": 8884,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -11.63,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -11.63,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "be4bdee7c45571f6cd22f606605da0a1d73532b8ccecf54d8daae1e45796bccc",
+      "canonicalParsedPointsSha256": "c505bb9ce4cf8ec3860cb36f2b2b214756dd0f0c8c5ad18a12a5e1a848560bd2",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "B",
+    "split": "holdout"
+  },
+  {
+    "id": "frc1.1-13-000225a01a6d",
+    "source": {
+      "collection": "HypetheSonics",
+      "form": "in-ear",
+      "model": "Periodic Audio Titanium V3",
+      "processedName": "Periodic Audio Titanium V3",
+      "deviceFamily": "periodic audio titanium v3",
+      "rig": "GRAS RA0045",
+      "sourceUrls": [
+        "https://www.hypethesonics.com/dbc/SPLdata/Titanium V3 L.txt",
+        "https://www.hypethesonics.com/dbc/SPLdata/Titanium V3 R.txt"
+      ],
+      "path": "measurements/HypetheSonics/data/in-ear/GRAS RA0045/Periodic Audio Titanium V3.csv",
+      "blobSha": "2aa0051dcbe3eea894d73b345b18bbb6795493f5",
+      "identity": "HypetheSonics|in-ear|GRAS RA0045|periodic audio titanium v3",
+      "upstreamSha256": "35837110d34e81c47dc63df20eef3661658a0ad858868ef839ca22d1ebd3f019",
+      "byteLength": 8943,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -15.28,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -15.28,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "6ba20a82d7fa2d62dc3a98166d2a79dd189e60ae01231ab5635dff9e52a55400",
+      "canonicalParsedPointsSha256": "e7ebd9d5f282e2ef41ee7335111cba82847e7a9871b711eca5d58c8d293d805a",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "BGVP DMA",
+      "processedName": "BGVP DMA",
+      "deviceFamily": "bgvp dma",
+      "rig": "711",
+      "sourceUrls": [
+        "https://tonedeafmonk.squig.link/data/BGVP%20DMA%20L.txt",
+        "https://tonedeafmonk.squig.link/data/BGVP%20DMA%20R.txt"
+      ],
+      "path": "measurements/ToneDeafMonk/data/in-ear/BGVP DMA.csv",
+      "blobSha": "730772515c29c595c2a64e2243586290902b65fe",
+      "identity": "ToneDeafMonk|in-ear|711|bgvp dma",
+      "upstreamSha256": "7829a789f14761ac235fd99d6db733d7974ece22b8789c035aacec1699c841f0",
+      "byteLength": 8758,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -14.42,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -14.42,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "dd83423869dff7085d0e13e818751a4df8652fa5d46575a33622de8d44a64bf2",
+      "canonicalParsedPointsSha256": "9b92979b980034f1299b1d82216c16f418cb0fde255ffa30fd2aa7078c12c57b",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "B",
+    "split": "holdout"
+  },
+  {
+    "id": "frc1.1-17-00036da52192",
+    "source": {
+      "collection": "HypetheSonics",
+      "form": "in-ear",
+      "model": "1MORE Triple Driver",
+      "processedName": "1MORE Triple Driver",
+      "deviceFamily": "1more triple driver",
+      "rig": "Bruel & Kjaer 5128",
+      "sourceUrls": [
+        "https://www.hypethesonics.com/hatsdbc/SPLdata/Triple Driver L.txt",
+        "https://www.hypethesonics.com/hatsdbc/SPLdata/Triple Driver R.txt"
+      ],
+      "path": "measurements/HypetheSonics/data/in-ear/Bruel & Kjaer 5128/1MORE Triple Driver.csv",
+      "blobSha": "490db6d4d33688a132aa437f66f499d52daa4334",
+      "identity": "HypetheSonics|in-ear|Bruel & Kjaer 5128|1more triple driver",
+      "upstreamSha256": "b583d484096e3e649bbd1f5ccf9b112152be9eb7c60e22f013591706f3f57c2f",
+      "byteLength": 8730,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -10.87,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -10.87,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "d612ead4e79340bafd1e499ad484e7106e71406d6a39b6129d3007ba01636d49",
+      "canonicalParsedPointsSha256": "2e06462bb1f89d1aa1175d4c53339cd832770536ed89dd08c33a4a94ad2dcc75",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "CVJ ShadowBlade (silver nozzle)",
+      "processedName": "CVJ ShadowBlade (silver nozzle)",
+      "deviceFamily": "cvj shadowblade",
+      "rig": "711",
+      "sourceUrls": [
+        "https://tonedeafmonk.squig.link/data/CVJ%20ShadowBlade%20Silver%20L.txt",
+        "https://tonedeafmonk.squig.link/data/CVJ%20ShadowBlade%20Silver%20R.txt"
+      ],
+      "path": "measurements/ToneDeafMonk/data/in-ear/CVJ ShadowBlade (silver nozzle).csv",
+      "blobSha": "69dc6656ad9573568809e0d4a6cfa8d26a8f2d56",
+      "identity": "ToneDeafMonk|in-ear|711|cvj shadowblade (silver nozzle)",
+      "upstreamSha256": "cb9834e505775b6137025fc2cdb402a3f53e7b518d026ab3703f0414764668e6",
+      "byteLength": 8683,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -21.68,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -21.68,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "cce1db83d6c6f48f9b4b70a1ccdb886ccd47a0d57161c1c20ab44135ea305d7e",
+      "canonicalParsedPointsSha256": "01b6b33c2eb2b1446798a3312847d3f49b8e462d4ccc85b2294a3447489d9e52",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "B",
+    "split": "holdout"
+  },
+  {
+    "id": "frc1.1-05-0000a93dae04",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "64 Audio A12t (mX Apex module)",
+      "processedName": "64 Audio A12t (mX Apex module)",
+      "deviceFamily": "64 audio a12t",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/64%20Audio%20U12t%20(S2%20-%20mX)%20L.txt",
+        "https://superreview.squig.link/data/64%20Audio%20U12t%20(S2%20-%20mX)%20R.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/64 Audio A12t (mX Apex module).csv",
+      "blobSha": "02745ebdd82e25aaa9026e2295a3fd25c85ef7b9",
+      "identity": "Super Review|in-ear|711|64 audio a12t (mx apex module)",
+      "upstreamSha256": "77e2c2c1ad8eb29a4fd060041042fa9e1de0e90bdd22a344ca9a4d184b4989dc",
+      "byteLength": 8680,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -24.82,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -24.82,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "7ee8044d202651e9ee21ec3ca6490fe1a3def1996d7e4c7a26c24cd0c6dc606f",
+      "canonicalParsedPointsSha256": "7e1184b94ebda9cdbb11b0f31c11281df65b33c7bf9310d6b082eb572924ca15",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Tin HiFi T2 Plus (AZLA Sedna Light Short eartips)",
+      "processedName": "Tin HiFi T2 Plus (AZLA Sedna Light Short eartips)",
+      "deviceFamily": "tin hifi t2 plus",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Tin%20Hifi%20T2%20Plus%20(Sedna%20Light)%20L.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Tin HiFi T2 Plus (AZLA Sedna Light Short eartips).csv",
+      "blobSha": "012e436afb722c0263bf6cee5be6d61cc566e1e2",
+      "identity": "Super Review|in-ear|711|tin hifi t2 plus (azla sedna light short eartips)",
+      "upstreamSha256": "3103f0f4b099f97a6e56d8db5cfa74780f4093e0ca5b1eaceb093ce22e13e04c",
+      "byteLength": 8746,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -56.95,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -56.95,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "e5a06fb12c59ce09aaec1d4891327b401a04b00e6e096d9a074d2e91e08a7a93",
+      "canonicalParsedPointsSha256": "0c998c9d48be01e5094a447c295759fe7c97a2b6857a3949e28fa7842408b17b",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "same-collection/same-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "C",
+    "split": "development"
+  },
+  {
+    "id": "frc1.1-18-0003c77fd5b4",
+    "source": {
+      "collection": "HypetheSonics",
+      "form": "in-ear",
+      "model": "AUKEY Latitude (bass)",
+      "processedName": "AUKEY Latitude (bass)",
+      "deviceFamily": "aukey latitude",
+      "rig": "GRAS RA0045",
+      "sourceUrls": [
+        "https://www.hypethesonics.com/dbc/SPLdata/Latitude Bass L.txt",
+        "https://www.hypethesonics.com/dbc/SPLdata/Latitude Bass R.txt"
+      ],
+      "path": "measurements/HypetheSonics/data/in-ear/GRAS RA0045/AUKEY Latitude (bass).csv",
+      "blobSha": "b5be422709acce84940e717c83e41e42f76f21cd",
+      "identity": "HypetheSonics|in-ear|GRAS RA0045|aukey latitude (bass)",
+      "upstreamSha256": "978e9eaec78cd69292520b8d770832b1db9a7f5ae95b136fc9de99d9010737ca",
+      "byteLength": 8863,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -20.34,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -20.34,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "896b8be6fbef848bd9988035dbd1db14d3ab20ab2ea2820c931c561b707e97ff",
+      "canonicalParsedPointsSha256": "da824b514f5e5910c473646604b73e392cbe46c07a6267b53da29e6019129f65",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "NF ACOUS NE4 (clear faceplate)",
+      "processedName": "NF ACOUS NE4 (clear faceplate)",
+      "deviceFamily": "nf acous ne4",
+      "rig": "711",
+      "sourceUrls": [
+        "https://tonedeafmonk.squig.link/data/NF%20AUDIO%20NE4%20CLR%20L.txt"
+      ],
+      "path": "measurements/ToneDeafMonk/data/in-ear/NF ACOUS NE4 (clear faceplate).csv",
+      "blobSha": "44a7af555903d8a2012f956f69a4f7a5d8126322",
+      "identity": "ToneDeafMonk|in-ear|711|nf acous ne4 (clear faceplate)",
+      "upstreamSha256": "cff4530705aad52654332c322a1284434169214b1579cd72c772afde366145a6",
+      "byteLength": 8941,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -14.84,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -14.84,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "dfa69989bd43ccb1a93cb5f995119d0e11bb3d05045ba2dc8a3af9ce9c82a12c",
+      "canonicalParsedPointsSha256": "44d91ebfb57e715ec9cbee4d96fa10eefc284b05bd6fe47731cdaa9e3bb14763",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "C",
+    "split": "development"
+  },
+  {
+    "id": "frc1.1-01-000013d2c2cd",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Campfire Audio Pathfinder",
+      "processedName": "Campfire Audio Pathfinder",
+      "deviceFamily": "campfire audio pathfinder",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Campfire%20Audio%20Pathfinder%20L.txt",
+        "https://superreview.squig.link/data/Campfire%20Audio%20Pathfinder%20R.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Campfire Audio Pathfinder.csv",
+      "blobSha": "aea335a7b166d781ec282547c9c23e56bea7f015",
+      "identity": "Super Review|in-ear|711|campfire audio pathfinder",
+      "upstreamSha256": "ce785958e248099ed6bf54fe6434a979f03ed09807373e0c52bce093fbb22fc6",
+      "byteLength": 8755,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -26.69,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -26.69,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "0a44fab24d71a4c1693cedacf799e0a52654df92126defab2db5418b4eba99b5",
+      "canonicalParsedPointsSha256": "1e6d344eec7066845f0cd1f48c32a58200e91b5247dbf31d15e1adbfb327fe4d",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Oriolus Traillii",
+      "processedName": "Oriolus Traillii",
+      "deviceFamily": "oriolus traillii",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Oriolus%20Traillii%20L.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Oriolus Traillii.csv",
+      "blobSha": "4fd8b5daf49b7cfe229eb4941a046ba31bd554fd",
+      "identity": "Super Review|in-ear|711|oriolus traillii",
+      "upstreamSha256": "3a0838bac3c7c9245053fd80f8bc358d80e986d6371ffeb0c8bfe35f0f505746",
+      "byteLength": 8816,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -27.32,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -27.32,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "44e748b6be5370dd0fc66da0558b44ecb5130831d5a15265ea5d3ba191311571",
+      "canonicalParsedPointsSha256": "b9c6fa6f91987d947724fc4c64b9b8b1a47a0642eea6b2e47f9bd43cd0db8e9b",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "same-collection/same-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "C",
+    "split": "development"
+  },
+  {
+    "id": "frc1.1-16-0003622f8ec5",
+    "source": {
+      "collection": "HypetheSonics",
+      "form": "in-ear",
+      "model": "Noble Audio Sultan",
+      "processedName": "Noble Audio Sultan",
+      "deviceFamily": "noble audio sultan",
+      "rig": "GRAS RA0045",
+      "sourceUrls": [
+        "https://www.hypethesonics.com/dbc/SPLdata/Sultan L.txt",
+        "https://www.hypethesonics.com/dbc/SPLdata/Sultan R.txt"
+      ],
+      "path": "measurements/HypetheSonics/data/in-ear/GRAS RA0045/Noble Audio Sultan.csv",
+      "blobSha": "fff1e29485ade7e62b692cb1f44f51183f330db1",
+      "identity": "HypetheSonics|in-ear|GRAS RA0045|noble audio sultan",
+      "upstreamSha256": "55a990a5c0ed02c3fbaf03811e4130e72794734ddebfd4370db66a904a499ca9",
+      "byteLength": 8743,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -19.37,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -19.37,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "90eb8f74eb343091265f0ebb94222343bed748addf2dd08bd36534b30cd42477",
+      "canonicalParsedPointsSha256": "b5206ad8fb8ef663f07bd44999446e11cae9d11aaac4eba2e8fe178f64e26ce1",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "ZiiGaat Nuo",
+      "processedName": "ZiiGaat Nuo",
+      "deviceFamily": "ziigaat nuo",
+      "rig": "711",
+      "sourceUrls": [
+        "https://tonedeafmonk.squig.link/data/ZIIGAAT%20NUO%20L.txt",
+        "https://tonedeafmonk.squig.link/data/ZIIGAAT%20NUO%20R.txt"
+      ],
+      "path": "measurements/ToneDeafMonk/data/in-ear/ZiiGaat Nuo.csv",
+      "blobSha": "861f6496f535c8604b970db4bf3787380ebabfae",
+      "identity": "ToneDeafMonk|in-ear|711|ziigaat nuo",
+      "upstreamSha256": "cc238f239a4e51409ae2f81be85d19498f0c6c7c465485380ea623230a442c95",
+      "byteLength": 8772,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -20.96,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -20.96,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "f2bca389c4edcf7718a09f35fe2266872a0ab684ec6937c522d213200aff3e9b",
+      "canonicalParsedPointsSha256": "9934f54baef9cc6506920e7223f4f11373ba577bb1433ee82c51b265e005fe0c",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "cross-collection/cross-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "C",
+    "split": "holdout"
+  },
+  {
+    "id": "frc1.1-02-00002f5caf38",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Shuoer EJ07M Kinda Lava Edition",
+      "processedName": "Shuoer EJ07M Kinda Lava Edition",
+      "deviceFamily": "shuoer ej07m kinda lava edition",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Letshuoer%20EJ07M%20Kinda%20Lava%20L.txt",
+        "https://superreview.squig.link/data/Letshuoer%20EJ07M%20Kinda%20Lava%20R.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Shuoer EJ07M Kinda Lava Edition.csv",
+      "blobSha": "cd553f06a15def3c0496a1a6956f0fb8f7d918e9",
+      "identity": "Super Review|in-ear|711|shuoer ej07m kinda lava edition",
+      "upstreamSha256": "b8b544769ce2abe179efada998e822d1cfedfbe3797a58fa445ebe73f400f9c5",
+      "byteLength": 8744,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -16.35,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -16.35,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "34120281e04cabca903d26ff9c9ce52910463d22636a3bc6b2503cc2f310cd6f",
+      "canonicalParsedPointsSha256": "cf6e7e68df3f39565cc0bb75a893a113a2515d0520dccb4fb5f69ccf87ee1217",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "VSonic GR07 Bass Edition",
+      "processedName": "VSonic GR07 Bass Edition",
+      "deviceFamily": "vsonic gr07 bass edition",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Vsonic%20GR07%20(Bass)%20L.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/VSonic GR07 Bass Edition.csv",
+      "blobSha": "6478efa88116cdfac9dff1b0766423429113ef59",
+      "identity": "Super Review|in-ear|711|vsonic gr07 bass edition",
+      "upstreamSha256": "32aedc1c8affbddb4fa12a56b679a5c3dab564054cfe1987f97647c37573f6d4",
+      "byteLength": 8724,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -21.3,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -21.3,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "a77e834a9dea2da81e679ded5af587634b50d1cc379a8c88a2a437b388b8c1f7",
+      "canonicalParsedPointsSha256": "7ec7c81f6cd441da0babae3a238d701bdda7d8bc33e23a680c31274b7032c82f",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "same-collection/same-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "C",
+    "split": "holdout"
+  },
+  {
+    "id": "frc1.1-04-00007c13a25b",
+    "source": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Shuoer S12",
+      "processedName": "Shuoer S12",
+      "deviceFamily": "shuoer s12",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/Letshuoer%20S12%20L.txt",
+        "https://superreview.squig.link/data/Letshuoer%20S12%20R.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/Shuoer S12.csv",
+      "blobSha": "ac32b0c9446f1a8c472b004657b4ab3815ae3608",
+      "identity": "Super Review|in-ear|711|shuoer s12",
+      "upstreamSha256": "e243a9beb3e5a719a2f9af3a5c49832624c688fe3c61aa991f94be6dea4db131",
+      "byteLength": 8735,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -19.91,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -19.91,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "53a4b7d36eb47512877274b6c9f9a2594b3e83b1e24989dd7a9fc07121da860a",
+      "canonicalParsedPointsSha256": "7d7b1481c9e7e2cd24dce9a3e0d2e859dedd3b78e35a9e737c7fb6bcfe532865",
+      "parserCanonicalizerVersion": 2
+    },
+    "target": {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "FLC Technology FLC8P (gunmetal, black, gunmetal)",
+      "processedName": "FLC Technology FLC8P (gunmetal, black, gunmetal)",
+      "deviceFamily": "flc technology flc8p",
+      "rig": "711",
+      "sourceUrls": [
+        "https://superreview.squig.link/data/FLC%208P%20(gunmetal-black-gunmetal)%20L.txt"
+      ],
+      "path": "measurements/Super Review/data/in-ear/FLC Technology FLC8P (gunmetal, black, gunmetal).csv",
+      "blobSha": "005bf4bda310d8d3a69f8d6e05ef8d73ff98cc94",
+      "identity": "Super Review|in-ear|711|flc technology flc8p (gunmetal, black, gunmetal)",
+      "upstreamSha256": "83359c11e01195bd7ed8186c71a7a3c48ac07eab8100c40a09e2ad0f374c0588",
+      "byteLength": 8896,
+      "originalTerminalFrequencyHz": 19955.54,
+      "originalTerminalDb": -29.1,
+      "canonicalTerminalFrequencyHz": 20000,
+      "canonicalTerminalDb": -29.1,
+      "transformation": "terminal-flat-hold-to-v2-max",
+      "originalParsedPointsSha256": "e01a855f48e6aec97b765038dbac5d5b9a16ce11d0506e9ea75f80df317c3503",
+      "canonicalParsedPointsSha256": "d7b0f1e2a61f6911aafd40c00d6bb5fac6690b7102ac72d45091d16c462fd8e7",
+      "parserCanonicalizerVersion": 2
+    },
+    "pairing": "same-collection/same-rig",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "batch": "C",
+    "split": "holdout"
+  }
+]

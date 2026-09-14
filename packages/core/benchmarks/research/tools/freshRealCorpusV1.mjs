@@ -8,7 +8,11 @@ export const TREE = '671f0a72499ace671e4b0a293bc1948bb8330c96'
 export const SEED = 'autoeq-workbench:fresh-real-corpus-v1'
 export const CACHE = '.research-cache/fresh-real-corpus-v1'
 export const prior = new Set(['dunu titan s2','softears rsv','letshuoer mystic 8','letshuoer s12 ultra','subtonic storm','64 audio u12t','64 audio trio'])
-export const canonicalName = value => value.normalize('NFKD').toLowerCase().replace(/\([^)]*\)/g, '').replace(/[^a-z0-9]+/g, ' ').trim()
+export const canonicalDeviceFamily = value => value.normalize('NFKD').toLowerCase().replace(/\([^)]*\)/g, '').replace(/[^a-z0-9]+/g, ' ').trim()
+export const canonicalCurveName = value => value.normalize('NFKD').trim().replace(/\s+/g, ' ').toLocaleLowerCase()
+export const curveIdentity = ({collection,form,rig,processedName}) => `${collection}|${form}|${rig}|${canonicalCurveName(processedName)}`
+/** Historical alias retained only for family-level exclusions. */
+export const canonicalName = canonicalDeviceFamily
 export const sha256 = value => createHash('sha256').update(value).digest('hex')
 export const rawUrl = path => `https://raw.githubusercontent.com/${REPOSITORY}/${COMMIT}/${path.split('/').map(encodeURIComponent).join('/')}`
 export const stable = value => sha256(`${SEED}:${value}`)
@@ -45,8 +49,8 @@ export async function verifyUpstream() {
 }
 export function selectPairs(items, sourceCollection, targetCollection, count, used) {
   const left = items.filter(x => x.collection === sourceCollection && !used.has(x.identity)); const right = items.filter(x => x.collection === targetCollection && !used.has(x.identity))
-  const pairs = left.flatMap(a => right.filter(b => canonicalName(a.model) !== canonicalName(b.model)).map(b => ({ source:a, target:b, rank:stable(`${a.identity}|${b.identity}`) }))).sort((a,b)=>a.rank.localeCompare(b.rank))
-  const chosen=[]; for (const p of pairs) { if (chosen.length === count) break; if (used.has(p.source.identity)||used.has(p.target.identity)||[...used].some(id=>id.endsWith(`|${canonicalName(p.source.model)}`)||id.endsWith(`|${canonicalName(p.target.model)}`))) continue; chosen.push(p); used.add(p.source.identity); used.add(p.target.identity) }
+  const pairs = left.flatMap(a => right.filter(b => a.deviceFamily !== b.deviceFamily).map(b => ({ source:a, target:b, rank:stable(`${a.identity}|${b.identity}`) }))).sort((a,b)=>a.rank.localeCompare(b.rank))
+  const chosen=[]; for (const p of pairs) { if (chosen.length === count) break; if (used.has(p.source.identity)||used.has(p.target.identity)||[...used].some(id=>id.endsWith(`|${p.source.deviceFamily}`)||id.endsWith(`|${p.target.deviceFamily}`))) continue; chosen.push(p); used.add(p.source.identity); used.add(p.target.identity) }
   if (chosen.length !== count) throw new Error(`selection shortage ${sourceCollection}→${targetCollection}: ${chosen.length}/${count}`); return chosen
 }
 export function assignBatches(cases) { return [...cases].sort((a,b)=>stable(a.id).localeCompare(stable(b.id))).map((c,i)=>({...c,batch:['A','B','C'][Math.floor(i/6)],split:i%6<3?'development':'holdout'})) }

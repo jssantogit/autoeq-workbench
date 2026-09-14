@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { COMMIT, TREE, canonicalName, canonicalizeTerminalEndpoint, parseCsv, rawUrl, selectPairs, assignBatches, v2EvaluationGrid } from './freshRealCorpusV1.mjs'
+import { COMMIT, TREE, canonicalName, canonicalCurveName, curveIdentity, canonicalizeTerminalEndpoint, parseCsv, rawUrl, selectPairs, assignBatches, v2EvaluationGrid } from './freshRealCorpusV1.mjs'
 
 test('constructs immutable upstream URLs', () => {
   assert.match(rawUrl('measurements/Super Review/name_index.tsv'), new RegExp(`/${COMMIT}/`))
@@ -20,8 +20,14 @@ test('applies only the frozen terminal flat hold', () => {
 test('canonical prior-name aliases normalize deterministically', () => {
   assert.equal(canonicalName('Letshuoer S12-Ultra (2024)'), 'letshuoer s12 ultra')
 })
+test('strict curve identities preserve variants, rigs, and row order', () => {
+  const variants=['Sennheiser IE 300 (AZLA Sedna Light eartips)','Sennheiser IE 300 (Final Audio Type E eartips)','Truthear Nova (black double flange eartips)','Truthear Nova (white double flange eartips)','KEFINE Klean (black filter)','KEFINE Klean (silver filter)','1MORE Aero (ANC Off)','1MORE Aero (transparency mode)']
+  assert.equal(new Set(variants.map(canonicalCurveName)).size,variants.length)
+  assert.notEqual(curveIdentity({collection:'H',form:'in-ear',rig:'GRAS RA0045',processedName:'Zero Audio Carbo Tenore'}),curveIdentity({collection:'H',form:'in-ear',rig:'Bruel & Kjaer 5128',processedName:'Zero Audio Carbo Tenore'}))
+  const grouped=rows=>[...rows].sort(); assert.deepEqual(grouped(['z','a']),grouped(['a','z']))
+})
 test('selection prevents duplicate devices and batch assignment is stable', () => {
-  const items=['a','b','c','d'].map(model=>({collection:'X',rig:'711',model,path:model,identity:`X|711|${model}`}))
+  const items=['a','b','c','d'].map(model=>({collection:'X',rig:'711',model,deviceFamily:model,path:model,identity:`X|711|${model}`}))
   const pairs=selectPairs(items,'X','X',2,new Set()); assert.equal(new Set(pairs.flatMap(p=>[p.source.model,p.target.model])).size,4)
   const cases=Array.from({length:18},(_,i)=>({id:`c${i}`})); const a=assignBatches(cases), b=assignBatches(cases)
   assert.deepEqual(a,b); assert.deepEqual(a.map(x=>x.batch).sort(),['A','A','A','A','A','A','B','B','B','B','B','B','C','C','C','C','C','C'])
