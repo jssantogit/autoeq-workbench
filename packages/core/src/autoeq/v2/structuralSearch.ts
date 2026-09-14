@@ -974,6 +974,15 @@ export interface StructuralSearchTraceEvent {
   generatedProposals?: number
   admittedProposals?: number
   polishedProposals?: number
+  candidateSourceCounts?: Partial<Record<StructuralMutation, number>>
+  residualRegionsGenerated?: number
+  structuralSignaturesGenerated?: number
+  structuralSignaturesAdmitted?: number
+  structuralSignaturesRetained?: number
+  stallDiversifications?: number
+  replacementAttempts?: number
+  replacementPolished?: number
+  replacementAccepted?: number
   duplicateStates?: number
   nextStates?: number
   /** Raw capacity-gate accounting for this trace event; never a quality estimate. */
@@ -1383,9 +1392,13 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           admitted = diverse
         } else admitted = selected.map(s => s.proposal)
       } else {
-        admitted = policy === 'vnext'
-          ? admitDiverseStructuralCandidates(vnextPool, config.proposalsPerParent).map(entry => entry.proposal)
-          : ordered.slice(0, config.proposalsPerParent)
+        if (policy === 'vnext') {
+          admitted = admitDiverseStructuralCandidates(vnextPool, config.proposalsPerParent).map(entry => entry.proposal)
+          const seen = new Set(admitted.map(proposalKey))
+          for (const proposal of ordered) if (admitted.length < config.proposalsPerParent && !seen.has(proposalKey(proposal))) {
+            admitted.push(proposal); seen.add(proposalKey(proposal))
+          }
+        } else admitted = ordered.slice(0, config.proposalsPerParent)
       }
       admittedProposals += admitted.length
       for (const proposal of admitted) {
