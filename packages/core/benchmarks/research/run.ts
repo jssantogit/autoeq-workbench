@@ -51,6 +51,9 @@ import type {
 // runner keeps the established research entrypoint discoverable without
 // changing the default research plan or its case selection.
 export { runC2Census } from './c2RobustLossDevCensus.js'
+// C2b is an explicitly invoked holdout-only confirmation. It is never part of
+// the default research plan and rejects development/Batch C IDs at runtime.
+export { runC2bHoldoutConfirmation } from './c2HuberHoldoutConfirmation.js'
 
 export const RESEARCH_CASE_IDS: readonly ResearchCaseId[] = [
   'titan-to-storm',
