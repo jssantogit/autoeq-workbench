@@ -17,7 +17,9 @@ import {
   selectResidualFeatures,
   selectShelfEvidence,
   simplifyStructuralState,
+  type StructuralProposal,
 } from '../../../src/autoeq/v2/structuralSearch.js'
+import type { Filter } from '../../../src/types/filter.js'
 
 const frequencies = [
   50, 60, 70,
@@ -593,4 +595,60 @@ it('reports bounded VNext diversity telemetry inside beam generations', async ()
   const beam = events.find(event => event.type === 'beam-generation')!
   expect(typeof beam.structuralSignaturesGenerated).toBe('number')
   expect(typeof beam.structuralSignaturesAdmitted).toBe('number')
+})
+
+describe('VNext pre-benchmark correctness mechanisms', () => {
+  it('annotates only the unambiguous additive candidate and retains non-additive proposals', async () => {
+    const { createRegionAwareCandidatePool } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const bounds = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 8 })
+    const hs: Filter = { id: 'hs-parent', enabled: true, type: 'HS', frequencyHz: 12_000, gainDb: 2, q: 0.7 }
+    const ls: Filter = { id: 'ls-parent', enabled: true, type: 'LS', frequencyHz: 100, gainDb: -1, q: 0.7 }
+    const existingPk: Filter = { id: 'pk-parent', enabled: true, type: 'PK', frequencyHz: 900, gainDb: 1, q: 1 }
+    const addedPk: Filter = { id: 'new-pk', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: -3, q: 2 }
+    const parent = [hs, ls, existingPk]
+    const proposals: StructuralProposal[] = [
+      { mutation: 'add-pk', filters: [addedPk, hs, ls, existingPk] },
+      { mutation: 'remove', filters: [hs, ls] },
+      { mutation: 'type-mutation', filters: [hs, ls, { ...existingPk, type: 'HS' }] },
+      { mutation: 'split', filters: [hs, ls, { ...existingPk, id: 'split-a', gainDb: 0.5 }, { ...existingPk, id: 'split-b', frequencyHz: 950, gainDb: 0.5 }] },
+      { mutation: 'merge', filters: [hs, { ...ls, id: 'merged', frequencyHz: 300, gainDb: 0 }] },
+    ]
+    const pool = createRegionAwareCandidatePool(parent, [-3, -3, -3], [100, 1_000, 12_000], bounds, 3, proposals.length, proposals)
+    const additive = pool.find(entry => entry.proposal.mutation === 'add-pk')!
+    expect(additive.metadata?.filterType).toBe('PK')
+    expect(additive.metadata?.sign).toBe(-1)
+    expect(additive.candidateFilter?.frequencyHz).toBe(1_000)
+    for (const mutation of ['remove', 'type-mutation', 'split', 'merge'] as const) {
+      const entry = pool.find(candidate => candidate.proposal.mutation === mutation)!
+      expect(entry.metadata).toBeUndefined()
+      expect(entry.candidateFilter).toBeUndefined()
+    }
+  })
+
+  it('reports one coherent q31 VNext pool and bounded diversity telemetry before any benchmark', async () => {
+    const { runStructuralSearchVNext } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const { resolveScalableEffortConfig } = await import('../../../src/autoeq/v2/scalableStructuralSearch.js')
+    const events: Array<Record<string, unknown>> = []
+    let checks = 0
+    const config = resolveScalableEffortConfig(
+      resolveStructuralSearchConfig({ preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET, timeLimitSeconds: 30 }),
+      10,
+      6,
+    )
+    runStructuralSearchVNext({
+      desiredDb: [4, -4, 4, -4, 4, -4],
+      frequencies: [40, 100, 250, 630, 1_600, 10_000],
+      sampleRateHz: 48_000,
+      config,
+      deadline: { isExpired: () => ++checks > 300 },
+      onTrace: event => events.push(event as unknown as Record<string, unknown>),
+    })
+    const generation = events.find(event => event.type === 'beam-generation')!
+    const generatedFamilies = generation.candidateSourceCounts as Record<string, number>
+    expect(Object.values(generatedFamilies).reduce((sum, count) => sum + count, 0)).toBe(generation.generatedProposals)
+    expect(generation.admittedProposals).toBeLessThanOrEqual(config.proposalsPerParent)
+    expect(typeof generation.residualRegionsAdmitted).toBe('number')
+    expect(typeof generation.structuralSignaturesRetained).toBe('number')
+    expect(typeof generation.bestImprovementPhase).toBe('string')
+  })
 })

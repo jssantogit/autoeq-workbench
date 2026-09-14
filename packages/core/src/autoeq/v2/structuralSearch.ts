@@ -105,7 +105,10 @@ export interface StructuralCandidateMetadata {
 
 export interface StructuralCandidatePoolEntry {
   proposal: StructuralProposal
-  metadata: StructuralCandidateMetadata
+  /** Present only when the structural diff proves one additive candidate. */
+  metadata?: StructuralCandidateMetadata
+  /** The same proven additive element used to construct a replacement. */
+  candidateFilter?: Filter
   signature: string
 }
 
@@ -800,7 +803,7 @@ export function structuralFilterDifference(
       const filterKey = key(filter); const count = counts.get(filterKey) ?? 0
       if (count === 0) return true
       counts.set(filterKey, count - 1); return false
-    })
+    }).sort((left, right) => key(left).localeCompare(key(right)) || left.id.localeCompare(right.id))
   }
   return { added: consume(after, before), removed: consume(before, after) }
 }
@@ -855,26 +858,35 @@ export function createRegionAwareCandidatePool(
     Math.floor(((Math.log2(frequencyHz) - minLog) / span) * regions)))
   const proposals = generated ?? generateStructuralMutations(filters, residualDb, frequenciesHz, bounds, regions,
     Math.log2(bounds.maxFrequencyHz / bounds.minFrequencyHz) / regions, 'semantic')
-  return orderStructuralProposals(proposals).slice(0, maxEntries).flatMap((proposal) => {
+  return orderStructuralProposals(proposals).slice(0, maxEntries).map((proposal) => {
     const diff = structuralFilterDifference(filters, proposal.filters)
-    // Only additive proposals have an unambiguous residual-targeted candidate.
-    if (!proposal.mutation.startsWith('add-') || diff.added.length !== 1) return []
-    const changed = diff.added[0]!
-    const frequencyHz = changed.frequencyHz
+    // Additive metadata is valid only for an exact, one-element addition.
+    // Removals, type changes, splits, and merges remain searchable, but do
+    // not borrow identity from an arbitrary canonical array position.
+    const candidateFilter = proposal.mutation.startsWith('add-') &&
+      diff.added.length === 1 && diff.removed.length === 0
+      ? diff.added[0]
+      : undefined
+    if (candidateFilter === undefined) return {
+      proposal,
+      signature: structuralSignature(proposal.filters, bounds, regions),
+    }
+    const frequencyHz = candidateFilter.frequencyHz
     const nearest = frequenciesHz.reduce((best, frequency, index) =>
       Math.abs(Math.log2(frequency / frequencyHz)) < Math.abs(Math.log2(frequenciesHz[best]! / frequencyHz)) ? index : best, 0)
     const residual = residualDb[nearest] ?? 0
-    return [{
+    return {
       proposal,
+      candidateFilter,
       metadata: {
         mutationFamily: proposal.mutation,
         residualRegion: regionFor(frequencyHz),
         sign: residual === 0 ? 0 : residual > 0 ? 1 : -1,
-        filterType: changed?.type ?? 'PK',
+        filterType: candidateFilter.type,
         structuralRegion: regionFor(frequencyHz),
       },
       signature: structuralSignature(proposal.filters, bounds, regions),
-    }]
+    }
   })
 }
 
@@ -889,8 +901,12 @@ export function admitDiverseStructuralCandidates(
   const signatures = new Set<string>()
   for (const entry of entries) {
     if (selected.length === maxEntries) return selected
-    if (!regions.has(entry.metadata.residualRegion) || !families.has(entry.metadata.mutationFamily) || !signatures.has(entry.signature)) {
-      selected.push(entry); regions.add(entry.metadata.residualRegion); families.add(entry.metadata.mutationFamily); signatures.add(entry.signature)
+    const region = entry.metadata?.residualRegion
+    if ((region !== undefined && !regions.has(region)) || !families.has(entry.proposal.mutation) || !signatures.has(entry.signature)) {
+      selected.push(entry)
+      if (region !== undefined) regions.add(region)
+      families.add(entry.proposal.mutation)
+      signatures.add(entry.signature)
     }
   }
   for (const entry of entries) {
@@ -976,6 +992,7 @@ export interface StructuralSearchTraceEvent {
   polishedProposals?: number
   candidateSourceCounts?: Partial<Record<StructuralMutation, number>>
   residualRegionsGenerated?: number
+  residualRegionsAdmitted?: number
   structuralSignaturesGenerated?: number
   structuralSignaturesAdmitted?: number
   structuralSignaturesRetained?: number
@@ -983,6 +1000,9 @@ export interface StructuralSearchTraceEvent {
   replacementAttempts?: number
   replacementPolished?: number
   replacementAccepted?: number
+  acceptedReplacementGain?: number
+  bestImprovementPhase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement'
+  finalImprovementPhase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement'
   duplicateStates?: number
   nextStates?: number
   /** Raw capacity-gate accounting for this trace event; never a quality estimate. */
@@ -1310,6 +1330,8 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
   }
   let beam: SearchState[] = [initialPolished]
   let beamGeneration = 0
+  let bestImprovementPhase: StructuralSearchTraceEvent['bestImprovementPhase'] = 'beam'
+  let finalImprovementPhase: StructuralSearchTraceEvent['finalImprovementPhase'] = 'beam'
   stateTrace('start', initialPolished, { phase: 'beam', status: 'start' })
 
   while (beam.length > 0 && !deadline.isExpired()) {
@@ -1319,8 +1341,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     let polishedProposals = 0
     let duplicateStates = 0
     let vnextRegions = new Set<number>()
+    let vnextAdmittedRegions = new Set<number>()
     let vnextGeneratedSignatures = new Set<string>()
     let vnextAdmittedSignatures = new Set<string>()
+    const candidateSourceCounts: Partial<Record<StructuralMutation, number>> = {}
+    const vnextPoolsByParent = new Map<string, StructuralCandidatePoolEntry[]>()
     let capacityPressure = createCapacityPressureDelta()
     let frontierUtilization = createFrontierUtilizationDelta()
 
@@ -1336,6 +1361,9 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
           config.featureRegionCount, config.minFeatureSeparationOctaves, config.candidatePolicy, config.mergeProximityOctaves)
         : generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
       generatedProposals += proposals.length
+      if (policy === 'vnext') for (const proposal of proposals) {
+        candidateSourceCounts[proposal.mutation] = (candidateSourceCounts[proposal.mutation] ?? 0) + 1
+      }
       for (const proposal of proposals) {
         frontierUtilization.generatedCandidateFilterCountMax = Math.max(frontierUtilization.generatedCandidateFilterCountMax, proposal.filters.length)
         if (proposal.filters.length === config.maxFilters) frontierUtilization.generatedCandidatesAtCapacity += 1
@@ -1354,19 +1382,28 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         ? createRegionAwareCandidatePool(parent.filters, solution.residualDb, frequencies, bounds,
           config.featureRegionCount ?? 1, proposals.length, proposals)
         : []
-      for (const entry of vnextPool) { vnextRegions.add(entry.metadata.residualRegion); vnextGeneratedSignatures.add(entry.signature) }
+      if (policy === 'vnext') vnextPoolsByParent.set(parent.candidateId, vnextPool)
+      for (const entry of vnextPool) {
+        if (entry.metadata !== undefined) vnextRegions.add(entry.metadata.residualRegion)
+        vnextGeneratedSignatures.add(entry.signature)
+      }
 
       let admitted: StructuralProposal[] = []
 
       if (config.admission === 'q31-b4-p8') {
-        const prePolishScored = ordered.map((proposal, lexicalRank) => {
+        const prePolishScored: Array<{
+          key: string; proposal: StructuralProposal; lexicalRank: number; quantized: Filter[]
+          rmseDb: number; maxAbsDb: number; filterCount: number; cancellationScore: number; semanticKey: string
+        }> = []
+        for (const [lexicalRank, proposal] of ordered.entries()) {
+          if (deadline.isExpired()) break
           const quantized = quantizeV2Filters(proposal.filters, bounds)
           const magnitude = cascadeMagnitudeDb(quantized, frequencies, sampleRateHz)
           const residualDb = desiredDb.map((desired, index) => desired - magnitude[index]!)
           const metrics = calculateErrorMetrics(residualDb, frequencies)
           const cancellationScore = auditCancellations(quantized, frequencies, sampleRateHz ?? 48000).totalScore
 
-          return {
+          prePolishScored.push({
             key: proposalKey(proposal),
             proposal,
             lexicalRank,
@@ -1376,8 +1413,8 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
             filterCount: quantized.length,
             cancellationScore,
             semanticKey: proposalKey(proposal)
-          }
-        })
+          })
+        }
 
         const rmseRanked = [...prePolishScored].sort((a, b) =>
           a.rmseDb - b.rmseDb ||
@@ -1388,9 +1425,18 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         )
         const selected = selectQuotaProposals(prePolishScored, rmseRanked, 6, 2, config.proposalsPerParent)
         if (policy === 'vnext') {
-          const diverse = admitDiverseStructuralCandidates(vnextPool, config.proposalsPerParent).map(entry => entry.proposal)
+          // Diversity selects first, but q31 remains the quality ordering for
+          // representatives and every remaining fill slot.
+          const q31Order = new Map<string, number>()
+          for (const item of [...selected, ...rmseRanked, ...prePolishScored]) {
+            if (!q31Order.has(item.key)) q31Order.set(item.key, q31Order.size)
+          }
+          const rankedPool = [...vnextPool].sort((left, right) =>
+            (q31Order.get(proposalKey(left.proposal)) ?? Number.MAX_SAFE_INTEGER) -
+            (q31Order.get(proposalKey(right.proposal)) ?? Number.MAX_SAFE_INTEGER))
+          const diverse = admitDiverseStructuralCandidates(rankedPool, config.proposalsPerParent).map(entry => entry.proposal)
           const seen = new Set(diverse.map(proposalKey))
-          for (const item of selected) if (diverse.length < config.proposalsPerParent && !seen.has(proposalKey(item.proposal))) {
+          for (const item of [...selected, ...rmseRanked, ...prePolishScored]) if (diverse.length < config.proposalsPerParent && !seen.has(proposalKey(item.proposal))) {
             diverse.push(item.proposal); seen.add(proposalKey(item.proposal))
           }
           admitted = diverse
@@ -1405,7 +1451,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         } else admitted = ordered.slice(0, config.proposalsPerParent)
       }
       admittedProposals += admitted.length
-      if (policy === 'vnext') for (const proposal of admitted) vnextAdmittedSignatures.add(structuralSignature(proposal.filters, bounds, config.featureRegionCount ?? 1))
+      if (policy === 'vnext') for (const proposal of admitted) {
+        const entry = vnextPool.find(candidate => proposalKey(candidate.proposal) === proposalKey(proposal))
+        if (entry?.metadata !== undefined) vnextAdmittedRegions.add(entry.metadata.residualRegion)
+        vnextAdmittedSignatures.add(structuralSignature(proposal.filters, bounds, config.featureRegionCount ?? 1))
+      }
       for (const proposal of admitted) {
         frontierUtilization.admittedCandidateFilterCountMax = Math.max(frontierUtilization.admittedCandidateFilterCountMax, proposal.filters.length)
         if (proposal.filters.length === config.maxFilters) frontierUtilization.admittedCandidatesAtCapacity += 1
@@ -1451,6 +1501,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       polishedProposals,
       duplicateStates,
       ...(policy === 'vnext' ? { residualRegionsGenerated: vnextRegions.size, structuralSignaturesGenerated: vnextGeneratedSignatures.size, structuralSignaturesAdmitted: vnextAdmittedSignatures.size, structuralSignaturesRetained: new Set(beam.map(state => structuralSignature(state.filters, bounds, config.featureRegionCount ?? 1))).size } : {}),
+      ...(policy === 'vnext' ? { candidateSourceCounts, residualRegionsAdmitted: vnextAdmittedRegions.size, bestImprovementPhase, finalImprovementPhase } : {}),
       nextStates: nextStates.length,
       capacityPressure,
       frontierUtilization,
@@ -1460,36 +1511,51 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     // one-for-one basin escape before the unchanged late rescue phases.
     if (nextStates.length === 0 && policy === 'vnext' && !deadline.isExpired()) {
       const parent = selectReferencePoint(beam)
-      const solution = evaluateV2Solution(parent.filters, desiredDb, frequencies, sampleRateHz)
-      const candidates = admitDiverseStructuralCandidates(createRegionAwareCandidatePool(
-        parent.filters, solution.residualDb, frequencies, bounds,
-        config.featureRegionCount ?? 1, config.proposalsPerParent,
-      ).filter(entry => entry.proposal.mutation === 'add-pk'), config.proposalsPerParent)
+      const candidates = admitDiverseStructuralCandidates((vnextPoolsByParent.get(parent.candidateId) ?? [])
+        .filter(entry => entry.proposal.mutation === 'add-pk' && entry.candidateFilter !== undefined), config.proposalsPerParent)
       const victims = parent.filters.map((_, index) => ({ index, state: evaluateStructuralFilters(
         parent.filters.filter((__, candidateIndex) => candidateIndex !== index), `vnext-victim-${index}`,
         bounds, desiredDb, frequencies, sampleRateHz,
       ) })).sort((left, right) => compareKeys(referenceSelectorKey(left.state), referenceSelectorKey(right.state)) || left.index - right.index)
         .slice(0, config.proposalsPerParent)
       let attempts = 0
+      let replacementPolished = 0
+      let replacementAccepted = 0
+      let acceptedReplacementGain = 0
       for (const victim of victims) for (const candidate of candidates) {
         if (deadline.isExpired() || attempts >= config.proposalsPerParent) break
         // Proposals are canonicalized, so position is not candidate identity.
         // Find the structurally added filter without IDs or ordering.
-        const replacement = structuralFilterDifference(parent.filters, candidate.proposal.filters).added[0]
-        if (replacement === undefined) continue
+        const replacementDiff = structuralFilterDifference(parent.filters, candidate.proposal.filters)
+        if (replacementDiff.added.length !== 1 || replacementDiff.removed.length !== 0) continue
+        const replacement = replacementDiff.added[0]!
         const kept = parent.filters.filter((_, index) => index !== victim.index)
         const polished = polishFilters(canonical([...kept, { ...replacement, id: uniqueId(kept, `vnext-replace-${attempts}`) }]),
           localPolishEvaluationBudget(config.localPolishEvaluations, parent.filters.length), bounds, desiredDb, frequencies, deadline, sampleRateHz)
         attempts += 1
+        replacementPolished += 1
+        const key = semanticFilterKey(polished.filters)
+        if (visited.has(key)) continue
+        visited.add(key)
         if (compareKeys(referenceSelectorKey(polished), referenceSelectorKey(parent)) < 0) {
+          const gain = Math.max(parent.rmseDb / 0.25, parent.maxAbsDb / 0.75) -
+            Math.max(polished.rmseDb / 0.25, polished.maxAbsDb / 0.75)
+          acceptedReplacementGain += gain
+          replacementAccepted += 1
           polished.candidateId = String(candidateCounter++).padStart(4, '0'); nextStates.push(polished)
         }
       }
       if (attempts > 0) stateTrace('phase', nextStates[0] ?? parent, {
         phase: 'vnext-replacement', status: 'end', attempts, acceptedSteps: nextStates.length,
         stallDiversifications: 1, replacementAttempts: attempts,
-        replacementPolished: attempts, replacementAccepted: nextStates.length,
+        replacementPolished, replacementAccepted, acceptedReplacementGain,
+        bestImprovementPhase: replacementAccepted > 0 ? 'vnext-replacement' : bestImprovementPhase,
+        finalImprovementPhase: replacementAccepted > 0 ? 'vnext-replacement' : finalImprovementPhase,
       })
+      if (replacementAccepted > 0) {
+        bestImprovementPhase = 'vnext-replacement'
+        finalImprovementPhase = 'vnext-replacement'
+      }
     }
     if (nextStates.length === 0) {
       stateTrace('beam-stop', traceState, {
@@ -1503,6 +1569,10 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     beam = policy === 'vnext'
       ? retainDiverseStructuralBeam(combined, config.beamWidth, bounds, config.featureRegionCount ?? 1)
       : retainParetoBeam(combined, config.beamWidth)
+    if (policy === 'vnext' && selectReferencePoint(beam).candidateId !== initialPolished.candidateId) {
+      bestImprovementPhase = 'beam'
+      finalImprovementPhase = 'beam'
+    }
     beamGeneration += 1
   }
 
