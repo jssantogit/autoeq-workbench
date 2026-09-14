@@ -6,7 +6,7 @@
     "effortLevel": 6,
     "trajectorySeconds": 30,
     "executionModel": "generation-work-bounded-replay",
-    "deterministicGenerationBound": 4,
+    "deterministicGenerationBound": 21,
     "repeatCount": 3,
     "snapshotSampling": "first completed generation; every 10th completed generation; final completed generation before deadline",
     "baselinePolicy": "frozen-ordinary-search",
@@ -30,7 +30,7 @@
       "workProfile": "full"
     }
   },
-  "observationCount": 60,
-  "aggregateSha256": "a462f32140413b14b987587a379062dd63fe71ecf9be2d1b3a166284e8042ee9",
-  "evidenceSha256": "3ac87d9d1c9556f902654825eb6de46f80c7837ce853da6e23487ad97a774d29"
+  "observationCount": 90,
+  "aggregateSha256": "7cdcda44f6b906bf70da1d0dee6ea5a1e0fb085465495df0ab9001555cd5d864",
+  "evidenceSha256": "fceb99fffed81d400c73ed651d78d507dd2ba1ebbf805c156b1cd4c66baeccc0"
 }

@@ -1830,7 +1830,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         ? generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds,
           config.featureRegionCount, config.minFeatureSeparationOctaves, config.candidatePolicy, config.mergeProximityOctaves)
         : generateStructuralMutations(parent.filters, solution.residualDb, frequencies, bounds)
-      const baselineParentCapture: StructuralSearchParentCapture | undefined = !baselineSnapshotSelected
+      // Keep only the current generation's lightweight ledger.  A selected
+      // generation is deep-copied at its boundary; an otherwise unselected
+      // generation is retained just long enough to support a natural terminal
+      // snapshot discovered after ordinary work finishes.
+      const baselineParentCapture: StructuralSearchParentCapture | undefined = onBaselineSnapshot === undefined
         ? undefined
         : {
             parent,
@@ -2045,8 +2049,9 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
 
       if (
         onBaselineSnapshot !== undefined &&
-        baselineSnapshotSelected &&
-        (captureBaselineGeneration === undefined || captureBaselineGeneration(beamGeneration, isFinal))
+        (baselineSnapshotSelected
+          ? (captureBaselineGeneration === undefined || captureBaselineGeneration(beamGeneration, isFinal))
+          : (isFinal && (captureBaselineGeneration === undefined || captureBaselineGeneration(beamGeneration, true))))
       ) {
         onBaselineSnapshot(snapshotBaselineGeneration(
           beamGeneration,

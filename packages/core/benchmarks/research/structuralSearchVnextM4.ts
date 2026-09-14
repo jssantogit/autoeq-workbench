@@ -51,6 +51,8 @@ import { loadSyntheticGroundTruthCorpus } from './syntheticCorpus.js'
 
 export const M4_FROZEN_BOUNDARY = '956be9ddcea4152276744df3565274352b9a9f80' as const
 export const M4_SNAPSHOT_STRIDE = 10 as const
+/** Frozen M4 replay envelope: 21 completed generations (0 through 20). */
+export const M4_DETERMINISTIC_GENERATION_BOUND = 21 as const
 export const M4_TRAJECTORY_SECONDS = 30 as const
 export const M4_REPEAT_COUNT = M3_REPEAT_COUNT
 export const M4_STRUCTURAL_CEILING = M3_STRUCTURAL_CEILING
@@ -142,6 +144,8 @@ export interface M4CandidateComparison {
 }
 
 export interface M4FamilyMetrics {
+  /** Number of snapshots for which this family produced no candidate. */
+  familyLocalCandidateAbsence: number
   candidatesGenerated: number
   semanticDuplicatesRejected: number
   validCandidates: number
@@ -154,6 +158,11 @@ export interface M4FamilyMetrics {
   candidatesImprovingReferenceMaxAbs: number
   candidatesImprovingBoth: number
   topologySubstitutionWins: number
+  /**
+   * Candidate-stage classifications plus the legacy NO_STRUCTURAL_CANDIDATE
+   * family-local counter.  The latter is not the generation-global
+   * decomposition in M4AggregateGroup.decomposition.
+   */
   classifications: Record<M4FailureClassification, number>
 }
 
@@ -192,12 +201,53 @@ export interface M4SnapshotObservation {
   repeatIndex: number
   snapshot: StructuralSearchGenerationSnapshot
   result: M4GenerationOracleResult
+  /** True when this is the trajectory's terminal completed generation. */
+  isFinal?: boolean
+  /** The terminal generation for this case/repeat, when known. */
+  terminalGeneration?: number | null
+  terminalReason?: 'natural-stop' | 'deterministic-bound'
+  samplingReasons?: Array<'first' | 'stride' | 'final'>
+}
+
+export interface M4TrajectoryCoverage {
+  caseId: string
+  caseLabel?: string
+  family: 'real' | 'synthetic'
+  split: 'development' | 'holdout' | 'sanity'
+  repeatIndex: number
+  capturedGenerations: number[]
+  terminalGeneration: number | null
+  terminalReason: 'natural-stop' | 'deterministic-bound' | 'unknown'
+  samplingAdequate: boolean
+  fingerprint: string
+}
+
+export interface M4RepeatIdentity {
+  caseId: string
+  repeatCount: number
+  identical: boolean
+  trajectoryFingerprints: string[]
+}
+
+export interface M4WinLocation {
+  caseId: string
+  caseLabel?: string
+  split: 'development' | 'holdout' | 'sanity'
+  repeatIndex: number
+  generation: number
+  phase: 'first' | 'middle' | 'final' | 'unscheduled'
+  families: M4OracleFamily[]
+  oracleWinCount: number
+  prePolishQualifiedWins: number
+  polishedEmergentWins: number
 }
 
 export interface M4AggregateEvidence {
   real: M4AggregateGroup
   synthetic: M4AggregateGroup
   byFamily: Record<M4OracleFamily, M4FamilyMetrics>
+  /** Generation-global decomposition; NO_STRUCTURAL_CANDIDATE is per snapshot. */
+  generationGlobalDecomposition: Record<M4FailureClassification, number>
   decomposition: Record<M4FailureClassification, number>
   decisionBoundary: M4DecisionBoundary
 }
@@ -212,7 +262,12 @@ export interface M4AggregateGroup {
   competitiveRepeatCount: number
   competitiveGenerationCount: number
   winsByCase: string[]
+  trajectoryCoverage: M4TrajectoryCoverage[]
+  repeatIdentityByCase: Record<string, M4RepeatIdentity>
+  winLocations: M4WinLocation[]
   byFamily: Record<M4OracleFamily, M4FamilyMetrics>
+  /** Generation-global decomposition; candidate-stage counts are event counts. */
+  generationGlobalDecomposition: Record<M4FailureClassification, number>
   decomposition: Record<M4FailureClassification, number>
 }
 
@@ -274,6 +329,7 @@ const EMPTY_CLASSIFICATIONS = (): Record<M4FailureClassification, number> => ({
 })
 
 const emptyFamilyMetrics = (): M4FamilyMetrics => ({
+  familyLocalCandidateAbsence: 0,
   candidatesGenerated: 0,
   semanticDuplicatesRejected: 0,
   validCandidates: 0,
@@ -665,6 +721,7 @@ function countByComparison(
 }
 
 function mergeFamilyMetrics(target: M4FamilyMetrics, source: M4FamilyMetrics): void {
+  target.familyLocalCandidateAbsence += source.familyLocalCandidateAbsence
   for (const key of [
     'candidatesGenerated',
     'semanticDuplicatesRejected',
@@ -682,6 +739,105 @@ function mergeFamilyMetrics(target: M4FamilyMetrics, source: M4FamilyMetrics): v
   for (const classification of Object.keys(target.classifications) as M4FailureClassification[]) {
     target.classifications[classification] += source.classifications[classification]
   }
+}
+
+function trajectorySamplingAdequate(
+  generations: readonly number[],
+  terminalGeneration: number | null,
+): boolean {
+  if (terminalGeneration === null) return false
+  const unique = [...new Set(generations)].sort((left, right) => left - right)
+  return unique.includes(0) &&
+    unique.includes(terminalGeneration) &&
+    unique.length >= M4_DECISION_RULE.requiredSnapshotPhases &&
+    unique.some((generation) => generation > 0 && generation < terminalGeneration && generation % M4_SNAPSHOT_STRIDE === 0)
+}
+
+function buildTrajectoryCoverage(
+  observations: readonly M4SnapshotObservation[],
+  family: 'real' | 'synthetic',
+): M4TrajectoryCoverage[] {
+  const rows = observations.filter((observation) => observation.family === family)
+  const grouped = new Map<string, M4SnapshotObservation[]>()
+  for (const row of rows) {
+    const key = `${row.caseId}|${row.repeatIndex}`
+    const group = grouped.get(key) ?? []
+    group.push(row)
+    grouped.set(key, group)
+  }
+  return [...grouped.values()].map((group) => {
+    const ordered = [...group].sort((left, right) => left.snapshot.generation - right.snapshot.generation)
+    const capturedGenerations = [...new Set(ordered.map((row) => row.snapshot.generation))].sort((left, right) => left - right)
+    const finalRow = ordered.find((row) => row.isFinal)
+    const terminalGeneration = finalRow?.terminalGeneration ?? ordered.at(-1)?.terminalGeneration ?? capturedGenerations.at(-1) ?? null
+    const terminalReason: M4TrajectoryCoverage['terminalReason'] = finalRow?.terminalReason ?? ordered.at(-1)?.terminalReason ?? 'unknown'
+    return {
+      caseId: ordered[0]!.caseId,
+      ...(ordered[0]!.caseLabel === undefined ? {} : { caseLabel: ordered[0]!.caseLabel }),
+      family,
+      split: ordered[0]!.split,
+      repeatIndex: ordered[0]!.repeatIndex,
+      capturedGenerations,
+      terminalGeneration,
+      terminalReason,
+      samplingAdequate: trajectorySamplingAdequate(capturedGenerations, terminalGeneration),
+      fingerprint: hashM4Evidence(ordered.map((row) => ({ snapshot: row.snapshot, result: row.result }))),
+    }
+  }).sort((left, right) => left.caseId.localeCompare(right.caseId) || left.repeatIndex - right.repeatIndex)
+}
+
+function buildRepeatIdentityByCase(
+  trajectories: readonly M4TrajectoryCoverage[],
+): Record<string, M4RepeatIdentity> {
+  const grouped = new Map<string, M4TrajectoryCoverage[]>()
+  for (const trajectory of trajectories) {
+    const group = grouped.get(trajectory.caseId) ?? []
+    group.push(trajectory)
+    grouped.set(trajectory.caseId, group)
+  }
+  return Object.fromEntries([...grouped.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([caseId, group]) => {
+    const ordered = [...group].sort((left, right) => left.repeatIndex - right.repeatIndex)
+    const trajectoryFingerprints = ordered.map((trajectory) => trajectory.fingerprint)
+    return [caseId, {
+      caseId,
+      repeatCount: ordered.length,
+      identical: new Set(trajectoryFingerprints).size <= 1,
+      trajectoryFingerprints,
+    } satisfies M4RepeatIdentity]
+  })) as Record<string, M4RepeatIdentity>
+}
+
+function buildWinLocations(
+  observations: readonly M4SnapshotObservation[],
+  family: 'real' | 'synthetic',
+): M4WinLocation[] {
+  return observations
+    .filter((observation) => observation.family === family)
+    .flatMap((observation) => {
+      const wins = observation.result.candidates.filter((candidate) => candidate.classification === 'ORACLE_WIN')
+      if (wins.length === 0) return []
+      const phase: M4WinLocation['phase'] = observation.isFinal
+        ? 'final'
+        : observation.snapshot.generation === 0
+          ? 'first'
+          : observation.snapshot.generation % M4_SNAPSHOT_STRIDE === 0
+            ? 'middle'
+            : 'unscheduled'
+      return [{
+        caseId: observation.caseId,
+        ...(observation.caseLabel === undefined ? {} : { caseLabel: observation.caseLabel }),
+        split: observation.split,
+        repeatIndex: observation.repeatIndex,
+        generation: observation.snapshot.generation,
+        phase,
+        families: [...new Set(wins.map((candidate) => candidate.family))].sort(),
+        oracleWinCount: wins.length,
+        prePolishQualifiedWins: wins.filter((candidate) => candidate.prePolishBeatsWorstOrdinary).length,
+        polishedEmergentWins: wins.filter((candidate) => !candidate.prePolishBeatsWorstOrdinary).length,
+      } satisfies M4WinLocation]
+    })
+    .sort((left, right) => left.caseId.localeCompare(right.caseId) ||
+      left.repeatIndex - right.repeatIndex || left.generation - right.generation)
 }
 
 /** Evaluate one immutable baseline snapshot; no search state is mutated. */
@@ -805,6 +961,7 @@ export function evaluateM4GenerationSnapshot(
       rawCounts[family].candidatesGenerated - candidates.filter((candidate) => candidate.family === family).length,
     )
     if (rawCounts[family].candidatesGenerated === 0) {
+      familyCandidates[family].familyLocalCandidateAbsence += 1
       familyCandidates[family].classifications.NO_STRUCTURAL_CANDIDATE += 1
     }
   }
@@ -856,6 +1013,8 @@ function mergeResultsIntoGroup(
   const caseIds = new Set(rows.map((row) => row.caseId))
   const repeats = new Set(rows.map((row) => `${row.caseId}|${row.repeatIndex}`))
   const competitiveRepeats = new Set(competitiveRows.map((row) => `${row.caseId}|${row.repeatIndex}`))
+  const trajectoryCoverage = buildTrajectoryCoverage(rows, family)
+  const winLocations = buildWinLocations(rows, family)
   return {
     family,
     snapshotCount: rows.length,
@@ -866,7 +1025,11 @@ function mergeResultsIntoGroup(
     competitiveRepeatCount: competitiveRepeats.size,
     competitiveGenerationCount: competitiveRows.length,
     winsByCase: [...new Set(competitiveRows.map((row) => row.caseId))].sort(),
+    trajectoryCoverage,
+    repeatIdentityByCase: buildRepeatIdentityByCase(trajectoryCoverage),
+    winLocations,
     byFamily,
+    generationGlobalDecomposition: decomposition,
     decomposition,
   }
 }
@@ -882,25 +1045,16 @@ function decideM4(
   const winningRepeats = new Set(realRows.filter((row) => row.result.candidates.some((candidate) => candidate.classification === 'ORACLE_WIN')).map((row) => `${row.caseId}|${row.repeatIndex}`)).size
   const winningGenerations = realRows.filter((row) => row.result.candidates.some((candidate) => candidate.classification === 'ORACLE_WIN')).length
   const missingInformation: string[] = []
-  const realRuns = new Map<string, number[]>()
-  for (const row of realRows) {
-    const key = `${row.caseId}|${row.repeatIndex}`
-    const generations = realRuns.get(key) ?? []
-    generations.push(row.snapshot.generation)
-    realRuns.set(key, generations)
-  }
-  const adequatelySampledRuns = [...realRuns.values()].filter((generations) => {
-    const unique = [...new Set(generations)].sort((left, right) => left - right)
-    return unique.includes(0) &&
-      unique.some((generation) => generation > 0 && generation % M4_SNAPSHOT_STRIDE === 0) &&
-      unique.length >= M4_DECISION_RULE.requiredSnapshotPhases
-  }).length
-  const samplingAdequate = realRuns.size >= M4_DECISION_RULE.requiredRealCaseCount * M4_DECISION_RULE.requiredRealRepeatCount &&
-    adequatelySampledRuns === realRuns.size
+  const realRuns = aggregate.real.trajectoryCoverage
+  const adequatelySampledRuns = realRuns.filter((trajectory) => trajectory.samplingAdequate).length
+  const samplingAdequate = realRuns.length >= M4_DECISION_RULE.requiredRealCaseCount * M4_DECISION_RULE.requiredRealRepeatCount &&
+    adequatelySampledRuns === realRuns.length
   const coverage = realRows.length > 0 && aggregate.real.generationCount > 0
   if (!coverage) missingInformation.push('real snapshot coverage is empty')
   if (!samplingAdequate) {
-    missingInformation.push('real sampling lacks first/middle/final snapshots for all six cases and three repeats')
+    const inadequate = realRuns.filter((trajectory) => !trajectory.samplingAdequate)
+      .map((trajectory) => `${trajectory.caseId}#${trajectory.repeatIndex}=[${trajectory.capturedGenerations.join(',')}]`)
+    missingInformation.push(`real sampling lacks first/middle/final snapshots for ${inadequate.length} trajectories${inadequate.length === 0 ? '' : `: ${inadequate.join('; ')}`}`)
   }
   const meaningful = coverage &&
     samplingAdequate &&
@@ -949,6 +1103,7 @@ export function aggregateM4OracleEvidence(
     real,
     synthetic,
     byFamily,
+    generationGlobalDecomposition: decomposition,
     decomposition,
     decisionBoundary: decideM4(observations, { real, synthetic }),
   }
@@ -956,6 +1111,126 @@ export function aggregateM4OracleEvidence(
 
 export function hashM4Evidence(value: unknown): string {
   return createHash('sha256').update(JSON.stringify(value)).digest('hex')
+}
+
+const M4_FAMILY_METRIC_ROWS: readonly [string, keyof M4FamilyMetrics][] = [
+  ['generated', 'candidatesGenerated'],
+  ['semantic duplicates', 'semanticDuplicatesRejected'],
+  ['valid', 'validCandidates'],
+  ['pre-polish beats worst admitted', 'prePolishCandidatesBeatingWorstOrdinary'],
+  ['pre-polish beats best ordinary', 'prePolishCandidatesBeatingBestOrdinary'],
+  ['polished beats worst ordinary', 'polishedCandidatesBeatingWorstOrdinary'],
+  ['polished beats best ordinary', 'polishedCandidatesBeatingBestOrdinary'],
+  ['would survive frozen beam', 'candidatesWouldSurviveFrozenParetoBeam'],
+  ['improves reference RMSE', 'candidatesImprovingReferenceRmse'],
+  ['improves reference maxAbs', 'candidatesImprovingReferenceMaxAbs'],
+  ['improves both', 'candidatesImprovingBoth'],
+  ['topology-substitution wins', 'topologySubstitutionWins'],
+  ['family-local absence', 'familyLocalCandidateAbsence'],
+]
+
+const M4_CLASSIFICATION_ROWS: readonly [string, M4FailureClassification][] = [
+  ['PREPOLISH_REJECTED', 'PREPOLISH_REJECTED'],
+  ['POLISH_FAILURE', 'POLISH_FAILURE'],
+  ['BEAM_REJECTED', 'BEAM_REJECTED'],
+  ['REFERENCE_NONIMPROVING', 'REFERENCE_NONIMPROVING'],
+  ['ORACLE_WIN', 'ORACLE_WIN'],
+]
+
+function renderFamilyMetricsTable(group: M4AggregateGroup): string[] {
+  const lines = [
+    `### ${group.family} per-family census`,
+    '',
+    'Candidate-stage metrics use candidate-event denominators (generated, deduplicated, or valid as applicable). Family-local absence is one count per snapshot and is not the generation-global absence denominator.',
+    '',
+    `| metric | ${M4_ORACLE_FAMILIES.join(' | ')} |`,
+    `| --- | ${M4_ORACLE_FAMILIES.map(() => '---').join(' | ')} |`,
+  ]
+  for (const [label, key] of M4_FAMILY_METRIC_ROWS) {
+    lines.push(`| ${label} | ${M4_ORACLE_FAMILIES.map((family) => String(group.byFamily[family][key] as number)).join(' | ')} |`)
+  }
+  for (const [label, classification] of M4_CLASSIFICATION_ROWS) {
+    lines.push(`| ${label} | ${M4_ORACLE_FAMILIES.map((family) => String(group.byFamily[family].classifications[classification])).join(' | ')} |`)
+  }
+  return lines
+}
+
+function renderGenerationGlobalDecomposition(group: M4AggregateGroup): string[] {
+  const decomposition = group.generationGlobalDecomposition ?? group.decomposition
+  const candidateEvents = Object.entries(decomposition)
+    .filter(([classification]) => classification !== 'NO_STRUCTURAL_CANDIDATE')
+    .reduce((total, [, count]) => total + count, 0)
+  return [
+    `### ${group.family} generation-global decomposition`,
+    '',
+    `Denominator: ${group.snapshotCount} captured snapshot generations. \`NO_STRUCTURAL_CANDIDATE\` counts generations with no valid candidate across O1–O4 (${decomposition.NO_STRUCTURAL_CANDIDATE}); the remaining stages are candidate-event counts (${candidateEvents}) and therefore are not the same denominator.`,
+    '',
+    `- ${Object.entries(decomposition).map(([key, value]) => `${key}=${value}`).join('; ')}`,
+  ]
+}
+
+function renderTrajectoryCoverage(group: M4AggregateGroup): string[] {
+  const lines = [
+    `### ${group.family} trajectory sampling`,
+    '',
+    '| case | repeat | captured generations | terminal | adequacy |',
+    '| --- | ---: | --- | --- | --- |',
+  ]
+  for (const trajectory of group.trajectoryCoverage) {
+    const label = trajectory.caseLabel ?? trajectory.caseId
+    const terminal = trajectory.terminalGeneration === null
+      ? 'unknown'
+      : `${trajectory.terminalGeneration} (${trajectory.terminalReason})`
+    lines.push(`| ${label} | ${trajectory.repeatIndex + 1} | ${trajectory.capturedGenerations.join(', ')} | ${terminal} | ${trajectory.samplingAdequate ? 'yes' : 'no'} |`)
+  }
+  if (group.trajectoryCoverage.length === 0) lines.push('| none | — | — | — | no |')
+  return lines
+}
+
+function renderRepeatIdentity(group: M4AggregateGroup): string[] {
+  const lines = [
+    `### ${group.family} deterministic repeat identity`,
+    '',
+    'Repeat outputs are compared as trajectory fingerprints. Identical deterministic repeats remain protocol repeats, not independent replication evidence.',
+    '',
+  ]
+  const entries = Object.values(group.repeatIdentityByCase).sort((left, right) => left.caseId.localeCompare(right.caseId))
+  if (entries.length === 0) return [...lines, '- none']
+  for (const entry of entries) {
+    lines.push(`- ${entry.caseId}: ${entry.identical ? 'identical' : 'different'} across ${entry.repeatCount} repeats.`)
+  }
+  return lines
+}
+
+function dominantFailureStage(group: M4AggregateGroup): string {
+  const decomposition = group.generationGlobalDecomposition ?? group.decomposition
+  const stages: Array<[string, number]> = [
+    ['admission', decomposition.PREPOLISH_REJECTED],
+    ['polish', decomposition.POLISH_FAILURE],
+    ['beam retention', decomposition.BEAM_REJECTED],
+    ['reference selection', decomposition.REFERENCE_NONIMPROVING],
+  ]
+  stages.sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+  return `${stages[0]![0]} (${stages[0]![1]})`
+}
+
+function renderWinLocalization(group: M4AggregateGroup): string[] {
+  const familyWins = M4_ORACLE_FAMILIES
+    .map((family) => `${family}=${group.byFamily[family].classifications.ORACLE_WIN}`)
+    .join('; ')
+  const locations = group.winLocations.map((location) =>
+    `${location.caseLabel ?? location.caseId}#${location.repeatIndex + 1}@g${location.generation}/${location.phase}[${location.families.join(', ')}]`,
+  )
+  const prePolishQualifiedWins = group.winLocations.reduce((total, location) => total + location.prePolishQualifiedWins, 0)
+  const polishedEmergentWins = group.winLocations.reduce((total, location) => total + location.polishedEmergentWins, 0)
+  return [
+    `### ${group.family} result localization`,
+    '',
+    `- ORACLE_WIN by family: ${familyWins}.`,
+    `- Win locations (case/repeat/generation/phase): ${locations.length === 0 ? 'none' : locations.join('; ')}.`,
+    `- Pre-polish-qualified wins: ${prePolishQualifiedWins}; wins emerging only after equal-work polish: ${polishedEmergentWins}.`,
+    `- Dominant failure stage among candidate events: ${dominantFailureStage(group)}.`,
+  ]
 }
 
 export function renderM4FinalReport(result: Pick<M4CampaignResult, 'protocol' | 'aggregate' | 'conclusion' | 'evidenceSha256'>): string {
@@ -975,7 +1250,32 @@ export function renderM4FinalReport(result: Pick<M4CampaignResult, 'protocol' | 
     `- Real snapshots/cases: ${result.aggregate.real.snapshotCount}/${result.aggregate.real.caseCount}; synthetic snapshots/cases: ${result.aggregate.synthetic.snapshotCount}/${result.aggregate.synthetic.caseCount}.`,
     `- Real oracle-win coverage: ${rule.developmentWinningCases} development cases, ${rule.holdoutWinningCases} holdout cases, ${rule.overallWinningCases} overall cases, ${rule.winningRepeats} repeats, ${rule.winningGenerations} generations.`,
     `- Sampling adequacy (first/middle/final across six cases and three repeats): **${rule.samplingAdequate ? 'yes' : 'no'}**.`,
-    `- Decomposition: ${Object.entries(result.aggregate.decomposition).map(([key, value]) => `${key}=${value}`).join('; ')}.`,
+    `- Generation-global decomposition (real): ${Object.entries(result.aggregate.real.generationGlobalDecomposition ?? result.aggregate.real.decomposition).map(([key, value]) => `${key}=${value}`).join('; ')}.`,
+    `- Generation-global decomposition (synthetic): ${Object.entries(result.aggregate.synthetic.generationGlobalDecomposition ?? result.aggregate.synthetic.decomposition).map(([key, value]) => `${key}=${value}`).join('; ')}.`,
+    `- Aggregate generation-global decomposition (real + synthetic): ${Object.entries(result.aggregate.generationGlobalDecomposition ?? result.aggregate.decomposition).map(([key, value]) => `${key}=${value}`).join('; ')}.`,
+    '',
+    'The committed 331d93c evidence used deterministicGenerationBound=4, so it captured only generation 0 and imposed terminal generation 3 (two snapshots per trajectory) and was sampling-inadequate. Those historical values are not used to tune this corrected census.',
+    'The historical partial coverage values (development 2/3, holdout 1/3, overall 3/6) remain incomplete evidence only and are not used to tune M4b.',
+    '',
+    ...renderTrajectoryCoverage(result.aggregate.real),
+    '',
+    ...renderRepeatIdentity(result.aggregate.real),
+    '',
+    ...renderFamilyMetricsTable(result.aggregate.real),
+    '',
+    ...renderGenerationGlobalDecomposition(result.aggregate.real),
+    '',
+    ...renderWinLocalization(result.aggregate.real),
+    '',
+    ...renderTrajectoryCoverage(result.aggregate.synthetic),
+    '',
+    ...renderRepeatIdentity(result.aggregate.synthetic),
+    '',
+    ...renderFamilyMetricsTable(result.aggregate.synthetic),
+    '',
+    ...renderGenerationGlobalDecomposition(result.aggregate.synthetic),
+    '',
+    ...renderWinLocalization(result.aggregate.synthetic),
     '',
     '## Frozen decision rule',
     '',
@@ -1028,7 +1328,7 @@ function preparedM4Cases(options: M4RunnerOptions): PreparedM4Case[] {
 /** Run a deterministic, work-bounded M4 capture/evaluation campaign. */
 export function runStructuralSearchM4(options: M4RunnerOptions = {}): M4CampaignResult {
   const repeats = options.repeats ?? M4_REPEAT_COUNT
-  const maxGenerations = options.deterministicMaxGenerations ?? 21
+  const maxGenerations = options.deterministicMaxGenerations ?? M4_DETERMINISTIC_GENERATION_BOUND
   const stride = options.snapshotStride ?? M4_SNAPSHOT_STRIDE
   if (!Number.isSafeInteger(repeats) || repeats <= 0) throw new Error('M4 repeats must be a positive integer')
   if (!Number.isSafeInteger(maxGenerations) || maxGenerations <= 0) throw new Error('M4 deterministic generation bound must be a positive integer')
@@ -1044,6 +1344,7 @@ export function runStructuralSearchM4(options: M4RunnerOptions = {}): M4Campaign
     for (let repeatIndex = 0; repeatIndex < repeats; repeatIndex += 1) {
       const captured: StructuralSearchGenerationSnapshot[] = []
       let imposedBoundaryReached = false
+      let naturalStopGeneration: number | null = null
       runStructuralSearch({
         desiredDb: prepared.desiredDb,
         frequencies: prepared.frequenciesHz,
@@ -1057,6 +1358,9 @@ export function runStructuralSearchM4(options: M4RunnerOptions = {}): M4Campaign
           if (event.type === 'beam-generation' && event.generation !== undefined && event.generation >= maxGenerations - 1) {
             imposedBoundaryReached = true
           }
+          if (event.type === 'beam-stop' && event.reason === 'no-next-states') {
+            naturalStopGeneration = event.generation ?? null
+          }
         },
         // Select the deterministic terminal generation before ordinary work
         // starts so unselected generations do not retain an oracle ledger.
@@ -1064,7 +1368,19 @@ export function runStructuralSearchM4(options: M4RunnerOptions = {}): M4Campaign
           (generation === maxGenerations - 1 || selectM4SnapshotGeneration(generation, isFinal)),
         onBaselineSnapshot: (snapshot) => captured.push(snapshot),
       })
+      const terminalGeneration = naturalStopGeneration !== null && naturalStopGeneration < maxGenerations - 1
+        ? naturalStopGeneration
+        : (imposedBoundaryReached ? maxGenerations - 1 : captured.at(-1)?.generation ?? null)
+      const terminalReason: M4SnapshotObservation['terminalReason'] =
+        naturalStopGeneration !== null && naturalStopGeneration < maxGenerations - 1
+          ? 'natural-stop'
+          : 'deterministic-bound'
       for (const snapshot of captured) {
+        const samplingReasons: M4SnapshotObservation['samplingReasons'] = [
+          ...(snapshot.generation === 0 ? ['first' as const] : []),
+          ...(snapshot.generation % M4_SNAPSHOT_STRIDE === 0 ? ['stride' as const] : []),
+          ...(snapshot.generation === terminalGeneration ? ['final' as const] : []),
+        ]
         const result = evaluateM4GenerationSnapshot(snapshot, bounds, {
           localPolishEvaluations: config.localPolishEvaluations,
           beamWidth: config.beamWidth,
@@ -1077,6 +1393,10 @@ export function runStructuralSearchM4(options: M4RunnerOptions = {}): M4Campaign
           repeatIndex,
           snapshot,
           result,
+          isFinal: snapshot.generation === terminalGeneration,
+          terminalGeneration,
+          terminalReason,
+          samplingReasons,
         })
       }
     }

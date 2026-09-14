@@ -7,6 +7,7 @@ import {
   type StructuralSearchGenerationSnapshot,
 } from '../../../../src/autoeq/v2/structuralSearch.js'
 import {
+  M4_DETERMINISTIC_GENERATION_BOUND,
   M4_SNAPSHOT_STRIDE,
   evaluateM4GenerationSnapshot,
   generateM4OracleCandidates,
@@ -25,10 +26,10 @@ const parentFilters: Filter[] = [
   { id: 'parent-pk', enabled: true, type: 'PK', frequencyHz: 1_000, gainDb: 1, q: 1 },
 ]
 
-function snapshot(): StructuralSearchGenerationSnapshot {
+function snapshot(filters: Filter[] = parentFilters): StructuralSearchGenerationSnapshot {
   const parent = {
     candidateId: 'parent',
-    filters: parentFilters,
+    filters,
     rmseDb: 2,
     maxAbsDb: 3,
     cancellationScore: 0,
@@ -59,11 +60,58 @@ function snapshot(): StructuralSearchGenerationSnapshot {
 
 describe('structural-search M4 candidate-oracle diagnostics', () => {
   it('uses a frozen first/every-N/final generation sampling rule', () => {
+    expect(M4_DETERMINISTIC_GENERATION_BOUND).toBe(21)
     expect(M4_SNAPSHOT_STRIDE).toBe(10)
     expect(selectM4SnapshotGeneration(0, false)).toBe(true)
     expect(selectM4SnapshotGeneration(1, false)).toBe(false)
     expect(selectM4SnapshotGeneration(10, false)).toBe(true)
     expect(selectM4SnapshotGeneration(11, true)).toBe(true)
+
+    const capturedByBound = Array.from({ length: M4_DETERMINISTIC_GENERATION_BOUND }, (_, generation) => generation)
+      .filter((generation) => selectM4SnapshotGeneration(generation))
+    expect(capturedByBound).toEqual([0, 10, 20])
+  })
+
+  it('captures a natural terminal generation even when it is not a stride generation', () => {
+    const config = resolveStructuralSearchConfig({ preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET })
+    const captured: StructuralSearchGenerationSnapshot[] = []
+    let naturalStopGeneration: number | null = null
+    const seedFilters: Filter[] = [{
+      id: 'natural-stop-seed',
+      enabled: true,
+      type: 'PK',
+      frequencyHz: 1_000,
+      gainDb: 2,
+      q: 1,
+    }]
+    runStructuralSearch({
+      desiredDb: [0, 0],
+      frequencies: [100, 10_000],
+      sampleRateHz: 48_000,
+      config,
+      seedFilters,
+      deadline: { isExpired: () => false },
+      onTrace: (event) => {
+        if (event.type === 'beam-stop' && event.reason === 'no-next-states') {
+          naturalStopGeneration = event.generation ?? null
+        }
+      },
+      captureBaselineGeneration: (generation, isFinal) =>
+        selectM4SnapshotGeneration(generation, isFinal),
+      onBaselineSnapshot: (value) => captured.push(value),
+    })
+
+    expect(naturalStopGeneration).toBeGreaterThan(0)
+    expect(naturalStopGeneration).not.toBe(10)
+    expect(captured.map((value) => value.generation)).toEqual([0, naturalStopGeneration])
+  })
+
+  it('keeps family-local candidate absence separate from generation-global absence', () => {
+    const evaluation = evaluateM4GenerationSnapshot(snapshot([]), bounds)
+
+    expect(evaluation.byFamily.O4_TOPOLOGY_SUBSTITUTION.familyLocalCandidateAbsence).toBe(1)
+    expect(evaluation.byFamily.O4_TOPOLOGY_SUBSTITUTION.classifications.NO_STRUCTURAL_CANDIDATE).toBe(1)
+    expect(evaluation.decomposition.NO_STRUCTURAL_CANDIDATE).toBe(0)
   })
 
   it('constructs deterministic O1/O2/O3 candidates and rejects semantic duplicates', () => {
@@ -79,7 +127,7 @@ describe('structural-search M4 candidate-oracle diagnostics', () => {
     expect(first.filter((candidate) => candidate.family === 'O4_TOPOLOGY_SUBSTITUTION').every((candidate) => candidate.filters.length === 1)).toBe(true)
   })
 
-  it('evaluates an oracle candidate offline without changing baseline results', () => {
+  it('preserves observer-only baseline equivalence while evaluating an oracle offline', () => {
     const config = resolveStructuralSearchConfig({ preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET })
     const input = {
       desiredDb: [0, 5, 0, 3, 0],
@@ -119,13 +167,38 @@ describe('structural-search M4 candidate-oracle diagnostics', () => {
       localPolishEvaluations: config.localPolishEvaluations,
       beamWidth: config.beamWidth,
     })
-    expect(evaluation.baselineResult).toEqual(evaluation.baselineResult)
+    expect(instrumented).toEqual(baseline)
     expect(evaluation.metrics).toHaveProperty('candidatesGenerated')
     expect(evaluation.candidates.every((candidate) => candidate.enteredBaselineBeam === false)).toBe(true)
     expect(evaluation.candidates.every((candidate) =>
       candidate.work.coordinateTrials <= candidate.work.polishEvaluationBudget,
     )).toBe(true)
     expect(evaluation.candidates.every((candidate) => candidate.prePolish.comparatorKey.length > 0)).toBe(true)
+  })
+
+  it('uses the same bounded equal-work polish budget for every oracle candidate', () => {
+    const config = resolveStructuralSearchConfig({ preset: MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET })
+    const captured: StructuralSearchGenerationSnapshot[] = []
+    runStructuralSearch({
+      desiredDb: [0, 5, 0, 3, 0],
+      frequencies: [100, 500, 1_000, 2_000, 10_000],
+      sampleRateHz: 48_000,
+      config,
+      seedFilters: [],
+      deadline: { isExpired: () => false },
+      captureBaselineGeneration: (generation) => generation === 0,
+      onBaselineSnapshot: (value) => captured.push(value),
+    })
+    const evaluation = evaluateM4GenerationSnapshot(captured[0]!, bounds, {
+      localPolishEvaluations: config.localPolishEvaluations,
+      beamWidth: config.beamWidth,
+    })
+
+    expect(evaluation.candidates.length).toBeGreaterThan(0)
+    expect(new Set(evaluation.candidates.map((candidate) => candidate.work.polishEvaluationBudget)).size).toBe(1)
+    expect(evaluation.candidates.every((candidate) =>
+      candidate.work.coordinateTrials <= candidate.work.polishEvaluationBudget,
+    )).toBe(true)
   })
 
   it('does not retain an unselected generation ledger', () => {

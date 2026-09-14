@@ -1,330 +1,1391 @@
 {
   "real": {
     "family": "real",
-    "snapshotCount": 36,
+    "snapshotCount": 54,
     "caseCount": 6,
     "repeatCount": 18,
-    "generationCount": 36,
-    "competitiveCaseCount": 3,
-    "competitiveRepeatCount": 9,
-    "competitiveGenerationCount": 9,
+    "generationCount": 54,
+    "competitiveCaseCount": 5,
+    "competitiveRepeatCount": 15,
+    "competitiveGenerationCount": 24,
     "winsByCase": [
       "titan-to-mystic-8",
-      "titan-to-s12-ultra",
-      "titan-to-storm"
+      "titan-to-rsv",
+      "titan-to-storm",
+      "titan-to-trio",
+      "titan-to-u12t"
     ],
-    "byFamily": {
-      "O1_RESIDUAL_EXTREMUM_PK": {
-        "candidatesGenerated": 36,
-        "semanticDuplicatesRejected": 0,
-        "validCandidates": 36,
-        "prePolishCandidatesBeatingWorstOrdinary": 21,
-        "prePolishCandidatesBeatingBestOrdinary": 0,
-        "polishedCandidatesBeatingWorstOrdinary": 33,
-        "polishedCandidatesBeatingBestOrdinary": 9,
-        "candidatesWouldSurviveFrozenParetoBeam": 15,
-        "candidatesImprovingReferenceRmse": 9,
-        "candidatesImprovingReferenceMaxAbs": 9,
-        "candidatesImprovingBoth": 3,
-        "topologySubstitutionWins": 0,
-        "classifications": {
-          "NO_STRUCTURAL_CANDIDATE": 0,
-          "PREPOLISH_REJECTED": 15,
-          "POLISH_FAILURE": 3,
-          "BEAM_REJECTED": 9,
-          "REFERENCE_NONIMPROVING": 6,
-          "ORACLE_WIN": 3
-        }
+    "trajectoryCoverage": [
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "b21c6960c440846360d4cd16920a2dd9408bb1598e4456c0268d600a442175d0"
       },
-      "O2_RESIDUAL_REGION_PK": {
-        "candidatesGenerated": 36,
-        "semanticDuplicatesRejected": 0,
-        "validCandidates": 36,
-        "prePolishCandidatesBeatingWorstOrdinary": 33,
-        "prePolishCandidatesBeatingBestOrdinary": 24,
-        "polishedCandidatesBeatingWorstOrdinary": 33,
-        "polishedCandidatesBeatingBestOrdinary": 9,
-        "candidatesWouldSurviveFrozenParetoBeam": 12,
-        "candidatesImprovingReferenceRmse": 9,
-        "candidatesImprovingReferenceMaxAbs": 6,
-        "candidatesImprovingBoth": 3,
-        "topologySubstitutionWins": 0,
-        "classifications": {
-          "NO_STRUCTURAL_CANDIDATE": 0,
-          "PREPOLISH_REJECTED": 3,
-          "POLISH_FAILURE": 3,
-          "BEAM_REJECTED": 21,
-          "REFERENCE_NONIMPROVING": 3,
-          "ORACLE_WIN": 6
-        }
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "b21c6960c440846360d4cd16920a2dd9408bb1598e4456c0268d600a442175d0"
       },
-      "O3_SHELF_EVIDENCE": {
-        "candidatesGenerated": 39,
-        "semanticDuplicatesRejected": 0,
-        "validCandidates": 39,
-        "prePolishCandidatesBeatingWorstOrdinary": 36,
-        "prePolishCandidatesBeatingBestOrdinary": 0,
-        "polishedCandidatesBeatingWorstOrdinary": 24,
-        "polishedCandidatesBeatingBestOrdinary": 0,
-        "candidatesWouldSurviveFrozenParetoBeam": 9,
-        "candidatesImprovingReferenceRmse": 3,
-        "candidatesImprovingReferenceMaxAbs": 3,
-        "candidatesImprovingBoth": 0,
-        "topologySubstitutionWins": 0,
-        "classifications": {
-          "NO_STRUCTURAL_CANDIDATE": 0,
-          "PREPOLISH_REJECTED": 3,
-          "POLISH_FAILURE": 12,
-          "BEAM_REJECTED": 15,
-          "REFERENCE_NONIMPROVING": 9,
-          "ORACLE_WIN": 0
-        }
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "b21c6960c440846360d4cd16920a2dd9408bb1598e4456c0268d600a442175d0"
       },
-      "O4_TOPOLOGY_SUBSTITUTION": {
-        "candidatesGenerated": 54,
-        "semanticDuplicatesRejected": 0,
-        "validCandidates": 54,
-        "prePolishCandidatesBeatingWorstOrdinary": 39,
-        "prePolishCandidatesBeatingBestOrdinary": 9,
-        "polishedCandidatesBeatingWorstOrdinary": 54,
-        "polishedCandidatesBeatingBestOrdinary": 3,
-        "candidatesWouldSurviveFrozenParetoBeam": 6,
-        "candidatesImprovingReferenceRmse": 6,
-        "candidatesImprovingReferenceMaxAbs": 0,
-        "candidatesImprovingBoth": 0,
-        "topologySubstitutionWins": 3,
-        "classifications": {
-          "NO_STRUCTURAL_CANDIDATE": 18,
-          "PREPOLISH_REJECTED": 15,
-          "POLISH_FAILURE": 0,
-          "BEAM_REJECTED": 33,
-          "REFERENCE_NONIMPROVING": 3,
-          "ORACLE_WIN": 3
-        }
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "bf0c8aeabf80236f1ae43a24d4444406f5de40c05faf329c44ccce6a1db00628"
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "bf0c8aeabf80236f1ae43a24d4444406f5de40c05faf329c44ccce6a1db00628"
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "bf0c8aeabf80236f1ae43a24d4444406f5de40c05faf329c44ccce6a1db00628"
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "caseLabel": "Titan → S12 Ultra",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "5661ee79ed36f672bc69c487af7b77facfaf1f1d1b59156272f4454a42246644"
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "caseLabel": "Titan → S12 Ultra",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "5661ee79ed36f672bc69c487af7b77facfaf1f1d1b59156272f4454a42246644"
+      },
+      {
+        "caseId": "titan-to-s12-ultra",
+        "caseLabel": "Titan → S12 Ultra",
+        "family": "real",
+        "split": "development",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "5661ee79ed36f672bc69c487af7b77facfaf1f1d1b59156272f4454a42246644"
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "24dc80efdc7d34da5f3f9d04205918d88a1fd2aeec0dc40a197bafd6ccae74f7"
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "24dc80efdc7d34da5f3f9d04205918d88a1fd2aeec0dc40a197bafd6ccae74f7"
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "24dc80efdc7d34da5f3f9d04205918d88a1fd2aeec0dc40a197bafd6ccae74f7"
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "a2cb7b51f9db255b31f981c4375db6d045211c6f6c022f30227c0f89b5581959"
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "a2cb7b51f9db255b31f981c4375db6d045211c6f6c022f30227c0f89b5581959"
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "a2cb7b51f9db255b31f981c4375db6d045211c6f6c022f30227c0f89b5581959"
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "ea7989b7ed523dcd1bf0229c47e287cb88f2662dee9d5cfa8a062b61db24d907"
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "ea7989b7ed523dcd1bf0229c47e287cb88f2662dee9d5cfa8a062b61db24d907"
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "family": "real",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "ea7989b7ed523dcd1bf0229c47e287cb88f2662dee9d5cfa8a062b61db24d907"
+      }
+    ],
+    "repeatIdentityByCase": {
+      "titan-to-mystic-8": {
+        "caseId": "titan-to-mystic-8",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "b21c6960c440846360d4cd16920a2dd9408bb1598e4456c0268d600a442175d0",
+          "b21c6960c440846360d4cd16920a2dd9408bb1598e4456c0268d600a442175d0",
+          "b21c6960c440846360d4cd16920a2dd9408bb1598e4456c0268d600a442175d0"
+        ]
+      },
+      "titan-to-rsv": {
+        "caseId": "titan-to-rsv",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "bf0c8aeabf80236f1ae43a24d4444406f5de40c05faf329c44ccce6a1db00628",
+          "bf0c8aeabf80236f1ae43a24d4444406f5de40c05faf329c44ccce6a1db00628",
+          "bf0c8aeabf80236f1ae43a24d4444406f5de40c05faf329c44ccce6a1db00628"
+        ]
+      },
+      "titan-to-s12-ultra": {
+        "caseId": "titan-to-s12-ultra",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "5661ee79ed36f672bc69c487af7b77facfaf1f1d1b59156272f4454a42246644",
+          "5661ee79ed36f672bc69c487af7b77facfaf1f1d1b59156272f4454a42246644",
+          "5661ee79ed36f672bc69c487af7b77facfaf1f1d1b59156272f4454a42246644"
+        ]
+      },
+      "titan-to-storm": {
+        "caseId": "titan-to-storm",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "24dc80efdc7d34da5f3f9d04205918d88a1fd2aeec0dc40a197bafd6ccae74f7",
+          "24dc80efdc7d34da5f3f9d04205918d88a1fd2aeec0dc40a197bafd6ccae74f7",
+          "24dc80efdc7d34da5f3f9d04205918d88a1fd2aeec0dc40a197bafd6ccae74f7"
+        ]
+      },
+      "titan-to-trio": {
+        "caseId": "titan-to-trio",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "a2cb7b51f9db255b31f981c4375db6d045211c6f6c022f30227c0f89b5581959",
+          "a2cb7b51f9db255b31f981c4375db6d045211c6f6c022f30227c0f89b5581959",
+          "a2cb7b51f9db255b31f981c4375db6d045211c6f6c022f30227c0f89b5581959"
+        ]
+      },
+      "titan-to-u12t": {
+        "caseId": "titan-to-u12t",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "ea7989b7ed523dcd1bf0229c47e287cb88f2662dee9d5cfa8a062b61db24d907",
+          "ea7989b7ed523dcd1bf0229c47e287cb88f2662dee9d5cfa8a062b61db24d907",
+          "ea7989b7ed523dcd1bf0229c47e287cb88f2662dee9d5cfa8a062b61db24d907"
+        ]
       }
     },
-    "decomposition": {
-      "NO_STRUCTURAL_CANDIDATE": 0,
-      "PREPOLISH_REJECTED": 36,
-      "POLISH_FAILURE": 18,
-      "BEAM_REJECTED": 78,
-      "REFERENCE_NONIMPROVING": 21,
-      "ORACLE_WIN": 12
-    }
-  },
-  "synthetic": {
-    "family": "synthetic",
-    "snapshotCount": 24,
-    "caseCount": 4,
-    "repeatCount": 12,
-    "generationCount": 24,
-    "competitiveCaseCount": 3,
-    "competitiveRepeatCount": 9,
-    "competitiveGenerationCount": 15,
-    "winsByCase": [
-      "synthetic-d-dense-known-structure",
-      "synthetic-e-high-q-valid",
-      "synthetic-h-alternating-structure"
+    "winLocations": [
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 0,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 16,
+        "prePolishQualifiedWins": 16,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 1,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 16,
+        "prePolishQualifiedWins": 16,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 2,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-mystic-8",
+        "caseLabel": "Titan → Mystic 8",
+        "split": "development",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 16,
+        "prePolishQualifiedWins": 16,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "split": "development",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "split": "development",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-rsv",
+        "caseLabel": "Titan → RSV",
+        "split": "development",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-storm",
+        "caseLabel": "Titan → Storm",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-trio",
+        "caseLabel": "Titan → Trio",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O3_SHELF_EVIDENCE",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 5,
+        "prePolishQualifiedWins": 5,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 0,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O3_SHELF_EVIDENCE",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 5,
+        "prePolishQualifiedWins": 5,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 1,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 10,
+        "phase": "middle",
+        "families": [
+          "O2_RESIDUAL_REGION_PK",
+          "O3_SHELF_EVIDENCE",
+          "O4_TOPOLOGY_SUBSTITUTION"
+        ],
+        "oracleWinCount": 5,
+        "prePolishQualifiedWins": 5,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "titan-to-u12t",
+        "caseLabel": "Titan → U12t",
+        "split": "holdout",
+        "repeatIndex": 2,
+        "generation": 20,
+        "phase": "final",
+        "families": [
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      }
     ],
     "byFamily": {
       "O1_RESIDUAL_EXTREMUM_PK": {
-        "candidatesGenerated": 39,
+        "familyLocalCandidateAbsence": 0,
+        "candidatesGenerated": 174,
         "semanticDuplicatesRejected": 0,
-        "validCandidates": 39,
-        "prePolishCandidatesBeatingWorstOrdinary": 30,
+        "validCandidates": 174,
+        "prePolishCandidatesBeatingWorstOrdinary": 162,
         "prePolishCandidatesBeatingBestOrdinary": 0,
-        "polishedCandidatesBeatingWorstOrdinary": 39,
-        "polishedCandidatesBeatingBestOrdinary": 21,
-        "candidatesWouldSurviveFrozenParetoBeam": 21,
-        "candidatesImprovingReferenceRmse": 30,
+        "polishedCandidatesBeatingWorstOrdinary": 171,
+        "polishedCandidatesBeatingBestOrdinary": 12,
+        "candidatesWouldSurviveFrozenParetoBeam": 15,
+        "candidatesImprovingReferenceRmse": 12,
         "candidatesImprovingReferenceMaxAbs": 12,
         "candidatesImprovingBoth": 9,
         "topologySubstitutionWins": 0,
         "classifications": {
           "NO_STRUCTURAL_CANDIDATE": 0,
-          "PREPOLISH_REJECTED": 9,
-          "POLISH_FAILURE": 0,
-          "BEAM_REJECTED": 15,
-          "REFERENCE_NONIMPROVING": 0,
-          "ORACLE_WIN": 15
+          "PREPOLISH_REJECTED": 12,
+          "POLISH_FAILURE": 3,
+          "BEAM_REJECTED": 150,
+          "REFERENCE_NONIMPROVING": 3,
+          "ORACLE_WIN": 6
         }
       },
       "O2_RESIDUAL_REGION_PK": {
-        "candidatesGenerated": 39,
-        "semanticDuplicatesRejected": 6,
-        "validCandidates": 33,
-        "prePolishCandidatesBeatingWorstOrdinary": 30,
-        "prePolishCandidatesBeatingBestOrdinary": 12,
-        "polishedCandidatesBeatingWorstOrdinary": 30,
-        "polishedCandidatesBeatingBestOrdinary": 9,
-        "candidatesWouldSurviveFrozenParetoBeam": 9,
-        "candidatesImprovingReferenceRmse": 18,
-        "candidatesImprovingReferenceMaxAbs": 3,
-        "candidatesImprovingBoth": 3,
+        "familyLocalCandidateAbsence": 0,
+        "candidatesGenerated": 174,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 174,
+        "prePolishCandidatesBeatingWorstOrdinary": 171,
+        "prePolishCandidatesBeatingBestOrdinary": 66,
+        "polishedCandidatesBeatingWorstOrdinary": 171,
+        "polishedCandidatesBeatingBestOrdinary": 42,
+        "candidatesWouldSurviveFrozenParetoBeam": 72,
+        "candidatesImprovingReferenceRmse": 96,
+        "candidatesImprovingReferenceMaxAbs": 39,
+        "candidatesImprovingBoth": 36,
         "topologySubstitutionWins": 0,
         "classifications": {
           "NO_STRUCTURAL_CANDIDATE": 0,
           "PREPOLISH_REJECTED": 3,
           "POLISH_FAILURE": 3,
-          "BEAM_REJECTED": 18,
-          "REFERENCE_NONIMPROVING": 0,
-          "ORACLE_WIN": 9
+          "BEAM_REJECTED": 99,
+          "REFERENCE_NONIMPROVING": 30,
+          "ORACLE_WIN": 39
         }
       },
       "O3_SHELF_EVIDENCE": {
-        "candidatesGenerated": 15,
+        "familyLocalCandidateAbsence": 3,
+        "candidatesGenerated": 138,
         "semanticDuplicatesRejected": 0,
-        "validCandidates": 15,
-        "prePolishCandidatesBeatingWorstOrdinary": 9,
+        "validCandidates": 138,
+        "prePolishCandidatesBeatingWorstOrdinary": 135,
         "prePolishCandidatesBeatingBestOrdinary": 0,
-        "polishedCandidatesBeatingWorstOrdinary": 9,
-        "polishedCandidatesBeatingBestOrdinary": 0,
-        "candidatesWouldSurviveFrozenParetoBeam": 6,
-        "candidatesImprovingReferenceRmse": 3,
+        "polishedCandidatesBeatingWorstOrdinary": 123,
+        "polishedCandidatesBeatingBestOrdinary": 3,
+        "candidatesWouldSurviveFrozenParetoBeam": 15,
+        "candidatesImprovingReferenceRmse": 21,
         "candidatesImprovingReferenceMaxAbs": 3,
         "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 3,
+          "PREPOLISH_REJECTED": 3,
+          "POLISH_FAILURE": 12,
+          "BEAM_REJECTED": 108,
+          "REFERENCE_NONIMPROVING": 12,
+          "ORACLE_WIN": 3
+        }
+      },
+      "O4_TOPOLOGY_SUBSTITUTION": {
+        "familyLocalCandidateAbsence": 18,
+        "candidatesGenerated": 429,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 429,
+        "prePolishCandidatesBeatingWorstOrdinary": 429,
+        "prePolishCandidatesBeatingBestOrdinary": 54,
+        "polishedCandidatesBeatingWorstOrdinary": 429,
+        "polishedCandidatesBeatingBestOrdinary": 39,
+        "candidatesWouldSurviveFrozenParetoBeam": 66,
+        "candidatesImprovingReferenceRmse": 99,
+        "candidatesImprovingReferenceMaxAbs": 45,
+        "candidatesImprovingBoth": 27,
+        "topologySubstitutionWins": 39,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 18,
+          "PREPOLISH_REJECTED": 0,
+          "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 363,
+          "REFERENCE_NONIMPROVING": 27,
+          "ORACLE_WIN": 39
+        }
+      }
+    },
+    "generationGlobalDecomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 0,
+      "PREPOLISH_REJECTED": 18,
+      "POLISH_FAILURE": 18,
+      "BEAM_REJECTED": 720,
+      "REFERENCE_NONIMPROVING": 72,
+      "ORACLE_WIN": 87
+    },
+    "decomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 0,
+      "PREPOLISH_REJECTED": 18,
+      "POLISH_FAILURE": 18,
+      "BEAM_REJECTED": 720,
+      "REFERENCE_NONIMPROVING": 72,
+      "ORACLE_WIN": 87
+    }
+  },
+  "synthetic": {
+    "family": "synthetic",
+    "snapshotCount": 36,
+    "caseCount": 4,
+    "repeatCount": 12,
+    "generationCount": 36,
+    "competitiveCaseCount": 2,
+    "competitiveRepeatCount": 6,
+    "competitiveGenerationCount": 6,
+    "winsByCase": [
+      "synthetic-d-dense-known-structure",
+      "synthetic-h-alternating-structure"
+    ],
+    "trajectoryCoverage": [
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "93647bc96e03591aefb17bf05e573e607e1573e8e9a32836c831f740c417743e"
+      },
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "93647bc96e03591aefb17bf05e573e607e1573e8e9a32836c831f740c417743e"
+      },
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "93647bc96e03591aefb17bf05e573e607e1573e8e9a32836c831f740c417743e"
+      },
+      {
+        "caseId": "synthetic-e-high-q-valid",
+        "caseLabel": "Synthetic E",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          19
+        ],
+        "terminalGeneration": 19,
+        "terminalReason": "natural-stop",
+        "samplingAdequate": true,
+        "fingerprint": "1e63feec80fcf5993eb62dd1d9618f7a87bc9cb615d3178e8f706d028d7ed5c0"
+      },
+      {
+        "caseId": "synthetic-e-high-q-valid",
+        "caseLabel": "Synthetic E",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          19
+        ],
+        "terminalGeneration": 19,
+        "terminalReason": "natural-stop",
+        "samplingAdequate": true,
+        "fingerprint": "1e63feec80fcf5993eb62dd1d9618f7a87bc9cb615d3178e8f706d028d7ed5c0"
+      },
+      {
+        "caseId": "synthetic-e-high-q-valid",
+        "caseLabel": "Synthetic E",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          19
+        ],
+        "terminalGeneration": 19,
+        "terminalReason": "natural-stop",
+        "samplingAdequate": true,
+        "fingerprint": "1e63feec80fcf5993eb62dd1d9618f7a87bc9cb615d3178e8f706d028d7ed5c0"
+      },
+      {
+        "caseId": "synthetic-f-upper-frequency-structure",
+        "caseLabel": "Synthetic F",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "59bf0ee2a6809580f8bf1fa9fb6aed612f11795d60fbf4fc9c63dc42766f7aaa"
+      },
+      {
+        "caseId": "synthetic-f-upper-frequency-structure",
+        "caseLabel": "Synthetic F",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "59bf0ee2a6809580f8bf1fa9fb6aed612f11795d60fbf4fc9c63dc42766f7aaa"
+      },
+      {
+        "caseId": "synthetic-f-upper-frequency-structure",
+        "caseLabel": "Synthetic F",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "59bf0ee2a6809580f8bf1fa9fb6aed612f11795d60fbf4fc9c63dc42766f7aaa"
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "3b86a61f1af5fdb4d83dcec7a9e6926761a5e2d90fd88eaa2e9ef9d746ce1751"
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "3b86a61f1af5fdb4d83dcec7a9e6926761a5e2d90fd88eaa2e9ef9d746ce1751"
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "family": "synthetic",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "capturedGenerations": [
+          0,
+          10,
+          20
+        ],
+        "terminalGeneration": 20,
+        "terminalReason": "deterministic-bound",
+        "samplingAdequate": true,
+        "fingerprint": "3b86a61f1af5fdb4d83dcec7a9e6926761a5e2d90fd88eaa2e9ef9d746ce1751"
+      }
+    ],
+    "repeatIdentityByCase": {
+      "synthetic-d-dense-known-structure": {
+        "caseId": "synthetic-d-dense-known-structure",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "93647bc96e03591aefb17bf05e573e607e1573e8e9a32836c831f740c417743e",
+          "93647bc96e03591aefb17bf05e573e607e1573e8e9a32836c831f740c417743e",
+          "93647bc96e03591aefb17bf05e573e607e1573e8e9a32836c831f740c417743e"
+        ]
+      },
+      "synthetic-e-high-q-valid": {
+        "caseId": "synthetic-e-high-q-valid",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "1e63feec80fcf5993eb62dd1d9618f7a87bc9cb615d3178e8f706d028d7ed5c0",
+          "1e63feec80fcf5993eb62dd1d9618f7a87bc9cb615d3178e8f706d028d7ed5c0",
+          "1e63feec80fcf5993eb62dd1d9618f7a87bc9cb615d3178e8f706d028d7ed5c0"
+        ]
+      },
+      "synthetic-f-upper-frequency-structure": {
+        "caseId": "synthetic-f-upper-frequency-structure",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "59bf0ee2a6809580f8bf1fa9fb6aed612f11795d60fbf4fc9c63dc42766f7aaa",
+          "59bf0ee2a6809580f8bf1fa9fb6aed612f11795d60fbf4fc9c63dc42766f7aaa",
+          "59bf0ee2a6809580f8bf1fa9fb6aed612f11795d60fbf4fc9c63dc42766f7aaa"
+        ]
+      },
+      "synthetic-h-alternating-structure": {
+        "caseId": "synthetic-h-alternating-structure",
+        "repeatCount": 3,
+        "identical": true,
+        "trajectoryFingerprints": [
+          "3b86a61f1af5fdb4d83dcec7a9e6926761a5e2d90fd88eaa2e9ef9d746ce1751",
+          "3b86a61f1af5fdb4d83dcec7a9e6926761a5e2d90fd88eaa2e9ef9d746ce1751",
+          "3b86a61f1af5fdb4d83dcec7a9e6926761a5e2d90fd88eaa2e9ef9d746ce1751"
+        ]
+      }
+    },
+    "winLocations": [
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-d-dense-known-structure",
+        "caseLabel": "Synthetic D",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK"
+        ],
+        "oracleWinCount": 1,
+        "prePolishQualifiedWins": 1,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "split": "sanity",
+        "repeatIndex": 0,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK",
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "split": "sanity",
+        "repeatIndex": 1,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK",
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      },
+      {
+        "caseId": "synthetic-h-alternating-structure",
+        "caseLabel": "Synthetic H",
+        "split": "sanity",
+        "repeatIndex": 2,
+        "generation": 0,
+        "phase": "first",
+        "families": [
+          "O1_RESIDUAL_EXTREMUM_PK",
+          "O2_RESIDUAL_REGION_PK"
+        ],
+        "oracleWinCount": 2,
+        "prePolishQualifiedWins": 2,
+        "polishedEmergentWins": 0
+      }
+    ],
+    "byFamily": {
+      "O1_RESIDUAL_EXTREMUM_PK": {
+        "familyLocalCandidateAbsence": 12,
+        "candidatesGenerated": 39,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 39,
+        "prePolishCandidatesBeatingWorstOrdinary": 33,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 39,
+        "polishedCandidatesBeatingBestOrdinary": 12,
+        "candidatesWouldSurviveFrozenParetoBeam": 12,
+        "candidatesImprovingReferenceRmse": 12,
+        "candidatesImprovingReferenceMaxAbs": 6,
+        "candidatesImprovingBoth": 6,
         "topologySubstitutionWins": 0,
         "classifications": {
           "NO_STRUCTURAL_CANDIDATE": 12,
           "PREPOLISH_REJECTED": 6,
           "POLISH_FAILURE": 0,
+          "BEAM_REJECTED": 27,
+          "REFERENCE_NONIMPROVING": 0,
+          "ORACLE_WIN": 6
+        }
+      },
+      "O2_RESIDUAL_REGION_PK": {
+        "familyLocalCandidateAbsence": 12,
+        "candidatesGenerated": 39,
+        "semanticDuplicatesRejected": 12,
+        "validCandidates": 27,
+        "prePolishCandidatesBeatingWorstOrdinary": 27,
+        "prePolishCandidatesBeatingBestOrdinary": 6,
+        "polishedCandidatesBeatingWorstOrdinary": 24,
+        "polishedCandidatesBeatingBestOrdinary": 3,
+        "candidatesWouldSurviveFrozenParetoBeam": 3,
+        "candidatesImprovingReferenceRmse": 3,
+        "candidatesImprovingReferenceMaxAbs": 0,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 12,
+          "PREPOLISH_REJECTED": 0,
+          "POLISH_FAILURE": 3,
+          "BEAM_REJECTED": 21,
+          "REFERENCE_NONIMPROVING": 0,
+          "ORACLE_WIN": 3
+        }
+      },
+      "O3_SHELF_EVIDENCE": {
+        "familyLocalCandidateAbsence": 27,
+        "candidatesGenerated": 12,
+        "semanticDuplicatesRejected": 0,
+        "validCandidates": 12,
+        "prePolishCandidatesBeatingWorstOrdinary": 6,
+        "prePolishCandidatesBeatingBestOrdinary": 0,
+        "polishedCandidatesBeatingWorstOrdinary": 6,
+        "polishedCandidatesBeatingBestOrdinary": 0,
+        "candidatesWouldSurviveFrozenParetoBeam": 3,
+        "candidatesImprovingReferenceRmse": 0,
+        "candidatesImprovingReferenceMaxAbs": 3,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
+        "classifications": {
+          "NO_STRUCTURAL_CANDIDATE": 27,
+          "PREPOLISH_REJECTED": 6,
+          "POLISH_FAILURE": 0,
           "BEAM_REJECTED": 3,
-          "REFERENCE_NONIMPROVING": 6,
+          "REFERENCE_NONIMPROVING": 3,
           "ORACLE_WIN": 0
         }
       },
       "O4_TOPOLOGY_SUBSTITUTION": {
-        "candidatesGenerated": 57,
-        "semanticDuplicatesRejected": 3,
-        "validCandidates": 54,
-        "prePolishCandidatesBeatingWorstOrdinary": 48,
+        "familyLocalCandidateAbsence": 24,
+        "candidatesGenerated": 54,
+        "semanticDuplicatesRejected": 9,
+        "validCandidates": 45,
+        "prePolishCandidatesBeatingWorstOrdinary": 45,
         "prePolishCandidatesBeatingBestOrdinary": 0,
-        "polishedCandidatesBeatingWorstOrdinary": 54,
-        "polishedCandidatesBeatingBestOrdinary": 3,
-        "candidatesWouldSurviveFrozenParetoBeam": 3,
-        "candidatesImprovingReferenceRmse": 15,
+        "polishedCandidatesBeatingWorstOrdinary": 45,
+        "polishedCandidatesBeatingBestOrdinary": 0,
+        "candidatesWouldSurviveFrozenParetoBeam": 0,
+        "candidatesImprovingReferenceRmse": 0,
         "candidatesImprovingReferenceMaxAbs": 3,
-        "candidatesImprovingBoth": 3,
-        "topologySubstitutionWins": 3,
+        "candidatesImprovingBoth": 0,
+        "topologySubstitutionWins": 0,
         "classifications": {
-          "NO_STRUCTURAL_CANDIDATE": 12,
-          "PREPOLISH_REJECTED": 6,
+          "NO_STRUCTURAL_CANDIDATE": 24,
+          "PREPOLISH_REJECTED": 0,
           "POLISH_FAILURE": 0,
           "BEAM_REJECTED": 45,
           "REFERENCE_NONIMPROVING": 0,
-          "ORACLE_WIN": 3
+          "ORACLE_WIN": 0
         }
       }
     },
-    "decomposition": {
-      "NO_STRUCTURAL_CANDIDATE": 0,
-      "PREPOLISH_REJECTED": 24,
+    "generationGlobalDecomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 12,
+      "PREPOLISH_REJECTED": 12,
       "POLISH_FAILURE": 3,
-      "BEAM_REJECTED": 81,
-      "REFERENCE_NONIMPROVING": 6,
-      "ORACLE_WIN": 27
+      "BEAM_REJECTED": 96,
+      "REFERENCE_NONIMPROVING": 3,
+      "ORACLE_WIN": 9
+    },
+    "decomposition": {
+      "NO_STRUCTURAL_CANDIDATE": 12,
+      "PREPOLISH_REJECTED": 12,
+      "POLISH_FAILURE": 3,
+      "BEAM_REJECTED": 96,
+      "REFERENCE_NONIMPROVING": 3,
+      "ORACLE_WIN": 9
     }
   },
   "byFamily": {
     "O1_RESIDUAL_EXTREMUM_PK": {
-      "candidatesGenerated": 75,
+      "familyLocalCandidateAbsence": 12,
+      "candidatesGenerated": 213,
       "semanticDuplicatesRejected": 0,
-      "validCandidates": 75,
-      "prePolishCandidatesBeatingWorstOrdinary": 51,
+      "validCandidates": 213,
+      "prePolishCandidatesBeatingWorstOrdinary": 195,
       "prePolishCandidatesBeatingBestOrdinary": 0,
-      "polishedCandidatesBeatingWorstOrdinary": 72,
-      "polishedCandidatesBeatingBestOrdinary": 30,
-      "candidatesWouldSurviveFrozenParetoBeam": 36,
-      "candidatesImprovingReferenceRmse": 39,
-      "candidatesImprovingReferenceMaxAbs": 21,
-      "candidatesImprovingBoth": 12,
+      "polishedCandidatesBeatingWorstOrdinary": 210,
+      "polishedCandidatesBeatingBestOrdinary": 24,
+      "candidatesWouldSurviveFrozenParetoBeam": 27,
+      "candidatesImprovingReferenceRmse": 24,
+      "candidatesImprovingReferenceMaxAbs": 18,
+      "candidatesImprovingBoth": 15,
       "topologySubstitutionWins": 0,
       "classifications": {
-        "NO_STRUCTURAL_CANDIDATE": 0,
-        "PREPOLISH_REJECTED": 24,
+        "NO_STRUCTURAL_CANDIDATE": 12,
+        "PREPOLISH_REJECTED": 18,
         "POLISH_FAILURE": 3,
-        "BEAM_REJECTED": 24,
-        "REFERENCE_NONIMPROVING": 6,
-        "ORACLE_WIN": 18
+        "BEAM_REJECTED": 177,
+        "REFERENCE_NONIMPROVING": 3,
+        "ORACLE_WIN": 12
       }
     },
     "O2_RESIDUAL_REGION_PK": {
-      "candidatesGenerated": 75,
-      "semanticDuplicatesRejected": 6,
-      "validCandidates": 69,
-      "prePolishCandidatesBeatingWorstOrdinary": 63,
-      "prePolishCandidatesBeatingBestOrdinary": 36,
-      "polishedCandidatesBeatingWorstOrdinary": 63,
-      "polishedCandidatesBeatingBestOrdinary": 18,
-      "candidatesWouldSurviveFrozenParetoBeam": 21,
-      "candidatesImprovingReferenceRmse": 27,
-      "candidatesImprovingReferenceMaxAbs": 9,
-      "candidatesImprovingBoth": 6,
+      "familyLocalCandidateAbsence": 12,
+      "candidatesGenerated": 213,
+      "semanticDuplicatesRejected": 12,
+      "validCandidates": 201,
+      "prePolishCandidatesBeatingWorstOrdinary": 198,
+      "prePolishCandidatesBeatingBestOrdinary": 72,
+      "polishedCandidatesBeatingWorstOrdinary": 195,
+      "polishedCandidatesBeatingBestOrdinary": 45,
+      "candidatesWouldSurviveFrozenParetoBeam": 75,
+      "candidatesImprovingReferenceRmse": 99,
+      "candidatesImprovingReferenceMaxAbs": 39,
+      "candidatesImprovingBoth": 36,
       "topologySubstitutionWins": 0,
       "classifications": {
-        "NO_STRUCTURAL_CANDIDATE": 0,
-        "PREPOLISH_REJECTED": 6,
+        "NO_STRUCTURAL_CANDIDATE": 12,
+        "PREPOLISH_REJECTED": 3,
         "POLISH_FAILURE": 6,
-        "BEAM_REJECTED": 39,
-        "REFERENCE_NONIMPROVING": 3,
-        "ORACLE_WIN": 15
+        "BEAM_REJECTED": 120,
+        "REFERENCE_NONIMPROVING": 30,
+        "ORACLE_WIN": 42
       }
     },
     "O3_SHELF_EVIDENCE": {
-      "candidatesGenerated": 54,
+      "familyLocalCandidateAbsence": 30,
+      "candidatesGenerated": 150,
       "semanticDuplicatesRejected": 0,
-      "validCandidates": 54,
-      "prePolishCandidatesBeatingWorstOrdinary": 45,
+      "validCandidates": 150,
+      "prePolishCandidatesBeatingWorstOrdinary": 141,
       "prePolishCandidatesBeatingBestOrdinary": 0,
-      "polishedCandidatesBeatingWorstOrdinary": 33,
-      "polishedCandidatesBeatingBestOrdinary": 0,
-      "candidatesWouldSurviveFrozenParetoBeam": 15,
-      "candidatesImprovingReferenceRmse": 6,
+      "polishedCandidatesBeatingWorstOrdinary": 129,
+      "polishedCandidatesBeatingBestOrdinary": 3,
+      "candidatesWouldSurviveFrozenParetoBeam": 18,
+      "candidatesImprovingReferenceRmse": 21,
       "candidatesImprovingReferenceMaxAbs": 6,
       "candidatesImprovingBoth": 0,
       "topologySubstitutionWins": 0,
       "classifications": {
-        "NO_STRUCTURAL_CANDIDATE": 12,
+        "NO_STRUCTURAL_CANDIDATE": 30,
         "PREPOLISH_REJECTED": 9,
         "POLISH_FAILURE": 12,
-        "BEAM_REJECTED": 18,
+        "BEAM_REJECTED": 111,
         "REFERENCE_NONIMPROVING": 15,
-        "ORACLE_WIN": 0
+        "ORACLE_WIN": 3
       }
     },
     "O4_TOPOLOGY_SUBSTITUTION": {
-      "candidatesGenerated": 111,
-      "semanticDuplicatesRejected": 3,
-      "validCandidates": 108,
-      "prePolishCandidatesBeatingWorstOrdinary": 87,
-      "prePolishCandidatesBeatingBestOrdinary": 9,
-      "polishedCandidatesBeatingWorstOrdinary": 108,
-      "polishedCandidatesBeatingBestOrdinary": 6,
-      "candidatesWouldSurviveFrozenParetoBeam": 9,
-      "candidatesImprovingReferenceRmse": 21,
-      "candidatesImprovingReferenceMaxAbs": 3,
-      "candidatesImprovingBoth": 3,
-      "topologySubstitutionWins": 6,
+      "familyLocalCandidateAbsence": 42,
+      "candidatesGenerated": 483,
+      "semanticDuplicatesRejected": 9,
+      "validCandidates": 474,
+      "prePolishCandidatesBeatingWorstOrdinary": 474,
+      "prePolishCandidatesBeatingBestOrdinary": 54,
+      "polishedCandidatesBeatingWorstOrdinary": 474,
+      "polishedCandidatesBeatingBestOrdinary": 39,
+      "candidatesWouldSurviveFrozenParetoBeam": 66,
+      "candidatesImprovingReferenceRmse": 99,
+      "candidatesImprovingReferenceMaxAbs": 48,
+      "candidatesImprovingBoth": 27,
+      "topologySubstitutionWins": 39,
       "classifications": {
-        "NO_STRUCTURAL_CANDIDATE": 30,
-        "PREPOLISH_REJECTED": 21,
+        "NO_STRUCTURAL_CANDIDATE": 42,
+        "PREPOLISH_REJECTED": 0,
         "POLISH_FAILURE": 0,
-        "BEAM_REJECTED": 78,
-        "REFERENCE_NONIMPROVING": 3,
-        "ORACLE_WIN": 6
+        "BEAM_REJECTED": 408,
+        "REFERENCE_NONIMPROVING": 27,
+        "ORACLE_WIN": 39
       }
     }
   },
-  "decomposition": {
-    "NO_STRUCTURAL_CANDIDATE": 0,
-    "PREPOLISH_REJECTED": 60,
+  "generationGlobalDecomposition": {
+    "NO_STRUCTURAL_CANDIDATE": 12,
+    "PREPOLISH_REJECTED": 30,
     "POLISH_FAILURE": 21,
-    "BEAM_REJECTED": 159,
-    "REFERENCE_NONIMPROVING": 27,
-    "ORACLE_WIN": 39
+    "BEAM_REJECTED": 816,
+    "REFERENCE_NONIMPROVING": 75,
+    "ORACLE_WIN": 96
+  },
+  "decomposition": {
+    "NO_STRUCTURAL_CANDIDATE": 12,
+    "PREPOLISH_REJECTED": 30,
+    "POLISH_FAILURE": 21,
+    "BEAM_REJECTED": 816,
+    "REFERENCE_NONIMPROVING": 75,
+    "ORACLE_WIN": 96
   },
   "decisionBoundary": {
-    "conclusion": "INCONCLUSIVE",
+    "conclusion": "STRUCTURAL_CANDIDATE_SIGNAL_SUPPORTED",
     "rule": {
       "developmentCaseCount": 3,
       "holdoutCaseCount": 3,
@@ -344,14 +1405,12 @@
       ]
     },
     "developmentWinningCases": 2,
-    "holdoutWinningCases": 1,
-    "overallWinningCases": 3,
-    "winningRepeats": 9,
-    "winningGenerations": 9,
-    "samplingAdequate": false,
-    "candidateCoverageSufficient": false,
-    "missingInformation": [
-      "real sampling lacks first/middle/final snapshots for all six cases and three repeats"
-    ]
+    "holdoutWinningCases": 3,
+    "overallWinningCases": 5,
+    "winningRepeats": 15,
+    "winningGenerations": 24,
+    "samplingAdequate": true,
+    "candidateCoverageSufficient": true,
+    "missingInformation": []
   }
 }
