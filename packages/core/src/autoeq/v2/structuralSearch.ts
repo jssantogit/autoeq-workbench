@@ -1318,6 +1318,9 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     let admittedProposals = 0
     let polishedProposals = 0
     let duplicateStates = 0
+    let vnextRegions = new Set<number>()
+    let vnextGeneratedSignatures = new Set<string>()
+    let vnextAdmittedSignatures = new Set<string>()
     let capacityPressure = createCapacityPressureDelta()
     let frontierUtilization = createFrontierUtilizationDelta()
 
@@ -1351,6 +1354,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         ? createRegionAwareCandidatePool(parent.filters, solution.residualDb, frequencies, bounds,
           config.featureRegionCount ?? 1, proposals.length, proposals)
         : []
+      for (const entry of vnextPool) { vnextRegions.add(entry.metadata.residualRegion); vnextGeneratedSignatures.add(entry.signature) }
 
       let admitted: StructuralProposal[] = []
 
@@ -1401,6 +1405,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         } else admitted = ordered.slice(0, config.proposalsPerParent)
       }
       admittedProposals += admitted.length
+      if (policy === 'vnext') for (const proposal of admitted) vnextAdmittedSignatures.add(structuralSignature(proposal.filters, bounds, config.featureRegionCount ?? 1))
       for (const proposal of admitted) {
         frontierUtilization.admittedCandidateFilterCountMax = Math.max(frontierUtilization.admittedCandidateFilterCountMax, proposal.filters.length)
         if (proposal.filters.length === config.maxFilters) frontierUtilization.admittedCandidatesAtCapacity += 1
@@ -1445,6 +1450,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       admittedProposals,
       polishedProposals,
       duplicateStates,
+      ...(policy === 'vnext' ? { residualRegionsGenerated: vnextRegions.size, structuralSignaturesGenerated: vnextGeneratedSignatures.size, structuralSignaturesAdmitted: vnextAdmittedSignatures.size, structuralSignaturesRetained: new Set(beam.map(state => structuralSignature(state.filters, bounds, config.featureRegionCount ?? 1))).size } : {}),
       nextStates: nextStates.length,
       capacityPressure,
       frontierUtilization,
