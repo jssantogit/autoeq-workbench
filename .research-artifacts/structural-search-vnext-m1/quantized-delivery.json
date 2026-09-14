@@ -1,0 +1,674 @@
+[
+  {
+    "caseId": "titan-to-mystic-8",
+    "structuralCeiling": 43,
+    "checkpointSeconds": 30,
+    "baselineFloatRmseMedian": 1.4787895331652208,
+    "vnextFloatRmseMedian": 1.2734435763891407,
+    "baselineQuantizedRmseMedian": 1.4787895331652208,
+    "vnextQuantizedRmseMedian": 1.2734435763891407,
+    "vnextAdvantageSurvivesDelivery": true,
+    "samples": [
+      {
+        "repeatIndex": 0,
+        "floatMetrics": {
+          "maeDb": 1.0587549596469563,
+          "rmseDb": 1.2734435763891407,
+          "maxAbsDb": 3.8691417625780486
+        },
+        "quantizedMetrics": {
+          "maeDb": 1.0587549596469563,
+          "rmseDb": 1.2734435763891407,
+          "maxAbsDb": 3.8691417625780486
+        },
+        "deltaMaeQuantization": 0,
+        "deltaRmseQuantization": 0,
+        "deltaMaxAbsQuantization": 0,
+        "finalQuantizedFilters": [
+          {
+            "id": "struct-add-pk-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 88,
+            "gainDb": -5.9,
+            "q": 0.61
+          },
+          {
+            "id": "struct-add-pk-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3111,
+            "gainDb": -1.2,
+            "q": 1.73
+          },
+          {
+            "id": "struct-add-pk-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4213,
+            "gainDb": -1.5,
+            "q": 1.42
+          },
+          {
+            "id": "struct-add-pk-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4275,
+            "gainDb": -2,
+            "q": 1.58
+          },
+          {
+            "id": "struct-add-pk-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4903,
+            "gainDb": -1.8,
+            "q": 1
+          },
+          {
+            "id": "struct-add-pk-2-split-low-split-low",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 10928,
+            "gainDb": 3.8,
+            "q": 3.53
+          },
+          {
+            "id": "struct-add-pk-2-split-low-split-high",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 11578,
+            "gainDb": 3.8,
+            "q": 3.53
+          },
+          {
+            "id": "struct-add-pk-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 13968,
+            "gainDb": -8.1,
+            "q": 8.97
+          },
+          {
+            "id": "struct-add-pk-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16975,
+            "gainDb": -4.1,
+            "q": 1.55
+          },
+          {
+            "id": "struct-add-pk",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 17222,
+            "gainDb": 12.3,
+            "q": 8.49
+          }
+        ],
+        "recomputedPreampDb": -8.3,
+        "baselineQuantizedMetrics": {
+          "maeDb": 1.0200480856461824,
+          "rmseDb": 1.4787895331652208,
+          "maxAbsDb": 4.4379833658911405
+        }
+      },
+      {
+        "repeatIndex": 1,
+        "floatMetrics": {
+          "maeDb": 0.9499440760756755,
+          "rmseDb": 1.2286534771519992,
+          "maxAbsDb": 3.881590781142612
+        },
+        "quantizedMetrics": {
+          "maeDb": 0.9499440760756755,
+          "rmseDb": 1.2286534771519992,
+          "maxAbsDb": 3.881590781142612
+        },
+        "deltaMaeQuantization": 0,
+        "deltaRmseQuantization": 0,
+        "deltaMaxAbsQuantization": 0,
+        "finalQuantizedFilters": [
+          {
+            "id": "struct-add-pk-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 76,
+            "gainDb": -4.7,
+            "q": 0.94
+          },
+          {
+            "id": "struct-add-pk-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 2693,
+            "gainDb": -0.2,
+            "q": 2.44
+          },
+          {
+            "id": "struct-add-pk-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3700,
+            "gainDb": -1,
+            "q": 2.23
+          },
+          {
+            "id": "struct-add-pk-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4213,
+            "gainDb": -1.5,
+            "q": 1.42
+          },
+          {
+            "id": "struct-add-pk-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4903,
+            "gainDb": -1.8,
+            "q": 1
+          },
+          {
+            "id": "struct-add-pk-2-split-low",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 11248,
+            "gainDb": 7.6,
+            "q": 3.53
+          },
+          {
+            "id": "struct-add-pk-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 13968,
+            "gainDb": -8.1,
+            "q": 8.97
+          },
+          {
+            "id": "struct-add-pk-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16975,
+            "gainDb": -4.1,
+            "q": 1.55
+          },
+          {
+            "id": "struct-add-pk",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 17222,
+            "gainDb": 12.3,
+            "q": 8.49
+          }
+        ],
+        "recomputedPreampDb": -8.3,
+        "baselineQuantizedMetrics": {
+          "maeDb": 1.0200480856461824,
+          "rmseDb": 1.4787895331652208,
+          "maxAbsDb": 4.4379833658911405
+        }
+      },
+      {
+        "repeatIndex": 2,
+        "floatMetrics": {
+          "maeDb": 1.0587549596469563,
+          "rmseDb": 1.2734435763891407,
+          "maxAbsDb": 3.8691417625780486
+        },
+        "quantizedMetrics": {
+          "maeDb": 1.0587549596469563,
+          "rmseDb": 1.2734435763891407,
+          "maxAbsDb": 3.8691417625780486
+        },
+        "deltaMaeQuantization": 0,
+        "deltaRmseQuantization": 0,
+        "deltaMaxAbsQuantization": 0,
+        "finalQuantizedFilters": [
+          {
+            "id": "struct-add-pk-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 88,
+            "gainDb": -5.9,
+            "q": 0.61
+          },
+          {
+            "id": "struct-add-pk-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3111,
+            "gainDb": -1.2,
+            "q": 1.73
+          },
+          {
+            "id": "struct-add-pk-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4213,
+            "gainDb": -1.5,
+            "q": 1.42
+          },
+          {
+            "id": "struct-add-pk-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4275,
+            "gainDb": -2,
+            "q": 1.58
+          },
+          {
+            "id": "struct-add-pk-7",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4903,
+            "gainDb": -1.8,
+            "q": 1
+          },
+          {
+            "id": "struct-add-pk-2-split-low-split-low",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 10928,
+            "gainDb": 3.8,
+            "q": 3.53
+          },
+          {
+            "id": "struct-add-pk-2-split-low-split-high",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 11578,
+            "gainDb": 3.8,
+            "q": 3.53
+          },
+          {
+            "id": "struct-add-pk-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 13968,
+            "gainDb": -8.1,
+            "q": 8.97
+          },
+          {
+            "id": "struct-add-pk-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16975,
+            "gainDb": -4.1,
+            "q": 1.55
+          },
+          {
+            "id": "struct-add-pk",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 17222,
+            "gainDb": 12.3,
+            "q": 8.49
+          }
+        ],
+        "recomputedPreampDb": -8.3,
+        "baselineQuantizedMetrics": {
+          "maeDb": 1.0201492053283292,
+          "rmseDb": 1.478898280627133,
+          "maxAbsDb": 4.437978419404988
+        }
+      }
+    ]
+  },
+  {
+    "caseId": "titan-to-u12t",
+    "structuralCeiling": 43,
+    "checkpointSeconds": 30,
+    "baselineFloatRmseMedian": 0.8697064254055235,
+    "vnextFloatRmseMedian": 0.8121348204572529,
+    "baselineQuantizedRmseMedian": 0.8697064254055235,
+    "vnextQuantizedRmseMedian": 0.8121348204572529,
+    "vnextAdvantageSurvivesDelivery": true,
+    "samples": [
+      {
+        "repeatIndex": 0,
+        "floatMetrics": {
+          "maeDb": 0.6274610085389905,
+          "rmseDb": 0.8121348204572529,
+          "maxAbsDb": 2.396031138460183
+        },
+        "quantizedMetrics": {
+          "maeDb": 0.6274610085389905,
+          "rmseDb": 0.8121348204572529,
+          "maxAbsDb": 2.396031138460183
+        },
+        "deltaMaeQuantization": 0,
+        "deltaRmseQuantization": 0,
+        "deltaMaxAbsQuantization": 0,
+        "finalQuantizedFilters": [
+          {
+            "id": "struct-add-pk-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 25,
+            "gainDb": -1.2,
+            "q": 0.47
+          },
+          {
+            "id": "struct-add-pk-4-split-low",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 161,
+            "gainDb": -1.3,
+            "q": 0.75
+          },
+          {
+            "id": "struct-add-pk-4-split-high",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 185,
+            "gainDb": -1.2,
+            "q": 1.15
+          },
+          {
+            "id": "struct-add-pk-1-split-low",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3249,
+            "gainDb": -4.6,
+            "q": 2.68
+          },
+          {
+            "id": "struct-add-pk-1-split-high",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4939,
+            "gainDb": -4.9,
+            "q": 1.44
+          },
+          {
+            "id": "struct-add-pk-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7034,
+            "gainDb": 1.3,
+            "q": 0.46
+          },
+          {
+            "id": "struct-add-pk-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 8305,
+            "gainDb": -4.8,
+            "q": 4.91
+          },
+          {
+            "id": "struct-add-pk-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 14171,
+            "gainDb": -9.7,
+            "q": 9.54
+          },
+          {
+            "id": "struct-add-pk-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16373,
+            "gainDb": -5.9,
+            "q": 9.36
+          },
+          {
+            "id": "struct-add-pk",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 17599,
+            "gainDb": 13.4,
+            "q": 2.09
+          },
+          {
+            "id": "struct-add-pk-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18780,
+            "gainDb": -1.2,
+            "q": 1.1
+          }
+        ],
+        "recomputedPreampDb": -12.2,
+        "baselineQuantizedMetrics": {
+          "maeDb": 0.6218504389017356,
+          "rmseDb": 0.8729961967428407,
+          "maxAbsDb": 2.6196149317619812
+        }
+      },
+      {
+        "repeatIndex": 1,
+        "floatMetrics": {
+          "maeDb": 0.5719211864572623,
+          "rmseDb": 0.7671396239036734,
+          "maxAbsDb": 2.249366448266456
+        },
+        "quantizedMetrics": {
+          "maeDb": 0.5719211864572623,
+          "rmseDb": 0.7671396239036734,
+          "maxAbsDb": 2.249366448266456
+        },
+        "deltaMaeQuantization": 0,
+        "deltaRmseQuantization": 0,
+        "deltaMaxAbsQuantization": 0,
+        "finalQuantizedFilters": [
+          {
+            "id": "struct-add-pk-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 29,
+            "gainDb": -1.2,
+            "q": 0.3
+          },
+          {
+            "id": "struct-add-pk-4-split-low",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 156,
+            "gainDb": -1.3,
+            "q": 0.75
+          },
+          {
+            "id": "struct-add-pk-4-split-high",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 214,
+            "gainDb": -1.4,
+            "q": 1.25
+          },
+          {
+            "id": "struct-add-pk-1-split-low",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3249,
+            "gainDb": -4.8,
+            "q": 2.46
+          },
+          {
+            "id": "struct-add-pk-1-split-high",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4939,
+            "gainDb": -4.9,
+            "q": 1.44
+          },
+          {
+            "id": "struct-add-pk-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 6834,
+            "gainDb": 1.3,
+            "q": 0.3
+          },
+          {
+            "id": "struct-add-pk-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 8548,
+            "gainDb": -4.8,
+            "q": 4.91
+          },
+          {
+            "id": "struct-add-pk-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 14171,
+            "gainDb": -10.4,
+            "q": 9.54
+          },
+          {
+            "id": "struct-add-pk-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16373,
+            "gainDb": -6.9,
+            "q": 9.36
+          },
+          {
+            "id": "struct-add-pk",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 17599,
+            "gainDb": 13.4,
+            "q": 2.09
+          },
+          {
+            "id": "struct-add-pk-4-split-low-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18245,
+            "gainDb": -0.6,
+            "q": 1.56
+          },
+          {
+            "id": "struct-add-pk-4-split-high-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 19330,
+            "gainDb": -0.6,
+            "q": 1.1
+          }
+        ],
+        "recomputedPreampDb": -12.3,
+        "baselineQuantizedMetrics": {
+          "maeDb": 0.6303707514110969,
+          "rmseDb": 0.8697064254055235,
+          "maxAbsDb": 2.616211066847675
+        }
+      },
+      {
+        "repeatIndex": 2,
+        "floatMetrics": {
+          "maeDb": 0.6274610085389905,
+          "rmseDb": 0.8121348204572529,
+          "maxAbsDb": 2.396031138460183
+        },
+        "quantizedMetrics": {
+          "maeDb": 0.6274610085389905,
+          "rmseDb": 0.8121348204572529,
+          "maxAbsDb": 2.396031138460183
+        },
+        "deltaMaeQuantization": 0,
+        "deltaRmseQuantization": 0,
+        "deltaMaxAbsQuantization": 0,
+        "finalQuantizedFilters": [
+          {
+            "id": "struct-add-pk-6",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 25,
+            "gainDb": -1.2,
+            "q": 0.47
+          },
+          {
+            "id": "struct-add-pk-4-split-low",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 161,
+            "gainDb": -1.3,
+            "q": 0.75
+          },
+          {
+            "id": "struct-add-pk-4-split-high",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 185,
+            "gainDb": -1.2,
+            "q": 1.15
+          },
+          {
+            "id": "struct-add-pk-1-split-low",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 3249,
+            "gainDb": -4.6,
+            "q": 2.68
+          },
+          {
+            "id": "struct-add-pk-1-split-high",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 4939,
+            "gainDb": -4.9,
+            "q": 1.44
+          },
+          {
+            "id": "struct-add-pk-1",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 7034,
+            "gainDb": 1.3,
+            "q": 0.46
+          },
+          {
+            "id": "struct-add-pk-5",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 8305,
+            "gainDb": -4.8,
+            "q": 4.91
+          },
+          {
+            "id": "struct-add-pk-2",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 14171,
+            "gainDb": -9.7,
+            "q": 9.54
+          },
+          {
+            "id": "struct-add-pk-3",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 16373,
+            "gainDb": -5.9,
+            "q": 9.36
+          },
+          {
+            "id": "struct-add-pk",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 17599,
+            "gainDb": 13.4,
+            "q": 2.09
+          },
+          {
+            "id": "struct-add-pk-4",
+            "enabled": true,
+            "type": "PK",
+            "frequencyHz": 18780,
+            "gainDb": -1.2,
+            "q": 1.1
+          }
+        ],
+        "recomputedPreampDb": -12.2,
+        "baselineQuantizedMetrics": {
+          "maeDb": 0.6303707514110969,
+          "rmseDb": 0.8697064254055235,
+          "maxAbsDb": 2.616211066847675
+        }
+      }
+    ]
+  }
+]
