@@ -736,6 +736,24 @@ function compareKeys(left: readonly (number | string)[], right: readonly (number
   return 0
 }
 
+export type StructuralImprovementPhase = 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement'
+
+export interface StructuralIncumbentProvenance {
+  state: SearchState
+  phase: StructuralImprovementPhase
+}
+
+/** Keep phase attribution causal: a later phase owns provenance only on gain. */
+export function updateStructuralIncumbentProvenance(
+  incumbent: StructuralIncumbentProvenance,
+  candidate: SearchState,
+  phase: StructuralImprovementPhase,
+): StructuralIncumbentProvenance {
+  return compareKeys(referenceSelectorKey(candidate), referenceSelectorKey(incumbent.state)) < 0
+    ? { state: candidate, phase }
+    : incumbent
+}
+
 export function selectReferencePoint(points: readonly SearchState[]): SearchState {
   return points.reduce((best, point) =>
     compareKeys(referenceSelectorKey(point), referenceSelectorKey(best)) < 0 ? point : best)
@@ -1001,8 +1019,8 @@ export interface StructuralSearchTraceEvent {
   replacementPolished?: number
   replacementAccepted?: number
   acceptedReplacementGain?: number
-  bestImprovementPhase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement'
-  finalImprovementPhase?: 'beam' | 'rescue' | 'pair-add' | 'cap-swap' | 'vnext-replacement'
+  bestImprovementPhase?: StructuralImprovementPhase
+  finalImprovementPhase?: StructuralImprovementPhase
   duplicateStates?: number
   nextStates?: number
   /** Raw capacity-gate accounting for this trace event; never a quality estimate. */
@@ -1329,9 +1347,9 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     cancellationScore
   }
   let beam: SearchState[] = [initialPolished]
+  const stateProvenance = new Map<string, StructuralImprovementPhase>([[initialPolished.candidateId, 'beam']])
   let beamGeneration = 0
-  let bestImprovementPhase: StructuralSearchTraceEvent['bestImprovementPhase'] = 'beam'
-  let finalImprovementPhase: StructuralSearchTraceEvent['finalImprovementPhase'] = 'beam'
+  let incumbentProvenance: StructuralIncumbentProvenance = { state: initialPolished, phase: 'beam' }
   stateTrace('start', initialPolished, { phase: 'beam', status: 'start' })
 
   while (beam.length > 0 && !deadline.isExpired()) {
@@ -1391,19 +1409,18 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       let admitted: StructuralProposal[] = []
 
       if (config.admission === 'q31-b4-p8') {
-        const prePolishScored: Array<{
+        type PrePolishScore = {
           key: string; proposal: StructuralProposal; lexicalRank: number; quantized: Filter[]
           rmseDb: number; maxAbsDb: number; filterCount: number; cancellationScore: number; semanticKey: string
-        }> = []
-        for (const [lexicalRank, proposal] of ordered.entries()) {
-          if (deadline.isExpired()) break
+        }
+        const scoreProposal = (proposal: StructuralProposal, lexicalRank: number): PrePolishScore => {
           const quantized = quantizeV2Filters(proposal.filters, bounds)
           const magnitude = cascadeMagnitudeDb(quantized, frequencies, sampleRateHz)
           const residualDb = desiredDb.map((desired, index) => desired - magnitude[index]!)
           const metrics = calculateErrorMetrics(residualDb, frequencies)
           const cancellationScore = auditCancellations(quantized, frequencies, sampleRateHz ?? 48000).totalScore
 
-          prePolishScored.push({
+          return {
             key: proposalKey(proposal),
             proposal,
             lexicalRank,
@@ -1413,7 +1430,17 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
             filterCount: quantized.length,
             cancellationScore,
             semanticKey: proposalKey(proposal)
-          })
+          }
+        }
+        // The frozen baseline scored its complete ordered proposal set without
+        // cooperative checks at this boundary.  Keep that path byte-for-byte in
+        // behavior; only VNext may stop its additional admission work early.
+        const prePolishScored: PrePolishScore[] = policy === 'baseline'
+          ? ordered.map(scoreProposal)
+          : []
+        if (policy === 'vnext') for (const [lexicalRank, proposal] of ordered.entries()) {
+          if (deadline.isExpired()) break
+          prePolishScored.push(scoreProposal(proposal, lexicalRank))
         }
 
         const rmseRanked = [...prePolishScored].sort((a, b) =>
@@ -1485,6 +1512,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         visited.add(key)
 
         polished.candidateId = String(candidateCounter++).padStart(4, '0')
+        stateProvenance.set(polished.candidateId, 'beam')
         nextStates.push(polished)
       }
     }
@@ -1501,7 +1529,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
       polishedProposals,
       duplicateStates,
       ...(policy === 'vnext' ? { residualRegionsGenerated: vnextRegions.size, structuralSignaturesGenerated: vnextGeneratedSignatures.size, structuralSignaturesAdmitted: vnextAdmittedSignatures.size, structuralSignaturesRetained: new Set(beam.map(state => structuralSignature(state.filters, bounds, config.featureRegionCount ?? 1))).size } : {}),
-      ...(policy === 'vnext' ? { candidateSourceCounts, residualRegionsAdmitted: vnextAdmittedRegions.size, bestImprovementPhase, finalImprovementPhase } : {}),
+      ...(policy === 'vnext' ? { candidateSourceCounts, residualRegionsAdmitted: vnextAdmittedRegions.size, bestImprovementPhase: incumbentProvenance.phase, finalImprovementPhase: incumbentProvenance.phase } : {}),
       nextStates: nextStates.length,
       capacityPressure,
       frontierUtilization,
@@ -1542,19 +1570,24 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
             Math.max(polished.rmseDb / 0.25, polished.maxAbsDb / 0.75)
           acceptedReplacementGain += gain
           replacementAccepted += 1
-          polished.candidateId = String(candidateCounter++).padStart(4, '0'); nextStates.push(polished)
+          polished.candidateId = String(candidateCounter++).padStart(4, '0')
+          stateProvenance.set(polished.candidateId, 'vnext-replacement')
+          nextStates.push(polished)
         }
       }
       if (attempts > 0) stateTrace('phase', nextStates[0] ?? parent, {
         phase: 'vnext-replacement', status: 'end', attempts, acceptedSteps: nextStates.length,
         stallDiversifications: 1, replacementAttempts: attempts,
         replacementPolished, replacementAccepted, acceptedReplacementGain,
-        bestImprovementPhase: replacementAccepted > 0 ? 'vnext-replacement' : bestImprovementPhase,
-        finalImprovementPhase: replacementAccepted > 0 ? 'vnext-replacement' : finalImprovementPhase,
+        bestImprovementPhase: replacementAccepted > 0 ? 'vnext-replacement' : incumbentProvenance.phase,
+        finalImprovementPhase: replacementAccepted > 0 ? 'vnext-replacement' : incumbentProvenance.phase,
       })
       if (replacementAccepted > 0) {
-        bestImprovementPhase = 'vnext-replacement'
-        finalImprovementPhase = 'vnext-replacement'
+        incumbentProvenance = updateStructuralIncumbentProvenance(
+          incumbentProvenance,
+          selectReferencePoint(nextStates),
+          'vnext-replacement',
+        )
       }
     }
     if (nextStates.length === 0) {
@@ -1569,9 +1602,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     beam = policy === 'vnext'
       ? retainDiverseStructuralBeam(combined, config.beamWidth, bounds, config.featureRegionCount ?? 1)
       : retainParetoBeam(combined, config.beamWidth)
-    if (policy === 'vnext' && selectReferencePoint(beam).candidateId !== initialPolished.candidateId) {
-      bestImprovementPhase = 'beam'
-      finalImprovementPhase = 'beam'
+    if (policy === 'vnext') {
+      for (const state of beam) {
+        const phase = stateProvenance.get(state.candidateId) ?? 'beam'
+        incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, state, phase)
+      }
     }
     beamGeneration += 1
   }
@@ -1661,6 +1696,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         left.rank - right.rank
     })
     rescued = improving[0]!.state
+    if (policy === 'vnext') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'rescue')
     rescueSteps += 1
   }
 
@@ -1783,6 +1819,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         left.seedOrder - right.seedOrder
     })
     rescued = improving[0]!.state
+    if (policy === 'vnext') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'pair-add')
     pairAddSteps += 1
   }
   stateTrace('phase', rescued, {
@@ -1871,6 +1908,7 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
         left.replacementIndex - right.replacementIndex
     })
     rescued = improving[0]!.state
+    if (policy === 'vnext') incumbentProvenance = updateStructuralIncumbentProvenance(incumbentProvenance, rescued, 'cap-swap')
     capSwapSteps += 1
   }
 
@@ -1887,6 +1925,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
     rescued.maxAbsDb / 0.75,
   )
   if (config.workProfile === 'short-5s' && postSwapViolation > 1.6) {
+    if (policy === 'vnext') stateTrace('end', rescued, {
+      reason: deadline.isExpired() ? 'deadline' : 'completed',
+      bestImprovementPhase: incumbentProvenance.phase,
+      finalImprovementPhase: incumbentProvenance.phase,
+    })
     return {
       filters: rescued.filters,
       rmseDb: rescued.rmseDb,
@@ -2007,6 +2050,11 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
   }
 
   if (config.workProfile === 'short-5s' && postSwapViolation > 1) {
+    if (policy === 'vnext') stateTrace('end', rescued, {
+      reason: deadline.isExpired() ? 'deadline' : 'completed',
+      bestImprovementPhase: incumbentProvenance.phase,
+      finalImprovementPhase: incumbentProvenance.phase,
+    })
     return {
       filters: rescued.filters,
       rmseDb: rescued.rmseDb,
@@ -2404,6 +2452,10 @@ function runStructuralSearchInternal(input: StructuralSearchInput, policy: 'base
 
   stateTrace('end', rescued, {
     reason: deadline.isExpired() ? 'deadline' : 'completed',
+    ...(policy === 'vnext' ? {
+      bestImprovementPhase: incumbentProvenance.phase,
+      finalImprovementPhase: incumbentProvenance.phase,
+    } : {}),
   })
   return {
     filters: rescued.filters,

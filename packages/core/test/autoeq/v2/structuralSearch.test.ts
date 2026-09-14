@@ -598,6 +598,38 @@ it('reports bounded VNext diversity telemetry inside beam generations', async ()
 })
 
 describe('VNext pre-benchmark correctness mechanisms', () => {
+  it('keeps frozen baseline q31 admission intact when its cooperative deadline expires during scoring', () => {
+    const events: Array<Record<string, unknown>> = []
+    let checks = 0
+    runStructuralSearch({
+      desiredDb: [...localizedResidual], frequencies: [...frequencies], sampleRateHz: 48_000,
+      config: { ...resolveStructuralSearchConfig({ preset: MAX10_BASELINE_PRESET }), admission: 'q31-b4-p8' },
+      deadline: { isExpired: () => ++checks >= 3 },
+      onTrace: event => events.push(event as unknown as Record<string, unknown>),
+    })
+    const generation = events.find(event => event.type === 'beam-generation')!
+    expect(generation.generatedProposals).toBeGreaterThan(0)
+    // Locked pre-VNext q31 fixture: full scoring selects its one unique
+    // candidate even though the subsequent polish boundary is expired.
+    expect(generation.admittedProposals).toBe(1)
+    expect(generation.polishedProposals).toBe(0)
+  })
+
+  it('preserves explicit phase provenance only when a phase improves the incumbent', async () => {
+    const { updateStructuralIncumbentProvenance } = await import('../../../src/autoeq/v2/structuralSearch.js')
+    const initial = { candidateId: 'initial', filters: [], rmseDb: 2, maxAbsDb: 2, cancellationScore: 0 }
+    const replacement = { ...initial, candidateId: 'replacement', rmseDb: 1.5 }
+    const beamOnly = { ...initial, candidateId: 'beam', rmseDb: 1.75 }
+    const replacementWinner = updateStructuralIncumbentProvenance(
+      { state: initial, phase: 'beam' }, replacement, 'vnext-replacement',
+    )
+    expect(replacementWinner.phase).toBe('vnext-replacement')
+    expect(updateStructuralIncumbentProvenance(replacementWinner, beamOnly, 'beam').phase).toBe('vnext-replacement')
+    const rescued = { ...initial, candidateId: 'rescued', rmseDb: 1 }
+    expect(updateStructuralIncumbentProvenance(replacementWinner, rescued, 'rescue').phase).toBe('rescue')
+    expect(updateStructuralIncumbentProvenance({ state: initial, phase: 'beam' }, initial, 'pair-add').phase).toBe('beam')
+  })
+
   it('annotates only the unambiguous additive candidate and retains non-additive proposals', async () => {
     const { createRegionAwareCandidatePool } = await import('../../../src/autoeq/v2/structuralSearch.js')
     const bounds = resolveStandardAutoEqV2Config({ ...DEFAULT_AUTOEQ_SETTINGS, maxFilters: 8 })
