@@ -14,6 +14,7 @@
     "research:v2:quick": "tsx benchmarks/research/run.ts --preset quick",
     "research:v2:full": "tsx benchmarks/research/run.ts --preset full",
     "research:vnext:m1": "tsx benchmarks/research/structuralSearchVnext.ts --m1-runner",
+    "research:vnext:m2": "tsx benchmarks/research/structuralSearchVnextM2.ts --m2-runner",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
