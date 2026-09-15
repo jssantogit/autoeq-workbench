@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "required": [
+    "artifactKind",
+    "campaign",
+    "phase",
+    "state",
+    "c1h",
+    "confidenceModel",
+    "standardV2",
+    "primaryGroupIds",
+    "secondaryGroupIds",
+    "solverSettings",
+    "primaryEndpoint",
+    "primaryExecution",
+    "safety"
+  ],
+  "scientificArms": [
+    "FROZEN_BASELINE",
+    "CONSTANT_AUTHORITY_CONTROL",
+    "CONFIDENCE_SHAPED"
+  ],
+  "outcomeFields": [
+    "E_base",
+    "E_const",
+    "E_conf",
+    "gain_vs_baseline",
+    "gain_vs_constant",
+    "combined_gain"
+  ],
+  "forbiddenInputs": [
+    ".research-cache/**",
+    "Batch C cases.json",
+    "C1d outcome artifacts",
+    "secondary reserve outcomes"
+  ]
+}
