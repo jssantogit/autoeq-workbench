@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "campaign": "C1h",
+  "phase": "PROTOCOL_FREEZE",
+  "classification": "C1H_PROTOCOL_FROZEN",
+  "baseCommit": "f93adaf41ac4dcf02897d5f390c911014a4fa536",
+  "c1f": {
+    "classification": "C1F_CORPUS_READY",
+    "baseCommit": "3eb0329b8eee80eae8de72e268bf0e4fa4be733c",
+    "toolingCommit": "cafd24db4bb2b2cce3145c2bce5eb0d274713c06",
+    "evidenceCommit": "f93adaf41ac4dcf02897d5f390c911014a4fa536",
+    "hashIndexSha256": "36cc16692dd7a0cc6e45c3c138e4ed2a481ab6c5293aca0a712098f6ecb3f7b7"
+  },
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "primaryGroupIds": [
+    "c1g-251bf90cf23f557cb011",
+    "c1g-c45cb51de5231139b2f2",
+    "c1g-e9b56c7e332c693b6f82",
+    "c1g-41b1767dc01a935198bf",
+    "c1g-ba1d3af16db7a116d755",
+    "c1g-1be44ee4bdbd73cbf632"
+  ],
+  "secondaryGroupIds": [
+    "c1g-6cf5995d049cff49d672",
+    "c1g-ccc7fd5250bd1714c73e",
+    "c1g-2fd95af2a97278cf88ef",
+    "c1g-256c26e3bb37c97b890a",
+    "c1g-6398ddcd56119d32eb70",
+    "c1g-3b112b59456722f8dabe"
+  ],
+  "parserCanonicalizerVersion": 1,
+  "normalization": {
+    "mode": "hz",
+    "frequencyHz": 500,
+    "levelDb": 60
+  },
+  "solverExecuted": false,
+  "causalOutcomesGenerated": false,
+  "confidenceMetricsComputed": false,
+  "disagreementMetricsComputed": false,
+  "batchCAccessAttempts": 0,
+  "batchCAccessed": false,
+  "batchCExecuted": false,
+  "rawUpstreamBytesCommitted": false,
+  "normalizedResponsePointsCommitted": false,
+  "selfContainedVerificationPassed": false,
+  "selfContainedVerificationNetworkAccess": false,
+  "selfContainedVerificationCacheAccess": false,
+  "productionModified": false,
+  "coreModified": false
+}

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "description": "C1h self-contained normalized individual response corpus; no causal quantities are materialized.",
+  "groupFiles": "group-<groupId>.json",
+  "curveFields": ["frequencyHz", "normalizedDb", "normalizedParsedPointsSha256", "curveHash", "normalization", "provenance"],
+  "pointEncoding": "parallel frequencyHz and normalizedDb arrays; JSON numeric values preserve C1f parsed representation",
+  "hashSerialization": "stable JSON with recursively sorted object keys and array order preserved"
+}
