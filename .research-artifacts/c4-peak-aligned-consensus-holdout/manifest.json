@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
+  "phase": "protocol-freeze",
+  "milestone": "C4c-holdout-protocol-only",
+  "frozenBoundary": "01ec92e8c3276b6cb42360e114d71f2ce5bc0d8e",
+  "c4a": {
+    "corpusCommit": "64f1fa7f8780cf14f87ce6427aaa71edbf686e2d",
+    "evidenceSha256": "03794a913b873e01df8b5afdd3664e6dc7e40deff9341a449c768ae1f39b73ea",
+    "classification": "C4_CORPUS_READY"
+  },
+  "c4b": {
+    "protocolFreezeCommit": "95d853db76bd456dd66a1b8a60a65039ca095b8b",
+    "evidenceCommit": "01ec92e8c3276b6cb42360e114d71f2ce5bc0d8e",
+    "evidenceSha256": "c2232862df04d0e90fa86fe7805f2032d2722e381c7d6e08118fcb7c29028d04",
+    "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
+    "algorithmSourceSha256": "61002d0552c3c8bdc8045355378a1dd40dbfe56845a790d0ccd6f3caef67a2ec",
+    "developmentClassification": "PEAK_ALIGNMENT_DEV_SIGNAL_SUPPORTED",
+    "developmentCoverage": "2/3"
+  },
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96",
+    "rawPolicy": "immutable raw URLs only; ignored cache; no raw bytes committed"
+  },
+  "domain": {
+    "form": "in-ear",
+    "v2MinHz": 20,
+    "v2MaxHz": 20000,
+    "pointsPerOctave": 96,
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "terminalClosure": "terminal-flat-hold-to-v2-max"
+  },
+  "frozenAlgorithm": {
+    "peakSearchHz": [
+      6000,
+      10000
+    ],
+    "alignmentEvaluationHz": [
+      6000,
+      14000
+    ],
+    "dominantPeakRule": "maximum-normalized-db-ties-lower-frequency",
+    "canonicalPeak": "median-log2-frequency-even-central-arithmetic-mean",
+    "warp": "three-anchor-log2-identity-outside-band",
+    "baseline": "POINTWISE_MEDIAN",
+    "candidate": "PEAK_ALIGNED_MEDIAN",
+    "evaluationRegistration": "candidate-separately-to-withheld-frame-no-scan",
+    "robustSigma": "1.4826*median_i(abs(x_i-median_j(x_j)))",
+    "groupGate": "reuse-C4b-exactly"
+  },
+  "holdoutGroups": [
+    {
+      "groupId": "c4g-c5a0b86e1ea4436ca9ce",
+      "deviceFamily": "simgot audio em6l",
+      "memberCount": 9
+    },
+    {
+      "groupId": "c4g-043aeb45a50adf964f89",
+      "deviceFamily": "simgot audio ew200",
+      "memberCount": 8
+    },
+    {
+      "groupId": "c4g-9f35923d2fa109244435",
+      "deviceFamily": "truthear x crinacle zero red",
+      "memberCount": 10
+    }
+  ],
+  "holdoutGroupIds": [
+    "c4g-c5a0b86e1ea4436ca9ce",
+    "c4g-043aeb45a50adf964f89",
+    "c4g-9f35923d2fa109244435"
+  ],
+  "holdoutCoverage": {
+    "groupCount": 3,
+    "memberCount": 27,
+    "expectedFoldCount": 27,
+    "protocol": "leave-one-measurement-out"
+  },
+  "holdoutGate": {
+    "requiredGroups": 3,
+    "minimumSignalGroups": 2,
+    "signalClassification": "PEAK_ALIGNMENT_SIGNAL",
+    "pass": "PEAK_ALIGNMENT_GENERALIZES",
+    "validFailure": "PEAK_ALIGNMENT_NOT_CONFIRMED",
+    "invalid": "INCONCLUSIVE"
+  },
+  "rejectedDevelopmentGroupIds": [
+    "c4g-95ca9d64e706e94c51e7",
+    "c4g-9c1d23845eb5a1d7beef",
+    "c4g-35f72baf0cca66570d01"
+  ],
+  "rejectedBatchCToken": "fresh-real-corpus-v1.2:Batch C",
+  "protocolFreezeCommit": null,
+  "developmentRerunForDecision": false,
+  "holdoutExecuted": false,
+  "freshRealCorpusBatchCExecuted": false,
+  "autoEqSolverExecuted": false,
+  "confidenceWeightingExecuted": false,
+  "outcomesGenerated": false,
+  "rawMeasurementsCommitted": false,
+  "artifactSchema": "schema.json",
+  "protocolPath": "research/c4-peak-aligned-consensus-holdout/protocol.md"
+}

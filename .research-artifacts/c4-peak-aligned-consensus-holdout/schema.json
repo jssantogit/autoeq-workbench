@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c4c-holdout-confirmation-outcome-schema",
+  "outcomeValuesAllowed": false,
+  "requiredTopLevel": [
+    "schemaVersion",
+    "algorithmVersion",
+    "protocolFreezeCommit",
+    "holdoutGroupEvidence",
+    "holdoutGate",
+    "combinedInterpretation",
+    "flags",
+    "evidenceSha256"
+  ],
+  "holdoutGroupEvidence": {
+    "required": [
+      "groupId",
+      "deviceFamily",
+      "memberCount",
+      "members",
+      "folds",
+      "dispersion",
+      "classification"
+    ],
+    "memberProvenanceRequired": [
+      "concreteCurveIdentity",
+      "collection",
+      "form",
+      "rig",
+      "rigClass",
+      "path",
+      "upstreamRawUrl",
+      "blobSha",
+      "upstreamSha256",
+      "originalParsedPointsSha256",
+      "canonicalParsedPointsSha256",
+      "normalizedParsedPointsSha256"
+    ],
+    "foldRequired": [
+      "withheldMemberIdentity",
+      "trainingMemberIdentities",
+      "canonicalPeakFrequencyHz",
+      "individualPeakFrequenciesHz",
+      "warpAnchors",
+      "pointwise",
+      "aligned",
+      "peakAlignmentFoldWin",
+      "peakShiftDiagnostics",
+      "dispersion"
+    ],
+    "metricFields": [
+      "registeredTrebleMAE",
+      "registeredTrebleRMSE",
+      "registeredTrebleMaxAbs",
+      "rawTrebleMAE",
+      "rawTrebleRMSE",
+      "candidateDominantPeakFrequencyHz",
+      "withheldDominantPeakFrequencyHz",
+      "rawPeakFrequencyErrorOctaves",
+      "candidatePeakDb",
+      "withheldPeakDb",
+      "absolutePeakLevelErrorAfterRegistration"
+    ]
+  },
+  "holdoutGate": {
+    "allowed": [
+      "PEAK_ALIGNMENT_GENERALIZES",
+      "PEAK_ALIGNMENT_NOT_CONFIRMED",
+      "INCONCLUSIVE"
+    ],
+    "minimumSignalGroups": 2,
+    "totalGroups": 3
+  },
+  "combinedInterpretation": [
+    "C4_PEAK_ALIGNMENT_GENERALIZED",
+    "C4_CLOSED_HOLDOUT_NOT_CONFIRMED",
+    "INCONCLUSIVE"
+  ],
+  "flags": {
+    "developmentRerunForDecision": false,
+    "holdoutExecuted": false,
+    "freshRealCorpusBatchCExecuted": false,
+    "autoEqSolverExecuted": false
+  }
+}
