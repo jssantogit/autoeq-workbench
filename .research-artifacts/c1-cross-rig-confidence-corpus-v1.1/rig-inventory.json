@@ -1,0 +1,397 @@
+{
+  "schemaVersion": 1,
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "exactUpstreamRigStrings": [
+    "711",
+    "Bruel & Kjaer 4620",
+    "Bruel & Kjaer 5128",
+    "GRAS 43AC",
+    "GRAS 43AC ",
+    "GRAS 43ACB",
+    "GRAS 45BC ",
+    "GRAS 45BC-10",
+    "GRAS GRAS 43AC",
+    "GRAS RA0045",
+    "HMS II.3",
+    "KB006x + 711",
+    "KB501x + 711"
+  ],
+  "rigMappings": [
+    {
+      "exactRig": "711",
+      "metadataRowCount": 8827,
+      "processedCurveCount": 3043,
+      "collections": [
+        "Auriculares Argentina",
+        "Bakkwatan",
+        "DHRME",
+        "Fahryst",
+        "Filk",
+        "Harpo",
+        "Hi End Portable",
+        "Jaytiss",
+        "Kazi",
+        "Regan Cipher",
+        "RikudouGoku",
+        "Super Review",
+        "Ted's Squig Hoard",
+        "ToneDeafMonk",
+        "crinacle",
+        "freeryder05",
+        "kr0mka"
+      ],
+      "examples": [
+        {
+          "collection": "Auriculares Argentina",
+          "model": "7Hz Salnotes Zero",
+          "sourceName": "7 Herz zero salsnote"
+        },
+        {
+          "collection": "Auriculares Argentina",
+          "model": "7Hz Salnotes Zero",
+          "sourceName": "7 Herz zero salsnote"
+        },
+        {
+          "collection": "Auriculares Argentina",
+          "model": "DUNU Titan S",
+          "sourceName": "Dunu titan s"
+        }
+      ],
+      "rigClass": "711-class",
+      "primary711Eligible": true,
+      "mappingEvidence": "exact upstream metadata string: 711"
+    },
+    {
+      "exactRig": "Bruel & Kjaer 4620",
+      "metadataRowCount": 404,
+      "processedCurveCount": 0,
+      "collections": [
+        "crinacle"
+      ],
+      "examples": [
+        {
+          "collection": "crinacle",
+          "model": "64 Audio Nio (m20 Apex module)",
+          "sourceName": "64 Audio Nio (m20)"
+        },
+        {
+          "collection": "crinacle",
+          "model": "64 Audio Nio (m20 Apex module)",
+          "sourceName": "64 Audio Nio (m20)"
+        },
+        {
+          "collection": "crinacle",
+          "model": "7Hz Eternal",
+          "sourceName": "7Hz-Salnotes Eternal"
+        }
+      ],
+      "rigClass": "bruel-and-kjaer-4620",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    },
+    {
+      "exactRig": "Bruel & Kjaer 5128",
+      "metadataRowCount": 144,
+      "processedCurveCount": 31,
+      "collections": [
+        "HypetheSonics",
+        "Rtings"
+      ],
+      "examples": [
+        {
+          "collection": "HypetheSonics",
+          "model": "1MORE Quad Driver",
+          "sourceName": "1MORE Quad Driver"
+        },
+        {
+          "collection": "HypetheSonics",
+          "model": "1MORE Quad Driver",
+          "sourceName": "1MORE Quad Driver"
+        },
+        {
+          "collection": "HypetheSonics",
+          "model": "1MORE Triple Driver",
+          "sourceName": "1MORE Triple Driver"
+        }
+      ],
+      "rigClass": "bruel-and-kjaer-5128",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    },
+    {
+      "exactRig": "GRAS 43AC",
+      "metadataRowCount": 193,
+      "processedCurveCount": 182,
+      "collections": [
+        "oratory1990"
+      ],
+      "examples": [
+        {
+          "collection": "oratory1990",
+          "model": "1MORE Quad Driver",
+          "sourceName": "1More Quad Driver"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "1MORE Quad Driver",
+          "sourceName": "1More Quad Driver"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "1MORE Single Driver",
+          "sourceName": "1More 1M301 Single Driver"
+        }
+      ],
+      "rigClass": "gras-43ac",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    },
+    {
+      "exactRig": "GRAS 43AC ",
+      "metadataRowCount": 10,
+      "processedCurveCount": 10,
+      "collections": [
+        "oratory1990"
+      ],
+      "examples": [
+        {
+          "collection": "oratory1990",
+          "model": "7Hz Salnotes Dioko",
+          "sourceName": "7Hz Salnotes Dioko"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "Bose QuietComfort 20 (passive)",
+          "sourceName": "Bose QC20 (passive)"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "Campfire Audio Dorado 2020",
+          "sourceName": "Campfire Audio Dorado 2020"
+        }
+      ],
+      "rigClass": "gras-43ac-",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    },
+    {
+      "exactRig": "GRAS 43ACB",
+      "metadataRowCount": 4,
+      "processedCurveCount": 4,
+      "collections": [
+        "oratory1990"
+      ],
+      "examples": [
+        {
+          "collection": "oratory1990",
+          "model": "Periodic Audio Carbon",
+          "sourceName": "Periodic Audio Carbon"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "Shuoer S12",
+          "sourceName": "Shuoer S12"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "Truthear x Crinacle Zero",
+          "sourceName": "Truthear Zero"
+        }
+      ],
+      "rigClass": "gras-43acb",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    },
+    {
+      "exactRig": "GRAS 45BC ",
+      "metadataRowCount": 10,
+      "processedCurveCount": 10,
+      "collections": [
+        "oratory1990"
+      ],
+      "examples": [
+        {
+          "collection": "oratory1990",
+          "model": "Anker Soundcore Liberty Air 2",
+          "sourceName": "Anker Soundcore Liberty Air 2"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "Audeze Euclid",
+          "sourceName": "Audeze Euclid"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "Brainwavz M5",
+          "sourceName": "Brainwavz M5"
+        }
+      ],
+      "rigClass": "gras-45bc-",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    },
+    {
+      "exactRig": "GRAS 45BC-10",
+      "metadataRowCount": 5,
+      "processedCurveCount": 5,
+      "collections": [
+        "oratory1990"
+      ],
+      "examples": [
+        {
+          "collection": "oratory1990",
+          "model": "Bose Q25 (ANC off)",
+          "sourceName": "Bose QC25 (ANC off)"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "Creative Aurvana Ace",
+          "sourceName": "Creative Aurvana Ace"
+        },
+        {
+          "collection": "oratory1990",
+          "model": "Sennheiser IE 400 Pro",
+          "sourceName": "Sennheiser IE400 Pro"
+        }
+      ],
+      "rigClass": "gras-45bc-10",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    },
+    {
+      "exactRig": "GRAS GRAS 43AC",
+      "metadataRowCount": 1,
+      "processedCurveCount": 1,
+      "collections": [
+        "oratory1990"
+      ],
+      "examples": [
+        {
+          "collection": "oratory1990",
+          "model": "JBL Free X",
+          "sourceName": "JBL Free X"
+        }
+      ],
+      "rigClass": "gras-gras-43ac~88822b4a",
+      "primary711Eligible": false,
+      "mappingEvidence": "distinct exact upstream metadata string; no equivalence inferred"
+    },
+    {
+      "exactRig": "GRAS RA0045",
+      "metadataRowCount": 343,
+      "processedCurveCount": 152,
+      "collections": [
+        "HypetheSonics"
+      ],
+      "examples": [
+        {
+          "collection": "HypetheSonics",
+          "model": "1MORE Aero (ANC Off)",
+          "sourceName": "1MORE Aero ANC Off"
+        },
+        {
+          "collection": "HypetheSonics",
+          "model": "1MORE Aero (ANC Off)",
+          "sourceName": "1MORE Aero ANC Off"
+        },
+        {
+          "collection": "HypetheSonics",
+          "model": "1MORE Aero (ANC On)",
+          "sourceName": "1MORE Aero ANC On"
+        }
+      ],
+      "rigClass": "gras-ra0045",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string: GRAS RA0045; capability not established; kept separate from 711"
+    },
+    {
+      "exactRig": "HMS II.3",
+      "metadataRowCount": 529,
+      "processedCurveCount": 31,
+      "collections": [
+        "Rtings"
+      ],
+      "examples": [
+        {
+          "collection": "Rtings",
+          "model": "1MORE Piston Classic",
+          "sourceName": "1More Piston Classic"
+        },
+        {
+          "collection": "Rtings",
+          "model": "1MORE Piston Classic",
+          "sourceName": "1More Piston Classic"
+        },
+        {
+          "collection": "Rtings",
+          "model": "1MORE Piston Fit",
+          "sourceName": "1More Piston Fit"
+        }
+      ],
+      "rigClass": "hms-ii-3",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    },
+    {
+      "exactRig": "KB006x + 711",
+      "metadataRowCount": 10,
+      "processedCurveCount": 3,
+      "collections": [
+        "Filk",
+        "Super Review"
+      ],
+      "examples": [
+        {
+          "collection": "Filk",
+          "model": "Moondrop Space Travel",
+          "sourceName": ""
+        },
+        {
+          "collection": "Filk",
+          "model": "Moondrop Space Travel",
+          "sourceName": ""
+        },
+        {
+          "collection": "Filk",
+          "model": "QCY T12 ANC2",
+          "sourceName": ""
+        }
+      ],
+      "rigClass": "kb006x-711",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    },
+    {
+      "exactRig": "KB501x + 711",
+      "metadataRowCount": 11,
+      "processedCurveCount": 6,
+      "collections": [
+        "Auriculares Argentina"
+      ],
+      "examples": [
+        {
+          "collection": "Auriculares Argentina",
+          "model": "EPZ Q5",
+          "sourceName": "Epz q5"
+        },
+        {
+          "collection": "Auriculares Argentina",
+          "model": "EPZ Q5",
+          "sourceName": "Epz q5"
+        },
+        {
+          "collection": "Auriculares Argentina",
+          "model": "EPZ Q5 Pro",
+          "sourceName": "Epz q5pro"
+        }
+      ],
+      "rigClass": "kb501x-711",
+      "primary711Eligible": false,
+      "mappingEvidence": "exact upstream metadata string; audited rig spelling retained"
+    }
+  ]
+}

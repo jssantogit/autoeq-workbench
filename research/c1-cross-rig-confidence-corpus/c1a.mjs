@@ -776,7 +776,7 @@ export function pathRigForProcessedPath(relativePath) {
   return tail.slice(0, -1).join('/')
 }
 
-async function inventoryUpstream({ fetchImpl, cacheRoot }) {
+export async function inventoryUpstream({ fetchImpl, cacheRoot }) {
   const verified = await verifyPinnedUpstream(fetchImpl, cacheRoot)
   const measurementsEntry = verified.tree.tree.find((entry) => entry.path === 'measurements' && entry.type === 'tree')
   if (!measurementsEntry) throw new Error('pinned tree has no measurements directory')
@@ -865,7 +865,7 @@ function isValidationError(error) {
   return /^(malformed|coverage|normalization):/.test(String(error?.message ?? error))
 }
 
-async function validateCandidateCurves(records, fetchImpl, cacheRoot) {
+export async function validateCandidateCurves(records, fetchImpl, cacheRoot) {
   const candidates = [...new Set(records.map((record) => record.upstreamPath))]
   const byPath = new Map()
   await mapWithConcurrency(candidates, 12, async (path) => {
