@@ -136,9 +136,7 @@ describe('AutoEQ controller', () => {
 
     expect(runs[0]!.options).toEqual({ mode: EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE })
     const result = createAutoEqResultV2(4)
-    ;(result.manifest as typeof result.manifest & {
-      experimentalStructuralSearch?: { preset: string; seedMode: string }
-    }).experimentalStructuralSearch = {
+    result.manifest.experimentalStructuralSearch = {
       preset: 'max10-q31-b4-p8-experimental',
       seedMode: 'zero-start',
     }
@@ -163,6 +161,38 @@ describe('AutoEQ controller', () => {
       activeRunId: null,
       error: { category: 'optimization' },
     })
+  })
+
+  it('rejects an experimental request with an unknown provenance marker', async () => {
+    const { workspace, runStore, controller, runs } = setup()
+    const before = solutionSnapshot(workspace.getState())
+    const pending = controller.runAutoEq({ mode: EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE })
+    const result = createAutoEqResultV2(4)
+    ;(result.manifest as unknown as { experimentalStructuralSearch: unknown })
+      .experimentalStructuralSearch = { preset: 'wrong', seedMode: 'zero-start' }
+
+    runs[0]!.resolve(result)
+    await pending
+
+    expect(solutionSnapshot(workspace.getState())).toEqual(before)
+    expect(runStore.getState()).toMatchObject({ status: 'error', activeRunId: null })
+  })
+
+  it('rejects an experimental marker on a Standard request', async () => {
+    const { workspace, runStore, controller, runs } = setup()
+    const before = solutionSnapshot(workspace.getState())
+    const pending = controller.runAutoEq()
+    const result = createAutoEqResultV2(4)
+    result.manifest.experimentalStructuralSearch = {
+      preset: 'max10-q31-b4-p8-experimental',
+      seedMode: 'zero-start',
+    }
+
+    runs[0]!.resolve(result)
+    await pending
+
+    expect(solutionSnapshot(workspace.getState())).toEqual(before)
+    expect(runStore.getState()).toMatchObject({ status: 'error', activeRunId: null })
   })
 
   it('starts transient running state after the client starts the Worker run', async () => {

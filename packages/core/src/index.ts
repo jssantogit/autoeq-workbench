@@ -102,6 +102,7 @@ export type {
   AutoEqResultV2,
   CancellationAudit,
   CancellationPair,
+  ExperimentalStructuralSearchProvenance,
   RunManifest,
   RunManifestV1,
   RunManifestV2,
