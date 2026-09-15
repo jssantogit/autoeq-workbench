@@ -1,0 +1,18 @@
+{
+  "protocolFreezeCommit": "d84fcd1ddb948c1a2b2c651cc40e3944d5e5f809",
+  "materializedCorpusSha256": "db81c5c329128eef6769fa7da210e5580c2eb6bf5c4bc690c2f1104e9b8092d4",
+  "executionUuid": "5823afed-f014-4a11-98c3-0f0567d41703",
+  "pid": 11268,
+  "hostname": "localhost",
+  "startTimestamp": "2026-09-15T12:17:53.551Z",
+  "command": "--execute-primary",
+  "primaryGroupIds": [
+    "c1g-251bf90cf23f557cb011",
+    "c1g-c45cb51de5231139b2f2",
+    "c1g-e9b56c7e332c693b6f82",
+    "c1g-41b1767dc01a935198bf",
+    "c1g-ba1d3af16db7a116d755",
+    "c1g-1be44ee4bdbd73cbf632"
+  ],
+  "permanentAttemptMarker": true
+}

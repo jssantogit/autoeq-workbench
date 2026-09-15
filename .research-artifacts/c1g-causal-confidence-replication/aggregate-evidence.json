@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c1g-causal-confidence-replication-aggregate-evidence",
+  "protocolFreezeCommit": "d84fcd1ddb948c1a2b2c651cc40e3944d5e5f809",
+  "baseC1hEvidenceCommit": "b2d13ba799067738dee523b22e8930e97e71c5b4",
+  "materializedCorpusSha256": "db81c5c329128eef6769fa7da210e5580c2eb6bf5c4bc690c2f1104e9b8092d4",
+  "primaryGroupIds": [
+    "c1g-251bf90cf23f557cb011",
+    "c1g-c45cb51de5231139b2f2",
+    "c1g-e9b56c7e332c693b6f82",
+    "c1g-41b1767dc01a935198bf",
+    "c1g-ba1d3af16db7a116d755",
+    "c1g-1be44ee4bdbd73cbf632"
+  ],
+  "secondaryReserveGroupIds": [
+    "c1g-6cf5995d049cff49d672",
+    "c1g-ccc7fd5250bd1714c73e",
+    "c1g-2fd95af2a97278cf88ef",
+    "c1g-256c26e3bb37c97b890a",
+    "c1g-6398ddcd56119d32eb70",
+    "c1g-3b112b59456722f8dabe"
+  ],
+  "groupClassifications": [
+    {
+      "groupId": "c1g-251bf90cf23f557cb011",
+      "gate": {
+        "informativeObservationCount": 2,
+        "informativeCount": 2,
+        "wins": 2,
+        "losses": 0,
+        "medianCombinedGain": 0.48727145810816574,
+        "classification": "CAUSAL_CONFIDENCE_SIGNAL"
+      }
+    },
+    {
+      "groupId": "c1g-c45cb51de5231139b2f2",
+      "gate": {
+        "informativeObservationCount": 1,
+        "informativeCount": 1,
+        "wins": 0,
+        "losses": 1,
+        "medianCombinedGain": -0.3528168836068797,
+        "classification": "NO_CAUSAL_CONFIDENCE_SIGNAL"
+      }
+    },
+    {
+      "groupId": "c1g-e9b56c7e332c693b6f82",
+      "gate": {
+        "informativeObservationCount": 1,
+        "informativeCount": 1,
+        "wins": 1,
+        "losses": 0,
+        "medianCombinedGain": 0.3107846255570232,
+        "classification": "CAUSAL_CONFIDENCE_SIGNAL"
+      }
+    },
+    {
+      "groupId": "c1g-41b1767dc01a935198bf",
+      "gate": {
+        "informativeObservationCount": 1,
+        "informativeCount": 1,
+        "wins": 0,
+        "losses": 1,
+        "medianCombinedGain": -0.46935969022331164,
+        "classification": "NO_CAUSAL_CONFIDENCE_SIGNAL"
+      }
+    },
+    {
+      "groupId": "c1g-ba1d3af16db7a116d755",
+      "gate": {
+        "informativeObservationCount": 1,
+        "informativeCount": 1,
+        "wins": 0,
+        "losses": 1,
+        "medianCombinedGain": -1.6209880853024252,
+        "classification": "NO_CAUSAL_CONFIDENCE_SIGNAL"
+      }
+    },
+    {
+      "groupId": "c1g-1be44ee4bdbd73cbf632",
+      "gate": {
+        "informativeObservationCount": 1,
+        "informativeCount": 1,
+        "wins": 0,
+        "losses": 1,
+        "medianCombinedGain": -0.23108088264641163,
+        "classification": "NO_CAUSAL_CONFIDENCE_SIGNAL"
+      }
+    }
+  ],
+  "campaignGate": {
+    "signalGroups": 2,
+    "classification": "C1G_CAUSAL_INTEGRATION_NOT_SUPPORTED"
+  },
+  "combinedScientificStatus": "C1_SIGNAL_MODEL_GENERALIZED_CAUSAL_INTEGRATION_NOT_SUPPORTED",
+  "executionUuid": "5823afed-f014-4a11-98c3-0f0567d41703"
+}

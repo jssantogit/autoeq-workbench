@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c1g-causal-confidence-replication-outcome-manifest",
+  "classification": "C1G_CAUSAL_INTEGRATION_NOT_SUPPORTED",
+  "combinedScientificStatus": "C1_SIGNAL_MODEL_GENERALIZED_CAUSAL_INTEGRATION_NOT_SUPPORTED",
+  "protocolFreezeCommit": "d84fcd1ddb948c1a2b2c651cc40e3944d5e5f809",
+  "baseC1hEvidenceCommit": "b2d13ba799067738dee523b22e8930e97e71c5b4",
+  "materializedCorpusSha256": "db81c5c329128eef6769fa7da210e5580c2eb6bf5c4bc690c2f1104e9b8092d4",
+  "c1hEvidenceIndexSha256": "73e5ae8f9bd11ecb63d5b0da7d273655bc023da15d6674a765b125915bcb66c7",
+  "confidenceModelSha256": "65cc495bebdce148ab3aaf06186b6683213717235c71854314859aba99f92f00",
+  "standardV2": {
+    "publishedIdentity": "7c9ebbbe6eefeb131c6c698055c737b429f5b0c6",
+    "historicalProductBoundary": "31cc11982ebd07e009788d5e2c5c3537e9e6b615",
+    "semanticCompatibility": "C1d-audited Standard V2 path: optional research tracing is inactive; no experimental structural module is called"
+  },
+  "primaryGroupIds": [
+    "c1g-251bf90cf23f557cb011",
+    "c1g-c45cb51de5231139b2f2",
+    "c1g-e9b56c7e332c693b6f82",
+    "c1g-41b1767dc01a935198bf",
+    "c1g-ba1d3af16db7a116d755",
+    "c1g-1be44ee4bdbd73cbf632"
+  ],
+  "secondaryReserveGroupIds": [
+    "c1g-6cf5995d049cff49d672",
+    "c1g-ccc7fd5250bd1714c73e",
+    "c1g-2fd95af2a97278cf88ef",
+    "c1g-256c26e3bb37c97b890a",
+    "c1g-6398ddcd56119d32eb70",
+    "c1g-3b112b59456722f8dabe"
+  ],
+  "primaryGroupCount": 6,
+  "signalGroups": 2,
+  "gate": "at least 4 of exactly 6 primary groups classified CAUSAL_CONFIDENCE_SIGNAL",
+  "state": "PRIMARY_COMPLETE",
+  "executionUuid": "5823afed-f014-4a11-98c3-0f0567d41703",
+  "solverExecuted": true,
+  "primaryExecutionAttempted": true,
+  "primaryExecutionComplete": true,
+  "concurrentPrimaryDetected": false,
+  "networkAccessAttempts": 0,
+  "cacheAccessAttempts": 0,
+  "batchCAccessed": false,
+  "batchCExecuted": false,
+  "secondaryReserveExecuted": false,
+  "modelRetrained": false,
+  "productionModified": false,
+  "coreModified": false,
+  "c1dOutcomeReused": false,
+  "upstreamNetworkAccessedDuringC1g": false
+}
