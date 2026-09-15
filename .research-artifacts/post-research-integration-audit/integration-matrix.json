@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "auditHead": "117e70c10a447c3c1f48ba87d6ebcaffc6a67121",
+  "batchCAccessed": false,
+  "lines": [
+    {"area":"Standard V2 canonical solver","conclusion":"Validated canonical baseline","currentImplementation":"runStandardAutoEqV2","outcome":"INTEGRATED_IN_PRODUCT","productStatus":"AUTHORIZED_DEFAULT","action":"KEEP"},
+    {"area":"Ranking / structural quality tie-breaks","conclusion":"Canonical deterministic ordering","currentImplementation":"ranking.ts","outcome":"INTEGRATED_IN_PRODUCT","productStatus":"AUTHORIZED_DEFAULT","action":"KEEP"},
+    {"area":"Response/trig cache and trial-buffer style reuse","conclusion":"Exact cost reduction","currentImplementation":"responseCache.ts and cached removal paths","outcome":"INFRASTRUCTURE_ONLY","productStatus":"INTEGRATED","action":"NO_ACTION","semantics":"SEMANTICS_PRESERVING"},
+    {"area":"Lazy removal audit / progressive evaluation","conclusion":"Cost-focused exact ordering preservation where primary differs","currentImplementation":"deliverable.ts lazy cancellation audit","outcome":"INFRASTRUCTURE_ONLY","productStatus":"INTEGRATED","action":"NO_ACTION","semantics":"SEMANTICS_PRESERVING"},
+    {"area":"Candidate policies / staged refinement","conclusion":"Current selected search policy","currentImplementation":"candidate shortlist; staged then fallback joint refinement","outcome":"INTEGRATED_IN_PRODUCT","productStatus":"AUTHORIZED_DEFAULT","action":"KEEP","semantics":"SEARCH_SEMANTICS_CHANGING"},
+    {"area":"Capacity-aware traversal / storm resource work","conclusion":"Resource ceiling was not the generic quality blocker; 64 is a ceiling, not a mode","currentImplementation":"No separately authorized policy from this line","outcome":"NEGATIVE_CLOSED","productStatus":"NOT_AUTHORIZED","action":"NO_ACTION"},
+    {"area":"Structural Search VNext M1-M4 / O2-O4","conclusion":"Local candidate signal; generic online injection not supported","currentImplementation":"No VNext injection in Standard V2","outcome":"NEGATIVE_CLOSED","productStatus":"NOT_AUTHORIZED","action":"NO_ACTION"},
+    {"area":"Max10 Q31-B4-P8 structural path","conclusion":"Exposed bounded structural sandbox, not a Standard V2 replacement","currentImplementation":"Worker/UI opt-in only","outcome":"INTEGRATED_AS_EXPERIMENTAL_OPT_IN","productStatus":"EXPERIMENTAL_NOT_PROMOTION_AUTHORIZED","action":"KEEP"},
+    {"area":"Manual real-FR regression","conclusion":"Frozen quality baseline and scalability harness","currentImplementation":"fixtures/baseline/test/workflow carried to canonical tree","outcome":"INTEGRATED_IN_PRODUCT","productStatus":"REGRESSION_GATE","action":"KEEP"},
+    {"area":"C1 confidence model","conclusion":"SIGNAL_MODEL_GENERALIZED; CAUSAL_INTEGRATION_NOT_SUPPORTED","currentImplementation":"NOT_INTEGRATED","outcome":"NEGATIVE_CLOSED","productStatus":"NOT_AUTHORIZED","action":"NO_ACTION","batchC":"NOT_AUTHORIZED"},
+    {"area":"C2 Huber-075 preference","conclusion":"C2_CLOSED_HOLDOUT_NOT_CONFIRMED","currentImplementation":"NOT_INTEGRATED","outcome":"NEGATIVE_CLOSED","productStatus":"NOT_AUTHORIZED","action":"NO_ACTION"},
+    {"area":"C3 filter-count/error knee","conclusion":"FRESH_REAL_CORPUS_INSUFFICIENT","currentImplementation":"NOT_INTEGRATED","outcome":"INCONCLUSIVE_CLOSED","productStatus":"NOT_AUTHORIZED","action":"NEW_RESEARCH_REQUIRED"},
+    {"area":"C4 peak-aligned consensus","conclusion":"C4_CLOSED_HOLDOUT_NOT_CONFIRMED","currentImplementation":"NOT_INTEGRATED","outcome":"NEGATIVE_CLOSED","productStatus":"NOT_AUTHORIZED","action":"NO_ACTION"},
+    {"area":"Research trace exports","conclusion":"Optional observability callbacks; no product caller enables them","currentImplementation":"core public exports","outcome":"INFRASTRUCTURE_ONLY","productStatus":"OBSERVABILITY_ONLY","action":"NO_ACTION"},
+    {"area":"Experimental provenance through sessions","conclusion":"Worker marks experimental result but V2 session canonicalization does not preserve/validate the marker","currentImplementation":"marker dropped on session round-trip","outcome":"UNKNOWN_NEEDS_AUDIT","productStatus":"PROVENANCE_GAP","action":"IMPLEMENT_CANDIDATE"}
+  ]
+}

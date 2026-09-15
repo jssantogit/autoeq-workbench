@@ -1,0 +1,12 @@
+Audit evidence (read-only sources; no Batch C content accessed)
+- current checkout: 117e70c10a447c3c1f48ba87d6ebcaffc6a67121
+- origin/main: 2feb737906442dad73116f5a75dc4957abdd83a8
+- origin/main:docs/research/BRANCH_CONSOLIDATION_20260912.json
+- c2d88e3755306b101c11bee8468a6d0a1d623447:.research-artifacts/c1-final-closeout/{manifest.json,final-report.md,evidence-index.txt}
+- 2718375:.research-artifacts/objective-c2-huber-holdout-confirmation/{manifest.json,final-report.md}
+- 04f49e2:.research-artifacts/objective-c3-filter-knee-census/{manifest.json,final-report.md}
+- be42805:.research-artifacts/c4-peak-aligned-consensus-holdout/{manifest.json,final-report.md}
+- b243d5c:.research-artifacts/structural-search-vnext-closeout/{manifest.json,final-report.md,evidence-index.json}
+- 638a37e: manual regression baseline/harness commit
+- current packages/core/src/autoeq/v2/{config,runStandardAutoEqV2,search,candidates,ranking,jointRefine,discreteRefine,deliverable,runtime,structuralSearch}.ts
+- current apps/web/src/{workers/autoeq.worker.ts,state/autoeqController.ts,features/filters/AutoEqSettings.tsx,features/filters/AutoEqRunControl.tsx,session/workbenchSession.ts}

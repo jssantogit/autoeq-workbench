@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "auditKind": "post-research-integration-audit",
+  "repo": {"worktree":"/root/projects/autoeq-workbench","branch":"research/storm-diagnosis-20260910","head":"117e70c10a447c3c1f48ba87d6ebcaffc6a67121","remoteMain":"2feb737906442dad73116f5a75dc4957abdd83a8","dirtyAtStart":true},
+  "protectedProductBoundary": "origin/main canonical tree; packages/core/src/** and apps/** read-only for this audit",
+  "branchConsolidation": {"document":"docs/research/BRANCH_CONSOLIDATION_20260912.json at origin/main","canonicalTreeSource":"798614e5e78d0639a3b373b179c7836350904cb1","historicalBranchTipsPreserved":143,"rejectedTreesReapplied":false},
+  "c1CloseoutSha":"c2d88e3755306b101c11bee8468a6d0a1d623447",
+  "c1Status":"C1_SIGNAL_MODEL_GENERALIZED_CAUSAL_INTEGRATION_NOT_SUPPORTED",
+  "standardV2ImplementationIdentity":"standard-v2 schemaVersion 3; current checkout HEAD",
+  "experimentalMax10Reachability":"PRODUCT_OPT_IN_EXPERIMENTAL: UI toggle -> controller mode -> worker -> Q31-B4-P8 zero-start structural search; eligibility requires default bounds and maxFilters=10",
+  "researchLinesAudited":15,
+  "integrated":6,
+  "positiveNotIntegrated":0,
+  "negativeOrInconclusive":6,
+  "shortlistCount":3,
+  "batchCAccessed":false,
+  "productionModified":false,
+  "coreModified":false,
+  "frontendModified":false,
+  "newExperimentExecuted":false
+}
