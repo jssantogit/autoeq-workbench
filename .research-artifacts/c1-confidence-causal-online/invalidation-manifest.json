@@ -1,0 +1,24 @@
+{
+  "artifactKind": "c1d-execution-integrity-invalidation",
+  "classification": "INCONCLUSIVE",
+  "frozenProtocolCommit": "b5606dc7b3aa2dd3917af2be817ca98d24649907",
+  "supersededPreOutcomeFreezeCommit": "d371defd11dc7ce274b0a9d8daa3f3439757fd4f",
+  "confidenceModelSha256": "65cc495bebdce148ab3aaf06186b6683213717235c71854314859aba99f92f00",
+  "primaryOutcomes": [
+    {
+      "path": "group-c1g-ebdb284a8c7563a12c5f.json",
+      "sha256": "3ba43762502b705d1ce93ee9e20094c600c248e090f217dbda5a09c333ef7cc1",
+      "scientificallyValid": false,
+      "invalidationReason": "CONCURRENT_PRIMARY_EXECUTION",
+      "preserved": true
+    }
+  ],
+  "reason": "The environment left the first primary execution running; a second frozen primary invocation began before it was detected. Standard V2 deadline/runtime behavior makes concurrent execution invalid for one-shot evidence.",
+  "batchCAccessed": false,
+  "batchCExecuted": false,
+  "confidenceModelRetrained": false,
+  "productionCoreModified": false,
+  "originalWipModified": false,
+  "rerunAllowed": false,
+  "scientificInterpretation": "No valid conclusion about causal confidence integration may be drawn. C1_CONFIDENCE_MODEL_GENERALIZED remains unchanged."
+}

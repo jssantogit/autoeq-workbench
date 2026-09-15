@@ -1,0 +1,573 @@
+{
+  "artifactKind": "c1d-group-causal-online-evidence",
+  "groupId": "c1g-ebdb284a8c7563a12c5f",
+  "split": "primary",
+  "primaryGateInput": true,
+  "freezeCommit": "d371defd11dc7ce274b0a9d8daa3f3439757fd4f",
+  "observations": [
+    {
+      "observationId": "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop Aria\"",
+      "rigClass": "gras-43ac",
+      "profileSource": "CLASS_SPECIFIC",
+      "confidenceKind": "CLASS_SPECIFIC",
+      "weightProfileHash": "b42540eea07b641cc2ee58cb944d528edaba29d20cf4de8dc912645b26588dd5",
+      "confidence": {
+        "mean": 0.3576712332128866,
+        "min": 0.02784776650748968,
+        "max": 0.9981649615757581,
+        "wBar": 0.11581266142387857
+      },
+      "arms": [
+        {
+          "arm": "FROZEN_BASELINE",
+          "artifactRmse4_14k": 2.9273731455457517,
+          "artifactMae4_14k": 1.8787330214527118,
+          "artifactMaxAbs4_14k": 7.93141378363118,
+          "artifactMaxAbsFrequencyHz": 11830.81161597208,
+          "artifactRmseFullGrid": 1.618452058238876,
+          "artifactMaeFullGrid": 1.2051688534422862,
+          "nineBands": [
+            {
+              "bandHz": [
+                20,
+                500
+              ],
+              "rmse": 1.2937767787374252,
+              "mae": 1.289004951135752
+            },
+            {
+              "bandHz": [
+                500,
+                1000
+              ],
+              "rmse": 1.4327990229647591,
+              "mae": 1.4263179757028783
+            },
+            {
+              "bandHz": [
+                1000,
+                2000
+              ],
+              "rmse": 0.7983476740297669,
+              "mae": 0.7736127964890044
+            },
+            {
+              "bandHz": [
+                2000,
+                4000
+              ],
+              "rmse": 0.3224551330568693,
+              "mae": 0.31582047825415555
+            },
+            {
+              "bandHz": [
+                4000,
+                6000
+              ],
+              "rmse": 0.3115700161859538,
+              "mae": 0.3074784095062582
+            },
+            {
+              "bandHz": [
+                6000,
+                8000
+              ],
+              "rmse": 0.6900945899955284,
+              "mae": 0.6669304642549118
+            },
+            {
+              "bandHz": [
+                8000,
+                10000
+              ],
+              "rmse": 1.9666802862571053,
+              "mae": 1.8694373458027798
+            },
+            {
+              "bandHz": [
+                10000,
+                14000
+              ],
+              "rmse": 5.3528817298839115,
+              "mae": 4.788318691709336
+            },
+            {
+              "bandHz": [
+                14000,
+                20000
+              ],
+              "rmse": 0.26414727179485575,
+              "mae": 0.2248777523114539
+            }
+          ],
+          "deliveredFilterCount": 10,
+          "sumAbsGainDb": 40.599999999999994,
+          "maxAbsGainDb": 13.6,
+          "maxQ": 3.04,
+          "preampDb": -0.7,
+          "cancellationScore": 0,
+          "solverInternalMetrics": {
+            "maeDb": 1.0144216411350537,
+            "rmseDb": 1.2382338791202412,
+            "maxAbsDb": 3.7148022270486747,
+            "maxAbsFrequencyHz": 20000
+          },
+          "terminationReason": "converged",
+          "elapsedMs": 37201.165166,
+          "filters": [
+            {
+              "id": "autoeq-1",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 45,
+              "gainDb": 2.4,
+              "q": 0.41
+            },
+            {
+              "id": "autoeq-2",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 100,
+              "gainDb": 2.3,
+              "q": 0.52
+            },
+            {
+              "id": "autoeq-3",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 101,
+              "gainDb": 1.9,
+              "q": 0.31
+            },
+            {
+              "id": "autoeq-4",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 119,
+              "gainDb": -13.6,
+              "q": 0.26
+            },
+            {
+              "id": "autoeq-5",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 134,
+              "gainDb": 1.7,
+              "q": 0.25
+            },
+            {
+              "id": "autoeq-6",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 146,
+              "gainDb": 2,
+              "q": 0.36
+            },
+            {
+              "id": "autoeq-7",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 164,
+              "gainDb": 2,
+              "q": 0.37
+            },
+            {
+              "id": "autoeq-8",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 220,
+              "gainDb": 1.9,
+              "q": 0.43
+            },
+            {
+              "id": "autoeq-9",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 11905,
+              "gainDb": -9,
+              "q": 2.45
+            },
+            {
+              "id": "autoeq-10",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 13832,
+              "gainDb": 3.8,
+              "q": 3.04
+            }
+          ]
+        },
+        {
+          "arm": "CONSTANT_AUTHORITY_CONTROL",
+          "artifactRmse4_14k": 0.2933375390471948,
+          "artifactMae4_14k": 0.1843257333181654,
+          "artifactMaxAbs4_14k": 0.8922430318764673,
+          "artifactMaxAbsFrequencyHz": 13184.099618988774,
+          "artifactRmseFullGrid": 1.1130982220372638,
+          "artifactMaeFullGrid": 0.8188250697633233,
+          "nineBands": [
+            {
+              "bandHz": [
+                20,
+                500
+              ],
+              "rmse": 1.47256266934477,
+              "mae": 1.2454241611902217
+            },
+            {
+              "bandHz": [
+                500,
+                1000
+              ],
+              "rmse": 1.3365810040345978,
+              "mae": 1.307800351979813
+            },
+            {
+              "bandHz": [
+                1000,
+                2000
+              ],
+              "rmse": 0.538975375896791,
+              "mae": 0.5126809642826698
+            },
+            {
+              "bandHz": [
+                2000,
+                4000
+              ],
+              "rmse": 0.16135010352281257,
+              "mae": 0.15181923078674814
+            },
+            {
+              "bandHz": [
+                4000,
+                6000
+              ],
+              "rmse": 0.061144814783470725,
+              "mae": 0.060685086474331615
+            },
+            {
+              "bandHz": [
+                6000,
+                8000
+              ],
+              "rmse": 0.05807061592897872,
+              "mae": 0.05779989792594124
+            },
+            {
+              "bandHz": [
+                8000,
+                10000
+              ],
+              "rmse": 0.10772105208324659,
+              "mae": 0.1047772012096986
+            },
+            {
+              "bandHz": [
+                10000,
+                14000
+              ],
+              "rmse": 0.5509795855273906,
+              "mae": 0.4917919914948916
+            },
+            {
+              "bandHz": [
+                14000,
+                20000
+              ],
+              "rmse": 0.24362280154836555,
+              "mae": 0.15123421656674543
+            }
+          ],
+          "deliveredFilterCount": 10,
+          "sumAbsGainDb": 28.299999999999997,
+          "maxAbsGainDb": 12.8,
+          "maxQ": 12,
+          "preampDb": -1,
+          "cancellationScore": 0,
+          "solverInternalMetrics": {
+            "maeDb": 0.9830994745274658,
+            "rmseDb": 1.2574172531164127,
+            "maxAbsDb": 3.7764050622933376,
+            "maxAbsFrequencyHz": 20000
+          },
+          "terminationReason": "converged",
+          "elapsedMs": 35198.839244,
+          "filters": [
+            {
+              "id": "autoeq-1",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 39,
+              "gainDb": 2.5,
+              "q": 0.59
+            },
+            {
+              "id": "autoeq-2",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 81,
+              "gainDb": 1.4,
+              "q": 0.55
+            },
+            {
+              "id": "autoeq-3",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 95,
+              "gainDb": -12.8,
+              "q": 0.27
+            },
+            {
+              "id": "autoeq-4",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 96,
+              "gainDb": 1.9,
+              "q": 0.23
+            },
+            {
+              "id": "autoeq-5",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 110,
+              "gainDb": 1.9,
+              "q": 0.31
+            },
+            {
+              "id": "autoeq-6",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 119,
+              "gainDb": 1.7,
+              "q": 0.43
+            },
+            {
+              "id": "autoeq-7",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 125,
+              "gainDb": 1.7,
+              "q": 0.3
+            },
+            {
+              "id": "autoeq-8",
+              "enabled": true,
+              "type": "LS",
+              "frequencyHz": 241,
+              "gainDb": 1.8,
+              "q": 0.7
+            },
+            {
+              "id": "autoeq-9",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 13342,
+              "gainDb": -1,
+              "q": 2.51
+            },
+            {
+              "id": "autoeq-10",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 14377,
+              "gainDb": 1.6,
+              "q": 12
+            }
+          ]
+        },
+        {
+          "arm": "CONFIDENCE_SHAPED",
+          "artifactRmse4_14k": 0.29130219713071226,
+          "artifactMae4_14k": 0.16073147489886394,
+          "artifactMaxAbs4_14k": 1.1910220604282606,
+          "artifactMaxAbsFrequencyHz": 13668.760106701147,
+          "artifactRmseFullGrid": 1.282485471506655,
+          "artifactMaeFullGrid": 1.041619852717791,
+          "nineBands": [
+            {
+              "bandHz": [
+                20,
+                500
+              ],
+              "rmse": 1.644715135376036,
+              "mae": 1.5797900344279676
+            },
+            {
+              "bandHz": [
+                500,
+                1000
+              ],
+              "rmse": 1.726694746180071,
+              "mae": 1.7021996430503652
+            },
+            {
+              "bandHz": [
+                1000,
+                2000
+              ],
+              "rmse": 0.7844398214610796,
+              "mae": 0.7514067424166001
+            },
+            {
+              "bandHz": [
+                2000,
+                4000
+              ],
+              "rmse": 0.24772867333338114,
+              "mae": 0.23267312871141635
+            },
+            {
+              "bandHz": [
+                4000,
+                6000
+              ],
+              "rmse": 0.08244401459233545,
+              "mae": 0.08083866395288508
+            },
+            {
+              "bandHz": [
+                6000,
+                8000
+              ],
+              "rmse": 0.05121245819494184,
+              "mae": 0.05115014202640594
+            },
+            {
+              "bandHz": [
+                8000,
+                10000
+              ],
+              "rmse": 0.061391711998323176,
+              "mae": 0.06071642441265998
+            },
+            {
+              "bandHz": [
+                10000,
+                14000
+              ],
+              "rmse": 0.5489396756486076,
+              "mae": 0.415150991770044
+            },
+            {
+              "bandHz": [
+                14000,
+                20000
+              ],
+              "rmse": 0.25566127171156394,
+              "mae": 0.14870707110482834
+            }
+          ],
+          "deliveredFilterCount": 10,
+          "sumAbsGainDb": 31.500000000000004,
+          "maxAbsGainDb": 13.7,
+          "maxQ": 12,
+          "preampDb": -1.1,
+          "cancellationScore": 0,
+          "solverInternalMetrics": {
+            "maeDb": 0.9573205683802821,
+            "rmseDb": 1.260661404896726,
+            "maxAbsDb": 3.7826705765212756,
+            "maxAbsFrequencyHz": 20000
+          },
+          "terminationReason": "converged",
+          "elapsedMs": 37091.92535799999,
+          "filters": [
+            {
+              "id": "autoeq-1",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 59,
+              "gainDb": 2.3,
+              "q": 0.64
+            },
+            {
+              "id": "autoeq-2",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 88,
+              "gainDb": 2.2,
+              "q": 0.49
+            },
+            {
+              "id": "autoeq-3",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 112,
+              "gainDb": 1.9,
+              "q": 0.33
+            },
+            {
+              "id": "autoeq-4",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 113,
+              "gainDb": -13.7,
+              "q": 0.27
+            },
+            {
+              "id": "autoeq-5",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 115,
+              "gainDb": 2.2,
+              "q": 0.53
+            },
+            {
+              "id": "autoeq-6",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 186,
+              "gainDb": 1.8,
+              "q": 0.31
+            },
+            {
+              "id": "autoeq-7",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 200,
+              "gainDb": 2,
+              "q": 0.38
+            },
+            {
+              "id": "autoeq-8",
+              "enabled": true,
+              "type": "LS",
+              "frequencyHz": 302,
+              "gainDb": 1.6,
+              "q": 0.7
+            },
+            {
+              "id": "autoeq-9",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 13852,
+              "gainDb": -1.6,
+              "q": 4.13
+            },
+            {
+              "id": "autoeq-10",
+              "enabled": true,
+              "type": "PK",
+              "frequencyHz": 14376,
+              "gainDb": 2.2,
+              "q": 12
+            }
+          ]
+        }
+      ],
+      "comparison": {
+        "gainVsBaseline": 0.900490240687644,
+        "gainVsConstant": 0.006938566141563834,
+        "combinedGain": 0.006938566141563834,
+        "classification": "CAUSAL_CONFIDENCE_LOSS"
+      }
+    }
+  ],
+  "gate": {
+    "informativeCount": 1,
+    "wins": 0,
+    "medianCombinedGain": 0.006938566141563834,
+    "classification": "NO_CAUSAL_CONFIDENCE_SIGNAL"
+  }
+}
