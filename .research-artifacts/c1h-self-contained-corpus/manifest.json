@@ -1,15 +1,14 @@
 {
   "schemaVersion": 1,
   "campaign": "C1h",
-  "phase": "PROTOCOL_FREEZE",
-  "classification": "C1H_PROTOCOL_FROZEN",
+  "classification": "C1H_CORPUS_SELF_CONTAINED",
   "baseCommit": "f93adaf41ac4dcf02897d5f390c911014a4fa536",
   "c1f": {
     "classification": "C1F_CORPUS_READY",
-    "baseCommit": "3eb0329b8eee80eae8de72e268bf0e4fa4be733c",
-    "toolingCommit": "cafd24db4bb2b2cce3145c2bce5eb0d274713c06",
     "evidenceCommit": "f93adaf41ac4dcf02897d5f390c911014a4fa536",
-    "hashIndexSha256": "36cc16692dd7a0cc6e45c3c138e4ed2a481ab6c5293aca0a712098f6ecb3f7b7"
+    "toolingCommit": "cafd24db4bb2b2cce3145c2bce5eb0d274713c06",
+    "hashIndexSha256": "36cc16692dd7a0cc6e45c3c138e4ed2a481ab6c5293aca0a712098f6ecb3f7b7",
+    "expectedHashIndexSha256": "36cc16692dd7a0cc6e45c3c138e4ed2a481ab6c5293aca0a712098f6ecb3f7b7"
   },
   "upstream": {
     "repository": "jaakkopasanen/AutoEq",
@@ -32,12 +31,21 @@
     "c1g-6398ddcd56119d32eb70",
     "c1g-3b112b59456722f8dabe"
   ],
+  "primaryCurveCount": 31,
+  "secondaryCurveCount": 25,
+  "materializedCorpusSha256": "db81c5c329128eef6769fa7da210e5580c2eb6bf5c4bc690c2f1104e9b8092d4",
   "parserCanonicalizerVersion": 1,
   "normalization": {
     "mode": "hz",
     "frequencyHz": 500,
     "levelDb": 60
   },
+  "cacheHits": 56,
+  "immutableRehydrations": 0,
+  "sourceHashMismatches": [],
+  "sourceC1fClassification": "C1F_CORPUS_READY",
+  "primarySelectionChanged": false,
+  "secondarySelectionChanged": false,
   "solverExecuted": false,
   "causalOutcomesGenerated": false,
   "confidenceMetricsComputed": false,
@@ -46,8 +54,8 @@
   "batchCAccessed": false,
   "batchCExecuted": false,
   "rawUpstreamBytesCommitted": false,
-  "normalizedResponsePointsCommitted": false,
-  "selfContainedVerificationPassed": false,
+  "normalizedResponsePointsCommitted": true,
+  "selfContainedVerificationPassed": true,
   "selfContainedVerificationNetworkAccess": false,
   "selfContainedVerificationCacheAccess": false,
   "productionModified": false,

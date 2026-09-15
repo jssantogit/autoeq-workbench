@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "classification": "C1H_CORPUS_SELF_CONTAINED",
+  "primaryGroupIds": [
+    "c1g-251bf90cf23f557cb011",
+    "c1g-c45cb51de5231139b2f2",
+    "c1g-e9b56c7e332c693b6f82",
+    "c1g-41b1767dc01a935198bf",
+    "c1g-ba1d3af16db7a116d755",
+    "c1g-1be44ee4bdbd73cbf632"
+  ],
+  "secondaryGroupIds": [
+    "c1g-6cf5995d049cff49d672",
+    "c1g-ccc7fd5250bd1714c73e",
+    "c1g-2fd95af2a97278cf88ef",
+    "c1g-256c26e3bb37c97b890a",
+    "c1g-6398ddcd56119d32eb70",
+    "c1g-3b112b59456722f8dabe"
+  ],
+  "groups": [
+    {
+      "groupId": "c1g-1be44ee4bdbd73cbf632",
+      "role": "PRIMARY",
+      "groupHash": "8564b0acfe9232e3d9a043b07119e09561f8be4e47be6d9b66f48ccb3d87e51e",
+      "memberCount": 5
+    },
+    {
+      "groupId": "c1g-251bf90cf23f557cb011",
+      "role": "PRIMARY",
+      "groupHash": "7f5989f68df52e6daab0c0601172b2a64bf2b784017c297bc063b151666eb7ce",
+      "memberCount": 6
+    },
+    {
+      "groupId": "c1g-256c26e3bb37c97b890a",
+      "role": "SECONDARY_RESERVE_UNEXECUTED",
+      "groupHash": "0e2f518c75996f099d452dabba2fce83249f7832409339b3f7d8bd2595d2b1bf",
+      "memberCount": 4
+    },
+    {
+      "groupId": "c1g-2fd95af2a97278cf88ef",
+      "role": "SECONDARY_RESERVE_UNEXECUTED",
+      "groupHash": "4194e0f8d8291839353bb1ba2ee7844f3c61db47ad67d201c854e700f3fa4bc0",
+      "memberCount": 4
+    },
+    {
+      "groupId": "c1g-3b112b59456722f8dabe",
+      "role": "SECONDARY_RESERVE_UNEXECUTED",
+      "groupHash": "17957bcb6a0d124cb18d8d84119235877e8e7de0212e93a8139b39a1ac58441b",
+      "memberCount": 4
+    },
+    {
+      "groupId": "c1g-41b1767dc01a935198bf",
+      "role": "PRIMARY",
+      "groupHash": "deecea3bbc9ac9fe7e1025630c8fabd86bf0f0d9fea2419151298333633c1441",
+      "memberCount": 5
+    },
+    {
+      "groupId": "c1g-6398ddcd56119d32eb70",
+      "role": "SECONDARY_RESERVE_UNEXECUTED",
+      "groupHash": "cd8e03acf94f2eff8f6e021c892dbbf0ae3036b828c085b96a57f0b6c6a2de33",
+      "memberCount": 4
+    },
+    {
+      "groupId": "c1g-6cf5995d049cff49d672",
+      "role": "SECONDARY_RESERVE_UNEXECUTED",
+      "groupHash": "a97f78bc43de00cabeabfb9e3765f740806238c01bf25f30088de6c62e9c14f0",
+      "memberCount": 5
+    },
+    {
+      "groupId": "c1g-ba1d3af16db7a116d755",
+      "role": "PRIMARY",
+      "groupHash": "ccc13e7c7a74a8a9f17d889234f5fc996fdd89928b10c2cf71546b127c8b3c1a",
+      "memberCount": 5
+    },
+    {
+      "groupId": "c1g-c45cb51de5231139b2f2",
+      "role": "PRIMARY",
+      "groupHash": "d15abe41de575a73be925269ed344b7246b8a110e6d32800926a25eb72765d14",
+      "memberCount": 5
+    },
+    {
+      "groupId": "c1g-ccc7fd5250bd1714c73e",
+      "role": "SECONDARY_RESERVE_UNEXECUTED",
+      "groupHash": "fb5ce98211bbf71221ac6ab598db88890833b97f9e2b70d60e89b7e1695a02cf",
+      "memberCount": 4
+    },
+    {
+      "groupId": "c1g-e9b56c7e332c693b6f82",
+      "role": "PRIMARY",
+      "groupHash": "4790cd6dd2157b41f46c5755ef38709f7ca45a97af1aaec20312e8acf7b6e177",
+      "memberCount": 5
+    }
+  ],
+  "primaryCurveCount": 31,
+  "secondaryCurveCount": 25,
+  "materializedCorpusSha256": "db81c5c329128eef6769fa7da210e5580c2eb6bf5c4bc690c2f1104e9b8092d4",
+  "c1fEvidenceCommit": "f93adaf41ac4dcf02897d5f390c911014a4fa536",
+  "c1fHashIndexSha256": "36cc16692dd7a0cc6e45c3c138e4ed2a481ab6c5293aca0a712098f6ecb3f7b7",
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "parserCanonicalizerVersion": 1
+}
