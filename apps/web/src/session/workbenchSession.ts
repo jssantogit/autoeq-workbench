@@ -324,6 +324,13 @@ function isValidRunManifestV2(manifest: unknown): manifest is RunManifestV2 {
   const targetAchieved = metricsAreValid &&
     (manifest.metrics as RunManifestV2['metrics']).rmseDb <= 0.25 &&
     (manifest.metrics as RunManifestV2['metrics']).maxAbsDb <= 0.75
+  const experimentalStructuralSearch = manifest.experimentalStructuralSearch
+  const experimentalStructuralSearchIsValid = experimentalStructuralSearch === undefined || (
+    isRecord(experimentalStructuralSearch) &&
+    Object.keys(experimentalStructuralSearch).length === 2 &&
+    experimentalStructuralSearch.preset === 'max10-q31-b4-p8-experimental' &&
+    experimentalStructuralSearch.seedMode === 'zero-start'
+  )
 
   return (
     manifest.schemaVersion === 3 &&
@@ -351,6 +358,7 @@ function isValidRunManifestV2(manifest: unknown): manifest is RunManifestV2 {
       manifest.terminationReason === 'time-limit') &&
     typeof manifest.targetAchieved === 'boolean' &&
     manifest.targetAchieved === targetAchieved &&
+    experimentalStructuralSearchIsValid &&
     (manifest.terminationReason !== 'target-reached' || manifest.targetAchieved)
   )
 }
@@ -386,6 +394,12 @@ function canonicalizeRunManifest(
       },
       terminationReason: manifest.terminationReason,
       targetAchieved: manifest.targetAchieved,
+      ...(manifest.experimentalStructuralSearch === undefined ? {} : {
+        experimentalStructuralSearch: {
+          preset: manifest.experimentalStructuralSearch.preset,
+          seedMode: manifest.experimentalStructuralSearch.seedMode,
+        },
+      }),
     }
   }
   return {

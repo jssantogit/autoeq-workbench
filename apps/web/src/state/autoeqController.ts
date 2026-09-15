@@ -56,11 +56,7 @@ function matchesCapturedProvenance(
 ): boolean {
   if (!manifest || typeof manifest !== 'object') return false
   if (manifest.schemaVersion !== 3 || manifest.algorithmVersion !== 'standard-v2') return false
-  const experimentalMarker = (
-    manifest as AutoEqResultV2['manifest'] & {
-      experimentalStructuralSearch?: { preset?: unknown; seedMode?: unknown }
-    }
-  ).experimentalStructuralSearch
+  const experimentalMarker = manifest.experimentalStructuralSearch
   if (mode === EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE) {
     if (
       experimentalMarker?.preset !== MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET ||

@@ -12,6 +12,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createAutoEqResult,
   createAutoEqResultV2,
+  createExperimentalAutoEqResultV2,
   createAutoEqRunRecord,
 } from '../test/autoEqFixture'
 import {
@@ -132,6 +133,13 @@ function createValidAutoEqSessionV2(): WorkbenchSessionV2 {
     solutionState: 'clean',
     autoEqRun: { manifest: result.manifest },
   }
+}
+
+function createExperimentalAutoEqSessionV2(): WorkbenchSessionV2 {
+  const session = createValidAutoEqSessionV2()
+  const result = createExperimentalAutoEqResultV2(2.5)
+  session.autoEqRun = { manifest: result.manifest }
+  return session
 }
 
 describe('Workbench Session V1 Serialization and Round-Trip', () => {
@@ -299,6 +307,44 @@ describe('Workbench Session V1 Serialization and Round-Trip', () => {
     expect(deserialized1.filters[0]!.gainDb).toBe(fixture.filters[0]!.gainDb)
   })
 
+  it('round-trips exact experimental structural provenance without adding it to Standard V2', () => {
+    const experimental = createExperimentalAutoEqSessionV2()
+    const standard = createValidAutoEqSessionV2()
+
+    const restoredExperimental = deserializeWorkbenchSession(serializeWorkbenchSession(experimental))
+    const restoredStandard = deserializeWorkbenchSession(serializeWorkbenchSession(standard))
+    if (restoredExperimental.autoEqRun?.manifest.algorithmVersion !== 'standard-v2') {
+      throw new Error('Expected V2 experimental manifest')
+    }
+    if (restoredStandard.autoEqRun?.manifest.algorithmVersion !== 'standard-v2') {
+      throw new Error('Expected V2 standard manifest')
+    }
+
+    expect(restoredExperimental.autoEqRun?.manifest.experimentalStructuralSearch).toEqual({
+      preset: 'max10-q31-b4-p8-experimental',
+      seedMode: 'zero-start',
+    })
+    expect(restoredExperimental.autoEqRun?.manifest.finalFilters).toEqual(
+      experimental.autoEqRun?.manifest.finalFilters,
+    )
+    expect('experimentalStructuralSearch' in restoredStandard.autoEqRun!.manifest).toBe(false)
+  })
+
+  it.each([
+    null,
+    {},
+    { preset: 'wrong', seedMode: 'zero-start' },
+    { preset: 'max10-q31-b4-p8-experimental', seedMode: 'warm-start' },
+    'not-an-object',
+    ['max10-q31-b4-p8-experimental', 'zero-start'],
+  ])('rejects malformed experimental structural provenance: %j', (marker) => {
+    const session = createExperimentalAutoEqSessionV2()
+    ;(session.autoEqRun!.manifest as unknown as { experimentalStructuralSearch: unknown })
+      .experimentalStructuralSearch = marker
+
+    expect(() => deserializeWorkbenchSession(JSON.stringify(session))).toThrow()
+  })
+
   it('deep freezes validated session and prevents runtime and typed mutation of nested structures', () => {
     const fixture = createValidAutoEqSession()
     const validated = validateWorkbenchSession(fixture)
@@ -358,6 +404,15 @@ describe('Workbench Session V1 Serialization and Round-Trip', () => {
       // @ts-expect-error - statically disallowed
       validated.autoEqRun!.manifest.finalFilters[0]!.gainDb = 99
     }).toThrow(TypeError)
+  })
+
+  it('deep freezes canonical experimental structural provenance', () => {
+    const validated = validateWorkbenchSession(createExperimentalAutoEqSessionV2())
+    if (validated.autoEqRun?.manifest.algorithmVersion !== 'standard-v2') {
+      throw new Error('Expected V2 experimental manifest')
+    }
+
+    expect(Object.isFrozen(validated.autoEqRun.manifest.experimentalStructuralSearch)).toBe(true)
   })
 
   it('applying deep-frozen validated session produces a mutable copy in workspaceStore', () => {

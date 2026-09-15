@@ -72,6 +72,11 @@ export interface RunManifestV1 {
   cancellationAudit: CancellationAudit
 }
 
+export interface ExperimentalStructuralSearchProvenance {
+  preset: 'max10-q31-b4-p8-experimental'
+  seedMode: 'zero-start'
+}
+
 export interface RunManifestV2 {
   schemaVersion: 3
   algorithmVersion: 'standard-v2'
@@ -89,6 +94,7 @@ export interface RunManifestV2 {
   cancellationAudit: CancellationAudit
   terminationReason: StandardV2TerminationReason
   targetAchieved: boolean
+  experimentalStructuralSearch?: ExperimentalStructuralSearchProvenance
 }
 
 export interface AutoEqResultV1 {

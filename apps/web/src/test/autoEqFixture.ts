@@ -101,6 +101,15 @@ export function createAutoEqResultV2(
   }
 }
 
+export function createExperimentalAutoEqResultV2(gainDb = 3): AutoEqResultV2 {
+  const result = createAutoEqResultV2(gainDb)
+  result.manifest.experimentalStructuralSearch = {
+    preset: 'max10-q31-b4-p8-experimental',
+    seedMode: 'zero-start',
+  }
+  return result
+}
+
 export function createAutoEqRunRecord(gainDb = 3): { manifest: RunManifestV1 } {
   return { manifest: createAutoEqResult(gainDb).manifest }
 }

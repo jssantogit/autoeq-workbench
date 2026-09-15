@@ -47,17 +47,14 @@ describe('AutoEQ Worker execution', () => {
       algorithmVersion: 'standard-v2',
       autoeqSettings: { timeLimitSeconds: 5 },
     })
+    expect('experimentalStructuralSearch' in result.manifest).toBe(false)
   })
 })
 
 describe('AutoEQ Worker experimental structural execution', () => {
   it('runs the validated Q31-B4-P8 zero-start mode only when explicitly requested', () => {
     const result = runAutoEqWorkerInput(input, EXPERIMENTAL_STRUCTURAL_AUTOEQ_MODE)
-    const marker = (
-      result.manifest as typeof result.manifest & {
-        experimentalStructuralSearch?: { preset?: string; seedMode?: string }
-      }
-    ).experimentalStructuralSearch
+    const marker = result.manifest.experimentalStructuralSearch
 
     expect(marker).toEqual({
       preset: 'max10-q31-b4-p8-experimental',

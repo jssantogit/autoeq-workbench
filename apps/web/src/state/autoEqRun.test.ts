@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { createAutoEqRunRecord, createAutoEqResult } from '../test/autoEqFixture'
+import {
+  createAutoEqRunRecord,
+  createAutoEqResult,
+  createExperimentalAutoEqResultV2,
+} from '../test/autoEqFixture'
 import {
   cloneAutoEqRunRecord,
   type AutoEqRunRecord,
@@ -30,6 +34,23 @@ describe('cloneAutoEqRunRecord', () => {
     // Mutation on clone does not affect original
     cloned!.manifest.finalFilters[0]!.gainDb = -99
     expect(original.manifest.finalFilters[0]!.gainDb).not.toBe(-99)
+  })
+
+  it('preserves and independently clones experimental structural provenance', () => {
+    const original: AutoEqRunRecord = { manifest: createExperimentalAutoEqResultV2().manifest }
+    const cloned = cloneAutoEqRunRecord(original)
+    if (cloned?.manifest.algorithmVersion !== 'standard-v2') throw new Error('Expected V2 manifest')
+    if (original.manifest.algorithmVersion !== 'standard-v2') throw new Error('Expected V2 manifest')
+
+    expect(cloned.manifest.experimentalStructuralSearch).toEqual({
+      preset: 'max10-q31-b4-p8-experimental',
+      seedMode: 'zero-start',
+    })
+    expect(cloned.manifest.experimentalStructuralSearch).not.toBe(
+      original.manifest.experimentalStructuralSearch,
+    )
+    cloned.manifest.experimentalStructuralSearch!.seedMode = 'changed' as never
+    expect(original.manifest.experimentalStructuralSearch!.seedMode).toBe('zero-start')
   })
 
   it('accepts deeply frozen/readonly AutoEqRunRecord from validated session and returns mutable record', () => {

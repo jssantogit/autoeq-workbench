@@ -41,6 +41,7 @@ describe('runStandardAutoEqV2', () => {
     expect(second).toEqual(first)
     expect(first.manifest.schemaVersion).toBe(3)
     expect(first.manifest.algorithmVersion).toBe('standard-v2')
+    expect('experimentalStructuralSearch' in first.manifest).toBe(false)
     expect(first.filters.length).toBeLessThanOrEqual(runInput.settings.maxFilters)
     expect(first.manifest.targetAchieved).toBe(
       first.metrics.rmseDb <= 0.25 && first.metrics.maxAbsDb <= 0.75,

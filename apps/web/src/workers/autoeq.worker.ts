@@ -46,20 +46,9 @@ export function sanitizeAutoEqError(cause: unknown): AutoEqPublicError {
   return { category: 'optimization', message: 'AutoEQ optimization failed.' }
 }
 
-interface ExperimentalStructuralManifestMarker {
-  preset: typeof MAX10_Q31_B4_P8_EXPERIMENTAL_PRESET
-  seedMode: 'zero-start'
-}
-
-type ExperimentalAutoEqResultV2 = AutoEqResultV2 & {
-  manifest: AutoEqResultV2['manifest'] & {
-    experimentalStructuralSearch: ExperimentalStructuralManifestMarker
-  }
-}
-
 export function runExperimentalStructuralAutoEqWorkerInput(
   input: StandardAutoEqInputV2,
-): ExperimentalAutoEqResultV2 {
+): AutoEqResultV2 {
   if (
     input === null || typeof input !== 'object' ||
     input.source === null || typeof input.source !== 'object' ||
