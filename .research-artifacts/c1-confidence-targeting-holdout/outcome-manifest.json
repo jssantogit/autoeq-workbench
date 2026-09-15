@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c1c-confidence-targeting-holdout-outcome",
+  "algorithmVersion": "c1-confidence-targeting-v1",
+  "phase": "holdout-outcome",
+  "milestone": "C1c-confidence-targeting-holdout-confirmation",
+  "frozenBoundary": "be4280512d36ad406fbebb63e49d5df51ce57a46",
+  "protocolFreezeCommit": "16491dbb517f6059e6d379e136019737b59f81c9",
+  "protocolSha256": "0a4e20c50879f2d7aaa5765debd2dca55348b2c34158a3fd8eb2dc79354422a0",
+  "protocolManifestSha256": "0a4e20c50879f2d7aaa5765debd2dca55348b2c34158a3fd8eb2dc79354422a0",
+  "confidenceModelSha256": "65cc495bebdce148ab3aaf06186b6683213717235c71854314859aba99f92f00",
+  "c1aV11": {
+    "corpusVersion": "c1-cross-rig-confidence-corpus-v1.1",
+    "commit": "28ce4470b12a3f3d6ed6eea0fcd5ea21081f1d3a",
+    "evidenceSha256": "a1bc2d4b6da004afb01685a48f95243dcde72e6d1284906edd03ca4cf471fd43",
+    "classification": "C1_CORPUS_V1_1_READY"
+  },
+  "c1b": {
+    "protocolFreezeCommit": "6e8dba547bc9f12a072e0660ce35c89a3d502455",
+    "evidenceCommit": "458f95642b6a0880311d48afdfc54409c1e8b34a",
+    "evidenceSha256": "a962156d1203a243740c909e464399e0fd84d4fc92ffeaa23fa514d8129b4004",
+    "developmentGroupIds": [
+      "c1g-c4cd2c0381c89a1e9911",
+      "c1g-106abf02ed8b580831bd",
+      "c1g-5fe954a9babbe4c5cda0",
+      "c1g-0a8d256822943d659136",
+      "c1g-20fa430247872858b84b",
+      "c1g-3579b4e7c8f794efd07a"
+    ],
+    "developmentClassification": "CONFIDENCE_TARGETING_DEV_SUPPORTED"
+  },
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "holdoutGroupIds": [
+    "c1g-ebdb284a8c7563a12c5f",
+    "c1g-3f4de360d87a28aea240",
+    "c1g-f2a43144c5936389d89d",
+    "c1g-8bd11cb5d7772ff2165b",
+    "c1g-6c369c990dd73512951b",
+    "c1g-dc1ade324d0c4b3192d6"
+  ],
+  "rejectedDevelopmentGroupIds": [
+    "c1g-c4cd2c0381c89a1e9911",
+    "c1g-106abf02ed8b580831bd",
+    "c1g-5fe954a9babbe4c5cda0",
+    "c1g-0a8d256822943d659136",
+    "c1g-20fa430247872858b84b",
+    "c1g-3579b4e7c8f794efd07a"
+  ],
+  "rejectedBatchCToken": "fresh-real-corpus-v1.2:Batch C",
+  "holdoutGroupEvidence": [
+    {
+      "groupId": "c1g-ebdb284a8c7563a12c5f",
+      "deviceFamily": "moondrop aria",
+      "configurationSignature": "moondrop aria",
+      "memberCount": 6,
+      "exact711MemberCount": 5,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 0,
+      "medianTargetingGain": 0.28612921760880067,
+      "medianRelativeTargetingGain": 0.28612921760880067,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "69f5586e98f708856fb8207ac25baf8efb8f1924281db7c056469759130bc722",
+      "repeatabilitySigmaSha256": "3474d08ebacb7aeafd71c25366871d0db1832cf732eb6565ca8952ac757d6bc5",
+      "observationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop Aria\""
+      ],
+      "targetingGains": [
+        0.28612921760880067
+      ]
+    },
+    {
+      "groupId": "c1g-3f4de360d87a28aea240",
+      "deviceFamily": "truthear hexa",
+      "configurationSignature": "truthear hexa",
+      "memberCount": 9,
+      "exact711MemberCount": 7,
+      "non711ObservationCount": 2,
+      "informativeObservationCount": 2,
+      "nonInformativeObservationCount": 0,
+      "winCount": 2,
+      "lossCount": 0,
+      "medianTargetingGain": 0.16848398743025245,
+      "medianRelativeTargetingGain": 0.16848398743025245,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "2146779a64f5dc29171a463aef471672bbb10e2d70831551b3698c26a9f68af9",
+      "repeatabilitySigmaSha256": "e33421b4795a6496b16a4293a7cfcefd83cc15ae0eace3348453906749770e69",
+      "observationIds": [
+        "\"HypetheSonics\"|\"in-ear\"|\"GRAS RA0045\"|\"Truthear Hexa\"",
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Truthear Hexa\""
+      ],
+      "targetingGains": [
+        0.1420434275336668,
+        0.19492454732683812
+      ]
+    },
+    {
+      "groupId": "c1g-f2a43144c5936389d89d",
+      "deviceFamily": "7hz salnotes zero",
+      "configurationSignature": "7hz salnotes zero",
+      "memberCount": 9,
+      "exact711MemberCount": 7,
+      "non711ObservationCount": 2,
+      "informativeObservationCount": 2,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 1,
+      "medianTargetingGain": 0.1295645087866565,
+      "medianRelativeTargetingGain": 0.1295645087866565,
+      "classification": "NO_CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "9a0d950afb5ba27f46776df74d16a530a45323510eb489b8aa444b5014631c72",
+      "repeatabilitySigmaSha256": "d6c6406c7e9507756a1f8b419848f2b80a6b34b2503dfdbd03bdb4a5ba8d9f3a",
+      "observationIds": [
+        "\"HypetheSonics\"|\"in-ear\"|\"GRAS RA0045\"|\"7Hz Salnotes Zero\"",
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"7Hz Salnotes Zero\""
+      ],
+      "targetingGains": [
+        0.0027030202278020225,
+        0.256425997345511
+      ]
+    },
+    {
+      "groupId": "c1g-8bd11cb5d7772ff2165b",
+      "deviceFamily": "moondrop quarks",
+      "configurationSignature": "moondrop quarks",
+      "memberCount": 6,
+      "exact711MemberCount": 5,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 0,
+      "lossCount": 1,
+      "medianTargetingGain": -0.047007559372769146,
+      "medianRelativeTargetingGain": -0.047007559372769146,
+      "classification": "NO_CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "770609e6366aff191958eb38b3adf8b29eea7f3ce8b573ee1b6263fafe20af23",
+      "repeatabilitySigmaSha256": "1dcaf6763dafb951ce288f697aedda7430a60fb46e2dde8b649664a81ece9301",
+      "observationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop Quarks\""
+      ],
+      "targetingGains": [
+        -0.047007559372769146
+      ]
+    },
+    {
+      "groupId": "c1g-6c369c990dd73512951b",
+      "deviceFamily": "epz q5",
+      "configurationSignature": "epz q5",
+      "memberCount": 7,
+      "exact711MemberCount": 6,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 0,
+      "medianTargetingGain": 0.5236848363214066,
+      "medianRelativeTargetingGain": 0.5236848363214066,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "01bf44cba8c761ed54db675d7704d7e022ca4de573ac1bcaa67f946281dae22c",
+      "repeatabilitySigmaSha256": "1a6e8a9284ea01b3bea87d9630bb2751b3ba8990b81dac0681bc9f76e6824160",
+      "observationIds": [
+        "\"Auriculares Argentina\"|\"in-ear\"|\"KB501x + 711\"|\"EPZ Q5\""
+      ],
+      "targetingGains": [
+        0.5236848363214066
+      ]
+    },
+    {
+      "groupId": "c1g-dc1ade324d0c4b3192d6",
+      "deviceFamily": "7hz timeless",
+      "configurationSignature": "7hz timeless",
+      "memberCount": 7,
+      "exact711MemberCount": 6,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 0,
+      "medianTargetingGain": 0.40675818285034854,
+      "medianRelativeTargetingGain": 0.40675818285034854,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "5b3d2dfdd1869838d01940b93a34a7ec026eba70649181cca2b5063b980f9a8f",
+      "repeatabilitySigmaSha256": "ccfff02a0d49fbced0d1390871242a4dbe8d37c3285373a3dfdabc6234c9c7bd",
+      "observationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"7Hz Timeless\""
+      ],
+      "targetingGains": [
+        0.40675818285034854
+      ]
+    }
+  ],
+  "groupEvidenceFiles": [
+    "group-c1g-ebdb284a8c7563a12c5f.json",
+    "group-c1g-3f4de360d87a28aea240.json",
+    "group-c1g-f2a43144c5936389d89d.json",
+    "group-c1g-8bd11cb5d7772ff2165b.json",
+    "group-c1g-6c369c990dd73512951b.json",
+    "group-c1g-dc1ade324d0c4b3192d6.json"
+  ],
+  "holdoutGate": {
+    "classification": "CONFIDENCE_TARGETING_GENERALIZES",
+    "groupCount": 6,
+    "signalGroupCount": 4,
+    "noSignalGroupCount": 2,
+    "inconclusiveGroupCount": 0,
+    "requiredGroups": 6,
+    "minimumSignals": 4
+  },
+  "combinedInterpretation": "C1_CONFIDENCE_MODEL_GENERALIZED",
+  "evidenceFiles": [
+    "aggregate-evidence.json",
+    "final-report.md",
+    "group-c1g-3f4de360d87a28aea240.json",
+    "group-c1g-6c369c990dd73512951b.json",
+    "group-c1g-8bd11cb5d7772ff2165b.json",
+    "group-c1g-dc1ade324d0c4b3192d6.json",
+    "group-c1g-ebdb284a8c7563a12c5f.json",
+    "group-c1g-f2a43144c5936389d89d.json",
+    "schema.json"
+  ],
+  "evidenceSha256": "589576e6ce169e36af695e02547191fa54744337b31f3405f396efc786a93b0b",
+  "flags": {
+    "developmentGroupsAccepted": false,
+    "developmentDecisionInputAccepted": false,
+    "developmentRerunForHoldoutDecision": false,
+    "holdoutExecuted": true,
+    "outcomesGenerated": true,
+    "responseOutcomeObserved": true,
+    "confidenceCurveComputed": true,
+    "confidenceWeightingApplied": true,
+    "consensusAlgorithmExecuted": true,
+    "retrainingAllowed": false,
+    "retrainingAfterFreeze": false,
+    "freshRealBatchCExecuted": false,
+    "batchCExecuted": false,
+    "autoEqSolverExecuted": false,
+    "solverExecuted": false,
+    "c4PeakAlignmentUsed": false,
+    "rawMeasurementsCommitted": false
+  },
+  "freshRealBatchCExecuted": false,
+  "retrainingAfterFreeze": false,
+  "autoEqSolverExecuted": false,
+  "c4PeakAlignmentUsed": false
+}

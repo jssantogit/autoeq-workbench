@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
+import { mkdtemp } from 'node:fs/promises'
 import { readFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import test from 'node:test'
 
 import {
@@ -16,7 +19,12 @@ import {
   INCONCLUSIVE,
   createHoldoutOutcomeSchema,
   createHoldoutProtocolManifest,
+  buildCombinedC1Interpretation,
+  buildHoldoutGate,
+  classifyHoldoutGate,
   hashJson,
+  reacquireC1cPinnedMember,
+  runHoldoutAfterProtocolFreeze,
   stableJson,
   validateHoldoutExecutionRequest,
   validateHoldoutProtocolManifest,
@@ -137,4 +145,72 @@ test('checked-in C1c bundle is the pre-outcome manifest/schema pair', () => {
   assert.equal(readFileSync(new URL('../../.research-artifacts/c1-confidence-targeting-holdout/protocol-sha256.txt', import.meta.url), 'utf8').trim(), createHash('sha256').update(manifestText + schemaText).digest('hex'))
   assert.equal(schema.outcomeValuesAllowed, false)
   assert.equal(schema.responseDerivedValuesAllowed, false)
+})
+
+test('holdout gate is the frozen all-six strict four-of-six decision', () => {
+  const signal = 'CONFIDENCE_TARGETING_SIGNAL'
+  const noSignal = 'NO_CONFIDENCE_TARGETING_SIGNAL'
+  assert.equal(classifyHoldoutGate([signal, signal, signal, signal, noSignal, noSignal]), 'CONFIDENCE_TARGETING_GENERALIZES')
+  assert.equal(classifyHoldoutGate([signal, signal, signal, noSignal, noSignal, noSignal]), 'CONFIDENCE_TARGETING_NOT_CONFIRMED')
+  assert.equal(classifyHoldoutGate([signal, signal, signal, signal, noSignal]), 'INCONCLUSIVE')
+  assert.equal(classifyHoldoutGate([signal, signal, signal, signal, noSignal, INCONCLUSIVE]), INCONCLUSIVE)
+  assert.deepEqual(buildHoldoutGate([signal, signal, signal, signal, noSignal, noSignal]), {
+    classification: 'CONFIDENCE_TARGETING_GENERALIZES',
+    groupCount: 6,
+    signalGroupCount: 4,
+    noSignalGroupCount: 2,
+    inconclusiveGroupCount: 0,
+    requiredGroups: 6,
+    minimumSignals: 4,
+  })
+})
+
+test('combined interpretation requires the independently audited development pass', () => {
+  assert.equal(buildCombinedC1Interpretation({
+    developmentClassification: 'CONFIDENCE_TARGETING_DEV_SUPPORTED',
+    holdoutClassification: 'CONFIDENCE_TARGETING_GENERALIZES',
+  }), 'C1_CONFIDENCE_MODEL_GENERALIZED')
+  assert.equal(buildCombinedC1Interpretation({
+    developmentClassification: 'CONFIDENCE_TARGETING_DEV_NOT_SUPPORTED',
+    holdoutClassification: 'CONFIDENCE_TARGETING_GENERALIZES',
+  }), 'C1_CLOSED_HOLDOUT_NOT_CONFIRMED')
+  assert.equal(buildCombinedC1Interpretation({
+    developmentClassification: 'CONFIDENCE_TARGETING_DEV_SUPPORTED',
+    holdoutClassification: INCONCLUSIVE,
+  }), INCONCLUSIVE)
+})
+
+test('pinned holdout acquisition verifies the Git blob and SHA-256 before caching', async () => {
+  const bytes = Buffer.from('frequency,response\n20,0\n20000,0\n')
+  const blobSha = createHash('sha1').update(`blob ${bytes.length}\0`).update(bytes).digest('hex')
+  const member = {
+    concreteCurveIdentity: 'synthetic-holdout-member',
+    path: 'measurements/Synthetic/data/in-ear/Synthetic.csv',
+    form: 'in-ear',
+    upstreamRawUrl: 'https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Synthetic/data/in-ear/Synthetic.csv',
+    blobSha,
+    integrity: { status: 'valid', upstreamSha256: createHash('sha256').update(bytes).digest('hex') },
+  }
+  let fetchCount = 0
+  const cacheRoot = await mkdtemp(join(tmpdir(), 'c1c-acquisition-test-'))
+  const result = await reacquireC1cPinnedMember(member, {
+    cacheRoot,
+    fetchImpl: async () => {
+      fetchCount += 1
+      return { ok: true, status: 200, arrayBuffer: async () => bytes }
+    },
+    retryDelayMs: 0,
+  })
+  assert.equal(result.acquisition, 'FETCHED_AND_VALIDATED')
+  assert.equal(result.provenance.blobSha, blobSha)
+  assert.equal(fetchCount, 1)
+})
+
+test('holdout execution fails closed unless HEAD is the protocol-freeze commit', async () => {
+  let acquired = false
+  await assert.rejects(runHoldoutAfterProtocolFreeze({
+    currentCommit: '0'.repeat(40),
+    fetchImpl: async () => { acquired = true; throw new Error('must not acquire') },
+  }), /exact protocol-freeze commit/)
+  assert.equal(acquired, false)
 })
