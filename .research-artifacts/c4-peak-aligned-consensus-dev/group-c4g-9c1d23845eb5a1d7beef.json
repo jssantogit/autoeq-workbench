@@ -1,0 +1,2465 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c4b-group-fold-evidence",
+  "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
+  "groupId": "c4g-9c1d23845eb5a1d7beef",
+  "deviceFamily": "kiwi ears quintet",
+  "configurationSignature": "kiwi ears quintet",
+  "memberCount": 8,
+  "members": [
+    {
+      "collection": "Harpo",
+      "form": "in-ear",
+      "model": "Kiwi Ears Quintet",
+      "processedName": "Kiwi Ears Quintet",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "path": "measurements/Harpo/data/in-ear/Kiwi Ears Quintet.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+      "blobSha": "1f9b51d4cb36a8eb6aa0736402c6eb4200f16051",
+      "sourceRows": [
+        {
+          "rowNumber": 135,
+          "url": "https://harpo.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "460b60277d6cd56264bb4033ffa4be19598c98c1f2db42109e1279ff7f83366e",
+        "byteLength": 8781,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -11.87,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -11.87,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "88842a51ee0dd7d988fdd7a37da65906d051c9b6c5abe9e77b2d381cf2a2aa7f",
+        "canonicalParsedPointsSha256": "33523fd627057095278669d157b7e58e58161efbf303cc7e16ea7f96f8c54539",
+        "normalizedParsedPointsSha256": "d3688f81eb117d350560096c193a2c5574c56d328242bd15cad91c0a43caf4f8",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Hi End Portable",
+      "form": "in-ear",
+      "model": "Kiwi Ears Quintet",
+      "processedName": "Kiwi Ears Quintet",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "path": "measurements/Hi End Portable/data/in-ear/Kiwi Ears Quintet.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+      "blobSha": "56379ce01f424dc36882c55950c6b2239c506c6b",
+      "sourceRows": [
+        {
+          "rowNumber": 283,
+          "url": "https://cqtek.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 284,
+          "url": "https://cqtek.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "5b4a91430533f60107f8c163ac4546aceb59abcb1f6a5ef2c8160df8b63c3d04",
+        "byteLength": 8822,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -18.21,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -18.21,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "c8f219ec9e35555484ded7c67adbc88b2f56d7c25be3d233c1332d04260d094f",
+        "canonicalParsedPointsSha256": "29bd4760d68dbcfeb125298b826f6d50944c5585df507fdc2aa8d9f87e08d181",
+        "normalizedParsedPointsSha256": "31e8f885320e42c71759160360f786c89dd02d9361d0c1705f8711ce549e52f3",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Jaytiss",
+      "form": "in-ear",
+      "model": "Kiwi Ears Quintet",
+      "processedName": "Kiwi Ears Quintet",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "path": "measurements/Jaytiss/data/in-ear/Kiwi Ears Quintet.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Jaytiss/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+      "blobSha": "f46d800444d57678e276b54dbf46b0a044a0bfcb",
+      "sourceRows": [
+        {
+          "rowNumber": 444,
+          "url": "https://jaytiss.squig.link/data/Quintet%20L.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 445,
+          "url": "https://jaytiss.squig.link/data/Quintet%20R.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "43b61cc8ee495d3e6ea1c7e57b224e0e4d44f4b90b558cbc2605fe7110763e5e",
+        "byteLength": 8796,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -20.02,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -20.02,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "f9204db5b4080289dd5e519c3a777c2b3dd50f30d6746f9d9d0eb1510f5cb793",
+        "canonicalParsedPointsSha256": "5782aa52f2691b7e22c01886be4863519b2ce462b4f2a804ac56cb63d23f0743",
+        "normalizedParsedPointsSha256": "23a8a71306ed3133a2bb818cf8117f74a947e4825e9e8e7bd44292866d9ae140",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Kazi",
+      "form": "in-ear",
+      "model": "Kiwi Ears Quintet",
+      "processedName": "Kiwi Ears Quintet",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "path": "measurements/Kazi/data/in-ear/Kiwi Ears Quintet.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+      "blobSha": "8099f53a2580de509c9123bca128fc21494e775f",
+      "sourceRows": [
+        {
+          "rowNumber": 150,
+          "url": "https://kazi.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 151,
+          "url": "https://kazi.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "2972ba653b80394f051b39728dc482a1e3601ffa1627a1e7b8b42499bc222b03",
+        "byteLength": 8798,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -24.8,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -24.8,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "c2895a2c0deb75c31e18538dd8b494e8f7329a90f67be532cd61a0c5d0fe36fc",
+        "canonicalParsedPointsSha256": "c6349b15b0f17a8438e543404a363cd274a1405e805a6f9f1b5b8226196683ff",
+        "normalizedParsedPointsSha256": "218d1f5eca0fda92fd7aade5971efe0145c39bb6d0952bf5794448ec6cc7b0ff",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Regan Cipher",
+      "form": "in-ear",
+      "model": "Kiwi Ears Quintet",
+      "processedName": "Kiwi Ears Quintet",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "path": "measurements/Regan Cipher/data/in-ear/Kiwi Ears Quintet.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+      "blobSha": "48e50398c325bda29653dec93ac880e01255e55b",
+      "sourceRows": [
+        {
+          "rowNumber": 246,
+          "url": "https://regancipher.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 247,
+          "url": "https://regancipher.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "5c2552f8c641c257df70d165096d74c008b23a720841dbb4148c08dcfb68ba0a",
+        "byteLength": 8770,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -19.61,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -19.61,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "2d268349329a2ca402b171caa0d4cd8c7729d105ad8d86e4142ef1db4684238c",
+        "canonicalParsedPointsSha256": "851b536e14a5e575eb79269189706d3bc40d211a3c6ab0513a181c85c0bf27da",
+        "normalizedParsedPointsSha256": "0b5c50d01c59f3d813bc699488659514c4434c46e30c55a9b96ddd6f0ec679c6",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "RikudouGoku",
+      "form": "in-ear",
+      "model": "Kiwi Ears Quintet",
+      "processedName": "Kiwi Ears Quintet",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "path": "measurements/RikudouGoku/data/in-ear/Kiwi Ears Quintet.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+      "blobSha": "a91987048560434d5ca5aba795436939c7d8d640",
+      "sourceRows": [
+        {
+          "rowNumber": 306,
+          "url": "https://rg.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 307,
+          "url": "https://rg.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "f6ec6f4997021df5837ab76d57fb30033b6b1603d3fb43f3ea2dee99bcce91e0",
+        "byteLength": 8837,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -14.51,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -14.51,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "2e8fe6a47600e36a70e589ed90e9b27a3bd3a29030b15b97c08ac4e0b001c74e",
+        "canonicalParsedPointsSha256": "fe4322f2e9ae09f5ba90edcd50f0aee3425723452cef14c052b12b6ee7edce0f",
+        "normalizedParsedPointsSha256": "ed51a16280aa81a89739cb2674b983e1ff385dd05198e9fb793ee1420e9b1db8",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Kiwi Ears Quintet",
+      "processedName": "Kiwi Ears Quintet",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "path": "measurements/Super Review/data/in-ear/Kiwi Ears Quintet.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+      "blobSha": "3a2fbba6c26770169b4d15722def04ba6f6035bd",
+      "sourceRows": [
+        {
+          "rowNumber": 1300,
+          "url": "https://superreview.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 1301,
+          "url": "https://superreview.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+          "sourceName": "Kiwi Ears Quintet",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "095080df163ed40a3f214ab40ba45f4e50e73de28f1bc475b48058f995eec70f",
+        "byteLength": 8756,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -18.18,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -18.18,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "638e9e06201e4d71e828a6692bea269b55c6c97ffa273bd6d20a9e5501ff50f7",
+        "canonicalParsedPointsSha256": "048feae354380802ffffae6314cd886b9f071558717ba96c1d0788540c657f3f",
+        "normalizedParsedPointsSha256": "584129ff854de4a3e292973b83d6960f79a244d210e46dcb54625180f9be7b46",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "Kiwi Ears Quintet",
+      "processedName": "Kiwi Ears Quintet",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "path": "measurements/ToneDeafMonk/data/in-ear/Kiwi Ears Quintet.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+      "blobSha": "202fde91adb7fec3633c8a784d06baa1cd1ed0b9",
+      "sourceRows": [
+        {
+          "rowNumber": 429,
+          "url": "https://tonedeafmonk.squig.link/data/Kiwiears%20Quintet%20L.txt",
+          "sourceName": "KiwiEars Quintet",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 430,
+          "url": "https://tonedeafmonk.squig.link/data/Kiwiears%20Quintet%20R.txt",
+          "sourceName": "KiwiEars Quintet",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "d14ce71dda2f1e63e5c5cfe54742a9d39cea6f744b960c24e705265874aeba8d",
+        "byteLength": 8829,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -22.61,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -22.61,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "0f2c63c8fab07340d68e170b0074736f1c00e8107c262789cba009e26fb18a37",
+        "canonicalParsedPointsSha256": "c56d69cd701f38274425518a7079e6ddb26adc32f46fc8ef41f63438c58dcb13",
+        "normalizedParsedPointsSha256": "c886d2081944b2482b7f0472523ab0aea7b4c527675708a61eb8816eb92a00e6",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    }
+  ],
+  "folds": [
+    {
+      "withheldMemberIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "withheldMember": {
+        "collection": "Harpo",
+        "path": "measurements/Harpo/data/in-ear/Kiwi Ears Quintet.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+        "blobSha": "1f9b51d4cb36a8eb6aa0736402c6eb4200f16051",
+        "upstreamSha256": "460b60277d6cd56264bb4033ffa4be19598c98c1f2db42109e1279ff7f83366e"
+      },
+      "trainingMemberIdentities": [
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\""
+      ],
+      "canonicalPeakFrequencyHz": 7293.243068510219,
+      "individualPeakFrequenciesHz": [
+        7085.61859565482,
+        7953.337962417689,
+        7293.243068510221,
+        7293.243068510221,
+        7506.951402802223,
+        8069.021926952379,
+        6883.9047885106165
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7085.61859565482
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7506.951402802223
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            6883.9047885106165
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.133810624672852,
+        "registeredTrebleRMSE": 2.6475388932486257,
+        "registeredTrebleMaxAbs": 5.309191744151411,
+        "rawTrebleMAE": 2.6015722289547916,
+        "rawTrebleRMSE": 2.9381832155640444,
+        "candidateDominantPeakFrequencyHz": 7293.243068510221,
+        "withheldDominantPeakFrequencyHz": 7896.119426088657,
+        "rawPeakFrequencyErrorOctaves": 0.11458333333333415,
+        "candidatePeakDb": 9.461154729198313,
+        "withheldPeakDb": 7.778237268926409,
+        "absolutePeakLevelErrorAfterRegistration": 1.682917460271904
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.3158891692964514,
+        "registeredTrebleRMSE": 2.736451937474824,
+        "registeredTrebleMaxAbs": 5.615639990971022,
+        "rawTrebleMAE": 2.834290418704167,
+        "rawTrebleRMSE": 3.15077522359558,
+        "candidateDominantPeakFrequencyHz": 7293.243068510221,
+        "withheldDominantPeakFrequencyHz": 7896.119426088657,
+        "rawPeakFrequencyErrorOctaves": 0.11458333333333415,
+        "candidatePeakDb": 9.597530383561997,
+        "withheldPeakDb": 7.778237268926409,
+        "absolutePeakLevelErrorAfterRegistration": 1.8192931146355882
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7293.243068510219,
+        "individualPeakFrequenciesHz": [
+          7085.61859565482,
+          7953.337962417689,
+          7293.243068510221,
+          7293.243068510221,
+          7506.951402802223,
+          8069.021926952379,
+          6883.9047885106165
+        ],
+        "log2Shifts": [
+          -0.041666666666666075,
+          0.125,
+          0,
+          0,
+          0.04166666666666785,
+          0.14583333333333393,
+          -0.08333333333333215
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 7085.61859565482,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7506.951402802223,
+            "log2Shift": 0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0.14583333333333393,
+            "absoluteOctaves": 0.14583333333333393,
+            "cents": 175.0000000000007
+          },
+          {
+            "frequencyHz": 6883.9047885106165,
+            "log2Shift": -0.08333333333333215,
+            "absoluteOctaves": 0.08333333333333215,
+            "cents": 99.99999999999858
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.14583333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.14583333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.6082699487009924,
+          "8-10kHz": 1.9874515909451396,
+          "10-14kHz": 3.236550625743329,
+          "6-14kHz": 2.6775090985881844,
+          "6-8kHzHz": 2.6082699487009924,
+          "8-10kHzHz": 1.9874515909451396,
+          "10-14kHzHz": 3.236550625743329,
+          "6-14kHzHz": 2.6775090985881844
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.383748794944804,
+          "8-10kHz": 1.751425064946717,
+          "10-14kHz": 2.796242612213752,
+          "6-14kHz": 2.384263937221214,
+          "6-8kHzHz": 1.383748794944804,
+          "8-10kHzHz": 1.751425064946717,
+          "10-14kHzHz": 2.796242612213752,
+          "6-14kHzHz": 2.384263937221214
+        },
+        "medianFullBandBefore": 2.6775090985881844,
+        "medianFullBandAfter": 2.384263937221214,
+        "beforeProfileSha256": "7a26f13d7708df346987eca4a07bf5a3c944c88e2df89a052b726fb0b310d8cd",
+        "afterProfileSha256": "ef474abfd8cb30b2195846fc1c3549fecebdaba37b4d6400bbe2b782bddd3b24"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "withheldMember": {
+        "collection": "Hi End Portable",
+        "path": "measurements/Hi End Portable/data/in-ear/Kiwi Ears Quintet.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+        "blobSha": "56379ce01f424dc36882c55950c6b2239c506c6b",
+        "upstreamSha256": "5b4a91430533f60107f8c163ac4546aceb59abcb1f6a5ef2c8160df8b63c3d04"
+      },
+      "trainingMemberIdentities": [
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\""
+      ],
+      "canonicalPeakFrequencyHz": 7506.9514028022195,
+      "individualPeakFrequenciesHz": [
+        7896.119426088657,
+        7953.337962417689,
+        7293.243068510221,
+        7293.243068510221,
+        7506.951402802223,
+        8069.021926952379,
+        6883.9047885106165
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7506.951402802223
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            6883.9047885106165
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.439191485974938,
+        "registeredTrebleRMSE": 2.7198903216750043,
+        "registeredTrebleMaxAbs": 5.7802391897049406,
+        "rawTrebleMAE": 2.439191485974931,
+        "rawTrebleRMSE": 2.7198903216749963,
+        "candidateDominantPeakFrequencyHz": 7085.61859565482,
+        "withheldDominantPeakFrequencyHz": 7085.61859565482,
+        "rawPeakFrequencyErrorOctaves": 0,
+        "candidatePeakDb": 8.429126958343389,
+        "withheldPeakDb": 9.885740752773083,
+        "absolutePeakLevelErrorAfterRegistration": 1.4566137944296944
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.0203128438945663,
+        "registeredTrebleRMSE": 2.30209677210868,
+        "registeredTrebleMaxAbs": 5.785819058354585,
+        "rawTrebleMAE": 2.451460465382477,
+        "rawTrebleRMSE": 2.7078962787615675,
+        "candidateDominantPeakFrequencyHz": 7506.951402802223,
+        "withheldDominantPeakFrequencyHz": 7085.61859565482,
+        "rawPeakFrequencyErrorOctaves": 0.083333333333334,
+        "candidatePeakDb": 8.708164137592071,
+        "withheldPeakDb": 9.885740752773083,
+        "absolutePeakLevelErrorAfterRegistration": 1.177576615181012
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7506.9514028022195,
+        "individualPeakFrequenciesHz": [
+          7896.119426088657,
+          7953.337962417689,
+          7293.243068510221,
+          7293.243068510221,
+          7506.951402802223,
+          8069.021926952379,
+          6883.9047885106165
+        ],
+        "log2Shifts": [
+          0.07291666666666607,
+          0.08333333333333215,
+          -0.04166666666666785,
+          -0.04166666666666785,
+          0,
+          0.10416666666666607,
+          -0.125
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": 0.07291666666666607,
+            "absoluteOctaves": 0.07291666666666607,
+            "cents": 87.49999999999929
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0.08333333333333215,
+            "absoluteOctaves": 0.08333333333333215,
+            "cents": 99.99999999999858
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 7506.951402802223,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0.10416666666666607,
+            "absoluteOctaves": 0.10416666666666607,
+            "cents": 124.99999999999929
+          },
+          {
+            "frequencyHz": 6883.9047885106165,
+            "log2Shift": -0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.07291666666666607,
+        "maximumAbsoluteShiftOctaves": 0.125,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.07291666666666607,
+        "maximumAbsoluteOctaves": 0.125
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.7196958166552267,
+          "8-10kHz": 2.3785113483012585,
+          "10-14kHz": 3.3373874292312866,
+          "6-14kHz": 2.809197941342075,
+          "6-8kHzHz": 2.7196958166552267,
+          "8-10kHzHz": 2.3785113483012585,
+          "10-14kHzHz": 3.3373874292312866,
+          "6-14kHzHz": 2.809197941342075
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 2.2059291355112616,
+          "8-10kHz": 1.7632145731532276,
+          "10-14kHz": 2.9813195296264934,
+          "6-14kHz": 2.482662713374867,
+          "6-8kHzHz": 2.2059291355112616,
+          "8-10kHzHz": 1.7632145731532276,
+          "10-14kHzHz": 2.9813195296264934,
+          "6-14kHzHz": 2.482662713374867
+        },
+        "medianFullBandBefore": 2.809197941342075,
+        "medianFullBandAfter": 2.482662713374867,
+        "beforeProfileSha256": "3c1d0565569c3089acb314fe187a1704957ff30eadefeb21f73122089f09ea97",
+        "afterProfileSha256": "37561fd05ef4d3ca33f7c7cf3fd9b56ea29050553d920107e440b598aa825ab4"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "withheldMember": {
+        "collection": "Jaytiss",
+        "path": "measurements/Jaytiss/data/in-ear/Kiwi Ears Quintet.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Jaytiss/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+        "blobSha": "f46d800444d57678e276b54dbf46b0a044a0bfcb",
+        "upstreamSha256": "43b61cc8ee495d3e6ea1c7e57b224e0e4d44f4b90b558cbc2605fe7110763e5e"
+      },
+      "trainingMemberIdentities": [
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\""
+      ],
+      "canonicalPeakFrequencyHz": 7293.243068510219,
+      "individualPeakFrequenciesHz": [
+        7896.119426088657,
+        7085.61859565482,
+        7293.243068510221,
+        7293.243068510221,
+        7506.951402802223,
+        8069.021926952379,
+        6883.9047885106165
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7085.61859565482
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7506.951402802223
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            6883.9047885106165
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.5509590123575574,
+        "registeredTrebleRMSE": 2.801189810380054,
+        "registeredTrebleMaxAbs": 4.171952201156188,
+        "rawTrebleMAE": 2.4919588201171288,
+        "rawTrebleRMSE": 2.9724264536316567,
+        "candidateDominantPeakFrequencyHz": 7293.243068510221,
+        "withheldDominantPeakFrequencyHz": 7953.337962417689,
+        "rawPeakFrequencyErrorOctaves": 0.1250000000000002,
+        "candidatePeakDb": 9.461154729198313,
+        "withheldPeakDb": 6.473949838681127,
+        "absolutePeakLevelErrorAfterRegistration": 2.9872048905171855
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.6785157358517524,
+        "registeredTrebleRMSE": 2.9289268786620632,
+        "registeredTrebleMaxAbs": 4.118946462916809,
+        "rawTrebleMAE": 2.6659189581723495,
+        "rawTrebleRMSE": 3.1383761253592692,
+        "candidateDominantPeakFrequencyHz": 7293.243068510221,
+        "withheldDominantPeakFrequencyHz": 7953.337962417689,
+        "rawPeakFrequencyErrorOctaves": 0.1250000000000002,
+        "candidatePeakDb": 9.597530383561997,
+        "withheldPeakDb": 6.473949838681127,
+        "absolutePeakLevelErrorAfterRegistration": 3.12358054488087
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7293.243068510219,
+        "individualPeakFrequenciesHz": [
+          7896.119426088657,
+          7085.61859565482,
+          7293.243068510221,
+          7293.243068510221,
+          7506.951402802223,
+          8069.021926952379,
+          6883.9047885106165
+        ],
+        "log2Shifts": [
+          0.11458333333333393,
+          -0.041666666666666075,
+          0,
+          0,
+          0.04166666666666785,
+          0.14583333333333393,
+          -0.08333333333333215
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": 0.11458333333333393,
+            "absoluteOctaves": 0.11458333333333393,
+            "cents": 137.5000000000007
+          },
+          {
+            "frequencyHz": 7085.61859565482,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7506.951402802223,
+            "log2Shift": 0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0.14583333333333393,
+            "absoluteOctaves": 0.14583333333333393,
+            "cents": 175.0000000000007
+          },
+          {
+            "frequencyHz": 6883.9047885106165,
+            "log2Shift": -0.08333333333333215,
+            "absoluteOctaves": 0.08333333333333215,
+            "cents": 99.99999999999858
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.14583333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.14583333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.434206008754451,
+          "8-10kHz": 3.2020497736050064,
+          "10-14kHz": 2.8824608205042423,
+          "6-14kHz": 2.6903085330915664,
+          "6-8kHzHz": 2.434206008754451,
+          "8-10kHzHz": 3.2020497736050064,
+          "10-14kHzHz": 2.8824608205042423,
+          "6-14kHzHz": 2.6903085330915664
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.3199838032006013,
+          "8-10kHz": 1.82088232836628,
+          "10-14kHz": 2.8941439435968106,
+          "6-14kHz": 2.3301194424314153,
+          "6-8kHzHz": 1.3199838032006013,
+          "8-10kHzHz": 1.82088232836628,
+          "10-14kHzHz": 2.8941439435968106,
+          "6-14kHzHz": 2.3301194424314153
+        },
+        "medianFullBandBefore": 2.6903085330915664,
+        "medianFullBandAfter": 2.3301194424314153,
+        "beforeProfileSha256": "6a2d88775f2050cd4eefd32e1d34314782bb2424e3d165496c6f197eeaaa4a23",
+        "afterProfileSha256": "4db5c5fb2e817b9fe9192fe61623e9e64b2d6ed6ab69852b5a5ef14031007b22"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "withheldMember": {
+        "collection": "Kazi",
+        "path": "measurements/Kazi/data/in-ear/Kiwi Ears Quintet.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+        "blobSha": "8099f53a2580de509c9123bca128fc21494e775f",
+        "upstreamSha256": "2972ba653b80394f051b39728dc482a1e3601ffa1627a1e7b8b42499bc222b03"
+      },
+      "trainingMemberIdentities": [
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\""
+      ],
+      "canonicalPeakFrequencyHz": 7506.9514028022195,
+      "individualPeakFrequenciesHz": [
+        7896.119426088657,
+        7085.61859565482,
+        7953.337962417689,
+        7293.243068510221,
+        7506.951402802223,
+        8069.021926952379,
+        6883.9047885106165
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7085.61859565482
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7506.951402802223
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            6883.9047885106165
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.8247695663899193,
+        "registeredTrebleRMSE": 2.1498063025882246,
+        "registeredTrebleMaxAbs": 4.165805939448179,
+        "rawTrebleMAE": 1.6429732824898917,
+        "rawTrebleRMSE": 1.9470822688824148,
+        "candidateDominantPeakFrequencyHz": 7085.61859565482,
+        "withheldDominantPeakFrequencyHz": 7293.243068510221,
+        "rawPeakFrequencyErrorOctaves": 0.04166666666666585,
+        "candidatePeakDb": 8.429126958343389,
+        "withheldPeakDb": 10.88683425160013,
+        "absolutePeakLevelErrorAfterRegistration": 2.4577072932567408
+      },
+      "aligned": {
+        "registeredTrebleMAE": 1.4842849633020314,
+        "registeredTrebleRMSE": 1.70271546133055,
+        "registeredTrebleMaxAbs": 3.5211259060768083,
+        "rawTrebleMAE": 1.4836246812527427,
+        "rawTrebleRMSE": 1.818124042827727,
+        "candidateDominantPeakFrequencyHz": 7506.951402802223,
+        "withheldDominantPeakFrequencyHz": 7293.243068510221,
+        "rawPeakFrequencyErrorOctaves": 0.04166666666666829,
+        "candidatePeakDb": 8.708164137592071,
+        "withheldPeakDb": 10.88683425160013,
+        "absolutePeakLevelErrorAfterRegistration": 2.1786701140080584
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7506.9514028022195,
+        "individualPeakFrequenciesHz": [
+          7896.119426088657,
+          7085.61859565482,
+          7953.337962417689,
+          7293.243068510221,
+          7506.951402802223,
+          8069.021926952379,
+          6883.9047885106165
+        ],
+        "log2Shifts": [
+          0.07291666666666607,
+          -0.08333333333333393,
+          0.08333333333333215,
+          -0.04166666666666785,
+          0,
+          0.10416666666666607,
+          -0.125
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": 0.07291666666666607,
+            "absoluteOctaves": 0.07291666666666607,
+            "cents": 87.49999999999929
+          },
+          {
+            "frequencyHz": 7085.61859565482,
+            "log2Shift": -0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0.08333333333333215,
+            "absoluteOctaves": 0.08333333333333215,
+            "cents": 99.99999999999858
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 7506.951402802223,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0.10416666666666607,
+            "absoluteOctaves": 0.10416666666666607,
+            "cents": 124.99999999999929
+          },
+          {
+            "frequencyHz": 6883.9047885106165,
+            "log2Shift": -0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.08333333333333215,
+        "maximumAbsoluteShiftOctaves": 0.125,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.08333333333333215,
+        "maximumAbsoluteOctaves": 0.125
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.707039056187346,
+          "8-10kHz": 2.3785113483012585,
+          "10-14kHz": 3.3373874292312866,
+          "6-14kHz": 2.7919851036169403,
+          "6-8kHzHz": 2.707039056187346,
+          "8-10kHzHz": 2.3785113483012585,
+          "10-14kHzHz": 3.3373874292312866,
+          "6-14kHzHz": 2.7919851036169403
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 2.2285034632482175,
+          "8-10kHz": 2.4367167192956556,
+          "10-14kHz": 2.699018137783435,
+          "6-14kHz": 2.4352829147680866,
+          "6-8kHzHz": 2.2285034632482175,
+          "8-10kHzHz": 2.4367167192956556,
+          "10-14kHzHz": 2.699018137783435,
+          "6-14kHzHz": 2.4352829147680866
+        },
+        "medianFullBandBefore": 2.7919851036169403,
+        "medianFullBandAfter": 2.4352829147680866,
+        "beforeProfileSha256": "f17eb1165627ff6e24322b5d978500ba3c7215ce05d6c6984473666025b8ba23",
+        "afterProfileSha256": "b1b65b460354e56b013fb4624a08f6cba2682e3c9ef32b4b326b1d5ed3b3bf39"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "withheldMember": {
+        "collection": "Regan Cipher",
+        "path": "measurements/Regan Cipher/data/in-ear/Kiwi Ears Quintet.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+        "blobSha": "48e50398c325bda29653dec93ac880e01255e55b",
+        "upstreamSha256": "5c2552f8c641c257df70d165096d74c008b23a720841dbb4148c08dcfb68ba0a"
+      },
+      "trainingMemberIdentities": [
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\""
+      ],
+      "canonicalPeakFrequencyHz": 7506.9514028022195,
+      "individualPeakFrequenciesHz": [
+        7896.119426088657,
+        7085.61859565482,
+        7953.337962417689,
+        7293.243068510221,
+        7506.951402802223,
+        8069.021926952379,
+        6883.9047885106165
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7085.61859565482
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7506.951402802223
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            6883.9047885106165
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 3.601972954915557,
+        "registeredTrebleRMSE": 4.244320330488543,
+        "registeredTrebleMaxAbs": 6.971996507248836,
+        "rawTrebleMAE": 3.488041764008864,
+        "rawTrebleRMSE": 4.154033061489666,
+        "candidateDominantPeakFrequencyHz": 7085.61859565482,
+        "withheldDominantPeakFrequencyHz": 7293.243068510221,
+        "rawPeakFrequencyErrorOctaves": 0.04166666666666585,
+        "candidatePeakDb": 8.429126958343389,
+        "withheldPeakDb": 9.597530383561999,
+        "absolutePeakLevelErrorAfterRegistration": 1.1684034252186102
+      },
+      "aligned": {
+        "registeredTrebleMAE": 3.1948542626449616,
+        "registeredTrebleRMSE": 3.974698249563638,
+        "registeredTrebleMaxAbs": 6.965953484502528,
+        "rawTrebleMAE": 3.334154252842299,
+        "rawTrebleRMSE": 4.013766453732889,
+        "candidateDominantPeakFrequencyHz": 7506.951402802223,
+        "withheldDominantPeakFrequencyHz": 7293.243068510221,
+        "rawPeakFrequencyErrorOctaves": 0.04166666666666829,
+        "candidatePeakDb": 8.708164137592071,
+        "withheldPeakDb": 9.597530383561999,
+        "absolutePeakLevelErrorAfterRegistration": 0.8893662459699279
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7506.9514028022195,
+        "individualPeakFrequenciesHz": [
+          7896.119426088657,
+          7085.61859565482,
+          7953.337962417689,
+          7293.243068510221,
+          7506.951402802223,
+          8069.021926952379,
+          6883.9047885106165
+        ],
+        "log2Shifts": [
+          0.07291666666666607,
+          -0.08333333333333393,
+          0.08333333333333215,
+          -0.04166666666666785,
+          0,
+          0.10416666666666607,
+          -0.125
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": 0.07291666666666607,
+            "absoluteOctaves": 0.07291666666666607,
+            "cents": 87.49999999999929
+          },
+          {
+            "frequencyHz": 7085.61859565482,
+            "log2Shift": -0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0.08333333333333215,
+            "absoluteOctaves": 0.08333333333333215,
+            "cents": 99.99999999999858
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 7506.951402802223,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0.10416666666666607,
+            "absoluteOctaves": 0.10416666666666607,
+            "cents": 124.99999999999929
+          },
+          {
+            "frequencyHz": 6883.9047885106165,
+            "log2Shift": -0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.08333333333333215,
+        "maximumAbsoluteShiftOctaves": 0.125,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.08333333333333215,
+        "maximumAbsoluteOctaves": 0.125
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.857888639117033,
+          "8-10kHz": 1.8695123646250131,
+          "10-14kHz": 2.8152947539990643,
+          "6-14kHz": 2.730589586673739,
+          "6-8kHzHz": 2.857888639117033,
+          "8-10kHzHz": 1.8695123646250131,
+          "10-14kHzHz": 2.8152947539990643,
+          "6-14kHzHz": 2.730589586673739
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 2.163280182768774,
+          "8-10kHz": 1.5523913790811805,
+          "10-14kHz": 2.380363786561658,
+          "6-14kHz": 2.093455823154044,
+          "6-8kHzHz": 2.163280182768774,
+          "8-10kHzHz": 1.5523913790811805,
+          "10-14kHzHz": 2.380363786561658,
+          "6-14kHzHz": 2.093455823154044
+        },
+        "medianFullBandBefore": 2.730589586673739,
+        "medianFullBandAfter": 2.093455823154044,
+        "beforeProfileSha256": "9fb7fe5bede9e189fbe50107030a32a855aa7c83437a43f6e40a79ec07bd95e1",
+        "afterProfileSha256": "e0592d12f694a25f5dac418c072b57ecfd8286a284e528077b79b34e04aa9a9e"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "withheldMember": {
+        "collection": "RikudouGoku",
+        "path": "measurements/RikudouGoku/data/in-ear/Kiwi Ears Quintet.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+        "blobSha": "a91987048560434d5ca5aba795436939c7d8d640",
+        "upstreamSha256": "f6ec6f4997021df5837ab76d57fb30033b6b1603d3fb43f3ea2dee99bcce91e0"
+      },
+      "trainingMemberIdentities": [
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\""
+      ],
+      "canonicalPeakFrequencyHz": 7293.243068510219,
+      "individualPeakFrequenciesHz": [
+        7896.119426088657,
+        7085.61859565482,
+        7953.337962417689,
+        7293.243068510221,
+        7293.243068510221,
+        8069.021926952379,
+        6883.9047885106165
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7085.61859565482
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            6883.9047885106165
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.8622243455842071,
+        "registeredTrebleRMSE": 2.2356302029193778,
+        "registeredTrebleMaxAbs": 5.998783151432736,
+        "rawTrebleMAE": 1.8186273604264318,
+        "rawTrebleRMSE": 2.1759958342402674,
+        "candidateDominantPeakFrequencyHz": 7034.642674985418,
+        "withheldDominantPeakFrequencyHz": 7506.951402802223,
+        "rawPeakFrequencyErrorOctaves": 0.09375000000000029,
+        "candidatePeakDb": 8.537967354345614,
+        "withheldPeakDb": 10.142154849929966,
+        "absolutePeakLevelErrorAfterRegistration": 1.6041874955843518
+      },
+      "aligned": {
+        "registeredTrebleMAE": 1.7253671327725757,
+        "registeredTrebleRMSE": 2.067148027410714,
+        "registeredTrebleMaxAbs": 5.442004327654857,
+        "rawTrebleMAE": 1.8825511527252392,
+        "rawTrebleRMSE": 2.2155018449657082,
+        "candidateDominantPeakFrequencyHz": 7293.243068510221,
+        "withheldDominantPeakFrequencyHz": 7506.951402802223,
+        "rawPeakFrequencyErrorOctaves": 0.04166666666666816,
+        "candidatePeakDb": 8.708164137592071,
+        "withheldPeakDb": 10.142154849929966,
+        "absolutePeakLevelErrorAfterRegistration": 1.433990712337895
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7293.243068510219,
+        "individualPeakFrequenciesHz": [
+          7896.119426088657,
+          7085.61859565482,
+          7953.337962417689,
+          7293.243068510221,
+          7293.243068510221,
+          8069.021926952379,
+          6883.9047885106165
+        ],
+        "log2Shifts": [
+          0.11458333333333393,
+          -0.041666666666666075,
+          0.125,
+          0,
+          0,
+          0.14583333333333393,
+          -0.08333333333333215
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": 0.11458333333333393,
+            "absoluteOctaves": 0.11458333333333393,
+            "cents": 137.5000000000007
+          },
+          {
+            "frequencyHz": 7085.61859565482,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0.14583333333333393,
+            "absoluteOctaves": 0.14583333333333393,
+            "cents": 175.0000000000007
+          },
+          {
+            "frequencyHz": 6883.9047885106165,
+            "log2Shift": -0.08333333333333215,
+            "absoluteOctaves": 0.08333333333333215,
+            "cents": 99.99999999999858
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.08333333333333215,
+        "maximumAbsoluteShiftOctaves": 0.14583333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.08333333333333215,
+        "maximumAbsoluteOctaves": 0.14583333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.7313554298880094,
+          "8-10kHz": 2.6759554026781616,
+          "10-14kHz": 3.1429767448638013,
+          "6-14kHz": 2.9077323627277982,
+          "6-8kHzHz": 2.7313554298880094,
+          "8-10kHzHz": 2.6759554026781616,
+          "10-14kHzHz": 3.1429767448638013,
+          "6-14kHzHz": 2.9077323627277982
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.9442584410006183,
+          "8-10kHz": 1.751425064946717,
+          "10-14kHz": 2.9438960091360267,
+          "6-14kHz": 2.4262662905449135,
+          "6-8kHzHz": 1.9442584410006183,
+          "8-10kHzHz": 1.751425064946717,
+          "10-14kHzHz": 2.9438960091360267,
+          "6-14kHzHz": 2.4262662905449135
+        },
+        "medianFullBandBefore": 2.9077323627277982,
+        "medianFullBandAfter": 2.4262662905449135,
+        "beforeProfileSha256": "c61e22319ed74f0dc76e1acf63d69ede3015276565cf0a21a63e18888f222059",
+        "afterProfileSha256": "19ac5f7c9c3571c3bda0a377dcbbb5194d69ce4e62658c56e6652256d0c459f3"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "withheldMember": {
+        "collection": "Super Review",
+        "path": "measurements/Super Review/data/in-ear/Kiwi Ears Quintet.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+        "blobSha": "3a2fbba6c26770169b4d15722def04ba6f6035bd",
+        "upstreamSha256": "095080df163ed40a3f214ab40ba45f4e50e73de28f1bc475b48058f995eec70f"
+      },
+      "trainingMemberIdentities": [
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\""
+      ],
+      "canonicalPeakFrequencyHz": 7293.243068510219,
+      "individualPeakFrequenciesHz": [
+        7896.119426088657,
+        7085.61859565482,
+        7953.337962417689,
+        7293.243068510221,
+        7293.243068510221,
+        7506.951402802223,
+        6883.9047885106165
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7085.61859565482
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            7506.951402802223
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7293.243068510219,
+            6883.9047885106165
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.7504105907941816,
+        "registeredTrebleRMSE": 3.0795429531233935,
+        "registeredTrebleMaxAbs": 5.609322242164165,
+        "rawTrebleMAE": 2.9463186127744554,
+        "rawTrebleRMSE": 3.232496001770923,
+        "candidateDominantPeakFrequencyHz": 7293.243068510221,
+        "withheldDominantPeakFrequencyHz": 8069.021926952379,
+        "rawPeakFrequencyErrorOctaves": 0.14583333333333418,
+        "candidatePeakDb": 9.461154729198313,
+        "withheldPeakDb": 7.139968668139399,
+        "absolutePeakLevelErrorAfterRegistration": 2.3211860610589143
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.797900719840864,
+        "registeredTrebleRMSE": 3.105906587301856,
+        "registeredTrebleMaxAbs": 5.707010785862284,
+        "rawTrebleMAE": 3.0876415843745595,
+        "rawTrebleRMSE": 3.3769218473449203,
+        "candidateDominantPeakFrequencyHz": 7293.243068510221,
+        "withheldDominantPeakFrequencyHz": 8069.021926952379,
+        "rawPeakFrequencyErrorOctaves": 0.14583333333333418,
+        "candidatePeakDb": 9.597530383561997,
+        "withheldPeakDb": 7.139968668139399,
+        "absolutePeakLevelErrorAfterRegistration": 2.4575617154225986
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7293.243068510219,
+        "individualPeakFrequenciesHz": [
+          7896.119426088657,
+          7085.61859565482,
+          7953.337962417689,
+          7293.243068510221,
+          7293.243068510221,
+          7506.951402802223,
+          6883.9047885106165
+        ],
+        "log2Shifts": [
+          0.11458333333333393,
+          -0.041666666666666075,
+          0.125,
+          0,
+          0,
+          0.04166666666666785,
+          -0.08333333333333215
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": 0.11458333333333393,
+            "absoluteOctaves": 0.11458333333333393,
+            "cents": 137.5000000000007
+          },
+          {
+            "frequencyHz": 7085.61859565482,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7506.951402802223,
+            "log2Shift": 0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 6883.9047885106165,
+            "log2Shift": -0.08333333333333215,
+            "absoluteOctaves": 0.08333333333333215,
+            "cents": 99.99999999999858
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.125,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.125
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.434206008754451,
+          "8-10kHz": 2.1826378693322397,
+          "10-14kHz": 2.7440762267367074,
+          "6-14kHz": 2.5630056138649335,
+          "6-8kHzHz": 2.434206008754451,
+          "8-10kHzHz": 2.1826378693322397,
+          "10-14kHzHz": 2.7440762267367074,
+          "6-14kHzHz": 2.5630056138649335
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.3199838032006013,
+          "8-10kHz": 2.5984079447136543,
+          "10-14kHz": 2.1231308842669216,
+          "6-14kHz": 1.9811531779239946,
+          "6-8kHzHz": 1.3199838032006013,
+          "8-10kHzHz": 2.5984079447136543,
+          "10-14kHzHz": 2.1231308842669216,
+          "6-14kHzHz": 1.9811531779239946
+        },
+        "medianFullBandBefore": 2.5630056138649335,
+        "medianFullBandAfter": 1.9811531779239946,
+        "beforeProfileSha256": "1a756c4f9eaa0e79f7fdd39aa17335965b9fc9c511205557bf36c7818630836f",
+        "afterProfileSha256": "97d7c633ebea785ec74473338d3f8186cef3f3d8ed590bac06fb2aed794c5405"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+      "withheldMember": {
+        "collection": "ToneDeafMonk",
+        "path": "measurements/ToneDeafMonk/data/in-ear/Kiwi Ears Quintet.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+        "blobSha": "202fde91adb7fec3633c8a784d06baa1cd1ed0b9",
+        "upstreamSha256": "d14ce71dda2f1e63e5c5cfe54742a9d39cea6f744b960c24e705265874aeba8d"
+      },
+      "trainingMemberIdentities": [
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\""
+      ],
+      "canonicalPeakFrequencyHz": 7506.9514028022195,
+      "individualPeakFrequenciesHz": [
+        7896.119426088657,
+        7085.61859565482,
+        7953.337962417689,
+        7293.243068510221,
+        7293.243068510221,
+        7506.951402802223,
+        8069.021926952379
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7085.61859565482
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7293.243068510221
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            7506.951402802223
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7506.9514028022195,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.3229537559556457,
+        "registeredTrebleRMSE": 3.1154191865491185,
+        "registeredTrebleMaxAbs": 8.995816163412858,
+        "rawTrebleMAE": 2.876668856286735,
+        "rawTrebleRMSE": 3.5474306356844894,
+        "candidateDominantPeakFrequencyHz": 7293.243068510221,
+        "withheldDominantPeakFrequencyHz": 6883.9047885106165,
+        "rawPeakFrequencyErrorOctaves": 0.08333333333333189,
+        "candidatePeakDb": 9.461154729198313,
+        "withheldPeakDb": 8.708164137592071,
+        "absolutePeakLevelErrorAfterRegistration": 0.7529905916062418
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.2343474094959612,
+        "registeredTrebleRMSE": 3.0714523415601334,
+        "registeredTrebleMaxAbs": 9.00011096672426,
+        "rawTrebleMAE": 2.9182864535217723,
+        "rawTrebleRMSE": 3.6721628073284394,
+        "candidateDominantPeakFrequencyHz": 7506.951402802223,
+        "withheldDominantPeakFrequencyHz": 6883.9047885106165,
+        "rawPeakFrequencyErrorOctaves": 0.12500000000000003,
+        "candidatePeakDb": 9.597530383561997,
+        "withheldPeakDb": 8.708164137592071,
+        "absolutePeakLevelErrorAfterRegistration": 0.8893662459699261
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7506.9514028022195,
+        "individualPeakFrequenciesHz": [
+          7896.119426088657,
+          7085.61859565482,
+          7953.337962417689,
+          7293.243068510221,
+          7293.243068510221,
+          7506.951402802223,
+          8069.021926952379
+        ],
+        "log2Shifts": [
+          0.07291666666666607,
+          -0.08333333333333393,
+          0.08333333333333215,
+          -0.04166666666666785,
+          -0.04166666666666785,
+          0,
+          0.10416666666666607
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": 0.07291666666666607,
+            "absoluteOctaves": 0.07291666666666607,
+            "cents": 87.49999999999929
+          },
+          {
+            "frequencyHz": 7085.61859565482,
+            "log2Shift": -0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0.08333333333333215,
+            "absoluteOctaves": 0.08333333333333215,
+            "cents": 99.99999999999858
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 7293.243068510221,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 7506.951402802223,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0.10416666666666607,
+            "absoluteOctaves": 0.10416666666666607,
+            "cents": 124.99999999999929
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.07291666666666607,
+        "maximumAbsoluteShiftOctaves": 0.10416666666666607,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.07291666666666607,
+        "maximumAbsoluteOctaves": 0.10416666666666607
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.7026880254613017,
+          "8-10kHz": 2.137063392506526,
+          "10-14kHz": 2.760933587554238,
+          "6-14kHz": 2.679779877491967,
+          "6-8kHzHz": 2.7026880254613017,
+          "8-10kHzHz": 2.137063392506526,
+          "10-14kHzHz": 2.760933587554238,
+          "6-14kHzHz": 2.679779877491967
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 2.3075889444015485,
+          "8-10kHz": 1.9087699722525577,
+          "10-14kHz": 2.4325961804579546,
+          "6-14kHz": 2.3429405236015812,
+          "6-8kHzHz": 2.3075889444015485,
+          "8-10kHzHz": 1.9087699722525577,
+          "10-14kHzHz": 2.4325961804579546,
+          "6-14kHzHz": 2.3429405236015812
+        },
+        "medianFullBandBefore": 2.679779877491967,
+        "medianFullBandAfter": 2.3429405236015812,
+        "beforeProfileSha256": "931d24d4de86502bc39d58c6f0b15beb6c4d9da217a0a4c23cea62d74912ca7d",
+        "afterProfileSha256": "88543b771d256b6adf7b9a8e20cc5e525632a53c241b1dffd036f5648088fde1"
+      }
+    }
+  ],
+  "dispersion": {
+    "foldCount": 8,
+    "medianByBandBefore": {
+      "6-8kHz": 2.7048635408243236,
+      "8-10kHz": 2.280574608816749,
+      "10-14kHz": 3.012718782684022,
+      "6-14kHz": 2.7104490598826527
+    },
+    "medianByBandAfter": {
+      "6-8kHz": 2.0537693118846962,
+      "8-10kHz": 1.7920484507597538,
+      "10-14kHz": 2.7476303749985935,
+      "6-14kHz": 2.3636022304113977
+    },
+    "medianFullBandBefore": 2.7104490598826527,
+    "medianFullBandAfter": 2.3636022304113977
+  },
+  "classification": "PEAK_ALIGNMENT_SIGNAL",
+  "foldWinCount": 5,
+  "foldLossCount": 3,
+  "strictMajority": true,
+  "medianRegisteredMAE": {
+    "pointwise": 2.381072620965292,
+    "aligned": 2.2751182893962065
+  },
+  "medianRobustSigma": {
+    "before": 2.7104490598826527,
+    "after": 2.3636022304113977
+  },
+  "criteria": {
+    "strictMajority": true,
+    "alignedMedianRegisteredMAELower": true,
+    "alignedMedianRobustSigmaLower": true
+  }
+}

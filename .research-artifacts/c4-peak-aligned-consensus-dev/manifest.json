@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
-  "phase": "protocol-freeze",
-  "milestone": "C4b-protocol-only",
+  "phase": "development-outcome",
+  "milestone": "C4b-development-outcome",
   "frozenBoundary": "64f1fa7f8780cf14f87ce6427aaa71edbf686e2d",
   "c4a": {
     "evidenceSha256": "03794a913b873e01df8b5afdd3664e6dc7e40deff9341a449c768ae1f39b73ea",
@@ -148,15 +148,40 @@
     "c4g-9f35923d2fa109244435"
   ],
   "rejectedBatchCToken": "fresh-real-corpus-v1.2:Batch C",
-  "protocolFreezeCommit": null,
-  "developmentExecuted": false,
+  "protocolFreezeCommit": "95d853db76bd456dd66a1b8a60a65039ca095b8b",
+  "developmentExecuted": true,
   "holdoutExecuted": false,
   "batchCExecuted": false,
   "freshRealCorpusBatchCExecuted": false,
-  "outcomesGenerated": false,
-  "consensusAlgorithmExecuted": false,
+  "outcomesGenerated": true,
+  "consensusAlgorithmExecuted": true,
   "autoEqSolverExecuted": false,
   "rawMeasurementsCommitted": false,
   "artifactSchema": "schema.json",
-  "protocolPath": "research/c4-peak-aligned-consensus-dev/protocol.md"
+  "protocolPath": "research/c4-peak-aligned-consensus-dev/protocol.md",
+  "outcomeClassification": "PEAK_ALIGNMENT_DEV_SIGNAL_SUPPORTED",
+  "groupEvidenceFiles": [
+    "group-c4g-35f72baf0cca66570d01.json",
+    "group-c4g-95ca9d64e706e94c51e7.json",
+    "group-c4g-9c1d23845eb5a1d7beef.json"
+  ],
+  "evidenceFiles": [
+    "aggregate-evidence.json",
+    "final-report.md",
+    "group-c4g-35f72baf0cca66570d01.json",
+    "group-c4g-95ca9d64e706e94c51e7.json",
+    "group-c4g-9c1d23845eb5a1d7beef.json",
+    "manifest.json",
+    "schema.json"
+  ],
+  "c4aEvidenceSha256": "03794a913b873e01df8b5afdd3664e6dc7e40deff9341a449c768ae1f39b73ea",
+  "developmentCoverage": {
+    "groupCount": 3,
+    "memberCount": 24,
+    "foldCount": 24,
+    "alignmentBandHz": [
+      6000,
+      14000
+    ]
+  }
 }

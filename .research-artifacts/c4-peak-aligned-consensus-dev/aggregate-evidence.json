@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c4b-development-aggregate-evidence",
+  "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
+  "frozenBoundary": "64f1fa7f8780cf14f87ce6427aaa71edbf686e2d",
+  "protocolFreezeCommit": "95d853db76bd456dd66a1b8a60a65039ca095b8b",
+  "c4aEvidenceSha256": "03794a913b873e01df8b5afdd3664e6dc7e40deff9341a449c768ae1f39b73ea",
+  "developmentGroupIds": [
+    "c4g-95ca9d64e706e94c51e7",
+    "c4g-9c1d23845eb5a1d7beef",
+    "c4g-35f72baf0cca66570d01"
+  ],
+  "groupEvidenceFiles": [
+    "group-c4g-35f72baf0cca66570d01.json",
+    "group-c4g-95ca9d64e706e94c51e7.json",
+    "group-c4g-9c1d23845eb5a1d7beef.json"
+  ],
+  "groups": [
+    {
+      "groupId": "c4g-95ca9d64e706e94c51e7",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "memberCount": 8,
+      "collections": [
+        "Bakkwatan",
+        "Fahryst",
+        "Harpo",
+        "Hi End Portable",
+        "Kazi",
+        "RikudouGoku",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "rigClasses": [
+        "711-class"
+      ],
+      "foldCount": 8,
+      "foldWinCount": 3,
+      "foldLossCount": 5,
+      "medianRegisteredTrebleMAE": {
+        "pointwise": 0.7902225083718251,
+        "aligned": 0.8388851967492585
+      },
+      "medianRawMAE": {
+        "pointwise": 0.8795505309232905,
+        "aligned": 0.8632693143969115
+      },
+      "medianRobustSigma": {
+        "before": 0.8961225598351644,
+        "after": 0.7012463890332746
+      },
+      "dominantPeakShiftDistribution": {
+        "observations": 56,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.015625,
+        "maximumAbsoluteOctaves": 0.11458333333333215,
+        "minimumCents": 0,
+        "medianCents": 18.75,
+        "maximumCents": 137.49999999999858
+      },
+      "classification": "NO_PEAK_ALIGNMENT_SIGNAL"
+    },
+    {
+      "groupId": "c4g-9c1d23845eb5a1d7beef",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "memberCount": 8,
+      "collections": [
+        "Harpo",
+        "Hi End Portable",
+        "Jaytiss",
+        "Kazi",
+        "Regan Cipher",
+        "RikudouGoku",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "rigClasses": [
+        "711-class"
+      ],
+      "foldCount": 8,
+      "foldWinCount": 5,
+      "foldLossCount": 3,
+      "medianRegisteredTrebleMAE": {
+        "pointwise": 2.381072620965292,
+        "aligned": 2.2751182893962065
+      },
+      "medianRawMAE": {
+        "pointwise": 2.54676552453596,
+        "aligned": 2.7501046884382583
+      },
+      "medianRobustSigma": {
+        "before": 2.7104490598826527,
+        "after": 2.3636022304113977
+      },
+      "dominantPeakShiftDistribution": {
+        "observations": 56,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.07291666666666607,
+        "maximumAbsoluteOctaves": 0.14583333333333393,
+        "minimumCents": 0,
+        "medianCents": 87.49999999999929,
+        "maximumCents": 175.0000000000007
+      },
+      "classification": "PEAK_ALIGNMENT_SIGNAL"
+    },
+    {
+      "groupId": "c4g-35f72baf0cca66570d01",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "memberCount": 8,
+      "collections": [
+        "Filk",
+        "Harpo",
+        "Regan Cipher",
+        "Super Review",
+        "Ted's Squig Hoard",
+        "ToneDeafMonk",
+        "freeryder05",
+        "kr0mka"
+      ],
+      "rigClasses": [
+        "711-class"
+      ],
+      "foldCount": 8,
+      "foldWinCount": 5,
+      "foldLossCount": 3,
+      "medianRegisteredTrebleMAE": {
+        "pointwise": 2.0678620404219066,
+        "aligned": 1.8579351542444995
+      },
+      "medianRawMAE": {
+        "pointwise": 1.7540962913565428,
+        "aligned": 1.7797593008043266
+      },
+      "medianRobustSigma": {
+        "before": 1.9110259031039787,
+        "after": 1.6034097076079705
+      },
+      "dominantPeakShiftDistribution": {
+        "observations": 56,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.44791666666666785,
+        "minimumCents": 0,
+        "medianCents": 50.00000000000142,
+        "maximumCents": 537.5000000000014
+      },
+      "classification": "PEAK_ALIGNMENT_SIGNAL"
+    }
+  ],
+  "developmentGate": {
+    "classification": "PEAK_ALIGNMENT_DEV_SIGNAL_SUPPORTED",
+    "signalGroupCount": 2,
+    "groupCount": 3
+  },
+  "developmentCoverage": {
+    "groupCount": 3,
+    "memberCount": 24,
+    "foldCount": 24,
+    "alignmentBandHz": [
+      6000,
+      14000
+    ]
+  },
+  "flags": {
+    "developmentExecuted": true,
+    "holdoutExecuted": false,
+    "batchCExecuted": false,
+    "freshRealCorpusBatchCExecuted": false,
+    "outcomesGenerated": true,
+    "consensusAlgorithmExecuted": true,
+    "autoEqSolverExecuted": false,
+    "rawMeasurementsCommitted": false
+  }
+}

@@ -1,0 +1,2471 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c4b-group-fold-evidence",
+  "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
+  "groupId": "c4g-95ca9d64e706e94c51e7",
+  "deviceFamily": "blon x hbb z300",
+  "configurationSignature": "blon x hbb z300",
+  "memberCount": 8,
+  "members": [
+    {
+      "collection": "Bakkwatan",
+      "form": "in-ear",
+      "model": "BLON x HBB Z300",
+      "processedName": "BLON x HBB Z300",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "path": "measurements/Bakkwatan/data/in-ear/BLON x HBB Z300.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Bakkwatan/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+      "blobSha": "24248baa49dc2bfcf5621c8a3852be2010057ce0",
+      "sourceRows": [
+        {
+          "rowNumber": 6,
+          "url": "https://bakkwatan.squig.link/data/BLON%20Z300%20L.txt",
+          "sourceName": "BLON X HBB Z300",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 7,
+          "url": "https://bakkwatan.squig.link/data/BLON%20Z300%20R.txt",
+          "sourceName": "BLON X HBB Z300",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "5925ad30f2788508263be41a28f8f5f92cd0d45fbabeea97d284aba422e48d4c",
+        "byteLength": 8743,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -21.55,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -21.55,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "091c78d1e4c78c94bc46f797820781e1a74fd8e984a793de5b6de5951822fa58",
+        "canonicalParsedPointsSha256": "b76fd5f57084681775335412c4caac9346845f53f56dcb7bf5e2b7b0565254b2",
+        "normalizedParsedPointsSha256": "fb7584e2507b763593e39976fae2472ac85b348d9b8706e27cbc3af90501c5de",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Fahryst",
+      "form": "in-ear",
+      "model": "BLON x HBB Z300",
+      "processedName": "BLON x HBB Z300",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "path": "measurements/Fahryst/data/in-ear/BLON x HBB Z300.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Fahryst/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+      "blobSha": "22d444bdda91451525b7416248d2318264da988d",
+      "sourceRows": [
+        {
+          "rowNumber": 41,
+          "url": "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20L.txt",
+          "sourceName": "BLON x HBB Z300 (Sample 1)",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 42,
+          "url": "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20R.txt",
+          "sourceName": "BLON x HBB Z300 (Sample 1)",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 43,
+          "url": "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20S2%20L.txt",
+          "sourceName": "BLON x HBB Z300 (Sample 2)",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 44,
+          "url": "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20S2%20R.txt",
+          "sourceName": "BLON x HBB Z300 (Sample 2)",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "d1a7288b25ad8cd589a05fdfffe643f627ce772fa30bf432d2ae048a971a9ec9",
+        "byteLength": 8765,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -13.61,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -13.61,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "184d47d65ad60a7078480b756ca13b9bd5ae228b9126571f8ee60b9a91be9caa",
+        "canonicalParsedPointsSha256": "cd4fc80aae65f3fd294347e52987b5aef34a0052aad3674567c3b44520a94397",
+        "normalizedParsedPointsSha256": "f0c0fd77ef149a3c043227e2d2e54f947da6f6d0d9511ee802d5754d1cb38639",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Harpo",
+      "form": "in-ear",
+      "model": "BLON x HBB Z300",
+      "processedName": "BLON x HBB Z300",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "path": "measurements/Harpo/data/in-ear/BLON x HBB Z300.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+      "blobSha": "cb29b53aa7bc17b10ef60bcfc0c1ecc3e7581eb8",
+      "sourceRows": [
+        {
+          "rowNumber": 32,
+          "url": "https://harpo.squig.link/data/Blon%20Z300%20R.txt",
+          "sourceName": "Blon Z300",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "94a1283b3b6c89f2eea7f437ce2a5c08c8626beecf5f6d83148f3d958640020c",
+        "byteLength": 8811,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -24.33,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -24.33,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "77599dab066edc17995edfac04976c4e5bb9f0abf9041b0feb729fd23c91ae20",
+        "canonicalParsedPointsSha256": "cd78057477de848c306f78d20c6fa61f8c505e53e408444bdb3386126bbd11ab",
+        "normalizedParsedPointsSha256": "5fd7a76556cbf2fe6e230e9610e5e939c659559eb8526358d436ad22f4b90b1f",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Hi End Portable",
+      "form": "in-ear",
+      "model": "BLON x HBB Z300",
+      "processedName": "BLON x HBB Z300",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "path": "measurements/Hi End Portable/data/in-ear/BLON x HBB Z300.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+      "blobSha": "4b0ef42d1c4445d4cd10e646faf9fcc7452cfc75",
+      "sourceRows": [
+        {
+          "rowNumber": 38,
+          "url": "https://cqtek.squig.link/data/Blon%20Z300%20L.txt",
+          "sourceName": "Blon Z300",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 39,
+          "url": "https://cqtek.squig.link/data/Blon%20Z300%20R.txt",
+          "sourceName": "Blon Z300",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "afce83090fdfea52e9127f228d904735e95d7e31fcce66781ea81a0a5971d694",
+        "byteLength": 8715,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -15.62,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -15.62,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "2a38cef999f75b4e7e4369274e5bc878d71eb165387fb942cefb016c6a4aafe3",
+        "canonicalParsedPointsSha256": "155116422c685bcaca7fe367107da91f6fc414dfef76a291c47d644d5fac569d",
+        "normalizedParsedPointsSha256": "7be37aed58262f36f9400e07186cb3590617b8d98930f13fa78653c31d54322f",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Kazi",
+      "form": "in-ear",
+      "model": "BLON x HBB Z300",
+      "processedName": "BLON x HBB Z300",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "path": "measurements/Kazi/data/in-ear/BLON x HBB Z300.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+      "blobSha": "a1dde041dec0f9a2ab58c0054cf19dc9eb178bc6",
+      "sourceRows": [
+        {
+          "rowNumber": 18,
+          "url": "https://kazi.squig.link/data/BLON%20X%20HBB%20Z300%20L.txt",
+          "sourceName": "BLON X HBB Z300",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 19,
+          "url": "https://kazi.squig.link/data/BLON%20X%20HBB%20Z300%20R.txt",
+          "sourceName": "BLON X HBB Z300",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "a16ecaf16e071aa8f95ff8f60881f65bdb1a717e0d83987771723bba7f1d37bd",
+        "byteLength": 8752,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -16.74,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -16.74,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "d2c5706492f61d218cc2af85e77a07942330262a57bcac47fdf5f084af14673e",
+        "canonicalParsedPointsSha256": "fd3248c0f648a50dc154917ba1380cd1f91a9c573b3b3721e0c0b1e02ec7eb21",
+        "normalizedParsedPointsSha256": "390e3988b6ed98a5089ca67c41fb0428d9279a003691586c1851d9a7fe5e9f04",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "RikudouGoku",
+      "form": "in-ear",
+      "model": "BLON x HBB Z300",
+      "processedName": "BLON x HBB Z300",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "path": "measurements/RikudouGoku/data/in-ear/BLON x HBB Z300.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+      "blobSha": "6f016d08a91072674592229badeb9b98bf8af137",
+      "sourceRows": [
+        {
+          "rowNumber": 44,
+          "url": "https://rg.squig.link/data/Blon%20X%20HBB%20Z300%20L.txt",
+          "sourceName": "Blon X HBB Z300",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 45,
+          "url": "https://rg.squig.link/data/Blon%20X%20HBB%20Z300%20R.txt",
+          "sourceName": "Blon X HBB Z300",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "6c6c6d763cfb5ab1fbcf08baaa0edfef9e98a97d667ebb02da4a114974d46558",
+        "byteLength": 8834,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -8.84,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -8.84,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "3e7187735cf7dea621703190cd4096c8b719055b00704d269f2e9607d4d8d853",
+        "canonicalParsedPointsSha256": "c212ef5b1fdc7173aadb3c489895e86b42b50689b1f55b8689b7e3c36c1335e2",
+        "normalizedParsedPointsSha256": "e6d499b20293d81eee239733ea1bd9aa71d5f340023c61678ffbd605b0d79343",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "BLON x HBB Z300",
+      "processedName": "BLON x HBB Z300",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "path": "measurements/Super Review/data/in-ear/BLON x HBB Z300.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+      "blobSha": "1b136cd3654f26d586acb2a6a7e418783c301090",
+      "sourceRows": [
+        {
+          "rowNumber": 284,
+          "url": "https://superreview.squig.link/data/Blon%20Z300%20L.txt",
+          "sourceName": "Blon Z300",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 285,
+          "url": "https://superreview.squig.link/data/Blon%20Z300%20R.txt",
+          "sourceName": "Blon Z300",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "764022896074741941f5a60135b362d699a3242a69be3603717707fcd36c440a",
+        "byteLength": 8817,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -17.56,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -17.56,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "710ae4ed605f9d53e384696eb7514c5ddc0ef0dadf80f5be70f6172d91a4f4d2",
+        "canonicalParsedPointsSha256": "83978a212788ebb437bc60c62eb4b65808797f23395b5ec37c8552d8070dc988",
+        "normalizedParsedPointsSha256": "5d2efada40b86b5e17059a197a80512ec070b41e2f5917934bed1410164f1955",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "BLON x HBB Z300",
+      "processedName": "BLON x HBB Z300",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "path": "measurements/ToneDeafMonk/data/in-ear/BLON x HBB Z300.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+      "blobSha": "c200a91bff1a719882b2c1181ba12df6e2774d37",
+      "sourceRows": [
+        {
+          "rowNumber": 89,
+          "url": "https://tonedeafmonk.squig.link/data/BLON%20HBB%20Z300%20L.txt",
+          "sourceName": "BLON HBB Z300",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "98d6a90cbff31463a7af59d6a71b81eee486134abcbf9273c462e372ff26a0f7",
+        "byteLength": 8742,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -23.32,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -23.32,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "166fa042316b225bb1bc650e911d1b8092cb7330d5defb6a468daef0ab68f022",
+        "canonicalParsedPointsSha256": "434d76b0e297e86ff13cb32d01129d7ed20ba2129bd5f34395fc876afdcb1307",
+        "normalizedParsedPointsSha256": "9fdfaa9041b90a761d817a57b622afacaac7ba88b68e09ce71c56785fb810668",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    }
+  ],
+  "folds": [
+    {
+      "withheldMemberIdentity": "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "withheldMember": {
+        "collection": "Bakkwatan",
+        "path": "measurements/Bakkwatan/data/in-ear/BLON x HBB Z300.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Bakkwatan/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+        "blobSha": "24248baa49dc2bfcf5621c8a3852be2010057ce0",
+        "upstreamSha256": "5925ad30f2788508263be41a28f8f5f92cd0d45fbabeea97d284aba422e48d4c"
+      },
+      "trainingMemberIdentities": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\""
+      ],
+      "canonicalPeakFrequencyHz": 8010.9711278478035,
+      "individualPeakFrequenciesHz": [
+        8010.971127847806,
+        7953.337962417689,
+        8673.176548516634,
+        8127.493386077178,
+        8186.388553498127,
+        8010.971127847806,
+        7452.944296151996
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8673.176548516634
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8127.493386077178
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7452.944296151996
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 0.5755788210097524,
+        "registeredTrebleRMSE": 0.6985025797568574,
+        "registeredTrebleMaxAbs": 1.4430366067394305,
+        "rawTrebleMAE": 0.46772629849769104,
+        "rawTrebleRMSE": 0.6304008521569181,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0.010416666666666068,
+        "candidatePeakDb": 9.750082434639717,
+        "withheldPeakDb": 10.147134271429003,
+        "absolutePeakLevelErrorAfterRegistration": 0.39705183678928613
+      },
+      "aligned": {
+        "registeredTrebleMAE": 0.4793518507683069,
+        "registeredTrebleRMSE": 0.6347150602908781,
+        "registeredTrebleMaxAbs": 1.4025450604238263,
+        "rawTrebleMAE": 0.47935185076831693,
+        "rawTrebleRMSE": 0.6347150602908855,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0,
+        "candidatePeakDb": 10.00808062169319,
+        "withheldPeakDb": 10.147134271429003,
+        "absolutePeakLevelErrorAfterRegistration": 0.13905364973581236
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8010.9711278478035,
+        "individualPeakFrequenciesHz": [
+          8010.971127847806,
+          7953.337962417689,
+          8673.176548516634,
+          8127.493386077178,
+          8186.388553498127,
+          8010.971127847806,
+          7452.944296151996
+        ],
+        "log2Shifts": [
+          0,
+          -0.010416666666667851,
+          0.11458333333333215,
+          0.02083333333333215,
+          0.03125,
+          0,
+          -0.10416666666666785
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.010416666666667851,
+            "absoluteOctaves": 0.010416666666667851,
+            "cents": 12.500000000001421
+          },
+          {
+            "frequencyHz": 8673.176548516634,
+            "log2Shift": 0.11458333333333215,
+            "absoluteOctaves": 0.11458333333333215,
+            "cents": 137.49999999999858
+          },
+          {
+            "frequencyHz": 8127.493386077178,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7452.944296151996,
+            "log2Shift": -0.10416666666666785,
+            "absoluteOctaves": 0.10416666666666785,
+            "cents": 125.00000000000142
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.02083333333333215,
+        "maximumAbsoluteShiftOctaves": 0.11458333333333215,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.02083333333333215,
+        "maximumAbsoluteOctaves": 0.11458333333333215
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 0.6309316411250372,
+          "8-10kHz": 1.0455391279196737,
+          "10-14kHz": 1.1288686319945356,
+          "6-14kHz": 1.0248517628065112,
+          "6-8kHzHz": 0.6309316411250372,
+          "8-10kHzHz": 1.0455391279196737,
+          "10-14kHzHz": 1.1288686319945356,
+          "6-14kHzHz": 1.0248517628065112
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 0.3956181073035132,
+          "8-10kHz": 1.0121444136459843,
+          "10-14kHz": 1.1722147773584353,
+          "6-14kHz": 0.7843650063992649,
+          "6-8kHzHz": 0.3956181073035132,
+          "8-10kHzHz": 1.0121444136459843,
+          "10-14kHzHz": 1.1722147773584353,
+          "6-14kHzHz": 0.7843650063992649
+        },
+        "medianFullBandBefore": 1.0248517628065112,
+        "medianFullBandAfter": 0.7843650063992649,
+        "beforeProfileSha256": "aa3e804dd887160db640fd63ea7b080709240b56d70037baf4d60fb5b11565a9",
+        "afterProfileSha256": "aa27c58610a988a622210820efc9db69a025b717b42da8dbf94f0a3ba417c02f"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "withheldMember": {
+        "collection": "Fahryst",
+        "path": "measurements/Fahryst/data/in-ear/BLON x HBB Z300.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Fahryst/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+        "blobSha": "22d444bdda91451525b7416248d2318264da988d",
+        "upstreamSha256": "d1a7288b25ad8cd589a05fdfffe643f627ce772fa30bf432d2ae048a971a9ec9"
+      },
+      "trainingMemberIdentities": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\""
+      ],
+      "canonicalPeakFrequencyHz": 8010.9711278478035,
+      "individualPeakFrequenciesHz": [
+        8010.971127847806,
+        7953.337962417689,
+        8673.176548516634,
+        8127.493386077178,
+        8186.388553498127,
+        8010.971127847806,
+        7452.944296151996
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8673.176548516634
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8127.493386077178
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7452.944296151996
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 0.8262906190090183,
+        "registeredTrebleRMSE": 1.0897110685377112,
+        "registeredTrebleMaxAbs": 2.8050771841503375,
+        "rawTrebleMAE": 0.9149178726768882,
+        "rawTrebleRMSE": 1.1304709219917168,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0.010416666666666068,
+        "candidatePeakDb": 9.750082434639717,
+        "withheldPeakDb": 10.399389981464065,
+        "absolutePeakLevelErrorAfterRegistration": 0.6493075468243479
+      },
+      "aligned": {
+        "registeredTrebleMAE": 0.8851007076377123,
+        "registeredTrebleRMSE": 1.1130441862623144,
+        "registeredTrebleMaxAbs": 2.723238284732846,
+        "rawTrebleMAE": 0.8851007076377095,
+        "rawTrebleRMSE": 1.113044186262314,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0,
+        "candidatePeakDb": 10.00808062169319,
+        "withheldPeakDb": 10.399389981464065,
+        "absolutePeakLevelErrorAfterRegistration": 0.3913093597708741
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8010.9711278478035,
+        "individualPeakFrequenciesHz": [
+          8010.971127847806,
+          7953.337962417689,
+          8673.176548516634,
+          8127.493386077178,
+          8186.388553498127,
+          8010.971127847806,
+          7452.944296151996
+        ],
+        "log2Shifts": [
+          0,
+          -0.010416666666667851,
+          0.11458333333333215,
+          0.02083333333333215,
+          0.03125,
+          0,
+          -0.10416666666666785
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.010416666666667851,
+            "absoluteOctaves": 0.010416666666667851,
+            "cents": 12.500000000001421
+          },
+          {
+            "frequencyHz": 8673.176548516634,
+            "log2Shift": 0.11458333333333215,
+            "absoluteOctaves": 0.11458333333333215,
+            "cents": 137.49999999999858
+          },
+          {
+            "frequencyHz": 8127.493386077178,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7452.944296151996,
+            "log2Shift": -0.10416666666666785,
+            "absoluteOctaves": 0.10416666666666785,
+            "cents": 125.00000000000142
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.02083333333333215,
+        "maximumAbsoluteShiftOctaves": 0.11458333333333215,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.02083333333333215,
+        "maximumAbsoluteOctaves": 0.11458333333333215
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 0.4544186820510362,
+          "8-10kHz": 0.6800405671479983,
+          "10-14kHz": 1.6125484806524535,
+          "6-14kHz": 0.9723171457359965,
+          "6-8kHzHz": 0.4544186820510362,
+          "8-10kHzHz": 0.6800405671479983,
+          "10-14kHzHz": 1.6125484806524535,
+          "6-14kHzHz": 0.9723171457359965
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 0.24456918370538655,
+          "8-10kHz": 0.6926322437269448,
+          "10-14kHz": 1.7398080986231987,
+          "6-14kHz": 0.7035306475359846,
+          "6-8kHzHz": 0.24456918370538655,
+          "8-10kHzHz": 0.6926322437269448,
+          "10-14kHzHz": 1.7398080986231987,
+          "6-14kHzHz": 0.7035306475359846
+        },
+        "medianFullBandBefore": 0.9723171457359965,
+        "medianFullBandAfter": 0.7035306475359846,
+        "beforeProfileSha256": "44908121c45f881d4db1eb00afa660f7400b1a0ffb8cb9e7072a4b5338ef3027",
+        "afterProfileSha256": "ecdbb9ae96413bcb4185d9d79c057a7a6325b190421d8d8d58668a6881ac9124"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "withheldMember": {
+        "collection": "Harpo",
+        "path": "measurements/Harpo/data/in-ear/BLON x HBB Z300.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+        "blobSha": "cb29b53aa7bc17b10ef60bcfc0c1ecc3e7581eb8",
+        "upstreamSha256": "94a1283b3b6c89f2eea7f437ce2a5c08c8626beecf5f6d83148f3d958640020c"
+      },
+      "trainingMemberIdentities": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\""
+      ],
+      "canonicalPeakFrequencyHz": 8010.9711278478035,
+      "individualPeakFrequenciesHz": [
+        8010.971127847806,
+        8010.971127847806,
+        8673.176548516634,
+        8127.493386077178,
+        8186.388553498127,
+        8010.971127847806,
+        7452.944296151996
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8673.176548516634
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8127.493386077178
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7452.944296151996
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.0332290416730503,
+        "registeredTrebleRMSE": 1.3981218032895175,
+        "registeredTrebleMaxAbs": 3.666326557597498,
+        "rawTrebleMAE": 0.9925361638803584,
+        "rawTrebleRMSE": 1.4001553033983323,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 7953.337962417689,
+        "rawPeakFrequencyErrorOctaves": 0.020833333333333797,
+        "candidatePeakDb": 9.750082434639717,
+        "withheldPeakDb": 10.109327568038841,
+        "absolutePeakLevelErrorAfterRegistration": 0.35924513339912423
+      },
+      "aligned": {
+        "registeredTrebleMAE": 0.9967724694053697,
+        "registeredTrebleRMSE": 1.3769583533821936,
+        "registeredTrebleMaxAbs": 3.708286546293047,
+        "rawTrebleMAE": 0.965209411951952,
+        "rawTrebleRMSE": 1.3729316662133946,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 7953.337962417689,
+        "rawPeakFrequencyErrorOctaves": 0.010416666666667658,
+        "candidatePeakDb": 10.00808062169319,
+        "withheldPeakDb": 10.109327568038841,
+        "absolutePeakLevelErrorAfterRegistration": 0.10124694634565046
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8010.9711278478035,
+        "individualPeakFrequenciesHz": [
+          8010.971127847806,
+          8010.971127847806,
+          8673.176548516634,
+          8127.493386077178,
+          8186.388553498127,
+          8010.971127847806,
+          7452.944296151996
+        ],
+        "log2Shifts": [
+          0,
+          0,
+          0.11458333333333215,
+          0.02083333333333215,
+          0.03125,
+          0,
+          -0.10416666666666785
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8673.176548516634,
+            "log2Shift": 0.11458333333333215,
+            "absoluteOctaves": 0.11458333333333215,
+            "cents": 137.49999999999858
+          },
+          {
+            "frequencyHz": 8127.493386077178,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7452.944296151996,
+            "log2Shift": -0.10416666666666785,
+            "absoluteOctaves": 0.10416666666666785,
+            "cents": 125.00000000000142
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.02083333333333215,
+        "maximumAbsoluteShiftOctaves": 0.11458333333333215,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.02083333333333215,
+        "maximumAbsoluteOctaves": 0.11458333333333215
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 0.506570052143311,
+          "8-10kHz": 0.9915056728813338,
+          "10-14kHz": 1.268111051380585,
+          "6-14kHz": 0.9247240951240412,
+          "6-8kHzHz": 0.506570052143311,
+          "8-10kHzHz": 0.9915056728813338,
+          "10-14kHzHz": 1.268111051380585,
+          "6-14kHzHz": 0.9247240951240412
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 0.39417863010826626,
+          "8-10kHz": 0.6620044866108428,
+          "10-14kHz": 1.3440238432947758,
+          "6-14kHz": 0.6156727843809728,
+          "6-8kHzHz": 0.39417863010826626,
+          "8-10kHzHz": 0.6620044866108428,
+          "10-14kHzHz": 1.3440238432947758,
+          "6-14kHzHz": 0.6156727843809728
+        },
+        "medianFullBandBefore": 0.9247240951240412,
+        "medianFullBandAfter": 0.6156727843809728,
+        "beforeProfileSha256": "dc56ce7206ce4bd4e03af4c1e487f7cd1497a87269a487c3a5692919df0beb9a",
+        "afterProfileSha256": "559710a98c8aab79f21fefb458185284223171677517942d9895295bd8dec7a0"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "withheldMember": {
+        "collection": "Hi End Portable",
+        "path": "measurements/Hi End Portable/data/in-ear/BLON x HBB Z300.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+        "blobSha": "4b0ef42d1c4445d4cd10e646faf9fcc7452cfc75",
+        "upstreamSha256": "afce83090fdfea52e9127f228d904735e95d7e31fcce66781ea81a0a5971d694"
+      },
+      "trainingMemberIdentities": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\""
+      ],
+      "canonicalPeakFrequencyHz": 8010.9711278478035,
+      "individualPeakFrequenciesHz": [
+        8010.971127847806,
+        8010.971127847806,
+        7953.337962417689,
+        8127.493386077178,
+        8186.388553498127,
+        8010.971127847806,
+        7452.944296151996
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8127.493386077178
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7452.944296151996
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.152320017943161,
+        "registeredTrebleRMSE": 2.706057736695766,
+        "registeredTrebleMaxAbs": 5.5848072616549445,
+        "rawTrebleMAE": 3.0632374944287766,
+        "rawTrebleRMSE": 3.5283258522165255,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8673.176548516634,
+        "rawPeakFrequencyErrorOctaves": 0.11458333333333241,
+        "candidatePeakDb": 10.008080621693193,
+        "withheldPeakDb": 7.924189100902979,
+        "absolutePeakLevelErrorAfterRegistration": 2.083891520790214
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.1616435121940745,
+        "registeredTrebleRMSE": 2.7060025007025694,
+        "registeredTrebleMaxAbs": 5.590081450021074,
+        "rawTrebleMAE": 3.081387054205767,
+        "rawTrebleRMSE": 3.547650608948887,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8673.176548516634,
+        "rawPeakFrequencyErrorOctaves": 0.11458333333333241,
+        "candidatePeakDb": 10.109327568038836,
+        "withheldPeakDb": 7.924189100902979,
+        "absolutePeakLevelErrorAfterRegistration": 2.1851384671358574
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8010.9711278478035,
+        "individualPeakFrequenciesHz": [
+          8010.971127847806,
+          8010.971127847806,
+          7953.337962417689,
+          8127.493386077178,
+          8186.388553498127,
+          8010.971127847806,
+          7452.944296151996
+        ],
+        "log2Shifts": [
+          0,
+          0,
+          -0.010416666666667851,
+          0.02083333333333215,
+          0.03125,
+          0,
+          -0.10416666666666785
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.010416666666667851,
+            "absoluteOctaves": 0.010416666666667851,
+            "cents": 12.500000000001421
+          },
+          {
+            "frequencyHz": 8127.493386077178,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7452.944296151996,
+            "log2Shift": -0.10416666666666785,
+            "absoluteOctaves": 0.10416666666666785,
+            "cents": 125.00000000000142
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.010416666666667851,
+        "maximumAbsoluteShiftOctaves": 0.10416666666666785,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.010416666666667851,
+        "maximumAbsoluteOctaves": 0.10416666666666785
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 0.3619945747116611,
+          "8-10kHz": 0.6943579996845927,
+          "10-14kHz": 1.108874378724603,
+          "6-14kHz": 0.7740700429221998,
+          "6-8kHzHz": 0.3619945747116611,
+          "8-10kHzHz": 0.6943579996845927,
+          "10-14kHzHz": 1.108874378724603,
+          "6-14kHzHz": 0.7740700429221998
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 0.293081045906164,
+          "8-10kHz": 0.7541595735826784,
+          "10-14kHz": 1.1576388200719208,
+          "6-14kHz": 0.6989621305305647,
+          "6-8kHzHz": 0.293081045906164,
+          "8-10kHzHz": 0.7541595735826784,
+          "10-14kHzHz": 1.1576388200719208,
+          "6-14kHzHz": 0.6989621305305647
+        },
+        "medianFullBandBefore": 0.7740700429221998,
+        "medianFullBandAfter": 0.6989621305305647,
+        "beforeProfileSha256": "1a3b5efb68270a9d212fb4ec525733a88037e0643c38166ee64671a5d5f30465",
+        "afterProfileSha256": "ef1f4dce6b242611a2c13f1bf8a6eb59527485016d50c77f20c6a21e9723acf6"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "withheldMember": {
+        "collection": "Kazi",
+        "path": "measurements/Kazi/data/in-ear/BLON x HBB Z300.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+        "blobSha": "a1dde041dec0f9a2ab58c0054cf19dc9eb178bc6",
+        "upstreamSha256": "a16ecaf16e071aa8f95ff8f60881f65bdb1a717e0d83987771723bba7f1d37bd"
+      },
+      "trainingMemberIdentities": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\""
+      ],
+      "canonicalPeakFrequencyHz": 8010.9711278478035,
+      "individualPeakFrequenciesHz": [
+        8010.971127847806,
+        8010.971127847806,
+        7953.337962417689,
+        8673.176548516634,
+        8186.388553498127,
+        8010.971127847806,
+        7452.944296151996
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8673.176548516634
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7452.944296151996
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 0.284376336528729,
+        "registeredTrebleRMSE": 0.35622212135555864,
+        "registeredTrebleMaxAbs": 1.031647961048027,
+        "rawTrebleMAE": 0.46776201210301643,
+        "rawTrebleRMSE": 0.5745824827603292,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8127.493386077178,
+        "rawPeakFrequencyErrorOctaves": 0.020833333333332177,
+        "candidatePeakDb": 10.008080621693193,
+        "withheldPeakDb": 9.348930114549296,
+        "absolutePeakLevelErrorAfterRegistration": 0.659150507143897
+      },
+      "aligned": {
+        "registeredTrebleMAE": 0.3306852533935198,
+        "registeredTrebleRMSE": 0.4022949853344689,
+        "registeredTrebleMaxAbs": 1.0519356487403977,
+        "rawTrebleMAE": 0.4743916173819675,
+        "rawTrebleRMSE": 0.6176695193548766,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8127.493386077178,
+        "rawPeakFrequencyErrorOctaves": 0.020833333333332177,
+        "candidatePeakDb": 10.109327568038836,
+        "withheldPeakDb": 9.348930114549296,
+        "absolutePeakLevelErrorAfterRegistration": 0.7603974534895404
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8010.9711278478035,
+        "individualPeakFrequenciesHz": [
+          8010.971127847806,
+          8010.971127847806,
+          7953.337962417689,
+          8673.176548516634,
+          8186.388553498127,
+          8010.971127847806,
+          7452.944296151996
+        ],
+        "log2Shifts": [
+          0,
+          0,
+          -0.010416666666667851,
+          0.11458333333333215,
+          0.03125,
+          0,
+          -0.10416666666666785
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.010416666666667851,
+            "absoluteOctaves": 0.010416666666667851,
+            "cents": 12.500000000001421
+          },
+          {
+            "frequencyHz": 8673.176548516634,
+            "log2Shift": 0.11458333333333215,
+            "absoluteOctaves": 0.11458333333333215,
+            "cents": 137.49999999999858
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7452.944296151996,
+            "log2Shift": -0.10416666666666785,
+            "absoluteOctaves": 0.10416666666666785,
+            "cents": 125.00000000000142
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.010416666666667851,
+        "maximumAbsoluteShiftOctaves": 0.11458333333333215,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.010416666666667851,
+        "maximumAbsoluteOctaves": 0.11458333333333215
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 0.4188488591640873,
+          "8-10kHz": 0.7816473425858128,
+          "10-14kHz": 1.6750685522782527,
+          "6-14kHz": 0.8675210245462877,
+          "6-8kHzHz": 0.4188488591640873,
+          "8-10kHzHz": 0.7816473425858128,
+          "10-14kHzHz": 1.6750685522782527,
+          "6-14kHzHz": 0.8675210245462877
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 0.32203826532863317,
+          "8-10kHz": 0.8606243115739197,
+          "10-14kHz": 2.00690227852044,
+          "6-14kHz": 0.9361468492456606,
+          "6-8kHzHz": 0.32203826532863317,
+          "8-10kHzHz": 0.8606243115739197,
+          "10-14kHzHz": 2.00690227852044,
+          "6-14kHzHz": 0.9361468492456606
+        },
+        "medianFullBandBefore": 0.8675210245462877,
+        "medianFullBandAfter": 0.9361468492456606,
+        "beforeProfileSha256": "f76628906f98f721d5c84530985fc666c3a419dae3172c425428bfb621a69570",
+        "afterProfileSha256": "dda51e5cde950a69c38b1ef5095996b3dbcf51fa3398366b827fea7e62265808"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "withheldMember": {
+        "collection": "RikudouGoku",
+        "path": "measurements/RikudouGoku/data/in-ear/BLON x HBB Z300.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+        "blobSha": "6f016d08a91072674592229badeb9b98bf8af137",
+        "upstreamSha256": "6c6c6d763cfb5ab1fbcf08baaa0edfef9e98a97d667ebb02da4a114974d46558"
+      },
+      "trainingMemberIdentities": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\""
+      ],
+      "canonicalPeakFrequencyHz": 8010.9711278478035,
+      "individualPeakFrequenciesHz": [
+        8010.971127847806,
+        8010.971127847806,
+        7953.337962417689,
+        8673.176548516634,
+        8127.493386077178,
+        8010.971127847806,
+        7452.944296151996
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8673.176548516634
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8127.493386077178
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7452.944296151996
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 0.7359703850902645,
+        "registeredTrebleRMSE": 0.8710194516450288,
+        "registeredTrebleMaxAbs": 1.6643458859753932,
+        "rawTrebleMAE": 0.8441831891696928,
+        "rawTrebleRMSE": 0.9930235664679159,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8186.388553498127,
+        "rawPeakFrequencyErrorOctaves": 0.03125000000000023,
+        "candidatePeakDb": 10.008080621693193,
+        "withheldPeakDb": 10.179584378696752,
+        "absolutePeakLevelErrorAfterRegistration": 0.1715037570035598
+      },
+      "aligned": {
+        "registeredTrebleMAE": 0.7335982793120632,
+        "registeredTrebleRMSE": 0.8684728459129286,
+        "registeredTrebleMaxAbs": 1.6643458859753826,
+        "rawTrebleMAE": 0.8414379211561133,
+        "rawTrebleRMSE": 0.9964372158903346,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8186.388553498127,
+        "rawPeakFrequencyErrorOctaves": 0.03125000000000023,
+        "candidatePeakDb": 10.00808062169319,
+        "withheldPeakDb": 10.179584378696752,
+        "absolutePeakLevelErrorAfterRegistration": 0.17150375700356157
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8010.9711278478035,
+        "individualPeakFrequenciesHz": [
+          8010.971127847806,
+          8010.971127847806,
+          7953.337962417689,
+          8673.176548516634,
+          8127.493386077178,
+          8010.971127847806,
+          7452.944296151996
+        ],
+        "log2Shifts": [
+          0,
+          0,
+          -0.010416666666667851,
+          0.11458333333333215,
+          0.02083333333333215,
+          0,
+          -0.10416666666666785
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.010416666666667851,
+            "absoluteOctaves": 0.010416666666667851,
+            "cents": 12.500000000001421
+          },
+          {
+            "frequencyHz": 8673.176548516634,
+            "log2Shift": 0.11458333333333215,
+            "absoluteOctaves": 0.11458333333333215,
+            "cents": 137.49999999999858
+          },
+          {
+            "frequencyHz": 8127.493386077178,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7452.944296151996,
+            "log2Shift": -0.10416666666666785,
+            "absoluteOctaves": 0.10416666666666785,
+            "cents": 125.00000000000142
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.010416666666667851,
+        "maximumAbsoluteShiftOctaves": 0.11458333333333215,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.010416666666667851,
+        "maximumAbsoluteOctaves": 0.11458333333333215
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 0.3334581479663905,
+          "8-10kHz": 0.9094656793459758,
+          "10-14kHz": 1.6125484806524535,
+          "6-14kHz": 0.7305363073303652,
+          "6-8kHzHz": 0.3334581479663905,
+          "8-10kHzHz": 0.9094656793459758,
+          "10-14kHzHz": 1.6125484806524535,
+          "6-14kHzHz": 0.7305363073303652
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 0.2731404086697882,
+          "8-10kHz": 0.7144290513450243,
+          "10-14kHz": 1.7398080986231987,
+          "6-14kHz": 0.6252278198218808,
+          "6-8kHzHz": 0.2731404086697882,
+          "8-10kHzHz": 0.7144290513450243,
+          "10-14kHzHz": 1.7398080986231987,
+          "6-14kHzHz": 0.6252278198218808
+        },
+        "medianFullBandBefore": 0.7305363073303652,
+        "medianFullBandAfter": 0.6252278198218808,
+        "beforeProfileSha256": "8a85ae4ede86274b9905d77be3c077465476e5b7b254f9cf0cd91162788fcc73",
+        "afterProfileSha256": "d5e0c344889762e2e60740ef62a6f20595ae4c2b8d2a647d8821b0f8b31d56f1"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "withheldMember": {
+        "collection": "Super Review",
+        "path": "measurements/Super Review/data/in-ear/BLON x HBB Z300.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+        "blobSha": "1b136cd3654f26d586acb2a6a7e418783c301090",
+        "upstreamSha256": "764022896074741941f5a60135b362d699a3242a69be3603717707fcd36c440a"
+      },
+      "trainingMemberIdentities": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\""
+      ],
+      "canonicalPeakFrequencyHz": 8010.9711278478035,
+      "individualPeakFrequenciesHz": [
+        8010.971127847806,
+        8010.971127847806,
+        7953.337962417689,
+        8673.176548516634,
+        8127.493386077178,
+        8186.388553498127,
+        7452.944296151996
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8673.176548516634
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8127.493386077178
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7452.944296151996
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 0.7541543977346318,
+        "registeredTrebleRMSE": 1.1916307707399179,
+        "registeredTrebleMaxAbs": 2.9004752784353727,
+        "rawTrebleMAE": 0.839971415957195,
+        "rawTrebleRMSE": 1.199992949263825,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0.010416666666666068,
+        "candidatePeakDb": 9.750082434639717,
+        "withheldPeakDb": 10.008080621693193,
+        "absolutePeakLevelErrorAfterRegistration": 0.25799818705347555
+      },
+      "aligned": {
+        "registeredTrebleMAE": 0.7926696858608047,
+        "registeredTrebleRMSE": 1.1918304397316777,
+        "registeredTrebleMaxAbs": 2.9345276605634867,
+        "rawTrebleMAE": 0.7926696858607944,
+        "rawTrebleRMSE": 1.1918304397316768,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0,
+        "candidatePeakDb": 10.109327568038836,
+        "withheldPeakDb": 10.008080621693193,
+        "absolutePeakLevelErrorAfterRegistration": 0.10124694634564335
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8010.9711278478035,
+        "individualPeakFrequenciesHz": [
+          8010.971127847806,
+          8010.971127847806,
+          7953.337962417689,
+          8673.176548516634,
+          8127.493386077178,
+          8186.388553498127,
+          7452.944296151996
+        ],
+        "log2Shifts": [
+          0,
+          0,
+          -0.010416666666667851,
+          0.11458333333333215,
+          0.02083333333333215,
+          0.03125,
+          -0.10416666666666785
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.010416666666667851,
+            "absoluteOctaves": 0.010416666666667851,
+            "cents": 12.500000000001421
+          },
+          {
+            "frequencyHz": 8673.176548516634,
+            "log2Shift": 0.11458333333333215,
+            "absoluteOctaves": 0.11458333333333215,
+            "cents": 137.49999999999858
+          },
+          {
+            "frequencyHz": 8127.493386077178,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 7452.944296151996,
+            "log2Shift": -0.10416666666666785,
+            "absoluteOctaves": 0.10416666666666785,
+            "cents": 125.00000000000142
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.02083333333333215,
+        "maximumAbsoluteShiftOctaves": 0.11458333333333215,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.02083333333333215,
+        "maximumAbsoluteOctaves": 0.11458333333333215
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 0.5766815520549802,
+          "8-10kHz": 0.9802919565915447,
+          "10-14kHz": 1.6750685522782527,
+          "6-14kHz": 0.9796921957901981,
+          "6-8kHzHz": 0.5766815520549802,
+          "8-10kHzHz": 0.9802919565915447,
+          "10-14kHzHz": 1.6750685522782527,
+          "6-14kHzHz": 0.9796921957901981
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 0.46675576357299287,
+          "8-10kHz": 0.8056242824477083,
+          "10-14kHz": 1.767597245990551,
+          "6-14kHz": 0.7396373971879199,
+          "6-8kHzHz": 0.46675576357299287,
+          "8-10kHzHz": 0.8056242824477083,
+          "10-14kHzHz": 1.767597245990551,
+          "6-14kHzHz": 0.7396373971879199
+        },
+        "medianFullBandBefore": 0.9796921957901981,
+        "medianFullBandAfter": 0.7396373971879199,
+        "beforeProfileSha256": "b8c67bdf5803b17651e8874f29bdb635f356e8834bef89e543825c30895e5210",
+        "afterProfileSha256": "195c434c728afcb82c711ee9a8a2cd00c9f872ced3068ab92d3055cef9fe2a48"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+      "withheldMember": {
+        "collection": "ToneDeafMonk",
+        "path": "measurements/ToneDeafMonk/data/in-ear/BLON x HBB Z300.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+        "blobSha": "c200a91bff1a719882b2c1181ba12df6e2774d37",
+        "upstreamSha256": "98d6a90cbff31463a7af59d6a71b81eee486134abcbf9273c462e372ff26a0f7"
+      },
+      "trainingMemberIdentities": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\""
+      ],
+      "canonicalPeakFrequencyHz": 8010.9711278478035,
+      "individualPeakFrequenciesHz": [
+        8010.971127847806,
+        8010.971127847806,
+        7953.337962417689,
+        8673.176548516634,
+        8127.493386077178,
+        8186.388553498127,
+        8010.971127847806
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8673.176548516634
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8127.493386077178
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8010.9711278478035,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.369668017792484,
+        "registeredTrebleRMSE": 3.2108643782461432,
+        "registeredTrebleMaxAbs": 7.516588652563922,
+        "rawTrebleMAE": 3.1899269864426265,
+        "rawTrebleRMSE": 3.8751122425739575,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 7452.944296151996,
+        "rawPeakFrequencyErrorOctaves": 0.10416666666666788,
+        "candidatePeakDb": 10.008080621693193,
+        "withheldPeakDb": 8.684381984723627,
+        "absolutePeakLevelErrorAfterRegistration": 1.3236986369695654
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.4319692634521477,
+        "registeredTrebleRMSE": 3.2155958782014133,
+        "registeredTrebleMaxAbs": 7.349631097486212,
+        "rawTrebleMAE": 3.138362385642517,
+        "rawTrebleRMSE": 3.82294741603032,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 7452.944296151996,
+        "rawPeakFrequencyErrorOctaves": 0.10416666666666788,
+        "candidatePeakDb": 10.109327568038836,
+        "withheldPeakDb": 8.684381984723627,
+        "absolutePeakLevelErrorAfterRegistration": 1.4249455833152087
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8010.9711278478035,
+        "individualPeakFrequenciesHz": [
+          8010.971127847806,
+          8010.971127847806,
+          7953.337962417689,
+          8673.176548516634,
+          8127.493386077178,
+          8186.388553498127,
+          8010.971127847806
+        ],
+        "log2Shifts": [
+          0,
+          0,
+          -0.010416666666667851,
+          0.11458333333333215,
+          0.02083333333333215,
+          0.03125,
+          0
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.010416666666667851,
+            "absoluteOctaves": 0.010416666666667851,
+            "cents": 12.500000000001421
+          },
+          {
+            "frequencyHz": 8673.176548516634,
+            "log2Shift": 0.11458333333333215,
+            "absoluteOctaves": 0.11458333333333215,
+            "cents": 137.49999999999858
+          },
+          {
+            "frequencyHz": 8127.493386077178,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.010416666666667851,
+        "maximumAbsoluteShiftOctaves": 0.11458333333333215,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.010416666666667851,
+        "maximumAbsoluteOctaves": 0.11458333333333215
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 0.39009795953489124,
+          "8-10kHz": 0.6696087289452896,
+          "10-14kHz": 1.1194489911539165,
+          "6-14kHz": 0.7644325691881965,
+          "6-8kHzHz": 0.39009795953489124,
+          "8-10kHzHz": 0.6696087289452896,
+          "10-14kHzHz": 1.1194489911539165,
+          "6-14kHzHz": 0.7644325691881965
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 0.24456918370538655,
+          "8-10kHz": 0.6813795896060407,
+          "10-14kHz": 1.101661307241586,
+          "6-14kHz": 0.6020308897169493,
+          "6-8kHzHz": 0.24456918370538655,
+          "8-10kHzHz": 0.6813795896060407,
+          "10-14kHzHz": 1.101661307241586,
+          "6-14kHzHz": 0.6020308897169493
+        },
+        "medianFullBandBefore": 0.7644325691881965,
+        "medianFullBandAfter": 0.6020308897169493,
+        "beforeProfileSha256": "9a2d1791e7fe364f130931480ad454c41247c42a40e036f88ab1a5bc230a7d77",
+        "afterProfileSha256": "d60e3ac472db3cc6677c1239b75e0dccff8ac0ad8bd4669c27c20eb8b0b8d9f4"
+      }
+    }
+  ],
+  "dispersion": {
+    "foldCount": 8,
+    "medianByBandBefore": {
+      "6-8kHz": 0.43663377060756176,
+      "8-10kHz": 0.8455565109658942,
+      "10-14kHz": 1.4403297660165193,
+      "6-14kHz": 0.8961225598351644
+    },
+    "medianByBandAfter": {
+      "6-8kHz": 0.3075596556173986,
+      "8-10kHz": 0.7342943124638514,
+      "10-14kHz": 1.5419159709589874,
+      "6-14kHz": 0.7012463890332746
+    },
+    "medianFullBandBefore": 0.8961225598351644,
+    "medianFullBandAfter": 0.7012463890332746
+  },
+  "classification": "NO_PEAK_ALIGNMENT_SIGNAL",
+  "foldWinCount": 3,
+  "foldLossCount": 5,
+  "strictMajority": false,
+  "medianRegisteredMAE": {
+    "pointwise": 0.7902225083718251,
+    "aligned": 0.8388851967492585
+  },
+  "medianRobustSigma": {
+    "before": 0.8961225598351644,
+    "after": 0.7012463890332746
+  },
+  "criteria": {
+    "strictMajority": false,
+    "alignedMedianRegisteredMAELower": false,
+    "alignedMedianRobustSigmaLower": true
+  }
+}

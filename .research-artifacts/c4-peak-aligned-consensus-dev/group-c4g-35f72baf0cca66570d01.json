@@ -1,0 +1,2477 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c4b-group-fold-evidence",
+  "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
+  "groupId": "c4g-35f72baf0cca66570d01",
+  "deviceFamily": "moondrop chu",
+  "configurationSignature": "moondrop chu",
+  "memberCount": 8,
+  "members": [
+    {
+      "collection": "Filk",
+      "form": "in-ear",
+      "model": "Moondrop Chu",
+      "processedName": "Moondrop Chu",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "path": "measurements/Filk/data/in-ear/Moondrop Chu.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Filk/data/in-ear/Moondrop%20Chu.csv",
+      "blobSha": "3e3dce11177c0f5ec2fba3e1d69299b20dde8cb2",
+      "sourceRows": [
+        {
+          "rowNumber": 249,
+          "url": "https://filk.squig.link/iems/data/Moondrop%20Chu%20L.txt",
+          "sourceName": "Moondrop Chu",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 250,
+          "url": "https://filk.squig.link/iems/data/Moondrop%20Chu%20R.txt",
+          "sourceName": "Moondrop Chu",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "ab5a54498140b86d5d9af4153cb22577840c81a9100b57fdb26fbe13bab04762",
+        "byteLength": 8869,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -25.6,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -25.6,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "bc7f4105c9bdaa51d9e8e158d064ad61963c9faf5c321a0b62cfcf8d92e0454a",
+        "canonicalParsedPointsSha256": "3f7a3f4446c0c1a5b281477b2d8bb8ce240d53d8dbe79a39097ece8c108c0d4c",
+        "normalizedParsedPointsSha256": "8146e917ac1064f2c53001a7e2d56e4998daae5409f3cb5673f920d26b477010",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "freeryder05",
+      "form": "in-ear",
+      "model": "Moondrop Chu",
+      "processedName": "Moondrop Chu",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "path": "measurements/freeryder05/data/in-ear/Moondrop Chu.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/freeryder05/data/in-ear/Moondrop%20Chu.csv",
+      "blobSha": "85763265e9c6618ef0b72183e282c6922fb128d3",
+      "sourceRows": [
+        {
+          "rowNumber": 123,
+          "url": "https://freeryder05.squig.link/data/Chu%20L.txt",
+          "sourceName": "Moondrop Chu",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 124,
+          "url": "https://freeryder05.squig.link/data/Chu%20R.txt",
+          "sourceName": "Moondrop Chu",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "e90534bf930b6c5e5ef3cb596f807e1e5147feaff5df10191c402b313f12dbce",
+        "byteLength": 8774,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -25.23,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -25.23,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "19d373c6ab8e4f6a22ed6099344533a88afd2a8b392bb5b9c75fd44aa7273a41",
+        "canonicalParsedPointsSha256": "39fa35b928ec0a695516c145fe98b8f6229d67d7d25bfb4bc9a2a75597152ec8",
+        "normalizedParsedPointsSha256": "d6fb52151fb29bdea38183b3d3a24f849a11f779a75df1bc42bec9b75dc40a74",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Harpo",
+      "form": "in-ear",
+      "model": "Moondrop Chu",
+      "processedName": "Moondrop Chu",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "path": "measurements/Harpo/data/in-ear/Moondrop Chu.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Moondrop%20Chu.csv",
+      "blobSha": "46d5f91306266c2215f0d6e53eddf090538a22de",
+      "sourceRows": [
+        {
+          "rowNumber": 144,
+          "url": "https://harpo.squig.link/data/Moondrop%20Chu%20R.txt",
+          "sourceName": "Moondrop Chu",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "9b2aefcb23ac2c74d1154656cf6f4428c4373d24687b618b43a3073afd69655b",
+        "byteLength": 8803,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -21.73,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -21.73,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "587e617523c5e9f7554d4379ac2f8846e6289cb3f1881724ae31012a0288b514",
+        "canonicalParsedPointsSha256": "2f1df5532ba6aab8d03fae8e9b011f6a2d53f3a225252f02f71e56803f7efa81",
+        "normalizedParsedPointsSha256": "984d6669f9523480aa86254240cf5aa8bdd8c958db5ab2802ddbbc296efc2f71",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "kr0mka",
+      "form": "in-ear",
+      "model": "Moondrop Chu",
+      "processedName": "Moondrop Chu",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "path": "measurements/kr0mka/data/in-ear/Moondrop Chu.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/kr0mka/data/in-ear/Moondrop%20Chu.csv",
+      "blobSha": "c8430a4305c35592a6449c4e70beb7dda4df9b46",
+      "sourceRows": [
+        {
+          "rowNumber": 685,
+          "url": "https://kr0mka.squig.link/data/Chu%20L.txt",
+          "sourceName": "Moondrop Chu",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 686,
+          "url": "https://kr0mka.squig.link/data/Chu%20R.txt",
+          "sourceName": "Moondrop Chu",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "9a5d60e7fdc0fff707ecf52a86212d231461c92cef23f4361cddb07962a5da5b",
+        "byteLength": 8803,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -23.56,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -23.56,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "4091ae294492047046cb52ebaec3879680d3d6d728bc5c9a24147b90ac702241",
+        "canonicalParsedPointsSha256": "58f0a9cb2e4635bbd77782160e03dd3eff8e9d095ac2e97f8c034b59f438e830",
+        "normalizedParsedPointsSha256": "7a0085ad5f3b985444125d896d0c3d3c1a13985db4c15fd84ca8b982ac88d81b",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Regan Cipher",
+      "form": "in-ear",
+      "model": "Moondrop Chu",
+      "processedName": "Moondrop Chu",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "path": "measurements/Regan Cipher/data/in-ear/Moondrop Chu.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Moondrop%20Chu.csv",
+      "blobSha": "3cdfe1f9e505f9191b07cd28c56e21573a3c02ed",
+      "sourceRows": [
+        {
+          "rowNumber": 253,
+          "url": "https://regancipher.squig.link/data/Moondrop%20Chu%20L.txt",
+          "sourceName": "Moondrop Chu",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 254,
+          "url": "https://regancipher.squig.link/data/Moondrop%20Chu%20R.txt",
+          "sourceName": "Moondrop Chu",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "b421902a43eddde44e6335eaf94382a447c15e0ea253a7bfea75a32e708d2bda",
+        "byteLength": 8768,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -16.5,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -16.5,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "cfb28ec6d34599c8c0b302895e0b9b05870c8f668f905d13e5440920ce3fbf97",
+        "canonicalParsedPointsSha256": "b9be7e07174443cb1eed02b7caf382b69262defb3fa46a3e3fd5658cb380cbcb",
+        "normalizedParsedPointsSha256": "c9fb36edef473511266fb3df0b2684338d84390a8ab5cf1be0f5da74d768725e",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Super Review",
+      "form": "in-ear",
+      "model": "Moondrop Chu",
+      "processedName": "Moondrop Chu",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "path": "measurements/Super Review/data/in-ear/Moondrop Chu.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/Moondrop%20Chu.csv",
+      "blobSha": "d27a1b096194ac251e33a383c0ba23fe22ed958e",
+      "sourceRows": [
+        {
+          "rowNumber": 1576,
+          "url": "https://superreview.squig.link/data/Moondrop%20Chu%20L.txt",
+          "sourceName": "Moondrop Chu stock",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 1577,
+          "url": "https://superreview.squig.link/data/Moondrop%20Chu%20R.txt",
+          "sourceName": "Moondrop Chu stock",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "a754c797c2c996ca2c5882be4811442b3efa5e2a99f29aa740759045031e699d",
+        "byteLength": 8776,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -21.63,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -21.63,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "2108dcca47499ac007dac5e8c1de79d0fb40b4120632e9d97fa5300cc1354367",
+        "canonicalParsedPointsSha256": "da4fdfe1a4a98ecbb4d507928098dcba61cf7fb17fbb80d2fc6a548c6f8bd277",
+        "normalizedParsedPointsSha256": "a9f38ee73508d4b1dc7d496e0755cdea2f3b0a8e237cd3fcf7277bd2763a431e",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Ted's Squig Hoard",
+      "form": "in-ear",
+      "model": "Moondrop Chu",
+      "processedName": "Moondrop Chu",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "path": "measurements/Ted's Squig Hoard/data/in-ear/Moondrop Chu.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Ted's%20Squig%20Hoard/data/in-ear/Moondrop%20Chu.csv",
+      "blobSha": "38762a6ab4499f8ec697f67e90689046f9a14811",
+      "sourceRows": [
+        {
+          "rowNumber": 48,
+          "url": "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S1%20L.txt",
+          "sourceName": "Moondrop Chu (S1)",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 49,
+          "url": "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S1%20R.txt",
+          "sourceName": "Moondrop Chu (S1)",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 50,
+          "url": "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S2%20L.txt",
+          "sourceName": "Moondrop Chu (S2)",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 51,
+          "url": "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S2%20R.txt",
+          "sourceName": "Moondrop Chu (S2)",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "95a80e1ccbaecdbabcd1f13241a0df368b7de4d9f9698e70c406e409f3293020",
+        "byteLength": 8802,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -21.82,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -21.82,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "3100f6408993fcc9a708837910dab6148d48471835e05d095d95028ddaea5b62",
+        "canonicalParsedPointsSha256": "064d74843bff11f000f146612eda90191c20f91135b4bec093c847fc3e2f8606",
+        "normalizedParsedPointsSha256": "1d7c89b3399c5319188a5646d9ba19be3a9f7c9d49b15ae584eba5fae669ce04",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "Moondrop Chu",
+      "processedName": "Moondrop Chu",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "path": "measurements/ToneDeafMonk/data/in-ear/Moondrop Chu.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Moondrop%20Chu.csv",
+      "blobSha": "beeee019cca0b7e2053e0ebc14c05eba8a0d779c",
+      "sourceRows": [
+        {
+          "rowNumber": 473,
+          "url": "https://tonedeafmonk.squig.link/data/MOONDROP%20CHU%20L.txt",
+          "sourceName": "MOONDROP CHU",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 474,
+          "url": "https://tonedeafmonk.squig.link/data/MOONDROP%20CHU%20R.txt",
+          "sourceName": "MOONDROP CHU",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "07d73f25a362cdecc7b70a12f9ef11ace37428e2b2b95d2719934cfb73f277d4",
+        "byteLength": 8775,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -16.82,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -16.82,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "c28a470946a911a68f7eba6e5082451534f1ea71ebdaf678f5aa8cf356f7ca9c",
+        "canonicalParsedPointsSha256": "7d1d7d18c1a79cebea88217078875561c2c94619ed2f5943b3c8d94901737e65",
+        "normalizedParsedPointsSha256": "8e2ee80a6221b2d7c06cabf89c9212c5198cc3a43efe9670c65550ee7217354f",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    }
+  ],
+  "folds": [
+    {
+      "withheldMemberIdentity": "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "withheldMember": {
+        "collection": "Filk",
+        "path": "measurements/Filk/data/in-ear/Moondrop Chu.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Filk/data/in-ear/Moondrop%20Chu.csv",
+        "blobSha": "3e3dce11177c0f5ec2fba3e1d69299b20dde8cb2",
+        "upstreamSha256": "ab5a54498140b86d5d9af4153cb22577840c81a9100b57fdb26fbe13bab04762"
+      },
+      "trainingMemberIdentities": [
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\""
+      ],
+      "canonicalPeakFrequencyHz": 8186.388553498124,
+      "individualPeakFrequenciesHz": [
+        7953.337962417689,
+        8426.2680481483,
+        7953.337962417689,
+        9322.56624442594,
+        8186.388553498127,
+        7896.119426088657,
+        8305.46231693746
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8426.2680481483
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            9322.56624442594
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8305.46231693746
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 3.0331716583792967,
+        "registeredTrebleRMSE": 3.70299502358014,
+        "registeredTrebleMaxAbs": 6.9837269962458945,
+        "rawTrebleMAE": 2.365081021154482,
+        "rawTrebleRMSE": 2.7156807900413025,
+        "candidateDominantPeakFrequencyHz": 7896.119426088657,
+        "withheldDominantPeakFrequencyHz": 6001.447366754564,
+        "rawPeakFrequencyErrorOctaves": 0.39583333333333415,
+        "candidatePeakDb": 7.961416537614103,
+        "withheldPeakDb": 7.77251097528068,
+        "absolutePeakLevelErrorAfterRegistration": 0.18890556233342348
+      },
+      "aligned": {
+        "registeredTrebleMAE": 3.650991811311951,
+        "registeredTrebleRMSE": 4.472268973381925,
+        "registeredTrebleMaxAbs": 8.848189726481486,
+        "rawTrebleMAE": 2.41394893776678,
+        "rawTrebleRMSE": 2.7107306814028167,
+        "candidateDominantPeakFrequencyHz": 8186.388553498127,
+        "withheldDominantPeakFrequencyHz": 6001.447366754564,
+        "rawPeakFrequencyErrorOctaves": 0.4479166666666681,
+        "candidatePeakDb": 7.961416537614103,
+        "withheldPeakDb": 7.77251097528068,
+        "absolutePeakLevelErrorAfterRegistration": 0.18890556233342348
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8186.388553498124,
+        "individualPeakFrequenciesHz": [
+          7953.337962417689,
+          8426.2680481483,
+          7953.337962417689,
+          9322.56624442594,
+          8186.388553498127,
+          7896.119426088657,
+          8305.46231693746
+        ],
+        "log2Shifts": [
+          -0.04166666666666785,
+          0.041666666666666075,
+          -0.04166666666666785,
+          0.1875,
+          0,
+          -0.052083333333333925,
+          0.02083333333333215
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 8426.2680481483,
+            "log2Shift": 0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 9322.56624442594,
+            "log2Shift": 0.1875,
+            "absoluteOctaves": 0.1875,
+            "cents": 225
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": -0.052083333333333925,
+            "absoluteOctaves": 0.052083333333333925,
+            "cents": 62.50000000000071
+          },
+          {
+            "frequencyHz": 8305.46231693746,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.1875,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.1875
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 1.6866028923585112,
+          "8-10kHz": 2.2717753195107515,
+          "10-14kHz": 1.788174898645051,
+          "6-14kHz": 1.8986445650046617,
+          "6-8kHzHz": 1.6866028923585112,
+          "8-10kHzHz": 2.2717753195107515,
+          "10-14kHzHz": 1.788174898645051,
+          "6-14kHzHz": 1.8986445650046617
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.6665908079383738,
+          "8-10kHz": 1.4219056368378897,
+          "10-14kHz": 1.731331748202475,
+          "6-14kHz": 1.6291278768575856,
+          "6-8kHzHz": 1.6665908079383738,
+          "8-10kHzHz": 1.4219056368378897,
+          "10-14kHzHz": 1.731331748202475,
+          "6-14kHzHz": 1.6291278768575856
+        },
+        "medianFullBandBefore": 1.8986445650046617,
+        "medianFullBandAfter": 1.6291278768575856,
+        "beforeProfileSha256": "6c215e6283c9fd27ffcc35f5b47d9eb2b0558059376c8d2591a96d52bbed189e",
+        "afterProfileSha256": "00acde69c13b0982196605d220e973f09ca723a83ed8af9c76945adba4f9a88d"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "withheldMember": {
+        "collection": "freeryder05",
+        "path": "measurements/freeryder05/data/in-ear/Moondrop Chu.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/freeryder05/data/in-ear/Moondrop%20Chu.csv",
+        "blobSha": "85763265e9c6618ef0b72183e282c6922fb128d3",
+        "upstreamSha256": "e90534bf930b6c5e5ef3cb596f807e1e5147feaff5df10191c402b313f12dbce"
+      },
+      "trainingMemberIdentities": [
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\""
+      ],
+      "canonicalPeakFrequencyHz": 8186.388553498124,
+      "individualPeakFrequenciesHz": [
+        6001.447366754564,
+        8426.2680481483,
+        7953.337962417689,
+        9322.56624442594,
+        8186.388553498127,
+        7896.119426088657,
+        8305.46231693746
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            6001.447366754564
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8426.2680481483
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            9322.56624442594
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8305.46231693746
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.730268896160413,
+        "registeredTrebleRMSE": 2.020928403921096,
+        "registeredTrebleMaxAbs": 4.701579787607999,
+        "rawTrebleMAE": 1.7790073785312908,
+        "rawTrebleRMSE": 2.0404974006296936,
+        "candidateDominantPeakFrequencyHz": 7616.142525315687,
+        "withheldDominantPeakFrequencyHz": 7953.337962417689,
+        "rawPeakFrequencyErrorOctaves": 0.06250000000000025,
+        "candidatePeakDb": 7.616226190438425,
+        "withheldPeakDb": 9.86450627016486,
+        "absolutePeakLevelErrorAfterRegistration": 2.2482800797264346
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.026427440662512,
+        "registeredTrebleRMSE": 2.2009855148122224,
+        "registeredTrebleMaxAbs": 4.671876237179793,
+        "rawTrebleMAE": 1.8633620404478757,
+        "rawTrebleRMSE": 2.086504604396134,
+        "candidateDominantPeakFrequencyHz": 8186.388553498127,
+        "withheldDominantPeakFrequencyHz": 7953.337962417689,
+        "rawPeakFrequencyErrorOctaves": 0.041666666666667976,
+        "candidatePeakDb": 7.814941999761285,
+        "withheldPeakDb": 9.86450627016486,
+        "absolutePeakLevelErrorAfterRegistration": 2.0495642704035753
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8186.388553498124,
+        "individualPeakFrequenciesHz": [
+          6001.447366754564,
+          8426.2680481483,
+          7953.337962417689,
+          9322.56624442594,
+          8186.388553498127,
+          7896.119426088657,
+          8305.46231693746
+        ],
+        "log2Shifts": [
+          -0.44791666666666785,
+          0.041666666666666075,
+          -0.04166666666666785,
+          0.1875,
+          0,
+          -0.052083333333333925,
+          0.02083333333333215
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 6001.447366754564,
+            "log2Shift": -0.44791666666666785,
+            "absoluteOctaves": 0.44791666666666785,
+            "cents": 537.5000000000014
+          },
+          {
+            "frequencyHz": 8426.2680481483,
+            "log2Shift": 0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 9322.56624442594,
+            "log2Shift": 0.1875,
+            "absoluteOctaves": 0.1875,
+            "cents": 225
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": -0.052083333333333925,
+            "absoluteOctaves": 0.052083333333333925,
+            "cents": 62.50000000000071
+          },
+          {
+            "frequencyHz": 8305.46231693746,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.44791666666666785,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.44791666666666785
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 1.6286717102701238,
+          "8-10kHz": 2.295940119822041,
+          "10-14kHz": 2.116476225879745,
+          "6-14kHz": 1.9773079411022474,
+          "6-8kHzHz": 1.6286717102701238,
+          "8-10kHzHz": 2.295940119822041,
+          "10-14kHzHz": 2.116476225879745,
+          "6-14kHzHz": 1.9773079411022474
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.4773688559140639,
+          "8-10kHz": 0.8693193629145591,
+          "10-14kHz": 1.9734298943353301,
+          "6-14kHz": 1.4669239528263853,
+          "6-8kHzHz": 1.4773688559140639,
+          "8-10kHzHz": 0.8693193629145591,
+          "10-14kHzHz": 1.9734298943353301,
+          "6-14kHzHz": 1.4669239528263853
+        },
+        "medianFullBandBefore": 1.9773079411022474,
+        "medianFullBandAfter": 1.4669239528263853,
+        "beforeProfileSha256": "4981d150815cb611ac54c6e09c8c82cfe7325b2b81b1653e28ba13357e42c907",
+        "afterProfileSha256": "bd7b660f913963a048d98eeb89362cd4a06670bb757a3fd7562f672868045c73"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "withheldMember": {
+        "collection": "Harpo",
+        "path": "measurements/Harpo/data/in-ear/Moondrop Chu.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Moondrop%20Chu.csv",
+        "blobSha": "46d5f91306266c2215f0d6e53eddf090538a22de",
+        "upstreamSha256": "9b2aefcb23ac2c74d1154656cf6f4428c4373d24687b618b43a3073afd69655b"
+      },
+      "trainingMemberIdentities": [
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\""
+      ],
+      "canonicalPeakFrequencyHz": 7953.337962417685,
+      "individualPeakFrequenciesHz": [
+        6001.447366754564,
+        7953.337962417689,
+        7953.337962417689,
+        9322.56624442594,
+        8186.388553498127,
+        7896.119426088657,
+        8305.46231693746
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            6001.447366754564
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            9322.56624442594
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            8305.46231693746
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.471222072481722,
+        "registeredTrebleRMSE": 1.8085526052114558,
+        "registeredTrebleMaxAbs": 4.734081025763158,
+        "rawTrebleMAE": 1.5530585836664792,
+        "rawTrebleRMSE": 1.8549051542357862,
+        "candidateDominantPeakFrequencyHz": 7896.119426088657,
+        "withheldDominantPeakFrequencyHz": 8426.2680481483,
+        "rawPeakFrequencyErrorOctaves": 0.09375000000000012,
+        "candidatePeakDb": 7.961416537614103,
+        "withheldPeakDb": 7.814941999761286,
+        "absolutePeakLevelErrorAfterRegistration": 0.14647453785281694
+      },
+      "aligned": {
+        "registeredTrebleMAE": 1.5785908763475973,
+        "registeredTrebleRMSE": 1.9225906541864286,
+        "registeredTrebleMaxAbs": 4.611105314313773,
+        "rawTrebleMAE": 1.6961565611607774,
+        "rawTrebleRMSE": 1.9798986319800058,
+        "candidateDominantPeakFrequencyHz": 7953.337962417689,
+        "withheldDominantPeakFrequencyHz": 8426.2680481483,
+        "rawPeakFrequencyErrorOctaves": 0.08333333333333397,
+        "candidatePeakDb": 7.961416537614103,
+        "withheldPeakDb": 7.814941999761286,
+        "absolutePeakLevelErrorAfterRegistration": 0.14647453785281694
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7953.337962417685,
+        "individualPeakFrequenciesHz": [
+          6001.447366754564,
+          7953.337962417689,
+          7953.337962417689,
+          9322.56624442594,
+          8186.388553498127,
+          7896.119426088657,
+          8305.46231693746
+        ],
+        "log2Shifts": [
+          -0.40625,
+          0,
+          0,
+          0.22916666666666785,
+          0.04166666666666785,
+          -0.010416666666666075,
+          0.0625
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 6001.447366754564,
+            "log2Shift": -0.40625,
+            "absoluteOctaves": 0.40625,
+            "cents": 487.5
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 9322.56624442594,
+            "log2Shift": 0.22916666666666785,
+            "absoluteOctaves": 0.22916666666666785,
+            "cents": 275.0000000000014
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8305.46231693746,
+            "log2Shift": 0.0625,
+            "absoluteOctaves": 0.0625,
+            "cents": 75
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.40625,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.40625
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 1.60906373862908,
+          "8-10kHz": 2.627384006353316,
+          "10-14kHz": 1.9910956117583158,
+          "6-14kHz": 1.85661385396915,
+          "6-8kHzHz": 1.60906373862908,
+          "8-10kHzHz": 2.627384006353316,
+          "10-14kHzHz": 1.9910956117583158,
+          "6-14kHzHz": 1.85661385396915
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.678474672258368,
+          "8-10kHz": 1.3209713825804996,
+          "10-14kHz": 1.7289062776666906,
+          "6-14kHz": 1.662355519414403,
+          "6-8kHzHz": 1.678474672258368,
+          "8-10kHzHz": 1.3209713825804996,
+          "10-14kHzHz": 1.7289062776666906,
+          "6-14kHzHz": 1.662355519414403
+        },
+        "medianFullBandBefore": 1.85661385396915,
+        "medianFullBandAfter": 1.662355519414403,
+        "beforeProfileSha256": "58bce5137d58182ddb8141b09b388cf49f648206042c20204d2b81acb92758a4",
+        "afterProfileSha256": "8eae64c1b10893090fceb750a9ef62a610eef0a3552f0744247e8176cfaa316a"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "withheldMember": {
+        "collection": "kr0mka",
+        "path": "measurements/kr0mka/data/in-ear/Moondrop Chu.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/kr0mka/data/in-ear/Moondrop%20Chu.csv",
+        "blobSha": "c8430a4305c35592a6449c4e70beb7dda4df9b46",
+        "upstreamSha256": "9a5d60e7fdc0fff707ecf52a86212d231461c92cef23f4361cddb07962a5da5b"
+      },
+      "trainingMemberIdentities": [
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\""
+      ],
+      "canonicalPeakFrequencyHz": 8186.388553498124,
+      "individualPeakFrequenciesHz": [
+        6001.447366754564,
+        7953.337962417689,
+        8426.2680481483,
+        9322.56624442594,
+        8186.388553498127,
+        7896.119426088657,
+        8305.46231693746
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            6001.447366754564
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8426.2680481483
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            9322.56624442594
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8305.46231693746
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.9120993094823926,
+        "registeredTrebleRMSE": 2.473432476940313,
+        "registeredTrebleMaxAbs": 6.078059685757438,
+        "rawTrebleMAE": 1.7291852041817948,
+        "rawTrebleRMSE": 2.2709179727480096,
+        "candidateDominantPeakFrequencyHz": 7616.142525315687,
+        "withheldDominantPeakFrequencyHz": 7953.337962417689,
+        "rawPeakFrequencyErrorOctaves": 0.06250000000000025,
+        "candidatePeakDb": 7.616226190438425,
+        "withheldPeakDb": 8.405929459431569,
+        "absolutePeakLevelErrorAfterRegistration": 0.7897032689931436
+      },
+      "aligned": {
+        "registeredTrebleMAE": 1.3894625938441592,
+        "registeredTrebleRMSE": 1.9593376482105624,
+        "registeredTrebleMaxAbs": 6.1902961183678435,
+        "rawTrebleMAE": 1.5270287063290993,
+        "rawTrebleRMSE": 1.9943834323828884,
+        "candidateDominantPeakFrequencyHz": 8186.388553498127,
+        "withheldDominantPeakFrequencyHz": 7953.337962417689,
+        "rawPeakFrequencyErrorOctaves": 0.041666666666667976,
+        "candidatePeakDb": 7.814941999761285,
+        "withheldPeakDb": 8.405929459431569,
+        "absolutePeakLevelErrorAfterRegistration": 0.5909874596702842
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8186.388553498124,
+        "individualPeakFrequenciesHz": [
+          6001.447366754564,
+          7953.337962417689,
+          8426.2680481483,
+          9322.56624442594,
+          8186.388553498127,
+          7896.119426088657,
+          8305.46231693746
+        ],
+        "log2Shifts": [
+          -0.44791666666666785,
+          -0.04166666666666785,
+          0.041666666666666075,
+          0.1875,
+          0,
+          -0.052083333333333925,
+          0.02083333333333215
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 6001.447366754564,
+            "log2Shift": -0.44791666666666785,
+            "absoluteOctaves": 0.44791666666666785,
+            "cents": 537.5000000000014
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 8426.2680481483,
+            "log2Shift": 0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 9322.56624442594,
+            "log2Shift": 0.1875,
+            "absoluteOctaves": 0.1875,
+            "cents": 225
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": -0.052083333333333925,
+            "absoluteOctaves": 0.052083333333333925,
+            "cents": 62.50000000000071
+          },
+          {
+            "frequencyHz": 8305.46231693746,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.44791666666666785,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.44791666666666785
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.2670001730398974,
+          "8-10kHz": 2.4119621173096775,
+          "10-14kHz": 1.6307670625629596,
+          "6-14kHz": 2.1751580792709935,
+          "6-8kHzHz": 2.2670001730398974,
+          "8-10kHzHz": 2.4119621173096775,
+          "10-14kHzHz": 1.6307670625629596,
+          "6-14kHzHz": 2.1751580792709935
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 2.473879438075847,
+          "8-10kHz": 2.201635511745019,
+          "10-14kHz": 2.0432323274020567,
+          "6-14kHz": 2.232697678462709,
+          "6-8kHzHz": 2.473879438075847,
+          "8-10kHzHz": 2.201635511745019,
+          "10-14kHzHz": 2.0432323274020567,
+          "6-14kHzHz": 2.232697678462709
+        },
+        "medianFullBandBefore": 2.1751580792709935,
+        "medianFullBandAfter": 2.232697678462709,
+        "beforeProfileSha256": "0d95bd87274a94677e50eaf3ecb92555580776072145528131c03c876c5bcc78",
+        "afterProfileSha256": "f0f5718b4024d047539e128f9235d2cc2ccb25d786dd9d8cf6c0d3e4ced732a8"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "withheldMember": {
+        "collection": "Regan Cipher",
+        "path": "measurements/Regan Cipher/data/in-ear/Moondrop Chu.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Moondrop%20Chu.csv",
+        "blobSha": "3cdfe1f9e505f9191b07cd28c56e21573a3c02ed",
+        "upstreamSha256": "b421902a43eddde44e6335eaf94382a447c15e0ea253a7bfea75a32e708d2bda"
+      },
+      "trainingMemberIdentities": [
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\""
+      ],
+      "canonicalPeakFrequencyHz": 7953.337962417685,
+      "individualPeakFrequenciesHz": [
+        6001.447366754564,
+        7953.337962417689,
+        8426.2680481483,
+        7953.337962417689,
+        8186.388553498127,
+        7896.119426088657,
+        8305.46231693746
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            6001.447366754564
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            8426.2680481483
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            8305.46231693746
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 3.2468796881167816,
+        "registeredTrebleRMSE": 3.77979842505795,
+        "registeredTrebleMaxAbs": 9.441152416261854,
+        "rawTrebleMAE": 4.373507738002094,
+        "rawTrebleRMSE": 4.878536508449835,
+        "candidateDominantPeakFrequencyHz": 7896.119426088657,
+        "withheldDominantPeakFrequencyHz": 9322.56624442594,
+        "rawPeakFrequencyErrorOctaves": 0.23958333333333384,
+        "candidatePeakDb": 7.961416537614103,
+        "withheldPeakDb": 5.834941999761286,
+        "absolutePeakLevelErrorAfterRegistration": 2.1264745378528174
+      },
+      "aligned": {
+        "registeredTrebleMAE": 3.1023438035962325,
+        "registeredTrebleRMSE": 3.697725404119664,
+        "registeredTrebleMaxAbs": 9.378574428362011,
+        "rawTrebleMAE": 4.253377683377085,
+        "rawTrebleRMSE": 4.808403712721583,
+        "candidateDominantPeakFrequencyHz": 7953.337962417689,
+        "withheldDominantPeakFrequencyHz": 9322.56624442594,
+        "rawPeakFrequencyErrorOctaves": 0.22916666666666782,
+        "candidatePeakDb": 7.961416537614103,
+        "withheldPeakDb": 5.834941999761286,
+        "absolutePeakLevelErrorAfterRegistration": 2.1264745378528174
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7953.337962417685,
+        "individualPeakFrequenciesHz": [
+          6001.447366754564,
+          7953.337962417689,
+          8426.2680481483,
+          7953.337962417689,
+          8186.388553498127,
+          7896.119426088657,
+          8305.46231693746
+        ],
+        "log2Shifts": [
+          -0.40625,
+          0,
+          0.08333333333333393,
+          0,
+          0.04166666666666785,
+          -0.010416666666666075,
+          0.0625
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 6001.447366754564,
+            "log2Shift": -0.40625,
+            "absoluteOctaves": 0.40625,
+            "cents": 487.5
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8426.2680481483,
+            "log2Shift": 0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8305.46231693746,
+            "log2Shift": 0.0625,
+            "absoluteOctaves": 0.0625,
+            "cents": 75
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.40625,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.40625
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 1.3769970462046701,
+          "8-10kHz": 2.2806515878167484,
+          "10-14kHz": 1.5540290850221927,
+          "6-14kHz": 1.6359593784472977,
+          "6-8kHzHz": 1.3769970462046701,
+          "8-10kHzHz": 2.2806515878167484,
+          "10-14kHzHz": 1.5540290850221927,
+          "6-14kHzHz": 1.6359593784472977
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.4954179620380463,
+          "8-10kHz": 0.829890475299997,
+          "10-14kHz": 2.0425299686052663,
+          "6-14kHz": 1.5776915383583556,
+          "6-8kHzHz": 1.4954179620380463,
+          "8-10kHzHz": 0.829890475299997,
+          "10-14kHzHz": 2.0425299686052663,
+          "6-14kHzHz": 1.5776915383583556
+        },
+        "medianFullBandBefore": 1.6359593784472977,
+        "medianFullBandAfter": 1.5776915383583556,
+        "beforeProfileSha256": "5d919b9cfe1324dfa99392ce636aa6082ab803e70eb9fa5545dc566ba13a556f",
+        "afterProfileSha256": "edfd3e24e2df2a0997963e3a0acce059f28880f0a6cb4a74911f9d93eb14204f"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "withheldMember": {
+        "collection": "Super Review",
+        "path": "measurements/Super Review/data/in-ear/Moondrop Chu.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/Moondrop%20Chu.csv",
+        "blobSha": "d27a1b096194ac251e33a383c0ba23fe22ed958e",
+        "upstreamSha256": "a754c797c2c996ca2c5882be4811442b3efa5e2a99f29aa740759045031e699d"
+      },
+      "trainingMemberIdentities": [
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\""
+      ],
+      "canonicalPeakFrequencyHz": 7953.337962417685,
+      "individualPeakFrequenciesHz": [
+        6001.447366754564,
+        7953.337962417689,
+        8426.2680481483,
+        7953.337962417689,
+        9322.56624442594,
+        7896.119426088657,
+        8305.46231693746
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            6001.447366754564
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            8426.2680481483
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            9322.56624442594
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            8305.46231693746
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.22362477136142,
+        "registeredTrebleRMSE": 2.5653925978775067,
+        "registeredTrebleMaxAbs": 5.852385452913745,
+        "rawTrebleMAE": 1.671875317768799,
+        "rawTrebleRMSE": 1.8552060529393806,
+        "candidateDominantPeakFrequencyHz": 7616.142525315687,
+        "withheldDominantPeakFrequencyHz": 8186.388553498127,
+        "rawPeakFrequencyErrorOctaves": 0.10416666666666802,
+        "candidatePeakDb": 7.616226190438425,
+        "withheldPeakDb": 10.053014864915534,
+        "absolutePeakLevelErrorAfterRegistration": 2.436788674477109
+      },
+      "aligned": {
+        "registeredTrebleMAE": 1.6894428678264872,
+        "registeredTrebleRMSE": 1.8364590480395857,
+        "registeredTrebleMaxAbs": 3.9142999077517646,
+        "rawTrebleMAE": 1.623122655939205,
+        "rawTrebleRMSE": 1.806095770768533,
+        "candidateDominantPeakFrequencyHz": 7953.337962417689,
+        "withheldDominantPeakFrequencyHz": 8186.388553498127,
+        "rawPeakFrequencyErrorOctaves": 0.04166666666666783,
+        "candidatePeakDb": 7.814941999761285,
+        "withheldPeakDb": 10.053014864915534,
+        "absolutePeakLevelErrorAfterRegistration": 2.2380728651542494
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7953.337962417685,
+        "individualPeakFrequenciesHz": [
+          6001.447366754564,
+          7953.337962417689,
+          8426.2680481483,
+          7953.337962417689,
+          9322.56624442594,
+          7896.119426088657,
+          8305.46231693746
+        ],
+        "log2Shifts": [
+          -0.40625,
+          0,
+          0.08333333333333393,
+          0,
+          0.22916666666666785,
+          -0.010416666666666075,
+          0.0625
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 6001.447366754564,
+            "log2Shift": -0.40625,
+            "absoluteOctaves": 0.40625,
+            "cents": 487.5
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8426.2680481483,
+            "log2Shift": 0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 9322.56624442594,
+            "log2Shift": 0.22916666666666785,
+            "absoluteOctaves": 0.22916666666666785,
+            "cents": 275.0000000000014
+          },
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8305.46231693746,
+            "log2Shift": 0.0625,
+            "absoluteOctaves": 0.0625,
+            "cents": 75
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.0625,
+        "maximumAbsoluteShiftOctaves": 0.40625,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.0625,
+        "maximumAbsoluteOctaves": 0.40625
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 1.6286717102701238,
+          "8-10kHz": 2.122957967883099,
+          "10-14kHz": 2.112749827872164,
+          "6-14kHz": 1.9234072412032959,
+          "6-8kHzHz": 1.6286717102701238,
+          "8-10kHzHz": 2.122957967883099,
+          "10-14kHzHz": 2.112749827872164,
+          "6-14kHzHz": 1.9234072412032959
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.4379191600170862,
+          "8-10kHz": 0.8727446698256397,
+          "10-14kHz": 1.7258513619143319,
+          "6-14kHz": 1.4360262379861113,
+          "6-8kHzHz": 1.4379191600170862,
+          "8-10kHzHz": 0.8727446698256397,
+          "10-14kHzHz": 1.7258513619143319,
+          "6-14kHzHz": 1.4360262379861113
+        },
+        "medianFullBandBefore": 1.9234072412032959,
+        "medianFullBandAfter": 1.4360262379861113,
+        "beforeProfileSha256": "3f850448cb5f8df4beb0b5ddc1bd246776942849514f36011c05dc872a1a8698",
+        "afterProfileSha256": "e9e3121460ebb9d030526cde2b002a740a6e64a89fa626bcda9a982eb5228d23"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "withheldMember": {
+        "collection": "Ted's Squig Hoard",
+        "path": "measurements/Ted's Squig Hoard/data/in-ear/Moondrop Chu.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Ted's%20Squig%20Hoard/data/in-ear/Moondrop%20Chu.csv",
+        "blobSha": "38762a6ab4499f8ec697f67e90689046f9a14811",
+        "upstreamSha256": "95a80e1ccbaecdbabcd1f13241a0df368b7de4d9f9698e70c406e409f3293020"
+      },
+      "trainingMemberIdentities": [
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\""
+      ],
+      "canonicalPeakFrequencyHz": 8186.388553498124,
+      "individualPeakFrequenciesHz": [
+        6001.447366754564,
+        7953.337962417689,
+        8426.2680481483,
+        7953.337962417689,
+        9322.56624442594,
+        8186.388553498127,
+        8305.46231693746
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            6001.447366754564
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8426.2680481483
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            9322.56624442594
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8186.388553498124,
+            8305.46231693746
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.8532756445786558,
+        "registeredTrebleRMSE": 2.430552516942114,
+        "registeredTrebleMaxAbs": 5.651781843313706,
+        "rawTrebleMAE": 1.5571830065941972,
+        "rawTrebleRMSE": 1.9274102123314591,
+        "candidateDominantPeakFrequencyHz": 7561.349867210237,
+        "withheldDominantPeakFrequencyHz": 7896.119426088657,
+        "rawPeakFrequencyErrorOctaves": 0.06249999999999992,
+        "candidatePeakDb": 7.655301205853089,
+        "withheldPeakDb": 7.961416537614103,
+        "absolutePeakLevelErrorAfterRegistration": 0.30611533176101435
+      },
+      "aligned": {
+        "registeredTrebleMAE": 1.1525289677999575,
+        "registeredTrebleRMSE": 1.5037493751426754,
+        "registeredTrebleMaxAbs": 4.506075451486602,
+        "rawTrebleMAE": 1.4771323527286555,
+        "rawTrebleRMSE": 1.8358051691244337,
+        "candidateDominantPeakFrequencyHz": 8186.388553498127,
+        "withheldDominantPeakFrequencyHz": 7896.119426088657,
+        "rawPeakFrequencyErrorOctaves": 0.05208333333333409,
+        "candidatePeakDb": 7.814941999761285,
+        "withheldPeakDb": 7.961416537614103,
+        "absolutePeakLevelErrorAfterRegistration": 0.14647453785281872
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8186.388553498124,
+        "individualPeakFrequenciesHz": [
+          6001.447366754564,
+          7953.337962417689,
+          8426.2680481483,
+          7953.337962417689,
+          9322.56624442594,
+          8186.388553498127,
+          8305.46231693746
+        ],
+        "log2Shifts": [
+          -0.44791666666666785,
+          -0.04166666666666785,
+          0.041666666666666075,
+          -0.04166666666666785,
+          0.1875,
+          0,
+          0.02083333333333215
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 6001.447366754564,
+            "log2Shift": -0.44791666666666785,
+            "absoluteOctaves": 0.44791666666666785,
+            "cents": 537.5000000000014
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 8426.2680481483,
+            "log2Shift": 0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": -0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 9322.56624442594,
+            "log2Shift": 0.1875,
+            "absoluteOctaves": 0.1875,
+            "cents": 225
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8305.46231693746,
+            "log2Shift": 0.02083333333333215,
+            "absoluteOctaves": 0.02083333333333215,
+            "cents": 24.99999999999858
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.44791666666666785,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.44791666666666785
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 1.9910431907222321,
+          "8-10kHz": 2.3688566757356515,
+          "10-14kHz": 2.0361918513829753,
+          "6-14kHz": 2.0535359583385944,
+          "6-8kHzHz": 1.9910431907222321,
+          "8-10kHzHz": 2.3688566757356515,
+          "10-14kHzHz": 2.0361918513829753,
+          "6-14kHzHz": 2.0535359583385944
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.9172290425779557,
+          "8-10kHz": 1.5319283170933164,
+          "10-14kHz": 2.1274720027497502,
+          "6-14kHz": 1.9172290425779557,
+          "6-8kHzHz": 1.9172290425779557,
+          "8-10kHzHz": 1.5319283170933164,
+          "10-14kHzHz": 2.1274720027497502,
+          "6-14kHzHz": 1.9172290425779557
+        },
+        "medianFullBandBefore": 2.0535359583385944,
+        "medianFullBandAfter": 1.9172290425779557,
+        "beforeProfileSha256": "706dbeb33c621bf6aca79f7f2939d20fa1d06a496b97f64659cbc6131dee0b4b",
+        "afterProfileSha256": "adaeb20fc0e715021aa76d8e2300748bb5047acd1f75ed8ec9a7e00d4507aa76"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+      "withheldMember": {
+        "collection": "ToneDeafMonk",
+        "path": "measurements/ToneDeafMonk/data/in-ear/Moondrop Chu.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Moondrop%20Chu.csv",
+        "blobSha": "beeee019cca0b7e2053e0ebc14c05eba8a0d779c",
+        "upstreamSha256": "07d73f25a362cdecc7b70a12f9ef11ace37428e2b2b95d2719934cfb73f277d4"
+      },
+      "trainingMemberIdentities": [
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+        "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\""
+      ],
+      "canonicalPeakFrequencyHz": 7953.337962417685,
+      "individualPeakFrequenciesHz": [
+        6001.447366754564,
+        7953.337962417689,
+        8426.2680481483,
+        7953.337962417689,
+        9322.56624442594,
+        8186.388553498127,
+        7896.119426088657
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            6001.447366754564
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            8426.2680481483
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7953.337962417689
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            9322.56624442594
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            8186.388553498127
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            7953.337962417685,
+            7896.119426088657
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 3.0713864568844067,
+        "registeredTrebleRMSE": 4.157962391435166,
+        "registeredTrebleMaxAbs": 10.784940459633818,
+        "rawTrebleMAE": 3.2375102441587464,
+        "rawTrebleRMSE": 4.130017966193988,
+        "candidateDominantPeakFrequencyHz": 7896.119426088657,
+        "withheldDominantPeakFrequencyHz": 8305.46231693746,
+        "rawPeakFrequencyErrorOctaves": 0.07291666666666623,
+        "candidatePeakDb": 7.961416537614103,
+        "withheldPeakDb": 5.993973488522615,
+        "absolutePeakLevelErrorAfterRegistration": 1.9674430490914885
+      },
+      "aligned": {
+        "registeredTrebleMAE": 3.0618492299978564,
+        "registeredTrebleRMSE": 4.211704145989374,
+        "registeredTrebleMaxAbs": 10.633524111784467,
+        "rawTrebleMAE": 3.334915456544727,
+        "rawTrebleRMSE": 4.253186524384848,
+        "candidateDominantPeakFrequencyHz": 7953.337962417689,
+        "withheldDominantPeakFrequencyHz": 8305.46231693746,
+        "rawPeakFrequencyErrorOctaves": 0.06250000000000008,
+        "candidatePeakDb": 7.961416537614103,
+        "withheldPeakDb": 5.993973488522615,
+        "absolutePeakLevelErrorAfterRegistration": 1.9674430490914885
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 7953.337962417685,
+        "individualPeakFrequenciesHz": [
+          6001.447366754564,
+          7953.337962417689,
+          8426.2680481483,
+          7953.337962417689,
+          9322.56624442594,
+          8186.388553498127,
+          7896.119426088657
+        ],
+        "log2Shifts": [
+          -0.40625,
+          0,
+          0.08333333333333393,
+          0,
+          0.22916666666666785,
+          0.04166666666666785,
+          -0.010416666666666075
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 6001.447366754564,
+            "log2Shift": -0.40625,
+            "absoluteOctaves": 0.40625,
+            "cents": 487.5
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8426.2680481483,
+            "log2Shift": 0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          },
+          {
+            "frequencyHz": 7953.337962417689,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 9322.56624442594,
+            "log2Shift": 0.22916666666666785,
+            "absoluteOctaves": 0.22916666666666785,
+            "cents": 275.0000000000014
+          },
+          {
+            "frequencyHz": 8186.388553498127,
+            "log2Shift": 0.04166666666666785,
+            "absoluteOctaves": 0.04166666666666785,
+            "cents": 50.00000000000142
+          },
+          {
+            "frequencyHz": 7896.119426088657,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.04166666666666785,
+        "maximumAbsoluteShiftOctaves": 0.40625,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.04166666666666785,
+        "maximumAbsoluteOctaves": 0.40625
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 1.3769970462046701,
+          "8-10kHz": 2.563018033273513,
+          "10-14kHz": 1.5257379378648397,
+          "6-14kHz": 1.6672488921776778,
+          "6-8kHzHz": 1.3769970462046701,
+          "8-10kHzHz": 2.563018033273513,
+          "10-14kHzHz": 1.5257379378648397,
+          "6-14kHzHz": 1.6672488921776778
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.4954179620380463,
+          "8-10kHz": 0.803148834020226,
+          "10-14kHz": 1.8272288119601527,
+          "6-14kHz": 1.4948919353797967,
+          "6-8kHzHz": 1.4954179620380463,
+          "8-10kHzHz": 0.803148834020226,
+          "10-14kHzHz": 1.8272288119601527,
+          "6-14kHzHz": 1.4948919353797967
+        },
+        "medianFullBandBefore": 1.6672488921776778,
+        "medianFullBandAfter": 1.4948919353797967,
+        "beforeProfileSha256": "bc99f6a3de58e7a8246be9cb4dfdc57ea1de7d67fc0e6593f262eb105320c081",
+        "afterProfileSha256": "707b7ebcad11fe64531e995a82b673fc841a6e34cc1818fe6bfb36d16b1e93cb"
+      }
+    }
+  ],
+  "dispersion": {
+    "foldCount": 8,
+    "medianByBandBefore": {
+      "6-8kHz": 1.6286717102701238,
+      "8-10kHz": 2.3323983977788463,
+      "10-14kHz": 1.8896352552016835,
+      "6-14kHz": 1.9110259031039787
+    },
+    "medianByBandAfter": {
+      "6-8kHz": 1.58100438498821,
+      "8-10kHz": 1.0968580262030696,
+      "10-14kHz": 1.9003293531477414,
+      "6-14kHz": 1.6034097076079705
+    },
+    "medianFullBandBefore": 1.9110259031039787,
+    "medianFullBandAfter": 1.6034097076079705
+  },
+  "classification": "PEAK_ALIGNMENT_SIGNAL",
+  "foldWinCount": 5,
+  "foldLossCount": 3,
+  "strictMajority": true,
+  "medianRegisteredMAE": {
+    "pointwise": 2.0678620404219066,
+    "aligned": 1.8579351542444995
+  },
+  "medianRobustSigma": {
+    "before": 1.9110259031039787,
+    "after": 1.6034097076079705
+  },
+  "criteria": {
+    "strictMajority": true,
+    "alignedMedianRegisteredMAELower": true,
+    "alignedMedianRobustSigmaLower": true
+  }
+}
