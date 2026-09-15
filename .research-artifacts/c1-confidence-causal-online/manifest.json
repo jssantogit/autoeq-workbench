@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c1d-causal-confidence-protocol-freeze",
+  "phase": "protocol-freeze",
+  "outcomesGenerated": false,
+  "solverExecuted": false,
+  "primaryExecuted": false,
+  "secondaryExecuted": false,
+  "batchCExecuted": false,
+  "freshRealBatchCExecuted": false,
+  "c1CampaignHead": "bf9581cba91f546e34e8e47a56c44cb61b744e52",
+  "standardV2": {
+    "publishedIdentity": "7c9ebbbe6eefeb131c6c698055c737b429f5b0c6",
+    "historicalProductBoundary": "31cc11982ebd07e009788d5e2c5c3537e9e6b615",
+    "semanticCompatibility": "executed Standard V2 path differs only by inactive optional research tracing; experimental structural modules are not called"
+  },
+  "confidenceModel": {
+    "path": ".research-artifacts/c1-confidence-targeting-dev/confidence-model.json",
+    "sha256": "65cc495bebdce148ab3aaf06186b6683213717235c71854314859aba99f92f00",
+    "immutable": true,
+    "retrainingAllowed": false
+  },
+  "primaryGroupIds": [
+    "c1g-ebdb284a8c7563a12c5f",
+    "c1g-3f4de360d87a28aea240",
+    "c1g-f2a43144c5936389d89d",
+    "c1g-8bd11cb5d7772ff2165b",
+    "c1g-6c369c990dd73512951b",
+    "c1g-dc1ade324d0c4b3192d6"
+  ],
+  "secondary": {
+    "primaryGateInput": false,
+    "source": ".research-artifacts/c1-confidence-targeting-dev/group-*.json"
+  },
+  "rejectedBatchCToken": "fresh-real-corpus-v1.2:Batch C",
+  "freshRealBatchCRejected": true,
+  "arms": [
+    "FROZEN_BASELINE",
+    "CONSTANT_AUTHORITY_CONTROL",
+    "CONFIDENCE_SHAPED"
+  ],
+  "settings": {
+    "minFrequencyHz": 20,
+    "maxFrequencyHz": 20000,
+    "minGainDb": -15,
+    "maxGainDb": 15,
+    "minQ": 0.1,
+    "maxQ": 12,
+    "maxFilters": 10,
+    "timeLimitSeconds": 60
+  },
+  "normalization": {
+    "mode": "hz",
+    "frequencyHz": 500,
+    "levelDb": 60
+  },
+  "primaryMetric": "artifact_rmse_4_14k of delivered PEQ cascade against zero correction",
+  "threshold": 0.05,
+  "groupRule": "strict majority of informative observations and median combined gain >= 0.05",
+  "campaignGate": "at least 4 of exactly 6 primary groups"
+}
