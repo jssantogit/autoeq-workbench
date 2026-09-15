@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
-  "phase": "protocol-freeze",
-  "milestone": "C4c-holdout-protocol-only",
+  "phase": "holdout-outcome",
+  "milestone": "C4c-holdout-confirmation-outcome",
   "frozenBoundary": "01ec92e8c3276b6cb42360e114d71f2ce5bc0d8e",
   "c4a": {
     "corpusCommit": "64f1fa7f8780cf14f87ce6427aaa71edbf686e2d",
@@ -79,16 +79,16 @@
   "holdoutCoverage": {
     "groupCount": 3,
     "memberCount": 27,
-    "expectedFoldCount": 27,
-    "protocol": "leave-one-measurement-out"
+    "foldCount": 27,
+    "alignmentBandHz": [
+      6000,
+      14000
+    ]
   },
   "holdoutGate": {
-    "requiredGroups": 3,
-    "minimumSignalGroups": 2,
-    "signalClassification": "PEAK_ALIGNMENT_SIGNAL",
-    "pass": "PEAK_ALIGNMENT_GENERALIZES",
-    "validFailure": "PEAK_ALIGNMENT_NOT_CONFIRMED",
-    "invalid": "INCONCLUSIVE"
+    "classification": "PEAK_ALIGNMENT_NOT_CONFIRMED",
+    "signalGroupCount": 1,
+    "groupCount": 3
   },
   "rejectedDevelopmentGroupIds": [
     "c4g-95ca9d64e706e94c51e7",
@@ -96,14 +96,89 @@
     "c4g-35f72baf0cca66570d01"
   ],
   "rejectedBatchCToken": "fresh-real-corpus-v1.2:Batch C",
-  "protocolFreezeCommit": null,
+  "protocolFreezeCommit": "f1f6900c91da4434d2a09085277b8622d7b039a6",
   "developmentRerunForDecision": false,
-  "holdoutExecuted": false,
+  "holdoutExecuted": true,
   "freshRealCorpusBatchCExecuted": false,
   "autoEqSolverExecuted": false,
   "confidenceWeightingExecuted": false,
-  "outcomesGenerated": false,
+  "outcomesGenerated": true,
   "rawMeasurementsCommitted": false,
   "artifactSchema": "schema.json",
-  "protocolPath": "research/c4-peak-aligned-consensus-holdout/protocol.md"
+  "protocolPath": "research/c4-peak-aligned-consensus-holdout/protocol.md",
+  "protocolSha256": "c29e5fe6e7396593297f82567c76e21b31b8791c5106f4fd94b9730bebd81296",
+  "outcomeClassification": "PEAK_ALIGNMENT_NOT_CONFIRMED",
+  "combinedInterpretation": "C4_CLOSED_HOLDOUT_NOT_CONFIRMED",
+  "consensusAlgorithmExecuted": true,
+  "groupEvidenceFiles": [
+    "group-c4g-043aeb45a50adf964f89.json",
+    "group-c4g-9f35923d2fa109244435.json",
+    "group-c4g-c5a0b86e1ea4436ca9ce.json"
+  ],
+  "evidenceFiles": [
+    "aggregate-evidence.json",
+    "final-report.md",
+    "group-c4g-043aeb45a50adf964f89.json",
+    "group-c4g-9f35923d2fa109244435.json",
+    "group-c4g-c5a0b86e1ea4436ca9ce.json",
+    "manifest.json",
+    "schema.json"
+  ],
+  "c4aEvidenceSha256": "03794a913b873e01df8b5afdd3664e6dc7e40deff9341a449c768ae1f39b73ea",
+  "combinedDiagnostics": {
+    "signalGroups": {
+      "count": 3,
+      "total": 6
+    },
+    "folds": {
+      "alignedWins": 29,
+      "total": 51
+    },
+    "perGroup": [
+      {
+        "groupId": "c4g-95ca9d64e706e94c51e7",
+        "medianAbsolutePeakShiftOctaves": 0.015625,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": -0.04866268837743348,
+        "relativeFullBandSigmaReduction": 0.21746598014197513,
+        "classification": "NO_PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-9c1d23845eb5a1d7beef",
+        "medianAbsolutePeakShiftOctaves": 0.07291666666666607,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": 0.10595433156908562,
+        "relativeFullBandSigmaReduction": 0.12796655528596118,
+        "classification": "PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-35f72baf0cca66570d01",
+        "medianAbsolutePeakShiftOctaves": 0.04166666666666785,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": 0.20992688617740707,
+        "relativeFullBandSigmaReduction": 0.16096913966281848,
+        "classification": "PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-c5a0b86e1ea4436ca9ce",
+        "medianAbsolutePeakShiftOctaves": 0.11979166666666607,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": 0.08468526192634696,
+        "relativeFullBandSigmaReduction": 0.26101636734870365,
+        "classification": "NO_PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-043aeb45a50adf964f89",
+        "medianAbsolutePeakShiftOctaves": 0.046875,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": -0.08135871634166669,
+        "relativeFullBandSigmaReduction": 0.15084722000448128,
+        "classification": "NO_PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-9f35923d2fa109244435",
+        "medianAbsolutePeakShiftOctaves": 0.02083333333333215,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": 0.08788444680293339,
+        "relativeFullBandSigmaReduction": 0.06324348026195352,
+        "classification": "PEAK_ALIGNMENT_SIGNAL"
+      }
+    ],
+    "relationship": "descriptive-only; no threshold, fit, or shift-trigger rule was introduced"
+  },
+  "c1Handoff": null
 }

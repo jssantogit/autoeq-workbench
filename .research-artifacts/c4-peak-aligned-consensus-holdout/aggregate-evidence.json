@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c4c-holdout-aggregate-evidence",
+  "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
+  "frozenBoundary": "01ec92e8c3276b6cb42360e114d71f2ce5bc0d8e",
+  "protocolFreezeCommit": "f1f6900c91da4434d2a09085277b8622d7b039a6",
+  "protocolSha256": "c29e5fe6e7396593297f82567c76e21b31b8791c5106f4fd94b9730bebd81296",
+  "c4aCorpusCommit": "64f1fa7f8780cf14f87ce6427aaa71edbf686e2d",
+  "c4aEvidenceSha256": "03794a913b873e01df8b5afdd3664e6dc7e40deff9341a449c768ae1f39b73ea",
+  "c4bProtocolFreezeCommit": "95d853db76bd456dd66a1b8a60a65039ca095b8b",
+  "c4bEvidenceCommit": "01ec92e8c3276b6cb42360e114d71f2ce5bc0d8e",
+  "c4bEvidenceSha256": "c2232862df04d0e90fa86fe7805f2032d2722e381c7d6e08118fcb7c29028d04",
+  "c4bAlgorithmSourceSha256": "61002d0552c3c8bdc8045355378a1dd40dbfe56845a790d0ccd6f3caef67a2ec",
+  "holdoutGroupIds": [
+    "c4g-c5a0b86e1ea4436ca9ce",
+    "c4g-043aeb45a50adf964f89",
+    "c4g-9f35923d2fa109244435"
+  ],
+  "groupEvidenceFiles": [
+    "group-c4g-043aeb45a50adf964f89.json",
+    "group-c4g-9f35923d2fa109244435.json",
+    "group-c4g-c5a0b86e1ea4436ca9ce.json"
+  ],
+  "groups": [
+    {
+      "groupId": "c4g-c5a0b86e1ea4436ca9ce",
+      "deviceFamily": "simgot audio em6l",
+      "configurationSignature": "simgot audio em6l",
+      "memberCount": 9,
+      "independentCollectionCount": 9,
+      "collections": [
+        "Fahryst",
+        "Harpo",
+        "Hi End Portable",
+        "Jaytiss",
+        "Kazi",
+        "Regan Cipher",
+        "RikudouGoku",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "rigClasses": [
+        "711-class"
+      ],
+      "foldCount": 9,
+      "foldWinCount": 3,
+      "foldLossCount": 6,
+      "medianRegisteredTrebleMAE": {
+        "pointwise": 1.8162097429975963,
+        "aligned": 1.7315244810712493
+      },
+      "medianRawMAE": {
+        "pointwise": 1.8971927759980705,
+        "aligned": 1.7818541510141026
+      },
+      "medianRobustSigma": {
+        "before": 1.9229477971905542,
+        "after": 1.421026948566684
+      },
+      "relativeFullBandSigmaReduction": 0.26101636734870365,
+      "dominantPeakShiftDistribution": {
+        "observations": 72,
+        "minimumAbsoluteOctaves": 0.0052083333333339255,
+        "medianAbsoluteOctaves": 0.11979166666666607,
+        "maximumAbsoluteOctaves": 0.5052083333333339,
+        "minimumCents": 6.2500000000007105,
+        "medianCents": 143.7499999999993,
+        "maximumCents": 606.2500000000007
+      },
+      "classification": "NO_PEAK_ALIGNMENT_SIGNAL"
+    },
+    {
+      "groupId": "c4g-043aeb45a50adf964f89",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "memberCount": 8,
+      "independentCollectionCount": 8,
+      "collections": [
+        "Fahryst",
+        "Harpo",
+        "Hi End Portable",
+        "Jaytiss",
+        "Kazi",
+        "Regan Cipher",
+        "RikudouGoku",
+        "ToneDeafMonk"
+      ],
+      "rigClasses": [
+        "711-class"
+      ],
+      "foldCount": 8,
+      "foldWinCount": 4,
+      "foldLossCount": 4,
+      "medianRegisteredTrebleMAE": {
+        "pointwise": 2.388822180868414,
+        "aligned": 2.4701808972100805
+      },
+      "medianRawMAE": {
+        "pointwise": 2.492264047784505,
+        "aligned": 2.5010155807720817
+      },
+      "medianRobustSigma": {
+        "before": 2.480677452705801,
+        "after": 2.1064741552373327
+      },
+      "relativeFullBandSigmaReduction": 0.15084722000448128,
+      "dominantPeakShiftDistribution": {
+        "observations": 56,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.046875,
+        "maximumAbsoluteOctaves": 0.23958333333333393,
+        "minimumCents": 0,
+        "medianCents": 56.25,
+        "maximumCents": 287.5000000000007
+      },
+      "classification": "NO_PEAK_ALIGNMENT_SIGNAL"
+    },
+    {
+      "groupId": "c4g-9f35923d2fa109244435",
+      "deviceFamily": "truthear x crinacle zero red",
+      "configurationSignature": "truthear x crinacle zero red",
+      "memberCount": 10,
+      "independentCollectionCount": 10,
+      "collections": [
+        "Bakkwatan",
+        "DHRME",
+        "Fahryst",
+        "Filk",
+        "Harpo",
+        "Jaytiss",
+        "Kazi",
+        "Super Review",
+        "ToneDeafMonk",
+        "freeryder05"
+      ],
+      "rigClasses": [
+        "711-class"
+      ],
+      "foldCount": 10,
+      "foldWinCount": 9,
+      "foldLossCount": 1,
+      "medianRegisteredTrebleMAE": {
+        "pointwise": 1.726217137873372,
+        "aligned": 1.6383326910704386
+      },
+      "medianRawMAE": {
+        "pointwise": 1.9060510948584772,
+        "aligned": 1.8135199114603782
+      },
+      "medianRobustSigma": {
+        "before": 1.4807302338236221,
+        "after": 1.38708370050752
+      },
+      "relativeFullBandSigmaReduction": 0.06324348026195352,
+      "dominantPeakShiftDistribution": {
+        "observations": 90,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.02083333333333215,
+        "maximumAbsoluteOctaves": 0.15625,
+        "minimumCents": 0,
+        "medianCents": 24.99999999999858,
+        "maximumCents": 187.5
+      },
+      "classification": "PEAK_ALIGNMENT_SIGNAL"
+    }
+  ],
+  "holdoutGate": {
+    "classification": "PEAK_ALIGNMENT_NOT_CONFIRMED",
+    "signalGroupCount": 1,
+    "groupCount": 3
+  },
+  "combinedInterpretation": "C4_CLOSED_HOLDOUT_NOT_CONFIRMED",
+  "combinedDiagnostics": {
+    "signalGroups": {
+      "count": 3,
+      "total": 6
+    },
+    "folds": {
+      "alignedWins": 29,
+      "total": 51
+    },
+    "perGroup": [
+      {
+        "groupId": "c4g-95ca9d64e706e94c51e7",
+        "medianAbsolutePeakShiftOctaves": 0.015625,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": -0.04866268837743348,
+        "relativeFullBandSigmaReduction": 0.21746598014197513,
+        "classification": "NO_PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-9c1d23845eb5a1d7beef",
+        "medianAbsolutePeakShiftOctaves": 0.07291666666666607,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": 0.10595433156908562,
+        "relativeFullBandSigmaReduction": 0.12796655528596118,
+        "classification": "PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-35f72baf0cca66570d01",
+        "medianAbsolutePeakShiftOctaves": 0.04166666666666785,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": 0.20992688617740707,
+        "relativeFullBandSigmaReduction": 0.16096913966281848,
+        "classification": "PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-c5a0b86e1ea4436ca9ce",
+        "medianAbsolutePeakShiftOctaves": 0.11979166666666607,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": 0.08468526192634696,
+        "relativeFullBandSigmaReduction": 0.26101636734870365,
+        "classification": "NO_PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-043aeb45a50adf964f89",
+        "medianAbsolutePeakShiftOctaves": 0.046875,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": -0.08135871634166669,
+        "relativeFullBandSigmaReduction": 0.15084722000448128,
+        "classification": "NO_PEAK_ALIGNMENT_SIGNAL"
+      },
+      {
+        "groupId": "c4g-9f35923d2fa109244435",
+        "medianAbsolutePeakShiftOctaves": 0.02083333333333215,
+        "registeredTrebleMAEDeltaPointwiseMinusAligned": 0.08788444680293339,
+        "relativeFullBandSigmaReduction": 0.06324348026195352,
+        "classification": "PEAK_ALIGNMENT_SIGNAL"
+      }
+    ],
+    "relationship": "descriptive-only; no threshold, fit, or shift-trigger rule was introduced"
+  },
+  "holdoutCoverage": {
+    "groupCount": 3,
+    "memberCount": 27,
+    "foldCount": 27,
+    "alignmentBandHz": [
+      6000,
+      14000
+    ]
+  },
+  "flags": {
+    "developmentRerunForDecision": false,
+    "holdoutExecuted": true,
+    "freshRealCorpusBatchCExecuted": false,
+    "outcomesGenerated": true,
+    "consensusAlgorithmExecuted": true,
+    "autoEqSolverExecuted": false,
+    "confidenceWeightingExecuted": false,
+    "rawMeasurementsCommitted": false
+  }
+}

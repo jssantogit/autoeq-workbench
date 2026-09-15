@@ -1,0 +1,2508 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c4c-holdout-group-fold-evidence",
+  "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
+  "frozenBoundary": "01ec92e8c3276b6cb42360e114d71f2ce5bc0d8e",
+  "protocolFreezeCommit": "f1f6900c91da4434d2a09085277b8622d7b039a6",
+  "groupId": "c4g-043aeb45a50adf964f89",
+  "deviceFamily": "simgot audio ew200",
+  "configurationSignature": "simgot audio ew200",
+  "memberCount": 8,
+  "independentCollectionCount": 8,
+  "members": [
+    {
+      "collection": "Fahryst",
+      "form": "in-ear",
+      "model": "Simgot Audio EW200",
+      "processedName": "Simgot Audio EW200",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "path": "measurements/Fahryst/data/in-ear/Simgot Audio EW200.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Fahryst/data/in-ear/Simgot%20Audio%20EW200.csv",
+      "blobSha": "42946f173f42d4348b662b99ab2e550ea96a94ac",
+      "upstreamSha256": "64245fb224faf8a8d8c785353b11dbc20ed5099fd6c3c996ca6f2fbb1ad5afd7",
+      "originalParsedPointsSha256": "db44d9c1dc92ec8d4bc53b3dacabeabcbbbbcf7e09ad645f935cb4a7a1589995",
+      "canonicalParsedPointsSha256": "279f6931bd928cfbb04f4e0db903f2ef232d136f45165c84cb39ce2de8800996",
+      "normalizedParsedPointsSha256": "aafa202e71fdc52acaea671045f5952140835fe70301fc41830a8d7455c19eeb",
+      "sourceRows": [
+        {
+          "rowNumber": 316,
+          "url": "https://fahryst.squig.link/data/Simgot%20EW200%20L.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 317,
+          "url": "https://fahryst.squig.link/data/Simgot%20EW200%20R.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "64245fb224faf8a8d8c785353b11dbc20ed5099fd6c3c996ca6f2fbb1ad5afd7",
+        "byteLength": 8752,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -25.5,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -25.5,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "db44d9c1dc92ec8d4bc53b3dacabeabcbbbbcf7e09ad645f935cb4a7a1589995",
+        "canonicalParsedPointsSha256": "279f6931bd928cfbb04f4e0db903f2ef232d136f45165c84cb39ce2de8800996",
+        "normalizedParsedPointsSha256": "aafa202e71fdc52acaea671045f5952140835fe70301fc41830a8d7455c19eeb",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Harpo",
+      "form": "in-ear",
+      "model": "Simgot Audio EW200",
+      "processedName": "Simgot Audio EW200",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "path": "measurements/Harpo/data/in-ear/Simgot Audio EW200.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Simgot%20Audio%20EW200.csv",
+      "blobSha": "660799a12d0dc9b0d519566f7e7645efa2552a02",
+      "upstreamSha256": "72e85c2be9165926b00971bfc126e697b9a0c3604fb60755cce92d1fc78f5273",
+      "originalParsedPointsSha256": "ca7418d6343b456edb230a6af4da1a9c75fafb6b6f0d777dc28be8af2dd5fde4",
+      "canonicalParsedPointsSha256": "5d36950251d8746a3acd5c850c1f630259741aaef2042faccbbace34c80c5a08",
+      "normalizedParsedPointsSha256": "a5025b39fb117b8c718a6ed828815f0485d48c3a5b4e8ae205cbdbc0c98ca142",
+      "sourceRows": [
+        {
+          "rowNumber": 190,
+          "url": "https://harpo.squig.link/data/Simgot%20EW200%20R.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "72e85c2be9165926b00971bfc126e697b9a0c3604fb60755cce92d1fc78f5273",
+        "byteLength": 8770,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -29.49,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -29.49,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "ca7418d6343b456edb230a6af4da1a9c75fafb6b6f0d777dc28be8af2dd5fde4",
+        "canonicalParsedPointsSha256": "5d36950251d8746a3acd5c850c1f630259741aaef2042faccbbace34c80c5a08",
+        "normalizedParsedPointsSha256": "a5025b39fb117b8c718a6ed828815f0485d48c3a5b4e8ae205cbdbc0c98ca142",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Hi End Portable",
+      "form": "in-ear",
+      "model": "Simgot Audio EW200",
+      "processedName": "Simgot Audio EW200",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "path": "measurements/Hi End Portable/data/in-ear/Simgot Audio EW200.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/Simgot%20Audio%20EW200.csv",
+      "blobSha": "6414b27bd6b725644075f9a07f671cb68e824473",
+      "upstreamSha256": "94bf238109b25989d04c5ebbbdfd1ce3a34dfc1d321d037fac0aacc00825b275",
+      "originalParsedPointsSha256": "8075db976bafb628078fe853c51431bbe98652ad19c67e4effe90296abac3190",
+      "canonicalParsedPointsSha256": "69a15d03962b6266858503cd869dffaa8b5e38845aab362cccedfc2c6deda192",
+      "normalizedParsedPointsSha256": "8fa27d5f0abb6d6c85eb0ddb0bd7d26983fb5b73901c17d23e3bbe75fbbe4a1d",
+      "sourceRows": [
+        {
+          "rowNumber": 497,
+          "url": "https://cqtek.squig.link/data/Simgot%20EW200%20L.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 498,
+          "url": "https://cqtek.squig.link/data/Simgot%20EW200%20R.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "94bf238109b25989d04c5ebbbdfd1ce3a34dfc1d321d037fac0aacc00825b275",
+        "byteLength": 8772,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -31.02,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -31.02,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "8075db976bafb628078fe853c51431bbe98652ad19c67e4effe90296abac3190",
+        "canonicalParsedPointsSha256": "69a15d03962b6266858503cd869dffaa8b5e38845aab362cccedfc2c6deda192",
+        "normalizedParsedPointsSha256": "8fa27d5f0abb6d6c85eb0ddb0bd7d26983fb5b73901c17d23e3bbe75fbbe4a1d",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Jaytiss",
+      "form": "in-ear",
+      "model": "Simgot Audio EW200",
+      "processedName": "Simgot Audio EW200",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "path": "measurements/Jaytiss/data/in-ear/Simgot Audio EW200.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Jaytiss/data/in-ear/Simgot%20Audio%20EW200.csv",
+      "blobSha": "78a9bd73301b68f0fa3e92f6c76cfbbe97255999",
+      "upstreamSha256": "7738ed69cdca246ef6a79b2c2cafbccde65cf92ea314dfd4106cc78631604dc9",
+      "originalParsedPointsSha256": "b3d8ca7aae371b64ade12db2f553e18d00e8b3fd10f32a8279d1cab1c45eabce",
+      "canonicalParsedPointsSha256": "88d980733106c95151a7351ba5e0de2fa2170bce608947691f4ab957a777d989",
+      "normalizedParsedPointsSha256": "e1f0a0adbe4b6600b1bb0bddc31c4c590b99d15d923d3d862b702504a126a7cc",
+      "sourceRows": [
+        {
+          "rowNumber": 697,
+          "url": "https://jaytiss.squig.link/data/Simgot%20EW200%20L.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 698,
+          "url": "https://jaytiss.squig.link/data/Simgot%20EW200%20R.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "7738ed69cdca246ef6a79b2c2cafbccde65cf92ea314dfd4106cc78631604dc9",
+        "byteLength": 8771,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -24.74,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -24.74,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "b3d8ca7aae371b64ade12db2f553e18d00e8b3fd10f32a8279d1cab1c45eabce",
+        "canonicalParsedPointsSha256": "88d980733106c95151a7351ba5e0de2fa2170bce608947691f4ab957a777d989",
+        "normalizedParsedPointsSha256": "e1f0a0adbe4b6600b1bb0bddc31c4c590b99d15d923d3d862b702504a126a7cc",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Kazi",
+      "form": "in-ear",
+      "model": "Simgot Audio EW200",
+      "processedName": "Simgot Audio EW200",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "path": "measurements/Kazi/data/in-ear/Simgot Audio EW200.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/Simgot%20Audio%20EW200.csv",
+      "blobSha": "7cd85c700abcdd6a70e5a8f30cf1647fccd7beac",
+      "upstreamSha256": "a6d85800bde216d0a24f38ce6bd551e05e1554cd09b348c29a183fc669445f11",
+      "originalParsedPointsSha256": "4ebbbc08ae313a0b83c1b6d655460b36f7506345eb57c24b6e25c792036cffbe",
+      "canonicalParsedPointsSha256": "6237299ca04fa727634588410a5cdd26e651d0fe277e83aac54cc6f93bfe259b",
+      "normalizedParsedPointsSha256": "42f2b7af345ba81c16663e5f1d6bea9a5f4824f8cbe2691b1dbecc0a38a1957e",
+      "sourceRows": [
+        {
+          "rowNumber": 238,
+          "url": "https://kazi.squig.link/data/Simgot%20EW200%20L.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 239,
+          "url": "https://kazi.squig.link/data/Simgot%20EW200%20R.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "a6d85800bde216d0a24f38ce6bd551e05e1554cd09b348c29a183fc669445f11",
+        "byteLength": 8766,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -28.63,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -28.63,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "4ebbbc08ae313a0b83c1b6d655460b36f7506345eb57c24b6e25c792036cffbe",
+        "canonicalParsedPointsSha256": "6237299ca04fa727634588410a5cdd26e651d0fe277e83aac54cc6f93bfe259b",
+        "normalizedParsedPointsSha256": "42f2b7af345ba81c16663e5f1d6bea9a5f4824f8cbe2691b1dbecc0a38a1957e",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "Regan Cipher",
+      "form": "in-ear",
+      "model": "Simgot Audio EW200",
+      "processedName": "Simgot Audio EW200",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "path": "measurements/Regan Cipher/data/in-ear/Simgot Audio EW200.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Simgot%20Audio%20EW200.csv",
+      "blobSha": "717aa6e98a10f2c13c7a82eb17d766ca5a23da7e",
+      "upstreamSha256": "c4f11e94eb2d5d61d4a6131ce14a16b937a04b03b5331d17648a7bdb04d04e6f",
+      "originalParsedPointsSha256": "764ffbab1c7ab7c3f01940744034f6226c382b1e11b4b6ac3708652085ad6aca",
+      "canonicalParsedPointsSha256": "6802d1eda2c7da57dc1cd5460e6bc2aea9eb7f8252634891bea47724ad3769ca",
+      "normalizedParsedPointsSha256": "60660997ed10e7eb8da959c2f389f5e719abd73a9529ca6f5f1b3f43deaf2950",
+      "sourceRows": [
+        {
+          "rowNumber": 489,
+          "url": "https://regancipher.squig.link/data/Simgot%20EW200%20L.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 490,
+          "url": "https://regancipher.squig.link/data/Simgot%20EW200%20R.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "c4f11e94eb2d5d61d4a6131ce14a16b937a04b03b5331d17648a7bdb04d04e6f",
+        "byteLength": 8772,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -27.91,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -27.91,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "764ffbab1c7ab7c3f01940744034f6226c382b1e11b4b6ac3708652085ad6aca",
+        "canonicalParsedPointsSha256": "6802d1eda2c7da57dc1cd5460e6bc2aea9eb7f8252634891bea47724ad3769ca",
+        "normalizedParsedPointsSha256": "60660997ed10e7eb8da959c2f389f5e719abd73a9529ca6f5f1b3f43deaf2950",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "RikudouGoku",
+      "form": "in-ear",
+      "model": "Simgot Audio EW200",
+      "processedName": "Simgot Audio EW200",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "path": "measurements/RikudouGoku/data/in-ear/Simgot Audio EW200.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/Simgot%20Audio%20EW200.csv",
+      "blobSha": "32e1ca96c150923f33bebcacbea80392a04f68ab",
+      "upstreamSha256": "1e98fbffaf19c5ae83ecf882b54942bea5e9627f248bc0eb5c576986950b6c34",
+      "originalParsedPointsSha256": "a8e46c593b530cbaf937865e8cd3b4e9e566b531b456f9a4396d8957b46ee844",
+      "canonicalParsedPointsSha256": "a643f65b0dbacbb7635681030c469e00c87b493c7b534d5d2cbe930d2e06c8c9",
+      "normalizedParsedPointsSha256": "7478d9750705f9c622fef9c03cf8b4a2adcb88639a72fb839f1c162b28308081",
+      "sourceRows": [
+        {
+          "rowNumber": 402,
+          "url": "https://rg.squig.link/data/Simgot%20EW200%20L.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 403,
+          "url": "https://rg.squig.link/data/Simgot%20EW200%20R.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "1e98fbffaf19c5ae83ecf882b54942bea5e9627f248bc0eb5c576986950b6c34",
+        "byteLength": 8752,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -25.48,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -25.48,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "a8e46c593b530cbaf937865e8cd3b4e9e566b531b456f9a4396d8957b46ee844",
+        "canonicalParsedPointsSha256": "a643f65b0dbacbb7635681030c469e00c87b493c7b534d5d2cbe930d2e06c8c9",
+        "normalizedParsedPointsSha256": "7478d9750705f9c622fef9c03cf8b4a2adcb88639a72fb839f1c162b28308081",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    },
+    {
+      "collection": "ToneDeafMonk",
+      "form": "in-ear",
+      "model": "Simgot Audio EW200",
+      "processedName": "Simgot Audio EW200",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "rig": "711",
+      "rigClass": "711-class",
+      "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "path": "measurements/ToneDeafMonk/data/in-ear/Simgot Audio EW200.csv",
+      "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Simgot%20Audio%20EW200.csv",
+      "blobSha": "16fe66d7d14bd72069dc0df485593cfac77e3daf",
+      "upstreamSha256": "3a6014117473eac334fd8580e3f542fac01fea1c37bf6cd3864283b95486ba0d",
+      "originalParsedPointsSha256": "00868b49bdd7f94daff8c9c6e120ec4c79a22089af7372da7ddb94a3a2f2ca24",
+      "canonicalParsedPointsSha256": "9d42087e88773b8d846fc982d2b16ffa7da069b25d1306347b327554cfe3ef42",
+      "normalizedParsedPointsSha256": "7b7cf6c0ab415393a1781348eade9b8bf30ae2f54359c659d9e8f35a46492ab2",
+      "sourceRows": [
+        {
+          "rowNumber": 658,
+          "url": "https://tonedeafmonk.squig.link/data/SIMGOT%20EW200%20L.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        },
+        {
+          "rowNumber": 659,
+          "url": "https://tonedeafmonk.squig.link/data/SIMGOT%20EW200%20R.txt",
+          "sourceName": "Simgot EW200",
+          "side": "unknown"
+        }
+      ],
+      "integrity": {
+        "status": "valid",
+        "upstreamSha256": "3a6014117473eac334fd8580e3f542fac01fea1c37bf6cd3864283b95486ba0d",
+        "byteLength": 8795,
+        "originalPointCount": 695,
+        "canonicalPointCount": 696,
+        "originalFirstFrequencyHz": 20,
+        "originalTerminalFrequencyHz": 19955.54,
+        "originalTerminalDb": -29.45,
+        "canonicalTerminalFrequencyHz": 20000,
+        "canonicalTerminalDb": -29.45,
+        "transformation": "terminal-flat-hold-to-v2-max",
+        "originalParsedPointsSha256": "00868b49bdd7f94daff8c9c6e120ec4c79a22089af7372da7ddb94a3a2f2ca24",
+        "canonicalParsedPointsSha256": "9d42087e88773b8d846fc982d2b16ffa7da069b25d1306347b327554cfe3ef42",
+        "normalizedParsedPointsSha256": "7b7cf6c0ab415393a1781348eade9b8bf30ae2f54359c659d9e8f35a46492ab2",
+        "normalization": {
+          "mode": "hz",
+          "frequencyHz": 500,
+          "levelDb": 60
+        },
+        "parserCanonicalizerVersion": 1
+      }
+    }
+  ],
+  "folds": [
+    {
+      "withheldMemberIdentity": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "withheldMember": {
+        "collection": "Fahryst",
+        "concreteCurveIdentity": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "path": "measurements/Fahryst/data/in-ear/Simgot Audio EW200.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Fahryst/data/in-ear/Simgot%20Audio%20EW200.csv",
+        "blobSha": "42946f173f42d4348b662b99ab2e550ea96a94ac",
+        "upstreamSha256": "64245fb224faf8a8d8c785353b11dbc20ed5099fd6c3c996ca6f2fbb1ad5afd7"
+      },
+      "trainingMemberIdentities": [
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\""
+      ],
+      "canonicalPeakFrequencyHz": 8245.710499580178,
+      "individualPeakFrequenciesHz": [
+        8010.971127847806,
+        8992.011061111294,
+        9526.703863317984,
+        7782.914330363465,
+        8010.971127847806,
+        8245.710499580182,
+        8736.025961076153
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8992.011061111294
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            9526.703863317984
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            7782.914330363465
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8245.710499580182
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8736.025961076153
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.5750760577924696,
+        "registeredTrebleRMSE": 3.2849644390381627,
+        "registeredTrebleMaxAbs": 9.260574900720668,
+        "rawTrebleMAE": 2.630298654739143,
+        "rawTrebleRMSE": 3.307452105941698,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8069.021926952379,
+        "rawPeakFrequencyErrorOctaves": 0.010416666666666177,
+        "candidatePeakDb": 8.114384543335435,
+        "withheldPeakDb": 10.679873555569039,
+        "absolutePeakLevelErrorAfterRegistration": 2.565489012233604
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.608662413834909,
+        "registeredTrebleRMSE": 3.285541476015411,
+        "registeredTrebleMaxAbs": 9.003511063497212,
+        "rawTrebleMAE": 2.425771895569991,
+        "rawTrebleRMSE": 3.2316641129980916,
+        "candidateDominantPeakFrequencyHz": 8245.710499580182,
+        "withheldDominantPeakFrequencyHz": 8069.021926952379,
+        "rawPeakFrequencyErrorOctaves": 0.031249999999999927,
+        "candidatePeakDb": 8.445095565456151,
+        "withheldPeakDb": 10.679873555569039,
+        "absolutePeakLevelErrorAfterRegistration": 2.234777990112887
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8245.710499580178,
+        "individualPeakFrequenciesHz": [
+          8010.971127847806,
+          8992.011061111294,
+          9526.703863317984,
+          7782.914330363465,
+          8010.971127847806,
+          8245.710499580182,
+          8736.025961076153
+        ],
+        "log2Shifts": [
+          -0.041666666666666075,
+          0.125,
+          0.20833333333333393,
+          -0.08333333333333393,
+          -0.041666666666666075,
+          0,
+          0.08333333333333393
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 8992.011061111294,
+            "log2Shift": 0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          },
+          {
+            "frequencyHz": 9526.703863317984,
+            "log2Shift": 0.20833333333333393,
+            "absoluteOctaves": 0.20833333333333393,
+            "cents": 250.0000000000007
+          },
+          {
+            "frequencyHz": 7782.914330363465,
+            "log2Shift": -0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 8245.710499580182,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8736.025961076153,
+            "log2Shift": 0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.08333333333333393,
+        "maximumAbsoluteShiftOctaves": 0.20833333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.08333333333333393,
+        "maximumAbsoluteOctaves": 0.20833333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 3.167042805695651,
+          "8-10kHz": 1.9937833323468686,
+          "10-14kHz": 2.6297466982582622,
+          "6-14kHz": 2.519772842796013,
+          "6-8kHzHz": 3.167042805695651,
+          "8-10kHzHz": 1.9937833323468686,
+          "10-14kHzHz": 2.6297466982582622,
+          "6-14kHzHz": 2.519772842796013
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 2.5374158816798658,
+          "8-10kHz": 0.7423646187864495,
+          "10-14kHz": 2.853181252094648,
+          "6-14kHz": 2.059682168070657,
+          "6-8kHzHz": 2.5374158816798658,
+          "8-10kHzHz": 0.7423646187864495,
+          "10-14kHzHz": 2.853181252094648,
+          "6-14kHzHz": 2.059682168070657
+        },
+        "medianFullBandBefore": 2.519772842796013,
+        "medianFullBandAfter": 2.059682168070657,
+        "beforeProfileSha256": "475a319d42feac6dece094471f2a975550f666e122f6637e6a4e44aec880f6fa",
+        "afterProfileSha256": "b3c04c8c19d7e3ba709ac41fb3f98cb48dce8a951baaf945ecf75e389661e089"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "withheldMember": {
+        "collection": "Harpo",
+        "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "path": "measurements/Harpo/data/in-ear/Simgot Audio EW200.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Simgot%20Audio%20EW200.csv",
+        "blobSha": "660799a12d0dc9b0d519566f7e7645efa2552a02",
+        "upstreamSha256": "72e85c2be9165926b00971bfc126e697b9a0c3604fb60755cce92d1fc78f5273"
+      },
+      "trainingMemberIdentities": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\""
+      ],
+      "canonicalPeakFrequencyHz": 8245.710499580178,
+      "individualPeakFrequenciesHz": [
+        8069.021926952379,
+        8992.011061111294,
+        9526.703863317984,
+        7782.914330363465,
+        8010.971127847806,
+        8245.710499580182,
+        8736.025961076153
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8992.011061111294
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            9526.703863317984
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            7782.914330363465
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8245.710499580182
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8736.025961076153
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.837630820935667,
+        "registeredTrebleRMSE": 2.6739055717565514,
+        "registeredTrebleMaxAbs": 8.814941999761334,
+        "rawTrebleMAE": 1.8376308209356602,
+        "rawTrebleRMSE": 2.6739055717565408,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0,
+        "candidatePeakDb": 8.114384543335435,
+        "withheldPeakDb": 9.820194446919169,
+        "absolutePeakLevelErrorAfterRegistration": 1.7058099035837344
+      },
+      "aligned": {
+        "registeredTrebleMAE": 1.6536161125680329,
+        "registeredTrebleRMSE": 2.5556062724566764,
+        "registeredTrebleMaxAbs": 8.741814013581752,
+        "rawTrebleMAE": 1.8204621657907003,
+        "rawTrebleRMSE": 2.6987306896903,
+        "candidateDominantPeakFrequencyHz": 8245.710499580182,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0.04166666666666611,
+        "candidatePeakDb": 8.445095565456151,
+        "withheldPeakDb": 9.820194446919169,
+        "absolutePeakLevelErrorAfterRegistration": 1.3750988814630176
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8245.710499580178,
+        "individualPeakFrequenciesHz": [
+          8069.021926952379,
+          8992.011061111294,
+          9526.703863317984,
+          7782.914330363465,
+          8010.971127847806,
+          8245.710499580182,
+          8736.025961076153
+        ],
+        "log2Shifts": [
+          -0.03125,
+          0.125,
+          0.20833333333333393,
+          -0.08333333333333393,
+          -0.041666666666666075,
+          0,
+          0.08333333333333393
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": -0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8992.011061111294,
+            "log2Shift": 0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          },
+          {
+            "frequencyHz": 9526.703863317984,
+            "log2Shift": 0.20833333333333393,
+            "absoluteOctaves": 0.20833333333333393,
+            "cents": 250.0000000000007
+          },
+          {
+            "frequencyHz": 7782.914330363465,
+            "log2Shift": -0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 8245.710499580182,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8736.025961076153,
+            "log2Shift": 0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.08333333333333393,
+        "maximumAbsoluteShiftOctaves": 0.20833333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.08333333333333393,
+        "maximumAbsoluteOctaves": 0.20833333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 3.467597152517547,
+          "8-10kHz": 2.3340010276938115,
+          "10-14kHz": 2.2600698530986323,
+          "6-14kHz": 2.804793346765795,
+          "6-8kHzHz": 3.467597152517547,
+          "8-10kHzHz": 2.3340010276938115,
+          "10-14kHzHz": 2.2600698530986323,
+          "6-14kHzHz": 2.804793346765795
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 3.4741319022314867,
+          "8-10kHz": 1.0016254511870681,
+          "10-14kHz": 2.0880522199130596,
+          "6-14kHz": 2.153266142404008,
+          "6-8kHzHz": 3.4741319022314867,
+          "8-10kHzHz": 1.0016254511870681,
+          "10-14kHzHz": 2.0880522199130596,
+          "6-14kHzHz": 2.153266142404008
+        },
+        "medianFullBandBefore": 2.804793346765795,
+        "medianFullBandAfter": 2.153266142404008,
+        "beforeProfileSha256": "94fe725f0b9e60a6b8cd0e52ff95c29050f1108289cd6df617de964f9c86c69f",
+        "afterProfileSha256": "54bf9ddf6a7d97d989c711a012af2acea7cc4eb0c38bf7b8e83dc2ca2760ceb5"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "withheldMember": {
+        "collection": "Hi End Portable",
+        "concreteCurveIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "path": "measurements/Hi End Portable/data/in-ear/Simgot Audio EW200.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/Simgot%20Audio%20EW200.csv",
+        "blobSha": "6414b27bd6b725644075f9a07f671cb68e824473",
+        "upstreamSha256": "94bf238109b25989d04c5ebbbdfd1ce3a34dfc1d321d037fac0aacc00825b275"
+      },
+      "trainingMemberIdentities": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\""
+      ],
+      "canonicalPeakFrequencyHz": 8069.021926952375,
+      "individualPeakFrequenciesHz": [
+        8069.021926952379,
+        8010.971127847806,
+        9526.703863317984,
+        7782.914330363465,
+        8010.971127847806,
+        8245.710499580182,
+        8736.025961076153
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            9526.703863317984
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            7782.914330363465
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8245.710499580182
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8736.025961076153
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.39692277814426,
+        "registeredTrebleRMSE": 2.685964716662564,
+        "registeredTrebleMaxAbs": 5.68768065671921,
+        "rawTrebleMAE": 3.06194712209549,
+        "rawTrebleRMSE": 3.3260448912564247,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 8992.011061111294,
+        "rawPeakFrequencyErrorOctaves": 0.1562500000000002,
+        "candidatePeakDb": 8.404696566853238,
+        "withheldPeakDb": 5.853792692560242,
+        "absolutePeakLevelErrorAfterRegistration": 2.5509038742929953
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.5727377826847446,
+        "registeredTrebleRMSE": 2.7850828297725276,
+        "registeredTrebleMaxAbs": 5.683964844738939,
+        "rawTrebleMAE": 3.3087511418224196,
+        "rawTrebleRMSE": 3.5550351772148754,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 8992.011061111294,
+        "rawPeakFrequencyErrorOctaves": 0.1562500000000002,
+        "candidatePeakDb": 8.887458833407058,
+        "withheldPeakDb": 5.853792692560242,
+        "absolutePeakLevelErrorAfterRegistration": 3.0336661408468153
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8069.021926952375,
+        "individualPeakFrequenciesHz": [
+          8069.021926952379,
+          8010.971127847806,
+          9526.703863317984,
+          7782.914330363465,
+          8010.971127847806,
+          8245.710499580182,
+          8736.025961076153
+        ],
+        "log2Shifts": [
+          0,
+          -0.010416666666666075,
+          0.23958333333333393,
+          -0.052083333333333925,
+          -0.010416666666666075,
+          0.03125,
+          0.11458333333333393
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 9526.703863317984,
+            "log2Shift": 0.23958333333333393,
+            "absoluteOctaves": 0.23958333333333393,
+            "cents": 287.5000000000007
+          },
+          {
+            "frequencyHz": 7782.914330363465,
+            "log2Shift": -0.052083333333333925,
+            "absoluteOctaves": 0.052083333333333925,
+            "cents": 62.50000000000071
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8245.710499580182,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8736.025961076153,
+            "log2Shift": 0.11458333333333393,
+            "absoluteOctaves": 0.11458333333333393,
+            "cents": 137.5000000000007
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.03125,
+        "maximumAbsoluteShiftOctaves": 0.23958333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.03125,
+        "maximumAbsoluteOctaves": 0.23958333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.1156601078869817,
+          "8-10kHz": 1.8054107015932699,
+          "10-14kHz": 2.6297466982582622,
+          "6-14kHz": 1.9113237684548436,
+          "6-8kHzHz": 2.1156601078869817,
+          "8-10kHzHz": 1.8054107015932699,
+          "10-14kHzHz": 2.6297466982582622,
+          "6-14kHzHz": 1.9113237684548436
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.7712927115769346,
+          "8-10kHz": 0.7282457486536514,
+          "10-14kHz": 3.6251216973479843,
+          "6-14kHz": 1.408263095078527,
+          "6-8kHzHz": 1.7712927115769346,
+          "8-10kHzHz": 0.7282457486536514,
+          "10-14kHzHz": 3.6251216973479843,
+          "6-14kHzHz": 1.408263095078527
+        },
+        "medianFullBandBefore": 1.9113237684548436,
+        "medianFullBandAfter": 1.408263095078527,
+        "beforeProfileSha256": "b94e05c371439c813ba607f46d0a857eb22a4865176e41d0d13ba1220df35c0a",
+        "afterProfileSha256": "4647a8141b65c93a5f3f567e8cb91a53e7bbb64f264ec7edd1c700df7350896c"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "withheldMember": {
+        "collection": "Jaytiss",
+        "concreteCurveIdentity": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "path": "measurements/Jaytiss/data/in-ear/Simgot Audio EW200.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Jaytiss/data/in-ear/Simgot%20Audio%20EW200.csv",
+        "blobSha": "78a9bd73301b68f0fa3e92f6c76cfbbe97255999",
+        "upstreamSha256": "7738ed69cdca246ef6a79b2c2cafbccde65cf92ea314dfd4106cc78631604dc9"
+      },
+      "trainingMemberIdentities": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\""
+      ],
+      "canonicalPeakFrequencyHz": 8069.021926952375,
+      "individualPeakFrequenciesHz": [
+        8069.021926952379,
+        8010.971127847806,
+        8992.011061111294,
+        7782.914330363465,
+        8010.971127847806,
+        8245.710499580182,
+        8736.025961076153
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8992.011061111294
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            7782.914330363465
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8245.710499580182
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8736.025961076153
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.380721583592568,
+        "registeredTrebleRMSE": 2.8918674048800606,
+        "registeredTrebleMaxAbs": 6.09558768315369,
+        "rawTrebleMAE": 4.094141790694987,
+        "rawTrebleRMSE": 4.727583510815297,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 9526.703863317984,
+        "rawPeakFrequencyErrorOctaves": 0.23958333333333384,
+        "candidatePeakDb": 8.404696566853238,
+        "withheldPeakDb": 8.445095565456155,
+        "absolutePeakLevelErrorAfterRegistration": 0.0403989986029174
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.4821074116633537,
+        "registeredTrebleRMSE": 2.9308424372019144,
+        "registeredTrebleMaxAbs": 6.333424210120148,
+        "rawTrebleMAE": 4.291343143451558,
+        "rawTrebleRMSE": 4.959687123510306,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 9526.703863317984,
+        "rawPeakFrequencyErrorOctaves": 0.23958333333333384,
+        "candidatePeakDb": 8.887458833407058,
+        "withheldPeakDb": 8.445095565456155,
+        "absolutePeakLevelErrorAfterRegistration": 0.44236326795090264
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8069.021926952375,
+        "individualPeakFrequenciesHz": [
+          8069.021926952379,
+          8010.971127847806,
+          8992.011061111294,
+          7782.914330363465,
+          8010.971127847806,
+          8245.710499580182,
+          8736.025961076153
+        ],
+        "log2Shifts": [
+          0,
+          -0.010416666666666075,
+          0.15625,
+          -0.052083333333333925,
+          -0.010416666666666075,
+          0.03125,
+          0.11458333333333393
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8992.011061111294,
+            "log2Shift": 0.15625,
+            "absoluteOctaves": 0.15625,
+            "cents": 187.5
+          },
+          {
+            "frequencyHz": 7782.914330363465,
+            "log2Shift": -0.052083333333333925,
+            "absoluteOctaves": 0.052083333333333925,
+            "cents": 62.50000000000071
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8245.710499580182,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8736.025961076153,
+            "log2Shift": 0.11458333333333393,
+            "absoluteOctaves": 0.11458333333333393,
+            "cents": 137.5000000000007
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.03125,
+        "maximumAbsoluteShiftOctaves": 0.15625,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.03125,
+        "maximumAbsoluteOctaves": 0.15625
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.1156601078869817,
+          "8-10kHz": 1.707905052748384,
+          "10-14kHz": 2.161447024666975,
+          "6-14kHz": 1.8943955948718672,
+          "6-8kHzHz": 2.1156601078869817,
+          "8-10kHzHz": 1.707905052748384,
+          "10-14kHzHz": 2.161447024666975,
+          "6-14kHzHz": 1.8943955948718672
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.7712927115769346,
+          "8-10kHz": 0.7706564135158884,
+          "10-14kHz": 2.6148566921492225,
+          "6-14kHz": 1.632575016902519,
+          "6-8kHzHz": 1.7712927115769346,
+          "8-10kHzHz": 0.7706564135158884,
+          "10-14kHzHz": 2.6148566921492225,
+          "6-14kHzHz": 1.632575016902519
+        },
+        "medianFullBandBefore": 1.8943955948718672,
+        "medianFullBandAfter": 1.632575016902519,
+        "beforeProfileSha256": "b310f84e28074dc719789d3644692049c6bb07e85fb7a66127741eaf9bbc4d41",
+        "afterProfileSha256": "4898afe029aa4bd1f5e3634b7dc221f13a6f052dda06ec3bbb65206ede23aaeb"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "withheldMember": {
+        "collection": "Kazi",
+        "concreteCurveIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "path": "measurements/Kazi/data/in-ear/Simgot Audio EW200.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/Simgot%20Audio%20EW200.csv",
+        "blobSha": "7cd85c700abcdd6a70e5a8f30cf1647fccd7beac",
+        "upstreamSha256": "a6d85800bde216d0a24f38ce6bd551e05e1554cd09b348c29a183fc669445f11"
+      },
+      "trainingMemberIdentities": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\""
+      ],
+      "canonicalPeakFrequencyHz": 8245.710499580178,
+      "individualPeakFrequenciesHz": [
+        8069.021926952379,
+        8010.971127847806,
+        8992.011061111294,
+        9526.703863317984,
+        8010.971127847806,
+        8245.710499580182,
+        8736.025961076153
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8992.011061111294
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            9526.703863317984
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8245.710499580182
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8736.025961076153
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.7242930655570303,
+        "registeredTrebleRMSE": 3.2562421010032607,
+        "registeredTrebleMaxAbs": 7.5925075492595,
+        "rawTrebleMAE": 2.9306074243097973,
+        "rawTrebleRMSE": 3.3674971826081115,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 7782.914330363465,
+        "rawPeakFrequencyErrorOctaves": 0.041666666666667664,
+        "candidatePeakDb": 8.114384543335435,
+        "withheldPeakDb": 9.14377055875572,
+        "absolutePeakLevelErrorAfterRegistration": 1.029386015420286
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.4582543827568077,
+        "registeredTrebleRMSE": 3.136134843893186,
+        "registeredTrebleMaxAbs": 7.790194798230935,
+        "rawTrebleMAE": 3.00893014167144,
+        "rawTrebleRMSE": 3.3765054231135565,
+        "candidateDominantPeakFrequencyHz": 8245.710499580182,
+        "withheldDominantPeakFrequencyHz": 7782.914330363465,
+        "rawPeakFrequencyErrorOctaves": 0.083333333333334,
+        "candidatePeakDb": 8.445095565456151,
+        "withheldPeakDb": 9.14377055875572,
+        "absolutePeakLevelErrorAfterRegistration": 0.6986749932995693
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8245.710499580178,
+        "individualPeakFrequenciesHz": [
+          8069.021926952379,
+          8010.971127847806,
+          8992.011061111294,
+          9526.703863317984,
+          8010.971127847806,
+          8245.710499580182,
+          8736.025961076153
+        ],
+        "log2Shifts": [
+          -0.03125,
+          -0.041666666666666075,
+          0.125,
+          0.20833333333333393,
+          -0.041666666666666075,
+          0,
+          0.08333333333333393
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": -0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 8992.011061111294,
+            "log2Shift": 0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          },
+          {
+            "frequencyHz": 9526.703863317984,
+            "log2Shift": 0.20833333333333393,
+            "absoluteOctaves": 0.20833333333333393,
+            "cents": 250.0000000000007
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 8245.710499580182,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8736.025961076153,
+            "log2Shift": 0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.041666666666666075,
+        "maximumAbsoluteShiftOctaves": 0.20833333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.041666666666666075,
+        "maximumAbsoluteOctaves": 0.20833333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 3.467597152517547,
+          "8-10kHz": 1.554475599772663,
+          "10-14kHz": 2.161447024666975,
+          "6-14kHz": 2.4415820626155886,
+          "6-8kHzHz": 3.467597152517547,
+          "8-10kHzHz": 1.554475599772663,
+          "10-14kHzHz": 2.161447024666975,
+          "6-14kHzHz": 2.4415820626155886
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 3.4741319022314867,
+          "8-10kHz": 1.1717332963653533,
+          "10-14kHz": 2.245187721121093,
+          "6-14kHz": 2.5492527158937506,
+          "6-8kHzHz": 3.4741319022314867,
+          "8-10kHzHz": 1.1717332963653533,
+          "10-14kHzHz": 2.245187721121093,
+          "6-14kHzHz": 2.5492527158937506
+        },
+        "medianFullBandBefore": 2.4415820626155886,
+        "medianFullBandAfter": 2.5492527158937506,
+        "beforeProfileSha256": "eac6e5717a351c8a2a3415389ca55b64924c2783949d93c262b0f8b46ed0f43d",
+        "afterProfileSha256": "1ae560c70dbc82875e028061f80448ffd4bce9c43dfa3308d5d959a8a49370b4"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "withheldMember": {
+        "collection": "Regan Cipher",
+        "concreteCurveIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "path": "measurements/Regan Cipher/data/in-ear/Simgot Audio EW200.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Simgot%20Audio%20EW200.csv",
+        "blobSha": "717aa6e98a10f2c13c7a82eb17d766ca5a23da7e",
+        "upstreamSha256": "c4f11e94eb2d5d61d4a6131ce14a16b937a04b03b5331d17648a7bdb04d04e6f"
+      },
+      "trainingMemberIdentities": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\""
+      ],
+      "canonicalPeakFrequencyHz": 8245.710499580178,
+      "individualPeakFrequenciesHz": [
+        8069.021926952379,
+        8010.971127847806,
+        8992.011061111294,
+        9526.703863317984,
+        7782.914330363465,
+        8245.710499580182,
+        8736.025961076153
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8992.011061111294
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            9526.703863317984
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            7782.914330363465
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8245.710499580182
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8245.710499580178,
+            8736.025961076153
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.5300920794919846,
+        "registeredTrebleRMSE": 2.3671727951199784,
+        "registeredTrebleMaxAbs": 7.546609842323592,
+        "rawTrebleMAE": 1.5753717043723552,
+        "rawTrebleRMSE": 2.413606794169186,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0.010416666666666068,
+        "candidatePeakDb": 8.404696566853238,
+        "withheldPeakDb": 8.114384543335435,
+        "absolutePeakLevelErrorAfterRegistration": 0.29031202351780294
+      },
+      "aligned": {
+        "registeredTrebleMAE": 1.4302911907232208,
+        "registeredTrebleRMSE": 2.3298232585560705,
+        "registeredTrebleMaxAbs": 7.54658850547968,
+        "rawTrebleMAE": 1.7600293070540018,
+        "rawTrebleRMSE": 2.5837975390650363,
+        "candidateDominantPeakFrequencyHz": 8245.710499580182,
+        "withheldDominantPeakFrequencyHz": 8010.971127847806,
+        "rawPeakFrequencyErrorOctaves": 0.04166666666666611,
+        "candidatePeakDb": 8.887458833407058,
+        "withheldPeakDb": 8.114384543335435,
+        "absolutePeakLevelErrorAfterRegistration": 0.773074290071623
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8245.710499580178,
+        "individualPeakFrequenciesHz": [
+          8069.021926952379,
+          8010.971127847806,
+          8992.011061111294,
+          9526.703863317984,
+          7782.914330363465,
+          8245.710499580182,
+          8736.025961076153
+        ],
+        "log2Shifts": [
+          -0.03125,
+          -0.041666666666666075,
+          0.125,
+          0.20833333333333393,
+          -0.08333333333333393,
+          0,
+          0.08333333333333393
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": -0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.041666666666666075,
+            "absoluteOctaves": 0.041666666666666075,
+            "cents": 49.99999999999929
+          },
+          {
+            "frequencyHz": 8992.011061111294,
+            "log2Shift": 0.125,
+            "absoluteOctaves": 0.125,
+            "cents": 150
+          },
+          {
+            "frequencyHz": 9526.703863317984,
+            "log2Shift": 0.20833333333333393,
+            "absoluteOctaves": 0.20833333333333393,
+            "cents": 250.0000000000007
+          },
+          {
+            "frequencyHz": 7782.914330363465,
+            "log2Shift": -0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          },
+          {
+            "frequencyHz": 8245.710499580182,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8736.025961076153,
+            "log2Shift": 0.08333333333333393,
+            "absoluteOctaves": 0.08333333333333393,
+            "cents": 100.00000000000071
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.08333333333333393,
+        "maximumAbsoluteShiftOctaves": 0.20833333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.08333333333333393,
+        "maximumAbsoluteOctaves": 0.20833333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 3.9055301235259874,
+          "8-10kHz": 1.864902773661337,
+          "10-14kHz": 2.255457560188699,
+          "6-14kHz": 3.098775664742518,
+          "6-8kHzHz": 3.9055301235259874,
+          "8-10kHzHz": 1.864902773661337,
+          "10-14kHzHz": 2.255457560188699,
+          "6-14kHzHz": 3.098775664742518
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 3.873117519474648,
+          "8-10kHz": 0.9696640452397692,
+          "10-14kHz": 2.733006032906963,
+          "6-14kHz": 2.5934046555565065,
+          "6-8kHzHz": 3.873117519474648,
+          "8-10kHzHz": 0.9696640452397692,
+          "10-14kHzHz": 2.733006032906963,
+          "6-14kHzHz": 2.5934046555565065
+        },
+        "medianFullBandBefore": 3.098775664742518,
+        "medianFullBandAfter": 2.5934046555565065,
+        "beforeProfileSha256": "1b13401b2b0d533e01223d6b6cc9b7e0955916381f89e95478d0bf8dc5b46d51",
+        "afterProfileSha256": "32c19f4b44f2ccb38581a259552c0638d304d7f03eed910c6caf9a7eb94a753f"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "withheldMember": {
+        "collection": "RikudouGoku",
+        "concreteCurveIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "path": "measurements/RikudouGoku/data/in-ear/Simgot Audio EW200.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/Simgot%20Audio%20EW200.csv",
+        "blobSha": "32e1ca96c150923f33bebcacbea80392a04f68ab",
+        "upstreamSha256": "1e98fbffaf19c5ae83ecf882b54942bea5e9627f248bc0eb5c576986950b6c34"
+      },
+      "trainingMemberIdentities": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\""
+      ],
+      "canonicalPeakFrequencyHz": 8069.021926952375,
+      "individualPeakFrequenciesHz": [
+        8069.021926952379,
+        8010.971127847806,
+        8992.011061111294,
+        9526.703863317984,
+        7782.914330363465,
+        8010.971127847806,
+        8736.025961076153
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8992.011061111294
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            9526.703863317984
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            7782.914330363465
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8736.025961076153
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 1.411315239350472,
+        "registeredTrebleRMSE": 2.0510244749467206,
+        "registeredTrebleMaxAbs": 7.418818241336892,
+        "rawTrebleMAE": 1.3354299167754506,
+        "rawTrebleRMSE": 2.0438479385896517,
+        "candidateDominantPeakFrequencyHz": 8010.971127847806,
+        "withheldDominantPeakFrequencyHz": 8245.710499580182,
+        "rawPeakFrequencyErrorOctaves": 0.041666666666666186,
+        "candidatePeakDb": 8.114384543335435,
+        "withheldPeakDb": 8.887458833407061,
+        "absolutePeakLevelErrorAfterRegistration": 0.7730742900716265
+      },
+      "aligned": {
+        "registeredTrebleMAE": 1.1737889025113835,
+        "registeredTrebleRMSE": 1.973450185104596,
+        "registeredTrebleMaxAbs": 7.42828941610765,
+        "rawTrebleMAE": 1.1659464847212857,
+        "rawTrebleRMSE": 1.9769349466707231,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 8245.710499580182,
+        "rawPeakFrequencyErrorOctaves": 0.03125000000000007,
+        "candidatePeakDb": 8.445095565456151,
+        "withheldPeakDb": 8.887458833407061,
+        "absolutePeakLevelErrorAfterRegistration": 0.44236326795090974
+      },
+      "peakAlignmentFoldWin": true,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8069.021926952375,
+        "individualPeakFrequenciesHz": [
+          8069.021926952379,
+          8010.971127847806,
+          8992.011061111294,
+          9526.703863317984,
+          7782.914330363465,
+          8010.971127847806,
+          8736.025961076153
+        ],
+        "log2Shifts": [
+          0,
+          -0.010416666666666075,
+          0.15625,
+          0.23958333333333393,
+          -0.052083333333333925,
+          -0.010416666666666075,
+          0.11458333333333393
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8992.011061111294,
+            "log2Shift": 0.15625,
+            "absoluteOctaves": 0.15625,
+            "cents": 187.5
+          },
+          {
+            "frequencyHz": 9526.703863317984,
+            "log2Shift": 0.23958333333333393,
+            "absoluteOctaves": 0.23958333333333393,
+            "cents": 287.5000000000007
+          },
+          {
+            "frequencyHz": 7782.914330363465,
+            "log2Shift": -0.052083333333333925,
+            "absoluteOctaves": 0.052083333333333925,
+            "cents": 62.50000000000071
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8736.025961076153,
+            "log2Shift": 0.11458333333333393,
+            "absoluteOctaves": 0.11458333333333393,
+            "cents": 137.5000000000007
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.052083333333333925,
+        "maximumAbsoluteShiftOctaves": 0.23958333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.052083333333333925,
+        "maximumAbsoluteOctaves": 0.23958333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 3.467597152517547,
+          "8-10kHz": 2.3340010276938115,
+          "10-14kHz": 3.152322944213952,
+          "6-14kHz": 2.832879435715051,
+          "6-8kHzHz": 3.467597152517547,
+          "8-10kHzHz": 2.3340010276938115,
+          "10-14kHzHz": 3.152322944213952,
+          "6-14kHzHz": 2.832879435715051
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 3.388508168323491,
+          "8-10kHz": 1.0462477979737863,
+          "10-14kHz": 2.2208810906384255,
+          "6-14kHz": 2.3285474574111316,
+          "6-8kHzHz": 3.388508168323491,
+          "8-10kHzHz": 1.0462477979737863,
+          "10-14kHzHz": 2.2208810906384255,
+          "6-14kHzHz": 2.3285474574111316
+        },
+        "medianFullBandBefore": 2.832879435715051,
+        "medianFullBandAfter": 2.3285474574111316,
+        "beforeProfileSha256": "18c04ce2f7f3081ae7ed410439401a7c86757426ca3c5d9a04667aad27570526",
+        "afterProfileSha256": "bf16cc7fb64c4c0e442680dd8155eb9ba1ac62d42d1a2e19153d305386e5eaf5"
+      }
+    },
+    {
+      "withheldMemberIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+      "withheldMember": {
+        "collection": "ToneDeafMonk",
+        "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "path": "measurements/ToneDeafMonk/data/in-ear/Simgot Audio EW200.csv",
+        "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Simgot%20Audio%20EW200.csv",
+        "blobSha": "16fe66d7d14bd72069dc0df485593cfac77e3daf",
+        "upstreamSha256": "3a6014117473eac334fd8580e3f542fac01fea1c37bf6cd3864283b95486ba0d"
+      },
+      "trainingMemberIdentities": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\""
+      ],
+      "canonicalPeakFrequencyHz": 8069.021926952375,
+      "individualPeakFrequenciesHz": [
+        8069.021926952379,
+        8010.971127847806,
+        8992.011061111294,
+        9526.703863317984,
+        7782.914330363465,
+        8010.971127847806,
+        8245.710499580182
+      ],
+      "warpAnchors": [
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8069.021926952379
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8992.011061111294
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            9526.703863317984
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            7782.914330363465
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8010.971127847806
+          ],
+          [
+            14000,
+            14000
+          ]
+        ],
+        [
+          [
+            6000,
+            6000
+          ],
+          [
+            8069.021926952375,
+            8245.710499580182
+          ],
+          [
+            14000,
+            14000
+          ]
+        ]
+      ],
+      "pointwise": {
+        "registeredTrebleMAE": 2.625808547907375,
+        "registeredTrebleRMSE": 2.8738032540961984,
+        "registeredTrebleMaxAbs": 5.066548438427235,
+        "rawTrebleMAE": 2.354229440829866,
+        "rawTrebleRMSE": 2.7403895122537514,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 8736.025961076153,
+        "rawPeakFrequencyErrorOctaves": 0.1145833333333338,
+        "candidatePeakDb": 8.404696566853238,
+        "withheldPeakDb": 4.884767839338417,
+        "absolutePeakLevelErrorAfterRegistration": 3.519928727514821
+      },
+      "aligned": {
+        "registeredTrebleMAE": 2.7160411411223437,
+        "registeredTrebleRMSE": 2.9872877448399686,
+        "registeredTrebleMaxAbs": 5.063004986506595,
+        "rawTrebleMAE": 2.5762592659741728,
+        "rawTrebleRMSE": 2.9113394843490283,
+        "candidateDominantPeakFrequencyHz": 8069.021926952379,
+        "withheldDominantPeakFrequencyHz": 8736.025961076153,
+        "rawPeakFrequencyErrorOctaves": 0.1145833333333338,
+        "candidatePeakDb": 8.887458833407058,
+        "withheldPeakDb": 4.884767839338417,
+        "absolutePeakLevelErrorAfterRegistration": 4.002690994068641
+      },
+      "peakAlignmentFoldWin": false,
+      "peakShiftDiagnostics": {
+        "canonicalPeakFrequencyHz": 8069.021926952375,
+        "individualPeakFrequenciesHz": [
+          8069.021926952379,
+          8010.971127847806,
+          8992.011061111294,
+          9526.703863317984,
+          7782.914330363465,
+          8010.971127847806,
+          8245.710499580182
+        ],
+        "log2Shifts": [
+          0,
+          -0.010416666666666075,
+          0.15625,
+          0.23958333333333393,
+          -0.052083333333333925,
+          -0.010416666666666075,
+          0.03125
+        ],
+        "shifts": [
+          {
+            "frequencyHz": 8069.021926952379,
+            "log2Shift": 0,
+            "absoluteOctaves": 0,
+            "cents": 0
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8992.011061111294,
+            "log2Shift": 0.15625,
+            "absoluteOctaves": 0.15625,
+            "cents": 187.5
+          },
+          {
+            "frequencyHz": 9526.703863317984,
+            "log2Shift": 0.23958333333333393,
+            "absoluteOctaves": 0.23958333333333393,
+            "cents": 287.5000000000007
+          },
+          {
+            "frequencyHz": 7782.914330363465,
+            "log2Shift": -0.052083333333333925,
+            "absoluteOctaves": 0.052083333333333925,
+            "cents": 62.50000000000071
+          },
+          {
+            "frequencyHz": 8010.971127847806,
+            "log2Shift": -0.010416666666666075,
+            "absoluteOctaves": 0.010416666666666075,
+            "cents": 12.49999999999929
+          },
+          {
+            "frequencyHz": 8245.710499580182,
+            "log2Shift": 0.03125,
+            "absoluteOctaves": 0.03125,
+            "cents": 37.5
+          }
+        ],
+        "minimumAbsoluteShiftOctaves": 0,
+        "medianAbsoluteShiftOctaves": 0.03125,
+        "maximumAbsoluteShiftOctaves": 0.23958333333333393,
+        "minimumAbsoluteOctaves": 0,
+        "medianAbsoluteOctaves": 0.03125,
+        "maximumAbsoluteOctaves": 0.23958333333333393
+      },
+      "dispersion": {
+        "medianByBandBefore": {
+          "6-8kHz": 2.1156601078869817,
+          "8-10kHz": 2.0798534623947056,
+          "10-14kHz": 2.7072613192492647,
+          "6-14kHz": 2.218994125515505,
+          "6-8kHzHz": 2.1156601078869817,
+          "8-10kHzHz": 2.0798534623947056,
+          "10-14kHzHz": 2.7072613192492647,
+          "6-14kHzHz": 2.218994125515505
+        },
+        "medianByBandAfter": {
+          "6-8kHz": 1.7712927115769346,
+          "8-10kHz": 0.918231597512413,
+          "10-14kHz": 2.425589238126275,
+          "6-14kHz": 1.2567524611630536,
+          "6-8kHzHz": 1.7712927115769346,
+          "8-10kHzHz": 0.918231597512413,
+          "10-14kHzHz": 2.425589238126275,
+          "6-14kHzHz": 1.2567524611630536
+        },
+        "medianFullBandBefore": 2.218994125515505,
+        "medianFullBandAfter": 1.2567524611630536,
+        "beforeProfileSha256": "48f291a58e9b24a6e7e2a1289b2b95bc9e9a9b54cb8f19da545c3d221bfb31ce",
+        "afterProfileSha256": "b6e3a52c4f077abc677fde033f174b965ed8fc3301b7d3af0f85325e26bb1865"
+      }
+    }
+  ],
+  "dispersion": {
+    "foldCount": 8,
+    "medianByBandBefore": {
+      "6-8kHz": 3.317319979106599,
+      "8-10kHz": 1.9293430530041027,
+      "10-14kHz": 2.444908275678447,
+      "6-14kHz": 2.480677452705801
+    },
+    "medianByBandAfter": {
+      "6-8kHz": 2.962962025001678,
+      "8-10kHz": 0.9439478213760911,
+      "10-14kHz": 2.520222965137749,
+      "6-14kHz": 2.1064741552373327
+    },
+    "medianFullBandBefore": 2.480677452705801,
+    "medianFullBandAfter": 2.1064741552373327
+  },
+  "classification": "NO_PEAK_ALIGNMENT_SIGNAL",
+  "foldWinCount": 4,
+  "foldLossCount": 4,
+  "strictMajority": false,
+  "medianRegisteredMAE": {
+    "pointwise": 2.388822180868414,
+    "aligned": 2.4701808972100805
+  },
+  "medianRobustSigma": {
+    "before": 2.480677452705801,
+    "after": 2.1064741552373327
+  },
+  "criteria": {
+    "strictMajority": false,
+    "alignedMedianRegisteredMAELower": false,
+    "alignedMedianRobustSigmaLower": true
+  }
+}
