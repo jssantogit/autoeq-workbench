@@ -3,12 +3,8 @@ import { Button } from '../../components/ui/Button'
 import {
   cancelAutoEq,
   runAutoEq,
-  runAutoEqExperimentalMax10,
 } from '../../state/autoeqController'
 import { useAutoEqRunStore } from '../../state/autoeqRunStore'
-import { useUiStore } from '../../state/uiStore'
-import { useWorkspaceStore } from '../../state/workspaceStore'
-import { isExperimentalStructuralAutoEqEligible } from '../../workers/autoeqClient'
 
 function formatElapsed(elapsedSeconds: number): string {
   const minutes = Math.floor(elapsedSeconds / 60)
@@ -19,10 +15,6 @@ function formatElapsed(elapsedSeconds: number): string {
 export function AutoEqRunControl({ disabled }: { disabled: boolean }) {
   const status = useAutoEqRunStore((state) => state.status)
   const startedAtMs = useAutoEqRunStore((state) => state.startedAtMs)
-  const experimentalMax10Enabled = useUiStore((state) => state.experimentalMax10Enabled)
-  const settings = useWorkspaceStore((state) => state.autoeqSettings)
-  const useExperimentalMax10 =
-    experimentalMax10Enabled && isExperimentalStructuralAutoEqEligible(settings)
   const [nowMs, setNowMs] = useState(() => performance.now())
 
   useEffect(() => {
@@ -32,10 +24,9 @@ export function AutoEqRunControl({ disabled }: { disabled: boolean }) {
   }, [status, startedAtMs])
 
   if (status !== 'running' || startedAtMs === null) {
-    const run = useExperimentalMax10 ? runAutoEqExperimentalMax10 : runAutoEq
     return (
-      <Button className="autoeq" disabled={disabled} onClick={() => void run()}>
-        {useExperimentalMax10 ? 'AutoEQ Experimental' : 'AutoEQ'}
+      <Button className="autoeq" disabled={disabled} onClick={() => void runAutoEq()}>
+        AutoEQ
       </Button>
     )
   }

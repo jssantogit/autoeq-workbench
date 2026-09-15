@@ -17,7 +17,8 @@ describe('UI preferences', () => {
   })
 
   it('defaults to light theme, Curves dock, inspector enabled, and no registered curve appearance', () => {
-    expect(createUiStore().getState()).toMatchObject({
+    const state = createUiStore().getState()
+    expect(state).toMatchObject({
       theme: 'light',
       activeDockTab: 'curves',
       inspectorEnabled: true,
@@ -27,6 +28,8 @@ describe('UI preferences', () => {
       baselineCurveId: null,
       curveAppearance: {},
     })
+    expect(state).not.toHaveProperty('experimentalMax10Enabled')
+    expect(state).not.toHaveProperty('setExperimentalMax10Enabled')
   })
 
   it('toggles the graph inspector without persisting it', () => {
