@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c1c-confidence-targeting-holdout-protocol",
+  "algorithmVersion": "c1-confidence-targeting-v1",
+  "phase": "protocol-freeze",
+  "milestone": "C1c-confidence-targeting-holdout",
+  "frozenBoundary": "be4280512d36ad406fbebb63e49d5df51ce57a46",
+  "c1aV11": {
+    "corpusVersion": "c1-cross-rig-confidence-corpus-v1.1",
+    "commit": "28ce4470b12a3f3d6ed6eea0fcd5ea21081f1d3a",
+    "evidenceSha256": "a1bc2d4b6da004afb01685a48f95243dcde72e6d1284906edd03ca4cf471fd43",
+    "classification": "C1_CORPUS_V1_1_READY"
+  },
+  "c1b": {
+    "algorithmVersion": "c1-confidence-targeting-v1",
+    "protocolFreezeCommit": "6e8dba547bc9f12a072e0660ce35c89a3d502455",
+    "evidenceCommit": "458f95642b6a0880311d48afdfc54409c1e8b34a",
+    "evidenceSha256": "a962156d1203a243740c909e464399e0fd84d4fc92ffeaa23fa514d8129b4004",
+    "developmentGroupIds": [
+      "c1g-c4cd2c0381c89a1e9911",
+      "c1g-106abf02ed8b580831bd",
+      "c1g-5fe954a9babbe4c5cda0",
+      "c1g-0a8d256822943d659136",
+      "c1g-20fa430247872858b84b",
+      "c1g-3579b4e7c8f794efd07a"
+    ],
+    "responseOutcomesUsedForModel": true
+  },
+  "confidenceModel": {
+    "path": ".research-artifacts/c1-confidence-targeting-dev/confidence-model.json",
+    "sha256": "65cc495bebdce148ab3aaf06186b6683213717235c71854314859aba99f92f00",
+    "source": "C1b final model trained on all six development groups",
+    "developmentGroupIds": [
+      "c1g-c4cd2c0381c89a1e9911",
+      "c1g-106abf02ed8b580831bd",
+      "c1g-5fe954a9babbe4c5cda0",
+      "c1g-0a8d256822943d659136",
+      "c1g-20fa430247872858b84b",
+      "c1g-3579b4e7c8f794efd07a"
+    ],
+    "holdoutUsed": false,
+    "immutable": true,
+    "retrainingAllowed": false,
+    "classProfileRule": "use frozen class-specific profile when serialized; otherwise frozen global profile fallback"
+  },
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "holdoutGroupIds": [
+    "c1g-ebdb284a8c7563a12c5f",
+    "c1g-3f4de360d87a28aea240",
+    "c1g-f2a43144c5936389d89d",
+    "c1g-8bd11cb5d7772ff2165b",
+    "c1g-6c369c990dd73512951b",
+    "c1g-dc1ade324d0c4b3192d6"
+  ],
+  "holdoutGroups": [
+    {
+      "groupId": "c1g-ebdb284a8c7563a12c5f",
+      "deviceFamily": "moondrop aria",
+      "configurationSignature": "moondrop aria",
+      "strengthTier": "B",
+      "memberCount": 6,
+      "exact711IndependentCount": 5,
+      "non711IndependentCount": 1,
+      "non711RigClasses": [
+        "gras-43ac"
+      ]
+    },
+    {
+      "groupId": "c1g-3f4de360d87a28aea240",
+      "deviceFamily": "truthear hexa",
+      "configurationSignature": "truthear hexa",
+      "strengthTier": "B",
+      "memberCount": 9,
+      "exact711IndependentCount": 7,
+      "non711IndependentCount": 2,
+      "non711RigClasses": [
+        "gras-43ac",
+        "gras-ra0045"
+      ]
+    },
+    {
+      "groupId": "c1g-f2a43144c5936389d89d",
+      "deviceFamily": "7hz salnotes zero",
+      "configurationSignature": "7hz salnotes zero",
+      "strengthTier": "B",
+      "memberCount": 9,
+      "exact711IndependentCount": 7,
+      "non711IndependentCount": 2,
+      "non711RigClasses": [
+        "gras-43ac",
+        "gras-ra0045"
+      ]
+    },
+    {
+      "groupId": "c1g-8bd11cb5d7772ff2165b",
+      "deviceFamily": "moondrop quarks",
+      "configurationSignature": "moondrop quarks",
+      "strengthTier": "B",
+      "memberCount": 6,
+      "exact711IndependentCount": 5,
+      "non711IndependentCount": 1,
+      "non711RigClasses": [
+        "gras-43ac"
+      ]
+    },
+    {
+      "groupId": "c1g-6c369c990dd73512951b",
+      "deviceFamily": "epz q5",
+      "configurationSignature": "epz q5",
+      "strengthTier": "B",
+      "memberCount": 7,
+      "exact711IndependentCount": 6,
+      "non711IndependentCount": 1,
+      "non711RigClasses": [
+        "kb501x-711"
+      ]
+    },
+    {
+      "groupId": "c1g-dc1ade324d0c4b3192d6",
+      "deviceFamily": "7hz timeless",
+      "configurationSignature": "7hz timeless",
+      "strengthTier": "B",
+      "memberCount": 7,
+      "exact711IndependentCount": 6,
+      "non711IndependentCount": 1,
+      "non711RigClasses": [
+        "gras-43ac"
+      ]
+    }
+  ],
+  "rejectedDevelopmentGroupIds": [
+    "c1g-c4cd2c0381c89a1e9911",
+    "c1g-106abf02ed8b580831bd",
+    "c1g-5fe954a9babbe4c5cda0",
+    "c1g-0a8d256822943d659136",
+    "c1g-20fa430247872858b84b",
+    "c1g-3579b4e7c8f794efd07a"
+  ],
+  "developmentDecisionInputAccepted": false,
+  "developmentGroupsAccepted": false,
+  "rejectedBatchCToken": "fresh-real-corpus-v1.2:Batch C",
+  "freshRealBatchCRejected": true,
+  "primaryBandHz": [
+    4000,
+    14000
+  ],
+  "dataPreparation": {
+    "form": "in-ear",
+    "v2MinHz": 20,
+    "v2MaxHz": 20000,
+    "pointsPerOctave": 96,
+    "grid": "frozen normal V2 log grid, terminal endpoint included at 20,000 Hz",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "terminalClosure": "terminal-flat-hold-to-v2-max",
+    "smoothing": false,
+    "peakAlignment": false,
+    "c4Preprocessing": false,
+    "responseDerivedFiltering": false,
+    "rawBytes": "reacquire immutable pinned upstream bytes; verify Git blob SHA-1 and SHA-256; cache only in ignored holdout cache"
+  },
+  "consensus": {
+    "primaryRigLiteral": "711",
+    "method": "pointwise median of exact-711 normalized curves within the withheld group",
+    "repeatability": "1.4826 * median_i(abs(x_i(f) - C_g(f)))",
+    "holdoutDataUse": "withheld responses enter only their own consensus/disagreement metrics after frozen model selection"
+  },
+  "evaluation": {
+    "protocol": "evaluate exactly six untouched holdout groups using frozen development-trained weights",
+    "primaryBandHz": [
+      4000,
+      14000
+    ],
+    "targetingThreshold": 0.05,
+    "gridInclusion": "use only normal V2 grid points with 4,000 <= f <= 14,000; no synthetic boundary interpolation",
+    "equalAuthorityControl": "w_const(f) = mean_primary(w_conf(f))",
+    "E_conf": "mean_primary(abs(w_conf(f) * D(f)))",
+    "E_const": "mean_primary(abs(w_bar * D(f)))",
+    "gain": "(E_const - E_conf) / E_const when E_const > 0",
+    "noninformative": "E_const == 0; omit from win/loss count and median gain",
+    "win": "gain >= 0.05 (exact)",
+    "holdoutGate": "at least four of six groups are CONFIDENCE_TARGETING_SIGNAL",
+    "developmentGateInput": "not accepted by holdout evaluator; combined interpretation is formed only after independent holdout acceptance"
+  },
+  "diagnostics": {
+    "rawMetrics": "raw cross-rig MAE and RMSE on the primary band; full-grid values retained as secondary diagnostics",
+    "bandsHz": [
+      {
+        "id": "20-500Hz",
+        "minHz": 20,
+        "maxHz": 500
+      },
+      {
+        "id": "500-1kHz",
+        "minHz": 500,
+        "maxHz": 1000
+      },
+      {
+        "id": "1-2kHz",
+        "minHz": 1000,
+        "maxHz": 2000
+      },
+      {
+        "id": "2-4kHz",
+        "minHz": 2000,
+        "maxHz": 4000
+      },
+      {
+        "id": "4-6kHz",
+        "minHz": 4000,
+        "maxHz": 6000
+      },
+      {
+        "id": "6-8kHz",
+        "minHz": 6000,
+        "maxHz": 8000
+      },
+      {
+        "id": "8-10kHz",
+        "minHz": 8000,
+        "maxHz": 10000
+      },
+      {
+        "id": "10-14kHz",
+        "minHz": 10000,
+        "maxHz": 14000
+      },
+      {
+        "id": "14-20kHz",
+        "minHz": 14000,
+        "maxHz": 20000
+      }
+    ],
+    "spearman": "Spearman rho between 1 - w_conf and abs(D), average ranks for exact ties, null for constant ranks",
+    "quartiles": "ceil(n/4) primary points, ordered by confidence then original grid index for deterministic ties"
+  },
+  "groupGate": {
+    "signal": "strict majority of informative observations AND median gain >= 0.05",
+    "informativeObservationRule": "E_const > 0",
+    "allowed": [
+      "CONFIDENCE_TARGETING_SIGNAL",
+      "NO_CONFIDENCE_TARGETING_SIGNAL",
+      "INCONCLUSIVE"
+    ]
+  },
+  "holdoutGate": {
+    "requiredGroups": 6,
+    "minimumSignals": 4,
+    "supported": "CONFIDENCE_TARGETING_GENERALIZES",
+    "notConfirmed": "CONFIDENCE_TARGETING_NOT_CONFIRMED",
+    "invalid": "INCONCLUSIVE"
+  },
+  "combinedInterpretation": {
+    "generalized": "C1_CONFIDENCE_MODEL_GENERALIZED only when independently audited C1b development gate passed and holdout gate generalizes",
+    "holdoutFailure": "C1_CLOSED_HOLDOUT_NOT_CONFIRMED",
+    "semanticDefect": "INCONCLUSIVE"
+  },
+  "defectPolicy": {
+    "semanticHoldoutDefect": "INCONCLUSIVE",
+    "semanticHoldoutDefectRerunAllowed": false,
+    "outcomeNeutralPackagingCorrectionAllowed": true,
+    "outcomeNeutralCorrectionMustProve": "computed outcomes, algorithm, inputs, hashes, and classifications are unchanged"
+  },
+  "protocolFreezeCommit": null,
+  "holdoutExecuted": false,
+  "outcomesGenerated": false,
+  "responseOutcomeObserved": false,
+  "confidenceCurveComputed": false,
+  "confidenceWeightingApplied": false,
+  "consensusAlgorithmExecuted": false,
+  "retrainingAllowed": false,
+  "retrainingAfterFreeze": false,
+  "developmentRerunForHoldoutDecision": false,
+  "batchCExecuted": false,
+  "freshRealBatchCExecuted": false,
+  "autoEqSolverExecuted": false,
+  "solverExecuted": false,
+  "c4PeakAlignmentUsed": false,
+  "rawMeasurementsCommitted": false,
+  "artifactSchema": "schema.json",
+  "protocolPath": "research/c1-confidence-targeting-holdout/protocol.md"
+}

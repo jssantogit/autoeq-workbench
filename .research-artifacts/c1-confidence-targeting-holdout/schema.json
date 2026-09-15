@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c1c-confidence-targeting-holdout-outcome-schema",
+  "algorithmVersion": "c1-confidence-targeting-v1",
+  "outcomeValuesAllowed": false,
+  "responseDerivedValuesAllowed": false,
+  "requiredTopLevel": [
+    "schemaVersion",
+    "artifactKind",
+    "algorithmVersion",
+    "protocolFreezeCommit",
+    "protocolSha256",
+    "confidenceModelSha256",
+    "holdoutGroupEvidence",
+    "holdoutGate",
+    "combinedInterpretation",
+    "flags",
+    "evidenceSha256"
+  ],
+  "holdoutGroupEvidence": {
+    "required": [
+      "groupId",
+      "deviceFamily",
+      "memberCount",
+      "members",
+      "consensus",
+      "repeatabilitySigma",
+      "observations",
+      "classification"
+    ],
+    "memberProvenanceRequired": [
+      "concreteCurveIdentity",
+      "collection",
+      "form",
+      "rig",
+      "rigClass",
+      "path",
+      "upstreamRawUrl",
+      "blobSha",
+      "upstreamSha256",
+      "originalParsedPointsSha256",
+      "canonicalParsedPointsSha256",
+      "normalizedParsedPointsSha256"
+    ],
+    "observationRequired": [
+      "observationId",
+      "rigClass",
+      "frequenciesHz",
+      "deltaDb",
+      "absoluteDeltaDb",
+      "metrics"
+    ],
+    "metricsRequired": [
+      "rawCrossRigMae",
+      "rawCrossRigRmse",
+      "E_conf",
+      "E_const",
+      "gain",
+      "meanConfidence",
+      "minimumConfidence",
+      "maximumConfidence",
+      "w_repeatability",
+      "w_rig",
+      "w_conf",
+      "spearmanUncertaintyArtifact",
+      "highestConfidenceQuartile",
+      "lowestConfidenceQuartile",
+      "bandDiagnostics"
+    ],
+    "consensusRequired": [
+      "method",
+      "frequenciesHz",
+      "valuesDb",
+      "hashSha256"
+    ],
+    "sigmaRequired": [
+      "method",
+      "frequenciesHz",
+      "valuesDb",
+      "hashSha256"
+    ]
+  },
+  "evaluation": {
+    "primaryBandHz": [
+      4000,
+      14000
+    ],
+    "targetingThreshold": 0.05,
+    "equalAuthorityControl": "w_const(f) = mean_primary(w_conf(f))",
+    "errorProxy": "mean_primary(abs(weight(f) * D(f)))",
+    "informativeRule": "E_const == 0",
+    "winRule": "informative AND gain >= 0.05",
+    "groupSignalRule": "strict majority of informative observations AND median gain >= 0.05",
+    "weightSource": "immutable development-trained confidence-model.json only",
+    "holdoutReference": "same-group exact-711 pointwise median; holdout responses enter only reference/metrics after frozen model selection"
+  },
+  "diagnostics": {
+    "bandsHz": [
+      {
+        "id": "20-500Hz",
+        "minHz": 20,
+        "maxHz": 500
+      },
+      {
+        "id": "500-1kHz",
+        "minHz": 500,
+        "maxHz": 1000
+      },
+      {
+        "id": "1-2kHz",
+        "minHz": 1000,
+        "maxHz": 2000
+      },
+      {
+        "id": "2-4kHz",
+        "minHz": 2000,
+        "maxHz": 4000
+      },
+      {
+        "id": "4-6kHz",
+        "minHz": 4000,
+        "maxHz": 6000
+      },
+      {
+        "id": "6-8kHz",
+        "minHz": 6000,
+        "maxHz": 8000
+      },
+      {
+        "id": "8-10kHz",
+        "minHz": 8000,
+        "maxHz": 10000
+      },
+      {
+        "id": "10-14kHz",
+        "minHz": 10000,
+        "maxHz": 14000
+      },
+      {
+        "id": "14-20kHz",
+        "minHz": 14000,
+        "maxHz": 20000
+      }
+    ],
+    "spearman": "average ranks for exact ties; null when either rank vector is constant",
+    "quartiles": "ceil(n/4) primary points; confidence desc/asc and original grid index tie order"
+  },
+  "groupGate": {
+    "signal": "strict majority of informative observations AND median gain >= 0.05",
+    "informativeExclusion": "E_const == 0 observations do not enter win/loss or median gain",
+    "allowed": [
+      "CONFIDENCE_TARGETING_SIGNAL",
+      "NO_CONFIDENCE_TARGETING_SIGNAL",
+      "INCONCLUSIVE"
+    ]
+  },
+  "holdoutGate": {
+    "totalGroups": 6,
+    "minimumSignalGroups": 4,
+    "allowed": [
+      "CONFIDENCE_TARGETING_GENERALIZES",
+      "CONFIDENCE_TARGETING_NOT_CONFIRMED",
+      "INCONCLUSIVE"
+    ],
+    "supported": "CONFIDENCE_TARGETING_GENERALIZES",
+    "notConfirmed": "CONFIDENCE_TARGETING_NOT_CONFIRMED",
+    "invalid": "INCONCLUSIVE"
+  },
+  "combinedInterpretation": [
+    "C1_CONFIDENCE_MODEL_GENERALIZED",
+    "C1_CLOSED_HOLDOUT_NOT_CONFIRMED",
+    "INCONCLUSIVE"
+  ],
+  "defectPolicy": {
+    "semanticHoldoutDefect": "INCONCLUSIVE",
+    "semanticHoldoutDefectRerunAllowed": false,
+    "outcomeNeutralPackagingCorrectionAllowed": true,
+    "outcomeNeutralCorrectionMustProve": "computed outcomes, algorithm, inputs, hashes, and classifications are unchanged"
+  },
+  "flags": {
+    "developmentGroupsAccepted": false,
+    "developmentDecisionInputAccepted": false,
+    "developmentRerunForHoldoutDecision": false,
+    "holdoutExecuted": false,
+    "outcomesGenerated": false,
+    "responseOutcomeObserved": false,
+    "confidenceCurveComputed": false,
+    "confidenceWeightingApplied": false,
+    "consensusAlgorithmExecuted": false,
+    "retrainingAfterFreeze": false,
+    "batchCExecuted": false,
+    "freshRealBatchCExecuted": false,
+    "autoEqSolverExecuted": false,
+    "solverExecuted": false,
+    "c4PeakAlignmentUsed": false,
+    "rawMeasurementsCommitted": false
+  }
+}
