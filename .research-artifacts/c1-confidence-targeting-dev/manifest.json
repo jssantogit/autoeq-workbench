@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c1b-confidence-targeting-protocol",
+  "algorithmVersion": "c1-confidence-targeting-v1",
+  "phase": "protocol-freeze",
+  "milestone": "C1b-confidence-targeting-development",
+  "c1aV11": {
+    "corpusVersion": "c1-cross-rig-confidence-corpus-v1.1",
+    "commit": "28ce4470b12a3f3d6ed6eea0fcd5ea21081f1d3a",
+    "evidenceSha256": "a1bc2d4b6da004afb01685a48f95243dcde72e6d1284906edd03ca4cf471fd43",
+    "classification": "C1_CORPUS_V1_1_READY"
+  },
+  "frozenBoundary": "be4280512d36ad406fbebb63e49d5df51ce57a46",
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "c4": {
+    "finalEvidenceSha256": "4ded0c7944e22c38843d21a06402fdfbd5656e87b33595a08595a1bf91ad03a4",
+    "finalInterpretation": "C4_CLOSED_HOLDOUT_NOT_CONFIRMED"
+  },
+  "developmentGroupIds": [
+    "c1g-c4cd2c0381c89a1e9911",
+    "c1g-106abf02ed8b580831bd",
+    "c1g-5fe954a9babbe4c5cda0",
+    "c1g-0a8d256822943d659136",
+    "c1g-20fa430247872858b84b",
+    "c1g-3579b4e7c8f794efd07a"
+  ],
+  "rejectedHoldoutGroupIds": [
+    "c1g-ebdb284a8c7563a12c5f",
+    "c1g-3f4de360d87a28aea240",
+    "c1g-f2a43144c5936389d89d",
+    "c1g-8bd11cb5d7772ff2165b",
+    "c1g-6c369c990dd73512951b",
+    "c1g-dc1ade324d0c4b3192d6"
+  ],
+  "rejectedBatchCToken": "fresh-real-corpus-v1.2:Batch C",
+  "freshRealBatchCRejected": true,
+  "upstreamResponseOutcomesObserved": false,
+  "primaryBandHz": [
+    4000,
+    14000
+  ],
+  "dataPreparation": {
+    "form": "in-ear",
+    "v2MinHz": 20,
+    "v2MaxHz": 20000,
+    "pointsPerOctave": 96,
+    "grid": "frozen normal V2 log grid, terminal endpoint included at 20,000 Hz",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "terminalClosure": "terminal-flat-hold-to-v2-max",
+    "smoothing": false,
+    "peakAlignment": false,
+    "c4Preprocessing": false,
+    "rawBytes": "reacquire immutable pinned upstream bytes; verify Git blob SHA-1 and SHA-256"
+  },
+  "consensus": {
+    "primaryRigLiteral": "711",
+    "method": "pointwise median of exact-711 normalized curves",
+    "repeatability": "1.4826 * median_i(abs(x_i(f) - C_g(f)))"
+  },
+  "profiles": {
+    "baseWeight": 1,
+    "repeatability": "R_T(f) = median_g(sigma_g(f))",
+    "globalRig": "G_global,T(f) = median(abs(D_g,r(f))) over all training non-711 observations",
+    "classRig": "G_k,T(f) = median(abs(D_g,r(f))) when class spans >=2 distinct training groups",
+    "fallback": "global rig profile when class spans fewer than 2 distinct training groups",
+    "classMinimumDistinctTrainingGroups": 2,
+    "transform": "c(u) = 0.75 / (0.75 + u)",
+    "product": "w_conf,k,T(f) = w_repeatability,T(f) * w_rig,k,T(f)",
+    "weightRange": "finite 0 < w <= 1; no clipping, smoothing, exponent, lambda, threshold, or psychoacoustic weighting"
+  },
+  "evaluation": {
+    "protocol": "leave-one-device-group-out across six development groups",
+    "primaryBandHz": [
+      4000,
+      14000
+    ],
+    "gridInclusion": "use only normal V2 grid points with 4,000 <= f <= 14,000; no synthetic boundary interpolation",
+    "equalAuthorityControl": "w_const(f) = mean_primary(w_conf(f))",
+    "E_conf": "mean_primary(abs(w_conf(f) * D(f)))",
+    "E_const": "mean_primary(abs(w_const(f) * D(f)))",
+    "gain": "(E_const - E_conf) / E_const when E_const > 0",
+    "noninformative": "E_const == 0; omit from win/loss count and median gain",
+    "win": "gain >= 0.05 (exact)"
+  },
+  "diagnostics": {
+    "rawMetrics": "raw cross-rig MAE and RMSE on the primary band; full-grid values are retained as secondary diagnostics",
+    "bandsHz": [
+      {
+        "id": "20-500Hz",
+        "minHz": 20,
+        "maxHz": 500
+      },
+      {
+        "id": "500-1kHz",
+        "minHz": 500,
+        "maxHz": 1000
+      },
+      {
+        "id": "1-2kHz",
+        "minHz": 1000,
+        "maxHz": 2000
+      },
+      {
+        "id": "2-4kHz",
+        "minHz": 2000,
+        "maxHz": 4000
+      },
+      {
+        "id": "4-6kHz",
+        "minHz": 4000,
+        "maxHz": 6000
+      },
+      {
+        "id": "6-8kHz",
+        "minHz": 6000,
+        "maxHz": 8000
+      },
+      {
+        "id": "8-10kHz",
+        "minHz": 8000,
+        "maxHz": 10000
+      },
+      {
+        "id": "10-14kHz",
+        "minHz": 10000,
+        "maxHz": 14000
+      },
+      {
+        "id": "14-20kHz",
+        "minHz": 14000,
+        "maxHz": 20000
+      }
+    ],
+    "spearman": "Spearman rho between 1 - w_conf and abs(D), with average ranks for exact ties; null for constant ranks",
+    "quartiles": "ceil(n/4) primary points, ordered by confidence then original grid index for deterministic ties"
+  },
+  "groupGate": {
+    "signal": "strict majority of informative observations AND median gain >= 0.05",
+    "informativeObservationRule": "E_const > 0"
+  },
+  "developmentGate": {
+    "requiredGroups": 6,
+    "minimumSignals": 4,
+    "supported": "CONFIDENCE_TARGETING_DEV_SUPPORTED",
+    "notSupported": "CONFIDENCE_TARGETING_DEV_NOT_SUPPORTED",
+    "invalid": "INCONCLUSIVE"
+  },
+  "protocolFreezeCommit": null,
+  "developmentExecuted": false,
+  "holdoutExecuted": false,
+  "outcomesGenerated": false,
+  "responseOutcomeObserved": false,
+  "confidenceCurveComputed": false,
+  "confidenceWeightingApplied": false,
+  "batchCExecuted": false,
+  "consensusAlgorithmExecuted": false,
+  "autoEqSolverExecuted": false,
+  "solverExecuted": false,
+  "freshRealBatchCExecuted": false,
+  "c4PeakAlignmentUsed": false,
+  "rawMeasurementsCommitted": false,
+  "artifactSchema": "schema.json",
+  "protocolPath": "research/c1-confidence-targeting-dev/protocol.md"
+}
