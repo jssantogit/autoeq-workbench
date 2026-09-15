@@ -83,4 +83,9 @@ async function execute(kind) {
   await writeFile(assertWritablePath('.research-artifacts/c1-confidence-causal-online/final-report.md'),`# C1d evidence\n\nPrimary gate: ${aggregate.primaryGate?.classification??'not executed'}\n`)
   return made
 }
-if(import.meta.url===`file://${process.argv[1]}`){ if(process.argv[2]==='--freeze')await freezeProtocol(); else if(process.argv[2]==='--execute-primary')await execute('primary'); else if(process.argv[2]==='--execute-secondary')await execute('secondary'); else throw Error('use --freeze, --execute-primary, or --execute-secondary') }
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  if(process.argv[2]==='--freeze') await freezeProtocol()
+  else if(process.argv[2]==='--execute-primary') await execute('primary')
+  else if(process.argv[2]==='--execute-secondary') await execute('secondary')
+  else throw Error('use --freeze, --execute-primary, or --execute-secondary')
+}
