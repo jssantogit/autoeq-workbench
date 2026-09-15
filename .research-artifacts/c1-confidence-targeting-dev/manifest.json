@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "artifactKind": "c1b-confidence-targeting-protocol",
   "algorithmVersion": "c1-confidence-targeting-v1",
-  "phase": "protocol-freeze",
-  "milestone": "C1b-confidence-targeting-development",
+  "phase": "development-outcome",
+  "milestone": "C1b-confidence-targeting-development-outcome",
   "c1aV11": {
     "corpusVersion": "c1-cross-rig-confidence-corpus-v1.1",
     "commit": "28ce4470b12a3f3d6ed6eea0fcd5ea21081f1d3a",
@@ -153,20 +153,54 @@
     "notSupported": "CONFIDENCE_TARGETING_DEV_NOT_SUPPORTED",
     "invalid": "INCONCLUSIVE"
   },
-  "protocolFreezeCommit": null,
-  "developmentExecuted": false,
+  "protocolFreezeCommit": "6e8dba547bc9f12a072e0660ce35c89a3d502455",
+  "developmentExecuted": true,
   "holdoutExecuted": false,
-  "outcomesGenerated": false,
-  "responseOutcomeObserved": false,
-  "confidenceCurveComputed": false,
-  "confidenceWeightingApplied": false,
+  "outcomesGenerated": true,
+  "responseOutcomeObserved": true,
+  "confidenceCurveComputed": true,
+  "confidenceWeightingApplied": true,
   "batchCExecuted": false,
-  "consensusAlgorithmExecuted": false,
+  "consensusAlgorithmExecuted": true,
   "autoEqSolverExecuted": false,
   "solverExecuted": false,
   "freshRealBatchCExecuted": false,
   "c4PeakAlignmentUsed": false,
   "rawMeasurementsCommitted": false,
   "artifactSchema": "schema.json",
-  "protocolPath": "research/c1-confidence-targeting-dev/protocol.md"
+  "protocolPath": "research/c1-confidence-targeting-dev/protocol.md",
+  "outcomeClassification": "CONFIDENCE_TARGETING_DEV_SUPPORTED",
+  "groupEvidenceFiles": [
+    "group-c1g-0a8d256822943d659136.json",
+    "group-c1g-106abf02ed8b580831bd.json",
+    "group-c1g-20fa430247872858b84b.json",
+    "group-c1g-3579b4e7c8f794efd07a.json",
+    "group-c1g-5fe954a9babbe4c5cda0.json",
+    "group-c1g-c4cd2c0381c89a1e9911.json"
+  ],
+  "evidenceFiles": [
+    "aggregate-evidence.json",
+    "final-report.md",
+    "group-c1g-0a8d256822943d659136.json",
+    "group-c1g-106abf02ed8b580831bd.json",
+    "group-c1g-20fa430247872858b84b.json",
+    "group-c1g-3579b4e7c8f794efd07a.json",
+    "group-c1g-5fe954a9babbe4c5cda0.json",
+    "group-c1g-c4cd2c0381c89a1e9911.json",
+    "manifest.json",
+    "schema.json"
+  ],
+  "c1aV11EvidenceSha256": "a1bc2d4b6da004afb01685a48f95243dcde72e6d1284906edd03ca4cf471fd43",
+  "developmentCoverage": {
+    "groupCount": 6,
+    "exact711MemberCount": 31,
+    "non711ObservationCount": 6,
+    "informativeObservationCount": 6,
+    "verifiedRawMemberCount": 37,
+    "looFoldCount": 6,
+    "primaryBandHz": [
+      4000,
+      14000
+    ]
+  }
 }

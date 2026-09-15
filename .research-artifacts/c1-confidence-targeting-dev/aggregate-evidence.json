@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c1b-development-aggregate-evidence",
+  "algorithmVersion": "c1-confidence-targeting-v1",
+  "protocolFreezeCommit": "6e8dba547bc9f12a072e0660ce35c89a3d502455",
+  "protocolSha256": "f5d273820e95871ebf6f22bbeffffe000add5a395fb0da6f8825dab185ff48e8",
+  "c1aV11": {
+    "corpusVersion": "c1-cross-rig-confidence-corpus-v1.1",
+    "commit": "28ce4470b12a3f3d6ed6eea0fcd5ea21081f1d3a",
+    "evidenceSha256": "a1bc2d4b6da004afb01685a48f95243dcde72e6d1284906edd03ca4cf471fd43",
+    "classification": "C1_CORPUS_V1_1_READY"
+  },
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "frozenBoundary": "be4280512d36ad406fbebb63e49d5df51ce57a46",
+  "developmentGroupIds": [
+    "c1g-c4cd2c0381c89a1e9911",
+    "c1g-106abf02ed8b580831bd",
+    "c1g-5fe954a9babbe4c5cda0",
+    "c1g-0a8d256822943d659136",
+    "c1g-20fa430247872858b84b",
+    "c1g-3579b4e7c8f794efd07a"
+  ],
+  "rejectedHoldoutGroupIds": [
+    "c1g-ebdb284a8c7563a12c5f",
+    "c1g-3f4de360d87a28aea240",
+    "c1g-f2a43144c5936389d89d",
+    "c1g-8bd11cb5d7772ff2165b",
+    "c1g-6c369c990dd73512951b",
+    "c1g-dc1ade324d0c4b3192d6"
+  ],
+  "rejectedBatchCToken": "fresh-real-corpus-v1.2:Batch C",
+  "groupEvidenceFiles": [
+    "group-c1g-0a8d256822943d659136.json",
+    "group-c1g-106abf02ed8b580831bd.json",
+    "group-c1g-20fa430247872858b84b.json",
+    "group-c1g-3579b4e7c8f794efd07a.json",
+    "group-c1g-5fe954a9babbe4c5cda0.json",
+    "group-c1g-c4cd2c0381c89a1e9911.json"
+  ],
+  "evidenceFiles": [
+    "aggregate-evidence.json",
+    "final-report.md",
+    "group-c1g-0a8d256822943d659136.json",
+    "group-c1g-106abf02ed8b580831bd.json",
+    "group-c1g-20fa430247872858b84b.json",
+    "group-c1g-3579b4e7c8f794efd07a.json",
+    "group-c1g-5fe954a9babbe4c5cda0.json",
+    "group-c1g-c4cd2c0381c89a1e9911.json",
+    "manifest.json",
+    "schema.json"
+  ],
+  "groups": [
+    {
+      "groupId": "c1g-c4cd2c0381c89a1e9911",
+      "deviceFamily": "moondrop x crinacle blessing2 dusk",
+      "configurationSignature": "moondrop x crinacle blessing2 dusk",
+      "exact711MemberCount": 5,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 0,
+      "medianTargetingGain": 0.25789506411179985,
+      "medianRelativeTargetingGain": 0.25789506411179985,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "6c089b3ecfb296c520f533c22a96b0e243ce8c9b18d3a16c7b88603f59ad953e",
+      "repeatabilitySigmaSha256": "ea926fbad92249dabb0aae4d257d9a11f616478aac01e628c433382519407bc6",
+      "observationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop x Crinacle Blessing2 Dusk\""
+      ],
+      "rawCrossRigMae": [
+        2.0493600983831675
+      ],
+      "rawCrossRigRmse": [
+        2.578889106070861
+      ]
+    },
+    {
+      "groupId": "c1g-106abf02ed8b580831bd",
+      "deviceFamily": "ikko oh10",
+      "configurationSignature": "ikko oh10",
+      "exact711MemberCount": 6,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 0,
+      "medianTargetingGain": 0.09401326588310913,
+      "medianRelativeTargetingGain": 0.09401326588310913,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "03427e0c1561084f070af0bfd4861317aac90d1880d1314e95a97154a3bb49bc",
+      "repeatabilitySigmaSha256": "d7049fad4ac153f7663e641f6465bb1a978720fdd61364028d05b30eeeb18c63",
+      "observationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"IKKO OH10\""
+      ],
+      "rawCrossRigMae": [
+        2.5967262481096767
+      ],
+      "rawCrossRigRmse": [
+        3.014606216190908
+      ]
+    },
+    {
+      "groupId": "c1g-5fe954a9babbe4c5cda0",
+      "deviceFamily": "simgot audio ea500",
+      "configurationSignature": "simgot audio ea500 (black nozzle)",
+      "exact711MemberCount": 5,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 0,
+      "medianTargetingGain": 0.27248442528648226,
+      "medianRelativeTargetingGain": 0.27248442528648226,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "27b51f18ed6f33bc19381380ce1c5a8b36ef60e467584151cf53c8ba074b5c81",
+      "repeatabilitySigmaSha256": "093e5ae389c2cc8da856929124423799a8b9c028b40705d0a6986e7cc63668e5",
+      "observationIds": [
+        "\"Auriculares Argentina\"|\"in-ear\"|\"KB501x + 711\"|\"Simgot Audio EA500 (black nozzle)\""
+      ],
+      "rawCrossRigMae": [
+        3.2908918803563485
+      ],
+      "rawCrossRigRmse": [
+        4.5007549198827705
+      ]
+    },
+    {
+      "groupId": "c1g-0a8d256822943d659136",
+      "deviceFamily": "kiwi ears ke4",
+      "configurationSignature": "kiwi ears ke4",
+      "exact711MemberCount": 5,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 0,
+      "medianTargetingGain": 0.3146138331875719,
+      "medianRelativeTargetingGain": 0.3146138331875719,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "455292e2880ec6b2b29bda2378d76687d0b67ed13db27af2d8a9ef5b033b9ca0",
+      "repeatabilitySigmaSha256": "89d061f00a9c797145d22b5a73667b80ffcc51f61755d2ec3f8e9bd80d98bb89",
+      "observationIds": [
+        "\"Auriculares Argentina\"|\"in-ear\"|\"KB501x + 711\"|\"Kiwi Ears KE4\""
+      ],
+      "rawCrossRigMae": [
+        2.134020581881187
+      ],
+      "rawCrossRigRmse": [
+        2.730528842500109
+      ]
+    },
+    {
+      "groupId": "c1g-20fa430247872858b84b",
+      "deviceFamily": "truthear x crinacle zero",
+      "configurationSignature": "truthear x crinacle zero",
+      "exact711MemberCount": 5,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 0,
+      "medianTargetingGain": 0.2516340810334106,
+      "medianRelativeTargetingGain": 0.2516340810334106,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "3d105335dadc150cc15ef4c6fa18675b9d6a73f083cd02c49ab48d6016daf843",
+      "repeatabilitySigmaSha256": "f048493d5284340d7ef83c127fc711605abdadfd860670c18ff19ca86db3f2e1",
+      "observationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43ACB\"|\"Truthear x Crinacle Zero\""
+      ],
+      "rawCrossRigMae": [
+        2.2282751301759776
+      ],
+      "rawCrossRigRmse": [
+        3.0912556187136073
+      ]
+    },
+    {
+      "groupId": "c1g-3579b4e7c8f794efd07a",
+      "deviceFamily": "moondrop ssr",
+      "configurationSignature": "moondrop ssr",
+      "exact711MemberCount": 5,
+      "non711ObservationCount": 1,
+      "informativeObservationCount": 1,
+      "nonInformativeObservationCount": 0,
+      "winCount": 1,
+      "lossCount": 0,
+      "medianTargetingGain": 0.24048367819950928,
+      "medianRelativeTargetingGain": 0.24048367819950928,
+      "classification": "CONFIDENCE_TARGETING_SIGNAL",
+      "consensusSha256": "138e6ff84bc564aee36b10615e834e996f69d1f7d7f6228c60da2d5729db0a87",
+      "repeatabilitySigmaSha256": "e3bb1acbd6a3c83645ced60a404de57fd455db3ca51dc6dace0254cbc74bd61b",
+      "observationIds": [
+        "\"HypetheSonics\"|\"in-ear\"|\"GRAS RA0045\"|\"Moondrop SSR\""
+      ],
+      "rawCrossRigMae": [
+        1.163215010618345
+      ],
+      "rawCrossRigRmse": [
+        1.4742552556202138
+      ]
+    }
+  ],
+  "developmentGate": {
+    "classification": "CONFIDENCE_TARGETING_DEV_SUPPORTED",
+    "groupCount": 6,
+    "signalGroupCount": 6,
+    "noSignalGroupCount": 0,
+    "inconclusiveGroupCount": 0,
+    "requiredGroups": 6,
+    "minimumSignals": 4
+  },
+  "developmentCoverage": {
+    "groupCount": 6,
+    "exact711MemberCount": 31,
+    "non711ObservationCount": 6,
+    "informativeObservationCount": 6,
+    "verifiedRawMemberCount": 37,
+    "looFoldCount": 6,
+    "primaryBandHz": [
+      4000,
+      14000
+    ]
+  },
+  "exclusionAssertions": {
+    "selectedFamiliesUnique": true,
+    "historicalObservedOverlap": false,
+    "sealedBatchCOverlap": false,
+    "noHoldoutResponseAcquisition": true
+  },
+  "protocolConstants": {
+    "form": "in-ear",
+    "primaryRigLiteral": "711",
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "targetScaleDb": 0.75,
+    "targetingThreshold": 0.05,
+    "minimumClassTrainingGroups": 2,
+    "baseWeight": 1,
+    "c1aSelectionSeed": "autoeq-workbench:c1-cross-rig-corpus-v1",
+    "c1aSplitSeed": "autoeq-workbench:c1-cross-rig-split-v1",
+    "c1aNormalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "noSmoothing": true,
+    "noPeakAlignment": true
+  },
+  "flags": {
+    "developmentExecuted": true,
+    "holdoutExecuted": false,
+    "outcomesGenerated": true,
+    "responseOutcomeObserved": true,
+    "confidenceCurveComputed": true,
+    "confidenceWeightingApplied": true,
+    "consensusAlgorithmExecuted": true,
+    "autoEqSolverExecuted": false,
+    "solverExecuted": false,
+    "freshRealBatchCExecuted": false,
+    "c4PeakAlignmentUsed": false,
+    "rawMeasurementsCommitted": false
+  }
+}
