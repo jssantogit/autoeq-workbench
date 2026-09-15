@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "allReserve": {
+    "rigClasses": {
+      "gras-43ac": 10,
+      "gras-ra0045": 7
+    },
+    "profileCategories": {
+      "CLASS_SPECIFIC": 16
+    }
+  },
+  "primary": {
+    "rigClasses": {
+      "gras-43ac": 5,
+      "gras-ra0045": 2
+    },
+    "profileCategories": {
+      "CLASS_SPECIFIC": 6
+    }
+  },
+  "secondary": {
+    "rigClasses": {
+      "gras-43ac": 2,
+      "gras-ra0045": 4
+    },
+    "profileCategories": {
+      "CLASS_SPECIFIC": 6
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "campaign": "C1f",
+  "classification": "C1F_CORPUS_READY",
+  "baseCommit": "3eb0329b8eee80eae8de72e268bf0e4fa4be733c",
+  "frozenC1V11ManifestCommit": "28ce4470b12a3f3d6ed6eea0fcd5ea21081f1d3a",
+  "frozenC1V11ManifestPath": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/manifest.json",
+  "frozenC1V11ManifestSha256": "afea61f17f945c2b4526c04bca8c33d9ecbb5e944fd2735fbfd1a3ec2d97238c",
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "expectedReserveCount": 22,
+  "successfullyReacquiredReserveCount": 16,
+  "excludedOrFailedReserveGroups": [
+    {
+      "groupId": "c1g-475064197540f231c71e",
+      "reason": "UNKNOWN_RIG_CLASS",
+      "detail": null
+    },
+    {
+      "groupId": "c1g-61f3ef2d22edbda0d4e9",
+      "reason": "UNKNOWN_RIG_CLASS",
+      "detail": null
+    },
+    {
+      "groupId": "c1g-6eee5959560dfe8bac37",
+      "reason": "UNKNOWN_RIG_CLASS",
+      "detail": null
+    },
+    {
+      "groupId": "c1g-856fc16f603398a5c7ac",
+      "reason": "UNKNOWN_RIG_CLASS",
+      "detail": null
+    },
+    {
+      "groupId": "c1g-d6b9e465ac5a797fe2cb",
+      "reason": "UNKNOWN_RIG_CLASS",
+      "detail": null
+    },
+    {
+      "groupId": "c1g-e394c150f910a0872d3e",
+      "reason": "UNKNOWN_RIG_CLASS",
+      "detail": null
+    }
+  ],
+  "acquisitionFailure": null,
+  "primaryGroupIds": [
+    "c1g-251bf90cf23f557cb011",
+    "c1g-c45cb51de5231139b2f2",
+    "c1g-e9b56c7e332c693b6f82",
+    "c1g-41b1767dc01a935198bf",
+    "c1g-ba1d3af16db7a116d755",
+    "c1g-1be44ee4bdbd73cbf632"
+  ],
+  "secondaryReserveGroupIds": [
+    "c1g-6cf5995d049cff49d672",
+    "c1g-ccc7fd5250bd1714c73e",
+    "c1g-2fd95af2a97278cf88ef",
+    "c1g-256c26e3bb37c97b890a",
+    "c1g-6398ddcd56119d32eb70",
+    "c1g-3b112b59456722f8dabe"
+  ],
+  "primaryRigClasses": [
+    "gras-43ac",
+    "gras-ra0045"
+  ],
+  "confidenceModel": {
+    "path": ".research-artifacts/c1-confidence-targeting-dev/confidence-model.json",
+    "modelSha256": "65cc495bebdce148ab3aaf06186b6683213717235c71854314859aba99f92f00",
+    "hashVerified": true,
+    "classSpecificRigClasses": [
+      "gras-43ac",
+      "gras-43acb",
+      "gras-ra0045",
+      "kb501x-711"
+    ],
+    "globalProfileAvailable": true
+  },
+  "batchCIdentityArtifact": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/historical-device-exclusions.json",
+  "batchCOverlapStatus": "VERIFIED_WITHOUT_BREAKING_SEAL",
+  "batchCAccessAttempts": 0,
+  "solverExecuted": false,
+  "causalOutcomesGenerated": false,
+  "confidenceMetricsComputed": false,
+  "confidenceTargetingMetricsComputed": false,
+  "confidenceWeightsUsedForSelection": false,
+  "responseAmplitudeUsedForSelection": false,
+  "disagreementMagnitudeUsedForSelection": false,
+  "modelRetrained": false,
+  "c1dEvidenceReusedAsValidOutcome": false,
+  "productionModified": false,
+  "coreModified": false,
+  "frontendModified": false,
+  "rawMeasurementBytesCommitted": false,
+  "noFullClone": true,
+  "outcomeBlindSelection": true,
+  "sourceInventory": {
+    "upstreamMetadataInventory": "immutable GitHub API tree/name_index metadata only",
+    "upstreamRepository": "jaakkopasanen/AutoEq",
+    "upstreamCommit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "upstreamTree": "671f0a72499ace671e4b0a293bc1948bb8330c96",
+    "cacheRoot": ".research-cache/c1f-upstream-reserve-corpus",
+    "metadataRecordCount": 3478,
+    "reserveGroupMemberCount": 99,
+    "pathsAccessed": [
+      ".research-artifacts/c1-confidence-causal-online/invalidation-manifest.json",
+      ".research-artifacts/c1-confidence-causal-online/manifest.json",
+      ".research-artifacts/c1-confidence-targeting-dev/confidence-model.json",
+      ".research-artifacts/c1-confidence-targeting-dev/manifest.json",
+      ".research-artifacts/c1-confidence-targeting-holdout/manifest.json",
+      ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/groups.json",
+      ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/historical-device-exclusions.json",
+      "git:28ce4470b12a3f3d6ed6eea0fcd5ea21081f1d3a:.research-artifacts/c1-cross-rig-confidence-corpus-v1.1/manifest.json"
+    ],
+    "pathsRejected": [],
+    "batchCAccessAttempts": 0,
+    "batchCAccessed": false,
+    "noFullClone": true,
+    "rawBytesCommitted": false
+  }
+}

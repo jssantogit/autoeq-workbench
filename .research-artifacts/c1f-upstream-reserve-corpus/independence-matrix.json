@@ -1,0 +1,446 @@
+{
+  "schemaVersion": 1,
+  "axes": [
+    "c1bTrainingIemIdentities",
+    "c1cHoldoutIemIdentities",
+    "c1dPrimaryIemIdentities",
+    "historicalC1GroupIds",
+    "measurementSourceIdentityReuse",
+    "familyIdentity",
+    "candidateToCandidateDuplicateIdentity",
+    "batchCOverlap"
+  ],
+  "batchCOverlapStatus": "VERIFIED_WITHOUT_BREAKING_SEAL",
+  "candidates": [
+    {
+      "candidateId": "c1g-1be44ee4bdbd73cbf632",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Bakkwatan",
+        "HypetheSonics",
+        "Jaytiss",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "measurementRigClasses": [
+        "gras-ra0045"
+      ],
+      "familyIdentity": "thieaudio monarch mkiii",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-251bf90cf23f557cb011",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Harpo",
+        "Hi End Portable",
+        "HypetheSonics",
+        "Jaytiss",
+        "Super Review",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac",
+        "gras-ra0045"
+      ],
+      "familyIdentity": "blon bl 03",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-256c26e3bb37c97b890a",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Jaytiss",
+        "Kazi",
+        "Regan Cipher",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "truthear nova",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-264806d8219b4dca4029",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Kazi",
+        "Super Review",
+        "freeryder05",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "sennheiser ie 900",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-2fd95af2a97278cf88ef",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "HypetheSonics",
+        "Super Review",
+        "freeryder05"
+      ],
+      "measurementRigClasses": [
+        "gras-ra0045"
+      ],
+      "familyIdentity": "jvc ha fdx1",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-3b112b59456722f8dabe",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Hi End Portable",
+        "HypetheSonics",
+        "Super Review",
+        "freeryder05"
+      ],
+      "measurementRigClasses": [
+        "gras-ra0045"
+      ],
+      "familyIdentity": "symphonium audio helios",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-41b1767dc01a935198bf",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "Harpo",
+        "Kazi",
+        "RikudouGoku",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "final audio e3000",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-475064197540f231c71e",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "DHRME",
+        "Kazi",
+        "Super Review",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-45bc-10"
+      ],
+      "familyIdentity": "sony wf 1000xm5",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-5b0636c3d20bda6230bf",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "HypetheSonics",
+        "Super Review",
+        "freeryder05"
+      ],
+      "measurementRigClasses": [
+        "gras-ra0045"
+      ],
+      "familyIdentity": "jvc ha fdx1",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-61f3ef2d22edbda0d4e9",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Filk",
+        "Jaytiss",
+        "Ted's Squig Hoard",
+        "kr0mka",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac-"
+      ],
+      "familyIdentity": "7hz salnotes dioko",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-6398ddcd56119d32eb70",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "HypetheSonics",
+        "Super Review",
+        "ToneDeafMonk",
+        "kr0mka"
+      ],
+      "measurementRigClasses": [
+        "gras-ra0045"
+      ],
+      "familyIdentity": "shuoer cadenza 12",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-6c525f42c65dd107d738",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Kazi",
+        "RikudouGoku",
+        "Super Review",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "final audio e500",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-6cf5995d049cff49d672",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Harpo",
+        "Hi End Portable",
+        "Kazi",
+        "ToneDeafMonk",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "simgot audio ew100p",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-6eee5959560dfe8bac37",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Hi End Portable",
+        "HypetheSonics",
+        "RikudouGoku",
+        "Super Review"
+      ],
+      "measurementRigClasses": [
+        "bruel-and-kjaer-5128"
+      ],
+      "familyIdentity": "blon bl 05",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-73102640e4e8f533ef93",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Bakkwatan",
+        "Fahryst",
+        "Jaytiss",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "sennheiser ie 200",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-856fc16f603398a5c7ac",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Bakkwatan",
+        "Kazi",
+        "RikudouGoku",
+        "Super Review",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac-"
+      ],
+      "familyIdentity": "kiwi ears orchestra lite",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-ba1d3af16db7a116d755",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Auriculares Argentina",
+        "Kazi",
+        "RikudouGoku",
+        "kr0mka",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "final audio e1000",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-c45cb51de5231139b2f2",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "Harpo",
+        "Jaytiss",
+        "Super Review",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "moondrop variations",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-ccc7fd5250bd1714c73e",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "HypetheSonics",
+        "Kazi",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "measurementRigClasses": [
+        "gras-ra0045"
+      ],
+      "familyIdentity": "moondrop chu 2",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-d6b9e465ac5a797fe2cb",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "Filk",
+        "Jaytiss",
+        "Super Review",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac-"
+      ],
+      "familyIdentity": "truthear gate",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-e394c150f910a0872d3e",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Bakkwatan",
+        "Harpo",
+        "Super Review",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac-"
+      ],
+      "familyIdentity": "moondrop quarks dsp",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    },
+    {
+      "candidateId": "c1g-e9b56c7e332c693b6f82",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "Jaytiss",
+        "Kazi",
+        "freeryder05",
+        "oratory1990"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "sennheiser ie 600",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCOverlap": false
+    }
+  ]
+}
