@@ -1,0 +1,1178 @@
+{
+  "schemaVersion": 1,
+  "roots": [
+    "research",
+    ".research-artifacts",
+    "packages/core/benchmarks",
+    "packages/core/.research-artifacts"
+  ],
+  "files": [
+    {
+      "path": ".research-artifacts/c1-confidence-causal-online/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 521
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-causal-online/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 841
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-causal-online/group-c1g-ebdb284a8c7563a12c5f.json",
+      "extension": ".json",
+      "sizeBytes": 15513
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-causal-online/invalidation-manifest.json",
+      "extension": ".json",
+      "sizeBytes": 1212
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-causal-online/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 2025
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-causal-online/protocol-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-causal-online/schema.json",
+      "extension": ".json",
+      "sizeBytes": 151
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/aggregate-evidence.json",
+      "extension": ".json",
+      "sizeBytes": 9406
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/confidence-model.json",
+      "extension": ".json",
+      "sizeBytes": 1319652
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 4017
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/group-c1g-0a8d256822943d659136.json",
+      "extension": ".json",
+      "sizeBytes": 1091475
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/group-c1g-106abf02ed8b580831bd.json",
+      "extension": ".json",
+      "sizeBytes": 1094665
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/group-c1g-20fa430247872858b84b.json",
+      "extension": ".json",
+      "sizeBytes": 1030469
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/group-c1g-3579b4e7c8f794efd07a.json",
+      "extension": ".json",
+      "sizeBytes": 1033168
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/group-c1g-5fe954a9babbe4c5cda0.json",
+      "extension": ".json",
+      "sizeBytes": 1094656
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/group-c1g-c4cd2c0381c89a1e9911.json",
+      "extension": ".json",
+      "sizeBytes": 1092016
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 6807
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/protocol-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-dev/schema.json",
+      "extension": ".json",
+      "sizeBytes": 3735
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/aggregate-evidence.json",
+      "extension": ".json",
+      "sizeBytes": 15260
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 4088
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/group-c1g-3f4de360d87a28aea240.json",
+      "extension": ".json",
+      "sizeBytes": 1327313
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/group-c1g-6c369c990dd73512951b.json",
+      "extension": ".json",
+      "sizeBytes": 726963
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/group-c1g-8bd11cb5d7772ff2165b.json",
+      "extension": ".json",
+      "sizeBytes": 722359
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/group-c1g-dc1ade324d0c4b3192d6.json",
+      "extension": ".json",
+      "sizeBytes": 727975
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/group-c1g-ebdb284a8c7563a12c5f.json",
+      "extension": ".json",
+      "sizeBytes": 720073
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/group-c1g-f2a43144c5936389d89d.json",
+      "extension": ".json",
+      "sizeBytes": 1330135
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 9441
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/outcome-manifest.json",
+      "extension": ".json",
+      "sizeBytes": 9543
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/protocol-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c1-confidence-targeting-holdout/schema.json",
+      "extension": ".json",
+      "sizeBytes": 5188
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/groups.json",
+      "extension": ".json",
+      "sizeBytes": 541267
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/historical-device-exclusions.json",
+      "extension": ".json",
+      "sizeBytes": 39002
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 20969
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/provenance.json",
+      "extension": ".json",
+      "sizeBytes": 217757
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/rig-inventory.json",
+      "extension": ".json",
+      "sizeBytes": 10800
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/selection-protocol.md",
+      "extension": ".md",
+      "sizeBytes": 2167
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus/groups.json",
+      "extension": ".json",
+      "sizeBytes": 623832
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 19538
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus/provenance.json",
+      "extension": ".json",
+      "sizeBytes": 257230
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus/rig-inventory.json",
+      "extension": ".json",
+      "sizeBytes": 10800
+    },
+    {
+      "path": ".research-artifacts/c1-cross-rig-confidence-corpus/selection-protocol.md",
+      "extension": ".md",
+      "sizeBytes": 3039
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-corpus/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-corpus/groups.json",
+      "extension": ".json",
+      "sizeBytes": 133955
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-corpus/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 8717
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-corpus/provenance.json",
+      "extension": ".json",
+      "sizeBytes": 122760
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-corpus/rig-inventory.json",
+      "extension": ".json",
+      "sizeBytes": 11160
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-corpus/selection-protocol.md",
+      "extension": ".md",
+      "sizeBytes": 3496
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-dev/aggregate-evidence.json",
+      "extension": ".json",
+      "sizeBytes": 4933
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-dev/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-dev/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 3186
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-dev/group-c4g-35f72baf0cca66570d01.json",
+      "extension": ".json",
+      "sizeBytes": 78336
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-dev/group-c4g-95ca9d64e706e94c51e7.json",
+      "extension": ".json",
+      "sizeBytes": 78553
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-dev/group-c4g-9c1d23845eb5a1d7beef.json",
+      "extension": ".json",
+      "sizeBytes": 79100
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-dev/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 4797
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-dev/protocol-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-dev/schema.json",
+      "extension": ".json",
+      "sizeBytes": 1921
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-holdout/aggregate-evidence.json",
+      "extension": ".json",
+      "sizeBytes": 8043
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-holdout/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-holdout/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 5126
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-holdout/group-c4g-043aeb45a50adf964f89.json",
+      "extension": ".json",
+      "sizeBytes": 83150
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-holdout/group-c4g-9f35923d2fa109244435.json",
+      "extension": ".json",
+      "sizeBytes": 116307
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-holdout/group-c4g-c5a0b86e1ea4436ca9ce.json",
+      "extension": ".json",
+      "sizeBytes": 100396
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-holdout/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 6434
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-holdout/protocol-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/c4-peak-aligned-consensus-holdout/schema.json",
+      "extension": ".json",
+      "sizeBytes": 2027
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1-endpoint-closure/canonicalization-policy.md",
+      "extension": ".md",
+      "sizeBytes": 1046
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1-endpoint-closure/cases.json",
+      "extension": ".json",
+      "sizeBytes": 39831
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1-endpoint-closure/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1-endpoint-closure/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 757
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1-endpoint-closure/provenance.json",
+      "extension": ".json",
+      "sizeBytes": 44290
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1/cases.json",
+      "extension": ".json",
+      "sizeBytes": 3
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 1100
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 776
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1/provenance.json",
+      "extension": ".json",
+      "sizeBytes": 7230
+    },
+    {
+      "path": ".research-artifacts/fresh-real-corpus-v1/selection-protocol.md",
+      "extension": ".md",
+      "sizeBytes": 1056
+    },
+    {
+      "path": ".research-artifacts/objective-c2-huber-holdout-confirmation/aggregate-evidence.json",
+      "extension": ".json",
+      "sizeBytes": 278794
+    },
+    {
+      "path": ".research-artifacts/objective-c2-huber-holdout-confirmation/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/objective-c2-huber-holdout-confirmation/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 5591
+    },
+    {
+      "path": ".research-artifacts/objective-c2-huber-holdout-confirmation/loss-census/frc1.1-13-000225a01a6d.json",
+      "extension": ".json",
+      "sizeBytes": 1839618
+    },
+    {
+      "path": ".research-artifacts/objective-c2-huber-holdout-confirmation/loss-census/frc1.1-14-00025d5729a1.json",
+      "extension": ".json",
+      "sizeBytes": 5640031
+    },
+    {
+      "path": ".research-artifacts/objective-c2-huber-holdout-confirmation/loss-census/frc1.1-17-00036da52192.json",
+      "extension": ".json",
+      "sizeBytes": 7439683
+    },
+    {
+      "path": ".research-artifacts/objective-c2-huber-holdout-confirmation/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 4031
+    },
+    {
+      "path": ".research-artifacts/objective-c2-robust-loss-dev-census/aggregate-evidence.json",
+      "extension": ".json",
+      "sizeBytes": 186458
+    },
+    {
+      "path": ".research-artifacts/objective-c2-robust-loss-dev-census/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/objective-c2-robust-loss-dev-census/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 11145
+    },
+    {
+      "path": ".research-artifacts/objective-c2-robust-loss-dev-census/loss-census/frc1.1-07-0000c470a9b3.json",
+      "extension": ".json",
+      "sizeBytes": 3490707
+    },
+    {
+      "path": ".research-artifacts/objective-c2-robust-loss-dev-census/loss-census/frc1.1-08-0000f6762889.json",
+      "extension": ".json",
+      "sizeBytes": 4942818
+    },
+    {
+      "path": ".research-artifacts/objective-c2-robust-loss-dev-census/loss-census/frc1.1-11-000279686a75.json",
+      "extension": ".json",
+      "sizeBytes": 4425525
+    },
+    {
+      "path": ".research-artifacts/objective-c2-robust-loss-dev-census/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 3787
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/aggregate-evidence.json",
+      "extension": ".json",
+      "sizeBytes": 11411
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 3600
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/frontiers/frc1.1-03-00003906daac.json",
+      "extension": ".json",
+      "sizeBytes": 49796
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/frontiers/frc1.1-06-0000c6497763.json",
+      "extension": ".json",
+      "sizeBytes": 49762
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/frontiers/frc1.1-09-0001b6618e24.json",
+      "extension": ".json",
+      "sizeBytes": 46593
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/frontiers/frc1.1-10-00027122c3ce.json",
+      "extension": ".json",
+      "sizeBytes": 49870
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/frontiers/frc1.1-12-0002977aa8bc.json",
+      "extension": ".json",
+      "sizeBytes": 49385
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/frontiers/frc1.1-15-000323cd8787.json",
+      "extension": ".json",
+      "sizeBytes": 67805
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census-v1.2/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 4379
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census/corpus-inventory.json",
+      "extension": ".json",
+      "sizeBytes": 2924
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 1643
+    },
+    {
+      "path": ".research-artifacts/objective-c3-filter-knee-census/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 680
+    },
+    {
+      "path": ".research-artifacts/structural-search-m3-stagnation-census/aggregate.json",
+      "extension": ".json",
+      "sizeBytes": 89404
+    },
+    {
+      "path": ".research-artifacts/structural-search-m3-stagnation-census/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 5845
+    },
+    {
+      "path": ".research-artifacts/structural-search-m3-stagnation-census/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 1505
+    },
+    {
+      "path": ".research-artifacts/structural-search-m3-stagnation-census/summary.md",
+      "extension": ".md",
+      "sizeBytes": 853
+    },
+    {
+      "path": ".research-artifacts/structural-search-m3b-telemetry-fidelity/aggregate.json",
+      "extension": ".json",
+      "sizeBytes": 53833
+    },
+    {
+      "path": ".research-artifacts/structural-search-m3b-telemetry-fidelity/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 6414
+    },
+    {
+      "path": ".research-artifacts/structural-search-m3b-telemetry-fidelity/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 2157
+    },
+    {
+      "path": ".research-artifacts/structural-search-m3b-telemetry-fidelity/summary.md",
+      "extension": ".md",
+      "sizeBytes": 478
+    },
+    {
+      "path": ".research-artifacts/structural-search-m4-candidate-oracle-causal-closeout/aggregate-evidence.json",
+      "extension": ".json",
+      "sizeBytes": 48717
+    },
+    {
+      "path": ".research-artifacts/structural-search-m4-candidate-oracle-causal-closeout/candidate-win-audit.json",
+      "extension": ".json",
+      "sizeBytes": 293421
+    },
+    {
+      "path": ".research-artifacts/structural-search-m4-candidate-oracle-causal-closeout/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/structural-search-m4-candidate-oracle-causal-closeout/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 14316
+    },
+    {
+      "path": ".research-artifacts/structural-search-m4-candidate-oracle-causal-closeout/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 1330
+    },
+    {
+      "path": ".research-artifacts/structural-search-m4-candidate-oracle/aggregate-evidence.json",
+      "extension": ".json",
+      "sizeBytes": 43498
+    },
+    {
+      "path": ".research-artifacts/structural-search-m4-candidate-oracle/evidence-sha256.txt",
+      "extension": ".txt",
+      "sizeBytes": 65
+    },
+    {
+      "path": ".research-artifacts/structural-search-m4-candidate-oracle/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 11327
+    },
+    {
+      "path": ".research-artifacts/structural-search-m4-candidate-oracle/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 1330
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-closeout/evidence-index.json",
+      "extension": ".json",
+      "sizeBytes": 4413
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-closeout/final-report.md",
+      "extension": ".md",
+      "sizeBytes": 7836
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-closeout/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 1149
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m1/aggregate.json",
+      "extension": ".json",
+      "sizeBytes": 506625
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m1/algorithm-design.md",
+      "extension": ".md",
+      "sizeBytes": 902
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m1/benchmark-plan.md",
+      "extension": ".md",
+      "sizeBytes": 779
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m1/complexity-sanity.json",
+      "extension": ".json",
+      "sizeBytes": 17448
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m1/final-m1-report.md",
+      "extension": ".md",
+      "sizeBytes": 5644
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m1/known-unrelated-standard-v1-mismatch.md",
+      "extension": ".md",
+      "sizeBytes": 496
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m1/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 1105
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m1/quantized-delivery.json",
+      "extension": ".json",
+      "sizeBytes": 17865
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m1/summary.md",
+      "extension": ".md",
+      "sizeBytes": 19047
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m2-protected-progress/aggregate.json",
+      "extension": ".json",
+      "sizeBytes": 670283
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m2-protected-progress/complexity-sanity.json",
+      "extension": ".json",
+      "sizeBytes": 24953
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m2-protected-progress/final-m2-report.md",
+      "extension": ".md",
+      "sizeBytes": 10237
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m2-protected-progress/manifest.json",
+      "extension": ".json",
+      "sizeBytes": 1207
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m2-protected-progress/quantized-delivery.json",
+      "extension": ".json",
+      "sizeBytes": 3
+    },
+    {
+      "path": ".research-artifacts/structural-search-vnext-m2-protected-progress/summary.md",
+      "extension": ".md",
+      "sizeBytes": 19091
+    },
+    {
+      "path": "packages/core/.research-artifacts/capacity-pressure-20260913/factorized-oracle.jsonl",
+      "extension": ".jsonl",
+      "sizeBytes": 48527
+    },
+    {
+      "path": "packages/core/.research-artifacts/capacity-pressure-20260913/frontier-capacity-oracle.jsonl",
+      "extension": ".jsonl",
+      "sizeBytes": 16164
+    },
+    {
+      "path": "packages/core/.research-artifacts/capacity-pressure-20260913/full-capacity-oracle.jsonl",
+      "extension": ".jsonl",
+      "sizeBytes": 8994
+    },
+    {
+      "path": "packages/core/.research-artifacts/capacity-pressure-20260913/paired-oracle.jsonl",
+      "extension": ".jsonl",
+      "sizeBytes": 27008
+    },
+    {
+      "path": "packages/core/benchmarks/baseline-standard-v1.json",
+      "extension": ".json",
+      "sizeBytes": 8372
+    },
+    {
+      "path": "packages/core/benchmarks/cases.ts",
+      "extension": ".ts",
+      "sizeBytes": 2901
+    },
+    {
+      "path": "packages/core/benchmarks/manualRegressionScalability.ts",
+      "extension": ".ts",
+      "sizeBytes": 4168
+    },
+    {
+      "path": "packages/core/benchmarks/research/adaptiveSchedulerComparison.ts",
+      "extension": ".ts",
+      "sizeBytes": 22400
+    },
+    {
+      "path": "packages/core/benchmarks/research/aggregate.ts",
+      "extension": ".ts",
+      "sizeBytes": 3003
+    },
+    {
+      "path": "packages/core/benchmarks/research/baseline-standard-v2.json",
+      "extension": ".json",
+      "sizeBytes": 491445
+    },
+    {
+      "path": "packages/core/benchmarks/research/baseline.ts",
+      "extension": ".ts",
+      "sizeBytes": 6618
+    },
+    {
+      "path": "packages/core/benchmarks/research/c2HuberHoldoutConfirmation.ts",
+      "extension": ".ts",
+      "sizeBytes": 30418
+    },
+    {
+      "path": "packages/core/benchmarks/research/c2RobustLossDevCensus.ts",
+      "extension": ".ts",
+      "sizeBytes": 46261
+    },
+    {
+      "path": "packages/core/benchmarks/research/c3FilterKneeCensus.ts",
+      "extension": ".ts",
+      "sizeBytes": 51396
+    },
+    {
+      "path": "packages/core/benchmarks/research/campaignRunner.ts",
+      "extension": ".ts",
+      "sizeBytes": 12838
+    },
+    {
+      "path": "packages/core/benchmarks/research/corpus.ts",
+      "extension": ".ts",
+      "sizeBytes": 3275
+    },
+    {
+      "path": "packages/core/benchmarks/research/decisionOracle.ts",
+      "extension": ".ts",
+      "sizeBytes": 27882
+    },
+    {
+      "path": "packages/core/benchmarks/research/deliveredMetrics.ts",
+      "extension": ".ts",
+      "sizeBytes": 7550
+    },
+    {
+      "path": "packages/core/benchmarks/research/fixedCapacity.ts",
+      "extension": ".ts",
+      "sizeBytes": 10802
+    },
+    {
+      "path": "packages/core/benchmarks/research/fullCapacityDecisionStates.ts",
+      "extension": ".ts",
+      "sizeBytes": 6230
+    },
+    {
+      "path": "packages/core/benchmarks/research/manual-regression-baseline.json",
+      "extension": ".json",
+      "sizeBytes": 732
+    },
+    {
+      "path": "packages/core/benchmarks/research/manualRegression.ts",
+      "extension": ".ts",
+      "sizeBytes": 4120
+    },
+    {
+      "path": "packages/core/benchmarks/research/multiQuantum.ts",
+      "extension": ".ts",
+      "sizeBytes": 15288
+    },
+    {
+      "path": "packages/core/benchmarks/research/naturalDecisionStates.ts",
+      "extension": ".ts",
+      "sizeBytes": 4468
+    },
+    {
+      "path": "packages/core/benchmarks/research/naturalStructuralDemand.ts",
+      "extension": ".ts",
+      "sizeBytes": 21287
+    },
+    {
+      "path": "packages/core/benchmarks/research/raw/64-audio-trio.txt",
+      "extension": ".txt",
+      "sizeBytes": 17647
+    },
+    {
+      "path": "packages/core/benchmarks/research/raw/64-audio-u12t.txt",
+      "extension": ".txt",
+      "sizeBytes": 17779
+    },
+    {
+      "path": "packages/core/benchmarks/research/raw/dunu-titan-s2.txt",
+      "extension": ".txt",
+      "sizeBytes": 17563
+    },
+    {
+      "path": "packages/core/benchmarks/research/raw/manual/letshuoer-mystic-8.txt.br",
+      "extension": ".br",
+      "sizeBytes": 7225
+    },
+    {
+      "path": "packages/core/benchmarks/research/raw/manual/letshuoer-s12-ultra.txt.br",
+      "extension": ".br",
+      "sizeBytes": 7310
+    },
+    {
+      "path": "packages/core/benchmarks/research/raw/manual/softears-rsv.txt.br",
+      "extension": ".br",
+      "sizeBytes": 7307
+    },
+    {
+      "path": "packages/core/benchmarks/research/raw/subtonic-storm.txt",
+      "extension": ".txt",
+      "sizeBytes": 17755
+    },
+    {
+      "path": "packages/core/benchmarks/research/report.ts",
+      "extension": ".ts",
+      "sizeBytes": 7421
+    },
+    {
+      "path": "packages/core/benchmarks/research/resourceMonotoneSeeds/titan-to-rsv-max10-60s.json",
+      "extension": ".json",
+      "sizeBytes": 1641
+    },
+    {
+      "path": "packages/core/benchmarks/research/run.ts",
+      "extension": ".ts",
+      "sizeBytes": 17759
+    },
+    {
+      "path": "packages/core/benchmarks/research/structuralSearchVnext.ts",
+      "extension": ".ts",
+      "sizeBytes": 47829
+    },
+    {
+      "path": "packages/core/benchmarks/research/structuralSearchVnextM2.ts",
+      "extension": ".ts",
+      "sizeBytes": 46626
+    },
+    {
+      "path": "packages/core/benchmarks/research/structuralSearchVnextM3.ts",
+      "extension": ".ts",
+      "sizeBytes": 36236
+    },
+    {
+      "path": "packages/core/benchmarks/research/structuralSearchVnextM3b.ts",
+      "extension": ".ts",
+      "sizeBytes": 57261
+    },
+    {
+      "path": "packages/core/benchmarks/research/structuralSearchVnextM4.ts",
+      "extension": ".ts",
+      "sizeBytes": 81790
+    },
+    {
+      "path": "packages/core/benchmarks/research/syntheticCorpus.ts",
+      "extension": ".ts",
+      "sizeBytes": 7660
+    },
+    {
+      "path": "packages/core/benchmarks/research/telemetry.ts",
+      "extension": ".ts",
+      "sizeBytes": 4249
+    },
+    {
+      "path": "packages/core/benchmarks/research/timeline.ts",
+      "extension": ".ts",
+      "sizeBytes": 3296
+    },
+    {
+      "path": "packages/core/benchmarks/research/tools/freezeFreshRealCorpusV1.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 5394
+    },
+    {
+      "path": "packages/core/benchmarks/research/tools/freshRealCorpusV1.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 5082
+    },
+    {
+      "path": "packages/core/benchmarks/research/tools/freshRealCorpusV1.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 2845
+    },
+    {
+      "path": "packages/core/benchmarks/research/types.ts",
+      "extension": ".ts",
+      "sizeBytes": 5324
+    },
+    {
+      "path": "packages/core/benchmarks/run.ts",
+      "extension": ".ts",
+      "sizeBytes": 2572
+    },
+    {
+      "path": "packages/core/benchmarks/runV2.ts",
+      "extension": ".ts",
+      "sizeBytes": 4164
+    },
+    {
+      "path": "packages/core/benchmarks/structuralAnytimeMystic.ts",
+      "extension": ".ts",
+      "sizeBytes": 6570
+    },
+    {
+      "path": "packages/core/benchmarks/structuralPairAddOracle.ts",
+      "extension": ".ts",
+      "sizeBytes": 4699
+    },
+    {
+      "path": "packages/core/benchmarks/structuralScalabilityMatrix.ts",
+      "extension": ".ts",
+      "sizeBytes": 7269
+    },
+    {
+      "path": "packages/core/benchmarks/structuralScalabilityTrace.ts",
+      "extension": ".ts",
+      "sizeBytes": 3430
+    },
+    {
+      "path": "packages/core/benchmarks/structuralScalableCapacityLadder.ts",
+      "extension": ".ts",
+      "sizeBytes": 16484
+    },
+    {
+      "path": "packages/core/benchmarks/v2Cases.ts",
+      "extension": ".ts",
+      "sizeBytes": 3921
+    },
+    {
+      "path": "packages/core/benchmarks/v2HoldoutCases.ts",
+      "extension": ".ts",
+      "sizeBytes": 939
+    },
+    {
+      "path": "research/c1-confidence-causal-online/c1d.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 13178
+    },
+    {
+      "path": "research/c1-confidence-causal-online/c1d.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 3040
+    },
+    {
+      "path": "research/c1-confidence-causal-online/protocol.md",
+      "extension": ".md",
+      "sizeBytes": 1658
+    },
+    {
+      "path": "research/c1-confidence-targeting-dev/c1b.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 52882
+    },
+    {
+      "path": "research/c1-confidence-targeting-dev/c1b.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 11171
+    },
+    {
+      "path": "research/c1-confidence-targeting-dev/phase2-model.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 29865
+    },
+    {
+      "path": "research/c1-confidence-targeting-dev/phase2-model.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 6080
+    },
+    {
+      "path": "research/c1-confidence-targeting-dev/protocol.md",
+      "extension": ".md",
+      "sizeBytes": 6068
+    },
+    {
+      "path": "research/c1-confidence-targeting-dev/run-phase1.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 37114
+    },
+    {
+      "path": "research/c1-confidence-targeting-holdout/c1c.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 65021
+    },
+    {
+      "path": "research/c1-confidence-targeting-holdout/c1c.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 10612
+    },
+    {
+      "path": "research/c1-confidence-targeting-holdout/protocol.md",
+      "extension": ".md",
+      "sizeBytes": 10066
+    },
+    {
+      "path": "research/c1-cross-rig-confidence-corpus/c1a-v1.1.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 33254
+    },
+    {
+      "path": "research/c1-cross-rig-confidence-corpus/c1a-v1.1.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 4642
+    },
+    {
+      "path": "research/c1-cross-rig-confidence-corpus/c1a.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 57320
+    },
+    {
+      "path": "research/c1-cross-rig-confidence-corpus/c1a.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 11871
+    },
+    {
+      "path": "research/c1e-corpus-discovery/discover.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 47777
+    },
+    {
+      "path": "research/c1e-corpus-discovery/discover.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 8685
+    },
+    {
+      "path": "research/c1e-corpus-discovery/protocol.md",
+      "extension": ".md",
+      "sizeBytes": 8723
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-corpus/c4a.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 53501
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-corpus/c4a.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 14027
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-dev/c4b.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 46091
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-dev/c4b.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 11190
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-dev/protocol.md",
+      "extension": ".md",
+      "sizeBytes": 5110
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-dev/run-phase2.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 15871
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-holdout/c4c.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 16749
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-holdout/c4c.test.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 6431
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-holdout/protocol.md",
+      "extension": ".md",
+      "sizeBytes": 7365
+    },
+    {
+      "path": "research/c4-peak-aligned-consensus-holdout/run-phase2.mjs",
+      "extension": ".mjs",
+      "sizeBytes": 26261
+    }
+  ],
+  "accessedPaths": [
+    ".research-artifacts/c1-confidence-causal-online/invalidation-manifest.json",
+    ".research-artifacts/c1-confidence-causal-online/manifest.json",
+    ".research-artifacts/c1-confidence-targeting-dev/confidence-model.json",
+    ".research-artifacts/c1-confidence-targeting-dev/manifest.json",
+    ".research-artifacts/c1-confidence-targeting-holdout/manifest.json",
+    ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/groups.json",
+    ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/historical-device-exclusions.json",
+    "research/c1-confidence-causal-online/protocol.md",
+    "research/c1-confidence-targeting-dev/protocol.md",
+    "research/c1-confidence-targeting-holdout/protocol.md"
+  ],
+  "rejectedPaths": [
+    ".research-artifacts/fresh-real-corpus-v1-metadata-repair/cases.json",
+    ".research-artifacts/fresh-real-corpus-v1-metadata-repair/evidence-sha256.txt",
+    ".research-artifacts/fresh-real-corpus-v1-metadata-repair/manifest.json",
+    ".research-artifacts/fresh-real-corpus-v1-metadata-repair/metadata-resolution-policy.md",
+    ".research-artifacts/fresh-real-corpus-v1-metadata-repair/provenance.json"
+  ],
+  "batchCAccessAttempts": 0,
+  "batchCAccessed": false,
+  "c1dInvalidationClassification": "INCONCLUSIVE"
+}

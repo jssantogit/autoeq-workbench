@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "campaign": "C1e",
+  "baseCommit": "4e86e95ce09e0c8d149be3307d0fcfc2d3b40ff8",
+  "c1dFrozenProtocolCommit": "b5606dc7b3aa2dd3917af2be817ca98d24649907",
+  "c1dSupersededFreeze": "d371defd11dc7ce274b0a9d8daa3f3439757fd4f",
+  "confidenceModel": {
+    "path": ".research-artifacts/c1-confidence-targeting-dev/confidence-model.json",
+    "sha256": "65cc495bebdce148ab3aaf06186b6683213717235c71854314859aba99f92f00",
+    "expectedSha256": "65cc495bebdce148ab3aaf06186b6683213717235c71854314859aba99f92f00",
+    "hashVerified": true
+  },
+  "solverExecuted": false,
+  "causalOutcomesGenerated": false,
+  "confidenceTargetingMetricsComputed": false,
+  "confidenceWeightsUsedForSelection": false,
+  "responseAmplitudeUsedForSelection": false,
+  "batchCAccessed": false,
+  "batchCExecuted": false,
+  "modelRetrained": false,
+  "productionModified": false,
+  "c1dEvidenceReusedAsValidOutcome": false,
+  "batchCOverlapStatus": "VERIFIED_WITHOUT_BREAKING_SEAL",
+  "batchCIdentityArtifact": ".research-artifacts/c1-cross-rig-confidence-corpus-v1.1/historical-device-exclusions.json",
+  "readiness": "C1E_CORPUS_INSUFFICIENT",
+  "measurementRecordCount": 81,
+  "potentialSameIemGroupCount": 12,
+  "primaryReadyCount": 0,
+  "proposedPrimaryCount": 0,
+  "candidateClassificationCounts": {
+    "IDENTITY_AMBIGUOUS": 0,
+    "VARIANT_OR_REVISION_MISMATCH": 0,
+    "USED_FOR_MODEL_TRAINING": 6,
+    "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL": 6,
+    "USED_FOR_C1C_HOLDOUT": 0,
+    "DUPLICATE_PRIOR_C1_IDENTITY": 0,
+    "NO_EXACT711_REFERENCE": 0,
+    "NO_NON711_OBSERVATION": 0,
+    "UNKNOWN_RIG_CLASS": 0,
+    "INSUFFICIENT_LOCAL_RESPONSE_DATA": 0,
+    "PROVENANCE_INSUFFICIENT": 0,
+    "ELIGIBLE_STRUCTURAL_CANDIDATE": 0,
+    "DUPLICATE_CANDIDATE": 0,
+    "OTHER_INELIGIBLE": 0
+  },
+  "priorC1MembershipCounts": {
+    "USED_FOR_MODEL_TRAINING": 6,
+    "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL": 6,
+    "USED_FOR_C1C_HOLDOUT": 6
+  },
+  "evidenceMode": "STRUCTURAL_PROVENANCE_ONLY"
+}

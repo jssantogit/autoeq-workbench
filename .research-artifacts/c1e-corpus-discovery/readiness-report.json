@@ -1,0 +1,34 @@
+{
+  "classification": "C1E_CORPUS_INSUFFICIENT",
+  "primaryReadyCount": 0,
+  "requiredPrimaryCount": 6,
+  "distinctNon711RigClasses": [],
+  "batchCOverlapStatus": "VERIFIED_WITHOUT_BREAKING_SEAL",
+  "reasonCounts": {
+    "IDENTITY_AMBIGUOUS": 0,
+    "VARIANT_OR_REVISION_MISMATCH": 0,
+    "USED_FOR_MODEL_TRAINING": 6,
+    "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL": 6,
+    "USED_FOR_C1C_HOLDOUT": 0,
+    "DUPLICATE_PRIOR_C1_IDENTITY": 0,
+    "NO_EXACT711_REFERENCE": 0,
+    "NO_NON711_OBSERVATION": 0,
+    "UNKNOWN_RIG_CLASS": 0,
+    "INSUFFICIENT_LOCAL_RESPONSE_DATA": 0,
+    "PROVENANCE_INSUFFICIENT": 0,
+    "ELIGIBLE_STRUCTURAL_CANDIDATE": 0,
+    "DUPLICATE_CANDIDATE": 0,
+    "OTHER_INELIGIBLE": 0
+  },
+  "priorC1MembershipReasonCounts": {
+    "USED_FOR_MODEL_TRAINING": 6,
+    "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL": 6,
+    "USED_FOR_C1C_HOLDOUT": 6
+  },
+  "rigClassDistribution": {},
+  "profileCategoryDistribution": {},
+  "proposedPrimary": [],
+  "secondaryReserve": [],
+  "selectionOutcomeBlind": true,
+  "noCausalGateStarted": true
+}

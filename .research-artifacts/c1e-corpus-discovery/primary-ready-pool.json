@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "primaryReadyCandidates": [],
+  "proposedPrimary": [],
+  "secondaryReserve": [],
+  "selection": {
+    "algorithm": "greedy lexicographically-maximal marginal diversity tuple: new rig classes, new canonical families, new measurement sources, exact-711 repeat count; candidate ID ascending tie-break",
+    "outcomeBlind": true,
+    "confidenceWeightsUsed": false,
+    "disagreementMagnitudeUsed": false,
+    "responseAmplitudeUsed": false
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "classificationOrder": [
+    "IDENTITY_AMBIGUOUS",
+    "VARIANT_OR_REVISION_MISMATCH",
+    "USED_FOR_MODEL_TRAINING",
+    "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+    "USED_FOR_C1C_HOLDOUT",
+    "DUPLICATE_PRIOR_C1_IDENTITY",
+    "NO_EXACT711_REFERENCE",
+    "NO_NON711_OBSERVATION",
+    "UNKNOWN_RIG_CLASS",
+    "INSUFFICIENT_LOCAL_RESPONSE_DATA",
+    "PROVENANCE_INSUFFICIENT",
+    "ELIGIBLE_STRUCTURAL_CANDIDATE",
+    "DUPLICATE_CANDIDATE",
+    "OTHER_INELIGIBLE"
+  ],
+  "reasonCounts": {
+    "IDENTITY_AMBIGUOUS": 0,
+    "VARIANT_OR_REVISION_MISMATCH": 0,
+    "USED_FOR_MODEL_TRAINING": 6,
+    "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL": 6,
+    "USED_FOR_C1C_HOLDOUT": 0,
+    "DUPLICATE_PRIOR_C1_IDENTITY": 0,
+    "NO_EXACT711_REFERENCE": 0,
+    "NO_NON711_OBSERVATION": 0,
+    "UNKNOWN_RIG_CLASS": 0,
+    "INSUFFICIENT_LOCAL_RESPONSE_DATA": 0,
+    "PROVENANCE_INSUFFICIENT": 0,
+    "ELIGIBLE_STRUCTURAL_CANDIDATE": 0,
+    "DUPLICATE_CANDIDATE": 0,
+    "OTHER_INELIGIBLE": 0
+  },
+  "priorMembershipReasonCounts": {
+    "USED_FOR_MODEL_TRAINING": 6,
+    "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL": 6,
+    "USED_FOR_C1C_HOLDOUT": 6
+  },
+  "entries": [
+    {
+      "candidateId": "c1e-07f1fe6ff7d91b84bcc0",
+      "canonicalIdentity": "|moondrop x crinacle blessing2 dusk|moondrop x crinacle blessing2 dusk",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-37e8a4152a7dbb5242b5",
+      "canonicalIdentity": "|truthear hexa|truthear hexa",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-6073b6987f5c60526b03",
+      "canonicalIdentity": "|ikko oh10|ikko oh10",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-7b65f7b6139c1f9ed2ed",
+      "canonicalIdentity": "|kiwi ears ke4|kiwi ears ke4",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-8b067d67abbe43ede22b",
+      "canonicalIdentity": "|moondrop quarks|moondrop quarks",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-9266c9f91e10b16dbb6e",
+      "canonicalIdentity": "|7hz timeless|7hz timeless",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-9a22a477e5074ece83c4",
+      "canonicalIdentity": "|epz q5|epz q5",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-cca03874b5f73596b04b",
+      "canonicalIdentity": "|simgot audio ea500|simgot audio ea500 (black nozzle)",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-d9db96d850a66960fba6",
+      "canonicalIdentity": "|7hz salnotes zero|7hz salnotes zero",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-da0e0c823e4af7562aa8",
+      "canonicalIdentity": "|moondrop ssr|moondrop ssr",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-e09a6960c4ef79f95206",
+      "canonicalIdentity": "|truthear x crinacle zero|truthear x crinacle zero",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-ea4718ac853f13161233",
+      "canonicalIdentity": "|moondrop aria|moondrop aria",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    }
+  ]
+}

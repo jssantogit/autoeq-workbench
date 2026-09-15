@@ -1,0 +1,1745 @@
+{
+  "totalPotentialGroups": 12,
+  "candidates": [
+    {
+      "candidateId": "c1e-07f1fe6ff7d91b84bcc0",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "canonicalIdentity": "|moondrop x crinacle blessing2 dusk|moondrop x crinacle blessing2 dusk",
+      "canonicalFamily": "moondrop x crinacle blessing2 dusk",
+      "manufacturer": "",
+      "model": "moondrop x crinacle blessing2 dusk",
+      "aliases": [
+        " moondrop x crinacle blessing2 dusk",
+        "moondrop x crinacle blessing2 dusk"
+      ],
+      "exact711ObservationCount": 5,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "gras-43ac"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC"
+      ],
+      "exact711ObservationIds": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\""
+      ],
+      "non711ObservationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop x Crinacle Blessing2 Dusk\""
+      ],
+      "responsePaths": [
+        "measurements/Bakkwatan/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+        "measurements/Hi End Portable/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+        "measurements/Jaytiss/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+        "measurements/kr0mka/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+        "measurements/oratory1990/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+        "measurements/Super Review/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv"
+      ],
+      "provenanceSources": [
+        "Bakkwatan",
+        "Hi End Portable",
+        "Jaytiss",
+        "kr0mka",
+        "oratory1990",
+        "Super Review"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+          "sourceId": "Bakkwatan",
+          "collection": "Bakkwatan",
+          "path": "measurements/Bakkwatan/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+          "sourceId": "Hi End Portable",
+          "collection": "Hi End Portable",
+          "path": "measurements/Hi End Portable/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+          "sourceId": "Jaytiss",
+          "collection": "Jaytiss",
+          "path": "measurements/Jaytiss/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+          "sourceId": "kr0mka",
+          "collection": "kr0mka",
+          "path": "measurements/kr0mka/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+          "sourceId": "oratory1990",
+          "collection": "oratory1990",
+          "path": "measurements/oratory1990/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS 43AC",
+          "rigClass": "gras-43ac"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop x Crinacle Blessing2 Dusk\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/Moondrop x Crinacle Blessing2 Dusk.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 5,
+        "measurementSources": [
+          "Bakkwatan",
+          "Hi End Portable",
+          "Jaytiss",
+          "kr0mka",
+          "Super Review"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": true,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": false,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Bakkwatan",
+          "Hi End Portable",
+          "Jaytiss",
+          "kr0mka",
+          "oratory1990",
+          "Super Review"
+        ],
+        "familyIdentity": "moondrop x crinacle blessing2 dusk",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-37e8a4152a7dbb5242b5",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "canonicalIdentity": "|truthear hexa|truthear hexa",
+      "canonicalFamily": "truthear hexa",
+      "manufacturer": "",
+      "model": "truthear hexa",
+      "aliases": [
+        " truthear hexa",
+        "truthear hexa"
+      ],
+      "exact711ObservationCount": 7,
+      "non711ObservationCount": 2,
+      "non711RigClasses": [
+        "gras-43ac",
+        "gras-ra0045"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC",
+        "GLOBAL_FALLBACK"
+      ],
+      "exact711ObservationIds": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Truthear Hexa\""
+      ],
+      "non711ObservationIds": [
+        "\"HypetheSonics\"|\"in-ear\"|\"GRAS RA0045\"|\"Truthear Hexa\"",
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Truthear Hexa\""
+      ],
+      "responsePaths": [
+        "measurements/Bakkwatan/data/in-ear/Truthear Hexa.csv",
+        "measurements/Fahryst/data/in-ear/Truthear Hexa.csv",
+        "measurements/Filk/data/in-ear/Truthear Hexa.csv",
+        "measurements/Harpo/data/in-ear/Truthear Hexa.csv",
+        "measurements/HypetheSonics/data/in-ear/GRAS RA0045/Truthear Hexa.csv",
+        "measurements/Jaytiss/data/in-ear/Truthear Hexa.csv",
+        "measurements/kr0mka/data/in-ear/Truthear Hexa.csv",
+        "measurements/oratory1990/data/in-ear/Truthear Hexa.csv",
+        "measurements/Super Review/data/in-ear/Truthear Hexa.csv"
+      ],
+      "provenanceSources": [
+        "Bakkwatan",
+        "Fahryst",
+        "Filk",
+        "Harpo",
+        "HypetheSonics",
+        "Jaytiss",
+        "kr0mka",
+        "oratory1990",
+        "Super Review"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+          "sourceId": "Bakkwatan",
+          "collection": "Bakkwatan",
+          "path": "measurements/Bakkwatan/data/in-ear/Truthear Hexa.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+          "sourceId": "Fahryst",
+          "collection": "Fahryst",
+          "path": "measurements/Fahryst/data/in-ear/Truthear Hexa.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Filk\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+          "sourceId": "Filk",
+          "collection": "Filk",
+          "path": "measurements/Filk/data/in-ear/Truthear Hexa.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Harpo\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+          "sourceId": "Harpo",
+          "collection": "Harpo",
+          "path": "measurements/Harpo/data/in-ear/Truthear Hexa.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"HypetheSonics\"|\"in-ear\"|\"GRAS RA0045\"|\"Truthear Hexa\"",
+          "sourceId": "HypetheSonics",
+          "collection": "HypetheSonics",
+          "path": "measurements/HypetheSonics/data/in-ear/GRAS RA0045/Truthear Hexa.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS RA0045",
+          "rigClass": "gras-ra0045"
+        },
+        {
+          "observationId": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+          "sourceId": "Jaytiss",
+          "collection": "Jaytiss",
+          "path": "measurements/Jaytiss/data/in-ear/Truthear Hexa.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"kr0mka\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+          "sourceId": "kr0mka",
+          "collection": "kr0mka",
+          "path": "measurements/kr0mka/data/in-ear/Truthear Hexa.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Truthear Hexa\"",
+          "sourceId": "oratory1990",
+          "collection": "oratory1990",
+          "path": "measurements/oratory1990/data/in-ear/Truthear Hexa.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS 43AC",
+          "rigClass": "gras-43ac"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"Truthear Hexa\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/Truthear Hexa.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 7,
+        "measurementSources": [
+          "Bakkwatan",
+          "Fahryst",
+          "Filk",
+          "Harpo",
+          "Jaytiss",
+          "kr0mka",
+          "Super Review"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": false,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": true,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Bakkwatan",
+          "Fahryst",
+          "Filk",
+          "Harpo",
+          "HypetheSonics",
+          "Jaytiss",
+          "kr0mka",
+          "oratory1990",
+          "Super Review"
+        ],
+        "familyIdentity": "truthear hexa",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-6073b6987f5c60526b03",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "canonicalIdentity": "|ikko oh10|ikko oh10",
+      "canonicalFamily": "ikko oh10",
+      "manufacturer": "",
+      "model": "ikko oh10",
+      "aliases": [
+        " ikko oh10",
+        "ikko oh10"
+      ],
+      "exact711ObservationCount": 6,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "gras-43ac"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC"
+      ],
+      "exact711ObservationIds": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"IKKO OH10\""
+      ],
+      "non711ObservationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"IKKO OH10\""
+      ],
+      "responsePaths": [
+        "measurements/Fahryst/data/in-ear/IKKO OH10.csv",
+        "measurements/Harpo/data/in-ear/IKKO OH10.csv",
+        "measurements/Hi End Portable/data/in-ear/IKKO OH10.csv",
+        "measurements/oratory1990/data/in-ear/IKKO OH10.csv",
+        "measurements/RikudouGoku/data/in-ear/IKKO OH10.csv",
+        "measurements/Super Review/data/in-ear/IKKO OH10.csv",
+        "measurements/ToneDeafMonk/data/in-ear/IKKO OH10.csv"
+      ],
+      "provenanceSources": [
+        "Fahryst",
+        "Harpo",
+        "Hi End Portable",
+        "oratory1990",
+        "RikudouGoku",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Fahryst\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+          "sourceId": "Fahryst",
+          "collection": "Fahryst",
+          "path": "measurements/Fahryst/data/in-ear/IKKO OH10.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Harpo\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+          "sourceId": "Harpo",
+          "collection": "Harpo",
+          "path": "measurements/Harpo/data/in-ear/IKKO OH10.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+          "sourceId": "Hi End Portable",
+          "collection": "Hi End Portable",
+          "path": "measurements/Hi End Portable/data/in-ear/IKKO OH10.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"IKKO OH10\"",
+          "sourceId": "oratory1990",
+          "collection": "oratory1990",
+          "path": "measurements/oratory1990/data/in-ear/IKKO OH10.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS 43AC",
+          "rigClass": "gras-43ac"
+        },
+        {
+          "observationId": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+          "sourceId": "RikudouGoku",
+          "collection": "RikudouGoku",
+          "path": "measurements/RikudouGoku/data/in-ear/IKKO OH10.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/IKKO OH10.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"IKKO OH10\"",
+          "sourceId": "ToneDeafMonk",
+          "collection": "ToneDeafMonk",
+          "path": "measurements/ToneDeafMonk/data/in-ear/IKKO OH10.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 6,
+        "measurementSources": [
+          "Fahryst",
+          "Harpo",
+          "Hi End Portable",
+          "RikudouGoku",
+          "Super Review",
+          "ToneDeafMonk"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": true,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": false,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Fahryst",
+          "Harpo",
+          "Hi End Portable",
+          "oratory1990",
+          "RikudouGoku",
+          "Super Review",
+          "ToneDeafMonk"
+        ],
+        "familyIdentity": "ikko oh10",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-7b65f7b6139c1f9ed2ed",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "canonicalIdentity": "|kiwi ears ke4|kiwi ears ke4",
+      "canonicalFamily": "kiwi ears ke4",
+      "manufacturer": "",
+      "model": "kiwi ears ke4",
+      "aliases": [
+        " kiwi ears ke4",
+        "kiwi ears ke4"
+      ],
+      "exact711ObservationCount": 5,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "kb501x-711"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC"
+      ],
+      "exact711ObservationIds": [
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\""
+      ],
+      "non711ObservationIds": [
+        "\"Auriculares Argentina\"|\"in-ear\"|\"KB501x + 711\"|\"Kiwi Ears KE4\""
+      ],
+      "responsePaths": [
+        "measurements/Auriculares Argentina/data/in-ear/Kiwi Ears KE4.csv",
+        "measurements/Filk/data/in-ear/Kiwi Ears KE4.csv",
+        "measurements/Hi End Portable/data/in-ear/Kiwi Ears KE4.csv",
+        "measurements/Jaytiss/data/in-ear/Kiwi Ears KE4.csv",
+        "measurements/Kazi/data/in-ear/Kiwi Ears KE4.csv",
+        "measurements/Super Review/data/in-ear/Kiwi Ears KE4.csv"
+      ],
+      "provenanceSources": [
+        "Auriculares Argentina",
+        "Filk",
+        "Hi End Portable",
+        "Jaytiss",
+        "Kazi",
+        "Super Review"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Auriculares Argentina\"|\"in-ear\"|\"KB501x + 711\"|\"Kiwi Ears KE4\"",
+          "sourceId": "Auriculares Argentina",
+          "collection": "Auriculares Argentina",
+          "path": "measurements/Auriculares Argentina/data/in-ear/Kiwi Ears KE4.csv",
+          "sourceUrl": null,
+          "rawRig": "KB501x + 711",
+          "rigClass": "kb501x-711"
+        },
+        {
+          "observationId": "\"Filk\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\"",
+          "sourceId": "Filk",
+          "collection": "Filk",
+          "path": "measurements/Filk/data/in-ear/Kiwi Ears KE4.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\"",
+          "sourceId": "Hi End Portable",
+          "collection": "Hi End Portable",
+          "path": "measurements/Hi End Portable/data/in-ear/Kiwi Ears KE4.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\"",
+          "sourceId": "Jaytiss",
+          "collection": "Jaytiss",
+          "path": "measurements/Jaytiss/data/in-ear/Kiwi Ears KE4.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\"",
+          "sourceId": "Kazi",
+          "collection": "Kazi",
+          "path": "measurements/Kazi/data/in-ear/Kiwi Ears KE4.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears KE4\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/Kiwi Ears KE4.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 5,
+        "measurementSources": [
+          "Filk",
+          "Hi End Portable",
+          "Jaytiss",
+          "Kazi",
+          "Super Review"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": true,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": false,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Auriculares Argentina",
+          "Filk",
+          "Hi End Portable",
+          "Jaytiss",
+          "Kazi",
+          "Super Review"
+        ],
+        "familyIdentity": "kiwi ears ke4",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-8b067d67abbe43ede22b",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "canonicalIdentity": "|moondrop quarks|moondrop quarks",
+      "canonicalFamily": "moondrop quarks",
+      "manufacturer": "",
+      "model": "moondrop quarks",
+      "aliases": [
+        " moondrop quarks",
+        "moondrop quarks"
+      ],
+      "exact711ObservationCount": 5,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "gras-43ac"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC"
+      ],
+      "exact711ObservationIds": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\"",
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\"",
+        "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\""
+      ],
+      "non711ObservationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop Quarks\""
+      ],
+      "responsePaths": [
+        "measurements/Fahryst/data/in-ear/Moondrop Quarks.csv",
+        "measurements/freeryder05/data/in-ear/Moondrop Quarks.csv",
+        "measurements/oratory1990/data/in-ear/Moondrop Quarks.csv",
+        "measurements/RikudouGoku/data/in-ear/Moondrop Quarks.csv",
+        "measurements/Super Review/data/in-ear/Moondrop Quarks.csv",
+        "measurements/Ted's Squig Hoard/data/in-ear/Moondrop Quarks.csv"
+      ],
+      "provenanceSources": [
+        "Fahryst",
+        "freeryder05",
+        "oratory1990",
+        "RikudouGoku",
+        "Super Review",
+        "Ted's Squig Hoard"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\"",
+          "sourceId": "Fahryst",
+          "collection": "Fahryst",
+          "path": "measurements/Fahryst/data/in-ear/Moondrop Quarks.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\"",
+          "sourceId": "freeryder05",
+          "collection": "freeryder05",
+          "path": "measurements/freeryder05/data/in-ear/Moondrop Quarks.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop Quarks\"",
+          "sourceId": "oratory1990",
+          "collection": "oratory1990",
+          "path": "measurements/oratory1990/data/in-ear/Moondrop Quarks.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS 43AC",
+          "rigClass": "gras-43ac"
+        },
+        {
+          "observationId": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\"",
+          "sourceId": "RikudouGoku",
+          "collection": "RikudouGoku",
+          "path": "measurements/RikudouGoku/data/in-ear/Moondrop Quarks.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/Moondrop Quarks.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Quarks\"",
+          "sourceId": "Ted's Squig Hoard",
+          "collection": "Ted's Squig Hoard",
+          "path": "measurements/Ted's Squig Hoard/data/in-ear/Moondrop Quarks.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 5,
+        "measurementSources": [
+          "Fahryst",
+          "freeryder05",
+          "RikudouGoku",
+          "Super Review",
+          "Ted's Squig Hoard"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": false,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": true,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Fahryst",
+          "freeryder05",
+          "oratory1990",
+          "RikudouGoku",
+          "Super Review",
+          "Ted's Squig Hoard"
+        ],
+        "familyIdentity": "moondrop quarks",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-9266c9f91e10b16dbb6e",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "canonicalIdentity": "|7hz timeless|7hz timeless",
+      "canonicalFamily": "7hz timeless",
+      "manufacturer": "",
+      "model": "7hz timeless",
+      "aliases": [
+        " 7hz timeless",
+        "7hz timeless"
+      ],
+      "exact711ObservationCount": 6,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "gras-43ac"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC"
+      ],
+      "exact711ObservationIds": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+        "\"Filk\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"7Hz Timeless\""
+      ],
+      "non711ObservationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"7Hz Timeless\""
+      ],
+      "responsePaths": [
+        "measurements/Fahryst/data/in-ear/7Hz Timeless.csv",
+        "measurements/Filk/data/in-ear/7Hz Timeless.csv",
+        "measurements/Harpo/data/in-ear/7Hz Timeless.csv",
+        "measurements/kr0mka/data/in-ear/7Hz Timeless.csv",
+        "measurements/oratory1990/data/in-ear/7Hz Timeless.csv",
+        "measurements/RikudouGoku/data/in-ear/7Hz Timeless.csv",
+        "measurements/Super Review/data/in-ear/7Hz Timeless.csv"
+      ],
+      "provenanceSources": [
+        "Fahryst",
+        "Filk",
+        "Harpo",
+        "kr0mka",
+        "oratory1990",
+        "RikudouGoku",
+        "Super Review"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Fahryst\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+          "sourceId": "Fahryst",
+          "collection": "Fahryst",
+          "path": "measurements/Fahryst/data/in-ear/7Hz Timeless.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Filk\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+          "sourceId": "Filk",
+          "collection": "Filk",
+          "path": "measurements/Filk/data/in-ear/7Hz Timeless.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Harpo\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+          "sourceId": "Harpo",
+          "collection": "Harpo",
+          "path": "measurements/Harpo/data/in-ear/7Hz Timeless.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"kr0mka\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+          "sourceId": "kr0mka",
+          "collection": "kr0mka",
+          "path": "measurements/kr0mka/data/in-ear/7Hz Timeless.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"7Hz Timeless\"",
+          "sourceId": "oratory1990",
+          "collection": "oratory1990",
+          "path": "measurements/oratory1990/data/in-ear/7Hz Timeless.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS 43AC",
+          "rigClass": "gras-43ac"
+        },
+        {
+          "observationId": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+          "sourceId": "RikudouGoku",
+          "collection": "RikudouGoku",
+          "path": "measurements/RikudouGoku/data/in-ear/7Hz Timeless.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"7Hz Timeless\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/7Hz Timeless.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 6,
+        "measurementSources": [
+          "Fahryst",
+          "Filk",
+          "Harpo",
+          "kr0mka",
+          "RikudouGoku",
+          "Super Review"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": false,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": true,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Fahryst",
+          "Filk",
+          "Harpo",
+          "kr0mka",
+          "oratory1990",
+          "RikudouGoku",
+          "Super Review"
+        ],
+        "familyIdentity": "7hz timeless",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-9a22a477e5074ece83c4",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "canonicalIdentity": "|epz q5|epz q5",
+      "canonicalFamily": "epz q5",
+      "manufacturer": "",
+      "model": "epz q5",
+      "aliases": [
+        " epz q5",
+        "epz q5"
+      ],
+      "exact711ObservationCount": 6,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "kb501x-711"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC"
+      ],
+      "exact711ObservationIds": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+        "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+        "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"EPZ Q5\""
+      ],
+      "non711ObservationIds": [
+        "\"Auriculares Argentina\"|\"in-ear\"|\"KB501x + 711\"|\"EPZ Q5\""
+      ],
+      "responsePaths": [
+        "measurements/Auriculares Argentina/data/in-ear/EPZ Q5.csv",
+        "measurements/Fahryst/data/in-ear/EPZ Q5.csv",
+        "measurements/Hi End Portable/data/in-ear/EPZ Q5.csv",
+        "measurements/Jaytiss/data/in-ear/EPZ Q5.csv",
+        "measurements/Regan Cipher/data/in-ear/EPZ Q5.csv",
+        "measurements/Super Review/data/in-ear/EPZ Q5.csv",
+        "measurements/ToneDeafMonk/data/in-ear/EPZ Q5.csv"
+      ],
+      "provenanceSources": [
+        "Auriculares Argentina",
+        "Fahryst",
+        "Hi End Portable",
+        "Jaytiss",
+        "Regan Cipher",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Auriculares Argentina\"|\"in-ear\"|\"KB501x + 711\"|\"EPZ Q5\"",
+          "sourceId": "Auriculares Argentina",
+          "collection": "Auriculares Argentina",
+          "path": "measurements/Auriculares Argentina/data/in-ear/EPZ Q5.csv",
+          "sourceUrl": null,
+          "rawRig": "KB501x + 711",
+          "rigClass": "kb501x-711"
+        },
+        {
+          "observationId": "\"Fahryst\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+          "sourceId": "Fahryst",
+          "collection": "Fahryst",
+          "path": "measurements/Fahryst/data/in-ear/EPZ Q5.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+          "sourceId": "Hi End Portable",
+          "collection": "Hi End Portable",
+          "path": "measurements/Hi End Portable/data/in-ear/EPZ Q5.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+          "sourceId": "Jaytiss",
+          "collection": "Jaytiss",
+          "path": "measurements/Jaytiss/data/in-ear/EPZ Q5.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+          "sourceId": "Regan Cipher",
+          "collection": "Regan Cipher",
+          "path": "measurements/Regan Cipher/data/in-ear/EPZ Q5.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/EPZ Q5.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"EPZ Q5\"",
+          "sourceId": "ToneDeafMonk",
+          "collection": "ToneDeafMonk",
+          "path": "measurements/ToneDeafMonk/data/in-ear/EPZ Q5.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 6,
+        "measurementSources": [
+          "Fahryst",
+          "Hi End Portable",
+          "Jaytiss",
+          "Regan Cipher",
+          "Super Review",
+          "ToneDeafMonk"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": false,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": true,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Auriculares Argentina",
+          "Fahryst",
+          "Hi End Portable",
+          "Jaytiss",
+          "Regan Cipher",
+          "Super Review",
+          "ToneDeafMonk"
+        ],
+        "familyIdentity": "epz q5",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-cca03874b5f73596b04b",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "canonicalIdentity": "|simgot audio ea500|simgot audio ea500 (black nozzle)",
+      "canonicalFamily": "simgot audio ea500",
+      "manufacturer": "",
+      "model": "simgot audio ea500 black nozzle",
+      "aliases": [
+        " simgot audio ea500",
+        " simgot audio ea500 black nozzle",
+        "simgot audio ea500",
+        "simgot audio ea500 black nozzle"
+      ],
+      "exact711ObservationCount": 5,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "kb501x-711"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC"
+      ],
+      "exact711ObservationIds": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\"",
+        "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\"",
+        "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\""
+      ],
+      "non711ObservationIds": [
+        "\"Auriculares Argentina\"|\"in-ear\"|\"KB501x + 711\"|\"Simgot Audio EA500 (black nozzle)\""
+      ],
+      "responsePaths": [
+        "measurements/Auriculares Argentina/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+        "measurements/Fahryst/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+        "measurements/Hi End Portable/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+        "measurements/Kazi/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+        "measurements/RikudouGoku/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+        "measurements/Super Review/data/in-ear/Simgot Audio EA500 (black nozzle).csv"
+      ],
+      "provenanceSources": [
+        "Auriculares Argentina",
+        "Fahryst",
+        "Hi End Portable",
+        "Kazi",
+        "RikudouGoku",
+        "Super Review"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Auriculares Argentina\"|\"in-ear\"|\"KB501x + 711\"|\"Simgot Audio EA500 (black nozzle)\"",
+          "sourceId": "Auriculares Argentina",
+          "collection": "Auriculares Argentina",
+          "path": "measurements/Auriculares Argentina/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+          "sourceUrl": null,
+          "rawRig": "KB501x + 711",
+          "rigClass": "kb501x-711"
+        },
+        {
+          "observationId": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\"",
+          "sourceId": "Fahryst",
+          "collection": "Fahryst",
+          "path": "measurements/Fahryst/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\"",
+          "sourceId": "Hi End Portable",
+          "collection": "Hi End Portable",
+          "path": "measurements/Hi End Portable/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\"",
+          "sourceId": "Kazi",
+          "collection": "Kazi",
+          "path": "measurements/Kazi/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\"",
+          "sourceId": "RikudouGoku",
+          "collection": "RikudouGoku",
+          "path": "measurements/RikudouGoku/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"Simgot Audio EA500 (black nozzle)\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/Simgot Audio EA500 (black nozzle).csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 5,
+        "measurementSources": [
+          "Fahryst",
+          "Hi End Portable",
+          "Kazi",
+          "RikudouGoku",
+          "Super Review"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": true,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": false,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Auriculares Argentina",
+          "Fahryst",
+          "Hi End Portable",
+          "Kazi",
+          "RikudouGoku",
+          "Super Review"
+        ],
+        "familyIdentity": "simgot audio ea500",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-d9db96d850a66960fba6",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "canonicalIdentity": "|7hz salnotes zero|7hz salnotes zero",
+      "canonicalFamily": "7hz salnotes zero",
+      "manufacturer": "",
+      "model": "7hz salnotes zero",
+      "aliases": [
+        " 7hz salnotes zero",
+        "7hz salnotes zero"
+      ],
+      "exact711ObservationCount": 7,
+      "non711ObservationCount": 2,
+      "non711RigClasses": [
+        "gras-43ac",
+        "gras-ra0045"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC",
+        "GLOBAL_FALLBACK"
+      ],
+      "exact711ObservationIds": [
+        "\"Auriculares Argentina\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+        "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\""
+      ],
+      "non711ObservationIds": [
+        "\"HypetheSonics\"|\"in-ear\"|\"GRAS RA0045\"|\"7Hz Salnotes Zero\"",
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"7Hz Salnotes Zero\""
+      ],
+      "responsePaths": [
+        "measurements/Auriculares Argentina/data/in-ear/7Hz Salnotes Zero.csv",
+        "measurements/Fahryst/data/in-ear/7Hz Salnotes Zero.csv",
+        "measurements/freeryder05/data/in-ear/7Hz Salnotes Zero.csv",
+        "measurements/Harpo/data/in-ear/7Hz Salnotes Zero.csv",
+        "measurements/HypetheSonics/data/in-ear/GRAS RA0045/7Hz Salnotes Zero.csv",
+        "measurements/Jaytiss/data/in-ear/7Hz Salnotes Zero.csv",
+        "measurements/oratory1990/data/in-ear/7Hz Salnotes Zero.csv",
+        "measurements/Super Review/data/in-ear/7Hz Salnotes Zero.csv",
+        "measurements/Ted's Squig Hoard/data/in-ear/7Hz Salnotes Zero.csv"
+      ],
+      "provenanceSources": [
+        "Auriculares Argentina",
+        "Fahryst",
+        "freeryder05",
+        "Harpo",
+        "HypetheSonics",
+        "Jaytiss",
+        "oratory1990",
+        "Super Review",
+        "Ted's Squig Hoard"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Auriculares Argentina\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+          "sourceId": "Auriculares Argentina",
+          "collection": "Auriculares Argentina",
+          "path": "measurements/Auriculares Argentina/data/in-ear/7Hz Salnotes Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Fahryst\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+          "sourceId": "Fahryst",
+          "collection": "Fahryst",
+          "path": "measurements/Fahryst/data/in-ear/7Hz Salnotes Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"freeryder05\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+          "sourceId": "freeryder05",
+          "collection": "freeryder05",
+          "path": "measurements/freeryder05/data/in-ear/7Hz Salnotes Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Harpo\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+          "sourceId": "Harpo",
+          "collection": "Harpo",
+          "path": "measurements/Harpo/data/in-ear/7Hz Salnotes Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"HypetheSonics\"|\"in-ear\"|\"GRAS RA0045\"|\"7Hz Salnotes Zero\"",
+          "sourceId": "HypetheSonics",
+          "collection": "HypetheSonics",
+          "path": "measurements/HypetheSonics/data/in-ear/GRAS RA0045/7Hz Salnotes Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS RA0045",
+          "rigClass": "gras-ra0045"
+        },
+        {
+          "observationId": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+          "sourceId": "Jaytiss",
+          "collection": "Jaytiss",
+          "path": "measurements/Jaytiss/data/in-ear/7Hz Salnotes Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"7Hz Salnotes Zero\"",
+          "sourceId": "oratory1990",
+          "collection": "oratory1990",
+          "path": "measurements/oratory1990/data/in-ear/7Hz Salnotes Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS 43AC",
+          "rigClass": "gras-43ac"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/7Hz Salnotes Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"7Hz Salnotes Zero\"",
+          "sourceId": "Ted's Squig Hoard",
+          "collection": "Ted's Squig Hoard",
+          "path": "measurements/Ted's Squig Hoard/data/in-ear/7Hz Salnotes Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 7,
+        "measurementSources": [
+          "Auriculares Argentina",
+          "Fahryst",
+          "freeryder05",
+          "Harpo",
+          "Jaytiss",
+          "Super Review",
+          "Ted's Squig Hoard"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": false,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": true,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Auriculares Argentina",
+          "Fahryst",
+          "freeryder05",
+          "Harpo",
+          "HypetheSonics",
+          "Jaytiss",
+          "oratory1990",
+          "Super Review",
+          "Ted's Squig Hoard"
+        ],
+        "familyIdentity": "7hz salnotes zero",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    },
+    {
+      "candidateId": "c1e-da0e0c823e4af7562aa8",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "canonicalIdentity": "|moondrop ssr|moondrop ssr",
+      "canonicalFamily": "moondrop ssr",
+      "manufacturer": "",
+      "model": "moondrop ssr",
+      "aliases": [
+        " moondrop ssr",
+        "moondrop ssr"
+      ],
+      "exact711ObservationCount": 5,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "gras-ra0045"
+      ],
+      "profileCategories": [
+        "GLOBAL_FALLBACK"
+      ],
+      "exact711ObservationIds": [
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop SSR\"",
+        "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop SSR\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop SSR\"",
+        "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Moondrop SSR\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop SSR\""
+      ],
+      "non711ObservationIds": [
+        "\"HypetheSonics\"|\"in-ear\"|\"GRAS RA0045\"|\"Moondrop SSR\""
+      ],
+      "responsePaths": [
+        "measurements/Filk/data/in-ear/Moondrop SSR.csv",
+        "measurements/freeryder05/data/in-ear/Moondrop SSR.csv",
+        "measurements/Harpo/data/in-ear/Moondrop SSR.csv",
+        "measurements/Hi End Portable/data/in-ear/Moondrop SSR.csv",
+        "measurements/HypetheSonics/data/in-ear/GRAS RA0045/Moondrop SSR.csv",
+        "measurements/Super Review/data/in-ear/Moondrop SSR.csv"
+      ],
+      "provenanceSources": [
+        "Filk",
+        "freeryder05",
+        "Harpo",
+        "Hi End Portable",
+        "HypetheSonics",
+        "Super Review"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop SSR\"",
+          "sourceId": "Filk",
+          "collection": "Filk",
+          "path": "measurements/Filk/data/in-ear/Moondrop SSR.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop SSR\"",
+          "sourceId": "freeryder05",
+          "collection": "freeryder05",
+          "path": "measurements/freeryder05/data/in-ear/Moondrop SSR.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop SSR\"",
+          "sourceId": "Harpo",
+          "collection": "Harpo",
+          "path": "measurements/Harpo/data/in-ear/Moondrop SSR.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Moondrop SSR\"",
+          "sourceId": "Hi End Portable",
+          "collection": "Hi End Portable",
+          "path": "measurements/Hi End Portable/data/in-ear/Moondrop SSR.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"HypetheSonics\"|\"in-ear\"|\"GRAS RA0045\"|\"Moondrop SSR\"",
+          "sourceId": "HypetheSonics",
+          "collection": "HypetheSonics",
+          "path": "measurements/HypetheSonics/data/in-ear/GRAS RA0045/Moondrop SSR.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS RA0045",
+          "rigClass": "gras-ra0045"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop SSR\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/Moondrop SSR.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 5,
+        "measurementSources": [
+          "Filk",
+          "freeryder05",
+          "Harpo",
+          "Hi End Portable",
+          "Super Review"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": true,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": false,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Filk",
+          "freeryder05",
+          "Harpo",
+          "Hi End Portable",
+          "HypetheSonics",
+          "Super Review"
+        ],
+        "familyIdentity": "moondrop ssr",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-e09a6960c4ef79f95206",
+      "classification": "USED_FOR_MODEL_TRAINING",
+      "canonicalIdentity": "|truthear x crinacle zero|truthear x crinacle zero",
+      "canonicalFamily": "truthear x crinacle zero",
+      "manufacturer": "",
+      "model": "truthear x crinacle zero",
+      "aliases": [
+        " truthear x crinacle zero",
+        "truthear x crinacle zero"
+      ],
+      "exact711ObservationCount": 5,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "gras-43acb"
+      ],
+      "profileCategories": [
+        "GLOBAL_FALLBACK"
+      ],
+      "exact711ObservationIds": [
+        "\"Fahryst\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\"",
+        "\"Filk\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\""
+      ],
+      "non711ObservationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43ACB\"|\"Truthear x Crinacle Zero\""
+      ],
+      "responsePaths": [
+        "measurements/Fahryst/data/in-ear/Truthear x Crinacle Zero.csv",
+        "measurements/Filk/data/in-ear/Truthear x Crinacle Zero.csv",
+        "measurements/Harpo/data/in-ear/Truthear x Crinacle Zero.csv",
+        "measurements/kr0mka/data/in-ear/Truthear x Crinacle Zero.csv",
+        "measurements/oratory1990/data/in-ear/Truthear x Crinacle Zero.csv",
+        "measurements/Super Review/data/in-ear/Truthear x Crinacle Zero.csv"
+      ],
+      "provenanceSources": [
+        "Fahryst",
+        "Filk",
+        "Harpo",
+        "kr0mka",
+        "oratory1990",
+        "Super Review"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\"",
+          "sourceId": "Fahryst",
+          "collection": "Fahryst",
+          "path": "measurements/Fahryst/data/in-ear/Truthear x Crinacle Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Filk\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\"",
+          "sourceId": "Filk",
+          "collection": "Filk",
+          "path": "measurements/Filk/data/in-ear/Truthear x Crinacle Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Harpo\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\"",
+          "sourceId": "Harpo",
+          "collection": "Harpo",
+          "path": "measurements/Harpo/data/in-ear/Truthear x Crinacle Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"kr0mka\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\"",
+          "sourceId": "kr0mka",
+          "collection": "kr0mka",
+          "path": "measurements/kr0mka/data/in-ear/Truthear x Crinacle Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"oratory1990\"|\"in-ear\"|\"GRAS 43ACB\"|\"Truthear x Crinacle Zero\"",
+          "sourceId": "oratory1990",
+          "collection": "oratory1990",
+          "path": "measurements/oratory1990/data/in-ear/Truthear x Crinacle Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS 43ACB",
+          "rigClass": "gras-43acb"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/Truthear x Crinacle Zero.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 5,
+        "measurementSources": [
+          "Fahryst",
+          "Filk",
+          "Harpo",
+          "kr0mka",
+          "Super Review"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": true,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": false,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Fahryst",
+          "Filk",
+          "Harpo",
+          "kr0mka",
+          "oratory1990",
+          "Super Review"
+        ],
+        "familyIdentity": "truthear x crinacle zero",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "USED_FOR_MODEL_TRAINING"
+      ]
+    },
+    {
+      "candidateId": "c1e-ea4718ac853f13161233",
+      "classification": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "canonicalIdentity": "|moondrop aria|moondrop aria",
+      "canonicalFamily": "moondrop aria",
+      "manufacturer": "",
+      "model": "moondrop aria",
+      "aliases": [
+        " moondrop aria",
+        "moondrop aria"
+      ],
+      "exact711ObservationCount": 5,
+      "non711ObservationCount": 1,
+      "non711RigClasses": [
+        "gras-43ac"
+      ],
+      "profileCategories": [
+        "CLASS_SPECIFIC"
+      ],
+      "exact711ObservationIds": [
+        "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"Moondrop Aria\"",
+        "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Aria\"",
+        "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Moondrop Aria\"",
+        "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Aria\"",
+        "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Aria\""
+      ],
+      "non711ObservationIds": [
+        "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop Aria\""
+      ],
+      "responsePaths": [
+        "measurements/Bakkwatan/data/in-ear/Moondrop Aria.csv",
+        "measurements/Harpo/data/in-ear/Moondrop Aria.csv",
+        "measurements/Jaytiss/data/in-ear/Moondrop Aria.csv",
+        "measurements/kr0mka/data/in-ear/Moondrop Aria.csv",
+        "measurements/oratory1990/data/in-ear/Moondrop Aria.csv",
+        "measurements/Super Review/data/in-ear/Moondrop Aria.csv"
+      ],
+      "provenanceSources": [
+        "Bakkwatan",
+        "Harpo",
+        "Jaytiss",
+        "kr0mka",
+        "oratory1990",
+        "Super Review"
+      ],
+      "provenance": [
+        {
+          "observationId": "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"Moondrop Aria\"",
+          "sourceId": "Bakkwatan",
+          "collection": "Bakkwatan",
+          "path": "measurements/Bakkwatan/data/in-ear/Moondrop Aria.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Aria\"",
+          "sourceId": "Harpo",
+          "collection": "Harpo",
+          "path": "measurements/Harpo/data/in-ear/Moondrop Aria.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Moondrop Aria\"",
+          "sourceId": "Jaytiss",
+          "collection": "Jaytiss",
+          "path": "measurements/Jaytiss/data/in-ear/Moondrop Aria.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Aria\"",
+          "sourceId": "kr0mka",
+          "collection": "kr0mka",
+          "path": "measurements/kr0mka/data/in-ear/Moondrop Aria.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        },
+        {
+          "observationId": "\"oratory1990\"|\"in-ear\"|\"GRAS 43AC\"|\"Moondrop Aria\"",
+          "sourceId": "oratory1990",
+          "collection": "oratory1990",
+          "path": "measurements/oratory1990/data/in-ear/Moondrop Aria.csv",
+          "sourceUrl": null,
+          "rawRig": "GRAS 43AC",
+          "rigClass": "gras-43ac"
+        },
+        {
+          "observationId": "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Aria\"",
+          "sourceId": "Super Review",
+          "collection": "Super Review",
+          "path": "measurements/Super Review/data/in-ear/Moondrop Aria.csv",
+          "sourceUrl": null,
+          "rawRig": "711",
+          "rigClass": "711-class"
+        }
+      ],
+      "exact711Consensus": {
+        "count": 5,
+        "measurementSources": [
+          "Bakkwatan",
+          "Harpo",
+          "Jaytiss",
+          "kr0mka",
+          "Super Review"
+        ],
+        "repeatAvailable": true,
+        "feasibility": "EXACT711_CONSENSUS_NOT_FEASIBLE"
+      },
+      "independence": {
+        "status": "NOT_PRIMARY_READY",
+        "c1bTrainingOverlap": false,
+        "c1cHoldoutOverlap": false,
+        "c1dPrimaryOverlap": true,
+        "historicalGroupIds": [],
+        "sourceIdentityReuse": [
+          "Bakkwatan",
+          "Harpo",
+          "Jaytiss",
+          "kr0mka",
+          "oratory1990",
+          "Super Review"
+        ],
+        "familyIdentity": "moondrop aria",
+        "candidateDuplicateIdentity": false
+      },
+      "exclusionFlags": [
+        "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL"
+      ]
+    }
+  ],
+  "primaryReadyCandidates": [],
+  "measurementRecords": 81
+}

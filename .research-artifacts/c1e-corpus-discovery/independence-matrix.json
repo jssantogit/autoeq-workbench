@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 1,
+  "batchCOverlapStatus": "VERIFIED_WITHOUT_BREAKING_SEAL",
+  "candidates": [
+    {
+      "candidateId": "c1e-07f1fe6ff7d91b84bcc0",
+      "canonicalIdentity": "|moondrop x crinacle blessing2 dusk|moondrop x crinacle blessing2 dusk",
+      "c1bTrainingIemIdentities": [
+        "|moondrop x crinacle blessing2 dusk|moondrop x crinacle blessing2 dusk"
+      ],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [
+        "c1g-c4cd2c0381c89a1e9911"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Bakkwatan",
+        "Hi End Portable",
+        "Jaytiss",
+        "kr0mka",
+        "oratory1990",
+        "Super Review"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "moondrop x crinacle blessing2 dusk",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-37e8a4152a7dbb5242b5",
+      "canonicalIdentity": "|truthear hexa|truthear hexa",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [
+        "|truthear hexa|truthear hexa"
+      ],
+      "c1dPrimaryIemIdentities": [
+        "|truthear hexa|truthear hexa"
+      ],
+      "historicalC1GroupIds": [
+        "c1g-3f4de360d87a28aea240",
+        "c1g-3f4de360d87a28aea240"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Bakkwatan",
+        "Fahryst",
+        "Filk",
+        "Harpo",
+        "HypetheSonics",
+        "Jaytiss",
+        "kr0mka",
+        "oratory1990",
+        "Super Review"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac",
+        "gras-ra0045"
+      ],
+      "familyIdentity": "truthear hexa",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-6073b6987f5c60526b03",
+      "canonicalIdentity": "|ikko oh10|ikko oh10",
+      "c1bTrainingIemIdentities": [
+        "|ikko oh10|ikko oh10"
+      ],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [
+        "c1g-106abf02ed8b580831bd"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "Harpo",
+        "Hi End Portable",
+        "oratory1990",
+        "RikudouGoku",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "ikko oh10",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-7b65f7b6139c1f9ed2ed",
+      "canonicalIdentity": "|kiwi ears ke4|kiwi ears ke4",
+      "c1bTrainingIemIdentities": [
+        "|kiwi ears ke4|kiwi ears ke4"
+      ],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [
+        "c1g-0a8d256822943d659136"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Auriculares Argentina",
+        "Filk",
+        "Hi End Portable",
+        "Jaytiss",
+        "Kazi",
+        "Super Review"
+      ],
+      "measurementRigClasses": [
+        "kb501x-711"
+      ],
+      "familyIdentity": "kiwi ears ke4",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-8b067d67abbe43ede22b",
+      "canonicalIdentity": "|moondrop quarks|moondrop quarks",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [
+        "|moondrop quarks|moondrop quarks"
+      ],
+      "c1dPrimaryIemIdentities": [
+        "|moondrop quarks|moondrop quarks"
+      ],
+      "historicalC1GroupIds": [
+        "c1g-8bd11cb5d7772ff2165b",
+        "c1g-8bd11cb5d7772ff2165b"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "freeryder05",
+        "oratory1990",
+        "RikudouGoku",
+        "Super Review",
+        "Ted's Squig Hoard"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "moondrop quarks",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-9266c9f91e10b16dbb6e",
+      "canonicalIdentity": "|7hz timeless|7hz timeless",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [
+        "|7hz timeless|7hz timeless"
+      ],
+      "c1dPrimaryIemIdentities": [
+        "|7hz timeless|7hz timeless"
+      ],
+      "historicalC1GroupIds": [
+        "c1g-dc1ade324d0c4b3192d6",
+        "c1g-dc1ade324d0c4b3192d6"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "Filk",
+        "Harpo",
+        "kr0mka",
+        "oratory1990",
+        "RikudouGoku",
+        "Super Review"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "7hz timeless",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-9a22a477e5074ece83c4",
+      "canonicalIdentity": "|epz q5|epz q5",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [
+        "|epz q5|epz q5"
+      ],
+      "c1dPrimaryIemIdentities": [
+        "|epz q5|epz q5"
+      ],
+      "historicalC1GroupIds": [
+        "c1g-6c369c990dd73512951b",
+        "c1g-6c369c990dd73512951b"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Auriculares Argentina",
+        "Fahryst",
+        "Hi End Portable",
+        "Jaytiss",
+        "Regan Cipher",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "measurementRigClasses": [
+        "kb501x-711"
+      ],
+      "familyIdentity": "epz q5",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-cca03874b5f73596b04b",
+      "canonicalIdentity": "|simgot audio ea500|simgot audio ea500 (black nozzle)",
+      "c1bTrainingIemIdentities": [
+        "|simgot audio ea500|simgot audio ea500 (black nozzle)"
+      ],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [
+        "c1g-5fe954a9babbe4c5cda0"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Auriculares Argentina",
+        "Fahryst",
+        "Hi End Portable",
+        "Kazi",
+        "RikudouGoku",
+        "Super Review"
+      ],
+      "measurementRigClasses": [
+        "kb501x-711"
+      ],
+      "familyIdentity": "simgot audio ea500",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-d9db96d850a66960fba6",
+      "canonicalIdentity": "|7hz salnotes zero|7hz salnotes zero",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [
+        "|7hz salnotes zero|7hz salnotes zero"
+      ],
+      "c1dPrimaryIemIdentities": [
+        "|7hz salnotes zero|7hz salnotes zero"
+      ],
+      "historicalC1GroupIds": [
+        "c1g-f2a43144c5936389d89d",
+        "c1g-f2a43144c5936389d89d"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Auriculares Argentina",
+        "Fahryst",
+        "freeryder05",
+        "Harpo",
+        "HypetheSonics",
+        "Jaytiss",
+        "oratory1990",
+        "Super Review",
+        "Ted's Squig Hoard"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac",
+        "gras-ra0045"
+      ],
+      "familyIdentity": "7hz salnotes zero",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-da0e0c823e4af7562aa8",
+      "canonicalIdentity": "|moondrop ssr|moondrop ssr",
+      "c1bTrainingIemIdentities": [
+        "|moondrop ssr|moondrop ssr"
+      ],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [
+        "c1g-3579b4e7c8f794efd07a"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Filk",
+        "freeryder05",
+        "Harpo",
+        "Hi End Portable",
+        "HypetheSonics",
+        "Super Review"
+      ],
+      "measurementRigClasses": [
+        "gras-ra0045"
+      ],
+      "familyIdentity": "moondrop ssr",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-e09a6960c4ef79f95206",
+      "canonicalIdentity": "|truthear x crinacle zero|truthear x crinacle zero",
+      "c1bTrainingIemIdentities": [
+        "|truthear x crinacle zero|truthear x crinacle zero"
+      ],
+      "c1cHoldoutIemIdentities": [],
+      "c1dPrimaryIemIdentities": [],
+      "historicalC1GroupIds": [
+        "c1g-20fa430247872858b84b"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Fahryst",
+        "Filk",
+        "Harpo",
+        "kr0mka",
+        "oratory1990",
+        "Super Review"
+      ],
+      "measurementRigClasses": [
+        "gras-43acb"
+      ],
+      "familyIdentity": "truthear x crinacle zero",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    },
+    {
+      "candidateId": "c1e-ea4718ac853f13161233",
+      "canonicalIdentity": "|moondrop aria|moondrop aria",
+      "c1bTrainingIemIdentities": [],
+      "c1cHoldoutIemIdentities": [
+        "|moondrop aria|moondrop aria"
+      ],
+      "c1dPrimaryIemIdentities": [
+        "|moondrop aria|moondrop aria"
+      ],
+      "historicalC1GroupIds": [
+        "c1g-ebdb284a8c7563a12c5f",
+        "c1g-ebdb284a8c7563a12c5f"
+      ],
+      "measurementSourceIdentityReuse": [
+        "Bakkwatan",
+        "Harpo",
+        "Jaytiss",
+        "kr0mka",
+        "oratory1990",
+        "Super Review"
+      ],
+      "measurementRigClasses": [
+        "gras-43ac"
+      ],
+      "familyIdentity": "moondrop aria",
+      "candidateToCandidateDuplicateIdentity": false,
+      "batchCIdentityOverlap": false
+    }
+  ]
+}

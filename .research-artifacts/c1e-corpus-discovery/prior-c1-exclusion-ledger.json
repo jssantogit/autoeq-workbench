@@ -1,0 +1,450 @@
+{
+  "schemaVersion": 1,
+  "groups": [
+    {
+      "groupId": "c1g-0a8d256822943d659136",
+      "reason": "USED_FOR_MODEL_TRAINING",
+      "identity": {
+        "manufacturer": "",
+        "model": "kiwi ears ke4",
+        "family": "kiwi ears ke4",
+        "configuration": "kiwi ears ke4",
+        "variantSignature": "configurationSignature=kiwi ears ke4",
+        "aliases": [
+          " kiwi ears ke4",
+          "kiwi ears ke4"
+        ],
+        "overlapKeys": [
+          "name: kiwi ears ke4",
+          "name:kiwi ears ke4"
+        ],
+        "fullKey": "|kiwi ears ke4|kiwi ears ke4",
+        "baseKey": "|kiwi ears ke4",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|kiwi ears ke4|kiwi ears ke4"
+    },
+    {
+      "groupId": "c1g-106abf02ed8b580831bd",
+      "reason": "USED_FOR_MODEL_TRAINING",
+      "identity": {
+        "manufacturer": "",
+        "model": "ikko oh10",
+        "family": "ikko oh10",
+        "configuration": "ikko oh10",
+        "variantSignature": "configurationSignature=ikko oh10",
+        "aliases": [
+          " ikko oh10",
+          "ikko oh10"
+        ],
+        "overlapKeys": [
+          "name: ikko oh10",
+          "name:ikko oh10"
+        ],
+        "fullKey": "|ikko oh10|ikko oh10",
+        "baseKey": "|ikko oh10",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|ikko oh10|ikko oh10"
+    },
+    {
+      "groupId": "c1g-20fa430247872858b84b",
+      "reason": "USED_FOR_MODEL_TRAINING",
+      "identity": {
+        "manufacturer": "",
+        "model": "truthear x crinacle zero",
+        "family": "truthear x crinacle zero",
+        "configuration": "truthear x crinacle zero",
+        "variantSignature": "configurationSignature=truthear x crinacle zero",
+        "aliases": [
+          " truthear x crinacle zero",
+          "truthear x crinacle zero"
+        ],
+        "overlapKeys": [
+          "name: truthear x crinacle zero",
+          "name:truthear x crinacle zero"
+        ],
+        "fullKey": "|truthear x crinacle zero|truthear x crinacle zero",
+        "baseKey": "|truthear x crinacle zero",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|truthear x crinacle zero|truthear x crinacle zero"
+    },
+    {
+      "groupId": "c1g-3579b4e7c8f794efd07a",
+      "reason": "USED_FOR_MODEL_TRAINING",
+      "identity": {
+        "manufacturer": "",
+        "model": "moondrop ssr",
+        "family": "moondrop ssr",
+        "configuration": "moondrop ssr",
+        "variantSignature": "configurationSignature=moondrop ssr",
+        "aliases": [
+          " moondrop ssr",
+          "moondrop ssr"
+        ],
+        "overlapKeys": [
+          "name: moondrop ssr",
+          "name:moondrop ssr"
+        ],
+        "fullKey": "|moondrop ssr|moondrop ssr",
+        "baseKey": "|moondrop ssr",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|moondrop ssr|moondrop ssr"
+    },
+    {
+      "groupId": "c1g-3f4de360d87a28aea240",
+      "reason": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "identity": {
+        "manufacturer": "",
+        "model": "truthear hexa",
+        "family": "truthear hexa",
+        "configuration": "truthear hexa",
+        "variantSignature": "configurationSignature=truthear hexa",
+        "aliases": [
+          " truthear hexa",
+          "truthear hexa"
+        ],
+        "overlapKeys": [
+          "name: truthear hexa",
+          "name:truthear hexa"
+        ],
+        "fullKey": "|truthear hexa|truthear hexa",
+        "baseKey": "|truthear hexa",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|truthear hexa|truthear hexa"
+    },
+    {
+      "groupId": "c1g-3f4de360d87a28aea240",
+      "reason": "USED_FOR_C1C_HOLDOUT",
+      "identity": {
+        "manufacturer": "",
+        "model": "truthear hexa",
+        "family": "truthear hexa",
+        "configuration": "truthear hexa",
+        "variantSignature": "configurationSignature=truthear hexa",
+        "aliases": [
+          " truthear hexa",
+          "truthear hexa"
+        ],
+        "overlapKeys": [
+          "name: truthear hexa",
+          "name:truthear hexa"
+        ],
+        "fullKey": "|truthear hexa|truthear hexa",
+        "baseKey": "|truthear hexa",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|truthear hexa|truthear hexa"
+    },
+    {
+      "groupId": "c1g-5fe954a9babbe4c5cda0",
+      "reason": "USED_FOR_MODEL_TRAINING",
+      "identity": {
+        "manufacturer": "",
+        "model": "simgot audio ea500 black nozzle",
+        "family": "simgot audio ea500",
+        "configuration": "simgot audio ea500 (black nozzle)",
+        "variantSignature": "configurationSignature=simgot audio ea500 black nozzle",
+        "aliases": [
+          " simgot audio ea500",
+          " simgot audio ea500 black nozzle",
+          "simgot audio ea500",
+          "simgot audio ea500 black nozzle"
+        ],
+        "overlapKeys": [
+          "name: simgot audio ea500",
+          "name: simgot audio ea500 black nozzle",
+          "name:simgot audio ea500",
+          "name:simgot audio ea500 black nozzle"
+        ],
+        "fullKey": "|simgot audio ea500|simgot audio ea500 (black nozzle)",
+        "baseKey": "|simgot audio ea500",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|simgot audio ea500|simgot audio ea500 (black nozzle)"
+    },
+    {
+      "groupId": "c1g-6c369c990dd73512951b",
+      "reason": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "identity": {
+        "manufacturer": "",
+        "model": "epz q5",
+        "family": "epz q5",
+        "configuration": "epz q5",
+        "variantSignature": "configurationSignature=epz q5",
+        "aliases": [
+          " epz q5",
+          "epz q5"
+        ],
+        "overlapKeys": [
+          "name: epz q5",
+          "name:epz q5"
+        ],
+        "fullKey": "|epz q5|epz q5",
+        "baseKey": "|epz q5",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|epz q5|epz q5"
+    },
+    {
+      "groupId": "c1g-6c369c990dd73512951b",
+      "reason": "USED_FOR_C1C_HOLDOUT",
+      "identity": {
+        "manufacturer": "",
+        "model": "epz q5",
+        "family": "epz q5",
+        "configuration": "epz q5",
+        "variantSignature": "configurationSignature=epz q5",
+        "aliases": [
+          " epz q5",
+          "epz q5"
+        ],
+        "overlapKeys": [
+          "name: epz q5",
+          "name:epz q5"
+        ],
+        "fullKey": "|epz q5|epz q5",
+        "baseKey": "|epz q5",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|epz q5|epz q5"
+    },
+    {
+      "groupId": "c1g-8bd11cb5d7772ff2165b",
+      "reason": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "identity": {
+        "manufacturer": "",
+        "model": "moondrop quarks",
+        "family": "moondrop quarks",
+        "configuration": "moondrop quarks",
+        "variantSignature": "configurationSignature=moondrop quarks",
+        "aliases": [
+          " moondrop quarks",
+          "moondrop quarks"
+        ],
+        "overlapKeys": [
+          "name: moondrop quarks",
+          "name:moondrop quarks"
+        ],
+        "fullKey": "|moondrop quarks|moondrop quarks",
+        "baseKey": "|moondrop quarks",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|moondrop quarks|moondrop quarks"
+    },
+    {
+      "groupId": "c1g-8bd11cb5d7772ff2165b",
+      "reason": "USED_FOR_C1C_HOLDOUT",
+      "identity": {
+        "manufacturer": "",
+        "model": "moondrop quarks",
+        "family": "moondrop quarks",
+        "configuration": "moondrop quarks",
+        "variantSignature": "configurationSignature=moondrop quarks",
+        "aliases": [
+          " moondrop quarks",
+          "moondrop quarks"
+        ],
+        "overlapKeys": [
+          "name: moondrop quarks",
+          "name:moondrop quarks"
+        ],
+        "fullKey": "|moondrop quarks|moondrop quarks",
+        "baseKey": "|moondrop quarks",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|moondrop quarks|moondrop quarks"
+    },
+    {
+      "groupId": "c1g-c4cd2c0381c89a1e9911",
+      "reason": "USED_FOR_MODEL_TRAINING",
+      "identity": {
+        "manufacturer": "",
+        "model": "moondrop x crinacle blessing2 dusk",
+        "family": "moondrop x crinacle blessing2 dusk",
+        "configuration": "moondrop x crinacle blessing2 dusk",
+        "variantSignature": "configurationSignature=moondrop x crinacle blessing2 dusk",
+        "aliases": [
+          " moondrop x crinacle blessing2 dusk",
+          "moondrop x crinacle blessing2 dusk"
+        ],
+        "overlapKeys": [
+          "name: moondrop x crinacle blessing2 dusk",
+          "name:moondrop x crinacle blessing2 dusk"
+        ],
+        "fullKey": "|moondrop x crinacle blessing2 dusk|moondrop x crinacle blessing2 dusk",
+        "baseKey": "|moondrop x crinacle blessing2 dusk",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|moondrop x crinacle blessing2 dusk|moondrop x crinacle blessing2 dusk"
+    },
+    {
+      "groupId": "c1g-dc1ade324d0c4b3192d6",
+      "reason": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "identity": {
+        "manufacturer": "",
+        "model": "7hz timeless",
+        "family": "7hz timeless",
+        "configuration": "7hz timeless",
+        "variantSignature": "configurationSignature=7hz timeless",
+        "aliases": [
+          " 7hz timeless",
+          "7hz timeless"
+        ],
+        "overlapKeys": [
+          "name: 7hz timeless",
+          "name:7hz timeless"
+        ],
+        "fullKey": "|7hz timeless|7hz timeless",
+        "baseKey": "|7hz timeless",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|7hz timeless|7hz timeless"
+    },
+    {
+      "groupId": "c1g-dc1ade324d0c4b3192d6",
+      "reason": "USED_FOR_C1C_HOLDOUT",
+      "identity": {
+        "manufacturer": "",
+        "model": "7hz timeless",
+        "family": "7hz timeless",
+        "configuration": "7hz timeless",
+        "variantSignature": "configurationSignature=7hz timeless",
+        "aliases": [
+          " 7hz timeless",
+          "7hz timeless"
+        ],
+        "overlapKeys": [
+          "name: 7hz timeless",
+          "name:7hz timeless"
+        ],
+        "fullKey": "|7hz timeless|7hz timeless",
+        "baseKey": "|7hz timeless",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|7hz timeless|7hz timeless"
+    },
+    {
+      "groupId": "c1g-ebdb284a8c7563a12c5f",
+      "reason": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "identity": {
+        "manufacturer": "",
+        "model": "moondrop aria",
+        "family": "moondrop aria",
+        "configuration": "moondrop aria",
+        "variantSignature": "configurationSignature=moondrop aria",
+        "aliases": [
+          " moondrop aria",
+          "moondrop aria"
+        ],
+        "overlapKeys": [
+          "name: moondrop aria",
+          "name:moondrop aria"
+        ],
+        "fullKey": "|moondrop aria|moondrop aria",
+        "baseKey": "|moondrop aria",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|moondrop aria|moondrop aria"
+    },
+    {
+      "groupId": "c1g-ebdb284a8c7563a12c5f",
+      "reason": "USED_FOR_C1C_HOLDOUT",
+      "identity": {
+        "manufacturer": "",
+        "model": "moondrop aria",
+        "family": "moondrop aria",
+        "configuration": "moondrop aria",
+        "variantSignature": "configurationSignature=moondrop aria",
+        "aliases": [
+          " moondrop aria",
+          "moondrop aria"
+        ],
+        "overlapKeys": [
+          "name: moondrop aria",
+          "name:moondrop aria"
+        ],
+        "fullKey": "|moondrop aria|moondrop aria",
+        "baseKey": "|moondrop aria",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|moondrop aria|moondrop aria"
+    },
+    {
+      "groupId": "c1g-f2a43144c5936389d89d",
+      "reason": "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL",
+      "identity": {
+        "manufacturer": "",
+        "model": "7hz salnotes zero",
+        "family": "7hz salnotes zero",
+        "configuration": "7hz salnotes zero",
+        "variantSignature": "configurationSignature=7hz salnotes zero",
+        "aliases": [
+          " 7hz salnotes zero",
+          "7hz salnotes zero"
+        ],
+        "overlapKeys": [
+          "name: 7hz salnotes zero",
+          "name:7hz salnotes zero"
+        ],
+        "fullKey": "|7hz salnotes zero|7hz salnotes zero",
+        "baseKey": "|7hz salnotes zero",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|7hz salnotes zero|7hz salnotes zero"
+    },
+    {
+      "groupId": "c1g-f2a43144c5936389d89d",
+      "reason": "USED_FOR_C1C_HOLDOUT",
+      "identity": {
+        "manufacturer": "",
+        "model": "7hz salnotes zero",
+        "family": "7hz salnotes zero",
+        "configuration": "7hz salnotes zero",
+        "variantSignature": "configurationSignature=7hz salnotes zero",
+        "aliases": [
+          " 7hz salnotes zero",
+          "7hz salnotes zero"
+        ],
+        "overlapKeys": [
+          "name: 7hz salnotes zero",
+          "name:7hz salnotes zero"
+        ],
+        "fullKey": "|7hz salnotes zero|7hz salnotes zero",
+        "baseKey": "|7hz salnotes zero",
+        "identityAmbiguous": false
+      },
+      "canonicalIdentity": "|7hz salnotes zero|7hz salnotes zero"
+    }
+  ],
+  "groupIdsByReason": {
+    "USED_FOR_MODEL_TRAINING": [
+      "c1g-0a8d256822943d659136",
+      "c1g-106abf02ed8b580831bd",
+      "c1g-20fa430247872858b84b",
+      "c1g-3579b4e7c8f794efd07a",
+      "c1g-5fe954a9babbe4c5cda0",
+      "c1g-c4cd2c0381c89a1e9911"
+    ],
+    "USED_FOR_C1C_HOLDOUT": [
+      "c1g-3f4de360d87a28aea240",
+      "c1g-6c369c990dd73512951b",
+      "c1g-8bd11cb5d7772ff2165b",
+      "c1g-dc1ade324d0c4b3192d6",
+      "c1g-ebdb284a8c7563a12c5f",
+      "c1g-f2a43144c5936389d89d"
+    ],
+    "CONSUMED_BY_INVALIDATED_C1D_PRIMARY_PROTOCOL": [
+      "c1g-3f4de360d87a28aea240",
+      "c1g-6c369c990dd73512951b",
+      "c1g-8bd11cb5d7772ff2165b",
+      "c1g-dc1ade324d0c4b3192d6",
+      "c1g-ebdb284a8c7563a12c5f",
+      "c1g-f2a43144c5936389d89d"
+    ]
+  },
+  "identityCount": 18
+}
