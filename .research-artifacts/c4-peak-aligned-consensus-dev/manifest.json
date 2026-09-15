@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "algorithmVersion": "c4-peak-aligned-consensus-dev-v1",
+  "phase": "protocol-freeze",
+  "milestone": "C4b-protocol-only",
+  "frozenBoundary": "64f1fa7f8780cf14f87ce6427aaa71edbf686e2d",
+  "c4a": {
+    "evidenceSha256": "03794a913b873e01df8b5afdd3664e6dc7e40deff9341a449c768ae1f39b73ea",
+    "classification": "C4_CORPUS_READY",
+    "corpusBoundary": "2718375e64e6e4682cb6cacf46ae8300a431e1ba"
+  },
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "domain": {
+    "form": "in-ear",
+    "v2MinHz": 20,
+    "v2MaxHz": 20000,
+    "pointsPerOctave": 96,
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "terminalClosure": "terminal-flat-hold-to-v2-max"
+  },
+  "bands": {
+    "peakSearchHz": [
+      6000,
+      10000
+    ],
+    "alignmentHz": [
+      6000,
+      14000
+    ]
+  },
+  "baseline": {
+    "method": "POINTWISE_MEDIAN",
+    "smoothing": false,
+    "weighting": false,
+    "confidence": false
+  },
+  "alignedConsensus": {
+    "method": "PEAK_ALIGNED_MEDIAN",
+    "peakRule": "max-normalized-db-in-6000-10000hz-ties-lower-frequency",
+    "anchors": [
+      [
+        6000,
+        6000
+      ],
+      [
+        "p_canonical",
+        "p_i"
+      ],
+      [
+        14000,
+        14000
+      ]
+    ],
+    "interpolation": "linear-in-log2-frequency",
+    "outsideBand": "identity",
+    "sourceCoverageFailure": "reject-no-extrapolation-or-clipping"
+  },
+  "evaluation": {
+    "protocol": "leave-one-measurement-out",
+    "registration": "each-candidate-separately-to-withheld-peak-frame",
+    "primaryMetric": "registeredTrebleMAE",
+    "primaryBandHz": [
+      6000,
+      14000
+    ],
+    "foldWin": "aligned-registeredTrebleMAE < pointwise-registeredTrebleMAE",
+    "strictComparison": true,
+    "secondaryMetrics": [
+      "registeredRMSE",
+      "registeredMaxAbs",
+      "rawMAE",
+      "rawRMSE",
+      "peakFrequencies",
+      "rawPeakFrequencyErrorOctaves",
+      "peakLevels",
+      "absolutePeakLevelErrorAfterRegistration"
+    ]
+  },
+  "diagnostics": {
+    "peakShifts": [
+      "individualPeakFrequenciesHz",
+      "log2Shifts",
+      "absoluteOctaves",
+      "cents"
+    ],
+    "robustSigma": "1.4826*median_i(abs(x_i-median_j(x_j)))",
+    "robustSigmaBandsHz": [
+      [
+        6000,
+        8000
+      ],
+      [
+        8000,
+        10000
+      ],
+      [
+        10000,
+        14000
+      ],
+      [
+        6000,
+        14000
+      ]
+    ],
+    "acceptanceThresholds": false
+  },
+  "groupGate": {
+    "classification": "PEAK_ALIGNMENT_SIGNAL iff strict-majority-wins AND lower-median-registered-MAE AND lower-median-full-band-robust-sigma",
+    "strictMajority": "wins > K/2"
+  },
+  "developmentGate": {
+    "requiredGroups": 3,
+    "minimumSignals": 2,
+    "supported": "PEAK_ALIGNMENT_DEV_SIGNAL_SUPPORTED",
+    "notSupported": "PEAK_ALIGNMENT_DEV_SIGNAL_NOT_SUPPORTED",
+    "invalid": "INCONCLUSIVE"
+  },
+  "developmentGroupIds": [
+    "c4g-95ca9d64e706e94c51e7",
+    "c4g-9c1d23845eb5a1d7beef",
+    "c4g-35f72baf0cca66570d01"
+  ],
+  "developmentGroups": [
+    {
+      "groupId": "c4g-95ca9d64e706e94c51e7",
+      "memberCount": 8
+    },
+    {
+      "groupId": "c4g-9c1d23845eb5a1d7beef",
+      "memberCount": 8
+    },
+    {
+      "groupId": "c4g-35f72baf0cca66570d01",
+      "memberCount": 8
+    }
+  ],
+  "rejectedHoldoutGroupIds": [
+    "c4g-c5a0b86e1ea4436ca9ce",
+    "c4g-043aeb45a50adf964f89",
+    "c4g-9f35923d2fa109244435"
+  ],
+  "rejectedBatchCToken": "fresh-real-corpus-v1.2:Batch C",
+  "protocolFreezeCommit": null,
+  "developmentExecuted": false,
+  "holdoutExecuted": false,
+  "batchCExecuted": false,
+  "freshRealCorpusBatchCExecuted": false,
+  "outcomesGenerated": false,
+  "consensusAlgorithmExecuted": false,
+  "autoEqSolverExecuted": false,
+  "rawMeasurementsCommitted": false,
+  "artifactSchema": "schema.json",
+  "protocolPath": "research/c4-peak-aligned-consensus-dev/protocol.md"
+}

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "c4b-development-outcome-schema",
+  "outcomeValuesAllowed": false,
+  "requiredTopLevel": [
+    "schemaVersion",
+    "algorithmVersion",
+    "groupEvidence",
+    "developmentGate",
+    "flags",
+    "evidenceSha256"
+  ],
+  "groupEvidence": {
+    "required": [
+      "groupId",
+      "memberCount",
+      "members",
+      "folds",
+      "classification",
+      "dispersion"
+    ],
+    "memberProvenanceRequired": [
+      "concreteCurveIdentity",
+      "collection",
+      "form",
+      "rig",
+      "rigClass",
+      "path",
+      "upstreamRawUrl",
+      "blobSha",
+      "upstreamSha256",
+      "originalParsedPointsSha256",
+      "canonicalParsedPointsSha256",
+      "normalizedParsedPointsSha256"
+    ],
+    "foldRequired": [
+      "withheldMemberIdentity",
+      "trainingMemberIdentities",
+      "canonicalPeakFrequencyHz",
+      "individualPeakFrequenciesHz",
+      "warpAnchors",
+      "pointwise",
+      "aligned",
+      "peakAlignmentFoldWin",
+      "peakShiftDiagnostics",
+      "dispersion"
+    ],
+    "metricFields": [
+      "registeredTrebleMAE",
+      "registeredTrebleRMSE",
+      "registeredTrebleMaxAbs",
+      "rawTrebleMAE",
+      "rawTrebleRMSE",
+      "candidateDominantPeakFrequencyHz",
+      "withheldDominantPeakFrequencyHz",
+      "rawPeakFrequencyErrorOctaves",
+      "candidatePeakDb",
+      "withheldPeakDb",
+      "absolutePeakLevelErrorAfterRegistration"
+    ]
+  },
+  "developmentGate": {
+    "allowed": [
+      "PEAK_ALIGNMENT_DEV_SIGNAL_SUPPORTED",
+      "PEAK_ALIGNMENT_DEV_SIGNAL_NOT_SUPPORTED",
+      "INCONCLUSIVE"
+    ],
+    "minimumSignalGroups": 2,
+    "totalGroups": 3
+  },
+  "flags": {
+    "holdoutExecuted": false,
+    "batchCExecuted": false,
+    "freshRealCorpusBatchCExecuted": false,
+    "outcomesGenerated": false,
+    "consensusAlgorithmExecuted": false,
+    "autoEqSolverExecuted": false,
+    "rawMeasurementsCommitted": false
+  }
+}
