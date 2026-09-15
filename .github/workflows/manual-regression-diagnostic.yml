@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'packages/core/src/autoeq/v2/**'
+      - 'packages/core/src/autoeq/types.ts'
       - 'packages/core/src/config/**'
       - 'packages/core/src/dsp/**'
       - 'packages/core/benchmarks/manualRegressionScalability.ts'
@@ -13,6 +14,12 @@ on:
       - 'packages/core/benchmarks/research/manual-regression-baseline.json'
       - 'packages/core/benchmarks/research/raw/manual/**'
       - 'packages/core/test/autoeq/v2/manualRegression.test.ts'
+      - 'apps/web/src/session/workbenchSession.ts'
+      - 'apps/web/src/session/workbenchSession.test.ts'
+      - 'apps/web/src/workers/autoeq.worker.ts'
+      - 'apps/web/src/workers/autoeq.worker.test.ts'
+      - 'apps/web/src/state/autoeqController.ts'
+      - 'apps/web/src/state/autoeqController.test.ts'
       - '.github/workflows/manual-regression-diagnostic.yml'
 
 permissions:
@@ -33,7 +40,14 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @autoeq-workbench/core typecheck
+      - run: pnpm --filter @autoeq-workbench/web typecheck
       - name: Verify manual regression fixtures
-        run: pnpm --filter @autoeq-workbench/core test -- manualRegression.test.ts
-      - name: Run Max10 60s manual regression diagnostic
+        run: pnpm --filter @autoeq-workbench/core exec vitest run test/autoeq/v2/manualRegression.test.ts --pool=threads --maxWorkers=1 --no-file-parallelism
+      - name: Verify session provenance round-trip
+        run: pnpm --filter @autoeq-workbench/web exec vitest run src/session/workbenchSession.test.ts --pool=threads --maxWorkers=1 --no-file-parallelism
+      - name: Verify worker Max10 provenance
+        run: pnpm --filter @autoeq-workbench/web exec vitest run src/workers/autoeq.worker.test.ts --pool=threads --maxWorkers=1 --no-file-parallelism
+      - name: Verify controller provenance validation
+        run: pnpm --filter @autoeq-workbench/web exec vitest run src/state/autoeqController.test.ts --pool=threads --maxWorkers=1 --no-file-parallelism
+      - name: Run Max10 60s experimental manual regression diagnostic
         run: pnpm --filter @autoeq-workbench/core exec tsx benchmarks/manualRegressionScalability.ts
