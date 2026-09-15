@@ -1,0 +1,336 @@
+{
+  "schemaVersion": 1,
+  "corpusVersion": "c4-peak-aligned-consensus-corpus-v1",
+  "milestone": "C4a-corpus-inventory-only",
+  "classification": "C4_CORPUS_READY",
+  "shortage": 0,
+  "frozenBoundary": "2718375e64e6e4682cb6cacf46ae8300a431e1ba",
+  "c2": {
+    "finalEvidenceSha256": "1de4d0ac26eb1d24724e01b4dbeae38a6a10343cb8a671c06ccc3e79229d751a",
+    "finalInterpretation": "C2_CLOSED_HOLDOUT_NOT_CONFIRMED"
+  },
+  "upstream": {
+    "repository": "jaakkopasanen/AutoEq",
+    "commit": "7ae0f56d53074872b028649617a22bbb4232feb7",
+    "tree": "671f0a72499ace671e4b0a293bc1948bb8330c96"
+  },
+  "domain": {
+    "form": "in-ear",
+    "v2MinHz": 20,
+    "v2MaxHz": 20000,
+    "normalization": {
+      "mode": "hz",
+      "frequencyHz": 500,
+      "levelDb": 60
+    },
+    "terminalClosure": "terminal-flat-hold-to-v2-max"
+  },
+  "selection": {
+    "seed": "autoeq-workbench:c4-consensus-corpus-v1",
+    "splitSeed": "autoeq-workbench:c4-consensus-split-v1",
+    "requiredGroupCount": 6,
+    "minimumIndependentMeasurements": 3,
+    "eligibleRepeatedDeviceGroupCount": 238,
+    "eligibleGroupCountByIndependentMeasurements": {
+      "3": 131,
+      "4": 52,
+      "5": 31,
+      "6": 8,
+      "7": 10,
+      "8": 4,
+      "9": 1,
+      "10": 1
+    },
+    "selectedGroupIds": [
+      "c4g-95ca9d64e706e94c51e7",
+      "c4g-9c1d23845eb5a1d7beef",
+      "c4g-35f72baf0cca66570d01",
+      "c4g-c5a0b86e1ea4436ca9ce",
+      "c4g-043aeb45a50adf964f89",
+      "c4g-9f35923d2fa109244435"
+    ],
+    "developmentGroupIds": [
+      "c4g-95ca9d64e706e94c51e7",
+      "c4g-9c1d23845eb5a1d7beef",
+      "c4g-35f72baf0cca66570d01"
+    ],
+    "holdoutGroupIds": [
+      "c4g-c5a0b86e1ea4436ca9ce",
+      "c4g-043aeb45a50adf964f89",
+      "c4g-9f35923d2fa109244435"
+    ]
+  },
+  "inventory": {
+    "processedInEarCurveCount": 4163,
+    "strictResolvedCurveCount": 3478,
+    "primary711CurveCount": 3043,
+    "selectedMemberCount": 51
+  },
+  "metadataAudit": {
+    "eligibleBeforeStrictResolution": 4163,
+    "eligibleAfterStrictResolution": 3478,
+    "unresolvedByCollection": {
+      "freeryder05": 1,
+      "Headphone.com Legacy": 94,
+      "Innerfidelity": 306,
+      "kr0mka": 3,
+      "rtings": 281
+    },
+    "ambiguousByCollection": {},
+    "missingMetadataCollections": [
+      "Headphone.com Legacy",
+      "Innerfidelity",
+      "rtings"
+    ],
+    "collections": {
+      "Auriculares Argentina": {
+        "metadataRows": 176,
+        "processedInEarCurves": 15,
+        "resolved": 15,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "Bakkwatan": {
+        "metadataRows": 80,
+        "processedInEarCurves": 40,
+        "resolved": 40,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "crinacle": {
+        "metadataRows": 6290,
+        "processedInEarCurves": 0,
+        "resolved": 0,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "DHRME": {
+        "metadataRows": 359,
+        "processedInEarCurves": 99,
+        "resolved": 99,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "Fahryst": {
+        "metadataRows": 457,
+        "processedInEarCurves": 173,
+        "resolved": 173,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "Filk": {
+        "metadataRows": 449,
+        "processedInEarCurves": 55,
+        "resolved": 55,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "freeryder05": {
+        "metadataRows": 191,
+        "processedInEarCurves": 65,
+        "resolved": 64,
+        "unresolved": 1,
+        "ambiguous": 0
+      },
+      "Harpo": {
+        "metadataRows": 221,
+        "processedInEarCurves": 185,
+        "resolved": 185,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "Headphone.com Legacy": {
+        "metadataRows": 0,
+        "processedInEarCurves": 94,
+        "resolved": 0,
+        "unresolved": 94,
+        "ambiguous": 0
+      },
+      "Hi End Portable": {
+        "metadataRows": 625,
+        "processedInEarCurves": 301,
+        "resolved": 301,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "HypetheSonics": {
+        "metadataRows": 685,
+        "processedInEarCurves": 180,
+        "resolved": 180,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "Innerfidelity": {
+        "metadataRows": 0,
+        "processedInEarCurves": 306,
+        "resolved": 0,
+        "unresolved": 306,
+        "ambiguous": 0
+      },
+      "Jaytiss": {
+        "metadataRows": 910,
+        "processedInEarCurves": 377,
+        "resolved": 377,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "Kazi": {
+        "metadataRows": 285,
+        "processedInEarCurves": 142,
+        "resolved": 142,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "kr0mka": {
+        "metadataRows": 1210,
+        "processedInEarCurves": 88,
+        "resolved": 85,
+        "unresolved": 3,
+        "ambiguous": 0
+      },
+      "Kuulokenurkka": {
+        "metadataRows": 751,
+        "processedInEarCurves": 0,
+        "resolved": 0,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "oratory1990": {
+        "metadataRows": 809,
+        "processedInEarCurves": 212,
+        "resolved": 212,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "Regan Cipher": {
+        "metadataRows": 594,
+        "processedInEarCurves": 153,
+        "resolved": 153,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "RikudouGoku": {
+        "metadataRows": 278,
+        "processedInEarCurves": 200,
+        "resolved": 200,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "rtings": {
+        "metadataRows": 0,
+        "processedInEarCurves": 281,
+        "resolved": 0,
+        "unresolved": 281,
+        "ambiguous": 0
+      },
+      "Rtings": {
+        "metadataRows": 1651,
+        "processedInEarCurves": 34,
+        "resolved": 34,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "Super Review": {
+        "metadataRows": 2660,
+        "processedInEarCurves": 715,
+        "resolved": 715,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "Ted's Squig Hoard": {
+        "metadataRows": 33,
+        "processedInEarCurves": 15,
+        "resolved": 15,
+        "unresolved": 0,
+        "ambiguous": 0
+      },
+      "ToneDeafMonk": {
+        "metadataRows": 830,
+        "processedInEarCurves": 433,
+        "resolved": 433,
+        "unresolved": 0,
+        "ambiguous": 0
+      }
+    }
+  },
+  "crossRigSideInventory": {
+    "groupCount": 160,
+    "groupsWithAtLeast3IndependentMeasurements": 84,
+    "collections": [
+      "Auriculares Argentina",
+      "Bakkwatan",
+      "DHRME",
+      "Fahryst",
+      "Filk",
+      "Harpo",
+      "Hi End Portable",
+      "HypetheSonics",
+      "Jaytiss",
+      "Kazi",
+      "Regan Cipher",
+      "RikudouGoku",
+      "Rtings",
+      "Super Review",
+      "Ted's Squig Hoard",
+      "ToneDeafMonk",
+      "freeryder05",
+      "kr0mka",
+      "oratory1990"
+    ],
+    "rigClasses": [
+      "711-class",
+      "bruel-and-kjaer-5128",
+      "gras-43ac",
+      "gras-43ac-",
+      "gras-43acb",
+      "gras-45bc-",
+      "gras-45bc-10",
+      "gras-ra0045",
+      "hms-ii-3",
+      "kb006x-711",
+      "kb501x-711"
+    ],
+    "exactRigStrings": [
+      "711",
+      "Bruel & Kjaer 5128",
+      "GRAS 43AC",
+      "GRAS 43AC ",
+      "GRAS 43ACB",
+      "GRAS 45BC ",
+      "GRAS 45BC-10",
+      "GRAS RA0045",
+      "HMS II.3",
+      "KB006x + 711",
+      "KB501x + 711"
+    ]
+  },
+  "hfCapableSideInventory": {
+    "curveCount": 0,
+    "groupCount": 0,
+    "exactRigStrings": [],
+    "rigClasses": [],
+    "repeatedSameRigGroupCount": 0
+  },
+  "flags": {
+    "consensusAlgorithmExecuted": false,
+    "autoEqSolverExecuted": false,
+    "rawMeasurementsCommitted": false,
+    "objectiveResponseOutcomeObserved": false
+  },
+  "solverExecuted": false,
+  "autoEqSolverExecuted": false,
+  "consensusAlgorithmExecuted": false,
+  "rawMeasurementsCommitted": false,
+  "hashes": {
+    "groupsSha256": "42d5386ee49cfaec6f38a7852f26341e6580165d3b4945a9f11f181526b72797",
+    "provenanceSha256": "321dd9df008d37d1cf61dc5dff02af462dbadb5527d406bce93430e730553670",
+    "rigInventorySha256": "803e390d3769839048ec8c33ca426ed4104eb743b26697282689c58e20a34cf0",
+    "selectionProtocolSha256": "7a01e5450a601c0a136fd1df113d8d700db2bf30ecd3b51c52d53535516f32cd"
+  },
+  "artifactFileHashes": {
+    "groups.json": "7e7665ec0a72dcc8ec772e4194e14b821add379b6cf44f7f8e2748cf5202ea83",
+    "provenance.json": "b9b309a4d66c5ee13218432d91be8ccf28667827c2419de6743f737015895384",
+    "rig-inventory.json": "ad5762c749628319b37bd5f04985aaca3c63698167ce24ff072135f1123c58ed",
+    "selection-protocol.md": "a2793836a2bdbc0a09648937789c16c1e88c8ef45eb4021ba9141916d59bc9b1"
+  }
+}

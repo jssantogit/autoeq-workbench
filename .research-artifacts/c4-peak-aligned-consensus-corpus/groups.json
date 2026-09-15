@@ -1,0 +1,2941 @@
+{
+  "schemaVersion": 1,
+  "corpusVersion": "c4-peak-aligned-consensus-corpus-v1",
+  "form": "in-ear",
+  "selectionSeed": "autoeq-workbench:c4-consensus-corpus-v1",
+  "splitSeed": "autoeq-workbench:c4-consensus-split-v1",
+  "requiredGroupCount": 6,
+  "minimumIndependentMeasurements": 3,
+  "groups": [
+    {
+      "groupId": "c4g-95ca9d64e706e94c51e7",
+      "groupKey": "blon x hbb z300|blon x hbb z300",
+      "deviceFamily": "blon x hbb z300",
+      "configurationSignature": "blon x hbb z300",
+      "selectionHash": "6f813de2b420ff26b55b36a736b0530d417ad14bb909f5c404d1597fd2ef26fc",
+      "split": "development",
+      "splitHash": "043675c6ea155bac80c824cc6c58d036276e667b73807bb29e530beab36531fe",
+      "eligible": true,
+      "independentMeasurementCount": 8,
+      "independentCollections": [
+        "Bakkwatan",
+        "Fahryst",
+        "Harpo",
+        "Hi End Portable",
+        "Kazi",
+        "RikudouGoku",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "duplicateCollections": [],
+      "rigClasses": [
+        "711-class"
+      ],
+      "exactRigStrings": [
+        "711"
+      ],
+      "members": [
+        {
+          "collection": "Bakkwatan",
+          "form": "in-ear",
+          "model": "BLON x HBB Z300",
+          "processedName": "BLON x HBB Z300",
+          "deviceFamily": "blon x hbb z300",
+          "configurationSignature": "blon x hbb z300",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Bakkwatan/data/in-ear/BLON x HBB Z300.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Bakkwatan/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+          "blobSha": "24248baa49dc2bfcf5621c8a3852be2010057ce0",
+          "concreteCurveIdentity": "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+          "sourceRows": [
+            {
+              "rowNumber": 6,
+              "url": "https://bakkwatan.squig.link/data/BLON%20Z300%20L.txt",
+              "sourceName": "BLON X HBB Z300",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 7,
+              "url": "https://bakkwatan.squig.link/data/BLON%20Z300%20R.txt",
+              "sourceName": "BLON X HBB Z300",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://bakkwatan.squig.link/data/BLON%20Z300%20L.txt",
+            "https://bakkwatan.squig.link/data/BLON%20Z300%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "5925ad30f2788508263be41a28f8f5f92cd0d45fbabeea97d284aba422e48d4c",
+            "byteLength": 8743,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -21.55,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -21.55,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "091c78d1e4c78c94bc46f797820781e1a74fd8e984a793de5b6de5951822fa58",
+            "canonicalParsedPointsSha256": "b76fd5f57084681775335412c4caac9346845f53f56dcb7bf5e2b7b0565254b2",
+            "normalizedParsedPointsSha256": "fb7584e2507b763593e39976fae2472ac85b348d9b8706e27cbc3af90501c5de",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Fahryst",
+          "form": "in-ear",
+          "model": "BLON x HBB Z300",
+          "processedName": "BLON x HBB Z300",
+          "deviceFamily": "blon x hbb z300",
+          "configurationSignature": "blon x hbb z300",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Fahryst/data/in-ear/BLON x HBB Z300.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Fahryst/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+          "blobSha": "22d444bdda91451525b7416248d2318264da988d",
+          "concreteCurveIdentity": "\"Fahryst\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+          "sourceRows": [
+            {
+              "rowNumber": 41,
+              "url": "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20L.txt",
+              "sourceName": "BLON x HBB Z300 (Sample 1)",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 42,
+              "url": "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20R.txt",
+              "sourceName": "BLON x HBB Z300 (Sample 1)",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 43,
+              "url": "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20S2%20L.txt",
+              "sourceName": "BLON x HBB Z300 (Sample 2)",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 44,
+              "url": "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20S2%20R.txt",
+              "sourceName": "BLON x HBB Z300 (Sample 2)",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20L.txt",
+            "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20R.txt",
+            "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20S2%20L.txt",
+            "https://fahryst.squig.link/data/BLON%20x%20HBB%20Z300%20S2%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "d1a7288b25ad8cd589a05fdfffe643f627ce772fa30bf432d2ae048a971a9ec9",
+            "byteLength": 8765,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -13.61,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -13.61,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "184d47d65ad60a7078480b756ca13b9bd5ae228b9126571f8ee60b9a91be9caa",
+            "canonicalParsedPointsSha256": "cd4fc80aae65f3fd294347e52987b5aef34a0052aad3674567c3b44520a94397",
+            "normalizedParsedPointsSha256": "f0c0fd77ef149a3c043227e2d2e54f947da6f6d0d9511ee802d5754d1cb38639",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Harpo",
+          "form": "in-ear",
+          "model": "BLON x HBB Z300",
+          "processedName": "BLON x HBB Z300",
+          "deviceFamily": "blon x hbb z300",
+          "configurationSignature": "blon x hbb z300",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Harpo/data/in-ear/BLON x HBB Z300.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+          "blobSha": "cb29b53aa7bc17b10ef60bcfc0c1ecc3e7581eb8",
+          "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+          "sourceRows": [
+            {
+              "rowNumber": 32,
+              "url": "https://harpo.squig.link/data/Blon%20Z300%20R.txt",
+              "sourceName": "Blon Z300",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://harpo.squig.link/data/Blon%20Z300%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "94a1283b3b6c89f2eea7f437ce2a5c08c8626beecf5f6d83148f3d958640020c",
+            "byteLength": 8811,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -24.33,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -24.33,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "77599dab066edc17995edfac04976c4e5bb9f0abf9041b0feb729fd23c91ae20",
+            "canonicalParsedPointsSha256": "cd78057477de848c306f78d20c6fa61f8c505e53e408444bdb3386126bbd11ab",
+            "normalizedParsedPointsSha256": "5fd7a76556cbf2fe6e230e9610e5e939c659559eb8526358d436ad22f4b90b1f",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Hi End Portable",
+          "form": "in-ear",
+          "model": "BLON x HBB Z300",
+          "processedName": "BLON x HBB Z300",
+          "deviceFamily": "blon x hbb z300",
+          "configurationSignature": "blon x hbb z300",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Hi End Portable/data/in-ear/BLON x HBB Z300.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+          "blobSha": "4b0ef42d1c4445d4cd10e646faf9fcc7452cfc75",
+          "concreteCurveIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+          "sourceRows": [
+            {
+              "rowNumber": 38,
+              "url": "https://cqtek.squig.link/data/Blon%20Z300%20L.txt",
+              "sourceName": "Blon Z300",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 39,
+              "url": "https://cqtek.squig.link/data/Blon%20Z300%20R.txt",
+              "sourceName": "Blon Z300",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://cqtek.squig.link/data/Blon%20Z300%20L.txt",
+            "https://cqtek.squig.link/data/Blon%20Z300%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "afce83090fdfea52e9127f228d904735e95d7e31fcce66781ea81a0a5971d694",
+            "byteLength": 8715,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -15.62,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -15.62,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "2a38cef999f75b4e7e4369274e5bc878d71eb165387fb942cefb016c6a4aafe3",
+            "canonicalParsedPointsSha256": "155116422c685bcaca7fe367107da91f6fc414dfef76a291c47d644d5fac569d",
+            "normalizedParsedPointsSha256": "7be37aed58262f36f9400e07186cb3590617b8d98930f13fa78653c31d54322f",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Kazi",
+          "form": "in-ear",
+          "model": "BLON x HBB Z300",
+          "processedName": "BLON x HBB Z300",
+          "deviceFamily": "blon x hbb z300",
+          "configurationSignature": "blon x hbb z300",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Kazi/data/in-ear/BLON x HBB Z300.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+          "blobSha": "a1dde041dec0f9a2ab58c0054cf19dc9eb178bc6",
+          "concreteCurveIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+          "sourceRows": [
+            {
+              "rowNumber": 18,
+              "url": "https://kazi.squig.link/data/BLON%20X%20HBB%20Z300%20L.txt",
+              "sourceName": "BLON X HBB Z300",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 19,
+              "url": "https://kazi.squig.link/data/BLON%20X%20HBB%20Z300%20R.txt",
+              "sourceName": "BLON X HBB Z300",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://kazi.squig.link/data/BLON%20X%20HBB%20Z300%20L.txt",
+            "https://kazi.squig.link/data/BLON%20X%20HBB%20Z300%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "a16ecaf16e071aa8f95ff8f60881f65bdb1a717e0d83987771723bba7f1d37bd",
+            "byteLength": 8752,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -16.74,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -16.74,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "d2c5706492f61d218cc2af85e77a07942330262a57bcac47fdf5f084af14673e",
+            "canonicalParsedPointsSha256": "fd3248c0f648a50dc154917ba1380cd1f91a9c573b3b3721e0c0b1e02ec7eb21",
+            "normalizedParsedPointsSha256": "390e3988b6ed98a5089ca67c41fb0428d9279a003691586c1851d9a7fe5e9f04",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "RikudouGoku",
+          "form": "in-ear",
+          "model": "BLON x HBB Z300",
+          "processedName": "BLON x HBB Z300",
+          "deviceFamily": "blon x hbb z300",
+          "configurationSignature": "blon x hbb z300",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/RikudouGoku/data/in-ear/BLON x HBB Z300.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+          "blobSha": "6f016d08a91072674592229badeb9b98bf8af137",
+          "concreteCurveIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+          "sourceRows": [
+            {
+              "rowNumber": 44,
+              "url": "https://rg.squig.link/data/Blon%20X%20HBB%20Z300%20L.txt",
+              "sourceName": "Blon X HBB Z300",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 45,
+              "url": "https://rg.squig.link/data/Blon%20X%20HBB%20Z300%20R.txt",
+              "sourceName": "Blon X HBB Z300",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://rg.squig.link/data/Blon%20X%20HBB%20Z300%20L.txt",
+            "https://rg.squig.link/data/Blon%20X%20HBB%20Z300%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "6c6c6d763cfb5ab1fbcf08baaa0edfef9e98a97d667ebb02da4a114974d46558",
+            "byteLength": 8834,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -8.84,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -8.84,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "3e7187735cf7dea621703190cd4096c8b719055b00704d269f2e9607d4d8d853",
+            "canonicalParsedPointsSha256": "c212ef5b1fdc7173aadb3c489895e86b42b50689b1f55b8689b7e3c36c1335e2",
+            "normalizedParsedPointsSha256": "e6d499b20293d81eee239733ea1bd9aa71d5f340023c61678ffbd605b0d79343",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Super Review",
+          "form": "in-ear",
+          "model": "BLON x HBB Z300",
+          "processedName": "BLON x HBB Z300",
+          "deviceFamily": "blon x hbb z300",
+          "configurationSignature": "blon x hbb z300",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Super Review/data/in-ear/BLON x HBB Z300.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+          "blobSha": "1b136cd3654f26d586acb2a6a7e418783c301090",
+          "concreteCurveIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+          "sourceRows": [
+            {
+              "rowNumber": 284,
+              "url": "https://superreview.squig.link/data/Blon%20Z300%20L.txt",
+              "sourceName": "Blon Z300",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 285,
+              "url": "https://superreview.squig.link/data/Blon%20Z300%20R.txt",
+              "sourceName": "Blon Z300",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://superreview.squig.link/data/Blon%20Z300%20L.txt",
+            "https://superreview.squig.link/data/Blon%20Z300%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "764022896074741941f5a60135b362d699a3242a69be3603717707fcd36c440a",
+            "byteLength": 8817,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -17.56,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -17.56,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "710ae4ed605f9d53e384696eb7514c5ddc0ef0dadf80f5be70f6172d91a4f4d2",
+            "canonicalParsedPointsSha256": "83978a212788ebb437bc60c62eb4b65808797f23395b5ec37c8552d8070dc988",
+            "normalizedParsedPointsSha256": "5d2efada40b86b5e17059a197a80512ec070b41e2f5917934bed1410164f1955",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "ToneDeafMonk",
+          "form": "in-ear",
+          "model": "BLON x HBB Z300",
+          "processedName": "BLON x HBB Z300",
+          "deviceFamily": "blon x hbb z300",
+          "configurationSignature": "blon x hbb z300",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/ToneDeafMonk/data/in-ear/BLON x HBB Z300.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/BLON%20x%20HBB%20Z300.csv",
+          "blobSha": "c200a91bff1a719882b2c1181ba12df6e2774d37",
+          "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"BLON x HBB Z300\"",
+          "sourceRows": [
+            {
+              "rowNumber": 89,
+              "url": "https://tonedeafmonk.squig.link/data/BLON%20HBB%20Z300%20L.txt",
+              "sourceName": "BLON HBB Z300",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://tonedeafmonk.squig.link/data/BLON%20HBB%20Z300%20L.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "98d6a90cbff31463a7af59d6a71b81eee486134abcbf9273c462e372ff26a0f7",
+            "byteLength": 8742,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -23.32,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -23.32,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "166fa042316b225bb1bc650e911d1b8092cb7330d5defb6a468daef0ab68f022",
+            "canonicalParsedPointsSha256": "434d76b0e297e86ff13cb32d01129d7ed20ba2129bd5f34395fc876afdcb1307",
+            "normalizedParsedPointsSha256": "9fdfaa9041b90a761d817a57b622afacaac7ba88b68e09ce71c56785fb810668",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        }
+      ]
+    },
+    {
+      "groupId": "c4g-9c1d23845eb5a1d7beef",
+      "groupKey": "kiwi ears quintet|kiwi ears quintet",
+      "deviceFamily": "kiwi ears quintet",
+      "configurationSignature": "kiwi ears quintet",
+      "selectionHash": "80e6431d637c5daae460880aeced07d89a165e919cabc5c81c43331d31d4a48b",
+      "split": "development",
+      "splitHash": "47e88e130d605acef154f2db9121fd1c757d0debcf983143fc3110b89eb80c48",
+      "eligible": true,
+      "independentMeasurementCount": 8,
+      "independentCollections": [
+        "Harpo",
+        "Hi End Portable",
+        "Jaytiss",
+        "Kazi",
+        "Regan Cipher",
+        "RikudouGoku",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "duplicateCollections": [],
+      "rigClasses": [
+        "711-class"
+      ],
+      "exactRigStrings": [
+        "711"
+      ],
+      "members": [
+        {
+          "collection": "Harpo",
+          "form": "in-ear",
+          "model": "Kiwi Ears Quintet",
+          "processedName": "Kiwi Ears Quintet",
+          "deviceFamily": "kiwi ears quintet",
+          "configurationSignature": "kiwi ears quintet",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Harpo/data/in-ear/Kiwi Ears Quintet.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+          "blobSha": "1f9b51d4cb36a8eb6aa0736402c6eb4200f16051",
+          "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+          "sourceRows": [
+            {
+              "rowNumber": 135,
+              "url": "https://harpo.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://harpo.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "460b60277d6cd56264bb4033ffa4be19598c98c1f2db42109e1279ff7f83366e",
+            "byteLength": 8781,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -11.87,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -11.87,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "88842a51ee0dd7d988fdd7a37da65906d051c9b6c5abe9e77b2d381cf2a2aa7f",
+            "canonicalParsedPointsSha256": "33523fd627057095278669d157b7e58e58161efbf303cc7e16ea7f96f8c54539",
+            "normalizedParsedPointsSha256": "d3688f81eb117d350560096c193a2c5574c56d328242bd15cad91c0a43caf4f8",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Hi End Portable",
+          "form": "in-ear",
+          "model": "Kiwi Ears Quintet",
+          "processedName": "Kiwi Ears Quintet",
+          "deviceFamily": "kiwi ears quintet",
+          "configurationSignature": "kiwi ears quintet",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Hi End Portable/data/in-ear/Kiwi Ears Quintet.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+          "blobSha": "56379ce01f424dc36882c55950c6b2239c506c6b",
+          "concreteCurveIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+          "sourceRows": [
+            {
+              "rowNumber": 283,
+              "url": "https://cqtek.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 284,
+              "url": "https://cqtek.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://cqtek.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+            "https://cqtek.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "5b4a91430533f60107f8c163ac4546aceb59abcb1f6a5ef2c8160df8b63c3d04",
+            "byteLength": 8822,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -18.21,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -18.21,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "c8f219ec9e35555484ded7c67adbc88b2f56d7c25be3d233c1332d04260d094f",
+            "canonicalParsedPointsSha256": "29bd4760d68dbcfeb125298b826f6d50944c5585df507fdc2aa8d9f87e08d181",
+            "normalizedParsedPointsSha256": "31e8f885320e42c71759160360f786c89dd02d9361d0c1705f8711ce549e52f3",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Jaytiss",
+          "form": "in-ear",
+          "model": "Kiwi Ears Quintet",
+          "processedName": "Kiwi Ears Quintet",
+          "deviceFamily": "kiwi ears quintet",
+          "configurationSignature": "kiwi ears quintet",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Jaytiss/data/in-ear/Kiwi Ears Quintet.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Jaytiss/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+          "blobSha": "f46d800444d57678e276b54dbf46b0a044a0bfcb",
+          "concreteCurveIdentity": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+          "sourceRows": [
+            {
+              "rowNumber": 444,
+              "url": "https://jaytiss.squig.link/data/Quintet%20L.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 445,
+              "url": "https://jaytiss.squig.link/data/Quintet%20R.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://jaytiss.squig.link/data/Quintet%20L.txt",
+            "https://jaytiss.squig.link/data/Quintet%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "43b61cc8ee495d3e6ea1c7e57b224e0e4d44f4b90b558cbc2605fe7110763e5e",
+            "byteLength": 8796,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -20.02,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -20.02,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "f9204db5b4080289dd5e519c3a777c2b3dd50f30d6746f9d9d0eb1510f5cb793",
+            "canonicalParsedPointsSha256": "5782aa52f2691b7e22c01886be4863519b2ce462b4f2a804ac56cb63d23f0743",
+            "normalizedParsedPointsSha256": "23a8a71306ed3133a2bb818cf8117f74a947e4825e9e8e7bd44292866d9ae140",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Kazi",
+          "form": "in-ear",
+          "model": "Kiwi Ears Quintet",
+          "processedName": "Kiwi Ears Quintet",
+          "deviceFamily": "kiwi ears quintet",
+          "configurationSignature": "kiwi ears quintet",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Kazi/data/in-ear/Kiwi Ears Quintet.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+          "blobSha": "8099f53a2580de509c9123bca128fc21494e775f",
+          "concreteCurveIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+          "sourceRows": [
+            {
+              "rowNumber": 150,
+              "url": "https://kazi.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 151,
+              "url": "https://kazi.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://kazi.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+            "https://kazi.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "2972ba653b80394f051b39728dc482a1e3601ffa1627a1e7b8b42499bc222b03",
+            "byteLength": 8798,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -24.8,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -24.8,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "c2895a2c0deb75c31e18538dd8b494e8f7329a90f67be532cd61a0c5d0fe36fc",
+            "canonicalParsedPointsSha256": "c6349b15b0f17a8438e543404a363cd274a1405e805a6f9f1b5b8226196683ff",
+            "normalizedParsedPointsSha256": "218d1f5eca0fda92fd7aade5971efe0145c39bb6d0952bf5794448ec6cc7b0ff",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Regan Cipher",
+          "form": "in-ear",
+          "model": "Kiwi Ears Quintet",
+          "processedName": "Kiwi Ears Quintet",
+          "deviceFamily": "kiwi ears quintet",
+          "configurationSignature": "kiwi ears quintet",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Regan Cipher/data/in-ear/Kiwi Ears Quintet.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+          "blobSha": "48e50398c325bda29653dec93ac880e01255e55b",
+          "concreteCurveIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+          "sourceRows": [
+            {
+              "rowNumber": 246,
+              "url": "https://regancipher.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 247,
+              "url": "https://regancipher.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://regancipher.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+            "https://regancipher.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "5c2552f8c641c257df70d165096d74c008b23a720841dbb4148c08dcfb68ba0a",
+            "byteLength": 8770,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -19.61,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -19.61,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "2d268349329a2ca402b171caa0d4cd8c7729d105ad8d86e4142ef1db4684238c",
+            "canonicalParsedPointsSha256": "851b536e14a5e575eb79269189706d3bc40d211a3c6ab0513a181c85c0bf27da",
+            "normalizedParsedPointsSha256": "0b5c50d01c59f3d813bc699488659514c4434c46e30c55a9b96ddd6f0ec679c6",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "RikudouGoku",
+          "form": "in-ear",
+          "model": "Kiwi Ears Quintet",
+          "processedName": "Kiwi Ears Quintet",
+          "deviceFamily": "kiwi ears quintet",
+          "configurationSignature": "kiwi ears quintet",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/RikudouGoku/data/in-ear/Kiwi Ears Quintet.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+          "blobSha": "a91987048560434d5ca5aba795436939c7d8d640",
+          "concreteCurveIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+          "sourceRows": [
+            {
+              "rowNumber": 306,
+              "url": "https://rg.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 307,
+              "url": "https://rg.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://rg.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+            "https://rg.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "f6ec6f4997021df5837ab76d57fb30033b6b1603d3fb43f3ea2dee99bcce91e0",
+            "byteLength": 8837,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -14.51,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -14.51,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "2e8fe6a47600e36a70e589ed90e9b27a3bd3a29030b15b97c08ac4e0b001c74e",
+            "canonicalParsedPointsSha256": "fe4322f2e9ae09f5ba90edcd50f0aee3425723452cef14c052b12b6ee7edce0f",
+            "normalizedParsedPointsSha256": "ed51a16280aa81a89739cb2674b983e1ff385dd05198e9fb793ee1420e9b1db8",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Super Review",
+          "form": "in-ear",
+          "model": "Kiwi Ears Quintet",
+          "processedName": "Kiwi Ears Quintet",
+          "deviceFamily": "kiwi ears quintet",
+          "configurationSignature": "kiwi ears quintet",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Super Review/data/in-ear/Kiwi Ears Quintet.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+          "blobSha": "3a2fbba6c26770169b4d15722def04ba6f6035bd",
+          "concreteCurveIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+          "sourceRows": [
+            {
+              "rowNumber": 1300,
+              "url": "https://superreview.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 1301,
+              "url": "https://superreview.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt",
+              "sourceName": "Kiwi Ears Quintet",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://superreview.squig.link/data/Kiwi%20Ears%20Quintet%20L.txt",
+            "https://superreview.squig.link/data/Kiwi%20Ears%20Quintet%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "095080df163ed40a3f214ab40ba45f4e50e73de28f1bc475b48058f995eec70f",
+            "byteLength": 8756,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -18.18,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -18.18,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "638e9e06201e4d71e828a6692bea269b55c6c97ffa273bd6d20a9e5501ff50f7",
+            "canonicalParsedPointsSha256": "048feae354380802ffffae6314cd886b9f071558717ba96c1d0788540c657f3f",
+            "normalizedParsedPointsSha256": "584129ff854de4a3e292973b83d6960f79a244d210e46dcb54625180f9be7b46",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "ToneDeafMonk",
+          "form": "in-ear",
+          "model": "Kiwi Ears Quintet",
+          "processedName": "Kiwi Ears Quintet",
+          "deviceFamily": "kiwi ears quintet",
+          "configurationSignature": "kiwi ears quintet",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/ToneDeafMonk/data/in-ear/Kiwi Ears Quintet.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Kiwi%20Ears%20Quintet.csv",
+          "blobSha": "202fde91adb7fec3633c8a784d06baa1cd1ed0b9",
+          "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Kiwi Ears Quintet\"",
+          "sourceRows": [
+            {
+              "rowNumber": 429,
+              "url": "https://tonedeafmonk.squig.link/data/Kiwiears%20Quintet%20L.txt",
+              "sourceName": "KiwiEars Quintet",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 430,
+              "url": "https://tonedeafmonk.squig.link/data/Kiwiears%20Quintet%20R.txt",
+              "sourceName": "KiwiEars Quintet",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://tonedeafmonk.squig.link/data/Kiwiears%20Quintet%20L.txt",
+            "https://tonedeafmonk.squig.link/data/Kiwiears%20Quintet%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "d14ce71dda2f1e63e5c5cfe54742a9d39cea6f744b960c24e705265874aeba8d",
+            "byteLength": 8829,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -22.61,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -22.61,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "0f2c63c8fab07340d68e170b0074736f1c00e8107c262789cba009e26fb18a37",
+            "canonicalParsedPointsSha256": "c56d69cd701f38274425518a7079e6ddb26adc32f46fc8ef41f63438c58dcb13",
+            "normalizedParsedPointsSha256": "c886d2081944b2482b7f0472523ab0aea7b4c527675708a61eb8816eb92a00e6",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        }
+      ]
+    },
+    {
+      "groupId": "c4g-35f72baf0cca66570d01",
+      "groupKey": "moondrop chu|moondrop chu",
+      "deviceFamily": "moondrop chu",
+      "configurationSignature": "moondrop chu",
+      "selectionHash": "d5bcb8bc700e88c3ee070bf51bef1c908bfcb764cac7301474364408976dc5e9",
+      "split": "development",
+      "splitHash": "b90f395023216d9497edb4dc377ff0e5466a1f1e06fe2011b5fa82f6f12c2822",
+      "eligible": true,
+      "independentMeasurementCount": 8,
+      "independentCollections": [
+        "Filk",
+        "Harpo",
+        "Regan Cipher",
+        "Super Review",
+        "Ted's Squig Hoard",
+        "ToneDeafMonk",
+        "freeryder05",
+        "kr0mka"
+      ],
+      "duplicateCollections": [],
+      "rigClasses": [
+        "711-class"
+      ],
+      "exactRigStrings": [
+        "711"
+      ],
+      "members": [
+        {
+          "collection": "Filk",
+          "form": "in-ear",
+          "model": "Moondrop Chu",
+          "processedName": "Moondrop Chu",
+          "deviceFamily": "moondrop chu",
+          "configurationSignature": "moondrop chu",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Filk/data/in-ear/Moondrop Chu.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Filk/data/in-ear/Moondrop%20Chu.csv",
+          "blobSha": "3e3dce11177c0f5ec2fba3e1d69299b20dde8cb2",
+          "concreteCurveIdentity": "\"Filk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+          "sourceRows": [
+            {
+              "rowNumber": 249,
+              "url": "https://filk.squig.link/iems/data/Moondrop%20Chu%20L.txt",
+              "sourceName": "Moondrop Chu",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 250,
+              "url": "https://filk.squig.link/iems/data/Moondrop%20Chu%20R.txt",
+              "sourceName": "Moondrop Chu",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://filk.squig.link/iems/data/Moondrop%20Chu%20L.txt",
+            "https://filk.squig.link/iems/data/Moondrop%20Chu%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "ab5a54498140b86d5d9af4153cb22577840c81a9100b57fdb26fbe13bab04762",
+            "byteLength": 8869,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -25.6,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -25.6,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "bc7f4105c9bdaa51d9e8e158d064ad61963c9faf5c321a0b62cfcf8d92e0454a",
+            "canonicalParsedPointsSha256": "3f7a3f4446c0c1a5b281477b2d8bb8ce240d53d8dbe79a39097ece8c108c0d4c",
+            "normalizedParsedPointsSha256": "8146e917ac1064f2c53001a7e2d56e4998daae5409f3cb5673f920d26b477010",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "freeryder05",
+          "form": "in-ear",
+          "model": "Moondrop Chu",
+          "processedName": "Moondrop Chu",
+          "deviceFamily": "moondrop chu",
+          "configurationSignature": "moondrop chu",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/freeryder05/data/in-ear/Moondrop Chu.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/freeryder05/data/in-ear/Moondrop%20Chu.csv",
+          "blobSha": "85763265e9c6618ef0b72183e282c6922fb128d3",
+          "concreteCurveIdentity": "\"freeryder05\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+          "sourceRows": [
+            {
+              "rowNumber": 123,
+              "url": "https://freeryder05.squig.link/data/Chu%20L.txt",
+              "sourceName": "Moondrop Chu",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 124,
+              "url": "https://freeryder05.squig.link/data/Chu%20R.txt",
+              "sourceName": "Moondrop Chu",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://freeryder05.squig.link/data/Chu%20L.txt",
+            "https://freeryder05.squig.link/data/Chu%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "e90534bf930b6c5e5ef3cb596f807e1e5147feaff5df10191c402b313f12dbce",
+            "byteLength": 8774,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -25.23,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -25.23,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "19d373c6ab8e4f6a22ed6099344533a88afd2a8b392bb5b9c75fd44aa7273a41",
+            "canonicalParsedPointsSha256": "39fa35b928ec0a695516c145fe98b8f6229d67d7d25bfb4bc9a2a75597152ec8",
+            "normalizedParsedPointsSha256": "d6fb52151fb29bdea38183b3d3a24f849a11f779a75df1bc42bec9b75dc40a74",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Harpo",
+          "form": "in-ear",
+          "model": "Moondrop Chu",
+          "processedName": "Moondrop Chu",
+          "deviceFamily": "moondrop chu",
+          "configurationSignature": "moondrop chu",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Harpo/data/in-ear/Moondrop Chu.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Moondrop%20Chu.csv",
+          "blobSha": "46d5f91306266c2215f0d6e53eddf090538a22de",
+          "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+          "sourceRows": [
+            {
+              "rowNumber": 144,
+              "url": "https://harpo.squig.link/data/Moondrop%20Chu%20R.txt",
+              "sourceName": "Moondrop Chu",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://harpo.squig.link/data/Moondrop%20Chu%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "9b2aefcb23ac2c74d1154656cf6f4428c4373d24687b618b43a3073afd69655b",
+            "byteLength": 8803,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -21.73,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -21.73,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "587e617523c5e9f7554d4379ac2f8846e6289cb3f1881724ae31012a0288b514",
+            "canonicalParsedPointsSha256": "2f1df5532ba6aab8d03fae8e9b011f6a2d53f3a225252f02f71e56803f7efa81",
+            "normalizedParsedPointsSha256": "984d6669f9523480aa86254240cf5aa8bdd8c958db5ab2802ddbbc296efc2f71",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "kr0mka",
+          "form": "in-ear",
+          "model": "Moondrop Chu",
+          "processedName": "Moondrop Chu",
+          "deviceFamily": "moondrop chu",
+          "configurationSignature": "moondrop chu",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/kr0mka/data/in-ear/Moondrop Chu.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/kr0mka/data/in-ear/Moondrop%20Chu.csv",
+          "blobSha": "c8430a4305c35592a6449c4e70beb7dda4df9b46",
+          "concreteCurveIdentity": "\"kr0mka\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+          "sourceRows": [
+            {
+              "rowNumber": 685,
+              "url": "https://kr0mka.squig.link/data/Chu%20L.txt",
+              "sourceName": "Moondrop Chu",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 686,
+              "url": "https://kr0mka.squig.link/data/Chu%20R.txt",
+              "sourceName": "Moondrop Chu",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://kr0mka.squig.link/data/Chu%20L.txt",
+            "https://kr0mka.squig.link/data/Chu%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "9a5d60e7fdc0fff707ecf52a86212d231461c92cef23f4361cddb07962a5da5b",
+            "byteLength": 8803,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -23.56,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -23.56,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "4091ae294492047046cb52ebaec3879680d3d6d728bc5c9a24147b90ac702241",
+            "canonicalParsedPointsSha256": "58f0a9cb2e4635bbd77782160e03dd3eff8e9d095ac2e97f8c034b59f438e830",
+            "normalizedParsedPointsSha256": "7a0085ad5f3b985444125d896d0c3d3c1a13985db4c15fd84ca8b982ac88d81b",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Regan Cipher",
+          "form": "in-ear",
+          "model": "Moondrop Chu",
+          "processedName": "Moondrop Chu",
+          "deviceFamily": "moondrop chu",
+          "configurationSignature": "moondrop chu",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Regan Cipher/data/in-ear/Moondrop Chu.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Moondrop%20Chu.csv",
+          "blobSha": "3cdfe1f9e505f9191b07cd28c56e21573a3c02ed",
+          "concreteCurveIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+          "sourceRows": [
+            {
+              "rowNumber": 253,
+              "url": "https://regancipher.squig.link/data/Moondrop%20Chu%20L.txt",
+              "sourceName": "Moondrop Chu",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 254,
+              "url": "https://regancipher.squig.link/data/Moondrop%20Chu%20R.txt",
+              "sourceName": "Moondrop Chu",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://regancipher.squig.link/data/Moondrop%20Chu%20L.txt",
+            "https://regancipher.squig.link/data/Moondrop%20Chu%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "b421902a43eddde44e6335eaf94382a447c15e0ea253a7bfea75a32e708d2bda",
+            "byteLength": 8768,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -16.5,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -16.5,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "cfb28ec6d34599c8c0b302895e0b9b05870c8f668f905d13e5440920ce3fbf97",
+            "canonicalParsedPointsSha256": "b9be7e07174443cb1eed02b7caf382b69262defb3fa46a3e3fd5658cb380cbcb",
+            "normalizedParsedPointsSha256": "c9fb36edef473511266fb3df0b2684338d84390a8ab5cf1be0f5da74d768725e",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Super Review",
+          "form": "in-ear",
+          "model": "Moondrop Chu",
+          "processedName": "Moondrop Chu",
+          "deviceFamily": "moondrop chu",
+          "configurationSignature": "moondrop chu",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Super Review/data/in-ear/Moondrop Chu.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/Moondrop%20Chu.csv",
+          "blobSha": "d27a1b096194ac251e33a383c0ba23fe22ed958e",
+          "concreteCurveIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+          "sourceRows": [
+            {
+              "rowNumber": 1576,
+              "url": "https://superreview.squig.link/data/Moondrop%20Chu%20L.txt",
+              "sourceName": "Moondrop Chu stock",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 1577,
+              "url": "https://superreview.squig.link/data/Moondrop%20Chu%20R.txt",
+              "sourceName": "Moondrop Chu stock",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://superreview.squig.link/data/Moondrop%20Chu%20L.txt",
+            "https://superreview.squig.link/data/Moondrop%20Chu%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "a754c797c2c996ca2c5882be4811442b3efa5e2a99f29aa740759045031e699d",
+            "byteLength": 8776,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -21.63,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -21.63,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "2108dcca47499ac007dac5e8c1de79d0fb40b4120632e9d97fa5300cc1354367",
+            "canonicalParsedPointsSha256": "da4fdfe1a4a98ecbb4d507928098dcba61cf7fb17fbb80d2fc6a548c6f8bd277",
+            "normalizedParsedPointsSha256": "a9f38ee73508d4b1dc7d496e0755cdea2f3b0a8e237cd3fcf7277bd2763a431e",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Ted's Squig Hoard",
+          "form": "in-ear",
+          "model": "Moondrop Chu",
+          "processedName": "Moondrop Chu",
+          "deviceFamily": "moondrop chu",
+          "configurationSignature": "moondrop chu",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Ted's Squig Hoard/data/in-ear/Moondrop Chu.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Ted's%20Squig%20Hoard/data/in-ear/Moondrop%20Chu.csv",
+          "blobSha": "38762a6ab4499f8ec697f67e90689046f9a14811",
+          "concreteCurveIdentity": "\"Ted's Squig Hoard\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+          "sourceRows": [
+            {
+              "rowNumber": 48,
+              "url": "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S1%20L.txt",
+              "sourceName": "Moondrop Chu (S1)",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 49,
+              "url": "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S1%20R.txt",
+              "sourceName": "Moondrop Chu (S1)",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 50,
+              "url": "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S2%20L.txt",
+              "sourceName": "Moondrop Chu (S2)",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 51,
+              "url": "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S2%20R.txt",
+              "sourceName": "Moondrop Chu (S2)",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S1%20L.txt",
+            "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S1%20R.txt",
+            "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S2%20L.txt",
+            "https://tedthepraimortis.squig.link/data/Moondrop%20Chu%20S2%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "95a80e1ccbaecdbabcd1f13241a0df368b7de4d9f9698e70c406e409f3293020",
+            "byteLength": 8802,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -21.82,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -21.82,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "3100f6408993fcc9a708837910dab6148d48471835e05d095d95028ddaea5b62",
+            "canonicalParsedPointsSha256": "064d74843bff11f000f146612eda90191c20f91135b4bec093c847fc3e2f8606",
+            "normalizedParsedPointsSha256": "1d7c89b3399c5319188a5646d9ba19be3a9f7c9d49b15ae584eba5fae669ce04",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "ToneDeafMonk",
+          "form": "in-ear",
+          "model": "Moondrop Chu",
+          "processedName": "Moondrop Chu",
+          "deviceFamily": "moondrop chu",
+          "configurationSignature": "moondrop chu",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/ToneDeafMonk/data/in-ear/Moondrop Chu.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Moondrop%20Chu.csv",
+          "blobSha": "beeee019cca0b7e2053e0ebc14c05eba8a0d779c",
+          "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Moondrop Chu\"",
+          "sourceRows": [
+            {
+              "rowNumber": 473,
+              "url": "https://tonedeafmonk.squig.link/data/MOONDROP%20CHU%20L.txt",
+              "sourceName": "MOONDROP CHU",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 474,
+              "url": "https://tonedeafmonk.squig.link/data/MOONDROP%20CHU%20R.txt",
+              "sourceName": "MOONDROP CHU",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://tonedeafmonk.squig.link/data/MOONDROP%20CHU%20L.txt",
+            "https://tonedeafmonk.squig.link/data/MOONDROP%20CHU%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "07d73f25a362cdecc7b70a12f9ef11ace37428e2b2b95d2719934cfb73f277d4",
+            "byteLength": 8775,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -16.82,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -16.82,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "c28a470946a911a68f7eba6e5082451534f1ea71ebdaf678f5aa8cf356f7ca9c",
+            "canonicalParsedPointsSha256": "7d1d7d18c1a79cebea88217078875561c2c94619ed2f5943b3c8d94901737e65",
+            "normalizedParsedPointsSha256": "8e2ee80a6221b2d7c06cabf89c9212c5198cc3a43efe9670c65550ee7217354f",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        }
+      ]
+    },
+    {
+      "groupId": "c4g-c5a0b86e1ea4436ca9ce",
+      "groupKey": "simgot audio em6l|simgot audio em6l",
+      "deviceFamily": "simgot audio em6l",
+      "configurationSignature": "simgot audio em6l",
+      "selectionHash": "f24a7209819d9799ffd03bf8dad22182fa045cb29084af138d8953924bb09032",
+      "split": "holdout",
+      "splitHash": "e13fb2b486629f3f8a6e491e24310b8cc7b324759043e59f001f0846c485f8d2",
+      "eligible": true,
+      "independentMeasurementCount": 9,
+      "independentCollections": [
+        "Fahryst",
+        "Harpo",
+        "Hi End Portable",
+        "Jaytiss",
+        "Kazi",
+        "Regan Cipher",
+        "RikudouGoku",
+        "Super Review",
+        "ToneDeafMonk"
+      ],
+      "duplicateCollections": [],
+      "rigClasses": [
+        "711-class"
+      ],
+      "exactRigStrings": [
+        "711"
+      ],
+      "members": [
+        {
+          "collection": "Fahryst",
+          "form": "in-ear",
+          "model": "Simgot Audio EM6L",
+          "processedName": "Simgot Audio EM6L",
+          "deviceFamily": "simgot audio em6l",
+          "configurationSignature": "simgot audio em6l",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Fahryst/data/in-ear/Simgot Audio EM6L.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Fahryst/data/in-ear/Simgot%20Audio%20EM6L.csv",
+          "blobSha": "e8641eddd4980c6191d3a929a655d5348012a2d3",
+          "concreteCurveIdentity": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EM6L\"",
+          "sourceRows": [
+            {
+              "rowNumber": 314,
+              "url": "https://fahryst.squig.link/data/Simgot%20EM6L%20L.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 315,
+              "url": "https://fahryst.squig.link/data/Simgot%20EM6L%20R.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://fahryst.squig.link/data/Simgot%20EM6L%20L.txt",
+            "https://fahryst.squig.link/data/Simgot%20EM6L%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "2d9852f42fe57d1607de1486d2e3c0997ae491b5a94bd2f28a2b9e685e063ac4",
+            "byteLength": 8700,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -11.21,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -11.21,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "27652e5527054093a6200c00c57542c371faccc20fdc600f3761dfe0ad8f463f",
+            "canonicalParsedPointsSha256": "9477fc38fb15bb3eed7bb0658fc5984733eedba28ccc4467ef24cb0cb732e0e6",
+            "normalizedParsedPointsSha256": "e800b189997ef688f2d55e52ad4b18da6ce8e7783494441cffb58790e5f266a1",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Harpo",
+          "form": "in-ear",
+          "model": "Simgot Audio EM6L",
+          "processedName": "Simgot Audio EM6L",
+          "deviceFamily": "simgot audio em6l",
+          "configurationSignature": "simgot audio em6l",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Harpo/data/in-ear/Simgot Audio EM6L.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Simgot%20Audio%20EM6L.csv",
+          "blobSha": "7c300e10768920c1d5cc286fe89df39a5d579929",
+          "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EM6L\"",
+          "sourceRows": [
+            {
+              "rowNumber": 188,
+              "url": "https://harpo.squig.link/data/Simgot%20EM6L%20R.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://harpo.squig.link/data/Simgot%20EM6L%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "ef08e2bea4010c2a5c00dd40a0fa0fab2614d3d43c3cbb4e9f0b775fdaa83652",
+            "byteLength": 8712,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -14.65,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -14.65,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "250d9262798137b0eafb3a4c917556a69a1fdb593dfb257fc9d22bb969c4eec8",
+            "canonicalParsedPointsSha256": "e758dec79b2e117176e1fbba727dfd27652efc672a405a187175c2f776d8b05b",
+            "normalizedParsedPointsSha256": "0651eb6b6efbf56c0d1e8757038830edfe76a3eafbabf6649d522c2025dc2584",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Hi End Portable",
+          "form": "in-ear",
+          "model": "Simgot Audio EM6L",
+          "processedName": "Simgot Audio EM6L",
+          "deviceFamily": "simgot audio em6l",
+          "configurationSignature": "simgot audio em6l",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Hi End Portable/data/in-ear/Simgot Audio EM6L.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/Simgot%20Audio%20EM6L.csv",
+          "blobSha": "dc521f301c75111887e5c8c89494c50586d1c15f",
+          "concreteCurveIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EM6L\"",
+          "sourceRows": [
+            {
+              "rowNumber": 485,
+              "url": "https://cqtek.squig.link/data/Simgot%20EM6L%20L.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 486,
+              "url": "https://cqtek.squig.link/data/Simgot%20EM6L%20R.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://cqtek.squig.link/data/Simgot%20EM6L%20L.txt",
+            "https://cqtek.squig.link/data/Simgot%20EM6L%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "c7cbea1e2e40c05f4fa24872013b6f0440ad4b3dbc5b5d39a225da501f1216c7",
+            "byteLength": 8745,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -16.4,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -16.4,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "ab653bb987c0ecd4f8ffa947c03f2d36231de41558679e884f39fb10fdf14e93",
+            "canonicalParsedPointsSha256": "4dd2225c86f7b316dacc646e38a46f58b08f611820b7118058408dbaa39ede49",
+            "normalizedParsedPointsSha256": "33e85a7c85a21f4e3ac709153dc6be7679b758d7f8d403544f1df9d7ea7deff5",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Jaytiss",
+          "form": "in-ear",
+          "model": "Simgot Audio EM6L",
+          "processedName": "Simgot Audio EM6L",
+          "deviceFamily": "simgot audio em6l",
+          "configurationSignature": "simgot audio em6l",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Jaytiss/data/in-ear/Simgot Audio EM6L.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Jaytiss/data/in-ear/Simgot%20Audio%20EM6L.csv",
+          "blobSha": "96795fb0b583624df3d90fb1ea6a956984163ce5",
+          "concreteCurveIdentity": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EM6L\"",
+          "sourceRows": [
+            {
+              "rowNumber": 689,
+              "url": "https://jaytiss.squig.link/data/EM6L%20L.txt",
+              "sourceName": "Simgot EM6L Phoenix",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 690,
+              "url": "https://jaytiss.squig.link/data/EM6L%20R.txt",
+              "sourceName": "Simgot EM6L Phoenix",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 691,
+              "url": "https://jaytiss.squig.link/data/Simgot%20EM6L%20L.txt",
+              "sourceName": "Simgot EM6L Phoenix",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 692,
+              "url": "https://jaytiss.squig.link/data/Simgot%20EM6L%20R.txt",
+              "sourceName": "Simgot EM6L Phoenix",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://jaytiss.squig.link/data/EM6L%20L.txt",
+            "https://jaytiss.squig.link/data/EM6L%20R.txt",
+            "https://jaytiss.squig.link/data/Simgot%20EM6L%20L.txt",
+            "https://jaytiss.squig.link/data/Simgot%20EM6L%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "efd28391b4fb0a3846f683295d51d698cc79019010ff3faddd7b045a500efc0f",
+            "byteLength": 8701,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -14.35,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -14.35,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "9a68da1af48c5dc6c5877f1751bf7ebe82cb70516c502d65a93be3f7b8218840",
+            "canonicalParsedPointsSha256": "24d7cd87cce0be56358e16c14fc2c80a47d04ec261f031a63f868eab40741e5b",
+            "normalizedParsedPointsSha256": "06b44a2148aac930f0437fc7ccb64058153776bbf8b8e1ffa8a0611b041d374b",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Kazi",
+          "form": "in-ear",
+          "model": "Simgot Audio EM6L",
+          "processedName": "Simgot Audio EM6L",
+          "deviceFamily": "simgot audio em6l",
+          "configurationSignature": "simgot audio em6l",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Kazi/data/in-ear/Simgot Audio EM6L.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/Simgot%20Audio%20EM6L.csv",
+          "blobSha": "81be960bc1235abc9bf4f7b676e4df64bb03352b",
+          "concreteCurveIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EM6L\"",
+          "sourceRows": [
+            {
+              "rowNumber": 221,
+              "url": "https://kazi.squig.link/data/Simgot%20EM6L%20L.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 222,
+              "url": "https://kazi.squig.link/data/Simgot%20EM6L%20R.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://kazi.squig.link/data/Simgot%20EM6L%20L.txt",
+            "https://kazi.squig.link/data/Simgot%20EM6L%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "279ea48e6ad1237259109c17957110898d0da1fb82a80d291b93476083e448f3",
+            "byteLength": 8817,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -18.2,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -18.2,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "9179d48ec2feead3723cec17fb7e728b07310bec4aa0a9b53a1e4becb54bf3e5",
+            "canonicalParsedPointsSha256": "b72dc50a378149599a65a6d5acdedd9d05ed3c889884ac7c8ea86c9068f316ee",
+            "normalizedParsedPointsSha256": "1eccf614a5aad93fb0176420827995ba7d7e84297c68dbb35587a96692a870c5",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Regan Cipher",
+          "form": "in-ear",
+          "model": "Simgot Audio EM6L",
+          "processedName": "Simgot Audio EM6L",
+          "deviceFamily": "simgot audio em6l",
+          "configurationSignature": "simgot audio em6l",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Regan Cipher/data/in-ear/Simgot Audio EM6L.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Simgot%20Audio%20EM6L.csv",
+          "blobSha": "2b4cbc02da0d236e7fb530472c402b0958ef4873",
+          "concreteCurveIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EM6L\"",
+          "sourceRows": [
+            {
+              "rowNumber": 487,
+              "url": "https://regancipher.squig.link/data/Simgot%20EM6L%20L.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 488,
+              "url": "https://regancipher.squig.link/data/Simgot%20EM6L%20R.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://regancipher.squig.link/data/Simgot%20EM6L%20L.txt",
+            "https://regancipher.squig.link/data/Simgot%20EM6L%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "fef8940b02172682a86dfc1e4f6b8e5a95d81f69ec524f5aeb892be20cea3ef0",
+            "byteLength": 8690,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -13.93,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -13.93,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "a7d7813b7b8a5b52fcec1bf281a858eb3e30ae817de3ca9e71c81b433313c450",
+            "canonicalParsedPointsSha256": "3b89a481a7ead2afff48dd55d3b12c3800ed039ae718684f252b951b65949bdd",
+            "normalizedParsedPointsSha256": "5090dab7bcc682143a9c84e7669e5548cbae9557b2cabe0a101112d6d81a416e",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "RikudouGoku",
+          "form": "in-ear",
+          "model": "Simgot Audio EM6L",
+          "processedName": "Simgot Audio EM6L",
+          "deviceFamily": "simgot audio em6l",
+          "configurationSignature": "simgot audio em6l",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/RikudouGoku/data/in-ear/Simgot Audio EM6L.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/Simgot%20Audio%20EM6L.csv",
+          "blobSha": "9323ebbeaf481c9e8aec037bd2c30e9e4a4a5017",
+          "concreteCurveIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EM6L\"",
+          "sourceRows": [
+            {
+              "rowNumber": 400,
+              "url": "https://rg.squig.link/data/Simgot%20EM6L%20L.txt",
+              "sourceName": "",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 401,
+              "url": "https://rg.squig.link/data/Simgot%20EM6L%20R.txt",
+              "sourceName": "",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://rg.squig.link/data/Simgot%20EM6L%20L.txt",
+            "https://rg.squig.link/data/Simgot%20EM6L%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "15aeac8cd9a3b8e119a2c79afe741fe9f5fa40f194603d44d8fe1cd311ba42ab",
+            "byteLength": 8774,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -12.56,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -12.56,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "842f87cf50a84946b4f0740f9c2bdaa48b737233d0a07bdeb8788db6aad839d1",
+            "canonicalParsedPointsSha256": "6d5c8fbc42f4e6752a433616eba219c696df13120c555ce30359df1ea1dc801b",
+            "normalizedParsedPointsSha256": "69ac115ec7e09088149fe299b1bb51f025565454203fd53552e8f92962fa7f43",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Super Review",
+          "form": "in-ear",
+          "model": "Simgot Audio EM6L",
+          "processedName": "Simgot Audio EM6L",
+          "deviceFamily": "simgot audio em6l",
+          "configurationSignature": "simgot audio em6l",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Super Review/data/in-ear/Simgot Audio EM6L.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/Simgot%20Audio%20EM6L.csv",
+          "blobSha": "d5874ee4d11b713d00362acce9471c61e4b213b1",
+          "concreteCurveIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"Simgot Audio EM6L\"",
+          "sourceRows": [
+            {
+              "rowNumber": 2259,
+              "url": "https://superreview.squig.link/data/Simgot%20EM6L%20L.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 2260,
+              "url": "https://superreview.squig.link/data/Simgot%20EM6L%20R.txt",
+              "sourceName": "Simgot EM6L",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://superreview.squig.link/data/Simgot%20EM6L%20L.txt",
+            "https://superreview.squig.link/data/Simgot%20EM6L%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "6dfb6f2d9ff7843963b3e2fbaa994c877f6cb124afc3d23253499c407418e8d5",
+            "byteLength": 8700,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -25.13,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -25.13,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "84cb1cb5eb6153c7d1c4ae7ca8a5c6d35b9f04a03c05820d4845ffec7364961c",
+            "canonicalParsedPointsSha256": "af797d1d08d025238cb4576c643af52b22e0641c05cf54702aed366c6628998a",
+            "normalizedParsedPointsSha256": "da9c7d4aecfd98687b388a8dabfcf86c1d5e46482d1cb76d2567b2d90382929a",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "ToneDeafMonk",
+          "form": "in-ear",
+          "model": "Simgot Audio EM6L",
+          "processedName": "Simgot Audio EM6L",
+          "deviceFamily": "simgot audio em6l",
+          "configurationSignature": "simgot audio em6l",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/ToneDeafMonk/data/in-ear/Simgot Audio EM6L.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Simgot%20Audio%20EM6L.csv",
+          "blobSha": "02cd0655f59cf06a98e79c474f74f9a7718960ea",
+          "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EM6L\"",
+          "sourceRows": [
+            {
+              "rowNumber": 655,
+              "url": "https://tonedeafmonk.squig.link/data/SIMGOT%20PHOENIX%20EM6L%20L.txt",
+              "sourceName": "Simgot PHOENIX EM6L (EM6L STOCK)",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 656,
+              "url": "https://tonedeafmonk.squig.link/data/SIMGOT%20PHOENIX%20EM6L%20R.txt",
+              "sourceName": "Simgot PHOENIX EM6L (EM6L STOCK)",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://tonedeafmonk.squig.link/data/SIMGOT%20PHOENIX%20EM6L%20L.txt",
+            "https://tonedeafmonk.squig.link/data/SIMGOT%20PHOENIX%20EM6L%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "d95c3bbc1083416c2abc114fd7ddb60a4b1303e786a46ab2b6a15effb99489b7",
+            "byteLength": 8766,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -13.8,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -13.8,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "8e0cd5033d7b6d269d422d2b6b6a4df755654b103918ea81d6a0bb90369fca9a",
+            "canonicalParsedPointsSha256": "633900f5b0ba2f5b734e86301e7b7140097075abb6d5e0c6008b4d8321d3cf1a",
+            "normalizedParsedPointsSha256": "53616dc4aba82934457b0cd0f6d8a82acd4559d39f062f2ae683f043450a4085",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        }
+      ]
+    },
+    {
+      "groupId": "c4g-043aeb45a50adf964f89",
+      "groupKey": "simgot audio ew200|simgot audio ew200",
+      "deviceFamily": "simgot audio ew200",
+      "configurationSignature": "simgot audio ew200",
+      "selectionHash": "d68e53b124c0679d4e259c01b9b01e232c8f52eafb627ec695fcce011633da81",
+      "split": "holdout",
+      "splitHash": "ed20234a843762bfe8f25db873c867e327118d278cc9189932390961a37b10db",
+      "eligible": true,
+      "independentMeasurementCount": 8,
+      "independentCollections": [
+        "Fahryst",
+        "Harpo",
+        "Hi End Portable",
+        "Jaytiss",
+        "Kazi",
+        "Regan Cipher",
+        "RikudouGoku",
+        "ToneDeafMonk"
+      ],
+      "duplicateCollections": [],
+      "rigClasses": [
+        "711-class"
+      ],
+      "exactRigStrings": [
+        "711"
+      ],
+      "members": [
+        {
+          "collection": "Fahryst",
+          "form": "in-ear",
+          "model": "Simgot Audio EW200",
+          "processedName": "Simgot Audio EW200",
+          "deviceFamily": "simgot audio ew200",
+          "configurationSignature": "simgot audio ew200",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Fahryst/data/in-ear/Simgot Audio EW200.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Fahryst/data/in-ear/Simgot%20Audio%20EW200.csv",
+          "blobSha": "42946f173f42d4348b662b99ab2e550ea96a94ac",
+          "concreteCurveIdentity": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+          "sourceRows": [
+            {
+              "rowNumber": 316,
+              "url": "https://fahryst.squig.link/data/Simgot%20EW200%20L.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 317,
+              "url": "https://fahryst.squig.link/data/Simgot%20EW200%20R.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://fahryst.squig.link/data/Simgot%20EW200%20L.txt",
+            "https://fahryst.squig.link/data/Simgot%20EW200%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "64245fb224faf8a8d8c785353b11dbc20ed5099fd6c3c996ca6f2fbb1ad5afd7",
+            "byteLength": 8752,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -25.5,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -25.5,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "db44d9c1dc92ec8d4bc53b3dacabeabcbbbbcf7e09ad645f935cb4a7a1589995",
+            "canonicalParsedPointsSha256": "279f6931bd928cfbb04f4e0db903f2ef232d136f45165c84cb39ce2de8800996",
+            "normalizedParsedPointsSha256": "aafa202e71fdc52acaea671045f5952140835fe70301fc41830a8d7455c19eeb",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Harpo",
+          "form": "in-ear",
+          "model": "Simgot Audio EW200",
+          "processedName": "Simgot Audio EW200",
+          "deviceFamily": "simgot audio ew200",
+          "configurationSignature": "simgot audio ew200",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Harpo/data/in-ear/Simgot Audio EW200.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Simgot%20Audio%20EW200.csv",
+          "blobSha": "660799a12d0dc9b0d519566f7e7645efa2552a02",
+          "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+          "sourceRows": [
+            {
+              "rowNumber": 190,
+              "url": "https://harpo.squig.link/data/Simgot%20EW200%20R.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://harpo.squig.link/data/Simgot%20EW200%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "72e85c2be9165926b00971bfc126e697b9a0c3604fb60755cce92d1fc78f5273",
+            "byteLength": 8770,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -29.49,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -29.49,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "ca7418d6343b456edb230a6af4da1a9c75fafb6b6f0d777dc28be8af2dd5fde4",
+            "canonicalParsedPointsSha256": "5d36950251d8746a3acd5c850c1f630259741aaef2042faccbbace34c80c5a08",
+            "normalizedParsedPointsSha256": "a5025b39fb117b8c718a6ed828815f0485d48c3a5b4e8ae205cbdbc0c98ca142",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Hi End Portable",
+          "form": "in-ear",
+          "model": "Simgot Audio EW200",
+          "processedName": "Simgot Audio EW200",
+          "deviceFamily": "simgot audio ew200",
+          "configurationSignature": "simgot audio ew200",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Hi End Portable/data/in-ear/Simgot Audio EW200.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Hi%20End%20Portable/data/in-ear/Simgot%20Audio%20EW200.csv",
+          "blobSha": "6414b27bd6b725644075f9a07f671cb68e824473",
+          "concreteCurveIdentity": "\"Hi End Portable\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+          "sourceRows": [
+            {
+              "rowNumber": 497,
+              "url": "https://cqtek.squig.link/data/Simgot%20EW200%20L.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 498,
+              "url": "https://cqtek.squig.link/data/Simgot%20EW200%20R.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://cqtek.squig.link/data/Simgot%20EW200%20L.txt",
+            "https://cqtek.squig.link/data/Simgot%20EW200%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "94bf238109b25989d04c5ebbbdfd1ce3a34dfc1d321d037fac0aacc00825b275",
+            "byteLength": 8772,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -31.02,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -31.02,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "8075db976bafb628078fe853c51431bbe98652ad19c67e4effe90296abac3190",
+            "canonicalParsedPointsSha256": "69a15d03962b6266858503cd869dffaa8b5e38845aab362cccedfc2c6deda192",
+            "normalizedParsedPointsSha256": "8fa27d5f0abb6d6c85eb0ddb0bd7d26983fb5b73901c17d23e3bbe75fbbe4a1d",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Jaytiss",
+          "form": "in-ear",
+          "model": "Simgot Audio EW200",
+          "processedName": "Simgot Audio EW200",
+          "deviceFamily": "simgot audio ew200",
+          "configurationSignature": "simgot audio ew200",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Jaytiss/data/in-ear/Simgot Audio EW200.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Jaytiss/data/in-ear/Simgot%20Audio%20EW200.csv",
+          "blobSha": "78a9bd73301b68f0fa3e92f6c76cfbbe97255999",
+          "concreteCurveIdentity": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+          "sourceRows": [
+            {
+              "rowNumber": 697,
+              "url": "https://jaytiss.squig.link/data/Simgot%20EW200%20L.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 698,
+              "url": "https://jaytiss.squig.link/data/Simgot%20EW200%20R.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://jaytiss.squig.link/data/Simgot%20EW200%20L.txt",
+            "https://jaytiss.squig.link/data/Simgot%20EW200%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "7738ed69cdca246ef6a79b2c2cafbccde65cf92ea314dfd4106cc78631604dc9",
+            "byteLength": 8771,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -24.74,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -24.74,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "b3d8ca7aae371b64ade12db2f553e18d00e8b3fd10f32a8279d1cab1c45eabce",
+            "canonicalParsedPointsSha256": "88d980733106c95151a7351ba5e0de2fa2170bce608947691f4ab957a777d989",
+            "normalizedParsedPointsSha256": "e1f0a0adbe4b6600b1bb0bddc31c4c590b99d15d923d3d862b702504a126a7cc",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Kazi",
+          "form": "in-ear",
+          "model": "Simgot Audio EW200",
+          "processedName": "Simgot Audio EW200",
+          "deviceFamily": "simgot audio ew200",
+          "configurationSignature": "simgot audio ew200",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Kazi/data/in-ear/Simgot Audio EW200.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/Simgot%20Audio%20EW200.csv",
+          "blobSha": "7cd85c700abcdd6a70e5a8f30cf1647fccd7beac",
+          "concreteCurveIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+          "sourceRows": [
+            {
+              "rowNumber": 238,
+              "url": "https://kazi.squig.link/data/Simgot%20EW200%20L.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 239,
+              "url": "https://kazi.squig.link/data/Simgot%20EW200%20R.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://kazi.squig.link/data/Simgot%20EW200%20L.txt",
+            "https://kazi.squig.link/data/Simgot%20EW200%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "a6d85800bde216d0a24f38ce6bd551e05e1554cd09b348c29a183fc669445f11",
+            "byteLength": 8766,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -28.63,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -28.63,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "4ebbbc08ae313a0b83c1b6d655460b36f7506345eb57c24b6e25c792036cffbe",
+            "canonicalParsedPointsSha256": "6237299ca04fa727634588410a5cdd26e651d0fe277e83aac54cc6f93bfe259b",
+            "normalizedParsedPointsSha256": "42f2b7af345ba81c16663e5f1d6bea9a5f4824f8cbe2691b1dbecc0a38a1957e",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Regan Cipher",
+          "form": "in-ear",
+          "model": "Simgot Audio EW200",
+          "processedName": "Simgot Audio EW200",
+          "deviceFamily": "simgot audio ew200",
+          "configurationSignature": "simgot audio ew200",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Regan Cipher/data/in-ear/Simgot Audio EW200.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Regan%20Cipher/data/in-ear/Simgot%20Audio%20EW200.csv",
+          "blobSha": "717aa6e98a10f2c13c7a82eb17d766ca5a23da7e",
+          "concreteCurveIdentity": "\"Regan Cipher\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+          "sourceRows": [
+            {
+              "rowNumber": 489,
+              "url": "https://regancipher.squig.link/data/Simgot%20EW200%20L.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 490,
+              "url": "https://regancipher.squig.link/data/Simgot%20EW200%20R.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://regancipher.squig.link/data/Simgot%20EW200%20L.txt",
+            "https://regancipher.squig.link/data/Simgot%20EW200%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "c4f11e94eb2d5d61d4a6131ce14a16b937a04b03b5331d17648a7bdb04d04e6f",
+            "byteLength": 8772,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -27.91,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -27.91,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "764ffbab1c7ab7c3f01940744034f6226c382b1e11b4b6ac3708652085ad6aca",
+            "canonicalParsedPointsSha256": "6802d1eda2c7da57dc1cd5460e6bc2aea9eb7f8252634891bea47724ad3769ca",
+            "normalizedParsedPointsSha256": "60660997ed10e7eb8da959c2f389f5e719abd73a9529ca6f5f1b3f43deaf2950",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "RikudouGoku",
+          "form": "in-ear",
+          "model": "Simgot Audio EW200",
+          "processedName": "Simgot Audio EW200",
+          "deviceFamily": "simgot audio ew200",
+          "configurationSignature": "simgot audio ew200",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/RikudouGoku/data/in-ear/Simgot Audio EW200.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/RikudouGoku/data/in-ear/Simgot%20Audio%20EW200.csv",
+          "blobSha": "32e1ca96c150923f33bebcacbea80392a04f68ab",
+          "concreteCurveIdentity": "\"RikudouGoku\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+          "sourceRows": [
+            {
+              "rowNumber": 402,
+              "url": "https://rg.squig.link/data/Simgot%20EW200%20L.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 403,
+              "url": "https://rg.squig.link/data/Simgot%20EW200%20R.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://rg.squig.link/data/Simgot%20EW200%20L.txt",
+            "https://rg.squig.link/data/Simgot%20EW200%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "1e98fbffaf19c5ae83ecf882b54942bea5e9627f248bc0eb5c576986950b6c34",
+            "byteLength": 8752,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -25.48,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -25.48,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "a8e46c593b530cbaf937865e8cd3b4e9e566b531b456f9a4396d8957b46ee844",
+            "canonicalParsedPointsSha256": "a643f65b0dbacbb7635681030c469e00c87b493c7b534d5d2cbe930d2e06c8c9",
+            "normalizedParsedPointsSha256": "7478d9750705f9c622fef9c03cf8b4a2adcb88639a72fb839f1c162b28308081",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "ToneDeafMonk",
+          "form": "in-ear",
+          "model": "Simgot Audio EW200",
+          "processedName": "Simgot Audio EW200",
+          "deviceFamily": "simgot audio ew200",
+          "configurationSignature": "simgot audio ew200",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/ToneDeafMonk/data/in-ear/Simgot Audio EW200.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Simgot%20Audio%20EW200.csv",
+          "blobSha": "16fe66d7d14bd72069dc0df485593cfac77e3daf",
+          "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Simgot Audio EW200\"",
+          "sourceRows": [
+            {
+              "rowNumber": 658,
+              "url": "https://tonedeafmonk.squig.link/data/SIMGOT%20EW200%20L.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 659,
+              "url": "https://tonedeafmonk.squig.link/data/SIMGOT%20EW200%20R.txt",
+              "sourceName": "Simgot EW200",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://tonedeafmonk.squig.link/data/SIMGOT%20EW200%20L.txt",
+            "https://tonedeafmonk.squig.link/data/SIMGOT%20EW200%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "3a6014117473eac334fd8580e3f542fac01fea1c37bf6cd3864283b95486ba0d",
+            "byteLength": 8795,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -29.45,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -29.45,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "00868b49bdd7f94daff8c9c6e120ec4c79a22089af7372da7ddb94a3a2f2ca24",
+            "canonicalParsedPointsSha256": "9d42087e88773b8d846fc982d2b16ffa7da069b25d1306347b327554cfe3ef42",
+            "normalizedParsedPointsSha256": "7b7cf6c0ab415393a1781348eade9b8bf30ae2f54359c659d9e8f35a46492ab2",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        }
+      ]
+    },
+    {
+      "groupId": "c4g-9f35923d2fa109244435",
+      "groupKey": "truthear x crinacle zero red|truthear x crinacle zero red",
+      "deviceFamily": "truthear x crinacle zero red",
+      "configurationSignature": "truthear x crinacle zero red",
+      "selectionHash": "79ecc68c3d205ea1c96ec011e351b82b97af7a42bc801430ba420b484e52a41d",
+      "split": "holdout",
+      "splitHash": "fac67e707039c213c3792f593bc8cbe2ae69e5bf6fc6d69e1738e68abfa6cd4e",
+      "eligible": true,
+      "independentMeasurementCount": 10,
+      "independentCollections": [
+        "Bakkwatan",
+        "DHRME",
+        "Fahryst",
+        "Filk",
+        "Harpo",
+        "Jaytiss",
+        "Kazi",
+        "Super Review",
+        "ToneDeafMonk",
+        "freeryder05"
+      ],
+      "duplicateCollections": [],
+      "rigClasses": [
+        "711-class"
+      ],
+      "exactRigStrings": [
+        "711"
+      ],
+      "members": [
+        {
+          "collection": "Bakkwatan",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Bakkwatan/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Bakkwatan/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "b82183bf3f95239628abd1b3a901291c9280d7d8",
+          "concreteCurveIdentity": "\"Bakkwatan\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 80,
+              "url": "https://bakkwatan.squig.link/data/Truthear%20Zero%20Red%20L.txt",
+              "sourceName": "Truthear X Crinacle Zero: Red ",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 81,
+              "url": "https://bakkwatan.squig.link/data/Truthear%20Zero%20Red%20R.txt",
+              "sourceName": "Truthear X Crinacle Zero: Red ",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://bakkwatan.squig.link/data/Truthear%20Zero%20Red%20L.txt",
+            "https://bakkwatan.squig.link/data/Truthear%20Zero%20Red%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "5bb058e3d9e150f9abeba9741f5e062407cda2525a151e5f45d62e7c83c1b9bb",
+            "byteLength": 8874,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -21.65,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -21.65,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "8b85f8f3924859ea85b8b9ec3c4ed414c093bc10eb77b140d4d8945ef1ed8893",
+            "canonicalParsedPointsSha256": "9027fa5d7d19edc6c9972ea657389b48e17eecb64819d29e69e355e1d23dcd1d",
+            "normalizedParsedPointsSha256": "492891b311eab81e28293d6eba5e72a197b50c8c23c2814abec9efa0168084c4",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "DHRME",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/DHRME/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/DHRME/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "147be5540e3b2106bfddc8bd13d0e72cb1045fac",
+          "concreteCurveIdentity": "\"DHRME\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 372,
+              "url": "https://dhrme.squig.link/data/TruthEar%20Crinacle%20Zero%20Red%20L.txt",
+              "sourceName": "TruthEar  x Crinacle Zero: Red ",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 373,
+              "url": "https://dhrme.squig.link/data/TruthEar%20Crinacle%20Zero%20Red%20R.txt",
+              "sourceName": "TruthEar  x Crinacle Zero: Red ",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://dhrme.squig.link/data/TruthEar%20Crinacle%20Zero%20Red%20L.txt",
+            "https://dhrme.squig.link/data/TruthEar%20Crinacle%20Zero%20Red%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "28e2a172f6a09eab791b3d9f10087a7ae0cad0cf64fe4191099096c69045dac4",
+            "byteLength": 8866,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -26.88,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -26.88,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "9442c657f0fa13486d42beaf66e550fc3bed08799b592e13a5e528095b586e07",
+            "canonicalParsedPointsSha256": "114f1c956a7c71a991e291d589edd86250ca4cc82d252c50bf2f944df860057f",
+            "normalizedParsedPointsSha256": "f42a247790faf7486dc9996690829d235024f7c237c2c73b085317b3b587d999",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Fahryst",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Fahryst/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Fahryst/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "419d187bf0727ec8532ec215c63c0a1f2c107edc",
+          "concreteCurveIdentity": "\"Fahryst\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 432,
+              "url": "https://fahryst.squig.link/data/Truthear%20Zero%20Red%20L.txt",
+              "sourceName": "Truthear x Crinacle Zero RED (Stock)",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 433,
+              "url": "https://fahryst.squig.link/data/Truthear%20Zero%20Red%20R.txt",
+              "sourceName": "Truthear x Crinacle Zero RED (Stock)",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://fahryst.squig.link/data/Truthear%20Zero%20Red%20L.txt",
+            "https://fahryst.squig.link/data/Truthear%20Zero%20Red%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "8605326ca5e476b79df4f0f3ecb875b07d70bccfd3ba8826b14bb37fe1099946",
+            "byteLength": 8874,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -17.81,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -17.81,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "309ea8bb66d964f606c9f7d6bdf0b0b2d1de4b347ace4ce32fc712b24aa623a7",
+            "canonicalParsedPointsSha256": "24394cc26565067f76ba810e02eeb3dcfdbfce969a7eabe9a11c33444073e61b",
+            "normalizedParsedPointsSha256": "8b04212181c19c647a66bedb7fe852e440c8401d18518ae2524c628456e1579a",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Filk",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Filk/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Filk/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "a04020844ec45e76d7f24f55342b299cdf0c300d",
+          "concreteCurveIdentity": "\"Filk\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 479,
+              "url": "https://filk.squig.link/iems/data/Truthear%20Zero%20Red%20L.txt",
+              "sourceName": "Truthear Zero:RED ",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 480,
+              "url": "https://filk.squig.link/iems/data/Truthear%20Zero%20Red%20R.txt",
+              "sourceName": "Truthear Zero:RED ",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://filk.squig.link/iems/data/Truthear%20Zero%20Red%20L.txt",
+            "https://filk.squig.link/iems/data/Truthear%20Zero%20Red%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "ca585f70ca53a596086d62e01740a7f0fb3a41a119ddb5986c285511a30f028a",
+            "byteLength": 8886,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -19.64,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -19.64,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "5ceb1f3c45bdec437cb346bf16eaca877b2ec4428da6da6df487f68e84c73dce",
+            "canonicalParsedPointsSha256": "1834d43de3f03d36d1c07c7fbff711a738d6bc6d34be311de1b7ebd2aafef479",
+            "normalizedParsedPointsSha256": "c1536d6ac2c63f30ba1d81548671a75c792ab885cebfbb327d8b02746d8781ef",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "freeryder05",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/freeryder05/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/freeryder05/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "9b581d91620dffc86bf6382114a8a7b458b02a4d",
+          "concreteCurveIdentity": "\"freeryder05\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 196,
+              "url": "https://freeryder05.squig.link/data/Project%20Red%20L.txt",
+              "sourceName": "Truthear Project Red",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 197,
+              "url": "https://freeryder05.squig.link/data/Project%20Red%20R.txt",
+              "sourceName": "Truthear Project Red",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://freeryder05.squig.link/data/Project%20Red%20L.txt",
+            "https://freeryder05.squig.link/data/Project%20Red%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "54d0e82f9e8e69361387ae1faf58de9603d800e08dc80e057f5c51aa1d4c1e0f",
+            "byteLength": 8861,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -23.53,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -23.53,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "674580d97d8b1fe4f19001fb9e38c7066f06655ea95f4f68c5c297927b302e28",
+            "canonicalParsedPointsSha256": "186cdd2713ca3232496aa2eed14318901ad98687818c99d2ed2c8d71384ecdd2",
+            "normalizedParsedPointsSha256": "320b22895ee3dd7d0eb0596b1b17854c7647343fe5475fe490b5ae50fb5d6aa6",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Harpo",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Harpo/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Harpo/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "82a6b5a2b4d6b87dc9e1e636c3f2c4369cb0ffb3",
+          "concreteCurveIdentity": "\"Harpo\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 244,
+              "url": "https://harpo.squig.link/data/Red%20Zero%20R.txt",
+              "sourceName": "Truthear Zero Red Zero Red",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://harpo.squig.link/data/Red%20Zero%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "fd3a1079c89984e77eac20e10428d7982177ac8eeb1f17644b08f5227c1b5fb9",
+            "byteLength": 8825,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -19.51,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -19.51,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "8202a9655c26940163f3aab256d9717f0982ed858f2713f7fb0cc3ed83f00541",
+            "canonicalParsedPointsSha256": "87a18b1885162e21d72584ecfbb444682b0b76f9620427c061ee7b77836181e9",
+            "normalizedParsedPointsSha256": "8c83cbf20e1d6e6a1cdc93f4c11dfcdf06b6fcfb073cf8c2bbcd25363798309b",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Jaytiss",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Jaytiss/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Jaytiss/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "2dfff91a691d047430007ec49c33519592196dca",
+          "concreteCurveIdentity": "\"Jaytiss\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 845,
+              "url": "https://jaytiss.squig.link/data/Red%20L.txt",
+              "sourceName": "Truthear Crinacle x Red",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 846,
+              "url": "https://jaytiss.squig.link/data/Red%20R.txt",
+              "sourceName": "Truthear Crinacle x Red",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://jaytiss.squig.link/data/Red%20L.txt",
+            "https://jaytiss.squig.link/data/Red%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "f8f5fec96cae721bc7f36f5f3d57030089491a232b00718147a0f3d2132bf25d",
+            "byteLength": 8888,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -15.63,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -15.63,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "6e7c28dcbc5f4e71dcb33849ac5de830930c18e9079cfcf59eacc87762495466",
+            "canonicalParsedPointsSha256": "ec8581bf2d8d5613fc1d7825df9877a502091031b46e3762188bfe498b85517c",
+            "normalizedParsedPointsSha256": "0addd76ffbe3eb1f5fa7dd086c97dece48b3ae91538975afe813ccaca1c8ac50",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Kazi",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Kazi/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Kazi/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "425afb131690eb8ffcf78d648b0f6e6426f04c64",
+          "concreteCurveIdentity": "\"Kazi\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 283,
+              "url": "https://kazi.squig.link/data/TruthEar%20X%20Crinacle%20Zero%20Red%20L.txt",
+              "sourceName": "TruthEar X Crinacle Zero Red",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 284,
+              "url": "https://kazi.squig.link/data/TruthEar%20X%20Crinacle%20Zero%20Red%20R.txt",
+              "sourceName": "TruthEar X Crinacle Zero Red",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://kazi.squig.link/data/TruthEar%20X%20Crinacle%20Zero%20Red%20L.txt",
+            "https://kazi.squig.link/data/TruthEar%20X%20Crinacle%20Zero%20Red%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "29f3ff9e8c60fd3e9cc3c0c9626ca38d0814361d35d3624ce08ed5e746101141",
+            "byteLength": 8890,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -31.45,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -31.45,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "c38cf4e76e3c3159d65d2b3077bc669cc0e8c3a1edb48609ff77be6016aa3933",
+            "canonicalParsedPointsSha256": "03913d4c94bdaddf5d6e9c6eae7c754e07a688f0bbae8ca6a31034b86a9785b6",
+            "normalizedParsedPointsSha256": "fe1c1f03bb07fd066be3ec05cb7526cd3dd25501b3d2263e83d09b0b6a9494cf",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "Super Review",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/Super Review/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/Super%20Review/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "09112daceb3ef38168bc93f7790882ffb1ed4bec",
+          "concreteCurveIdentity": "\"Super Review\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 2778,
+              "url": "https://superreview.squig.link/data/Truthear%20Zero%20Red%20L.txt",
+              "sourceName": "Truthear Zero: Red ",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 2779,
+              "url": "https://superreview.squig.link/data/Truthear%20Zero%20Red%20R.txt",
+              "sourceName": "Truthear Zero: Red ",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://superreview.squig.link/data/Truthear%20Zero%20Red%20L.txt",
+            "https://superreview.squig.link/data/Truthear%20Zero%20Red%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "b537c55c39fa2f65337ba99dff751ea157855fe79af10c514dbf3df55e62fd5b",
+            "byteLength": 8727,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -26.07,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -26.07,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "feb24f1a7cd6c93d1ba7f4aeb276f813e0cfb14a82273a7aabb512ba0de3da30",
+            "canonicalParsedPointsSha256": "3e1d08a3c5b6f22da3c74c6f113d56528c0320535143e5f562e23d1dcc75646a",
+            "normalizedParsedPointsSha256": "7e30bfd019444a02912f165321640ef7cc48e09207e8f665b317e35c34e9014b",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        },
+        {
+          "collection": "ToneDeafMonk",
+          "form": "in-ear",
+          "model": "Truthear x Crinacle Zero RED",
+          "processedName": "Truthear x Crinacle Zero RED",
+          "deviceFamily": "truthear x crinacle zero red",
+          "configurationSignature": "truthear x crinacle zero red",
+          "rig": "711",
+          "rigClass": "711-class",
+          "path": "measurements/ToneDeafMonk/data/in-ear/Truthear x Crinacle Zero RED.csv",
+          "upstreamRawUrl": "https://raw.githubusercontent.com/jaakkopasanen/AutoEq/7ae0f56d53074872b028649617a22bbb4232feb7/measurements/ToneDeafMonk/data/in-ear/Truthear%20x%20Crinacle%20Zero%20RED.csv",
+          "blobSha": "7b90d21789a4b13a999ef10b2a5d363bcb700d82",
+          "concreteCurveIdentity": "\"ToneDeafMonk\"|\"in-ear\"|\"711\"|\"Truthear x Crinacle Zero RED\"",
+          "sourceRows": [
+            {
+              "rowNumber": 848,
+              "url": "https://tonedeafmonk.squig.link/data/TruthEar%20ZERO%20RED%20L.txt",
+              "sourceName": "TruthEar ZERO RED (L)",
+              "side": "unknown"
+            },
+            {
+              "rowNumber": 849,
+              "url": "https://tonedeafmonk.squig.link/data/TruthEar%20ZERO%20RED%20R.txt",
+              "sourceName": "TruthEar ZERO RED (L)",
+              "side": "unknown"
+            }
+          ],
+          "sourceUrls": [
+            "https://tonedeafmonk.squig.link/data/TruthEar%20ZERO%20RED%20L.txt",
+            "https://tonedeafmonk.squig.link/data/TruthEar%20ZERO%20RED%20R.txt"
+          ],
+          "integrity": {
+            "status": "valid",
+            "upstreamSha256": "5cf8382329968a6d6714df96b77efb5c45375d08f243ae4ad5a45dcff4a318af",
+            "byteLength": 8885,
+            "originalPointCount": 695,
+            "canonicalPointCount": 696,
+            "originalFirstFrequencyHz": 20,
+            "originalTerminalFrequencyHz": 19955.54,
+            "originalTerminalDb": -20.2,
+            "canonicalTerminalFrequencyHz": 20000,
+            "canonicalTerminalDb": -20.2,
+            "transformation": "terminal-flat-hold-to-v2-max",
+            "originalParsedPointsSha256": "aa4fe2287246dad7c46898f516753e000703752e485bd1628b7818b6325e8f42",
+            "canonicalParsedPointsSha256": "df9d7fc1bda8dbb383326223e5847d1edc0a16f567818ce0bec4b488f779bfe6",
+            "normalizedParsedPointsSha256": "45c3dd1eeeb8f35d2bb4c9d5572a573e1486de6fc6f9a5517cbd297d2af1c266",
+            "normalization": {
+              "mode": "hz",
+              "frequencyHz": 500,
+              "levelDb": 60
+            },
+            "parserCanonicalizerVersion": 1
+          }
+        }
+      ]
+    }
+  ]
+}
